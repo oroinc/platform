@@ -3,6 +3,6 @@
     <a href="{{ url }}" data-filename="{{ fileName }}"
        {% if additional['galleryId'] %}data-gallery="{{ additional['galleryId'] }}"{% endif %}
        class="no-hash" title="{{ fileName }}">
-        {{ fileName|oro_format_filename }}
+        {{ oro_format_filename(fileName) }}
     </a>
 </span>

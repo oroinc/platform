@@ -106,6 +106,10 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
             ->method('isImageType')
             ->willReturn(true);
 
+         $this->manager->expects($this->once())
+            ->method('getAttachmentIconClass')
+            ->willReturn('icon-class');
+
         $this->emailAttachmentManager->expects($this->once())
             ->method('getResizedImageUrl')
             ->willReturn('imageurl.jpg');
@@ -119,6 +123,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $attachmentModel->getType());
         $this->assertEquals($attachmentEntity, $attachmentModel->getEmailAttachment());
         $this->assertEquals('imageurl.jpg', $attachmentModel->getPreview());
+        $this->assertEquals('icon-class', $attachmentModel->getIcon());
     }
 
     public function testOroToModel()
@@ -142,7 +147,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
             ->method('getMimeType')
             ->willReturn('image/jpeg');
 
-        $attachmentOro->expects($this->exactly(4))
+        $attachmentOro->expects($this->exactly(5))
             ->method('getFile')
             ->willReturn($file);
 
@@ -153,6 +158,10 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())
             ->method('isImageType')
             ->willReturn(true);
+
+        $this->manager->expects($this->once())
+            ->method('getAttachmentIconClass')
+            ->willReturn('icon-class');
 
         $this->manager->expects($this->once())
             ->method('getResizedImageUrl')
@@ -167,6 +176,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $attachmentModel->getType());
         $this->assertEquals(null, $attachmentModel->getEmailAttachment());
         $this->assertEquals('imageurl.jpg', $attachmentModel->getPreview());
+        $this->assertEquals('icon-class', $attachmentModel->getIcon());
     }
 
     public function testOroToEntity()

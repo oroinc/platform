@@ -495,7 +495,7 @@ require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function
      */
     $(document).on('click.gallery', function(e) {
         var $target = $(e.target);
-        if ($target.is('img')) { //if click was done on thumbnail image, use parent element as a target
+        if ($target.is('.thumbnail')) { //if click was done on thumbnail image, use parent element as a target
             $target = $target.parent();
         }
         if ($target.data('gallery')) {
@@ -504,23 +504,32 @@ require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function
                 return $(this).data('gallery') == galleryId;
             });
             var dynamicEl = [];
+            var images = [];
+            var currentSlide = 0;
+            var i = 0;
             $items.each(function() {
                 var $item = $(this);
-                var el = {};
-                el.src = $item.attr('href');
-                var img = $item.find('img');
-                if (img.length) {
-                    el.thumb = img.attr('src');
-                } else {
-                    el.thumb = el.src;
+                var src = $item.attr('href');
+                if (_.indexOf(images, src) === -1) {
+                    images.push(src);
+                    var el = {};
+                    el.src = src;
+                    var img = $item.find('.thumbnail');
+                    if (img.length) {
+                        el.thumb = img.css('background-image').replace(/^url\(['"]?/,'').replace(/['"]?\)$/,'');
+                    } else {
+                        el.thumb = el.src;
+                    }
+                    if ($item.data('filename')) {
+                        el.subHtml = _.escape($item.data('filename'));
+                    }
+                    dynamicEl.push(el);
+                    if (src == $target.attr('href')) {
+                        currentSlide = i;
+                    }
+                    i++;
                 }
-                if ($item.data('filename')) {
-                    el.subHtml = _.escape($item.data('filename'));
-                }
-                dynamicEl.push(el);
             });
-
-            var currentSlide = _.indexOf($items, $target.get(0));
 
             $(this).lightGallery({
                 dynamic: true,

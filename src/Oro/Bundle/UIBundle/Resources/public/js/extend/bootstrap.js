@@ -156,36 +156,38 @@ define([
         if (replace) $tip.offset(offset)
         // jscs:enable
         /* jshint ignore:end */
+        
+        if (!this.$element.data('noscroll')) {
+            /*
+             * SCROLL support
+             */
+            var adjustmentLeft = scrollHelper.scrollIntoView(this.$tip[0]);
 
-        /*
-         * SCROLL support
-         */
-        var adjustmentLeft = scrollHelper.scrollIntoView(this.$tip[0]);
+            /*
+             * SHIFT support
+             */
+            var visibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
 
-        /*
-         * SHIFT support
-         */
-        var visibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
+            if (placement === 'right' || placement === 'left') {
+                var outerHeight = this.$tip.outerHeight();
+                var visibleHeight = visibleRect.bottom - visibleRect.top;
+                if (visibleHeight < outerHeight - /* fixes floating pixel calculation */ 1) {
+                    // still doesn't match, decrease height and move into visible area
+                    this.$tip.css({
+                        maxHeight: visibleHeight
+                    });
+                    this.$tip.css({
+                        height: this.$tip.outerHeight()
+                    });
+                    var centerChange = (outerHeight - visibleHeight) / 2;
 
-        if (placement === 'right' || placement === 'left') {
-            var outerHeight = this.$tip.outerHeight();
-            var visibleHeight = visibleRect.bottom - visibleRect.top;
-            if (visibleHeight < outerHeight - /* fixes floating pixel calculation */ 1) {
-                // still doesn't match, decrease height and move into visible area
-                this.$tip.css({
-                    maxHeight: visibleHeight
-                });
-                this.$tip.css({
-                    height: this.$tip.outerHeight()
-                });
-                var centerChange = (outerHeight - visibleHeight) / 2;
-
-                this.$tip.css({
-                    top: parseFloat(this.$tip.css('top')) + adjustmentLeft.vertical
-                });
-                this.$arrow.css({
-                    top: 'calc(50% + ' + (centerChange - adjustmentLeft.vertical) + 'px)'
-                });
+                    this.$tip.css({
+                        top: parseFloat(this.$tip.css('top')) + adjustmentLeft.vertical
+                    });
+                    this.$arrow.css({
+                        top: 'calc(50% + ' + (centerChange - adjustmentLeft.vertical) + 'px)'
+                    });
+                }
             }
         }
     };

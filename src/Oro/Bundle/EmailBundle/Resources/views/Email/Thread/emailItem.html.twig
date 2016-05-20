@@ -106,13 +106,9 @@
                     {% set aCount = email.emailBody.attachments|length %}
                     {% if aCount %}
                         <div class="email-attachments-list-cont">
-                            <span class="pull-left">
-                                <h6>{{ aCount }} {{ aCount > 1 ? 'oro.attachment.entity_plural_label'|trans : 'oro.attachment.entity_label'|trans }}</h6>
-                            </span>
-                            <span class="pull-right">
-                                <a class="no-hash" href="{{ path('oro_email_body_attachments', {id: email.emailBody.id}) }}">{{ 'oro.email.attachment.download_all'|trans }}</a>
-                            </span>
-                            <ul class="email-attachments-list thumbnails">
+                            <h6 class="pull-left">{{ aCount }} {{ aCount > 1 ? 'oro.attachment.entity_plural_label'|trans : 'oro.attachment.entity_label'|trans }}</h6>
+                            <a class="pull-left no-hash" href="{{ path('oro_email_body_attachments', {id: email.emailBody.id}) }}">{{ 'oro.email.attachment.download_all'|trans }}</a>
+                            <ul class="email-attachments-list thumbnails {{ aCount > 8 ? 'name-only' : ''  }}"> {# show thumbnails only for 8 attachments max #}
                                 {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
                             </ul>
                         </div>

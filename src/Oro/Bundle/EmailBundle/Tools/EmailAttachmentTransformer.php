@@ -23,10 +23,6 @@ use Oro\Bundle\EmailBundle\Form\Model\Factory;
  */
 class EmailAttachmentTransformer
 {
-    const PREVIEW_WIDTH  = 110;
-
-    const PREVIEW_HEIGHT = 80;
-
     /**
      * @var Filesystem
      */
@@ -79,12 +75,13 @@ class EmailAttachmentTransformer
         $attachmentModel->setId($attachmentEntity->getId());
         $attachmentModel->setFileSize($attachmentEntity->getSize());
         $attachmentModel->setModified($attachmentEntity->getEmailBody()->getCreated());
+        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachmentEntity));
         if ($this->manager->isImageType($attachmentEntity->getContentType())) {
             $attachmentModel->setPreview(
                 $this->emailAttachmentManager->getResizedImageUrl(
                     $attachmentEntity,
-                    self::PREVIEW_WIDTH,
-                    self::PREVIEW_HEIGHT
+                    AttachmentManager::THUMBNAIL_WIDTH,
+                    AttachmentManager::THUMBNAIL_HEIGHT
                 )
             );
         }
@@ -106,12 +103,13 @@ class EmailAttachmentTransformer
         $attachmentModel->setFileName($attachmentOro->getFile()->getOriginalFilename());
         $attachmentModel->setFileSize($attachmentOro->getFile()->getFileSize());
         $attachmentModel->setModified($attachmentOro->getCreatedAt());
+        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachmentOro->getFile()));
         if ($this->manager->isImageType($attachmentOro->getFile()->getMimeType())) {
             $attachmentModel->setPreview(
                 $this->manager->getResizedImageUrl(
                     $attachmentOro->getFile(),
-                    self::PREVIEW_WIDTH,
-                    self::PREVIEW_HEIGHT
+                    AttachmentManager::THUMBNAIL_WIDTH,
+                    AttachmentManager::THUMBNAIL_HEIGHT
                 )
             );
         }

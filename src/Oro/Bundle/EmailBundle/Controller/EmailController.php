@@ -314,6 +314,8 @@ class EmailController extends Controller
     }
 
     /**
+     * Get resized image url
+     *
      * @Route("media/cache/email_attachment/resize/{id}/{width}/{height}",
      *   name="oro_resize_email_attachment",
      *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
@@ -327,28 +329,35 @@ class EmailController extends Controller
      */
     public function getResizedAttachmentImageAction(EmailAttachment $attachment, $width, $height)
     {
-        $path       = substr($this->getRequest()->getPathInfo(), 2);
-        $filterName = 'attachment_' . $width . '_' . $height;
-
-        $this->get('liip_imagine.filter.configuration')->set(
-            $filterName,
-            [
-                'filters' => [
-                    'thumbnail' => [
-                        'size' => [$width, $height]
+        $fileSystemMap = $this->get('knp_gaufrette.filesystem_map');
+        $fileSystem = $fileSystemMap->get('attachments');
+        $path = substr($this->getRequest()->getPathInfo(), 1);
+        if (!$fileSystem->has($path)) {
+            $filterName = 'attachment_' . $width . '_' . $height;
+            $this->get('liip_imagine.filter.configuration')->set(
+                $filterName,
+                [
+                    'filters' => [
+                        'thumbnail' => [
+                            'size' => [$width, $height]
+                        ]
                     ]
                 ]
-            ]
-        );
-        $content = ContentDecoder::decode(
-            $attachment->getContent()->getContent(),
-            $attachment->getContent()->getContentTransferEncoding()
-        );
-        $binary         = $this->get('liip_imagine')->load($content);
-        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
-        $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getContentType()));
+            );
+            $content = ContentDecoder::decode(
+                $attachment->getContent()->getContent(),
+                $attachment->getContent()->getContentTransferEncoding()
+            );
+            $binary = $this->get('liip_imagine')->load($content);
+            $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
+            $fileSystem->write($path, $filteredBinary);
+        } else {
+            $filteredBinary = $fileSystem->read($path);
+        }
 
-        return $this->get('liip_imagine.cache.manager')->store($response, $path, $filterName);
+        $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getContentType()));
+
+        return $response;
     }
 
     /**

@@ -33,6 +33,8 @@ class AttachmentManager
     const DEFAULT_IMAGE_HEIGHT = 100;
     const SMALL_IMAGE_WIDTH = 32;
     const SMALL_IMAGE_HEIGHT = 32;
+    const THUMBNAIL_WIDTH  = 110;
+    const THUMBNAIL_HEIGHT = 80;
 
     /** @var Filesystem */
     protected $filesystem;

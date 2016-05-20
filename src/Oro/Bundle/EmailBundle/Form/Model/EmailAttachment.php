@@ -51,6 +51,11 @@ class EmailAttachment
      * @var string
      */
     protected $preview;
+    
+    /**
+     * @var string
+     */
+    protected $icon;
 
     /**
      * @return int
@@ -211,5 +216,25 @@ class EmailAttachment
     public function getPreview()
     {
         return $this->preview;
+    }
+    
+    /**
+     * @param string $icon
+     *
+     * @return $this
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
     }
 }

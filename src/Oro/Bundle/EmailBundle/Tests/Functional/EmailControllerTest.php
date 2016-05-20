@@ -107,7 +107,7 @@ class EmailControllerTest extends WebTestCase
         ]);
         $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
         $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 201);
+        $this->assertResponseStatusCodeEquals($result, 200);
         $this->assertResponseContentTypeEquals($result, $attachment->getContentType());
     }
 

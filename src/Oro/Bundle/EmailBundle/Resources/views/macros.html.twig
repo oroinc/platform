@@ -395,30 +395,35 @@
     {%- for attachment in attachments -%}
         {% if attachment.embeddedContentId is null %}
             {% set canCopyToRecord = (hasGrantReattach and target is defined and oro_can_attache(attachment, target)) ? true : false %}
-            <li class="email-attachments-list-item span3">
+            {% set attachmentUrl = path('oro_email_attachment', {id: attachment.id}) %}
+            {% set isImage = oro_type_is_image(attachment.contentType) %}
+            {% set icon = oro_attachment_icon(attachment) %}
+            <li class="email-attachments-list-item">
                 <div class="email-attachments-file">
-                    {% if oro_type_is_image(attachment.contentType) %}
+                    {% if (isImage) %}
                         <a data-gallery="gallery-{{ galleryUid }}"
                            data-filename="{{ attachment.fileName }}"
                            class="no-hash"
-                           href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                            <img src="{{ path('oro_resize_email_attachment', {id: attachment.id, width: 110, height: 80}) }}"
-                                 class="img-rounded" width="110" height="80" alt="" />
+                           href="{{ attachmentUrl }}">
+                            <span class="thumbnail" style="background: url('{{ path('oro_resize_email_attachment', {id: attachment.id, width: 110, height: 80}) }}') 50% 50% no-repeat;"></span>
                         </a>
                     {% else %}
                         <div class="thumbnail">
-                            <i class="fa {{ oro_attachment_icon(attachment) }} fa-3x"></i>
+                            <i class="fa {{ icon }} fa-3x"></i>
                         </div>
                     {% endif %}
                 </div>
                 <div class="dropdown link-to-record">
                     <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
-                        <i class="fa {{ oro_attachment_icon(attachment) }}"></i> {{ attachment.fileName|oro_format_filename }}
+                        <i class="fa {{ icon }}"></i> {{ oro_format_filename(attachment.fileName, 11, 4, 5) }}
                     </a>
                     <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
-                        <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
+                        <a class="no-hash" tabindex="-1" href="{{ attachmentUrl }}">
                             {{ 'oro.email.attachment.save'|trans }}<span>({{ file_size(attachment.size) }})</span>
                         </a>
+                        {% if (isImage) %}
+                            <a class="view-image no-hash" tabindex="-1" data-gallery="gallery-{{ galleryUid }}" href="{{ attachmentUrl }}">{{ 'oro.email.attachment.view'|trans }}</a>
+                        {% endif %}
                         {% if (canCopyToRecord) %}
                             {% set options = {
                                 'view': 'oroemail/js/app/views/email-attachment-link-view',
