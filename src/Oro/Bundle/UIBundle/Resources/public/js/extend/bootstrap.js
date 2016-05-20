@@ -160,7 +160,7 @@ define([
         /*
          * SCROLL support
          */
-        scrollHelper.scrollIntoView(this.$tip[0]);
+        var adjustmentLeft = scrollHelper.scrollIntoView(this.$tip[0]);
 
         /*
          * SHIFT support
@@ -177,11 +177,24 @@ define([
                 });
                 //find adjustment to move tooltip
                 var adjustment = outerHeight - visibleHeight;
+                //change adjustemnt direction if needed
+                if (adjustmentLeft.vertical < 0) {
+                    adjustment = -adjustment;
+                }
 
                 this.$tip.css({
                     top: parseFloat(this.$tip.css('top')) + adjustment
                 });
-
+                if (!scrollHelper.isCompletelyVisible(this.$tip[0]) && adjustment < 0) {
+                    /**
+                     * make a second attempt to move tooltip up
+                     * to fix the issue when unnecessary scroll is done by scrollIntoView
+                     */
+                    this.$tip.css({
+                        top: parseFloat(this.$tip.css('top')) + adjustment
+                    });
+                    adjustment += adjustment;
+                }
                 //check visible area after move, update arrow position and height
                 var newVisibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
                 var newVisibleHeight = newVisibleRect.bottom - newVisibleRect.top;
