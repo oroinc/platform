@@ -15,23 +15,20 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        initialize: function(options) {
-            UniformSelectInputWidget.__super__.initialize.apply(this, arguments);
+        initializeWidget: function() {
+            UniformSelectInputWidget.__super__.initializeWidget.apply(this, arguments);
             if (this.$el.is('.error:not([multiple])')) {
                 this.$el.removeClass('error');
-                this.$container.addClass('error');
+                this.findContainer().addClass('error');
             }
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
+        disposeWidget: function() {
             this.$el.uniform.restore(this.$el);
-            UniformSelectInputWidget.__super__.dispose.apply(this, arguments);
+            UniformSelectInputWidget.__super__.disposeWidget.apply(this, arguments);
         },
 
         /**

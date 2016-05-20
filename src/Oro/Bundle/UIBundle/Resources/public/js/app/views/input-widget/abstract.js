@@ -45,12 +45,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.resolveOptions(options);
-
-            if (this.initializeOptions) {
-                this.widgetFunction(this.initializeOptions);
-            } else {
-                this.widgetFunction();
-            }
+            this.initializeWidget();
 
             if (this.isInitialized()) {
                 this.findContainer();
@@ -58,15 +53,24 @@ define(function(require) {
             }
         },
 
+        initializeWidget: function() {
+            if (this.initializeOptions) {
+                this.widgetFunction(this.initializeOptions);
+            } else {
+                this.widgetFunction();
+            }
+        },
+
         delegateEvents: function() {
             AbstractInputWidget.__super__.delegateEvents.apply(this, arguments);
             if (this.refreshOnChange) {
-                this.$el.on('change' + this.eventNamespace(), _.bind(this.refresh, this));
+                this._addEvent('change', _.bind(this.refresh, this));
             }
         },
 
         /**
          * Implement this method in child class if widget can not be initialized for some reason
+         *
          * @returns {boolean}
          */
         isInitialized: function() {
@@ -99,14 +103,18 @@ define(function(require) {
                 return;
             }
 
-            if (this.destroyOptions) {
-                this.widgetFunction(this.destroyOptions);
-            }
+            this.disposeWidget();
 
             this.$el.removeData('inputWidget');
             delete this.$container;
 
             return AbstractInputWidget.__super__.dispose.apply(this, arguments);
+        },
+
+        disposeWidget: function() {
+            if (this.destroyOptions) {
+                this.widgetFunction(this.destroyOptions);
+            }
         },
 
         /**
@@ -140,7 +148,14 @@ define(function(require) {
         refresh: function() {
             if (this.refreshOptions) {
                 this.widgetFunction(this.refreshOptions);
+            } else {
+                this.disposeWidget();
+                this.initializeWidget();
             }
+        },
+
+        _addEvent: function(eventName, callback) {
+            this.$el.on(eventName + this.eventNamespace(), callback);
         }
     });
 
