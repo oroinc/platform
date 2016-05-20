@@ -6,6 +6,8 @@ oro:
         controller:
             emailnotification:
                 saved.message: Email notification rule saved
+            massnotification:
+                saved.message: Mass notifications are saved and start
 
         event:
             entity_post_update:  Entity update
@@ -38,6 +40,12 @@ oro:
             recipient_list.label: Recipient list
             email.label:          Email
             owner.label:          Owner
+
+        massnotification:
+            dummy_id.label:                 Id
+            dummy_label.label:              Label
+            massnotification_pluray.label:  Mass Notification
+            massnotification.datagrid:      Datagrid
 
         system_configuration:
             email_notification_sender_email: Sender Email

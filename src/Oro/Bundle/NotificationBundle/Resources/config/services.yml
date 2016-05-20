@@ -2,6 +2,7 @@ parameters:
     # Entity classes
     oro_notification.event_entity.class: Oro\Bundle\NotificationBundle\Entity\Event
     oro_notification.emailnotification.entity.class: Oro\Bundle\NotificationBundle\Entity\EmailNotification
+    oro_notification.massnotification.entity.class: Oro\Bundle\NotificationBundle\Entity\MassNotification
 
     # Entity spool
     oro_notification.entity_spool.class: Oro\Bundle\NotificationBundle\Doctrine\EntityPool

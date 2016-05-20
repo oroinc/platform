@@ -1,4 +1,21 @@
 datagrid:
+    mass-notification-grid:
+       options:
+          entity_pagination: true
+       acl_resource: oro_notification_massnotification_view
+       source:
+          type: orm
+          query:
+             select:
+                - e
+             from:
+                 - { table: OroNotificationBundle:MassNotification, alias: e }
+          columns:
+              id:
+                  label: oro.notification.massnotification.dummy_id.label
+              label:
+                  label: oro.notification.massnotification.dummy_label.label
+
     email-notification-grid:
         options:
             entityHint: transactional email

@@ -6,14 +6,27 @@ oro_menu_config:
             extras:
                 routes: ['oro_notification_emailnotification_*']
                 description: 'oro.notification.menu.emailnotification_list.description'
+        massnotifications:
+            label: 'oro.notification.massnotification.massnotification_pluray.label'
+            uri:   '#'
+            extras:
+                position: 50
+        oro_notification_massnotification_list:
+            label: 'oro.notification.massnotification.massnotification.datagrid'
+            route: 'oro_notification_massnotification_index'
+            extras:
+                routes: ['oro_notification_massnotification_*']
     tree:
         application_menu:
             children:
                 system_tab:
                     children:
-                        emails:
+                      acme_tab:
                             children:
-                                oro_notification_emailnotification_list: ~
+                                oro_notification_massnotification_list: ~
+                      emails:
+                          children:
+                              oro_notification_emailnotification_list: ~
 
 oro_titles:
     oro_notification_emailnotification_index: ~
