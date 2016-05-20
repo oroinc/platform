@@ -95,8 +95,7 @@ define([
          */
         ensurePopupCriteriaClosed: function() {
             if (this.popupCriteriaShowed) {
-                this._hideCriteria();
-                this.applyValue();
+                this._applyValueAndHideCriteria();
             }
         },
 
@@ -108,8 +107,7 @@ define([
          */
         _onReadCriteriaInputKey: function(e) {
             if (e.which === 13) {
-                this._hideCriteria();
-                this.applyValue();
+                this._applyValueAndHideCriteria();
             }
         },
 
@@ -121,8 +119,7 @@ define([
          */
         _onClickUpdateCriteria: function(e) {
             this.trigger('updateCriteriaClick', this);
-            this._hideCriteria();
-            this.applyValue();
+            this._applyValueAndHideCriteria();
         },
 
         /**
@@ -155,9 +152,16 @@ define([
             var elem = this.$(this.criteriaSelector);
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
-                this._hideCriteria();
-                this.applyValue();
+                this._applyValueAndHideCriteria();
             }
+        },
+
+        /**
+         * @protected
+         */
+        _applyValueAndHideCriteria: function() {
+            this._hideCriteria();
+            this.applyValue();
         },
 
         /**
