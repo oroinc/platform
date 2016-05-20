@@ -41,7 +41,7 @@ class ActionFactory
             throw new \RuntimeException('The action type must be defined');
         }
 
-        $id = array_key_exists($type, $this->types) ? $this->types[$type] : false;
+        $id = isset($this->types[$type]) ? $this->types[$type] : false;
 
         if (!$id) {
             throw new \RuntimeException(sprintf('No attached service to action type named `%s`', $type));
