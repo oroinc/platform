@@ -16,7 +16,7 @@ services:
     oro_cron.job_manager:
         class: '%oro_cron.job_manager.class%'
         arguments:
-            - "@doctrine.orm.entity_manager"
+            - '@doctrine.orm.entity_manager'
 
     oro_cron.schedule_manager:
         class: '%oro_cron.schedule_manager.class%'
@@ -25,18 +25,18 @@ services:
             - '%oro_cron.entity.schedule.class%'
 
     oro_cron.command_args_tokenizer:
-        class: Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer
+        class: 'Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer'
         public: false
         calls:
             - [ addNormalizer, [ '@oro_cron.command_args_normalizer.default' ] ]
             - [ addNormalizer, [ '@oro_cron.command_args_normalizer.pgsql92' ] ]
 
     oro_cron.command_args_normalizer.default:
-        class: Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer
+        class: 'Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer'
         public: false
 
     oro_cron.command_args_normalizer.pgsql92:
-        class: Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer
+        class: 'Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer'
         public: false
 
     oro_cron.command_with_args_string_filter:
@@ -49,14 +49,14 @@ services:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
 
     oro_cron.action.create_job:
-        class: Oro\Bundle\CronBundle\Action\CreateJobAction
+        class: 'Oro\Bundle\CronBundle\Action\CreateJobAction'
         arguments:
-            - "@oro_action.context_accessor"
-            - "@oro_cron.job_manager"
-            - "@doctrine"
+            - '@oro_action.context_accessor'
+            - '@oro_cron.job_manager'
+            - '@doctrine'
         tags:
             - { name: oro_action.action, alias: create_job }
             - { name: oro_workflow.action, alias: create_job }
 
     oro_cron.helper.cron:
-        class: Oro\Bundle\CronBundle\Helper\CronHelper
+        class: 'Oro\Bundle\CronBundle\Helper\CronHelper'

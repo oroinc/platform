@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
@@ -11,12 +13,8 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
 
-use Oro\Component\DoctrineUtils\ORM\EntityManagerResolvingTrait;
-
 class ProcessTriggersImport
 {
-    use EntityManagerResolvingTrait;
-
     /**
      * @var ProcessConfigurationBuilder
      */
@@ -25,7 +23,7 @@ class ProcessTriggersImport
     /**
      * @var ManagerRegistry
      */
-    private $managerRegistry;
+    private $registry;
 
     /**
      * @var string
@@ -44,18 +42,18 @@ class ProcessTriggersImport
 
     /**
      * @param ProcessConfigurationBuilder $configurationBuilder
-     * @param ManagerRegistry $managerRegistry
+     * @param ManagerRegistry $registry
      * @param string $triggerEntityClass
      * @param ProcessTriggerScheduler $processCronScheduler
      */
     public function __construct(
         ProcessConfigurationBuilder $configurationBuilder,
-        ManagerRegistry $managerRegistry,
+        ManagerRegistry $registry,
         $triggerEntityClass,
         ProcessTriggerScheduler $processCronScheduler
     ) {
         $this->configurationBuilder = $configurationBuilder;
-        $this->managerRegistry = $managerRegistry;
+        $this->registry = $registry;
         $this->triggerEntityClass = $triggerEntityClass;
         $this->processCronScheduler = $processCronScheduler;
     }
@@ -120,18 +118,18 @@ class ProcessTriggersImport
     }
 
     /**
-     * @return string
+     * @return ObjectManager
      */
-    protected function getEntityClass()
+    protected function getObjectManager()
     {
-        return $this->triggerEntityClass;
+        return $this->registry->getManagerForClass($this->triggerEntityClass);
     }
 
     /**
-     * @return ManagerRegistry
+     * @return ObjectRepository
      */
-    protected function getManagerRegistry()
+    protected function getRepository()
     {
-        return $this->managerRegistry;
+        return $this->getObjectManager()->getRepository($this->triggerEntityClass);
     }
 }

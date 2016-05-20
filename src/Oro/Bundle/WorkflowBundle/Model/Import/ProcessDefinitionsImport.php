@@ -3,17 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
-use Oro\Component\DoctrineUtils\ORM\EntityManagerResolvingTrait;
-
 class ProcessDefinitionsImport
 {
-    use EntityManagerResolvingTrait;
-
     /**
      * @var ProcessConfigurationBuilder
      */
@@ -22,7 +19,7 @@ class ProcessDefinitionsImport
     /**
      * @var ManagerRegistry
      */
-    private $managerRegistry;
+    private $registry;
 
     /**
      * @var string
@@ -31,16 +28,16 @@ class ProcessDefinitionsImport
 
     /**
      * @param ProcessConfigurationBuilder $configurationBuilder
-     * @param ManagerRegistry $managerRegistry
+     * @param ManagerRegistry $registry
      * @param string $definitionClass
      */
     public function __construct(
         ProcessConfigurationBuilder $configurationBuilder,
-        ManagerRegistry $managerRegistry,
+        ManagerRegistry $registry,
         $definitionClass
     ) {
         $this->configurationBuilder = $configurationBuilder;
-        $this->managerRegistry = $managerRegistry;
+        $this->registry = $registry;
         $this->definitionClass = $definitionClass;
     }
 
@@ -79,26 +76,18 @@ class ProcessDefinitionsImport
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository
+     * @return ObjectManager
      */
-    public function getDefinitionsRepository()
+    protected function getObjectManager()
     {
-        return $this->getRepository();
+        return $this->registry->getManagerForClass($this->definitionClass);
     }
 
     /**
-     * @return string
+     * @return ObjectRepository
      */
-    protected function getEntityClass()
+    protected function getRepository()
     {
-        return $this->definitionClass;
-    }
-
-    /**
-     * @return ManagerRegistry
-     */
-    protected function getManagerRegistry()
-    {
-        return $this->managerRegistry;
+        return $this->getObjectManager()->getRepository($this->definitionClass);
     }
 }

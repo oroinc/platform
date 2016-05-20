@@ -3,15 +3,21 @@
 namespace Oro\Bundle\CronBundle\Tests\Unit\Action;
 
 use Doctrine\Common\Persistence\ObjectManager;
+
 use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\CronBundle\Action\CreateJobAction;
 use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
+
 use Oro\Component\Action\Model\ContextAccessor;
-use Oro\Component\Action\Tests\Unit\Action\CreateEntityTest;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class CreateJobActionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -34,7 +40,8 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->jobManager = $this->getMockBuilder('Oro\Bundle\CronBundle\Entity\Manager\JobManager')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
 
@@ -48,9 +55,7 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
     {
         $options = [
             CreateJobAction::OPTION_COMMAND => 'help',
-            CreateJobAction::OPTION_ARGUMENTS => [
-                '--env=dev'
-            ],
+            CreateJobAction::OPTION_ARGUMENTS => ['--env=dev'],
             CreateJobAction::OPTION_ALLOW_DUPLICATES => true,
             CreateJobAction::OPTION_PRIORITY => 100500,
             CreateJobAction::OPTION_QUEUE => 'special',
@@ -61,36 +66,36 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
         $result = $this->createJobAction->initialize($options);
 
         $this->assertInstanceOf('Oro\Bundle\CronBundle\Action\CreateJobAction', $result);
-
         $this->assertAttributeEquals($options, 'options', $this->createJobAction);
     }
 
     public function testInitializeDefaults()
     {
-        $options = [
-            CreateJobAction::OPTION_COMMAND => 'help'
-        ];
+        $options = [CreateJobAction::OPTION_COMMAND => 'help'];
 
         $result = $this->createJobAction->initialize($options);
 
         $this->assertInstanceOf('Oro\Bundle\CronBundle\Action\CreateJobAction', $result);
-
-        $this->assertAttributeEquals([
-            'command' => 'help',
-            'allow_duplicates' => false,
-            'commit' => true,
-            'arguments' => [],
-            'queue' => 'default',
-            'priority' => 0,
-            'attribute' => null
-        ], 'options', $this->createJobAction);
+        $this->assertAttributeEquals(
+            [
+                'command' => 'help',
+                'allow_duplicates' => false,
+                'commit' => true,
+                'arguments' => [],
+                'queue' => 'default',
+                'priority' => 0,
+                'attribute' => null
+            ],
+            'options',
+            $this->createJobAction
+        );
     }
 
     /**
      * @dataProvider initializeExceptionsData
+     *
      * @param array $options
      * @param string $exceptionMessage
-     * @throws \Oro\Component\Action\Exception\InvalidParameterException
      */
     public function testInitializeExceptions(array $options, $exceptionMessage)
     {
@@ -160,20 +165,20 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
             ->with('help', json_encode(['--env=test']))
             ->willReturn(false);
 
-        $this->assertResolvingObjectManager('JMS\JobQueueBundle\Entity\Job', $this->objectManager);
+        $this->assertResolvingObjectManager('JMSJobQueueBundle:Job', $this->objectManager);
 
         $this->objectManager->expects($this->once())->method('persist');
-
         $this->objectManager->expects($this->once())->method('flush');
 
         $context = new ActionData();
         $this->createJobAction->execute($context);
 
         $this->assertArrayHasKey('result', $context, 'result must be provided');
+
         /** @var Job $job */
         $job = $context['result'];
-        $this->assertInstanceOf('JMS\JobQueueBundle\Entity\Job', $job);
 
+        $this->assertInstanceOf('JMS\JobQueueBundle\Entity\Job', $job);
         $this->assertEquals('help', $job->getCommand());
         $this->assertEquals(['--env=test'], $job->getArgs());
         $this->assertEquals(Job::STATE_PENDING, $job->getState()); //confirmed by default
@@ -192,10 +197,9 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
 
         $this->jobManager->expects($this->never())->method('hasJobInQueue'); //the case
 
-        $this->assertResolvingObjectManager('JMS\JobQueueBundle\Entity\Job', $this->objectManager);
+        $this->assertResolvingObjectManager('JMSJobQueueBundle:Job', $this->objectManager);
 
         $this->objectManager->expects($this->once())->method('persist');
-
         $this->objectManager->expects($this->once())->method('flush');
 
         $context = new ActionData();
@@ -220,7 +224,6 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true); // <-- has stored one
 
         $this->objectManager->expects($this->never())->method('persist');
-
         $this->objectManager->expects($this->never())->method('flush');
 
         $context = new ActionData();
@@ -244,12 +247,10 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
             ->with('help', json_encode(['--env=test']))
             ->willReturn(false);
 
-        $this->assertResolvingObjectManager('JMS\JobQueueBundle\Entity\Job', $this->objectManager);
+        $this->assertResolvingObjectManager('JMSJobQueueBundle:Job', $this->objectManager);
 
         $this->objectManager->expects($this->once())->method('persist');
-
-        $this->objectManager->expects($this->never())// <-- not expected
-        ->method('flush');
+        $this->objectManager->expects($this->never())->method('flush'); // <-- not expected
 
         $context = new ActionData();
         $this->createJobAction->execute($context);
@@ -274,10 +275,9 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
             ->with('help', json_encode([]))
             ->willReturn(false);
 
-        $this->assertResolvingObjectManager('JMS\JobQueueBundle\Entity\Job', $this->objectManager);
+        $this->assertResolvingObjectManager('JMSJobQueueBundle:Job', $this->objectManager);
 
         $this->objectManager->expects($this->once())->method('persist');
-
         $this->objectManager->expects($this->once())->method('flush');
 
         $context = new ActionData();

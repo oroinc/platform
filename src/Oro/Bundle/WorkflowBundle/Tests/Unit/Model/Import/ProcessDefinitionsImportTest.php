@@ -96,20 +96,12 @@ class ProcessDefinitionsImportTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetDefinitionsRepository()
-    {
-        $this->assertManagerRegistryCalled($this->definitionClass);
-        $this->assertObjectManagerCalledForRepository($this->definitionClass);
-        $this->assertSame($this->repository, $this->processDefinitionsImport->getDefinitionsRepository());
-    }
-
     /**
      * @param string $entityClass
      */
     public function assertManagerRegistryCalled($entityClass)
     {
-        $this->managerRegistry
-            ->expects($this->once())
+        $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->with($entityClass)
             ->willReturn($this->objectManager);
@@ -120,8 +112,7 @@ class ProcessDefinitionsImportTest extends \PHPUnit_Framework_TestCase
      */
     public function assertObjectManagerCalledForRepository($entityClass)
     {
-        $this->objectManager
-            ->expects($this->once())
+        $this->objectManager->expects($this->once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($this->repository);
