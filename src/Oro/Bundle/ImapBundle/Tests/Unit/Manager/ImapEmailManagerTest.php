@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
 use Zend\Mail\Header\HeaderInterface;
 
+use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 
@@ -345,7 +346,10 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return mixed
+     * Returns mock of Message object with injected headers
+     *
+     * @param array $headers headers array which will be injected into message mock
+     * @return Message
      */
     private function getMessageMock(array $headers)
     {
