@@ -8,11 +8,11 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
-use Oro\Component\DoctrineUtils\ORM\EntityManagementTrait;
+use Oro\Component\DoctrineUtils\ORM\EntityManagerResolvingTrait;
 
 class ProcessTriggersImport
 {
-    use EntityManagementTrait;
+    use EntityManagerResolvingTrait;
 
     /**
      * @var ProcessConfigurationBuilder

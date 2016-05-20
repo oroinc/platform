@@ -4,22 +4,22 @@ namespace Oro\Bundle\CronBundle\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use JMS\JobQueueBundle\Entity\Job;
+use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\Action\OptionsResolverTrait;
-use Oro\Component\DoctrineUtils\ORM\EntityManagementTrait;
-use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Oro\Component\DoctrineUtils\ORM\EntityManagerResolvingTrait;
 
 class CreateJobAction extends AbstractAction
 {
-    use EntityManagementTrait;
+    use EntityManagerResolvingTrait;
     use OptionsResolverTrait;
-    const OPT_COMMAND             = 'command'; #job command to run
-    const OPT_ARGS                = 'arguments'; #job command arguments
+    const OPTION_COMMAND          = 'command'; #job command to run
+    const OPTION_ARGUMENTS        = 'arguments'; #job command arguments
     const OPTION_ALLOW_DUPLICATES = 'allow_duplicates'; #allow same jobs to be added
     const OPTION_PRIORITY         = 'priority'; #job priority
     const OPTION_QUEUE            = 'queue'; #job queue name
@@ -80,43 +80,38 @@ class CreateJobAction extends AbstractAction
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(self::OPT_COMMAND);
+        $resolver->setRequired(self::OPTION_COMMAND);
 
+        $resolver->setDefined(
+            [
+                self::OPTION_ATTRIBUTE,
+                self::OPTION_PRIORITY,
+                self::OPTION_ARGUMENTS,
+                self::OPTION_QUEUE
+            ]
+        );
+        
         $resolver->setAllowedTypes(
             self::OPTION_ATTRIBUTE,
             ['null', 'Symfony\Component\PropertyAccess\PropertyPathInterface']
         );
 
         $resolver->setAllowedTypes(self::OPTION_PRIORITY, ['int']);
-        $resolver->setAllowedTypes(self::OPT_ARGS, ['array']);
+        $resolver->setAllowedTypes(self::OPTION_ARGUMENTS, ['array']);
         $resolver->setAllowedTypes(self::OPTION_QUEUE, ['string']);
 
-        $resolver->setAllowedValues(self::OPT_COMMAND, function ($value) {
+        $resolver->setAllowedValues(self::OPTION_COMMAND, function ($value) {
             return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
         });
 
-        $resolver->setAllowedValues(self::OPTION_QUEUE, function ($value) {
-        });
-
-        $resolver->setNormalizer(
-            self::OPT_ARGS,
-            function (Options $options, $value) {
-                $normalized = [];
-                foreach ((array)$value as $commandArgumentOrOption) {
-                    $normalized[] = (string)$commandArgumentOrOption;
-                }
-
-                return $normalized;
-            }
-        );
-
         $resolver->setDefaults(
             [
-                self::OPT_ARGS => [],
+                self::OPTION_ARGUMENTS => [],
                 self::OPTION_QUEUE => Job::DEFAULT_QUEUE,
                 self::OPTION_PRIORITY => Job::PRIORITY_DEFAULT,
                 self::OPTION_ALLOW_DUPLICATES => false,
-                self::OPTION_COMMIT => true
+                self::OPTION_COMMIT => true,
+                self::OPTION_ATTRIBUTE => null
             ]
         );
     }
@@ -135,8 +130,8 @@ class CreateJobAction extends AbstractAction
         }
 
         $job = Job::create(
-            $this->options[self::OPT_COMMAND],
-            $this->options[self::OPT_ARGS],
+            $this->options[self::OPTION_COMMAND],
+            $this->options[self::OPTION_ARGUMENTS],
             true,
             $this->options[self::OPTION_QUEUE],
             $this->options[self::OPTION_PRIORITY]
@@ -154,6 +149,22 @@ class CreateJobAction extends AbstractAction
     }
 
     /**
+     * Checks if we can add a Job to a queue
+     * @return bool
+     */
+    private function canAddTheJob()
+    {
+        if ($this->options[self::OPTION_ALLOW_DUPLICATES]) {
+            return true;
+        }
+
+        return false === $this->jobManager->hasJobInQueue(
+            $this->options[self::OPTION_COMMAND],
+            json_encode($this->options[self::OPTION_ARGUMENTS])
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getEntityClass()
@@ -167,21 +178,5 @@ class CreateJobAction extends AbstractAction
     protected function getManagerRegistry()
     {
         return $this->managerRegistry;
-    }
-
-    /**
-     * Checks if we can add a Job to a queue
-     * @return bool
-     */
-    private function canAddTheJob()
-    {
-        if ($this->options[self::OPTION_ALLOW_DUPLICATES]) {
-            return true;
-        }
-
-        return false === $this->jobManager->hasJobInQueue(
-            $this->options[self::OPT_COMMAND],
-            json_encode($this->options[self::OPT_ARGS])
-        );
     }
 }

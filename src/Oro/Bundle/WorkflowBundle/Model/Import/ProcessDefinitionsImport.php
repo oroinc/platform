@@ -5,11 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Model\Import;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Component\DoctrineUtils\ORM\EntityManagementTrait;
+use Oro\Component\DoctrineUtils\ORM\EntityManagerResolvingTrait;
 
 class ProcessDefinitionsImport
 {
-    use EntityManagementTrait;
+    use EntityManagerResolvingTrait;
 
     /**
      * @var ProcessConfigurationBuilder
