@@ -32,9 +32,9 @@ class BuildRouteRegistryPass implements CompilerPassInterface
                 }
 
                 $processorName = empty($tagAttribute['processorName']) ? $serviceId : $tagAttribute['processorName'];
-                $queueName = empty($tagAttribute['queueName']) ? null : $tagAttribute['queueName'];
+                $destinationName = empty($tagAttribute['destinationName']) ? null : $tagAttribute['destinationName'];
 
-                $configs[$tagAttribute['topicName']][] = [$processorName, $queueName];
+                $configs[$tagAttribute['topicName']][] = [$processorName, $destinationName];
             }
         }
 
