@@ -65,7 +65,7 @@ class CalendarEventRepository extends EntityRepository
      *
      * @param array $filters
      * @param array $extraFields
-     * @param null|string $recurringEventId
+     * @param null|integer $recurringEventId
      *
      * @return QueryBuilder
      */
@@ -77,7 +77,7 @@ class CalendarEventRepository extends EntityRepository
         $qb = $this->getUserEventListQueryBuilder($filters, $extraFields);
         if ($recurringEventId) {
             $qb->orWhere('e.id = :recurringEventId')
-                ->setParameter('recurringEventId', $recurringEventId);
+                ->setParameter('recurringEventId', (int)$recurringEventId);
         }
 
         return $qb;
