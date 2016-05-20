@@ -5,10 +5,10 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Oro\Bundle\FormBundle\Form\DataTransformer\DurationToStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Time interval (duration) field type
@@ -29,61 +29,37 @@ class OroTimeIntervalType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer(new DurationToStringTransformer());
-
-        if ($options['input_property_path']) {
-            $this->addFieldListeners($builder, $options);
-        }
+        // We need to validate user input before it is passed to the model transformer
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
     }
 
-
-    private function addFieldListeners(FormBuilderInterface $builder, array $options)
+    function preSubmit(FormEvent $event)
     {
-        // populate the field with the connected field data
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options) {
-                $data = $event->getData();
-                if (is_object($event->getForm()->getParent())) {
-                    $data = $event->getForm()->getParent()->getData();
-                }
+        if ($this->isValidDuration($event->getData())) {
+            return;
+        }
+        $event->getForm()->addError(new FormError('Value is not in a valid duration format'));
+    }
 
-                $value = '';
-                // data is array
-                if (is_array($data) && array_key_exists($options['input_property_path'], $data)) {
-                    $value = $data[$options['input_property_path']];
-                }
+    /**
+     * @param string $duration
+     *
+     * @return bool
+     */
+    protected function isValidDuration($duration)
+    {
+        $regexJIRAFormat =
+            '/^' .
+            '(?:(?:(\d+(?:\.\d)?)?)h(?:[\s]*|$))?' .
+            '(?:(?:(\d+(?:\.\d)?)?)m(?:[\s]*|$))?' .
+            '(?:(?:(\d+(?:\.\d)?)?)s)?' .
+            '$/i';
+        $regexColumnFormat =
+            '/^' .
+            '((\d{1,3}:)?\d{1,3}:)?\d{1,3}' .
+            '$/i';
 
-                // data is entity
-                $accessor = PropertyAccess::createPropertyAccessor();
-                if ($accessor->isReadable($data, $options['input_property_path'])) {
-                    $value = $accessor->getValue($data, $options['input_property_path']);
-                }
-
-                $event->setData((string) $value);
-            }
-        );
-
-        // store the submitted input data into the connected field
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) use ($options) {
-                if (!is_object($event->getForm()->getParent())) {
-                    return;
-                }
-                $value = $event->getData();
-                $data = $event->getForm()->getParent()->getData();
-                // data is array
-                if (is_array($data)) {
-                    $data[$options['input_property_path']] = $value;
-                }
-
-                // data is entity
-                $accessor = PropertyAccess::createPropertyAccessor();
-                if ($accessor->isWritable($data, $options['input_property_path'])) {
-                    $accessor->setValue($data, $options['input_property_path'], $value);
-                }
-            }
-        );
+        return preg_match($regexJIRAFormat, $duration) || preg_match($regexColumnFormat, $duration);
     }
 
     /**
@@ -95,11 +71,8 @@ class OroTimeIntervalType extends AbstractType
             [
                 'tooltip' => 'oro.form.oro_time_interval.tooltip',
                 'type' => 'text',
-                'input_property_path' => null, // where to store user input
             ]
         );
-
-        $resolver->setAllowedTypes('input_property_path', ['string', 'null']);
     }
 
     /**

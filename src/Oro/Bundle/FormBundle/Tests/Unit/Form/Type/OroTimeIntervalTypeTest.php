@@ -29,11 +29,10 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 
     public function testSetDefaultOptions()
     {
-        $expectedOptions = array(
+        $expectedOptions = [
             'tooltip' => 'oro.form.oro_time_interval.tooltip',
             'type' => 'text',
-            'input_property_path' => null,
-        );
+        ];
 
         $form = $this->factory->create($this->type);
 
@@ -56,29 +55,40 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
         $form->submit($value);
         $data = $form->getData();
 
-        $this->assertInstanceOf($expected, $data);
+        $this->assertEquals($expected, $data);
     }
 
     public function submitDataProvider()
     {
         return [
             'default' => [
-                120,
-                'DateTime',
+                '1:30', // 1 min 30 sec
+                90,
             ],
             'BC datetime should pass trough' => [
-                new \DateTime(),
-                'DateTime',
+                '1h 30m',
+                5400,
             ],
+            'invalid' => [
+                'test', 0
+            ]
         ];
+    }
+
+    public function testSubmitInvalidData()
+    {
+        $form = $this->factory->create($this->type);
+        $form->submit('invalid');
+        $errors = $form->getErrors();
+
+        $this->assertCount(1, $errors);
     }
 
     public function testConfigureOptions()
     {
-        $expectedOptions = array(
+        $expectedOptions = [
             'tooltip' => 'test',
-            'input_property_path' => 'durationString',
-        );
+        ];
 
         $form = $this->factory->create($this->type, null, $expectedOptions);
 
