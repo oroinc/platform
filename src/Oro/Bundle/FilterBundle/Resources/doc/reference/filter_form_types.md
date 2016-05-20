@@ -211,7 +211,7 @@ Available attributes are:
 **Options**
 
 * data_type
-* fromatter_options
+* formatter_options
 
 **Inherit Options**
 

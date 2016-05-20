@@ -103,8 +103,8 @@ and rendered by [Oro.Filter.NumberFilter](./javascript_widgets.md#orofilternumbe
 
 `type: currency` - currency filter
 
-Validated by [NumberRangeFilterType](./filter_form_types.md#oro_type_number_filter-form-type) on backend
-and rendered by [Oro.Filter.NumberRangeFilter](./javascript_widgets.md#orofilternumberfilter)
+Validated by [NumberRangeFilterType](./filter_form_types.md#oro_type_number_range_filter-form-type) on backend
+and rendered by [Oro.Filter.NumberRangeFilter](./javascript_widgets.md#orofilternumberrangefilter)
 
 ### Boolean filter
 

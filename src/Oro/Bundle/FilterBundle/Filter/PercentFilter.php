@@ -25,8 +25,13 @@ class PercentFilter extends NumberRangeFilter
     {
         $data = parent::parseData($data);
 
-        if ($data && is_numeric($data['value'])) {
-            $data['value'] /= 100;
+        if ($data) {
+            $valueKeys = ['value', 'value_end'];
+            foreach ($valueKeys as $key) {
+                if (is_numeric($data[$key])) {
+                    $data[$key] /= 100;
+                }
+            }
         }
 
         return $data;
