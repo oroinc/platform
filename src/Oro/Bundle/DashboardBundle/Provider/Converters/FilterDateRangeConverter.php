@@ -62,9 +62,14 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             list($startValue, $endValue, $type) = $this->getPeriodValues($value);
 
             $start = $startValue instanceof DateTime ? $startValue : $this->dateCompiler->compile($startValue);
-            $start->setTime(0, 0, 0);
-
             $end = $endValue instanceof DateTime ? $endValue : $this->dateCompiler->compile($endValue);
+            //Swap start and end dates if end date is behind start date
+            if ($start > $end) {
+                $e = $end;
+                $end = $start;
+                $start = $e;
+            }
+            $start->setTime(0, 0, 0);
             $end->setTime(23, 59, 59);
         }
 
