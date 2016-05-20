@@ -4,8 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
 

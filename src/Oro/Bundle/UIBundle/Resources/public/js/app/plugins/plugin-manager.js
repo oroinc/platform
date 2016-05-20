@@ -139,6 +139,7 @@ define(function(require) {
 
         dispose: function() {
             var instance;
+            this.disposing = true;
             for (var i = 0; i < this._pluginList.length; i++) {
                 instance = this._pluginList[i];
                 if (instance.enabled) {

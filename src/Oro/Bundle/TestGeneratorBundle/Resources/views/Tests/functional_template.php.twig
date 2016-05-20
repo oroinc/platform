@@ -1,0 +1,28 @@
+<?php
+
+namespace {{ namespace }};
+
+{% for vendor in vendors %}
+{% for use in vendor %}
+use {{ use }};
+{% endfor %}
+
+{% endfor %}
+/**
+ * @dbIsolation
+ */
+class {{ className }} extends WebTestCase
+{
+    protected function setUp()
+    {
+        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->loadFixtures([]);
+    }
+{% for methodData in methodsData %}
+
+    public function {{ methodData.testName }}()
+    {
+        //TODO: add test assertions
+    }
+{% endfor %}
+}

@@ -8,7 +8,8 @@
             ['jquery', 'underscore', 'oro/filter/datetime-filter', 'oroui/js/tools', 'orodashboard/js/widget/datetime-range'],
             function ($, _, DateTimeFilter, tools, WidgetConfigDateTimeRangeFilter) {
                 $(function () {
-                    var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(constant('JSON_UNESCAPED_SLASHES'))|raw }}');
+                    {% set encodeBitmask = constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_APOS') %}
+                    var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(encodeBitmask)|raw }}');
                     var DatetimeFilterWithMeta = WidgetConfigDateTimeRangeFilter.extend(metadata);
                     var dateRangeFilter = new DatetimeFilterWithMeta();
 
@@ -24,9 +25,8 @@
                         type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
                         value: valueConfig
                     };
-                    dateRangeFilter.setValue(value);
+                    dateRangeFilter.updateValue(value);
                     dateRangeFilter.render();
-                    dateRangeFilter._formatRawValue(value);
 
                     $('.datetime-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
                     $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
@@ -47,7 +47,8 @@
             ['jquery', 'underscore', 'orodashboard/js/widget/date-range'],
             function ($, _, WidgetConfigDateRangeFilter) {
                 $(function () {
-                    var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(constant('JSON_UNESCAPED_SLASHES'))|raw }}');
+                    {% set encodeBitmask = constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_APOS') %}
+                    var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(encodeBitmask)|raw }}');
                     var DatetimeFilterWithMeta = WidgetConfigDateRangeFilter.extend(metadata);
                     var dateRangeFilter = new DatetimeFilterWithMeta();
 
@@ -63,9 +64,8 @@
                         type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
                         value: valueConfig
                     };
-                    dateRangeFilter.setValue(value);
+                    dateRangeFilter.updateValue(value);
                     dateRangeFilter.render();
-                    dateRangeFilter._formatRawValue(value);
 
                     $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
                     $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');

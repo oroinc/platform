@@ -1,0 +1,65 @@
+<?php
+
+namespace {{ namespace }};
+
+{% for vendor in vendors %}
+{% for use in vendor %}
+use {{ use }};
+{% endfor %}
+
+{% endfor %}
+class {{ className }} extends \PHPUnit_Framework_TestCase
+{
+{% for dependencyData in dependenciesData %}
+    /**
+     * @var {{ dependencyData.class }}|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected ${{ dependencyData.variable }};
+
+{% endfor %}
+    /**
+     * @var {{ testedClassName }}
+     */
+    protected ${{ testedClassNameVariable }};
+
+    protected function setUp()
+    {
+{% for dependencyData in dependenciesData %}
+{% if dependencyData.has_constructor is defined %}
+{% if dependencyData.has_constructor %}
+        $this->{{ dependencyData.variable }} = $this->getMockBuilder('{{ dependencyData.fullClassName }}')
+            ->disableOriginalConstructor()
+            ->getMock();
+{% else %}
+        $this->{{ dependencyData.variable }} = $this->getMock('{{ dependencyData.fullClassName }}');
+{% endif %}
+{% endif %}
+{% endfor %}
+        $this->{{ testedClassNameVariable }} = new {{testedClassName}}({% for key, dependencyData in dependenciesData %}$this->{{ dependencyData.variable }}{% if not loop.last %}, {% endif %}{% endfor %});
+    }
+{% for methodData in methodsData %}
+
+    public function {{ methodData.testName }}()
+    {
+{% for argument in methodData.arguments %}
+{% if argument.class %}        /** @var {{ argument.class }}{% if argument.class|length !=0 %}|\PHPUnit_Framework_MockObject_MockObject{% endif %} ${{ argument.name }} **/
+{% endif %}
+{% if argument.has_constructor is defined %}
+{% if argument.has_constructor %}
+        ${{ argument.name }} = $this->getMockBuilder('{{ argument.fullClass }}')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+{% else %}
+        ${{ argument.name }} = $this->getMock('{{ argument.fullClass }}');
+
+{% endif %}
+{% else %}
+        ${{ argument.name }} = '';
+{% endif %}
+{% endfor %}
+        //TODO: add test assertions
+        $this->{{ testedClassNameVariable }}->{{methodData.name}}({% for key, argument in methodData.arguments %}${{ argument.name }}{% if methodData.arguments|length != key+1 %}, {% endif %}{% endfor %});
+    }
+{% endfor %}
+}

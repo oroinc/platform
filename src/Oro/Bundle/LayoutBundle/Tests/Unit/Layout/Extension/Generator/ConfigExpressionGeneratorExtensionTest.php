@@ -61,7 +61,7 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->expressionAssembler->expects($this->once())
             ->method('assemble')
             ->with([['@true' => null]])
-            ->will($this->returnValue(new Condition\True()));
+            ->will($this->returnValue(new Condition\TrueCondition()));
 
         $this->extension->prepare(
             [

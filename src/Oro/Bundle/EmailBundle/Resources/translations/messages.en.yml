@@ -173,7 +173,7 @@ oro:
             mark:
                 success_message: "{0} No entities were marked|{1} One entity was marked|]1,Inf[ %count% entities were marked"
             mailbox:
-                view: Mailbox: %mailbox%
+                view: 'Mailbox: %mailbox%'
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -236,7 +236,7 @@ oro:
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden
         empty_body:               Empty body
-        unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
+        unable_to_load_body:      'Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.'
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
         body_synced.label:        Email body synced
@@ -262,8 +262,8 @@ oro:
         load_more_emails:         "%quantity% older messages"
 
         emailuser:
-            entity_label:             Email User
-            entity_plural_label:      Email Users
+            entity_label:             Email-User Relation
+            entity_plural_label:      Email-User Relations
             email.label:              Email
             folder.label:             Folder
             id.label:                 Id
