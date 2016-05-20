@@ -20,14 +20,14 @@ class HtmlPurifierTelValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $phone
-     * @param bool $returnValue
+     * @param bool $expectedValue
      *
      * @dataProvider phoneProvider
      */
-    public function testPhones($phone, $returnValue)
+    public function testPhones($phone, $expectedValue)
     {
         $this->uri->path = $phone;
-        $this->assertEquals($returnValue, $this->validator->doValidate($this->uri, null, null));
+        $this->assertEquals($expectedValue, $this->validator->doValidate($this->uri, null, null));
     }
 
     /**
@@ -36,12 +36,30 @@ class HtmlPurifierTelValidatorTest extends \PHPUnit_Framework_TestCase
     public function phoneProvider()
     {
         return [
-            ['123456789', true],
-            ['123-456-789', true],
-            ['(123)-456-789', true],
-            ['123.456.789', true],
-            ['not phone', false],
-            ['654 75456', false],
+            [
+                'phone' => '123456789',
+                'expectedValue' => true
+            ],
+            [
+                'phone' => '123-456-789',
+                'expectedValue' => true
+            ],
+            [
+                'phone' => '(123)-456-789',
+                'expectedValue' => true
+            ],
+            [
+                'phone' => '123.456.789',
+                'expectedValue' => true
+            ],
+            [
+                'phone' => 'not phone',
+                'expectedValue' => false
+            ],
+            [
+                'phone' => '654 75456',
+                'expectedValue' => false
+            ],
         ];
     }
 }
