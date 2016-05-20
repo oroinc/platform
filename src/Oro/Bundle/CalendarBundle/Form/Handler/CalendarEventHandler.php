@@ -98,10 +98,11 @@ class CalendarEventHandler
             // clone attendees to have have original attendees at disposal later
             $originalAttendees = new ArrayCollection($entity->getAttendees()->toArray());
 
+            $this->ensureCalendarSet($entity);
+
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
-                $this->ensureCalendarSet($entity);
 
                 // TODO: should be refactored after finishing BAP-8722
                 // Contexts handling should be moved to common for activities form handler
