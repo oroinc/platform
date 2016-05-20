@@ -29,6 +29,9 @@ class DbDumpSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param BeforeExerciseCompleted $event
+     */
     public function dbDump(BeforeExerciseCompleted $event)
     {
         $this->dbDumper->dumpDb();
