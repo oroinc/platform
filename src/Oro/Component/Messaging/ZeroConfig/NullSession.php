@@ -1,14 +1,13 @@
 <?php
 namespace Oro\Component\Messaging\ZeroConfig;
 
-use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
-use Oro\Component\Messaging\Transport\Amqp\AmqpSession as TransportAmqpSession;
+use Oro\Component\Messaging\Transport\Null\NullSession as TransportNullSession;
 use Oro\Component\Messaging\Transport\Queue;
 
-class AmqpSession implements Session
+class NullSession implements Session
 {
     /**
-     * @var TransportAmqpSession
+     * @var TransportNullSession
      */
     protected $session;
 
@@ -18,10 +17,10 @@ class AmqpSession implements Session
     protected $config;
 
     /**
-     * @param TransportAmqpSession $session
+     * @param TransportNullSession $session
      * @param Config               $config
      */
-    public function __construct(TransportAmqpSession $session, Config $config)
+    public function __construct(TransportNullSession $session, Config $config)
     {
         $this->session = $session;
         $this->config = $config;
@@ -32,9 +31,7 @@ class AmqpSession implements Session
      */
     public function createMessage()
     {
-        return $this->session->createMessage(null, [], [
-            'delivery_mode' => AmqpMessage::DELIVERY_MODE_PERSISTENT,
-        ]);
+        return $this->session->createMessage();
     }
 
     /**
@@ -60,12 +57,7 @@ class AmqpSession implements Session
      */
     public function createQueue($queueName)
     {
-        $queue = $this->session->createQueue($queueName);
-        $queue->setDurable(true);
-        $queue->setAutoDelete(false);
-        $this->session->declareQueue($queue);
-
-        return $queue;
+        return $this->session->createQueue($queueName);
     }
 
     /**

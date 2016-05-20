@@ -1,37 +1,33 @@
 <?php
 namespace Oro\Component\Messaging\Tests\ZeroConfig;
 
-use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
-use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
-use Oro\Component\Messaging\Transport\Amqp\AmqpSession as TransportAmqpSession;
+use Oro\Component\Messaging\Transport\Null\NullMessage;
+use Oro\Component\Messaging\Transport\Null\NullQueue;
+use Oro\Component\Messaging\Transport\Null\NullSession as TransportNullSession;
 use Oro\Component\Messaging\ZeroConfig\FrontProducer;
-use Oro\Component\Messaging\ZeroConfig\AmqpSession;
+use Oro\Component\Messaging\ZeroConfig\NullSession;
 use Oro\Component\Messaging\ZeroConfig\Config;
 
-class AmqpSessionTest extends \PHPUnit_Framework_TestCase
+class NullSessionTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new AmqpSession($this->createTransportSessionMock(), new Config('', '', '', '', ''));
+        new NullSession($this->createTransportSessionMock(), new Config('', '', '', '', ''));
     }
 
     public function testShouldCreateMessageInstance()
     {
-        $message = new AmqpMessage();
-
-        $expectedProperties = [
-            'delivery_mode' => AmqpMessage::DELIVERY_MODE_PERSISTENT,
-        ];
+        $message = new NullMessage();
 
         $transportSession = $this->createTransportSessionMock();
         $transportSession
             ->expects($this->once())
             ->method('createMessage')
-            ->with(null, [], $expectedProperties)
+            ->with(null, [], [])
             ->will($this->returnValue($message))
         ;
 
-        $session = new AmqpSession($transportSession, new Config('', '', '', '', ''));
+        $session = new NullSession($transportSession, new Config('', '', '', '', ''));
         $result = $session->createMessage();
 
         $this->assertSame($message, $result);
@@ -46,7 +42,7 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('producer-instance'))
         ;
 
-        $session = new AmqpSession($transportSession, new Config('', '', '', '', ''));
+        $session = new NullSession($transportSession, new Config('', '', '', '', ''));
         $result = $session->createProducer();
 
         $this->assertEquals('producer-instance', $result);
@@ -54,7 +50,7 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCreateFrontProducerInstance()
     {
-        $session = new AmqpSession($this->createTransportSessionMock(), new Config('', '', '', '', ''));
+        $session = new NullSession($this->createTransportSessionMock(), new Config('', '', '', '', ''));
         $result = $session->createFrontProducer();
 
         $this->assertInstanceOf(FrontProducer::class, $result);
@@ -64,15 +60,15 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Config('', '', '', '', '');
 
-        $session = new AmqpSession($this->createTransportSessionMock(), $config);
+        $session = new NullSession($this->createTransportSessionMock(), $config);
         $result = $session->getConfig();
 
         $this->assertSame($config, $result);
     }
 
-    public function testShouldCreateQueueWithExpectedParameters()
+    public function testShouldCreateQueue()
     {
-        $queue = new AmqpQueue('');
+        $queue = new NullQueue('');
 
         $config = new Config('', '', '', '', '');
 
@@ -83,33 +79,18 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
             ->with('queue-name')
             ->will($this->returnValue($queue))
         ;
-        $transportSession
-            ->expects($this->once())
-            ->method('declareQueue')
-            ->with($this->identicalTo($queue))
-        ;
 
-        $session = new AmqpSession($transportSession, $config);
+        $session = new NullSession($transportSession, $config);
         $result = $session->createQueue('queue-name');
 
         $this->assertSame($queue, $result);
-
-        $this->assertEmpty($queue->getConsumerTag());
-        $this->assertEmpty($queue->getTable());
-        $this->assertFalse($queue->isExclusive());
-        $this->assertFalse($queue->isAutoDelete());
-        $this->assertFalse($queue->isPassive());
-        $this->assertFalse($queue->isNoWait());
-        $this->assertTrue($queue->isDurable());
-        $this->assertFalse($queue->isNoAck());
-        $this->assertFalse($queue->isNoLocal());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TransportAmqpSession
+     * @return \PHPUnit_Framework_MockObject_MockObject|TransportNullSession
      */
     protected function createTransportSessionMock()
     {
-        return $this->getMock(TransportAmqpSession::class, [], [], '', false);
+        return $this->getMock(TransportNullSession::class, [], [], '', false);
     }
 }
