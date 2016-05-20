@@ -4,14 +4,14 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 
-class PercentFilter extends NumberFilter
+class PercentFilter extends NumberRangeFilter
 {
     /**
      * {@inheritDoc}
      */
     public function init($name, array $params)
     {
-        $params[FilterUtility::FRONTEND_TYPE_KEY]             = 'number';
+        $params[FilterUtility::FRONTEND_TYPE_KEY]             = 'number-range';
         $params[FilterUtility::FORM_OPTIONS_KEY]              =
             isset($params[FilterUtility::FORM_OPTIONS_KEY]) ? $params[FilterUtility::FORM_OPTIONS_KEY] : [];
         $params[FilterUtility::FORM_OPTIONS_KEY]['data_type'] = NumberFilterType::PERCENT;
@@ -25,8 +25,13 @@ class PercentFilter extends NumberFilter
     {
         $data = parent::parseData($data);
 
-        if ($data && is_numeric($data['value'])) {
-            $data['value'] /= 100;
+        if ($data) {
+            $valueKeys = ['value', 'value_end'];
+            foreach ($valueKeys as $key) {
+                if (is_numeric($data[$key])) {
+                    $data[$key] /= 100;
+                }
+            }
         }
 
         return $data;
