@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 use Behat\Behat\Context\Context;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
+use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -99,7 +100,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $attributes) {
-                if ($attributes["driver"] !== $driver) {
+                if ($attributes['driver'] !== $driver) {
                     continue;
                 }
 
@@ -138,18 +139,19 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $suiteConfigurations = $container->getParameter('suite.configurations');
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
-        $symfonySuiteGenerator = $container->get('symfony2_extension.suite.generator');
+        /** @var SymfonySuiteGenerator $suiteGenerator */
+        $suiteGenerator = $container->get('symfony2_extension.suite.generator');
         $commonContexts = $container->getParameter('oro_test.shared_contexts');
 
         $configuredBundles = $this->getConfiguredBundles($suiteConfigurations);
 
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if (in_array($bundle->getName(), $configuredBundles)) {
+            if (in_array($bundle->getName(), $configuredBundles, true)) {
                 continue;
             }
 
-            $bundleSuite = $symfonySuiteGenerator->generateSuite($bundle->getName(), []);
+            $bundleSuite = $suiteGenerator->generateSuite($bundle->getName(), []);
 
             if (!$this->hasValidPaths($bundleSuite)) {
                 continue;
@@ -200,7 +202,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     private function getSuiteContexts(SymfonyBundleSuite $bundleSuite, array $commonContexts)
     {
-        $suiteContexts = array_filter($bundleSuite->getSetting('contexts'), "class_exists");
+        $suiteContexts = array_filter($bundleSuite->getSetting('contexts'), 'class_exists');
         $suiteContexts = count($suiteContexts) ? $suiteContexts : $commonContexts;
 
         return $suiteContexts;
@@ -212,7 +214,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     protected function hasValidPaths(SymfonyBundleSuite $bundleSuite)
     {
-        return 0 < count(array_filter($bundleSuite->getSetting('paths'), "is_dir"));
+        return 0 < count(array_filter($bundleSuite->getSetting('paths'), 'is_dir'));
     }
 
     /**
