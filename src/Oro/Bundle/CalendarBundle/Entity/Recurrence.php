@@ -11,7 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  *     name="oro_calendar_recurrence",
  *      indexes={
  *          @ORM\Index(name="oro_calendar_r_start_time_idx", columns={"start_time"}),
- *          @ORM\Index(name="oro_calendar_r_end_time_idx", columns={"end_time"})
+ *          @ORM\Index(name="oro_calendar_r_end_time_idx", columns={"end_time"}),
+ *          @ORM\Index(name="oro_calendar_r_c_end_time_idx", columns={"calculated_end_time"})
  *      }
  * )
  * @ORM\Entity
@@ -26,10 +27,25 @@ class Recurrence
     protected $id;
 
     /**
-     * According to recurrenceType it determines what recurrence strategy must be used for
-     * calculating new calendar event occurrences, getting textual representation etc.
-     * Possible values: daily, weekly, monthly, monthnth, yearly, yearnth.
+     * Determines what recurrence strategy must be used to calculate occurrences of recurring event,
+     * to get textual representation etc. Possible values are: daily, weekly, monthly, monthnth, yearly, yearnth.
      *
+     * Constants for possible values:
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::TYPE_DAILY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::TYPE_WEEKLY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::TYPE_MONTHLY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::TYPE_MONTH_N_TH
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::TYPE_YEARLY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::TYPE_YEAR_N_TH
+     *
+     * Corresponding strategies:
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\DailyStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\WeeklyStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\MonthNthStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\YearlyStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\YearNthStrategy
+\    *
      * @var string
      *
      * @ORM\Column(name="recurrence_type", type="string", length=16)
@@ -38,9 +54,7 @@ class Recurrence
 
     /**
      * Contains number of units how often recurring events must repeat.
-     * For example, 'every X days', 'every X weeks', 'every X months' (where X is interval).
-     *
-     * @var int
+     * For example, 'every X days', 'every X weeks', 'every X months' (where X is a value of $interval).
      *
      * Units of this attribute depend of recurrenceType.
      * For daily recurrence it is number of days.
@@ -48,17 +62,26 @@ class Recurrence
      * For monthly, monthnth recurrences it is number of months.
      * For yearly, yearnth recurrences it is number of month, which is multiple of 12. I.e. 12, 24, 36 etc.
      *
+     * @var int
+     *
      * @ORM\Column(name="`interval`", type="integer")
      */
     protected $interval;
 
     /**
-     * Contains a value from 1 to 5, that is relative value for 'first', 'second',
-     * 'third', 'fourth' and 'last'.
-     * It is used in monthnth and yearnth strategies, for creating
-     * recurring events like 'Yearly every 2 years on the first Saturday of April',
+     * Contains a value from 1 to 5, that is relative value for 'first', 'second', 'third', 'fourth' and 'last'.
+     *
+     * It is used in monthnth and yearnth strategies, for creating recurring events like:
+     * 'Yearly every 2 years on the first Saturday of April',
      * 'Monthly the fourth Saturday of every 2 months',
-     * 'Yearly every 2 years on the last Saturday of April'
+     * 'Yearly every 2 years on the last Saturday of April'.
+     *
+     * Constants for possible values:
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::INSTANCE_FIRST
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::INSTANCE_SECOND
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::INSTANCE_THIRD
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::INSTANCE_FOURTH
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::INSTANCE_LAST
      *
      * @var int
      *
@@ -68,13 +91,23 @@ class Recurrence
 
     /**
      * Contains array of weekdays.
+     *
      * Possible values: 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'.
      * For relative 'weekday' value the array will be ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].
      * For relative 'weekend' value the array will be ['sunday', 'saturday'].
      * For relative 'any day' value
      * the array will be ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].
      *
-     * @var []
+     * Constants for days:
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::DAY_SUNDAY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::DAY_MONDAY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::DAY_TUESDAY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::DAY_WEDNESDAY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::DAY_THURSDAY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::DAY_FRIDAY
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::DAY_SATURDAY
+     *
+     * @var string[]
      *
      * @ORM\Column(name="day_of_week", type="array", nullable=true)
      */
@@ -117,18 +150,20 @@ class Recurrence
     protected $endTime;
 
     /**
-     * Contains additionally calculated end datetime for range of recurrence.
-     * It is used for SQL query and recurrence strategies optimization.
+     * Contains calculated end datetime for range of recurrence.
+     * It is used for optimization of SQL query responsible to get all events in some range of time.
+     *
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface::getCalculatedEndTime
      *
      * @var \DateTime
      *
-     * @ORM\Column(name="additional_end_time", type="datetime")
+     * @ORM\Column(name="calculated_end_time", type="datetime")
      */
-    protected $additionalEndTime;
+    protected $calculatedEndTime;
 
     /**
      * Contains the number of occurrences for range of recurrence.
-     * It means that recurrence ends after X occurrences, where X is 'occurrences' value.
+     * It means that recurrence ends after X occurrences, where X is value of $occurrences.
      *
      * @var int
      *
@@ -339,13 +374,13 @@ class Recurrence
     }
 
     /**
-     * @param \DateTime|null $additionalEndTime
+     * @param \DateTime|null $calculatedEndTime
      *
      * @return self
      */
-    public function setAdditionalEndTime($additionalEndTime)
+    public function setCalculatedEndTime($calculatedEndTime)
     {
-        $this->additionalEndTime = $additionalEndTime;
+        $this->calculatedEndTime = $calculatedEndTime;
 
         return $this;
     }
@@ -353,9 +388,9 @@ class Recurrence
     /**
      * @return \DateTime|null
      */
-    public function getAdditionalEndTime()
+    public function getCalculatedEndTime()
     {
-        return $this->additionalEndTime;
+        return $this->calculatedEndTime;
     }
 
     /**

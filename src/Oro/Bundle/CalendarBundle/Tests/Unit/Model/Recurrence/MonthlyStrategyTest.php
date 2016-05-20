@@ -82,7 +82,7 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
             ->setDayOfMonth($params['dayOfMonth'])
             ->setStartTime(new \DateTime($params['startTime']))
             ->setEndTime(new \DateTime($params['endTime']))
-            ->setAdditionalEndTime(new \DateTime($params['endTime']));
+            ->setCalculatedEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
             $recurrence->setOccurrences($params['occurrences']);
         }

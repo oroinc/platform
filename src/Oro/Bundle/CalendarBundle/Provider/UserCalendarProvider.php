@@ -135,30 +135,39 @@ class UserCalendarProvider extends AbstractCalendarProvider
     }
 
     /**
-     * @param array $items
+     * Returns transformed and expanded list with respected recurring events based on unprocessed events in $rawItems
+     * and date range.
+     *
+     * @param array $rawItems
      * @param \DateTime $start
      * @param \DateTime $end
      *
      * @return array
      */
-    protected function getExpandedRecurrences(array $items, \DateTime $start, \DateTime $end)
+    protected function getExpandedRecurrences(array $rawItems, \DateTime $start, \DateTime $end)
     {
-        $regularEvents = $this->getRegularEvents($items);
-        $exceptions = $this->getExceptions($items);
-        $occurrences = $this->getOccurrences($items, $start, $end);
+        $regularEvents = $this->filterRegularEvents($rawItems);
+        $recurringExceptionEvents = $this->filterRecurringExceptionEvents($rawItems);
+        $recurringOccurrenceEvents = $this->filterRecurringOccurrenceEvents($rawItems, $start, $end);
 
-        return array_merge($regularEvents, $this->getMergedOccurrencesWithExceptions($occurrences, $exceptions));
+        return $this->mergeRegularAndRecurringEvents(
+            $regularEvents,
+            $recurringOccurrenceEvents,
+            $recurringExceptionEvents
+        );
     }
 
     /**
+     * Returns list of all regular and not recurring events. Filters processed events from $items.
+     *
      * @param array $items
      *
      * @return array
      */
-    protected function getRegularEvents(array $items)
+    protected function filterRegularEvents(array &$items)
     {
         $events = [];
-        foreach ($items as $item) {
+        foreach ($items as $index => $item) {
             if (empty($item[Recurrence::STRING_KEY]) && empty($item['recurringEventId'])) {
                 $events[] = $item;
             }
@@ -168,18 +177,21 @@ class UserCalendarProvider extends AbstractCalendarProvider
     }
 
     /**
+     * Returns list of all events which represent exception of recurring event. Filters processed events from $items.
+     *
      * @param array $items
      *
      * @return array
      */
-    protected function getExceptions(array $items)
+    protected function filterRecurringExceptionEvents(array &$items)
     {
         $exceptions = [];
-        foreach ($items as $item) {
+        foreach ($items as $index => $item) {
             if (empty($item[Recurrence::STRING_KEY]) &&
                 !empty($item['recurringEventId']) &&
                 !empty($item['originalStart'])
             ) {
+                unset($items[$index]);
                 $exceptions[] = $item;
             }
         }
@@ -188,6 +200,9 @@ class UserCalendarProvider extends AbstractCalendarProvider
     }
 
     /**
+     * For each recurring event creates records representing events of recurring occurrence for [$start, $end] range.
+     * Returns merged list of all such events. Filters processed events from $items.
+     *
      * @param array $items
      * @param \DateTime $start
      * @param \DateTime $end
@@ -199,14 +214,15 @@ class UserCalendarProvider extends AbstractCalendarProvider
      * @throws \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
-    protected function getOccurrences(array $items, \DateTime $start, \DateTime $end)
+    protected function filterRecurringOccurrenceEvents(array &$items, \DateTime $start, \DateTime $end)
     {
         $key = Recurrence::STRING_KEY;
         $propertyAccessor = $this->getPropertyAccessor();
         $occurrences = [];
-        $dateFields = ['startTime', 'endTime', 'additionalEndTime'];
-        foreach ($items as $item) {
+        $dateFields = ['startTime', 'endTime', 'calculatedEndTime'];
+        foreach ($items as $index => $item) {
             if (!empty($item[$key]) && empty($item['recurringEventId'])) {
+                unset($items[$index]);
                 $recurrence = new Entity\Recurrence();
                 foreach ($item[$key] as $field => $value) {
                     $value = in_array($field, $dateFields, true) && $value !== null ? new \DateTime($value) : $value;
@@ -214,7 +230,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
                         $propertyAccessor->setValue($recurrence, $field, $value);
                     }
                 }
-                unset($item[$key]['additionalEndTime']);
+                unset($item[$key]['calculatedEndTime']);
                 $occurrenceDates = $this->recurrenceStrategy->getOccurrences($recurrence, $start, $end);
                 foreach ($occurrenceDates as $occurrenceDate) {
                     $newItem = $item;
@@ -236,34 +252,44 @@ class UserCalendarProvider extends AbstractCalendarProvider
     }
 
     /**
-     * @param array $occurrences
-     * @param array $exceptions
+     * Merges all previously filtered events.
+     *
+     * Result will contain:
+     * $regularEvents + ($recurringOccurrenceEvents - $recurringExceptionEvents) + $recurringExceptionEvents
+     *
+     * @param array $regularEvents
+     * @param array $recurringOccurrenceEvents
+     * @param array $recurringExceptionEvents
      *
      * @return array
      */
-    protected function getMergedOccurrencesWithExceptions(array $occurrences, array $exceptions)
-    {
-        foreach ($occurrences as $oKey => &$occurrence) {
-            foreach ($exceptions as $eKey => $exception) {
+    protected function mergeRegularAndRecurringEvents(
+        array $regularEvents,
+        array $recurringOccurrenceEvents,
+        array $recurringExceptionEvents
+    ) {
+        $recurringEvents = [];
+
+        foreach ($recurringOccurrenceEvents as $occurrence) {
+            $exceptionFound = false;
+            foreach ($recurringExceptionEvents as $key => $exception) {
                 if ((int)$exception['recurringEventId'] === (int)$occurrence['id'] &&
-                    (new \DateTime($exception['originalStart'])) == (new \DateTime($occurrence['start']))
+                    new \DateTime($exception['originalStart']) == new \DateTime($occurrence['start'])
                 ) {
-                    if ($exception['isCancelled']) {
-                        unset($occurrences[$oKey]);
-                    } else {
-                        $occurrence = $exception;
+                    $exceptionFound = true;
+                    if (empty($exception['isCancelled'])) {
+                        $recurringEvents[] = $exception;
                     }
-                    unset($exceptions[$eKey]);
+                    unset($recurringExceptionEvents[$key]);
                 }
             }
-        }
-        unset($occurrence);
-        $occurrences = empty($occurrences) ? [] : $occurrences;
-        if (!empty($exceptions)) {
-            $occurrences = array_merge($occurrences, $exceptions);
+
+            if (!$exceptionFound) {
+                $recurringEvents[] = $occurrence;
+            }
         }
 
-        return $occurrences;
+        return array_merge($regularEvents, $recurringEvents, $recurringExceptionEvents);
     }
 
     /**
@@ -282,7 +308,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
         $queryBuilder->orWhere(
             $expr->andX(
                 $expr->lte('r.startTime', ':endDate'),
-                $expr->gte('r.additionalEndTime', ':startDate')
+                $expr->gte('r.calculatedEndTime', ':startDate')
             )
         )
         ->orWhere(

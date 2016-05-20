@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -174,10 +175,15 @@ class RestCalendarEventTest extends WebTestCase
 
         $this->assertNotEmpty($result);
         $this->assertTrue(isset($result['id']));
-        $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
+        /** @var CalendarEvent $event */
+        $event = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
             ->find($result['id']);
         $this->assertNotNull($event);
-        $this->assertEquals(Recurrence::MAX_END_DATE, $event->getRecurrence()->getAdditionalEndTime()->format(DATE_RFC3339));
+        $this->assertEquals(
+            Recurrence::MAX_END_DATE,
+            $event->getRecurrence()->getCalculatedEndTime()->format(DATE_RFC3339)
+        );
 
         return ['id' => $result['id'], 'recurrenceId' => $event->getRecurrence()->getId()];
     }

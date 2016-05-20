@@ -82,7 +82,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
             ->setMonthOfYear($params['monthOfYear'])
             ->setStartTime(new \DateTime($params['startTime']))
             ->setEndTime(new \DateTime($params['endTime']))
-            ->setAdditionalEndTime(new \DateTime($params['endTime']));
+            ->setCalculatedEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
             $recurrence->setOccurrences($params['occurrences']);
         }

@@ -10,8 +10,28 @@ use Oro\Bundle\CalendarBundle\Entity;
 class Recurrence
 {
     const STRING_KEY = 'recurrence';
+
+    /**
+     * Used to calculate max endTime when it's empty and there are no occurrences specified.
+     *
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\AbstractStrategy::getCalculatedEndTime
+     */
     const MAX_END_DATE = '9000-01-01T00:00:01+00:00';
 
+    /**#@+
+     * Type of recurrence
+     *
+     * Respective strategies:
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\DailyStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\WeeklyStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\MonthNthStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\YearlyStrategy
+     * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\YearNthStrategy
+     *
+     * Property which obtains one of these values:
+     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$recurrenceType
+     */
     const TYPE_DAILY = 'daily';
     const TYPE_WEEKLY = 'weekly';
     const TYPE_MONTHLY = 'monthly';
@@ -19,12 +39,28 @@ class Recurrence
     const TYPE_YEARLY = 'yearly';
     const TYPE_YEAR_N_TH = 'yearnth';
 
+
+    /**#@+
+     * It is used in monthnth and yearnth strategies, for creating recurring events like:
+     * 'Yearly every 2 years on the first Saturday of April',
+     * 'Monthly the fourth Saturday of every 2 months',
+     * 'Yearly every 2 years on the last Saturday of April'.
+     *
+     * Property which obtains one of these values:
+     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$instance
+     */
     const INSTANCE_FIRST = 1;
     const INSTANCE_SECOND = 2;
     const INSTANCE_THIRD = 3;
     const INSTANCE_FOURTH = 4;
     const INSTANCE_LAST = 5;
 
+    /**#@+
+     * Constants of days used in recurrence.
+     *
+     * Property which obtains one of these values:
+     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$dayOfWeek
+     */
     const DAY_SUNDAY = 'sunday';
     const DAY_MONDAY = 'monday';
     const DAY_TUESDAY = 'tuesday';
@@ -55,17 +91,17 @@ class Recurrence
 
     /** @var array */
     protected static $weekdays = [
-        'monday',
-        'tuesday',
-        'wednesday',
-        'thursday',
-        'friday',
+        self::DAY_MONDAY,
+        self::DAY_TUESDAY,
+        self::DAY_WEDNESDAY,
+        self::DAY_THURSDAY,
+        self::DAY_FRIDAY,
     ];
 
     /** @var array */
     protected static $weekends = [
-        'saturday',
-        'sunday',
+        self::DAY_SATURDAY,
+        self::DAY_SUNDAY,
     ];
 
     /**

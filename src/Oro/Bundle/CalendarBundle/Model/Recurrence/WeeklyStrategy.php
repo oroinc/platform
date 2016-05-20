@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
+class WeeklyStrategy extends AbstractStrategy
 {
     /**
      * {@inheritdoc}
@@ -46,11 +46,11 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
 
         $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}");
 
-        while ($afterFullWeeksDate <= $end && $afterFullWeeksDate <= $recurrence->getAdditionalEndTime()) {
+        while ($afterFullWeeksDate <= $end && $afterFullWeeksDate <= $recurrence->getCalculatedEndTime()) {
             foreach ($weekDays as $day) {
                 $next = $this->getNextOccurrence($day, $afterFullWeeksDate);
                 if ($next > $end
-                    || $next > $recurrence->getAdditionalEndTime()
+                    || $next > $recurrence->getCalculatedEndTime()
                     || ($recurrence->getOccurrences() && $fromStartInterval >= $recurrence->getOccurrences())
                 ) {
                     return $result;
@@ -59,7 +59,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
                 if ($next >= $start
                     && $next <= $end
                     && $next >= $recurrence->getStartTime()
-                    && $next <= $recurrence->getAdditionalEndTime()
+                    && $next <= $recurrence->getCalculatedEndTime()
                 ) {
                     $result[] = $next;
                 }

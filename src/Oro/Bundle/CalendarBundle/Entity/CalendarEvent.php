@@ -258,6 +258,8 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $invitationStatus;
 
     /**
+     * Defines recurring event rules. Only original recurring event has this relation not empty.
+     *
      * @var Recurrence
      *
      * @ORM\OneToOne(targetEntity="Recurrence", cascade={"persist"})
@@ -266,6 +268,17 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $recurrence;
 
     /**
+     * Collection of exceptions of recurring event.
+     *
+     * Exception event is added if one of the events of recurrence have to have different state.
+     * For example recurring event starts at 9 AM on weekdays. But on Wednesday user moved this event to 10AM and
+     * on Friday user cancelled this event.
+     * In that case there will be 3 entities: 1 for recurring event and 2 for exceptions.
+     *
+     * Only original recurring event might have this collection not empty.
+     * Only exception event uses these properties: $recurringEvent, $originalStart and $isCancelled.
+     * At the same time exception cannot use these properties: $recurrence, $recurringEventExceptions.
+     *
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="recurringEvent", orphanRemoval=true, cascade={"all"})
@@ -273,7 +286,9 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $recurringEventExceptions;
 
     /**
-     * This attribute facilitates to determine whether an event is an exception and which event is it's parent one.
+     * This attribute determines whether an event is an exception and what is original recurring event.
+     *
+     * Only exception event has this relation not empty.
      *
      * @var CalendarEvent
      *
@@ -283,7 +298,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $recurringEvent;
 
     /**
-     * This attribute determines when an exception breaks recurrence sequence.
+     * For an instance of exception of $recurringEvent, this is the time at which this event would start according to
+     * the recurrence data saved in $recurrence property of $recurringEvent.
+     *
+     * Only exception event has this value not empty.
      *
      * @var \DateTime
      *
@@ -292,10 +310,9 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $originalStart;
 
     /**
-     * Setting isCancelled value with this method is applicable only for events
-     * referring to recurring event (aka exceptions). If user have decided to cancel
-     * one of the events in the recurrence a new instance of exception event will be
-     * created with this flag set to false.
+     * For an instance of exception of $recurringEvent, this flag determines if this event is cancelled.
+     *
+     * Only exception event has this value not empty.
      *
      * @var bool
      *

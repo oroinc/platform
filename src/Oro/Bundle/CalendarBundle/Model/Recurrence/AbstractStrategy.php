@@ -8,7 +8,7 @@ use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
-abstract class AbstractStrategy
+abstract class AbstractStrategy implements StrategyInterface
 {
     /** @var Recurrence */
     protected $model;
@@ -122,10 +122,12 @@ abstract class AbstractStrategy
         $occurrences = $recurrence->getOccurrences();
         $currentEndTime = $recurrence->getEndTime();
 
-        if (empty($currentEndTime) && !empty($occurrences)) {
+        if (!empty($currentEndTime)) {
+            $result = $currentEndTime;
+        } elseif (!empty($occurrences)) {
             $result = $this->getLastOccurrence($recurrence);
         } else {
-            $result = empty($currentEndTime) ? new \DateTime(Recurrence::MAX_END_DATE) : $currentEndTime;
+            $result = new \DateTime(Recurrence::MAX_END_DATE);
         }
 
         return $result;

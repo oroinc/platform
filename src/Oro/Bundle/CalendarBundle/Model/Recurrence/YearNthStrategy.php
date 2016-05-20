@@ -8,7 +8,7 @@ use Oro\Bundle\CalendarBundle\Model\Recurrence;
 /**
  * Recurrence with type Recurrence::TYPE_YEAR_N_TH will provide interval a number of month, which is multiple of 12.
  */
-class YearNthStrategy extends AbstractStrategy implements StrategyInterface
+class YearNthStrategy extends AbstractStrategy
 {
     /**
      * {@inheritdoc}
@@ -50,7 +50,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
         }
 
         $occurrences = $recurrence->getOccurrences();
-        while ($occurrenceDate <= $recurrence->getAdditionalEndTime()
+        while ($occurrenceDate <= $recurrence->getCalculatedEndTime()
             && $occurrenceDate <= $end
             && ($occurrences === null || $fromStartInterval <= $occurrences)
         ) {

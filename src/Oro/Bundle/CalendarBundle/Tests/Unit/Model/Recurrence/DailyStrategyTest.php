@@ -83,7 +83,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             ->setInterval($params['interval'])
             ->setStartTime(new \DateTime($params['startTime']))
             ->setEndTime(new \DateTime($params['endTime']))
-            ->setAdditionalEndTime(new \DateTime($params['endTime']));
+            ->setCalculatedEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
             $recurrence->setOccurrences($params['occurrences']);
         }

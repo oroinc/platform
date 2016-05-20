@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
+class MonthlyStrategy extends AbstractStrategy
 {
     /**
      * {@inheritdoc}
@@ -26,7 +26,7 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
         }
 
         $occurrences = $recurrence->getOccurrences();
-        while ($occurrenceDate <= $recurrence->getAdditionalEndTime()
+        while ($occurrenceDate <= $recurrence->getCalculatedEndTime()
             && $occurrenceDate <= $end
             && ($occurrences === null || $fromStartInterval <= $occurrences)
         ) {
