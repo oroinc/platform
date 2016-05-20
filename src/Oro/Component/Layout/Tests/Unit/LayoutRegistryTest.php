@@ -192,7 +192,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $name     = 'test';
         /** @var OptionsResolver $resolver */
-        $resolver = $this->getMock('Oro\Component\Layout\OptionsResolver\OptionsResolver');
+        $resolver = $this->getMock('Oro\Component\Layout\Block\OptionsResolver\OptionsResolver');
 
         $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
