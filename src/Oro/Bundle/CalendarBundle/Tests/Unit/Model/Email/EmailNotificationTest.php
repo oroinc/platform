@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailNotification;
 
 class EmailNotificationTest extends \PHPUnit_Framework_TestCase
@@ -76,6 +75,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
 
         $this->notification->setTemplateName('template_test');
+        $this->notification->setEntity(new Attendee());
         $this->notification->getTemplate();
     }
 
