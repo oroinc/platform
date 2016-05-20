@@ -77,6 +77,7 @@ define(function(require) {
             $(window).off('.' + this.cid);
             this.removeActiveEditorComponents();
             if (!this.manager.disposing) {
+                this.main.columns.each(this.removePatchForCellConstructor);
                 this.main.$el.removeClass('grid-editable');
                 this.main.body.refresh();
             }
@@ -220,6 +221,15 @@ define(function(require) {
                 cell: extended,
                 oldCell: cellCtor
             });
+        },
+
+        removePatchForCellConstructor: function(column) {
+            if (column.get('oldCell')) {
+                column.set({
+                    cell: column.get('oldCell'),
+                    oldCell: false
+                });
+            }
         },
 
         hasChanges: function() {
