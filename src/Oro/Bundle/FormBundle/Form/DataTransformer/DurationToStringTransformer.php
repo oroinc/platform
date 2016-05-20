@@ -7,9 +7,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Transforms between time duration (string or \DateTime instance) and time duration string.
- * Straight transform will generate string from DateTime with the given generateFormat
- * or will just pass trough the value if it is already a string
+ * Transforms between time duration in seconds (scalar) and duration encoded string.
+ * Straight transform will generate JIRA style encoded string (0h 0m 0s)
+ * with zero values omitted (e.g. 3600 => 1h)
  *
  * Reverse transform supports:
  * - JIRA style encoding (0.0h 0.0m 0.0s).
@@ -20,24 +20,10 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *   Parts are converted to int, thus trailing non-digits are trimmed, while leading will
  *   result to 0's (1a:b2:3.5m => 1:0:3). Missing leading zeros are also valid (:1: => 0:1:0).
  * In both styles time parts are cumulative, so '1m 120s' (or '1:120') becomes 3 min.
- * Resulting \DateTime object is Unix epoch based (1970-01-01 0:0:0 UTC)
+ * Returns integer representing duration in seconds
  */
 class DurationToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * Format used for straight transform (\DateTime to string)
-     * @var string
-     */
-    private $generateFormat;
-
-    /**
-     * @param string $generateFormat
-     */
-    public function __construct($generateFormat = 'H:i:s')
-    {
-        $this->generateFormat = $generateFormat;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -47,16 +33,34 @@ class DurationToStringTransformer implements DataTransformerInterface
             return '';
         }
 
-        // do not transform if it is already a string
-        if (is_string($value)) {
-            return $value;
+        if (!is_scalar($value)) {
+            throw new UnexpectedTypeException($value, 'scalar');
         }
 
-        if (!$value instanceof \DateTimeInterface && !$value instanceof \DateTime) {
-            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
+        $encoded = [];
+        try {
+            $dateInterval = new \DateInterval('PT' . (int) $value . 'S');
+            // since \DateInterval does not handle carryovers, we need to use \DateTime::diff
+            $dateTime = new \DateTimeImmutable();
+            $timeInterval = $dateTime->diff($dateTime->add($dateInterval));
+        } catch (\Exception $e) {
+            throw new TransformationFailedException('Duration too long to convert.');
         }
 
-        return $value->format($this->generateFormat);
+        $hours = $timeInterval->days * 24 + $timeInterval->h;
+        $minutes = $timeInterval->i;
+        $seconds = $timeInterval->s;
+        if ($hours) {
+            $encoded[] = $hours . 'h';
+        }
+        if ($minutes) {
+            $encoded[] = $minutes . 'm';
+        }
+        if ($seconds) {
+            $encoded[] = $seconds . 's';
+        }
+
+        return empty($encoded) ? '0s' : join(' ', $encoded);
     }
 
     /**
@@ -68,26 +72,13 @@ class DurationToStringTransformer implements DataTransformerInterface
             return null;
         }
 
-        // Do not transform if already a DateTime (for BC)
-        if ($value instanceof \DateTime) {
-            return $value;
-        }
-
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
         $parts = $this->getTimeParts($value);
 
-        $seconds = $parts['h'] * 3600 + $parts['m'] * 60 + $parts['s'];
-
-        $dateTime = \DateTime::createFromFormat('U', round($seconds), new \DateTimeZone('UTC'));
-
-        if (!$dateTime) {
-            throw new TransformationFailedException('Failed to create a \DateTime instance.');
-        }
-
-        return $dateTime;
+        return round($parts['h'] * 3600 + $parts['m'] * 60 + $parts['s']);
     }
 
     /**

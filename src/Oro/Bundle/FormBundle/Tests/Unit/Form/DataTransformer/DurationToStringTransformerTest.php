@@ -21,25 +21,35 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function transformDataProvider()
     {
         return [
-            'default' => [
-                \DateTime::createFromFormat('U', 120),
-                '00:02:00',
+            '120 seconds' => [
+                120,
+                '2m',
             ],
-            'string' => [
-                '120',
-                '120',
+            '1 day and 10 seconds' => [
+                86410, // 3600 * 24 + 10,
+                '24h 10s',
             ],
         ];
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a \DateTime or \DateTimeInterface.
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "scalar", "array" given
      */
     public function testTransformFailsWhenUnexpectedType()
     {
         $transformer = $this->createTestTransformer();
         $transformer->transform([]);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage Duration too long to convert.
+     */
+    public function testTransformFailsWithBigNumbers()
+    {
+        $transformer = $this->createTestTransformer();
+        $transformer->transform(PHP_INT_MAX);
     }
 
     /**
@@ -52,8 +62,7 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $transformer = $this->createTestTransformer();
         $transformed = $transformer->reverseTransform($value);
-        $this->assertInstanceOf('DateTime', $transformed);
-        $this->assertEquals($expectedValue, $transformed->format('H:i:s'));
+        $this->assertEquals($expectedValue, $transformed);
     }
 
     public function reverseTransformDataProvider()
@@ -61,88 +70,79 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
         return [
             'default' => [
                 '1:2:3',
-                '01:02:03',
+                3723, // '01:02:03'
             ],
             'Column style no hours' => [
                 '2:3',
-                '00:02:03',
+                123, // '00:02:03'
             ],
             'Column style only seconds' => [
                 '3',
-                '00:00:03',
+                3,
             ],
             'Column style 123 seconds' => [
                 '123',
-                '00:02:03',
+                123, // '00:02:03'
             ],
             'Column style 1:123 seconds' => [
                 '1:123',
-                '00:03:03',
+                183, // '00:03:03'
             ],
             'Column style untrimmed' => [
                 ' 1:2 : 3  ',
-                '01:02:03',
+                3723, // '01:02:03'
             ],
             'Column style extra columns' => [
                 '1:2:3::4',
-                '01:02:03',
+                3723, // '01:02:03'
             ],
             'Column style extra trailing symbols' => [
                 '1a:2.5:3c',
-                '01:02:03',
+                3723, // '01:02:03'
             ],
             'Column style extra leading symbols' => [
                 'a1:2b:3c',
-                '00:02:03',
+                123, // '00:02:03'
             ],
-            'JIRA style' => [
+            'JIRA style all parts' => [
                 '1h 2m 3s',
-                '01:02:03',
+                3723, // '01:02:03'
             ],
-            'JIRA style fractions rounded' => [
+            'JIRA style all parts with fractions' => [
                 '1.5h 2.5m 3.5s',
-                '01:32:34',
-            ],
-            'JIRA style hours' => [
-                '1h',
-                '01:00:00',
-            ],
-            'JIRA style 23h' => [
-                '23h',
-                '23:00:00',
-            ],
-            // TODO: fix time field and remove the test
-            'JIRA style 24h trimmed to 00' => [
-                '24h',
-                '00:00:00',
-            ],
-            'JIRA style minutes' => [
-                '2m',
-                '00:02:00',
-            ],
-            'JIRA style seconds' => [
-                '3s',
-                '00:00:03',
-            ],
-            'JIRA style hours minutes' => [
-                '1h 2m',
-                '01:02:00',
-            ],
-            'JIRA style minutes seconds' => [
-                '2m 3s',
-                '00:02:03',
-            ],
-            'JIRA style hours seconds' => [
-                '1h 3s',
-                '01:00:03',
-            ],
-            'JIRA style no spaces' => [
-                '1h2m3s',
-                '01:02:03',
+                5554, // '01:32:34' rounded
             ],
             'JIRA style no spaces fractions' => [
                 '1.5h2.5m3.5s',
-                '01:32:34',
+                5554, // '01:32:34' rounded
+            ],
+            'JIRA style only hours' => [
+                '24h',
+                86400, // '24:00:00'
+            ],
+            'JIRA style only minutes' => [
+                '90m',
+                5400, // '01:30:00'
+            ],
+            'JIRA style only seconds' => [
+                '120s',
+                120, // '00:02:00'
+            ],
+            'JIRA style hours minutes' => [
+                '1h 90m',
+                9000, // '2:30:00'
+            ],
+            'JIRA style minutes seconds' => [
+                '90m 120s',
+                5520, // '2:32:00'
+            ],
+            'JIRA style hours seconds' => [
+                '1h 3s',
+                3603, // '01:00:03'
+            ],
+            'JIRA style no spaces' => [
+                '1h2m3s',
+                3723, // '01:02:03'
             ],
         ];
     }
@@ -173,20 +173,6 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformFailsWhenUnexpectedType()
     {
         $this->createTestTransformer()->reverseTransform(array());
-    }
-
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Failed to create a \DateTime instance.
-     */
-    public function testReverseTransformFailsWithBigNumbers()
-    {
-        $this->createTestTransformer()
-             ->reverseTransform(
-                 sprintf('%s:%s:%s', PHP_INT_MAX, PHP_INT_MAX, PHP_INT_MAX)
-             )
-        ;
     }
 
     private function createTestTransformer()
