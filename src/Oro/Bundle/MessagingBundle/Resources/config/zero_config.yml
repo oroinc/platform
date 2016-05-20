@@ -2,15 +2,16 @@ services:
     oro_messaging.zero_config.config:
         class: 'Oro\Component\Messaging\ZeroConfig\Config'
 
-    oro_messaging.zero_config.transport.session:
-        class: 'Oro\Component\Messaging\Transport\Amqp\AmqpSession'
-        factory: ['@oro_messaging.transport.amqp.connection', 'createSession']
-
     oro_messaging.zero_config.session:
-        class: 'Oro\Component\Messaging\ZeroConfig\AmqpSession'
+        class: 'Oro\Component\Messaging\ZeroConfig\Session'
+        factory: ['Oro\Component\Messaging\ZeroConfig\SessionFactory', 'create']
         arguments:
-            - '@oro_messaging.zero_config.transport.session'
+            - '@oro_messaging.transport.connection'
             - '@oro_messaging.zero_config.config'
+
+    oro_messaging.zero_config.front_producer:
+        class: 'Oro\Component\Messaging\ZeroConfig\FrontProducer'
+        factory: ['@oro_messaging.zero_config.session', 'createFrontProducer']
 
     oro_messaging.zero_config.router:
         class: 'Oro\Component\Messaging\ZeroConfig\Router'
@@ -35,8 +36,15 @@ services:
         arguments:
             - '@oro_messaging.zero_config.message_processor_registry'
 
+    oro_messaging.zero_config.extension.create_queue:
+        class: 'Oro\Component\Messaging\ZeroConfig\ConsumptionExtension\CreateQueueExtension'
+        arguments:
+            - '@oro_messaging.zero_config.session'
+        tags:
+            - { name: 'oro_messaging.consumption.extension' }
+
     oro_messaging.zero_config.consume_messages_command:
-        class: Oro\Component\Messaging\ZeroConfig\ConsumeMessagesCommand
+        class: 'Oro\Component\Messaging\ZeroConfig\ConsumeMessagesCommand'
         arguments:
             - '@oro_messaging.consumption.queue_consumer'
             - '@oro_messaging.zero_config.delegate_message_processor'

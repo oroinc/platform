@@ -13,14 +13,14 @@ class SessionFactory
      *
      * @return Session
      */
-    public function create(Connection $connection, Config $config)
+    public static function create(Connection $connection, Config $config)
     {
         if ($connection instanceof  AmqpConnection) {
             return new AmqpSession($connection->createSession(), $config);
         } elseif ($connection instanceof NullConnection) {
             return new NullSession($connection->createSession(), $config);
         } else {
-            throw new \LogicException();
+            throw new \LogicException(sprintf('Unexpected connection instance: "%s"', get_class($connection)));
         }
     }
 }
