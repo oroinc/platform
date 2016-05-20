@@ -13,7 +13,7 @@ class OptionsResolver extends BaseOptionsResolver
      */
     public function setAllowedTypes($option, $allowedTypes = null)
     {
-        $this->throwAllowedTypesException();
+        $this->throwAllowedTypesException(__FUNCTION__);
     }
 
     /**
@@ -21,13 +21,17 @@ class OptionsResolver extends BaseOptionsResolver
      */
     public function addAllowedTypes($option, $allowedTypes = null)
     {
-        $this->throwAllowedTypesException();
+        $this->throwAllowedTypesException(__FUNCTION__);
     }
 
-    protected function throwAllowedTypesException()
+    /**
+     * @param string $methodName
+     */
+    protected function throwAllowedTypesException($methodName)
     {
-        throw new LogicException(
-            'Oro\Component\Layout\Block\OptionsResolver\OptionsResolver::setAllowedTypes method call is denied'
-        );
+        throw new LogicException(sprintf(
+            'Oro\Component\Layout\Block\OptionsResolver\OptionsResolver::%s method call is denied',
+            $methodName
+        ));
     }
 }
