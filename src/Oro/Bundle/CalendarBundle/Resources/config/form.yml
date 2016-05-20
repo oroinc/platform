@@ -33,7 +33,7 @@ services:
             - '@oro_calendar.calendar_event_manager'
             - '@doctrine'
             - '@oro_security.security_facade'
-            - '@request'
+            - '@request_stack'
         tags:
             - { name: form.type, alias: oro_calendar_event_api }
 

@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -22,24 +22,24 @@ class CalendarEventApiType extends CalendarEventType
     /** @var CalendarEventManager */
     protected $calendarEventManager;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /**
      * @param CalendarEventManager $calendarEventManager
      * @param ManagerRegistry      $registry
      * @param SecurityFacade       $securityFacade
-     * @param Request              $request
+     * @param RequestStack         $requestStack
      */
     public function __construct(
         CalendarEventManager $calendarEventManager,
         ManagerRegistry $registry,
         SecurityFacade $securityFacade,
-        Request $request
+        RequestStack $requestStack
     ) {
         parent::__construct($registry, $securityFacade);
         $this->calendarEventManager = $calendarEventManager;
-        $this->request              = $request;
+        $this->requestStack         = $requestStack;
     }
 
     /**
@@ -134,7 +134,7 @@ class CalendarEventApiType extends CalendarEventType
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventSubscriber(new CalendarEventApiTypeSubscriber(
             $this->calendarEventManager,
-            $this->request
+            $this->requestStack
         ));
         $builder->addEventSubscriber(new ChildEventsSubscriber(
             $builder,

@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Form\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
@@ -16,13 +16,19 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
     /** @var CalendarEventManager */
     protected $calendarEventManager;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
-    public function __construct(CalendarEventManager $calendarEventManager, Request $request)
+    /**
+     * CalendarEventApiTypeSubscriber constructor.
+     *
+     * @param CalendarEventManager $calendarEventManager
+     * @param RequestStack         $requestStack
+     */
+    public function __construct(CalendarEventManager $calendarEventManager, RequestStack $requestStack)
     {
         $this->calendarEventManager = $calendarEventManager;
-        $this->request              = $request;
+        $this->requestStack         = $requestStack;
     }
 
     /**
@@ -51,7 +57,9 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->request->request->has('attendees')) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request->request->has('attendees')) {
             $form->remove('invitedUsers');
         }
     }
@@ -65,17 +73,12 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
     {
         $form = $event->getForm();
         $data = $event->getData();
-
-        if (empty($data)) {
-            return;
-        }
-
+        
         if (!empty($data['attendees'])) {
             $form->remove('invitedUsers');
         }
     }
-
-
+    
     /**
      * POST_SUBMIT event handler
      *
