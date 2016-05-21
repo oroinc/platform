@@ -11,6 +11,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase
 
 class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $criteriaConnector;
+
     /** @var BuildSingleItemQuery */
     protected $processor;
 
@@ -18,7 +21,11 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
     {
         parent::setUp();
 
-        $this->processor = new BuildSingleItemQuery($this->doctrineHelper);
+        $this->criteriaConnector = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\CriteriaConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->processor = new BuildSingleItemQuery($this->doctrineHelper, $this->criteriaConnector);
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
@@ -58,8 +65,12 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
+        $criteria = new Criteria($resolver);
 
-        $this->context->setCriteria(new Criteria($resolver));
+        $this->criteriaConnector->expects($this->once())
+            ->method('applyCriteria');
+
+        $this->context->setCriteria($criteria);
         $this->context->setClassName($className);
         $this->context->setId($id);
         $this->processor->process($this->context);

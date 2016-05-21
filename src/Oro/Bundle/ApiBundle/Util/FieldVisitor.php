@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Collection;
+namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
@@ -45,7 +45,8 @@ class FieldVisitor extends ExpressionVisitor
      */
     public function walkCompositeExpression(CompositeExpression $expr)
     {
-        foreach ($expr->getExpressionList() as $child) {
+        $expressionList = $expr->getExpressionList();
+        foreach ($expressionList as $child) {
             $this->dispatch($child);
         }
     }
