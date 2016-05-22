@@ -176,3 +176,9 @@ services:
             - '@oro_workflow.process.import.definitions'
             - '@oro_workflow.process.import.triggers'
             - '%oro_workflow.process_definition.entity.class%'
+
+    oro_workflow.transition.schedule_helper:
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper'
+        scope: prototype
+        arguments:
+            - '@doctrine'

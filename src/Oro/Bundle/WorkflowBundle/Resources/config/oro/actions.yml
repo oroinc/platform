@@ -1,0 +1,19 @@
+action_groups:
+    oro_workflow_transition_process_schedule:
+        parameters:
+            steps:
+                type: array
+            entity_class:
+                type: string
+            transition:
+                type: Oro\Bundle\WorkflowBundle\Model\Transition
+        actions:
+            - '@call_service_method':
+                service: oro_workflow.transition.schedule_helper
+                method: getWorkflowItemIds
+                method_parameters: [$.steps, $.entity_class, $.transition.scheduleFilter]
+                attribute: $.workflowItemIds
+            - '@foreach':
+                array: $.workflowItemIds
+                value: $.id
+                actions:
