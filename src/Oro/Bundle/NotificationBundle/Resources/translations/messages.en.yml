@@ -42,10 +42,15 @@ oro:
             owner.label:          Owner
 
         massnotification:
-            dummy_id.label:                 Id
-            dummy_label.label:              Label
-            massnotification_pluray.label:  Mass Notification
-            massnotification.datagrid:      Datagrid
+            entity_label:         Mass Notification
+            entity_plural_label:  Mass Notifications
+            entity_description:   Represent mass email notifications
+            title.label:          Title
+            body.label:           Body
+            email.label:          Email
+            status.label:         Status
+            scheduled_at.label:   Scheduled At
+            processed_at.label:   Processed At
 
         system_configuration:
             email_notification_sender_email: Sender Email

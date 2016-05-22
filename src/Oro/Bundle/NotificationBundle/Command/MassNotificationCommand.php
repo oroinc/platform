@@ -1,6 +1,6 @@
 <?php
 
-namespace  Oro\Bundle\NavigationBundle\Command;
+namespace  Oro\Bundle\NotificationBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
  * Class MassNotificationCommand
  * Console command implementation
  *
- * @package Oro\Bundle\NavigationBundle\Command
+ * @package Oro\Bundle\NotificationBundle\Command
  */
 class MassNotificationCommand extends ContainerAwareCommand
 {
