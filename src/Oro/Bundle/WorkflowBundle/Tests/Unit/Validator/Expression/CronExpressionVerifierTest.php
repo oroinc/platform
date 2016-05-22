@@ -37,6 +37,9 @@ class CronExpressionVerifierTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expression, $result);
     }
 
+    /**
+     * @return array
+     */
     public function validateExpressionDataProvider()
     {
         return [

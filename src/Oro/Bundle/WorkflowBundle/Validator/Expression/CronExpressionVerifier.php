@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Validator\Expression;
 
 use Cron\CronExpression;
 use Cron\FieldFactory;
+
 use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException;
 
 class CronExpressionVerifier implements ExpressionVerifierInterface
