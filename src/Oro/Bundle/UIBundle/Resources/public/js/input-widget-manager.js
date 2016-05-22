@@ -52,6 +52,11 @@ define(function(require) {
                 Widget: null
             });
 
+            if (widget.selector.indexOf(',') !== -1) {
+                // @see http://www.w3schools.com/cssref/sel_element_comma.asp
+                throw new Error('Comma in widget.selector is not supported');
+            }
+
             this.addWidgets.push(widget);
         },
 
@@ -144,12 +149,14 @@ define(function(require) {
          * @param {jQuery} $input
          * @param {AbstractInputWidget|Function} Widget
          * @param {Object} options
+         * @param {String} humanName - widget key (human name) assigned to this widget
          * @returns {AbstractInputWidget|Object}
          */
-        createWidget: function($input, Widget, options) {
+        createWidget: function($input, Widget, options, humanName) {
             if (!options) {
                 options = {};
             }
+            $input.attr('data-bound-input-widget', humanName || 'no-name');
             options.$el = $input;
             var widget = new Widget(options);
             if (!widget.isInitialized()) {
@@ -162,7 +169,7 @@ define(function(require) {
          * @returns {boolean}
          */
         hasWidget: function($input) {
-            return Boolean(this.getWidget($input));
+            return Boolean($input.attr('data-bound-input-widget'));
         },
 
         /**
@@ -177,6 +184,43 @@ define(function(require) {
             if (tools.debug) {
                 console.error.apply(console, arguments);
             }
+        },
+
+        /**
+         * Finds and initializes all input widgets in container
+         */
+        seekAndCreateWidgetsInContainer: function($container) {
+            var self = this;
+            var attachedWidgetsCount = 0;
+            _.each(this.widgetsByPriority, function(widget) {
+                var $els = $container.find(widget.selector).filter(
+                    ':not(' +
+                        (self.noWidgetSelector ? (self.noWidgetSelector + ',') : '') +
+                        '[data-bound-input-widget]' +
+                    ')'
+                );
+                $els.each(function() {
+                    attachedWidgetsCount++;
+                    self.createWidget($(this), widget.Widget, {}, widget.key);
+                });
+            });
+            $container.data('attachedWidgetsCount',
+                ($container.data('attachedWidgetsCount') || 0) + attachedWidgetsCount);
+        },
+
+        /**
+         * Finds and destroys all input widgets in container
+         */
+        seekAndDestroyWidgetsInContainer: function($container) {
+            if (!$container.data('attachedWidgetsCount')) {
+                // no inputWidgets
+                return;
+            }
+            var self = this;
+            $container.find('[data-bound-input-widget]').each(function() {
+                self.getWidget($(this)).dispose();
+            });
+            this.collectWidgets();
         }
     };
 
@@ -188,11 +232,13 @@ define(function(require) {
          * Otherwise will be executed `InputWidget[command]` function for each element.
          *
          * Example of usage:
-         *     $(':input').inputWidget('create');//create widgets
-         *     $(':input').inputWidget('refresh');//update widget, for example after input value change
-         *     $(':input:first').inputWidget('getContainer');//get widget root element
-         *     $(':input').inputWidget('setWidth', 100);//set widget width
-         *     $(':input').inputWidget('dispose');//destroy widgets and dispose widget instance
+         *     $(':input').inputWidget('create'); //create widgets
+         *     $('#container').inputWidget('seekAndCreate'); //create widgets in container
+         *     $('#container').inputWidget('seekAndDestroy'); //destroys widgets in container
+         *     $(':input').inputWidget('refresh'); //update widget, for example after input value change
+         *     $(':input:first').inputWidget('getContainer'); //get widget root element
+         *     $(':input').inputWidget('setWidth', 100); //set widget width
+         *     $(':input').inputWidget('dispose'); //destroy widgets and dispose widget instance
          *
          * @param {String|null} command
          * @returns {mixed}
@@ -200,6 +246,12 @@ define(function(require) {
         inputWidget: function(command) {
             if (command === 'create') {
                 return InputWidgetManager.create(this);
+            }
+            if (command === 'seekAndCreate') {
+                return InputWidgetManager.seekAndCreateWidgetsInContainer(this);
+            }
+            if (command === 'seekAndDestroy') {
+                return InputWidgetManager.seekAndDestroyWidgetsInContainer(this);
             }
 
             var response = null;
