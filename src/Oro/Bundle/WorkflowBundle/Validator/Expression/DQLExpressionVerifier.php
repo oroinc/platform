@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Validator\Expression;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\AST\SelectStatement;
 
 use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException;
 
@@ -26,10 +27,16 @@ class DQLExpressionVerifier implements ExpressionVerifierInterface
     public function verify($expression)
     {
         try {
-            $this->em->createQuery($expression)
-                ->setFirstResult(0)
-                ->setMaxResults(1)
-                ->execute();
+            $query = $this->em->createQuery($expression);
+
+            //Try to execute only "SELECT" queries, because they are safe
+            if ($query->getAST() instanceof SelectStatement) {
+                $query->setFirstResult(0)
+                    ->setMaxResults(1)
+                    ->execute();
+            }
+
+            return $expression;
         } catch (\Exception $e) {
             throw new ExpressionException($e->getMessage());
         }

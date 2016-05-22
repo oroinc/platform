@@ -18,7 +18,9 @@ class CronExpressionVerifier implements ExpressionVerifierInterface
     public function verify($expression)
     {
         try {
-            new CronExpression($expression, new FieldFactory());
+            CronExpression::factory($expression, new FieldFactory());
+
+            return $expression;
         } catch (\InvalidArgumentException $e) {
             throw new ExpressionException($e->getMessage());
         }
