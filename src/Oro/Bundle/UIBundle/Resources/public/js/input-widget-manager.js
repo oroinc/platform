@@ -156,27 +156,23 @@ define(function(require) {
             }
         },
 
+        getCompoundQuery: function() {
+            var queries = [];
+            for (var i = 0; i < this.widgetsByPriority.length; i++) {
+                var widget = this.widgetsByPriority[i];
+                queries.push(widget.selector);
+            }
+            return queries.join(',');
+        },
+
         /**
          * Finds and initializes all input widgets in container
          */
         seekAndCreateWidgetsInContainer: function($container) {
-            var self = this;
-            var attachedWidgetsCount = 0;
-            for (var i = 0; i < this.widgetsByPriority.length; i++) {
-                var widget = this.widgetsByPriority[i];
-                var $els = $container.find(widget.selector).filter(
-                    ':not(' +
-                        (this.noWidgetSelector ? (this.noWidgetSelector + ',') : '') +
-                        '[data-bound-input-widget]' +
-                    ')'
-                );
-                for (var j = 0; j < $els.length; j++) {
-                    attachedWidgetsCount++;
-                    self.createWidget($($els[j]), widget.Widget, {}, widget.key);
-                }
-            }
+            var foundElements = $container.find(this.getCompoundQuery());
+            this.create(foundElements);
             $container.data('attachedWidgetsCount',
-                ($container.data('attachedWidgetsCount') || 0) + attachedWidgetsCount);
+                ($container.data('attachedWidgetsCount') || 0) + foundElements.length);
         },
 
         /**
