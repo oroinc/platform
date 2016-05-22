@@ -284,7 +284,7 @@ class EmailController extends Controller
      * Get the given email body content
      *
      * @Route("/body/{id}", name="oro_email_body", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_body_view")
      */
     public function bodyAction(EmailBody $entity)
     {
@@ -295,7 +295,7 @@ class EmailController extends Controller
      * Get a response for download the given email attachment
      *
      * @Route("/attachment/{id}", name="oro_email_attachment", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_attachment_view")
      */
     public function attachmentAction(EmailAttachment $entity)
     {
@@ -320,7 +320,7 @@ class EmailController extends Controller
      *   name="oro_resize_email_attachment",
      *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
      * )
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_attachment_view")
      *
      * @param EmailAttachment $attachment
      * @param int $width
@@ -364,7 +364,7 @@ class EmailController extends Controller
      * Get a zip with email attachments from the given email body
      *
      * @Route("/attachments/{id}", name="oro_email_body_attachments", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_body_view")
      *
      * @param EmailBody $entity
      * @return BinaryFileResponse
