@@ -32,13 +32,9 @@ define(function(require) {
     InputWidgetManager = {
         noWidgetSelector: '.no-input-widget',
 
-        addWidgets: [],
-
-        removeWidgets: [],
-
         widgets: {},
 
-        widgetsByPriority: {},
+        widgetsByPriority: [],
 
         /**
          * @param {String} key
@@ -52,54 +48,28 @@ define(function(require) {
                 Widget: null
             });
 
-            if (widget.selector.indexOf(',') !== -1) {
-                // @see http://www.w3schools.com/cssref/sel_element_comma.asp
-                throw new Error('Comma in widget.selector is not supported');
-            }
-
-            this.addWidgets.push(widget);
+            this.widgets[widget.key] = widget;
+            this.prioritizeWidgets();
         },
 
         /**
          * @param {String} key
          */
         removeWidget: function(key) {
-            this.removeWidgets.push(key);
+            delete this.widgets[key];
+            this.prioritizeWidgets();
         },
 
-        /**
-         * Execute addWidgets and removeWidgets queue, then rebuild widgetsByPriority.
-         */
-        collectWidgets: function() {
+        prioritizeWidgets: function() {
             var self = this;
-            var rebuild = false;
-
-            if (self.addWidgets.length) {
-                rebuild = true;
-                _.each(self.addWidgets, function(widget) {
-                    self.widgets[widget.key] = widget;
-                });
-                self.addWidgets = [];
-            }
-
-            if (self.removeWidgets.length) {
-                rebuild = true;
-                _.each(self.removeWidgets, function(key) {
-                    delete self.widgets[key];
-                });
-                self.removeWidgets = [];
-            }
-
-            if (rebuild) {
-                self.widgetsByPriority = [];
-                _.each(_.sortBy(self.widgets, 'priority'), function(widget) {
-                    if (!self.isValidWidget(widget)) {
-                        self.error('Input widget "%s" is invalid', widget.key);
-                        return;
-                    }
-                    self.widgetsByPriority.push(widget);
-                });
-            }
+            this.widgetsByPriority = [];
+            _.each(_.sortBy(self.widgets, 'priority'), function(widget) {
+                if (!self.isValidWidget(widget)) {
+                    self.error('Input widget "%s" is invalid', widget.key);
+                    return;
+                }
+                self.widgetsByPriority.push(widget);
+            });
         },
 
         isValidWidget: function(widget) {
@@ -115,7 +85,6 @@ define(function(require) {
          */
         create: function($inputs) {
             var self = this;
-            self.collectWidgets();
 
             _.each($inputs, function(input) {
                 var $input = $(input);
@@ -123,11 +92,12 @@ define(function(require) {
                     return ;
                 }
 
-                _.each(self.widgetsByPriority, function(widget) {
+                for (var i = 0; i < self.widgetsByPriority.length; i++) {
+                    var widget = self.widgetsByPriority[i];
                     if (!self.hasWidget($input) && self.isApplicable($input, widget)) {
                         self.createWidget($input, widget.Widget, {});
                     }
-                });
+                }
             });
         },
 
@@ -192,18 +162,19 @@ define(function(require) {
         seekAndCreateWidgetsInContainer: function($container) {
             var self = this;
             var attachedWidgetsCount = 0;
-            _.each(this.widgetsByPriority, function(widget) {
+            for (var i = 0; i < this.widgetsByPriority.length; i++) {
+                var widget = this.widgetsByPriority[i];
                 var $els = $container.find(widget.selector).filter(
                     ':not(' +
-                        (self.noWidgetSelector ? (self.noWidgetSelector + ',') : '') +
+                        (this.noWidgetSelector ? (this.noWidgetSelector + ',') : '') +
                         '[data-bound-input-widget]' +
                     ')'
                 );
-                $els.each(function() {
+                for (var j = 0; j < $els.length; j++) {
                     attachedWidgetsCount++;
-                    self.createWidget($(this), widget.Widget, {}, widget.key);
-                });
-            });
+                    self.createWidget($($els[j]), widget.Widget, {}, widget.key);
+                }
+            }
             $container.data('attachedWidgetsCount',
                 ($container.data('attachedWidgetsCount') || 0) + attachedWidgetsCount);
         },
@@ -220,7 +191,6 @@ define(function(require) {
             $container.find('[data-bound-input-widget]').each(function() {
                 self.getWidget($(this)).dispose();
             });
-            this.collectWidgets();
         }
     };
 
