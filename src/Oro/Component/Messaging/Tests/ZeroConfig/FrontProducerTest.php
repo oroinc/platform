@@ -35,9 +35,9 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
         $producer->send('topic', 'message');
 
         $expectedProperties = [
-            'oro.messaging.zero_conf.topic_name' => 'topic',
-            'oro.messaging.zero_conf.processor_name' => 'route-message-processor',
-            'oro.messaging.zero_conf.queue_name' => 'router-queue',
+            'oro.messaging.zero_config.topic_name' => 'topic',
+            'oro.messaging.zero_config.processor_name' => 'route-message-processor',
+            'oro.messaging.zero_config.queue_name' => 'router-queue',
         ];
 
         $this->assertEquals($expectedProperties, $message->getProperties());

@@ -89,7 +89,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             \LogicException::class,
-            'Got message without required parameter: "oro.messaging.zero_conf.topic_name"'
+            'Got message without required parameter: "oro.messaging.zero_config.topic_name"'
         );
         $result = $router->route(new NullMessage());
 

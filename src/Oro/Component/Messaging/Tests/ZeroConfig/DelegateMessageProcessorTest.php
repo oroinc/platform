@@ -17,7 +17,7 @@ class DelegateMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfProcessorNameIsNotSet()
     {
-        $this->setExpectedException(\LogicException::class, 'Got message without required parameter: "oro.messaging.zero_conf.processor_name"');
+        $this->setExpectedException(\LogicException::class, 'Got message without required parameter: "oro.messaging.zero_config.processor_name"');
 
         $processor = new DelegateMessageProcessor($this->createMessageProcessorRegistryMock());
         $processor->process(new AmqpMessage(), $this->createTransportSessionMock());

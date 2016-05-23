@@ -46,7 +46,13 @@ class LoggerExtension implements Extension
      */
     public function onPreReceived(Context $context)
     {
-        $context->getLogger()->info('Message received');
+        $message = $context->getMessage();
+
+        $logger = $context->getLogger();
+        $logger->info('Message received');
+        $logger->debug(sprintf('Headers: %s', var_export($message->getHeaders(), true)));
+        $logger->debug(sprintf('Properties: %s', var_export($message->getProperties(), true)));
+        $logger->debug(sprintf('Payload: %s', var_export($message->getBody(), true)));
     }
 
     /**

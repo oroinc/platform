@@ -24,7 +24,7 @@ services:
 
     oro_messaging.zero_config.route_message_processor:
         class: 'Oro\Component\Messaging\Router\RouterMessageProcessor'
-        public: false
+        public: true
         arguments:
             - '@oro_messaging.zero_config.router'
         tags:
@@ -65,6 +65,7 @@ services:
 
     oro_messaging.zero_config.consume_messages_command:
         class: 'Oro\Component\Messaging\ZeroConfig\ConsumeMessagesCommand'
+        public: true
         arguments:
             - '@oro_messaging.zero_config.queue_consumer'
             - '@oro_messaging.zero_config.delegate_message_processor'

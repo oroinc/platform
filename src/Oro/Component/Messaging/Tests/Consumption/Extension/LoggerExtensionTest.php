@@ -4,6 +4,7 @@ namespace Oro\Component\Messaging\Tests\Consumption\Extension;
 use Oro\Component\Messaging\Consumption\Context;
 use Oro\Component\Messaging\Consumption\Extension;
 use Oro\Component\Messaging\Consumption\Extension\LoggerExtension;
+use Oro\Component\Messaging\Transport\Null\NullMessage;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\LoggerInterface;
 
@@ -37,7 +38,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->onStart($context);
     }
 
-    public function testShouldAddDebugMessageOnStart()
+    public function testShouldAddInfoMessageOnStart()
     {
         $logger = $this->createLogger();
         $logger
@@ -58,7 +59,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->onStart($context);
     }
 
-    public function testShouldAddDebugMessageOnBeforeReceive()
+    public function testShouldAddInfoMessageOnBeforeReceive()
     {
         $logger = $this->createLogger();
         $logger
@@ -74,7 +75,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->onBeforeReceive($context);
     }
 
-    public function testShouldAddDebugMessageOnPreReceived()
+    public function testShouldAddInfoMessageOnPreReceived()
     {
         $logger = $this->createLogger();
         $logger
@@ -85,12 +86,43 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension = new LoggerExtension($logger);
 
-        $context = $this->createContextStub($logger);
+        $context = $this->createContextStub($logger, new NullMessage());
 
         $extension->onPreReceived($context);
     }
 
-    public function testShouldAddDebugMessageOnPostReceived()
+    public function testShouldAddDebugInfoAboutMessageOnPreReceived()
+    {
+        $message = new NullMessage();
+        $message->setBody('theBody');
+        $message->setHeaders(['theFoo' => 'theFooVal']);
+        $message->setProperties(['theBar' => 'theBarVal']);
+
+        $logger = $this->createLogger();
+        $logger
+            ->expects($this->at(1))
+            ->method('debug')
+            ->with($this->stringStartsWith('Headers: array ('))
+        ;
+        $logger
+            ->expects($this->at(2))
+            ->method('debug')
+            ->with($this->stringStartsWith('Properties: array ('))
+        ;
+        $logger
+            ->expects($this->at(3))
+            ->method('debug')
+            ->with($this->stringStartsWith('Payload: \'theBody\''))
+        ;
+
+        $extension = new LoggerExtension($logger);
+
+        $context = $this->createContextStub($logger, $message);
+
+        $extension->onPreReceived($context);
+    }
+
+    public function testShouldAddInfoMessageOnPostReceived()
     {
         $logger = $this->createLogger();
         $logger
@@ -106,7 +138,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->onPostReceived($context);
     }
 
-    public function testShouldAddDebugMessageOnIdle()
+    public function testShouldAddInfoMessageOnIdle()
     {
         $logger = $this->createLogger();
         $logger
@@ -122,7 +154,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->onIdle($context);
     }
 
-    public function testShouldAddDebugMessageOnInterrupted()
+    public function testShouldAddInfoMessageOnInterrupted()
     {
         $logger = $this->createLogger();
         $logger
@@ -141,16 +173,21 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Context
      */
-    protected function createContextStub($logger)
+    protected function createContextStub($logger = null, $message = null)
     {
-        $sessionMock = $this->getMock(Context::class, [], [], '', false);
-        $sessionMock
+        $contextMock = $this->getMock(Context::class, [], [], '', false);
+        $contextMock
             ->expects($this->any())
             ->method('getLogger')
             ->willReturn($logger)
         ;
+        $contextMock
+            ->expects($this->any())
+            ->method('getMessage')
+            ->willReturn($message)
+        ;
 
-        return $sessionMock;
+        return $contextMock;
     }
 
     /**
