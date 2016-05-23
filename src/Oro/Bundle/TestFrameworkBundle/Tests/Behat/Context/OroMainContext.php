@@ -55,9 +55,10 @@ class OroMainContext extends MinkContext implements
         }
 
         $screenshot = sprintf(
-            '%s/%s.png',
+            '%s/%s-%s-line.png',
             $this->getKernel()->getLogDir(),
-            $scope->getScenario()->getTitle()
+            $scope->getFeature()->getTitle(),
+            $scope->getScenario()->getLine()
         );
         file_put_contents($screenshot, $this->getSession()->getScreenshot());
     }
@@ -116,6 +117,16 @@ class OroMainContext extends MinkContext implements
      */
     public function iWaitingForAjaxResponse($time = 15000)
     {
+        $this->waitPageToLoad($time);
+        $this->waitForAjax($time);
+    }
+
+    /**
+     * Wait PAGE load
+     * @param int $time Time should be in milliseconds
+     */
+    protected function waitPageToLoad($time)
+    {
         $this->getSession()->wait(
             $time,
             '"complete" == document["readyState"] '.
@@ -124,6 +135,30 @@ class OroMainContext extends MinkContext implements
             '&& $ !== null '.
             '&& false === $( "div.loader-mask" ).hasClass("shown"))'
         );
+    }
+
+    /**
+     * Wait AJAX request
+     * @param int $time Time should be in milliseconds
+     */
+    protected function waitForAjax($time)
+    {
+        $jsAppActiveCheck = <<<JS
+        (function () {
+            var isAppActive = false;
+            try {
+                if (!window.mediatorCachedForSelenium) {
+                    window.mediatorCachedForSelenium = require('oroui/js/mediator');
+                }
+                isAppActive = window.mediatorCachedForSelenium.execute('isInAction');
+            } catch (e) {
+                return false;
+            }
+
+            return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;
+        })();
+JS;
+        $this->getSession()->wait($time, $jsAppActiveCheck);
     }
 
     /**

@@ -106,7 +106,7 @@ If you need some specific feature steps for your bundle you should create ```Tes
 Instead of ```OroMainContext``` FeatureContext will be used for bundle test suite.
 Perhaps FeatureContext may be extended from OroMainContext for reload some feature steps.
 
-Every Bundle can have own number of elements. All elements must be discribed in ```Resources/config/behat_elements.yml``` in way:
+Every Bundle can have own number of elements. All elements must be described in ```Resources/config/behat_elements.yml``` in way:
 
 ```yml
 Login:
