@@ -156,7 +156,7 @@ define([
         if (replace) $tip.offset(offset)
         // jscs:enable
         /* jshint ignore:end */
-        
+
         if (!this.$element.data('noscroll')) {
             /*
              * SCROLL support

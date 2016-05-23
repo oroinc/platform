@@ -516,7 +516,7 @@ require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function
                     el.src = src;
                     var img = $item.find('.thumbnail');
                     if (img.length) {
-                        el.thumb = img.css('background-image').replace(/^url\(['"]?/,'').replace(/['"]?\)$/,'');
+                        el.thumb = img.css('background-image').replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
                     } else {
                         el.thumb = el.src;
                     }
@@ -541,7 +541,6 @@ require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function
                 $(this).data('lightGallery').destroy(true); //fully destroy gallery on close
                 $(this).off('onCloseAfter.lg');
             });
-            
             e.preventDefault();
         }
     });

@@ -47,8 +47,8 @@
             'name': 'print-frame'
         });
         frame.css({
-            'position': "absolute",
-            'top': "-10000px"
+            'position': 'absolute',
+            'top': '-10000px'
         })
         $('body').append(frame);
 
@@ -63,9 +63,9 @@
         frameDoc.document.write(printHtml);
         frameDoc.document.write('</body></html>');
         frameDoc.document.close();
-        setTimeout(function () {
-            window.frames["print-frame"].focus();
-            window.frames["print-frame"].print();
+        setTimeout(function() {
+            window.frames['print-frame'].focus();
+            window.frames['print-frame'].print();
             frame.remove();
         }, 500);
     }
