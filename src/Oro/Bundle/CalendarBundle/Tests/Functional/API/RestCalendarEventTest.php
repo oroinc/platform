@@ -41,11 +41,17 @@ class RestCalendarEventTest extends WebTestCase
      */
     public function testPostOriginClient()
     {
+        $user = $this->getReference('simple_user');
+
+        $adminUser = $this->getContainer()->get('doctrine')
+            ->getRepository('OroUserBundle:User')
+            ->findOneByEmail('admin@example.com');
+
         $request = [
             'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
             'id'              => null,
-            'title'           => "Test Event",
-            'description'     => "Test Description",
+            'title'           => 'Test Event',
+            'description'     => 'Test Description',
             'start'           => '2016-05-04T11:29:46+00:00',
             'end'             => '2016-05-04T11:29:46+00:00',
             'allDay'          => true,
@@ -53,14 +59,14 @@ class RestCalendarEventTest extends WebTestCase
             'origin'          => 'client',
             'attendees'       => [
                 [
-                    'displayName' => 'Admin',
-                    'email'       => 'admin@example.com',
+                    'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                    'email'       => $adminUser->getEmail(),
                     'origin'      => 'client',
                     'status'      => null,
                 ],
                 [
-                    'displayName' => 'Simple user',
-                    'email'       => 'simple_user@example.com',
+                    'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
+                    'email'       => $user->getEmail(),
                     'origin'      => 'client',
                     'status'      => null,
                 ],
@@ -83,6 +89,11 @@ class RestCalendarEventTest extends WebTestCase
      */
     public function testGetAfterPost($id)
     {
+        $user      = $this->getReference('simple_user');
+        $adminUser = $this->getContainer()->get('doctrine')
+            ->getRepository('OroUserBundle:User')
+            ->findOneByEmail('admin@example.com');
+
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
@@ -115,18 +126,20 @@ class RestCalendarEventTest extends WebTestCase
                 'notifiable'       => false,
                 'attendees'        => [
                     [
-                        'displayName' => 'Admin',
-                        'email'       => 'admin@example.com',
-                        'origin'      => 'client',
-                        'status'      => 'accepted',
-                        'type'        => null,
-                    ],
-                    [
-                        'displayName' => 'Simple user',
+                        'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
                         'email'       => 'simple_user@example.com',
                         'origin'      => 'client',
                         'status'      => 'none',
                         'type'        => null,
+                        'user_id'     => $user->getId()
+                    ],
+                    [
+                        'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                        'email'       => 'admin@example.com',
+                        'origin'      => 'client',
+                        'status'      => 'accepted',
+                        'type'        => null,
+                        'user_id'     => $adminUser->getId()
                     ],
                 ],
             ],
@@ -140,14 +153,13 @@ class RestCalendarEventTest extends WebTestCase
         $attendees = $calendarEvent->getAttendees();
         $this->assertCount(2, $attendees);
 
-        $admin = $attendees->first();
-        $this->assertEquals('admin@example.com', $admin->getEmail());
-        $this->assertEquals('admin', $admin->getUser()->getUsername());
-        $this->assertEquals($admin, $calendarEvent->getRelatedAttendee());
+        $user = $attendees->last();
 
-        $simpleUser = $attendees->get(1);
-        $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
-        $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
+        foreach ($attendees as $attendee) {
+            if ($attendee->getEmail() === 'admin@example.com') {
+                $this->assertEquals($attendee, $calendarEvent->getRelatedAttendee());
+            }
+        }
     }
 
     /**
@@ -201,6 +213,10 @@ class RestCalendarEventTest extends WebTestCase
      */
     public function testGetAfterPut($id)
     {
+        $adminUser = $this->getContainer()->get('doctrine')
+            ->getRepository('OroUserBundle:User')
+            ->findOneByEmail('admin@example.com');
+
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
@@ -234,17 +250,19 @@ class RestCalendarEventTest extends WebTestCase
                 'attendees'        => [
                     [
                         'displayName' => 'Admin',
-                        'email'       => 'admin@example.com',
+                        'email'       => $adminUser->getEmail(),
                         'origin'      => 'client',
                         'status'      => 'accepted',
                         'type'        => null,
+                        'user_id'     => $adminUser->getId()
                     ],
                     [
                         'displayName' => 'Ext',
                         'email'       => 'ext@example.com',
                         'origin'      => 'external',
                         'status'      => 'tentative',
-                        'type'        => 'organizer'
+                        'type'        => 'organizer',
+                        'user_id'     => null
                     ]
                 ],
             ],
@@ -481,6 +499,11 @@ class RestCalendarEventTest extends WebTestCase
      */
     public function testPostOriginServer()
     {
+        $user      = $this->getReference('simple_user');
+        $adminUser = $this->getContainer()->get('doctrine')
+            ->getRepository('OroUserBundle:User')
+            ->findOneByEmail('admin@example.com');
+
         $request = [
             'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
             'id'              => null,
@@ -493,15 +516,15 @@ class RestCalendarEventTest extends WebTestCase
             'origin'          => 'server',
             'attendees'       => [
                 [
-                    'displayName' => 'Admin',
-                    'email'       => 'admin@example.com',
-                    'origin'      => 'server',
+                    'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                    'email'       => $adminUser->getEmail(),
+                    'origin'      => 'client',
                     'status'      => null,
                 ],
                 [
-                    'displayName' => 'Simple user',
-                    'email'       => 'simple_user@example.com',
-                    'origin'      => 'server',
+                    'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
+                    'email'       => $user->getEmail(),
+                    'origin'      => 'client',
                     'status'      => null,
                 ],
             ]
@@ -527,6 +550,11 @@ class RestCalendarEventTest extends WebTestCase
             'GET',
             $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
         );
+
+        $user      = $this->getReference('simple_user');
+        $adminUser = $this->getContainer()->get('doctrine')
+            ->getRepository('OroUserBundle:User')
+            ->findOneByEmail('admin@example.com');
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
@@ -555,18 +583,20 @@ class RestCalendarEventTest extends WebTestCase
                 'notifiable'       => true,
                 'attendees'        => [
                     [
-                        'displayName' => 'Admin',
-                        'email'       => 'admin@example.com',
-                        'origin'      => 'server',
-                        'status'      => 'accepted',
-                        'type'        => null,
-                    ],
-                    [
-                        'displayName' => 'Simple user',
+                        'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
                         'email'       => 'simple_user@example.com',
-                        'origin'      => 'server',
+                        'origin'      => 'client',
                         'status'      => 'none',
                         'type'        => null,
+                        'user_id'     => $user->getId()
+                    ],
+                    [
+                        'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                        'email'       => 'admin@example.com',
+                        'origin'      => 'client',
+                        'status'      => 'accepted',
+                        'type'        => null,
+                        'user_id'     => $adminUser->getId()
                     ],
                 ],
             ],
@@ -580,14 +610,11 @@ class RestCalendarEventTest extends WebTestCase
         $attendees = $calendarEvent->getAttendees();
         $this->assertCount(2, $attendees);
 
-        $admin = $attendees->first();
-        $this->assertEquals('admin@example.com', $admin->getEmail());
-        $this->assertEquals('admin', $admin->getUser()->getUsername());
-        $this->assertEquals($admin, $calendarEvent->getRelatedAttendee());
-
-        $simpleUser = $attendees->get(1);
-        $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
-        $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
+        foreach ($attendees as $attendee) {
+            if ($attendee->getEmail() === 'admin@example.com') {
+                $this->assertEquals($attendee, $calendarEvent->getRelatedAttendee());
+            }
+        }
     }
 
 
@@ -672,11 +699,12 @@ class RestCalendarEventTest extends WebTestCase
                 'notifiable'       => false,
                 'attendees'        => [
                     [
-                        'displayName' => 'Elley Towards',
-                        'email'       => 'simple_user@example.com',
+                        'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
+                        'email'       => $user->getEmail(),
                         'origin'      => 'client',
                         'status'      => 'none',
                         'type'        => 'optional',
+                        'user_id'     => $user->getId()
                     ],
                 ],
             ],
