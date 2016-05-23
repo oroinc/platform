@@ -267,6 +267,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $reminders;
 
     /**
+     * Contains list of all attendees of the event. This property is empty for all child events and
+     * value of the one from parentEvent is used since all (parent, child) events have the same attendees
+     * (so there is no need for some synchronization mechanism in case attendees changes).
+     *
      * @var Collection|Attendee[]
      *
      * @ORM\OneToMany(
