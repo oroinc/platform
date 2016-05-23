@@ -183,7 +183,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.criteria_coupler'
+            - '@oro_api.criteria_connector'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -100 }
 

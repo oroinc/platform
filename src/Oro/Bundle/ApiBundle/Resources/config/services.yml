@@ -30,8 +30,8 @@ services:
         arguments:
             - '@service_container'
 
-    oro_api.criteria_coupler:
-        class: Oro\Bundle\ApiBundle\Util\QueryCriteriaCoupler
+    oro_api.criteria_connector:
+        class: Oro\Bundle\ApiBundle\Util\CriteriaConnector
         public: false
         arguments:
             - '@oro_api.criteria_normalizer'

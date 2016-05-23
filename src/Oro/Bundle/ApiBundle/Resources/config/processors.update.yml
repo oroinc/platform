@@ -146,7 +146,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.criteria_coupler'
+            - '@oro_api.criteria_connector'
         tags:
             - { name: oro.api.processor, action: update, group: build_query, priority: -100 }
 
