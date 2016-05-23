@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
@@ -25,10 +26,6 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class EmailAttachmentManager
 {
     const ATTACHMENT_DIR = 'attachment';
-
-    const DEFAULT_IMAGE_WIDTH = 100;
-
-    const DEFAULT_IMAGE_HEIGHT = 100;
 
     /** @var Filesystem */
     protected $filesystem;
@@ -149,8 +146,8 @@ class EmailAttachmentManager
      */
     public function getResizedImageUrl(
         EmailAttachment $entity,
-        $width = self::DEFAULT_IMAGE_WIDTH,
-        $height = self::DEFAULT_IMAGE_HEIGHT,
+        $width = AttachmentManager::DEFAULT_IMAGE_WIDTH,
+        $height = AttachmentManager::DEFAULT_IMAGE_HEIGHT,
         $referenceType = Router::ABSOLUTE_PATH
     ) {
         return $this->router->generate(
