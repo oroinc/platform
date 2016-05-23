@@ -87,14 +87,6 @@ class FieldAclExtension extends EntityAclExtension
     /**
      * {@inheritdoc}
      */
-    public function isRootSupported()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function supports($type, $id)
     {
         $isEntity = parent::supports($type, $id);

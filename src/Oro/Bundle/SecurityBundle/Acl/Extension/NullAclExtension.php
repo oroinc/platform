@@ -164,12 +164,4 @@ final class NullAclExtension implements AclExtensionInterface
     {
         return array();
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isRootSupported()
-    {
-        return true;
-    }
 }

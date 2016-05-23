@@ -221,11 +221,4 @@ interface AclExtensionInterface
      *   value = access level name
      */
     public function getAccessLevelNames($object, $permissionName = null);
-
-    /**
-     * Returns true if extension supports root records
-     *
-     * @return boolean
-     */
-    public function isRootSupported();
 }
