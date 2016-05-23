@@ -28,15 +28,15 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
      */
     protected function prepareValueType($value)
     {
-        if (!is_array($value)) {
-            if ($this->allowScalarValues) {
-                $value = (array)$value;
-            } else {
-                throw new UnexpectedTypeException($value, 'array', 'value');
-            }
+        if (is_array($value)) {
+            return array_values($value);
         }
 
-        return array_values($value);
+        if ($this->allowScalarValues) {
+            return [$value];
+        }
+
+        throw new UnexpectedTypeException($value, 'array', 'value');
     }
 
     /**
@@ -44,11 +44,9 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
      */
     public function add($value)
     {
-        if (!($value = $this->prepareValueType($value))) {
-            return;
+        if ($prepared = $this->prepareValueType($value)) {
+            $this->values = array_merge($this->values, $prepared);
         }
-
-        $this->values = array_merge($this->values, $value);
     }
 
     /**
@@ -56,13 +54,13 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
      */
     public function remove($value)
     {
-        if (!($value = $this->prepareValueType($value))) {
+        if (!($prepared = $this->prepareValueType($value))) {
             return;
         }
 
         // array_diff can't be used because of string conversion
-        $this->values = array_values(array_filter($this->values, function ($existingValue) use ($value) {
-            return !in_array($existingValue, $value, true);
+        $this->values = array_values(array_filter($this->values, function ($existingValue) use ($prepared) {
+            return !in_array($existingValue, $prepared, true);
         }));
     }
 
@@ -71,11 +69,7 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
      */
     public function replace($oldValues, $newValue)
     {
-        if (!($value = $this->prepareValueType($oldValues))) {
-            return;
-        }
-
-        if (!($value = $this->prepareValueType($newValue))) {
+        if (!$this->prepareValueType($oldValues) || !$this->prepareValueType($newValue)) {
             return;
         }
 

@@ -81,4 +81,26 @@ class EnumValueRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $result->getPriority());
         $this->assertTrue($result->isDefault());
     }
+
+    public function testCreateEnumValueWithZeroAsKey()
+    {
+        $result = $this->repo->createEnumValue('Test Value 1', 1, true, '0');
+
+        $this->assertInstanceOf(self::ENUM_VALUE_CLASS_NAME, $result);
+        $this->assertSame('0', $result->getId());
+        $this->assertEquals('Test Value 1', $result->getName());
+        $this->assertEquals(1, $result->getPriority());
+        $this->assertTrue($result->isDefault());
+    }
+
+    public function testCreateEnumValueWithEmptyString()
+    {
+        $result = $this->repo->createEnumValue('Test Value 1', 1, true, '');
+
+        $this->assertInstanceOf(self::ENUM_VALUE_CLASS_NAME, $result);
+        $this->assertEquals('test_value_1', $result->getId());
+        $this->assertEquals('Test Value 1', $result->getName());
+        $this->assertEquals(1, $result->getPriority());
+        $this->assertTrue($result->isDefault());
+    }
 }

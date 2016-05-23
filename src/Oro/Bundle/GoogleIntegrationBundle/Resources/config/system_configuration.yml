@@ -6,6 +6,7 @@ oro_system_configuration:
         google_integration_settings:
             title: oro.google_integration.system_configuration.groups.google_integration_settings.title
             priority: 50
+            tooltip: oro.google_integration.system_configuration.groups.google_integration_settings.tooltip
 
     fields:
         oro_google_integration.client_id:
@@ -15,7 +16,6 @@ oro_system_configuration:
                 label: oro.google_integration.system_configuration.fields.client_id.label
                 resettable: false
                 required: false
-                tooltip: oro.google_integration.system_configuration.fields.client_id.tooltip
             priority: 30
         oro_google_integration.client_secret:
             data_type: string

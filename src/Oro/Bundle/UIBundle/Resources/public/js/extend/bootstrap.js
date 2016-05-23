@@ -173,18 +173,37 @@ define([
             if (visibleHeight < outerHeight - /* fixes floating pixel calculation */ 1) {
                 // still doesn't match, decrease height and move into visible area
                 this.$tip.css({
-                    maxHeight: visibleHeight
-                });
-                this.$tip.css({
                     height: this.$tip.outerHeight()
                 });
-                var centerChange = (outerHeight - visibleHeight) / 2;
+                //find adjustment to move tooltip
+                var adjustment = outerHeight - visibleHeight;
+                //change adjustemnt direction if needed
+                if (adjustmentLeft.vertical < 0) {
+                    adjustment = -adjustment;
+                }
 
                 this.$tip.css({
-                    top: parseFloat(this.$tip.css('top')) + adjustmentLeft.vertical
+                    top: parseFloat(this.$tip.css('top')) + adjustment
                 });
+                if (!scrollHelper.isCompletelyVisible(this.$tip[0]) && adjustment < 0) {
+                    /**
+                     * make a second attempt to move tooltip up
+                     * to fix the issue when unnecessary scroll is done by scrollIntoView
+                     */
+                    this.$tip.css({
+                        top: parseFloat(this.$tip.css('top')) + adjustment
+                    });
+                    adjustment += adjustment;
+                }
+                //check visible area after move, update arrow position and height
+                var newVisibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
+                var newVisibleHeight = newVisibleRect.bottom - newVisibleRect.top;
+                this.$tip.css({
+                    maxHeight: newVisibleHeight
+                });
+                var centerChange = (outerHeight - newVisibleHeight) / 2;
                 this.$arrow.css({
-                    top: 'calc(50% + ' + (centerChange - adjustmentLeft.vertical) + 'px)'
+                    top: 'calc(50% + ' + (centerChange - adjustment) + 'px)'
                 });
             }
         }
