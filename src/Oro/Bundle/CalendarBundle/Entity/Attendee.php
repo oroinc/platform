@@ -31,9 +31,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class Attendee extends ExtendAttendee
 {
-    const STATUS_ENUM_CODE = 'oro_attendee_status';
-    const ORIGIN_ENUM_CODE = 'oro_attendee_origin';
-    const TYPE_ENUM_CODE = 'oro_attendee_type';
+    const STATUS_ENUM_CODE = 'oro_ce_attendee_status';
+    const ORIGIN_ENUM_CODE = 'oro_ce_attendee_origin';
+    const TYPE_ENUM_CODE = 'oro_ce_attendee_type';
 
     const ORIGIN_SERVER = 'server';
     const ORIGIN_CLIENT = 'client';

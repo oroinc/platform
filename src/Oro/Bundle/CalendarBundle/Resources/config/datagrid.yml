@@ -84,7 +84,7 @@ datagrid:
                     data_name: event.end
                 invitationStatus:
                     type: enum
-                    enum_code: oro_attendee_status
+                    enum_code: oro_ce_attendee_status
                     data_name: status.id
         properties:
             id: ~
