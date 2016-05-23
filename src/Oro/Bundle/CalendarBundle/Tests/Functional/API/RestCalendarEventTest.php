@@ -247,21 +247,21 @@ class RestCalendarEventTest extends WebTestCase
                 'notifiable'       => false,
                 'attendees'        => [
                     [
-                        'displayName' => 'Admin',
-                        'email'       => $adminUser->getEmail(),
-                        'origin'      => 'client',
-                        'status'      => 'accepted',
-                        'type'        => null,
-                        'user_id'     => $adminUser->getId()
-                    ],
-                    [
                         'displayName' => 'Ext',
                         'email'       => 'ext@example.com',
                         'origin'      => 'external',
                         'status'      => 'tentative',
                         'type'        => 'organizer',
                         'user_id'     => null
-                    ]
+                    ],
+                    [
+                        'displayName' => sprintf('%s %s',$adminUser->getFirstName(), $adminUser->getLastName()),
+                        'email'       => $adminUser->getEmail(),
+                        'origin'      => 'client',
+                        'status'      => 'accepted',
+                        'type'        => null,
+                        'user_id'     => $adminUser->getId()
+                    ],
                 ],
             ],
             $this->extractInterestingResponseData($result)
@@ -330,19 +330,19 @@ class RestCalendarEventTest extends WebTestCase
                     'calendarAlias'    => 'user',
                     'attendees'        => [
                         [
-                            'displayName' => 'Admin',
-                            'email'       => 'admin@example.com',
-                            'origin'      => 'client',
-                            'status'      => 'accepted',
-                            'type'        => null,
-                        ],
-                        [
                             'displayName' => 'Ext',
                             'email'       => 'ext@example.com',
                             'origin'      => 'external',
                             'status'      => 'tentative',
                             'type'        => 'organizer',
-                        ]
+                        ],
+                        [
+                            'displayName' => 'John Doe',
+                            'email'       => 'admin@example.com',
+                            'origin'      => 'client',
+                            'status'      => 'accepted',
+                            'type'        => null,
+                        ],
                     ],
                 ],
             ],
