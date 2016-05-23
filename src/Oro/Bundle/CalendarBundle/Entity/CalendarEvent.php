@@ -284,6 +284,9 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $attendees;
 
     /**
+     * Attendee associated with this event (one attendee from attendees property having calendar owner in user property)
+     * It can be null for parent event in case creator of the event is not among attendees.
+     *
      * @var Attendee
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee", cascade={"persist"})
