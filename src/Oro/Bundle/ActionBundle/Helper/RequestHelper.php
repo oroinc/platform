@@ -14,6 +14,7 @@ class RequestHelper
 
     /**
      * @param RequestStack $requestStack
+     * @param ApplicationsHelper $applicationsHelper
      */
     public function __construct(RequestStack $requestStack, ApplicationsHelper $applicationsHelper)
     {
