@@ -295,7 +295,7 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
-            ->with('Extend\Entity\EV_Oro_CE_Attendee_Status')
+            ->with('Extend\Entity\EV_Oro_Ce_Attendee_Status')
             ->will($this->returnValue($statusRepository));
 
         $event = new CalendarEvent();
@@ -307,12 +307,35 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException Oro\Bundle\CalendarBundle\Exception\RelatedAttendeeNotFoundException
      * @expectedExceptionMessage Calendar event does not have relatedAttendee
      */
     public function testChangeStatusWithEmptyRelatedAttendee()
     {
         $event = new CalendarEvent();
+        $this->manager->changeStatus($event, CalendarEvent::STATUS_ACCEPTED);
+    }
+
+    /**
+     * @expectedException Oro\Bundle\CalendarBundle\Exception\StatusNotFoundException
+     * @expectedExceptionMessage Status "accepted" does not exists
+     */
+    public function testChangeStatusWithNonExistingStatus()
+    {
+        $statusRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $statusRepository->expects($this->any())
+            ->method('find')
+            ->with(CalendarEvent::STATUS_ACCEPTED)
+            ->will($this->returnValue(null));
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with('Extend\Entity\EV_Oro_Ce_Attendee_Status')
+            ->will($this->returnValue($statusRepository));
+
+        $event = (new CalendarEvent())
+            ->setRelatedAttendee(new Attendee());
+
         $this->manager->changeStatus($event, CalendarEvent::STATUS_ACCEPTED);
     }
 }

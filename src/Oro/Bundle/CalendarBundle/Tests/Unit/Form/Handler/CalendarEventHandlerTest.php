@@ -187,16 +187,13 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage Both logged in user and organization must be defined.
      */
-    public function testProcessGetRequestWithoutCurrentUser($method)
+    public function testProcessRequestWithoutCurrentUser($method)
     {
         $this->request->setMethod($method);
 
-        $this->form->expects($this->once())
+        $this->form->expects($this->never())
             ->method('submit')
             ->with($this->identicalTo($this->request));
-        $this->form->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue(true));
 
         $this->securityFacade->expects($this->once())
             ->method('getLoggedUser')

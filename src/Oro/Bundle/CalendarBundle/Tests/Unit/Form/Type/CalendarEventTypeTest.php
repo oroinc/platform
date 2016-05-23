@@ -24,7 +24,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
         $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $managerRegistry->expects($this->any())
             ->method('getRepository')
-            ->with('Extend\Entity\EV_Oro_CE_Attendee_Status')
+            ->with('Extend\Entity\EV_Oro_Ce_Attendee_Status')
             ->will($this->returnValue($repository));
 
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
