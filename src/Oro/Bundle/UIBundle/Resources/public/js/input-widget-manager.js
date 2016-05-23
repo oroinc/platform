@@ -90,7 +90,7 @@ define(function(require) {
          */
         create: function($inputs) {
             var self = this;
-            var _cachedWidgetsByPriority = this.get_cachedWidgetsByPriority();
+            var widgetsByPriority = this.get_cachedWidgetsByPriority();
 
             _.each($inputs, function(input) {
                 var $input = $(input);
@@ -98,8 +98,8 @@ define(function(require) {
                     return ;
                 }
 
-                for (var i = 0; i < _cachedWidgetsByPriority.length; i++) {
-                    var widget = _cachedWidgetsByPriority[i];
+                for (var i = 0; i < widgetsByPriority.length; i++) {
+                    var widget = widgetsByPriority[i];
                     if (self.isApplicable($input, widget)) {
                         self.createWidget($input, widget.Widget, {});
                         break;
@@ -166,9 +166,9 @@ define(function(require) {
         getCompoundQuery: function() {
             if (!this._cachedCompoundQuery) {
                 var queries = [];
-                var _cachedWidgetsByPriority = this.get_cachedWidgetsByPriority();
-                for (var i = 0; i < _cachedWidgetsByPriority.length; i++) {
-                    var widget = _cachedWidgetsByPriority[i];
+                var widgetsByPriority = this.get_cachedWidgetsByPriority();
+                for (var i = 0; i < widgetsByPriority.length; i++) {
+                    var widget = widgetsByPriority[i];
                     queries.push(widget.selector);
                 }
                 this._cachedCompoundQuery = queries.join(',');
