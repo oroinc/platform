@@ -110,7 +110,6 @@ class AclPrivilegeRepository
             // load ACLs for all object identities
             $acls = $this->findAcls($sid, $oids);
 
-            $rootAcl = null;
             // find ACL for the root object identity
             $rootAcl = $this->findAclByOid($acls, $rootOid);
 
