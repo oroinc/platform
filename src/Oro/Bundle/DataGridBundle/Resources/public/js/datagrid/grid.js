@@ -269,8 +269,8 @@ define(function(require) {
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
-                if ('selectState' in this.header.row.cells[0]) {
-                    this.selectState = this.header.row.cells[0].selectState;
+                if ('selectState' in this.header.row.subviews[0]) {
+                    this.selectState = this.header.row.subviews[0].selectState;
                 }
             }
             if (this.selectState === null) {
@@ -1123,7 +1123,7 @@ define(function(require) {
                 return null;
             }
             try {
-                return _.findWhere(this.header.row.cells, {
+                return _.findWhere(this.header.row.subviews, {
                     column: this.columns.at(columnI)
                 });
             } catch (e) {

@@ -54,6 +54,7 @@ define([
             var rowOptions = {
                 columns: this.columns,
                 collection: this.filteredColumns,
+                dataCollection: this.collection,
                 headerCell: this.headerCell
             };
             this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
