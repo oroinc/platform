@@ -27,6 +27,7 @@ class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $recurrence = new EntityRecurrence();
+        $recurrence->setRecurrenceType('daily');
 
         $this->getValidator()->validate($recurrence, $this->constraint);
     }
@@ -37,8 +38,9 @@ class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $recurrence = new EntityRecurrence();
-        $recurrence->setStartTime(new \DateTime());
-        $recurrence->setEndTime(new \DateTime('-3 day'));
+        $recurrence->setRecurrenceType('daily')
+            ->setStartTime(new \DateTime())
+            ->setEndTime(new \DateTime('-3 day'));
 
         $this->getValidator()->validate($recurrence, $this->constraint);
     }

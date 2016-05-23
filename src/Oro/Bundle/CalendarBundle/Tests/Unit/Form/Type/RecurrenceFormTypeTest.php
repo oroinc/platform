@@ -12,9 +12,18 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
     /** @var RecurrenceFormType */
     protected $type;
 
+    /** @var  Recurrence */
+    protected $model;
+
     protected function setUp()
     {
-        $this->type = new RecurrenceFormType();
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
+            ->getMock();
+        $strategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
+            ->getMock();
+
+        $this->model = new Recurrence($validator, $strategy);
+        $this->type = new RecurrenceFormType($this->model);
     }
 
     /**
@@ -35,7 +44,7 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
                     'required' => true,
                     'label' => 'oro.calendar.recurrence.entity_label',
                     'empty_value' => false,
-                    'choices' => Recurrence::getRecurrenceTypes(),
+                    'choices' => $this->model->getRecurrenceTypes(),
                 ]
             )
             ->will($this->returnSelf());
@@ -59,7 +68,7 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
                     'required' => false,
                     'label' => 'oro.calendar.recurrence.instance.label',
                     'empty_value' => false,
-                    'choices' => Recurrence::getInstances(),
+                    'choices' => $this->model->getInstances(),
                 ]
             )
             ->will($this->returnSelf());
@@ -72,7 +81,7 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
                     'required' => false,
                     'label' => 'oro.calendar.recurrence.day_of_week.label',
                     'multiple' => true,
-                    'choices' => Recurrence::getDaysOfWeek(),
+                    'choices' => $this->model->getDaysOfWeek(),
                 ]
             )
             ->will($this->returnSelf());

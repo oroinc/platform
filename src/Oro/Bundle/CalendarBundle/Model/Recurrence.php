@@ -185,9 +185,9 @@ class Recurrence
      *
      * @return array
      */
-    public static function getRecurrenceTypesValues()
+    public function getRecurrenceTypesValues()
     {
-        return array_keys(self::getRecurrenceTypes());
+        return array_keys($this->getRecurrenceTypes());
     }
 
     /**
@@ -195,9 +195,9 @@ class Recurrence
      *
      * @return array
      */
-    public static function getDaysOfWeekValues()
+    public function getDaysOfWeekValues()
     {
-        return array_keys(self::getDaysOfWeek());
+        return array_keys($this->getDaysOfWeek());
     }
 
     /**
@@ -205,7 +205,7 @@ class Recurrence
      *
      * @return array
      */
-    public static function getRecurrenceTypes()
+    public function getRecurrenceTypes()
     {
         return [
             self::TYPE_DAILY => 'oro.calendar.recurrence.types.daily',
@@ -222,7 +222,7 @@ class Recurrence
      *
      * @return array
      */
-    public static function getInstances()
+    public function getInstances()
     {
         return [
             self::INSTANCE_FIRST => 'oro.calendar.recurrence.instances.first',
@@ -238,7 +238,7 @@ class Recurrence
      *
      * @return array
      */
-    public static function getDaysOfWeek()
+    public function getDaysOfWeek()
     {
         return [
             self::DAY_SUNDAY => 'oro.calendar.recurrence.days.sunday',

@@ -11,6 +11,19 @@ use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class RecurrenceFormType extends AbstractType
 {
+    /** @var Recurrence  */
+    protected $recurrenceModel;
+
+    /**
+     * RecurrenceFormType constructor.
+     *
+     * @param Recurrence $recurrenceModel
+     */
+    public function __construct(Recurrence $recurrenceModel)
+    {
+        $this->recurrenceModel = $recurrenceModel;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -24,7 +37,7 @@ class RecurrenceFormType extends AbstractType
                     'required' => true,
                     'label' => 'oro.calendar.recurrence.entity_label',
                     'empty_value' => false,
-                    'choices' => Recurrence::getRecurrenceTypes(),
+                    'choices' => $this->recurrenceModel->getRecurrenceTypes(),
                 ]
             )
             ->add(
@@ -42,7 +55,7 @@ class RecurrenceFormType extends AbstractType
                     'required' => false,
                     'label' => 'oro.calendar.recurrence.instance.label',
                     'empty_value' => false,
-                    'choices' => Recurrence::getInstances(),
+                    'choices' => $this->recurrenceModel->getInstances(),
                 ]
             )
             ->add(
@@ -52,7 +65,7 @@ class RecurrenceFormType extends AbstractType
                     'required' => false,
                     'label' => 'oro.calendar.recurrence.day_of_week.label',
                     'multiple' => true,
-                    'choices' => Recurrence::getDaysOfWeek(),
+                    'choices' => $this->recurrenceModel->getDaysOfWeek(),
                 ]
             )
             ->add(

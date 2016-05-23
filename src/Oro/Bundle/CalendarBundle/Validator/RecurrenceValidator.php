@@ -30,6 +30,23 @@ class RecurrenceValidator extends ConstraintValidator
             $this->context->addViolation("Parameter 'endTime' date can't be earlier than startTime date.");
         }
 
+        if (!in_array($value->getRecurrenceType(), $this->recurrenceModel->getRecurrenceTypesValues())) {
+            $this->context->addViolation(
+                "Parameter 'recurrenceType' must have one of the values: {{ values }}.",
+                ['{{ values }}' => implode(', ', $this->recurrenceModel->getRecurrenceTypesValues())]
+            );
+        }
+
+        $dayOfWeekValues = $this->recurrenceModel->getDaysOfWeekValues();
+        if ($value->getDayOfWeek() !== null
+            && count(array_intersect($value->getDayOfWeek(), $dayOfWeekValues)) !== count($value->getDayOfWeek())
+        ) {
+            $this->context->addViolation(
+                "Parameter 'dayOfWeek' can have values from the list: {{ values }}.",
+                ['{{ values }}' => implode(', ', $dayOfWeekValues)]
+            );
+        }
+
         if ($errorMessage = $this->recurrenceModel->getValidationErrorMessage($value)) {
             $this->context->addViolation($errorMessage);
         }

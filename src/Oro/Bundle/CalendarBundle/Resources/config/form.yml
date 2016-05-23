@@ -180,6 +180,8 @@ services:
 
     oro_calendar.recurrence.form.type:
         class: '%oro_calendar.recurrence.form.type.class%'
+        arguments:
+            - '@oro_calendar.model.recurrence'
         tags:
             - { name: form.type, alias: oro_calendar_event_recurrence }
 

@@ -37,8 +37,6 @@ Oro\Bundle\CalendarBundle\Entity\Recurrence:
     constraints:
         - Oro\Bundle\CalendarBundle\Validator\Constraints\Recurrence: ~
     properties:
-        recurrenceType:
-            - Choice: { callback: [Oro\Bundle\CalendarBundle\Model\Recurrence, getRecurrenceTypesValues] }
         interval:
             - Range:
                 min: 1
@@ -47,10 +45,6 @@ Oro\Bundle\CalendarBundle\Entity\Recurrence:
             - Range:
                 min: 1
                 max: 5
-        dayOfWeek:
-            - Choice:
-                multiple: true
-                callback: [Oro\Bundle\CalendarBundle\Model\Recurrence, getDaysOfWeekValues]
         dayOfMonth:
             - Range:
                 min: 1

@@ -13,3 +13,5 @@
 "Parameter 'dayOfWeek' can't be empty for YearNth recurrence pattern.": "Parameter 'dayOfWeek' can't be empty for YearNth recurrence pattern."
 "Parameter 'monthOfYear' can't be empty for YearNth recurrence pattern.": "Parameter 'monthOfYear' can't be empty for YearNth recurrence pattern."
 "Parameter 'interval' can't be more than 99 for Daily recurrence pattern": "Parameter 'interval' can't be more than 99 for Daily recurrence pattern"
+"Parameter 'recurrenceType' must have one of the values: {{ values }}.": "Parameter 'recurrenceType' must have one of the values: {{ values }}."
+"Parameter 'dayOfWeek' can have values from the list: {{ values }}.": "Parameter 'dayOfWeek' can have values from the list: {{ values }}."

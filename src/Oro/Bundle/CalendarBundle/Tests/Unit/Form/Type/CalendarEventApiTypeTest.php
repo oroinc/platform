@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -244,6 +245,14 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
+            ->getMock();
+
+        $strategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
+            ->getMock();
+
+        $recurrenceModel = new Recurrence($validator, $strategy);
+
         $types = [
             new ReminderCollectionType($this->registry),
             new CollectionType($this->registry),
@@ -260,7 +269,7 @@ class CalendarEventApiTypeTest extends TypeTestCase
             new UserMultiSelectType($this->entityManager),
             new OroJquerySelect2HiddenType($this->entityManager, $searchRegistry, $configProvider),
             new Select2Type('hidden'),
-            new RecurrenceFormType(),
+            new RecurrenceFormType($recurrenceModel),
         ];
 
         $keys = array_map(
