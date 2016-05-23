@@ -34,7 +34,7 @@ define(function(require) {
 
         widgets: {},
 
-        widgetsByPriority: null,
+        _cachedWidgetsByPriority: null,
 
         /**
          * @param {String} key
@@ -49,8 +49,8 @@ define(function(require) {
             });
 
             this.widgets[widget.key] = widget;
-            delete this.widgetsByPriority;
-            delete this.cachedCompoundQuery;
+            delete this._cachedWidgetsByPriority;
+            delete this._cachedCompoundQuery;
         },
 
         /**
@@ -58,23 +58,23 @@ define(function(require) {
          */
         removeWidget: function(key) {
             delete this.widgets[key];
-            delete this.widgetsByPriority;
-            delete this.cachedCompoundQuery;
+            delete this._cachedWidgetsByPriority;
+            delete this._cachedCompoundQuery;
         },
 
-        getWidgetsByPriority: function() {
-            if (!this.widgetsByPriority) {
+        get_cachedWidgetsByPriority: function() {
+            if (!this._cachedWidgetsByPriority) {
                 var self = this;
-                this.widgetsByPriority = [];
+                this._cachedWidgetsByPriority = [];
                 _.each(_.sortBy(self.widgets, 'priority'), function(widget) {
                     if (!self.isValidWidget(widget)) {
                         self.error('Input widget "%s" is invalid', widget.key);
                         return;
                     }
-                    self.widgetsByPriority.push(widget);
+                    self._cachedWidgetsByPriority.push(widget);
                 });
             }
-            return this.widgetsByPriority;
+            return this._cachedWidgetsByPriority;
         },
 
         isValidWidget: function(widget) {
@@ -90,6 +90,7 @@ define(function(require) {
          */
         create: function($inputs) {
             var self = this;
+            var _cachedWidgetsByPriority = this.get_cachedWidgetsByPriority();
 
             _.each($inputs, function(input) {
                 var $input = $(input);
@@ -97,10 +98,8 @@ define(function(require) {
                     return ;
                 }
 
-                var widgetsByPriority = this.getWidgetsByPriority();
-
-                for (var i = 0; i < widgetsByPriority.length; i++) {
-                    var widget = widgetsByPriority[i];
+                for (var i = 0; i < _cachedWidgetsByPriority.length; i++) {
+                    var widget = _cachedWidgetsByPriority[i];
                     if (self.isApplicable($input, widget)) {
                         self.createWidget($input, widget.Widget, {});
                         break;
@@ -165,16 +164,16 @@ define(function(require) {
         },
 
         getCompoundQuery: function() {
-            if (!this.cachedCompoundQuery) {
+            if (!this._cachedCompoundQuery) {
                 var queries = [];
-                var widgetsByPriority = this.getWidgetsByPriority();
-                for (var i = 0; i < widgetsByPriority.length; i++) {
-                    var widget = widgetsByPriority[i];
+                var _cachedWidgetsByPriority = this.get_cachedWidgetsByPriority();
+                for (var i = 0; i < _cachedWidgetsByPriority.length; i++) {
+                    var widget = _cachedWidgetsByPriority[i];
                     queries.push(widget.selector);
                 }
-                this.cachedCompoundQuery = queries.join(',');
+                this._cachedCompoundQuery = queries.join(',');
             }
-            return this.cachedCompoundQuery;
+            return this._cachedCompoundQuery;
         },
 
         /**
