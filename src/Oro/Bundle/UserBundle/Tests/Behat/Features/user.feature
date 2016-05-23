@@ -4,7 +4,7 @@ Feature: User
   As a OroCRM Admin user
   I need to be able to open Create User dialog and create new user
 Scenario: Create new user
-  Given Login as an existing "admin" user and "admin" password
+  Given login as "admin" user with "admin" password
   And I go to "/user/create"
   When I fill "User" form with:
         | Username          | userName       |
