@@ -10,7 +10,6 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
@@ -83,51 +82,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^user exists with:$/
-     */
-    public function userExists(TableNode $data)
-    {
-        $this->getKernel()->boot();
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $manager = $this->getContainer()->get('oro_user.manager');
-
-        $user = $manager->createUser();
-        $user->setPlainPassword('test');
-
-        foreach ($data->getRows() as $row) {
-            switch ($row[0]) {
-                case 'roles':
-                    $roles = explode(',', $row[1]);
-                    array_walk($roles, function ($role) use ($user, $em) {
-                        $roleEntity = $em->getRepository('OroUserBundle:Role')->findOneBy(['label' => trim($role)]);
-                        $user->addRole($roleEntity);
-                    });
-                    break;
-                default:
-                    $user->{'set'.ucfirst($row[0])}($row[1]);
-            }
-        }
-
-        $organization = $em
-            ->getRepository('OroOrganizationBundle:Organization')->findOneBy([]);
-        $businessUnit = $em
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy([]);
-
-        $user
-            ->setEnabled(true)
-            ->addBusinessUnit($businessUnit)
-            ->addOrganization($organization)
-            ->setOrganization($organization)
-        ;
-
-        $manager->updateUser($user);
-    }
-
-    /**
      * @Given Login as an existing :login user and :password password
-     * @Given Login as :login
      */
     public function loginAsAnExistingUserAndPassword($login, $password)
     {
