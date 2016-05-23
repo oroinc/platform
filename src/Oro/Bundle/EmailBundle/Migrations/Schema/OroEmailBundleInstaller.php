@@ -25,6 +25,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_19\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_20\OroEmailBundle as OroEmailBundle120;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_21\OroEmailBundle as OroEmailBundle121;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_22\OroEmailBundle as OroEmailBundle122;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_23\OroEmailBundle as OroEmailBundle123;
 
 /**
  * Class OroEmailBundleInstaller
@@ -39,7 +40,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_22';
+        return 'v1_23';
     }
 
     /**
@@ -110,5 +111,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle121::addIndexes($schema);
 
         OroEmailBundle122::oroEmailFolderTable($schema);
+
+        OroEmailBundle123::oroEmailTable($schema);
     }
 }
