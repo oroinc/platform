@@ -71,13 +71,17 @@ class CalendarEventDeleteHandler extends DeleteHandler
             if ($calendar->isPublic()) {
                 if (!$this->calendarConfig->isPublicCalendarEnabled()) {
                     throw new ForbiddenException('Public calendars are disabled.');
-                } elseif (!$this->securityFacade->isGranted('oro_public_calendar_event_management')) {
+                }
+
+                if (!$this->securityFacade->isGranted('oro_public_calendar_event_management')) {
                     throw new ForbiddenException('Access denied.');
                 }
             } else {
                 if (!$this->calendarConfig->isSystemCalendarEnabled()) {
                     throw new ForbiddenException('System calendars are disabled.');
-                } elseif (!$this->securityFacade->isGranted('oro_system_calendar_event_management')) {
+                }
+
+                if (!$this->securityFacade->isGranted('oro_system_calendar_event_management')) {
                     throw new ForbiddenException('Access denied.');
                 }
             }

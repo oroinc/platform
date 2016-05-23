@@ -36,6 +36,12 @@ abstract class AbstractDateFilter extends AbstractFilter
 
         $dateStartValue = $data['date_start'];
         $dateEndValue   = $data['date_end'];
+        //Swap start and end dates if end date is behind start date
+        if (null !== $dateStartValue && null !== $dateEndValue && $dateStartValue > $dateEndValue) {
+            $end = $dateEndValue;
+            $dateEndValue = $dateStartValue;
+            $dateStartValue = $end;
+        }
 
         $startDateParameterName = $ds->generateParameterName($this->getName());
         $endDateParameterName   = $ds->generateParameterName($this->getName());
