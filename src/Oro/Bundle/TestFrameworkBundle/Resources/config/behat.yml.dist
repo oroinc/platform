@@ -15,7 +15,7 @@ default: &default
         Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension:
             shared_contexts: ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext']
     autoload:
-            - %paths.base%/../vendor/autoload.php
+            - %paths.base%/../../../../../../../../app/bootstrap.php.cache
     suites: []
 
 selenium2:
