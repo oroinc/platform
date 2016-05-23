@@ -143,7 +143,7 @@ class EmailSendProcessor
             case CalendarEvent::STATUS_ACCEPTED:
                 $templateName = self::ACCEPTED_TEMPLATE_NAME;
                 break;
-            case CalendarEvent::STATUS_TENTATIVELY_ACCEPTED:
+            case CalendarEvent::STATUS_TENTATIVE:
                 $templateName = self::TENTATIVE_TEMPLATE_NAME;
                 break;
             case CalendarEvent::STATUS_DECLINED:

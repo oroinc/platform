@@ -74,18 +74,18 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     use DatesAwareTrait;
 
     /** @deprecated since 1.10 use constant with STATUS_ prefix */
-    const NOT_RESPONDED        = self::STATUS_NOT_RESPONDED;
+    const NOT_RESPONDED        = self::STATUS_NONE;
     /** @deprecated since 1.10 use constant with STATUS_ prefix */
-    const TENTATIVELY_ACCEPTED = self::STATUS_TENTATIVELY_ACCEPTED;
+    const TENTATIVELY_ACCEPTED = self::STATUS_TENTATIVE;
     /** @deprecated since 1.10 use constant with STATUS_ prefix */
     const ACCEPTED             = self::STATUS_ACCEPTED;
     /** @deprecated since 1.10 use constant with STATUS_ prefix */
     const DECLINED             = self::STATUS_DECLINED;
 
-    const STATUS_NOT_RESPONDED        = 'none';
-    const STATUS_TENTATIVELY_ACCEPTED = 'tentative';
-    const STATUS_ACCEPTED             = 'accepted';
-    const STATUS_DECLINED             = 'declined';
+    const STATUS_NONE      = 'none';
+    const STATUS_TENTATIVE = 'tentative';
+    const STATUS_ACCEPTED  = 'accepted';
+    const STATUS_DECLINED  = 'declined';
 
     const WITHOUT_STATUS = null;
     
@@ -96,7 +96,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 
     protected $availableStatuses = [
         CalendarEvent::STATUS_ACCEPTED,
-        CalendarEvent::STATUS_TENTATIVELY_ACCEPTED,
+        CalendarEvent::STATUS_TENTATIVE,
         CalendarEvent::STATUS_DECLINED
     ];
 
@@ -669,14 +669,14 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function getInvitationStatus()
     {
         if (!$this->relatedAttendee) {
-            return static::STATUS_NOT_RESPONDED;
+            return static::STATUS_NONE;
         }
 
         $status = $this->relatedAttendee->getStatus();
 
         return $status
             ? $status->getId()
-            : static::STATUS_NOT_RESPONDED;
+            : static::STATUS_NONE;
     }
 
     /**

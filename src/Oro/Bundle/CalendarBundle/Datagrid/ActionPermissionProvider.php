@@ -44,7 +44,7 @@ class ActionPermissionProvider
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::ACCEPTED
+                CalendarEvent::STATUS_ACCEPTED
             ),
             'decline'     => $this->isAvailableResponseButton(
                 $user,
@@ -52,7 +52,7 @@ class ActionPermissionProvider
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::DECLINED
+                CalendarEvent::STATUS_DECLINED
             ),
             'tentatively' => $this->isAvailableResponseButton(
                 $user,
@@ -60,7 +60,7 @@ class ActionPermissionProvider
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::TENTATIVELY_ACCEPTED
+                CalendarEvent::STATUS_TENTATIVE
             ),
             'view'        => true,
             'update'      => $isEditable

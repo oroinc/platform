@@ -34,7 +34,7 @@
 {% endmacro %}
 
 {% macro get_invitatition_badge_class(invitationStatus) %}
-    {%- if invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::STATUS_TENTATIVELY_ACCEPTED') -%}
+    {%- if invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::STATUS_TENTATIVE') -%}
         tentatively
     {%- elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::STATUS_ACCEPTED') -%}
         enabled
@@ -44,9 +44,9 @@
 {% endmacro %}
 
 {% macro get_invitatition_status_class(invitationStatus) %}
-    {%- if invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::STATUS_NOT_RESPONDED') -%}
+    {%- if invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::STATUS_NONE') -%}
         icon-reply
-    {%- elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::STATUS_TENTATIVELY_ACCEPTED') -%}
+    {%- elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::STATUS_TENTATIVE') -%}
         icon-question
     {%- elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::STATUS_ACCEPTED') -%}
         icon-ok

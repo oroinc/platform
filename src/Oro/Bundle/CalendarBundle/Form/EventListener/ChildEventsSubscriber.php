@@ -222,7 +222,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
      */
     protected function setDefaultAttendeeStatus(
         Attendee $attendee = null,
-        $status = CalendarEvent::STATUS_NOT_RESPONDED
+        $status = CalendarEvent::STATUS_NONE
     ) {
         if (!$attendee || $attendee->getStatus()) {
             return;

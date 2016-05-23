@@ -141,9 +141,9 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->childEventsSubscriber->postSubmit(new FormEvent($form, []));
 
         $this->assertEquals(CalendarEvent::STATUS_ACCEPTED, $parentEvent->getInvitationStatus());
-        $this->assertEquals(CalendarEvent::STATUS_NOT_RESPONDED, $firstEvent->getInvitationStatus());
-        $this->assertEquals(CalendarEvent::STATUS_NOT_RESPONDED, $secondEvent->getInvitationStatus());
-        $this->assertEquals(CalendarEvent::STATUS_NOT_RESPONDED, $eventWithoutRelatedAttendee->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_NONE, $firstEvent->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_NONE, $secondEvent->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_NONE, $eventWithoutRelatedAttendee->getInvitationStatus());
         $this->assertEventDataEquals($parentEvent, $firstEvent);
         $this->assertEventDataEquals($parentEvent, $secondEvent);
         $this->assertEventDataEquals($parentEvent, $eventWithoutRelatedAttendee);
@@ -162,7 +162,7 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
             new TestEnumValue(CalendarEvent::STATUS_DECLINED, CalendarEvent::STATUS_DECLINED)
         );
         $secondEvent->getRelatedAttendee()->setStatus(
-            new TestEnumValue(CalendarEvent::STATUS_TENTATIVELY_ACCEPTED, CalendarEvent::STATUS_TENTATIVELY_ACCEPTED)
+            new TestEnumValue(CalendarEvent::STATUS_TENTATIVE, CalendarEvent::STATUS_TENTATIVE)
         );
 
         // assert modified data
@@ -170,8 +170,8 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(CalendarEvent::STATUS_ACCEPTED, $parentEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::STATUS_DECLINED, $firstEvent->getInvitationStatus());
-        $this->assertEquals(CalendarEvent::STATUS_TENTATIVELY_ACCEPTED, $secondEvent->getInvitationStatus());
-        $this->assertEquals(CalendarEvent::STATUS_NOT_RESPONDED, $eventWithoutRelatedAttendee->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_TENTATIVE, $secondEvent->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_NONE, $eventWithoutRelatedAttendee->getInvitationStatus());
         $this->assertEventDataEquals($parentEvent, $firstEvent);
         $this->assertEventDataEquals($parentEvent, $secondEvent);
         $this->assertEventDataEquals($parentEvent, $eventWithoutRelatedAttendee);
