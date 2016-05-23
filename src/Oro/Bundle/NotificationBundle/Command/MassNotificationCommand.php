@@ -15,12 +15,14 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
  */
 class MassNotificationCommand extends ContainerAwareCommand
 {
+    const COMMAND_NAME = 'oro:mass_notification:send';
+
     /**
      * Console command configuration
      */
     public function configure()
     {
-        $this->setName('oro:mass_notification:send')
+        $this->setName(self::COMMAND_NAME)
             ->addArgument(
                 'title',
                 InputArgument::REQUIRED,
