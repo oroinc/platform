@@ -198,13 +198,13 @@ define(function(require) {
          * @returns {mixed}
          */
         inputWidget: function(command) {
-            $('select:first,input:last').width();
             if (command === 'create') {
                 return InputWidgetManager.create(this);
             }
 
             var response = null;
             var args = Array.prototype.slice.call(arguments, 1);
+            var overrideJqueryMethods = AbstractInputWidget.prototype.overrideJqueryMethods;
             this.each(function(i) {
                 var result = null;
                 var $input = $(this);
@@ -212,12 +212,14 @@ define(function(require) {
 
                 if (!command) {
                     result = widget;
-                } else if (widget) {
-                    if (!_.isFunction(widget[command])) {
+                } else if (!widget || !_.isFunction(widget[command])) {
+                    if (_.indexOf(overrideJqueryMethods, command) !== -1) {
+                        result = $input[command].apply($input, args);
+                    } else if (widget) {
                         InputWidgetManager.error('Input widget doesn\'t support command "%s"', command);
-                    } else {
-                        result = widget[command].apply(widget, args);
                     }
+                } else {
+                    result = widget[command].apply(widget, args);
                 }
 
                 if (i === 0) {

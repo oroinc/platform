@@ -40,6 +40,8 @@ define(function(require) {
 
         refreshOnChange: false,
 
+        overrideJqueryMethods: ['val'],
+
         /**
          * @inheritDoc
          */
