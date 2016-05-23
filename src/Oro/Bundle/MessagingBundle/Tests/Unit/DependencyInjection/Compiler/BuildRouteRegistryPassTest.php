@@ -88,7 +88,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRoutes, $router->getArgument(1));
     }
 
-    public function testShouldSetDistinationToNullIfIsNotSetInTag()
+    public function testShouldSetDestinationToNullIfIsNotSetInTag()
     {
         $container = new ContainerBuilder();
 

@@ -103,4 +103,73 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ]
         ], $config);
     }
+
+    public function testShouldSetDefaultConfigurationForZeroConfig()
+    {
+        $configuration = new Configuration();
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration($configuration, [[
+            'transport' => [
+                'default' => 'null',
+                'null' => true,
+            ],
+            'zero_config' => null,
+        ]]);
+
+        $this->assertEquals([
+            'transport' => [
+                'default' => 'null',
+                'null' => true,
+            ],
+            'zero_config' => [
+                'prefix' => 'oro.messaging.zero_config',
+                'router_processor' => null,
+                'router_destination' => 'default',
+                'default_destination' => 'default',
+            ],
+        ], $config);
+    }
+
+    public function testShouldThrowExceptionIfRouterDestinationIsEmpty()
+    {
+        $this->setExpectedException(
+            InvalidConfigurationException::class,
+            'The path "oro_messaging.zero_config.router_destination" cannot contain an empty value, but got "".'
+        );
+
+        $configuration = new Configuration();
+
+        $processor = new Processor();
+        $processor->processConfiguration($configuration, [[
+            'transport' => [
+                'default' => 'null',
+                'null' => true,
+            ],
+            'zero_config' => [
+                'router_destination' => '',
+            ],
+        ]]);
+    }
+
+    public function testShouldThrowExceptionIfDefaultDestinationIsEmpty()
+    {
+        $this->setExpectedException(
+            InvalidConfigurationException::class,
+            'The path "oro_messaging.zero_config.default_destination" cannot contain an empty value, but got "".'
+        );
+
+        $configuration = new Configuration();
+
+        $processor = new Processor();
+        $processor->processConfiguration($configuration, [[
+            'transport' => [
+                'default' => 'null',
+                'null' => true,
+            ],
+            'zero_config' => [
+                'default_destination' => '',
+            ],
+        ]]);
+    }
 }
