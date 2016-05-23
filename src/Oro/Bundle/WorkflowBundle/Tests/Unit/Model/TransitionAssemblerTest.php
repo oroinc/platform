@@ -49,10 +49,6 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         'full_definition' => array(
             'page_template' => 'Test:Page:template',
             'dialog_template' => 'Test:Dialog:template',
-            'schedule' => [
-                'cron' => '1 * * * *',
-                'filter' => 'e.field < 1'
-            ],
             'pre_conditions' => array('@true' => null),
             'conditions' => array('@true' => null),
             'post_actions' => array('@assign_value' => array('parameters' => array('$attribute', 'first_value'))),
@@ -315,8 +311,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             $this->assertNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
         }
 
-        if (array_key_exists('schedule', $transitionDefinition)) {
-            $scheduleDefinition = $transitionDefinition['schedule'];
+        if (array_key_exists('schedule', $configuration)) {
+            $scheduleDefinition = $configuration['schedule'];
             $this->assertEquals((string) $scheduleDefinition['cron'], $actualTransition->getScheduleCron());
             if (isset($scheduleDefinition['filter'])) {
                 $this->assertEquals((string) $scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
@@ -344,6 +340,9 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @return array
+     */
     public function configurationDataProvider()
     {
         return array(
@@ -386,6 +385,10 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'acl_message' => 'test acl message',
                     'label' => 'label',
                     'step_to' => 'step',
+                    'schedule' => [
+                        'cron' => '1 * * * *',
+                        'filter' => 'e.field < 1'
+                    ],
                 ),
                 'transitionDefinition' => self::$transitionDefinitions['full_definition'],
             ),

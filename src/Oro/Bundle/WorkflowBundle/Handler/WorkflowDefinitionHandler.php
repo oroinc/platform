@@ -6,15 +6,11 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionHandler
 {
-    /** @var WorkflowDefinitionHandleBuilder */
-    protected $definitionBuilder;
-
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
@@ -24,25 +20,16 @@ class WorkflowDefinitionHandler
     /** @var string */
     protected $entityClass;
 
-    /** @var EntityRepository */
-    protected $entityRepository;
-
-    /** @var EntityManager */
-    protected $entityManager;
-
     /**
-     * @param WorkflowDefinitionHandleBuilder $definitionBuilder
      * @param WorkflowAssembler $workflowAssembler
      * @param ManagerRegistry $managerRegistry
      * @param string $entityClass
      */
     public function __construct(
-        WorkflowDefinitionHandleBuilder $definitionBuilder,
         WorkflowAssembler $workflowAssembler,
         ManagerRegistry $managerRegistry,
         $entityClass
     ) {
-        $this->definitionBuilder = $definitionBuilder;
         $this->workflowAssembler = $workflowAssembler;
         $this->managerRegistry = $managerRegistry;
         $this->entityClass = $entityClass;
@@ -87,8 +74,10 @@ class WorkflowDefinitionHandler
         if ($workflowDefinition->isSystem()) {
             return false;
         }
-        $this->getEntityManager()->remove($workflowDefinition);
-        $this->getEntityManager()->flush();
+
+        $em = $this->getEntityManager();
+        $em->remove($workflowDefinition);
+        $em->flush();
 
         return true;
     }
@@ -98,11 +87,7 @@ class WorkflowDefinitionHandler
      */
     private function getEntityManager()
     {
-        if (null === $this->entityManager) {
-            $this->entityManager = $this->managerRegistry->getManagerForClass($this->entityClass);
-        }
-
-        return $this->entityManager;
+        return $this->managerRegistry->getManagerForClass($this->entityClass);
     }
 
     /**
@@ -110,10 +95,6 @@ class WorkflowDefinitionHandler
      */
     private function getEntityRepository()
     {
-        if (null === $this->entityRepository) {
-            $this->entityRepository = $this->getEntityManager()->getRepository($this->entityClass);
-        }
-
-        return $this->entityRepository;
+        return $this->getEntityManager()->getRepository($this->entityClass);
     }
 }

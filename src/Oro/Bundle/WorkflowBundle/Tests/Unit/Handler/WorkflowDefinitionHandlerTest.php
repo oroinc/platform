@@ -6,16 +6,12 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 
 class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowDefinitionHandleBuilder */
-    protected $definitionBuilder;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
     protected $entityRepository;
 
@@ -30,12 +26,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->definitionBuilder = $this->getMockBuilder(
-            'Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-
         /** @var WorkflowAssembler $assembler */
         $assembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
             ->disableOriginalConstructor()
@@ -61,7 +51,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->entityManager);
 
         $this->handler = new WorkflowDefinitionHandler(
-            $this->definitionBuilder,
             $assembler,
             $managerRegistry,
             'OroWorkflowBundle:WorkflowDefinition'
