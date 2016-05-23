@@ -77,7 +77,6 @@ class CalendarEventApiHandler
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
-
                 /** @deprecated since version 1.10. Please use field attendees instead of invitedUsers */
                 if ($this->form->has('invitedUsers')) {
                     $this->convertInvitedUsersToAttendee($entity, $this->form->get('invitedUsers')->getData());

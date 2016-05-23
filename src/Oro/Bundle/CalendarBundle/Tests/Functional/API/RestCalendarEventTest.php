@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolation
@@ -43,9 +44,7 @@ class RestCalendarEventTest extends WebTestCase
     {
         $user = $this->getReference('simple_user');
 
-        $adminUser = $this->getContainer()->get('doctrine')
-            ->getRepository('OroUserBundle:User')
-            ->findOneByEmail('admin@example.com');
+        $adminUser = $this->getAdminUser();
 
         $request = [
             'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
@@ -90,9 +89,7 @@ class RestCalendarEventTest extends WebTestCase
     public function testGetAfterPost($id)
     {
         $user      = $this->getReference('simple_user');
-        $adminUser = $this->getContainer()->get('doctrine')
-            ->getRepository('OroUserBundle:User')
-            ->findOneByEmail('admin@example.com');
+        $adminUser = $this->getAdminUser();
 
         $this->client->request(
             'GET',
@@ -171,6 +168,8 @@ class RestCalendarEventTest extends WebTestCase
      */
     public function testPut($id)
     {
+        $adminUser = $this->getAdminUser();
+
         $request = [
             'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
             'title'           => 'Test Event Updated',
@@ -182,9 +181,10 @@ class RestCalendarEventTest extends WebTestCase
             'origin'          => 'client',
             'attendees'       => [
                 [
-                    'displayName' => 'Admin',
-                    'email'       => 'admin@example.com',
+                    'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                    'email'       => $adminUser->getEmail(),
                     'origin'      => 'client',
+                    'status'      => null,
                 ],
                 [
                     'displayName' => 'Ext',
@@ -213,9 +213,7 @@ class RestCalendarEventTest extends WebTestCase
      */
     public function testGetAfterPut($id)
     {
-        $adminUser = $this->getContainer()->get('doctrine')
-            ->getRepository('OroUserBundle:User')
-            ->findOneByEmail('admin@example.com');
+        $adminUser = $this->getAdminUser();
 
         $this->client->request(
             'GET',
@@ -500,9 +498,7 @@ class RestCalendarEventTest extends WebTestCase
     public function testPostOriginServer()
     {
         $user      = $this->getReference('simple_user');
-        $adminUser = $this->getContainer()->get('doctrine')
-            ->getRepository('OroUserBundle:User')
-            ->findOneByEmail('admin@example.com');
+        $adminUser = $this->getAdminUser();
 
         $request = [
             'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
@@ -552,9 +548,7 @@ class RestCalendarEventTest extends WebTestCase
         );
 
         $user      = $this->getReference('simple_user');
-        $adminUser = $this->getContainer()->get('doctrine')
-            ->getRepository('OroUserBundle:User')
-            ->findOneByEmail('admin@example.com');
+        $adminUser = $this->getAdminUser();
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
@@ -710,5 +704,15 @@ class RestCalendarEventTest extends WebTestCase
             ],
             $this->extractInterestingResponseData($result)
         );
+    }
+
+    /**
+     * @return User
+     */
+    protected function getAdminUser()
+    {
+        return $this->getContainer()->get('doctrine')
+            ->getRepository('OroUserBundle:User')
+            ->findOneByEmail('admin@example.com');
     }
 }
