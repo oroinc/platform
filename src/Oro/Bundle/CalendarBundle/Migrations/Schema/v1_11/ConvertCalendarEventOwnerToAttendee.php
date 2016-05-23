@@ -29,9 +29,9 @@ class ConvertCalendarEventOwnerToAttendee extends ParametrizedMigrationQuery
     }
 
     /**
-     * This query inserts data into `oro_calendar_event_attendee` with related `oro_calendar_event id`, we should use `ce.id`,
-     * because in `updateCalendarEvents` we should set `related_attendee` and `calendar_event_id` will get
-     * normal value in `updateAttendee`
+     * This query inserts data into `oro_calendar_event_attendee` with related `oro_calendar_event id`,
+     * we should use `ce.id`, because in `updateCalendarEvents` we should set `related_attendee`
+     * and `calendar_event_id` will get  normal value in `updateAttendee`
      *
      * @param LoggerInterface $logger
      *
