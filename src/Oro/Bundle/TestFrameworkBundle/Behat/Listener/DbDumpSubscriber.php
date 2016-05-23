@@ -3,8 +3,10 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Testwork\EventDispatcher\Event\BeforeExerciseCompleted;
-use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
 
 class DbDumpSubscriber implements EventSubscriberInterface
 {

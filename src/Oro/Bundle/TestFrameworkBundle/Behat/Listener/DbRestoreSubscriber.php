@@ -4,8 +4,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\FeatureTested;
-use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
 
 class DbRestoreSubscriber implements EventSubscriberInterface
 {

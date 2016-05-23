@@ -8,6 +8,9 @@ use Symfony\Component\Process\Process;
 
 abstract class AbstractDbDumper implements DbDumperInterface
 {
+    /** The max runtime for a process in seconds */
+    const TIMEOUT = 30;
+
     /** @var string */
     protected $dbHost;
 
@@ -45,7 +48,7 @@ abstract class AbstractDbDumper implements DbDumperInterface
     {
         $process = new Process($commandline);
 
-        $process->setTimeout(30);
+        $process->setTimeout(static::TIMEOUT);
         $process->run();
 
         if (!$process->isSuccessful()) {

@@ -8,6 +8,7 @@ use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -64,7 +65,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function load(ContainerBuilder $container, array $config)
     {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
@@ -223,7 +224,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     protected function hasDirectory(BundleInterface $bundle, $namespace)
     {
-        $path = $bundle->getPath().str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
+        $path = $bundle->getPath() . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
 
         return is_dir($path);
     }

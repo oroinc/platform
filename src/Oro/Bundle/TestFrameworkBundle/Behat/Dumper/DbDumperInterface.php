@@ -5,16 +5,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Dumper;
 interface DbDumperInterface
 {
     /**
-     * Dump database to storage for restore
-     *
-     * @return void
+     * Dumps the database.
      */
     public function dumpDb();
 
     /**
-     * Restore database from dump
-     *
-     * @return void
+     * Restores the database from dump.
      */
     public function restoreDb();
 }
