@@ -295,7 +295,7 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
-            ->with('Extend\Entity\EV_Oro_Ce_Attendee_Status')
+            ->with('Extend\Entity\EV_Oro_Attendee_Status')
             ->will($this->returnValue($statusRepository));
 
         $event = new CalendarEvent();
@@ -330,7 +330,7 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
-            ->with('Extend\Entity\EV_Oro_Ce_Attendee_Status')
+            ->with('Extend\Entity\EV_Oro_Attendee_Status')
             ->will($this->returnValue($statusRepository));
 
         $event = (new CalendarEvent())
