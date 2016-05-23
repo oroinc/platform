@@ -501,7 +501,7 @@ require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function
         if ($target.data('gallery')) {
             var galleryId = $target.data('gallery');
             var $items = $('[data-gallery]').filter(function() {
-                return $(this).data('gallery') == galleryId;
+                return $(this).data('gallery') === galleryId;
             });
             var dynamicEl = [];
             var images = [];
@@ -524,7 +524,7 @@ require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function
                         el.subHtml = _.escape($item.data('filename'));
                     }
                     dynamicEl.push(el);
-                    if (src == $target.attr('href')) {
+                    if (src === $target.attr('href')) {
                         currentSlide = i;
                     }
                     i++;
@@ -544,4 +544,4 @@ require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function
             e.preventDefault();
         }
     });
-})
+});

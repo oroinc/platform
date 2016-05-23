@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Entity\FileExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 
 /**
@@ -18,7 +18,7 @@ use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
  * @ORM\Table(name="oro_email_attachment")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository")
  */
-class EmailAttachment implements FileExtensionAwareInterface
+class EmailAttachment implements FileExtensionInterface
 {
     const CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\EmailAttachment';
 

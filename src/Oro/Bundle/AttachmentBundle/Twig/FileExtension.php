@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Entity\FileExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -54,6 +54,7 @@ class FileExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
             new \Twig_SimpleFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
+            new \Twig_SimpleFunction('oro_is_preview_available', [$this, 'isPreviewAvailable']),
             new \Twig_SimpleFunction('oro_file_icons_config', [$this, 'getFileIconsConfig']),
             new \Twig_SimpleFunction(
                 'oro_file_view',
@@ -129,11 +130,11 @@ class FileExtension extends \Twig_Extension
     /**
      * Get attachment icon class
      *
-     * @param FileExtensionAwareInterface $attachment
+     * @param FileExtensionInterface $attachment
      *
      * @return string
      */
-    public function getAttachmentIcon(FileExtensionAwareInterface $attachment)
+    public function getAttachmentIcon(FileExtensionInterface $attachment)
     {
         return $this->manager->getAttachmentIconClass($attachment);
     }
@@ -271,6 +272,18 @@ class FileExtension extends \Twig_Extension
     public function getTypeIsImage($type)
     {
         return $this->manager->isImageType($type);
+    }
+
+    /**
+     * Check if we can show preview for file type
+     * Currently only images preview is supported
+     *
+     * @param  string $type
+     * @return bool
+     */
+    public function isPreviewAvailable($type)
+    {
+        return $this->getTypeIsImage($type);
     }
 
     /**

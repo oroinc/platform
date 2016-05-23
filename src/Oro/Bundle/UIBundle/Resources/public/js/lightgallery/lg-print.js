@@ -1,4 +1,4 @@
-(function($, window, document, undefined) {
+define(['jquery'], function($) {
 
     'use strict';
 
@@ -49,7 +49,7 @@
         frame.css({
             'position': 'absolute',
             'top': '-10000px'
-        })
+        });
         $('body').append(frame);
 
         var contentWindow = frame.prop('contentWindow');
@@ -63,12 +63,15 @@
         frameDoc.document.write(printHtml);
         frameDoc.document.write('</body></html>');
         frameDoc.document.close();
-        setTimeout(function() {
-            window.frames['print-frame'].focus();
-            window.frames['print-frame'].print();
-            frame.remove();
-        }, 500);
-    }
+        $(window.frames['print-frame']).load(function() {
+            var self = $(this).get(0);
+            setTimeout(function() {
+                self.focus();
+                self.print();
+                frame.remove();
+            }, 500);
+        });
+    };
 
     Print.prototype.destroy = function() {
 
@@ -76,4 +79,4 @@
 
     $.fn.lightGallery.modules.print = Print;
 
-})(jQuery, window, document);
+});

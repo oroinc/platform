@@ -39,7 +39,7 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
  *      }
  * )
  */
-class File extends ExtendFile implements FileExtensionAwareInterface
+class File extends ExtendFile implements FileExtensionInterface
 {
     /**
      * @var integer

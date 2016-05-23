@@ -397,6 +397,7 @@
             {% set canCopyToRecord = (hasGrantReattach and target is defined and oro_can_attache(attachment, target)) ? true : false %}
             {% set attachmentUrl = path('oro_email_attachment', {id: attachment.id}) %}
             {% set isImage = oro_type_is_image(attachment.contentType) %}
+            {% set isPreviewAvailable = oro_is_preview_available(attachment.contentType) %}
             {% set icon = oro_attachment_icon(attachment) %}
             <li class="email-attachments-list-item">
                 <div class="email-attachments-file">
@@ -418,7 +419,7 @@
                         <i class="fa {{ icon }}"></i> {{ oro_format_filename(attachment.fileName, 11, 4, 5) }}
                     </a>
                     <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
-                        {% if (isImage) %}
+                        {% if (isPreviewAvailable) %}
                             <a class="view-image no-hash" tabindex="-1" data-gallery="gallery-{{ galleryUid }}" href="{{ attachmentUrl }}">{{ 'oro.email.attachment.view'|trans }}</a>
                         {% endif %}
                         <a class="no-hash" tabindex="-1" href="{{ attachmentUrl }}">

@@ -51,7 +51,7 @@ define(function(require) {
                 if (value) {
                     self.model.set('fileName', value);
                     self.model.set('type', 3);
-                    var extension = value.substr(value.lastIndexOf('.') + 1)
+                    var extension = value.substr(value.lastIndexOf('.') + 1);
                     var icon = self.fileIcons['default'];
                     if (extension && self.fileIcons[extension]) {
                         icon = self.fileIcons[extension];

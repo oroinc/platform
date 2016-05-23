@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
-interface FileExtensionAwareInterface
+interface FileExtensionInterface
 {
     /**
      * Get file extension
