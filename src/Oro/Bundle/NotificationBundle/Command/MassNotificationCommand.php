@@ -1,6 +1,6 @@
 <?php
 
-namespace  Oro\Bundle\NavigationBundle\Command;
+namespace  Oro\Bundle\NotificationBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,5 +51,10 @@ class MassNotificationCommand extends ContainerAwareCommand
         $output->writeln($this->getDescription());
 
         $output->writeln('Completed');
+    }
+
+    public function getHelpMessage()
+    {
+        
     }
 }
