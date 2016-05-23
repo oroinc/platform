@@ -14,21 +14,8 @@ class ProcessConfigurationGenerator
     public function generateForScheduledTransition(WorkflowDefinition $workflowDefinition)
     {
         return [
-            ProcessConfigurationProvider::NODE_DEFINITIONS => [
-                'test_definition' => [
-                    'label' => 'Test Definition',
-                    'enabled' => true,
-                    'entity' => 'Oro\Bundle\UserBundle\Entity\User',
-                    'actions_configuration' => [
-                        ['@assign_value' => ['$entity.field', 'value']]
-                    ]
-                ]
-            ],
-            ProcessConfigurationProvider::NODE_TRIGGERS => [
-                'test_definition' => [
-                    ['cron' => '*/1 * * * *']
-                ]
-            ]
+            ProcessConfigurationProvider::NODE_DEFINITIONS => [],
+            ProcessConfigurationProvider::NODE_TRIGGERS => []
         ];
     }
 }
