@@ -20,9 +20,10 @@ class RequestHelper
     /**
      * @return string
      */
-    public function getMasterRequestRoute()
+    public function getRequestRoute()
     {
-        if (null === ($request = $this->requestStack->getMasterRequest())) {
+        if (null === $this->requestStack->getParentRequest() ||
+                null === ($request = $this->requestStack->getMasterRequest())) {
             return;
         }
 

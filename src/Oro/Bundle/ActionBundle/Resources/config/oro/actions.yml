@@ -8,6 +8,7 @@ operations:
                 - '@not_blank': $.data
                 - '@or':
                     - '@blank': $.gridName
+                    - '@blank' : $.requestRoute
                     - '@and':
                         - '@not_empty': $.routes[name]
                         - '@not_empty': $.requestRoute
@@ -35,7 +36,7 @@ operations:
                         actions:
                             - '@call_service_method':
                                 service: oro_action.helper.request
-                                method: getMasterRequestRoute
+                                method: getRequestRoute
                                 attribute: $.requestRoute
                             - '@call_service_method':
                                 service: oro_entity_config.helper.entity_config

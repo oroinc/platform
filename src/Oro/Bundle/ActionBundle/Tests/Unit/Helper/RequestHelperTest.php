@@ -28,36 +28,49 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Request|null $request
+     * @param Request $parentRequest
+     * @param Request $masterRequest
      * @param string|null $expected
      *
-     * @dataProvider getMasterRequestRouteProvider
+     * @dataProvider getRequestRouteProvider
      */
-    public function testGetMasterRequestRoute($request, $expected)
+    public function testGetRequestRoute(Request $parentRequest = null, Request $masterRequest = null, $expected = null)
     {
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
-            ->willReturn($request);
+        $this->requestStack->expects($this->at(0))
+            ->method('getParentRequest')
+            ->willReturn($parentRequest);
 
-        $this->assertEquals($expected, $this->helper->getMasterRequestRoute());
+        $this->requestStack->expects($parentRequest ? $this->at(1) : $this->never())
+            ->method('getMasterRequest')
+            ->willReturn($masterRequest);
+
+        $this->assertEquals($expected, $this->helper->getRequestRoute());
     }
 
     /**
      * @return array
      */
-    public function getMasterRequestRouteProvider()
+    public function getRequestRouteProvider()
     {
         return [
-            'empty request' => [
-                'request' => null,
+            'empty parent request' => [
+                'parentRequest' => null,
+                'masterRequest' => null,
+                'expected' => null,
+            ],
+            'empty master request' => [
+                'parentRequest' => new Request(),
+                'masterRequest' => null,
                 'expected' => null,
             ],
             'empty route name' => [
-                'request' => new Request(),
+                'parentRequest' => new Request(),
+                'masterRequest' => new Request(),
                 'expected' => null,
             ],
             'exists route name' => [
-                'request' => new Request([
+                'parentRequest' => new Request(),
+                'masterRequest' => new Request([
                     '_route' => 'test_route',
                 ]),
                 'expected' => 'test_route',

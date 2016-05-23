@@ -43,7 +43,6 @@ class Dump extends AbstractCondition implements ContextAccessorAwareInterface
 
         $result = array_shift($options);
 
-
         error_log('action.DEBUG: ' . json_encode($options ?: $this->getContextValues($context)));
 
         return $result;

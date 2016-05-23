@@ -42,11 +42,11 @@ class ItemControllerTest extends WebTestCase
 
         $this->assertArrayHasKey('update', $data['data'][0]['action_configuration']);
         $this->assertArrayHasKey('delete', $data['data'][0]['action_configuration']);
-        $this->assertInternalType('array' , $data['data'][0]['action_configuration']['update']);
-        $this->assertInternalType('array' , $data['data'][0]['action_configuration']['delete']);
+        $this->assertInternalType('array', $data['data'][0]['action_configuration']['update']);
+        $this->assertInternalType('array', $data['data'][0]['action_configuration']['delete']);
 
         $this->assertArrayHasKey('delete', $data['metadata']['massActions']);
-        $this->assertInternalType('array' , $data['metadata']['massActions']['delete']);
+        $this->assertInternalType('array', $data['metadata']['massActions']['delete']);
     }
 
     public function testViewPage()
