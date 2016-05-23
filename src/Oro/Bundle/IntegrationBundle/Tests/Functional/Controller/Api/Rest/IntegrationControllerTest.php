@@ -4,10 +4,10 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
 
-use JMS\JobQueueBundle\Entity\Job;
-use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
+use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 
 /**
  * @dbIsolation
@@ -107,10 +107,9 @@ class IntegrationControllerTest extends WebTestCase
         $this->assertTrue($channel->getPreviouslyEnabled());
     }
 
-    public function testShouldScheduleSyncJobOnActivation()
+    public function testShouldSendSyncIntegrationMessageOnActivation()
     {
-        //guard
-        $this->assertCount(0, $this->getScheduledSyncJobs());
+        $this->getMessageProducer()->clearTraces();
 
         $channel = $this->createChannel();
         $channel->setEnabled(true);
@@ -124,8 +123,10 @@ class IntegrationControllerTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_api_activate_integration', ['id' => $channelId]));
 
         $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
-
-        $this->assertCount(1, $this->getScheduledSyncJobs());
+        
+        $traces = $this->getMessageProducer()->getTopicTraces(Topics::SYNC_INTEGRATION);
+        
+        $this->assertCount(1, $traces);
     }
 
     /**
@@ -169,11 +170,10 @@ class IntegrationControllerTest extends WebTestCase
     }
 
     /**
-     * @return array|Job[]
+     * @return TraceableMessageProducer
      */
-    protected function getScheduledSyncJobs()
+    private function getMessageProducer()
     {
-        return $this->getContainer()->get('doctrine')->getRepository('JMSJobQueueBundle:Job')
-            ->findBy(['command' => SyncCommand::COMMAND_NAME]);
+        return $this->getContainer()->get('oro_message_queue.message_producer');
     }
 }

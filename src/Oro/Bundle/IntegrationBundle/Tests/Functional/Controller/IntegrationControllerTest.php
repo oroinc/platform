@@ -3,7 +3,9 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Symfony\Component\DomCrawler\Form;
 
 use Oro\Bundle\UserBundle\Entity\User;
@@ -159,7 +161,9 @@ class IntegrationControllerTest extends WebTestCase
 
         $this->assertNotEmpty($result);
         $this->assertTrue($result['successful']);
-        $this->assertNotEmpty($result['job_id']);
+
+        $traces = $this->getMessageProducer()->getTopicTraces(Topics::SYNC_INTEGRATION);
+        $this->assertCount(1, $traces);
     }
 
     public function testShouldNotScheduleSyncJobIfIntegrationNotActive()
@@ -217,5 +221,13 @@ class IntegrationControllerTest extends WebTestCase
         $channel->setEnabled(true);
 
         return $channel;
+    }
+
+    /**
+     * @return TraceableMessageProducer
+     */
+    private function getMessageProducer()
+    {
+        return $this->getContainer()->get('oro_message_queue.message_producer');
     }
 }

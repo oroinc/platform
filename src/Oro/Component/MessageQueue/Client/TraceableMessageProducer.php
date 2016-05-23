@@ -39,6 +39,23 @@ class TraceableMessageProducer implements MessageProducerInterface
         return $this->traces;
     }
 
+    /**
+     * @param string $topic
+     *
+     * @return array
+     */
+    public function getTopicTraces($topic)
+    {
+        $topicTraces = [];
+        foreach ($this->getTraces() as $trace) {
+            if ($topic == $trace['topic']) {
+                $topicTraces[] = $trace;
+            }
+        }
+        
+        return $topicTraces;
+    }
+
     public function clearTraces()
     {
         $this->traces = [];

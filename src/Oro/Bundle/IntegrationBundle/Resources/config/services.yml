@@ -29,9 +29,7 @@ parameters:
 
     oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
     oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
-    oro_integration.genuine_sync_scheduler.class:                         Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler
 
-    oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
     oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
 
     oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
@@ -208,16 +206,15 @@ services:
     oro_integration.sync_scheduler:
         class: %oro_integration.sync_scheduler.class%
         arguments:
-            - '@doctrine'
-            - '@oro_integration.manager.types_registry'
+            - '@oro_message_queue.message_producer'
 
     oro_integration.genuine_sync_scheduler:
-        class: %oro_integration.genuine_sync_scheduler.class%
+        class: 'Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler'
         arguments:
-            - '@doctrine'
+            - '@oro_message_queue.message_producer'
 
     oro_integration.reverse_sync.processor:
-        class: %oro_integration.reverse_sync.processor.class%
+        class: 'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor'
         arguments:
             - '@oro_importexport.processor.registry'
             - '@oro_integration.job_executor'
@@ -302,3 +299,12 @@ services:
             - '@event_dispatcher'
         tags:
             - { name: twig.extension }
+
+    oro_integration.async.sync_integration_processor:
+        class: 'Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor'
+        arguments:
+            - '@doctrine'
+            - '@security.token_storage'
+            - '@oro_integration.processor_registry'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

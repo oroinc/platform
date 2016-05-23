@@ -5,9 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
@@ -17,6 +15,8 @@ class ChannelRepository extends EntityRepository
     const BUFFER_SIZE = 100;
 
     /**
+     * @deprecated TODO CRM-5839 remove it
+     *
      * @info Check if task is running
      *
      * @param string   $commandName
@@ -34,6 +34,8 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
+     * @deprecated TODO CRM-5839 remove it
+     *
      * @info Check if task is pending or running
      *
      * @param string   $commandName
@@ -51,6 +53,8 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
+     * @deprecated TODO CRM-5839 remove it
+     *
      * @param string   $commandName
      * @param int|null $integrationId
      *
@@ -87,6 +91,8 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
+     * @deprecated TODO CRM-5839 remove it
+     *
      * @param string[]|string      $commandName
      * @param string[]|string|null $arguments
      * @param string[]|string|null $states
@@ -136,6 +142,8 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
+     * @deprecated TODO CRM-5839 remove it
+     *
      * @param string[]|string      $commandName
      * @param string[]|string|null $arguments
      * @param string[]|string|null $states
@@ -151,6 +159,8 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
+     * @deprecated TODO CRM-5839 remove it
+     *
      * @param string               $commandName
      * @param string[]|string|null $arguments
      * @param string[]|string|null $states

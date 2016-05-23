@@ -3,13 +3,19 @@
 namespace Oro\Bundle\IntegrationBundle\Command;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-
+/**
+ * TODO CRM-5839 remove it
+ *
+ * @deprecated
+ */
 abstract class AbstractSyncCronCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
+     * @deprecated
+     *
      * Check is job running (from previous schedule)
      *
      * @param null|int $integrationId
@@ -27,6 +33,8 @@ abstract class AbstractSyncCronCommand extends ContainerAwareCommand implements 
     }
 
     /**
+     * @deprecated
+     *
      * Get service from DI container by id
      *
      * @param string $id

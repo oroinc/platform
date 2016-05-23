@@ -2,125 +2,72 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
+use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
+use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 
 class GenuineSyncSchedulerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRegistryAsFirstArgument()
     {
-        new GenuineSyncScheduler($this->createRegistryStub());
+        new GenuineSyncScheduler($this->createTraceableMessageProducer());
+    }
+
+    public function testShouldSendSyncIntegrationMessageWithIntegrationIdOnly()
+    {
+        $messageProducer = $this->createTraceableMessageProducer();
+
+        $scheduler = new GenuineSyncScheduler($messageProducer);
+
+        $scheduler->schedule('theIntegrationId');
+
+        $traces = $messageProducer->getTopicTraces(Topics::SYNC_INTEGRATION);
+
+        $this->assertCount(1, $traces);
+
+        $this->assertEquals(Topics::SYNC_INTEGRATION, $traces[0]['topic']);
+        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
+        $this->assertEquals([
+            'integrationId' => 'theIntegrationId',
+            'connector' => null,
+            'connector_parameters' => [],
+            'transport_batch_size' => 100,
+        ], $traces[0]['message']);
+    }
+
+    public function testShouldAllowPassConnectorNameAndOptions()
+    {
+        $messageProducer = $this->createTraceableMessageProducer();
+
+        $scheduler = new GenuineSyncScheduler($messageProducer);
+
+        $scheduler->schedule('theIntegrationId', 'theConnectorName', ['theOption' => 'theValue']);
+
+        $traces = $messageProducer->getTopicTraces(Topics::SYNC_INTEGRATION);
+
+        $this->assertCount(1, $traces);
+
+        $this->assertEquals(Topics::SYNC_INTEGRATION, $traces[0]['topic']);
+        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
+        $this->assertEquals([
+            'integrationId' => 'theIntegrationId',
+            'connector' => 'theConnectorName',
+            'connector_parameters' => ['theOption' => 'theValue'],
+            'transport_batch_size' => 100,
+        ], $traces[0]['message']);
     }
 
     /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The integration is not active.
+     * @return TraceableMessageProducer
      */
-    public function testThrowIfChannelNotActive()
+    protected function createTraceableMessageProducer()
     {
-        $channel = new Channel();
-        $channel->setEnabled(false);
+        /** @var MessageProducerInterface $internalMessageProducer */
+        $internalMessageProducer = $this->getMock(MessageProducerInterface::class);
 
-        $scheduler = new GenuineSyncScheduler($this->createRegistryStub());
-
-        $scheduler->schedule($channel);
-    }
-
-    public function testShouldCreateJobAndStoreToDatabase()
-    {
-        $channel = new Channel();
-        $channel->setEnabled(true);
-
-        $managerMock = $this->createEntityManagerMock();
-        $managerMock
-            ->expects($this->once())
-            ->method('persist')
-            ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
-        ;
-        $managerMock
-            ->expects($this->once())
-            ->method('flush')
-        ;
-
-        $scheduler = new GenuineSyncScheduler($this->createRegistryStub($managerMock));
-
-        $scheduler->schedule($channel);
-    }
-
-    public function testShouldReturnCreatedJob()
-    {
-        $channel = new Channel();
-        $channel->setEnabled(true);
-
-        $this->writeIdProperty($channel, 123);
-
-        $managerMock = $this->createEntityManagerMock();
-
-        $scheduler = new GenuineSyncScheduler($this->createRegistryStub($managerMock));
-
-        $job = $scheduler->schedule($channel);
-
-        $this->assertInstanceOf('JMS\JobQueueBundle\Entity\Job', $job);
-        $this->assertEquals(SyncCommand::COMMAND_NAME, $job->getCommand());
-        $this->assertEquals(['--integration-id=123', '-v'], $job->getArgs());
-    }
-
-    public function testShouldAllowPassTheForceCliOption()
-    {
-        $channel = new Channel();
-        $channel->setEnabled(true);
-
-        $this->writeIdProperty($channel, 123);
-
-        $managerMock = $this->createEntityManagerMock();
-
-        $scheduler = new GenuineSyncScheduler($this->createRegistryStub($managerMock));
-
-        $job = $scheduler->schedule($channel, true);
-
-        $this->assertInstanceOf('JMS\JobQueueBundle\Entity\Job', $job);
-        $this->assertEquals(SyncCommand::COMMAND_NAME, $job->getCommand());
-        $this->assertEquals(['--integration-id=123', '-v', '--force'], $job->getArgs());
-    }
-
-    /**
-     * @param EntityManagerInterface $em
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
-     */
-    protected function createRegistryStub(EntityManagerInterface $em = null)
-    {
-        $registryMock = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $registryMock
-            ->expects($this->any())
-            ->method('getManagerForClass')
-            ->willReturn($em)
-        ;
-
-        return $registryMock;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManagerInterface
-     */
-    protected function createEntityManagerMock()
-    {
-        return $this->getMock('Doctrine\ORM\EntityManagerInterface');
-    }
-
-    /**
-     * @param object $object
-     * @param int $id
-     */
-    protected function writeIdProperty($object, $id)
-    {
-        $rp = new \ReflectionProperty($object, 'id');
-        $rp->setAccessible(true);
-        $rp->setValue($object, $id);
-        $rp->setAccessible(false);
+        return new TraceableMessageProducer($internalMessageProducer);
     }
 }

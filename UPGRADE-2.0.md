@@ -1,5 +1,4 @@
 UPGRADE FROM 1.10 to 2.0 
-========================
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` construction signature was changed: now it takes `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` and `Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager` as arguments.
@@ -42,3 +41,13 @@ UPGRADE FROM 1.10 to 2.0
 - Added ExpressionFunction `localized_value` to `Oro\Bundle\LocaleBundle\Layout\ExpressionLanguageProvider` - can be used in Layouts
 - Added Localization Settings page in System configuration
 - Updated `Oro\Bundle\LocaleBundle\Helper\LocalizationHelper`, used `CurrentLocalizationProvider` for provide current localization and added `getLocalizedValue()` to retrieve fallback values
+
+####OroIntegrationBundle:
+- The option `--integration-id` renamed to `--integration` in `oro:cron:integration:sync` cli command.
+- The option `--force` were removed from `oro:cron:integration:sync` cli command. Pass it as connector option  `force=true`.
+- The option `--transport-batch-size force` were removed from `oro:cron:integration:sync` cli command.
+- The option `--params` were removed from `oro:integration:reverse:sync` cli command. Use `--connector-parameters` instead.
+- The `SyncScheduler::schedule` method signature was changed. 
+- The `GenuineSyncScheduler::schedule` method signature was changed.
+- The parameter `oro_integration.genuine_sync_scheduler.class` was removed.
+- The parameter `oro_integration.reverse_sync.processor.class` was removed.

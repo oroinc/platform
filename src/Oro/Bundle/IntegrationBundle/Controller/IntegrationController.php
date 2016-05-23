@@ -2,16 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
-use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use FOS\RestBundle\Util\Codes;
-
-use JMS\JobQueueBundle\Entity\Job;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -19,7 +15,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -95,20 +90,11 @@ class IntegrationController extends Controller
         ];
 
         try {
-            $job = $this->getSyncScheduler()->schedule($integration, (bool) $request->get('force', false));
-            
-            $jobViewLink = sprintf(
-                '<a href="%s" class="job-view-link">%s</a>',
-                $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
-                $this->get('translator')->trans('oro.integration.progress')
-            );
+            $this->getSyncScheduler()->schedule($integration->getId(), null, [
+                'force' => (bool) $request->get('force', false)
+            ]);
 
-            $response['message'] = str_replace(
-                '{{ job_view_link }}',
-                $jobViewLink,
-                $this->get('translator')->trans('oro.integration.sync')
-            );
-            $response['job_id'] = $job->getId();
+            // TODO CRM-5839 previous version returned a link to the job.
         } catch (\Exception $e) {
             $status  = Codes::HTTP_BAD_REQUEST;
 
