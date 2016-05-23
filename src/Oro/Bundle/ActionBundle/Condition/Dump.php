@@ -33,6 +33,9 @@ class Dump extends AbstractCondition implements ContextAccessorAwareInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function isConditionAllowed($context)
     {
         /* @var $context ActionData */
