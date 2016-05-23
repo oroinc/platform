@@ -103,6 +103,7 @@ define(function(require) {
                     var widget = widgetsByPriority[i];
                     if (self.isApplicable($input, widget)) {
                         self.createWidget($input, widget.Widget, {});
+                        break;
                     }
                 }
             });
