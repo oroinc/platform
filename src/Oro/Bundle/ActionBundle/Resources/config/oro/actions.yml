@@ -8,10 +8,9 @@ operations:
                 - '@not_blank': $.data
                 - '@or':
                     - '@blank': $.gridName
-                    - '@blank' : $.requestRoute
+                    - '@blank': $.requestRoute
                     - '@and':
-                        - '@not_empty': $.routes[name]
-                        - '@not_empty': $.requestRoute
+                        - '@not_blank': $.routes[name]
                         - '@eq':
                             - $.routes[name]
                             - $.requestRoute

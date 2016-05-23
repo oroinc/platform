@@ -5,12 +5,16 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\RequestHelper;
 
 class RequestHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
     protected $requestStack;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper */
+    protected $applicationsHelper;
 
     /** @var RequestHelper */
     protected $helper;
@@ -24,25 +28,29 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new RequestHelper($this->requestStack);
+        $this->applicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->helper = new RequestHelper($this->requestStack, $this->applicationsHelper);
     }
 
     /**
-     * @param Request $parentRequest
      * @param Request $masterRequest
+     * @param string|null $executionRoute
      * @param string|null $expected
      *
      * @dataProvider getRequestRouteProvider
      */
-    public function testGetRequestRoute(Request $parentRequest = null, Request $masterRequest = null, $expected = null)
+    public function testGetRequestRoute(Request $masterRequest = null, $executionRoute = null, $expected = null)
     {
-        $this->requestStack->expects($this->at(0))
-            ->method('getParentRequest')
-            ->willReturn($parentRequest);
-
-        $this->requestStack->expects($parentRequest ? $this->at(1) : $this->never())
+        $this->requestStack->expects($this->once())
             ->method('getMasterRequest')
             ->willReturn($masterRequest);
+
+        $this->applicationsHelper->expects($executionRoute ? $this->once() : $this->never())
+            ->method('getExecutionRoute')
+            ->willReturn($executionRoute);
 
         $this->assertEquals($expected, $this->helper->getRequestRoute());
     }
@@ -53,28 +61,30 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
     public function getRequestRouteProvider()
     {
         return [
-            'empty parent request' => [
-                'parentRequest' => null,
-                'masterRequest' => null,
-                'expected' => null,
-            ],
             'empty master request' => [
-                'parentRequest' => new Request(),
                 'masterRequest' => null,
+                'executionRoute' => null,
                 'expected' => null,
             ],
             'empty route name' => [
-                'parentRequest' => new Request(),
                 'masterRequest' => new Request(),
+                'executionRoute' => 'execution_route',
+                'expected' => null,
+            ],
+            'execution route name' => [
+                'masterRequest' => new Request([
+                    '_route' => 'execution_route',
+                ]),
+                'executionRoute' => 'execution_route',
                 'expected' => null,
             ],
             'exists route name' => [
-                'parentRequest' => new Request(),
                 'masterRequest' => new Request([
                     '_route' => 'test_route',
                 ]),
+                'executionRoute' => 'execution_route',
                 'expected' => 'test_route',
-            ]
+            ],
         ];
     }
 }

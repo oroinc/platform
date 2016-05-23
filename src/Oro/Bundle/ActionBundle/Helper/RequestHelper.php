@@ -9,12 +9,16 @@ class RequestHelper
     /** @var RequestStack */
     protected $requestStack;
 
+    /** @var ApplicationsHelper */
+    protected $applicationsHelper;
+
     /**
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, ApplicationsHelper $applicationsHelper)
     {
         $this->requestStack = $requestStack;
+        $this->applicationsHelper = $applicationsHelper;
     }
 
     /**
@@ -22,11 +26,12 @@ class RequestHelper
      */
     public function getRequestRoute()
     {
-        if (null === $this->requestStack->getParentRequest() ||
-                null === ($request = $this->requestStack->getMasterRequest())) {
+        if (null === ($request = $this->requestStack->getMasterRequest())) {
             return;
         }
 
-        return $request->get('_route');
+        $route = $request->get('_route');
+
+        return $route !== $this->applicationsHelper->getExecutionRoute() ? $route : null;
     }
 }

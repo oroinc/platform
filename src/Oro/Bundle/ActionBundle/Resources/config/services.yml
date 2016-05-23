@@ -39,6 +39,7 @@ services:
         public: true
         arguments:
             - '@request_stack'
+            - '@oro_action.helper.applications'
 
     oro_action.helper.applications:
         class: %oro_action.helper.applications.class%
