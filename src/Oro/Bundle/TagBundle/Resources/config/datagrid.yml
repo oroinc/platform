@@ -62,7 +62,7 @@ datagrid:
                     type: string
                     data_name: t.name
                 usage:
-                    type: number
+                    type: number-range
                     data_name: usage
                     filter_by_having: true
 
