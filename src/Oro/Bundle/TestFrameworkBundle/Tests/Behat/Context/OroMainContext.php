@@ -34,7 +34,17 @@ class OroMainContext extends MinkContext implements
     /** @BeforeStep */
     public function beforeStep(BeforeStepScope $scope)
     {
-        $this->iWaitingForAjaxResponse();
+        $url = $this->getSession()->getCurrentUrl();
+
+        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
+            $this->waitPageToLoad();
+
+            return;
+        } elseif ('about:blank' === $url) {
+            return;
+        }
+
+        $this->waitForAjax();
     }
 
     /**
@@ -82,9 +92,9 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given Login as an existing :login user and :password password
+     * @Given /^(?:|I )login as "(?P<login>(?:[^"]|\\")*)" user with "(?P<password>(?:[^"]|\\")*)" password$/
      */
-    public function loginAsAnExistingUserAndPassword($login, $password)
+    public function loginAsUserWithPassword($login, $password)
     {
         $this->visit('user/login');
         $this->fillField('_username', $login);
@@ -99,7 +109,6 @@ class OroMainContext extends MinkContext implements
     {
         try {
             parent::pressButton($button);
-            $this->iWaitingForAjaxResponse();
         } catch (ElementNotFoundException $e) {
             if ($this->getSession()->getPage()->hasLink($button)) {
                 $this->clickLink($button);
@@ -110,22 +119,10 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Wait for AJAX to finish.
-     *
-     * @Given /^(?:|I )waiting for AJAX response$/
-     * @param int $time Time should be in milliseconds
-     */
-    public function iWaitingForAjaxResponse($time = 15000)
-    {
-        $this->waitPageToLoad($time);
-        $this->waitForAjax($time);
-    }
-
-    /**
      * Wait PAGE load
      * @param int $time Time should be in milliseconds
      */
-    protected function waitPageToLoad($time)
+    protected function waitPageToLoad($time = 15000)
     {
         $this->getSession()->wait(
             $time,
@@ -141,8 +138,10 @@ class OroMainContext extends MinkContext implements
      * Wait AJAX request
      * @param int $time Time should be in milliseconds
      */
-    protected function waitForAjax($time)
+    protected function waitForAjax($time = 15000)
     {
+        $this->waitPageToLoad($time);
+
         $jsAppActiveCheck = <<<JS
         (function () {
             var isAppActive = false;
