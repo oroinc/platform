@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -65,29 +68,10 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
      */
     protected function serializeCalendarEvent(CalendarEvent $event, array $extraFields = [])
     {
-        $propertyAccessor = $this->getPropertyAccessor();
         $extraValues = [];
 
         foreach ($extraFields as $field) {
-            $extraValues[$field] = $propertyAccessor->getValue($event, $field);
-        }
-
-        $extraValues['attendees']    = [];
-        $extraValues['invitedUsers'] = [];
-        foreach ($event->getAttendees() as $attendee) {
-            $extraValues['attendees'][] =  $this->transformEntity([
-                'displayName' => $attendee->getDisplayName(),
-                'email' => $attendee->getEmail(),
-                'createdAt' => $attendee->getCreatedAt(),
-                'updatedAt' => $attendee->getUpdatedAt(),
-                'origin' => $attendee->getOrigin() ? $attendee->getOrigin()->getId() : null,
-                'status' => $attendee->getStatus() ? $attendee->getStatus()->getId() : null,
-                'type' => $attendee->getType() ? $attendee->getType()->getId() : null,
-            ]);
-
-            if ($attendee->getUser()) {
-                $extraValues['invitedUsers'][] = $attendee->getUser()->getId();
-            }
+            $extraValues[$field] = $this->getObjectValue($event, $field);
         }
 
         return array_merge(
@@ -108,7 +92,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                     ? $event->getRealCalendarEvent()->getOrigin()->getId()
                     : null
             ],
-            $extraValues
+            $this->prepareExtraValues($event, $extraValues)
         );
     }
 
@@ -159,5 +143,55 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         return $this->propertyAccessor;
+    }
+
+    /**
+     * @param mixed $object
+     * @param string $propertyPath
+     *
+     * @return mixed|null
+     */
+    protected function getObjectValue($object, $propertyPath)
+    {
+        $propertyAccessor = $this->getPropertyAccessor();
+
+        try {
+            return $propertyAccessor->getValue($object, $propertyPath);
+        } catch (InvalidPropertyPathException $e) {
+            return null;
+        } catch (NoSuchPropertyException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param CalendarEvent $event
+     * @param array         $extraValues
+     *
+     * @return array
+     */
+    protected function prepareExtraValues(CalendarEvent $event, array $extraValues)
+    {
+        $extraValues['attendees']    = [];
+        $extraValues['invitedUsers'] = [];
+
+        foreach ($event->getAttendees() as $attendee) {
+            $extraValues['attendees'][] = $this->transformEntity([
+                'displayName' => $attendee->getDisplayName(),
+                'email'       => $attendee->getEmail(),
+                'user_id'     => $this->getObjectValue($attendee, 'user.id'),
+                'createdAt'   => $attendee->getCreatedAt(),
+                'updatedAt'   => $attendee->getUpdatedAt(),
+                'origin'      => $this->getObjectValue($attendee, 'origin.id'),
+                'status'      => $this->getObjectValue($attendee, 'status.id'),
+                'type'        => $this->getObjectValue($attendee, 'type.id'),
+            ]);
+
+            if ($attendee->getUser()) {
+                $extraValues['invitedUsers'][] = $attendee->getUser()->getId();
+            }
+        }
+
+        return $extraValues;
     }
 }
