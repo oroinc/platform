@@ -31,10 +31,15 @@ Remove ```composer.lock``` file if you install dependencies with ```--no-dev``` 
 
 Install dev dependencies:
 
-```php
+```bash
 composer install
 ```
 
+Install application without fixture in prod mode:
+
+```bash
+app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=OroCRM --env=prod --sample-data=n
+```
 
 ### Run tests
 
@@ -106,7 +111,9 @@ If you need some specific feature steps for your bundle you should create ```Tes
 Instead of ```OroMainContext``` FeatureContext will be used for bundle test suite.
 Perhaps FeatureContext may be extended from OroMainContext for reload some feature steps.
 
-Every Bundle can have own number of elements. All elements must be described in ```Resources/config/behat_elements.yml``` in way:
+#### Page elements
+
+Every Bundle can have own number of elements. All elements must be discribed in ```Resources/config/behat_elements.yml``` in way:
 
 ```yml
 Login:
@@ -136,9 +143,14 @@ Login:
 3. ```class``` namespace for element class. It must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```
 4. ```options``` it's an array of extra options that will be set in options property of Element class
 
+#### Feature isolation
+
+Every feature can interact with application, perform CRUD operation and thereby the database can be modified.
+So, it is why features are isolated each other. The isolation is reached by dumping the database before execution of tests and restoring the database after execution of any feature.
+
 ### Configuration
 
-Base configuration is holded by [behat.yml.dist](../../config/behat.yml.dist).
+Base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
 Use it by parameter ```-c``` for use your custom config:
 
 ```bash

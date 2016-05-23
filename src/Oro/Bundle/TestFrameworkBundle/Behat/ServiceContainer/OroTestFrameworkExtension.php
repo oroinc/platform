@@ -3,23 +3,22 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Context\ServiceContainer\ContextExtension;
-use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
+use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
-    const ELEMENT_FACTORY_ID = 'oro_element_factory';
-
     /**
      * {@inheritdoc}
      */
@@ -27,7 +26,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
-        $this->processElementFactory($container);
+        $this->processElements($container);
+        $this->processDbIsolationSubscribers($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -65,8 +65,51 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function load(ContainerBuilder $container, array $config)
     {
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
+        $loader->load('services.yml');
+
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
-        $this->loadElementFactoryInitializer($container);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function processDbIsolationSubscribers(ContainerBuilder $container)
+    {
+        $dumper = $this->getDumper($container);
+        $container->getDefinition('oro_test.listener.db_restore_subscriber')->replaceArgument(
+            0,
+            $dumper
+        );
+        $container->getDefinition('oro_test.listener.db_dump_subscriber')->replaceArgument(
+            0,
+            $dumper
+        );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @return Reference
+     */
+    private function getDumper(ContainerBuilder $container)
+    {
+        $driver = $container->get(Symfony2Extension::KERNEL_ID)->getContainer()->getParameter('database_driver');
+
+        $taggedServices = $container->findTaggedServiceIds(
+            'oro_test.db_dumper'
+        );
+
+        foreach ($taggedServices as $id => $tags) {
+            foreach ($tags as $attributes) {
+                if ($attributes['driver'] !== $driver) {
+                    continue;
+                }
+
+                return new Reference($id);
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('You must specify db dumper service for "%s" driver', $driver));
     }
 
     /**
@@ -97,18 +140,19 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $suiteConfigurations = $container->getParameter('suite.configurations');
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
-        $symfonySuiteGenerator = $container->get('symfony2_extension.suite.generator');
+        /** @var SymfonySuiteGenerator $suiteGenerator */
+        $suiteGenerator = $container->get('symfony2_extension.suite.generator');
         $commonContexts = $container->getParameter('oro_test.shared_contexts');
 
         $configuredBundles = $this->getConfiguredBundles($suiteConfigurations);
 
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if (in_array($bundle->getName(), $configuredBundles)) {
+            if (in_array($bundle->getName(), $configuredBundles, true)) {
                 continue;
             }
 
-            $bundleSuite = $symfonySuiteGenerator->generateSuite($bundle->getName(), []);
+            $bundleSuite = $suiteGenerator->generateSuite($bundle->getName(), []);
 
             if (!$this->hasValidPaths($bundleSuite)) {
                 continue;
@@ -129,7 +173,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     /**
      * @param ContainerBuilder $container
      */
-    private function processElementFactory(ContainerBuilder $container)
+    private function processElements(ContainerBuilder $container)
     {
         $elementConfiguration = [];
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
@@ -149,27 +193,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             $elementConfiguration = array_merge($elementConfiguration, Yaml::parse($mappingPath));
         }
 
-        $elementFactory = new Definition(
-            'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory',
-            [
-                new Reference(MinkExtension::MINK_ID),
-                $elementConfiguration,
-            ]
-        );
-        $container->setDefinition(self::ELEMENT_FACTORY_ID, $elementFactory);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function loadElementFactoryInitializer(ContainerBuilder $container)
-    {
-        $formFillerAwareInitializerDefinition = new Definition(
-            'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ElementFactoryInitializer',
-            [new Reference(self::ELEMENT_FACTORY_ID)]
-        );
-        $formFillerAwareInitializerDefinition->addTag(ContextExtension::INITIALIZER_TAG, array('priority' => 0));
-        $container->setDefinition('oro_behat_form_filler_initializer', $formFillerAwareInitializerDefinition);
+        $container->getDefinition('oro_element_factory')->replaceArgument(1, $elementConfiguration);
     }
 
     /**
@@ -179,7 +203,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     private function getSuiteContexts(SymfonyBundleSuite $bundleSuite, array $commonContexts)
     {
-        $suiteContexts = array_filter($bundleSuite->getSetting('contexts'), "class_exists");
+        $suiteContexts = array_filter($bundleSuite->getSetting('contexts'), 'class_exists');
         $suiteContexts = count($suiteContexts) ? $suiteContexts : $commonContexts;
 
         return $suiteContexts;
@@ -191,7 +215,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     protected function hasValidPaths(SymfonyBundleSuite $bundleSuite)
     {
-        return 0 < count(array_filter($bundleSuite->getSetting('paths'), "is_dir"));
+        return 0 < count(array_filter($bundleSuite->getSetting('paths'), 'is_dir'));
     }
 
     /**
@@ -200,7 +224,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     protected function hasDirectory(BundleInterface $bundle, $namespace)
     {
-        $path = $bundle->getPath().str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
+        $path = $bundle->getPath() . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
 
         return is_dir($path);
     }
