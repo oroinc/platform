@@ -184,4 +184,11 @@ interface ExpressionBuilderInterface
      * @return mixed
      */
     public function coalesce(array $x);
+
+    /**
+     * Set case sensitive parameter
+     *
+     * @param bool $caseInsensitive
+     */
+    public function setCaseInsensitive($caseInsensitive = true);
 }

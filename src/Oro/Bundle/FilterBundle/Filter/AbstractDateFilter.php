@@ -29,13 +29,19 @@ abstract class AbstractDateFilter extends AbstractFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        $data = $this->dateFilterUtility->parseData($this->get(FilterUtility::DATA_NAME_KEY), $data);
+        $data = $this->dateFilterUtility->parseData($this->get(FilterUtility::DATA_NAME_KEY), $data, $this->name);
         if (!$data) {
             return false;
         }
 
         $dateStartValue = $data['date_start'];
         $dateEndValue   = $data['date_end'];
+        //Swap start and end dates if end date is behind start date
+        if (null !== $dateStartValue && null !== $dateEndValue && $dateStartValue > $dateEndValue) {
+            $end = $dateEndValue;
+            $dateEndValue = $dateStartValue;
+            $dateStartValue = $end;
+        }
 
         $startDateParameterName = $ds->generateParameterName($this->getName());
         $endDateParameterName   = $ds->generateParameterName($this->getName());

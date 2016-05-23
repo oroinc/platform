@@ -6,15 +6,13 @@ use Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 
-class OperationExtensionTest extends \PHPUnit_Framework_TestCase
+class OperationExtensionTest extends AbstractExtensionTest
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
 
@@ -24,14 +22,9 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var OperationExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
-    protected $manager;
-
     protected function setUp()
     {
-        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
         $contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
@@ -68,13 +61,16 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             $this->manager,
             $contextHelper,
             $this->massActionProviderRegistry,
-            $optionsHelper
+            $optionsHelper,
+            $this->gridConfigurationHelper
         );
     }
 
     protected function tearDown()
     {
-        unset($this->extension, $this->manager, $this->massActionProviderRegistry);
+        unset($this->extension, $this->massActionProviderRegistry);
+
+        parent::tearDown();
     }
 
     /**
@@ -134,9 +130,14 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
         if ($groups) {
             $this->extension->setGroups($groups);
         }
-        $this->extension->isApplicable($datagridConfig);
 
-        $this->assertEquals($expectedActions, $this->extension->getRowConfiguration($record, []));
+        if ($this->extension->isApplicable($datagridConfig)) {
+            $actionConfigurationCallback = $datagridConfig->offsetGet(ActionExtension::ACTION_CONFIGURATION_KEY);
+
+            $this->assertInstanceOf('Closure', $actionConfigurationCallback);
+
+            $this->assertEquals($expectedActions, call_user_func($actionConfigurationCallback, $record, []));
+        }
     }
 
     /**
@@ -144,35 +145,16 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function isApplicableProvider()
     {
-        $operation1 = $this->createOperation(
-            'test_operation',
-            true,
-            [
-                'getDatagridOptions' => ['mass_action_provider' => self::PROVIDER_ALIAS]
-            ]
-        );
-
-        $operation2 = $this->createOperation(
-            'test_operation',
-            true,
-            [
-                'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
-            ]
-        );
-
-        $operation3 = $this->createOperation(
-            'action3',
-            true,
-            [
-                'getName' => 'action3',
-                'getLabel' => 'Action 3 label'
-            ]
-        );
-
         return [
             'applicable with provider' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['test_operation' => $operation1],
+                'actions' => ['test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action_provider' => self::PROVIDER_ALIAS]
+                    ]
+                )],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
@@ -180,7 +162,13 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'applicable with single mass action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['test_operation' => $operation2],
+                'actions' => ['test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
+                    ]
+                )],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
@@ -188,7 +176,14 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'applicable with single action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['action3' => $operation3],
+                'actions' => ['action3' => $this->createOperation(
+                    'action3',
+                    true,
+                    [
+                        'getName' => 'action3',
+                        'getLabel' => 'Action 3 label'
+                    ]
+                )],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'actions' => ['action3' => $this->getRowActionConfig('action3', 'Action 3 label')],
@@ -196,7 +191,20 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'should not replace existing default action' => [
                 'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
-                'actions' => ['action3' => $operation3, 'test_operation' => $operation2],
+                'actions' => ['action3' => $this->createOperation(
+                    'action3',
+                    true,
+                    [
+                        'getName' => 'action3',
+                        'getLabel' => 'Action 3 label'
+                    ]
+                ), 'test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
+                    ]
+                )],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'actions' => [
@@ -218,10 +226,6 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function getRowConfigurationProvider()
     {
-        $operationAllowed1 = $this->createOperation('operation1', true);
-        $operationAllowed2 = $this->createOperation('operation2', true);
-        $operationNotAllowed = $this->createOperation('operation3', false);
-
         return [
             'no actions' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
@@ -242,7 +246,10 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             '2 allowed actions' => [
                 'config' => DatagridConfiguration::create([]),
                 'record' => new ResultRecord(['id' => 2]),
-                'actions' => ['action1' => $operationAllowed1, 'action2' => $operationAllowed2],
+                'actions' => [
+                    'action1' => $this->createOperation('operation1', true),
+                    'action2' => $this->createOperation('operation2', true)
+                ],
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action2' => ['option1' => 'value1', 'option2' => 'value2'],
@@ -252,7 +259,10 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             '1 allowed action' => [
                 'config' => DatagridConfiguration::create([]),
                 'record' => new ResultRecord(['id' => 3]),
-                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
+                'actions' => [
+                    'action1' => $this->createOperation('operation1', true),
+                    'action3' => $this->createOperation('operation3', false)
+                ],
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false
@@ -268,7 +278,10 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
-                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
+                'actions' => [
+                    'action1' => $this->createOperation('operation1', true),
+                    'action3' => $this->createOperation('operation3', false)
+                ],
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false,
@@ -288,11 +301,15 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                     },
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
-                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
+                'actions' => [
+                    'action1' => $this->createOperation('operation1', true),
+                    'action3' => $this->createOperation('operation3', false)
+                ],
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false,
                     'view' => ['key2' => 'value2'],
+                    'update' => true
                 ],
                 'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
@@ -316,41 +333,5 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                 'operationName' => $action,
             ]
         ];
-    }
-
-    /**
-     * @param string $name
-     * @param bool $isAvailable
-     * @param array $definitionParams
-     *
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createOperation($name = 'test_operation', $isAvailable = true, array $definitionParams = [])
-    {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OperationDefinition $definition */
-        $definition = $this->getMock('Oro\Bundle\ActionBundle\Model\OperationDefinition');
-
-        foreach ($definitionParams as $method => $params) {
-            $definition->expects($this->any())
-                ->method($method)
-                ->willReturn($params);
-        }
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
-        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $operation->expects($this->any())
-            ->method('getDefinition')
-            ->willReturn($definition);
-        $operation->expects($this->any())
-            ->method('getName')
-            ->willReturn($name);
-        $operation->expects($this->any())
-            ->method('isAvailable')
-            ->withAnyParameters()
-            ->willReturn($isAvailable);
-
-        return $operation;
     }
 }

@@ -15,6 +15,9 @@ datagrid:
                 - HINT_FORCE_PARTIAL_LOAD
 
         columns:
+            id:
+              label: oro.cron.header.id
+              frontend_type: integer
             command:
                 label: oro.cron.header.command
                 type: twig
@@ -38,6 +41,12 @@ datagrid:
                 frontend_type: integer
             createdAt:
                 label: oro.ui.created_at
+                frontend_type: datetime
+            startedAt:
+                label: oro.cron.header.started_at
+                frontend_type: datetime
+            closedAt:
+                label: oro.cron.header.closed_at
                 frontend_type: datetime
         sorters:
             columns:
@@ -69,10 +78,10 @@ datagrid:
                                 terminated: oro.cron.job.status.terminated
                                 incomplete: oro.cron.job.status.incomplete
                 runtime:
-                    type: number
+                    type: number-range
                     data_name: j.runtime
                 priority:
-                    type: number
+                    type: number-range
                     data_name: j.priority * -1
                 createdAt:
                     type:      datetime

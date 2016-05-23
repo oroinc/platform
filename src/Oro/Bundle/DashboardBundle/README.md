@@ -19,6 +19,7 @@ oro_dashboard_config:
             acl:        acl_resource                         # acl resource of dashboard
             route:      oro_dashboard_itemized_widget        # widget route
             route_parameters: { bundle: OroDashboardBundle, name: quickLaunchpad } # additional route parameters
+            isNew: true                                      # show or not "New" label next to the title
  
     # Configuration of dashboards
     dashboards:                                              # dashboard configuration section

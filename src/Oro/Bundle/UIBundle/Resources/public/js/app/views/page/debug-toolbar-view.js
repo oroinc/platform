@@ -7,6 +7,22 @@ define([
 ], function($, _, mediator, routing, PageRegionView) {
     'use strict';
 
+    var sendUpdateMessages = _.debounce(function() {
+        mediator.trigger('debugToolbar:afterUpdateView');
+        mediator.trigger('layout:adjustHeight');
+    }, 0);
+
+    /* globals Sfjs */
+    // Sfjs is global object that provides access to Symfony Debug Toolbar
+    // Sfjs is patched to update layout on Debug Toolbar changes
+    if (Sfjs !== void 0) {
+        var originalRenderAjaxRequests = Sfjs.renderAjaxRequests;
+        Sfjs.renderAjaxRequests = function() {
+            originalRenderAjaxRequests.call(Sfjs, arguments);
+            sendUpdateMessages();
+        };
+    }
+
     var DebugToolbarView;
 
     DebugToolbarView = PageRegionView.extend({
@@ -15,8 +31,8 @@ define([
         },
 
         events: {
-            'click .hide-button': 'sendUpdates',
-            'click .sf-minitoolbar': 'sendUpdates'
+            'click .hide-button': sendUpdateMessages,
+            'click .sf-minitoolbar': sendUpdateMessages
         },
 
         /**
@@ -31,7 +47,7 @@ define([
          */
         onPageUpdate: function(data, actionArgs, xhr) {
             if (!actionArgs.route.previous) {
-                this.sendUpdates();
+                sendUpdateMessages();
                 // nothing to do, the page just loaded
                 return;
             } else if (!xhr) {
@@ -73,16 +89,9 @@ define([
                 .attr('id', id)
                 .attr('data-sfurl', url);
             this.$el.html(data);
-
-            this.sendUpdates();
-        },
-
-        /**
-         * Notifies application about updates
-         */
-        sendUpdates: function() {
-            mediator.trigger('debugToolbar:afterUpdateView');
-            mediator.trigger('layout:adjustHeight');
+            if (Sfjs) {
+                Sfjs.renderAjaxRequests();
+            }
         }
     });
 

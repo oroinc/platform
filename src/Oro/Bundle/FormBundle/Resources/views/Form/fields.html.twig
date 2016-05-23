@@ -310,6 +310,9 @@
         {% set disabled = widget.parent.vars.disabled %}
         {% set allow_delete = widget.parent.vars.allow_delete %}
         {% set allow_add_after = widget.parent.vars.allow_add_after %}
+        {% if widget.vars.allow_delete is defined %}
+            {% set allow_delete = allow_delete and widget.vars.allow_delete %}
+        {% endif %}
     {% endif %}
     <div data-content="{{ name }}" data-validation-optional-group>
         <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
@@ -334,6 +337,7 @@
         <div class="row-oro">
             {% set prototype_name = form.vars.prototype_name %}
             <div {{ block('widget_container_attributes') }} data-last-index="{{ form.children|length}}" data-row-count-add="{{ form.vars.row_count_add }}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
+                <input type="hidden" name="validate_{{ full_name }}" data-collection-name="{{ full_name }}" data-name="collection-validation" disabled data-validate-element>
                 {% if form.children|length %}
                     {% for child in form.children %}
                         {{ _self.oro_collection_item_prototype(child) }}

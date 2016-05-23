@@ -16,7 +16,9 @@ class JobControllerTest extends WebTestCase
 
     public function testIndex()
     {
+        $this->client->useHashNavigation(true);
         $this->client->request('GET', $this->getUrl('oro_cron_job_index'));
+        $this->client->useHashNavigation(false);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }

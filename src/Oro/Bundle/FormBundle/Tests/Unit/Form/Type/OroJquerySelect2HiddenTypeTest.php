@@ -98,7 +98,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
             && is_string($options['converter'])
             && method_exists($this, $options['converter'])
         ) {
-            $options['converter'] = $this->$options['converter']();
+            $options['converter'] = $this->{$options['converter']}();
         }
 
         foreach ($expectedCalls as $key => $calls) {
@@ -246,7 +246,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
             && is_string($options['converter'])
             && method_exists($this, $options['converter'])
         ) {
-            $options['converter'] = $this->$options['converter']();
+            $options['converter'] = $this->{$options['converter']}();
         }
 
         foreach ($expectedCalls as $key => $calls) {

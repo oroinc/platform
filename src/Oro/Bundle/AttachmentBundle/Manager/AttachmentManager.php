@@ -127,7 +127,7 @@ class AttachmentManager
 
             if ($file instanceof UploadedFile) {
                 $entity->setOriginalFilename($file->getClientOriginalName());
-                $entity->setMimeType($file->getClientMimeType());
+                $entity->setMimeType($file->getMimeType());
                 $entity->setFileSize($file->getClientSize());
             } else {
                 $entity->setOriginalFilename($file->getFileName());
@@ -347,11 +347,9 @@ class AttachmentManager
      */
     public function getAttachmentIconClass(File $entity)
     {
-        if (isset($this->fileIcons[$entity->getExtension()])) {
-            return $this->fileIcons[$entity->getExtension()];
-        }
-
-        return $this->fileIcons['default'];
+        return isset($this->fileIcons[$entity->getExtension()])
+            ? $this->fileIcons[$entity->getExtension()]
+            : $this->fileIcons['default'];
     }
 
     /**

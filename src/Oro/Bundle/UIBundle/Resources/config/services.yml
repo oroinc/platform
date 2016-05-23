@@ -31,13 +31,13 @@ services:
         class: %oro_ui.placeholder.provider.class%
         arguments:
             - %oro_ui.placeholders%
-            - @oro_ui.placeholder.resolver
-            - @oro_security.security_facade
+            - '@oro_ui.placeholder.resolver'
+            - '@oro_security.security_facade'
 
     oro_ui.placeholder.resolver:
         class: %oro_ui.placeholder.resolver.class%
         arguments:
-            - @service_container
+            - '@service_container'
 
     oro_ui.placeholder.filter:
         class: %oro_ui.placeholder.filter.class%
@@ -46,12 +46,12 @@ services:
     oro_ui.router:
         class: %oro_ui.router.class%
         scope: request
-        arguments: [@request, @router, @oro_security.security_facade]
+        arguments:  ['@request', '@router', '@oro_security.security_facade']
 
     oro_ui.dynamic_asset_version_manager:
         class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager
         arguments:
-            - @oro_ui.dynamic_asset_version.cache
+            - '@oro_ui.dynamic_asset_version.cache'
 
     oro_ui.dynamic_asset_version.cache:
         public: false
@@ -62,22 +62,22 @@ services:
     oro_ui.view.listener:
         class: %oro_ui.view.listener.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
     oro_ui.view.content_provider.listener:
         class: %oro_ui.view.content_provider.listener.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_ui.format_converter.date_time.jquery_ui:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%
         arguments:
-            - @oro_locale.formatter.date_time
-            - @translator
+            - '@oro_locale.formatter.date_time'
+            - '@translator'
         tags:
             - { name: oro_locale.format_converter.date_time, alias: jquery_ui }
 
@@ -85,31 +85,31 @@ services:
         abstract: true
         class: %oro_ui.label_provider.action_button.class%
         arguments:
-            - @translator
+            - '@translator'
 
     oro_ui.label_provider.action_button_group:
         class: %oro_ui.label_provider.action_button_group.class%
         arguments:
-            - @translator
+            - '@translator'
 
     oro_ui.widget_provider.action_button.abstract:
         abstract: true
         class: %oro_ui.widget_provider.action_button.class%
         arguments:
-            - @oro_ui.placeholder.provider
+            - '@oro_ui.placeholder.provider'
 
     oro_ui.widget_provider.view_actions:
         class: %oro_ui.widget_provider.view_actions.class%
         arguments:
-            - @oro_ui.label_provider.action_button_group
-            - @event_dispatcher
+            - '@oro_ui.label_provider.action_button_group'
+            - '@event_dispatcher'
             - %oro_ui.widget_provider.view_actions.page_type%
 
     oro_ui.widget_provider.update_actions:
         class: %oro_ui.widget_provider.update_actions.class%
         arguments:
-            - @oro_ui.label_provider.action_button_group
-            - @event_dispatcher
+            - '@oro_ui.label_provider.action_button_group'
+            - '@event_dispatcher'
             - %oro_ui.widget_provider.update_actions.page_type%
 
     oro_ui.content_provider.manager:
@@ -123,13 +123,13 @@ services:
     oro_ui.html_tag_helper:
         class: %oro_ui.html_tag_helper.class%
         arguments:
-            - @oro_form.provider.html_tag_provider
+            - '@oro_form.provider.html_tag_provider'
             - %kernel.cache_dir%
 
     oro_ui.user_agent_provider:
         class: %oro_ui.user_agent_provider.class%
         arguments:
-            - @request_stack
+            - '@request_stack'
 
     ## Formatters
     oro_ui.formatter:
@@ -138,6 +138,6 @@ services:
     oro_ui.twig.extension.formatter:
         class: %oro_ui.twig.extension.formatter.class%
         arguments:
-            - @oro_ui.formatter
+            - '@oro_ui.formatter'
         tags:
             - { name: twig.extension }

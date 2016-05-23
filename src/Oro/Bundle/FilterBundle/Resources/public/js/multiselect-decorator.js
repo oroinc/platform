@@ -80,7 +80,7 @@ define([
             if (this.element.data('ech-multiselect')) {
                 this.multiselect('destroy');
             }
-            this.element.hide();
+            this.element.remove();
             delete this.element;
         },
 

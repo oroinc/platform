@@ -113,6 +113,14 @@ label, input, button, select, textarea { font-size:13px;}
   font-size:13px;
   text-align:left;
   line-height:1.2em;
+  &.header-tooltips {
+    display: inline;
+    float: none;
+    .oro-popover-content {
+      line-height: 20px;
+      color: #777;
+    }
+  }
 }
 .control-group .controls p.control-label{
   width: auto;
@@ -138,7 +146,6 @@ label, input, button, select, textarea { font-size:13px;}
       text-align: right;
       .tooltip-icon {
         margin-right: 5px;
-        cursor: pointer;
       }
       label {
         display: inline;
@@ -1234,7 +1241,8 @@ footer {
   color: #aaa;
   background-color: #f2f2f2;
 }
-.status-disabled {
+.status-disabled,
+.status-unknown {
   color: #aaa;
 }
 .status-enabled {
@@ -1245,7 +1253,8 @@ footer {
 }
 .status-disabled,
 .status-tentatively,
-.status-enabled {
+.status-enabled,
+.status-unknown {
   margin-left: 5px;
   margin-top:-4px;
   text-shadow:none;
@@ -1256,6 +1265,7 @@ footer {
 }
 .status-enabled [class^='icon-']:before { color:#4a9938; }
 .status-disabled [class^='icon-']:before { color:#e37878; }
+.status-unknown [class^='icon-']:before { color:#aaa; }
 
 .dib {
   display: inline-block;
@@ -2197,10 +2207,11 @@ div.uploader {
   line-height: 28px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
+  white-space: nowrap;
 }
 
 div.uploader span.action {
-  float: left;
+  display: inline-block;
   height: 28px;
   border-left: 1px solid #ccc;
   padding: 0 10px;
@@ -2213,8 +2224,7 @@ div.uploader.active  span.action {
 }
 div.uploader span.filename {
   padding: 0px 10px;
-  float: left;
-  display: block;
+  display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2225,6 +2235,7 @@ div.uploader span.filename {
 div.uploader input {
   float: right;
   height: 25px;
+  font-size: 40px; /* to expand real file input through whole ui substrate */
 }
 /* Select */
 
@@ -2409,6 +2420,9 @@ label.validation-error {
       margin-left: -6px;
       padding-left: 5px;
     }
+  }
+  div.error {
+    min-height: 28px;
   }
   .input-append.error, .input-prepend.error {
     border-width: 0;
@@ -2769,7 +2783,7 @@ span.validation-failed {
   }
 }
 .default-field{
-  background: #C3C3C3;
+  background: #f5f5f5;
 }
 .tab-container{
   .nav-tabs > .active > a,
@@ -2999,6 +3013,7 @@ span.validation-failed {
 .tooltip-icon {
   color: #6b92d0;
   font-size: 13px;
+  cursor: pointer;
 }
 
 #container .popover {
@@ -3185,4 +3200,18 @@ label .popover-content {
 [class^='icon-'].hide-text:after,
 [class^='icon-'].hide-text:before {
   color:#666;
+}
+.pinned-dropdown {
+  > .btn-group > .btn {
+    padding: 0 11px;
+    [class^="icon-"], a [class*=" icon-"] {
+      margin-left: 0;
+    }
+  }
+  .dropdown-menu > li > a {
+    padding: 0 11px;
+    [class^="icon-"], a [class*=" icon-"] {
+      margin: 0;
+    }
+  }
 }

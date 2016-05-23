@@ -544,6 +544,17 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $this->converter->convertToImportFormat($input));
     }
 
+    public function testGetFieldHeaderWithRelation()
+    {
+        $fieldName = 'name';
+        $simpleFieldValue = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', $fieldName);
+        $this->assertEquals($simpleFieldValue, ucfirst($fieldName));
+
+        $relationFieldValue = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', 'fullScalar');
+        $this->assertEquals($relationFieldValue, 'Full Scalar Entity Name');
+
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
@@ -579,8 +590,6 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $fieldHelper->expects($this->any())->method('processAsScalar')
-            ->will($this->returnValue(false));
         return $fieldHelper;
     }
 

@@ -6,6 +6,7 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
      * @name   oroui.tools
      */
     var tools = {};
+    var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
 
     _.extend(tools, Chaplin.utils);
 
@@ -171,6 +172,13 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         },
 
         /**
+         * Are we currently on iOS device
+         */
+        isIOS: function() {
+            return iOS;
+        },
+
+        /**
          * Loads dynamic list of modules and execute callback function with passed modules
          *
          * @param {Object.<string, string>|Array.<string>|string} modules
@@ -291,6 +299,14 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          */
         addCSSRule: function(selector, styles) {
             document.styleSheets[0].insertRule(selector + '{' + styles + '}', 0);
+        },
+
+        /**
+         * @param {Object} event
+         */
+        isTargetBlankEvent: function(event) {
+            var mouseMiddleButton = 2;
+            return this.modifierKeyPressed(event) || event.which === mouseMiddleButton;
         }
     });
 

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Sorter;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Select;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -16,21 +15,21 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class PostgresqlGridModifier extends AbstractExtension
 {
-    const PRIORITY = -251;
+    const PRIORITY = -261;
 
-    /** @var ContainerInterface */
-    protected $container;
+    /** @var string */
+    protected $databaseDriver;
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
     /**
-     * @param ContainerInterface $container
+     * @param string $databaseDriver
      * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(ContainerInterface $container, EntityClassResolver $entityClassResolver)
+    public function __construct($databaseDriver, EntityClassResolver $entityClassResolver)
     {
-        $this->container = $container;
+        $this->databaseDriver = $databaseDriver;
         $this->entityClassResolver = $entityClassResolver;
     }
 
@@ -39,8 +38,7 @@ class PostgresqlGridModifier extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $dbDriver = $this->container->getParameter('database_driver');
-        return $dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL;
+        return $this->databaseDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL;
     }
 
     /**
@@ -92,6 +90,9 @@ class PostgresqlGridModifier extends AbstractExtension
             $field = $alias . '.' . $identifier;
             $orderBy = $queryBuilder->getDQLPart('orderBy');
             if (!isset($orderBy[$field])) {
+                if ($this->isDistinct($queryBuilder)) {
+                    $this->ensureIdentifierSelected($queryBuilder, $field);
+                }
                 $queryBuilder->addOrderBy($field, 'ASC');
             }
         }
@@ -138,5 +139,55 @@ class PostgresqlGridModifier extends AbstractExtension
         }
 
         return false;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @return bool
+     */
+    protected function isDistinct(QueryBuilder $queryBuilder)
+    {
+        if ($queryBuilder->getDQLPart('distinct')) {
+            return true;
+        }
+
+        foreach ($queryBuilder->getDQLPart('select') as $select) {
+            $selectString = ltrim(strtolower((string)$select));
+            if (strpos($selectString, 'distinct ') === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param string $field
+     */
+    protected function ensureIdentifierSelected(QueryBuilder $queryBuilder, $field)
+    {
+        $isSelected = false;
+        /** @var Select $select */
+        foreach ($queryBuilder->getDQLPart('select') as $select) {
+            $selectString = ltrim(strtolower((string)$select));
+            if (strpos($selectString, 'distinct ') === 0) {
+                $selectString = substr($selectString, 9);
+            }
+            // if field itself or field with alias
+            if ($selectString === $field ||
+                (
+                    strpos($selectString, $field) === 0 &&
+                    strpos(strtolower(ltrim(substr($selectString, strlen($field)))), 'as ') === 0
+                )
+            ) {
+                $isSelected = true;
+                break;
+            }
+        }
+
+        if (!$isSelected) {
+            $queryBuilder->addSelect($field);
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Field;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 use Doctrine\Common\Util\ClassUtils;
 
@@ -265,24 +266,43 @@ class FieldHelper
      * @param object $object
      * @param string $fieldName
      * @param mixed  $value
-     * @throws \Exception
+     * @throws NoSuchPropertyException|\TypeError|\ErrorException
      */
     public function setObjectValue($object, $fieldName, $value)
     {
         try {
             $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
-        } catch (\Exception $e) {
-            $class = ClassUtils::getClass($object);
-            while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
-            }
+        } catch (NoSuchPropertyException $e) {
+            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
+        } catch (\TypeError $e) {
+            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
+        } catch (\ErrorException $e) {
+            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
+        }
+    }
 
-            if ($class) {
-                $reflection = new \ReflectionProperty($class, $fieldName);
-                $reflection->setAccessible(true);
-                $reflection->setValue($object, $value);
-            } else {
-                throw $e;
-            }
+    /**
+     * If Property accessor have type_error
+     * try added value by ReflectionProperty
+     *
+     * @param object $object
+     * @param string $fieldName
+     * @param mixed  $value
+     * @param NoSuchPropertyException|\TypeError|\ErrorException $exception
+     * @throws NoSuchPropertyException|\TypeError|\ErrorException
+     */
+    protected function setObjectValueWithReflection($object, $fieldName, $value, $exception)
+    {
+        $class = ClassUtils::getClass($object);
+        while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+        }
+
+        if ($class) {
+            $reflection = new \ReflectionProperty($class, $fieldName);
+            $reflection->setAccessible(true);
+            $reflection->setValue($object, $value);
+        } else {
+            throw $exception;
         }
     }
 

@@ -184,6 +184,7 @@ config:
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/app/components/basic-tree-component': 'bundles/oroui/js/app/components/basic-tree-component.js'
         'oroui/js/app/components/basic-tree-manage-component': 'bundles/oroui/js/app/components/basic-tree-manage-component.js'
+        'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'
@@ -205,7 +206,15 @@ config:
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
 
+        'oroui/js/app/views/widget-picker/widget-picker-collection-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-collection-view.js'
+        'oroui/js/app/views/widget-picker/widget-picker-filter-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-filter-view.js'
+        'oroui/js/app/views/widget-picker/widget-picker-item-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-item-view.js'
+        'oroui/js/app/models/widget-picker/widget-picker-filter-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-filter-model.js'
+        'oroui/js/app/models/widget-picker/widget-picker-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-model.js'
+
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
+
+        'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/js/app/modules/messenger-module
@@ -220,12 +229,9 @@ build:
 #       files which does not support AMD. backbone-bootstrap-modal use AMD without dependency,
 #       therefore it's excluded
         'backbone-bootstrap-modal': 'empty:'
-        'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'empty:'
         'oroui/lib/jquery.datepair-0.4.4/jquery.datepair': 'empty:'
-        'cryptojs/core': 'empty:'
         'cryptojs/enc-base64': 'empty:'
         'cryptojs/hmac': 'empty:'
-        'cryptojs/sha256': 'empty:'
         'cryptojs/pbkdf2': 'empty:'
 #       jQuery.UI after v.1.11.2 started to support AMD. And that broke a js-build with
 #       files which does not support AMD. jquery.multiselect and jquery.multiselect.filter

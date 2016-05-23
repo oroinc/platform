@@ -14,10 +14,11 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
-
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class OrmFilterExtension extends AbstractExtension
 {
@@ -33,11 +34,16 @@ class OrmFilterExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var ConfigurationProvider */
+    protected $configurationProvider;
+
     /**
+     * @param ConfigurationProvider $configurationProvider
      * @param TranslatorInterface $translator
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(ConfigurationProvider $configurationProvider, TranslatorInterface $translator)
     {
+        $this->configurationProvider = $configurationProvider;
         $this->translator = $translator;
     }
 
@@ -120,6 +126,10 @@ class OrmFilterExtension extends AbstractExtension
         $initialValues = $this->getValuesToApply($config, false);
         $lazy          = $data->offsetGetOr(MetadataObject::LAZY_KEY, true);
         $filtersParams = $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
+        $rawConfig     = $this->configurationProvider->isApplicable($config->getName())
+            ? $this->configurationProvider->getRawConfiguration($config->getName())
+            : [];
+
         foreach ($filters as $filter) {
             if (!$lazy) {
                 $filter->resolveOptions();
@@ -137,7 +147,8 @@ class OrmFilterExtension extends AbstractExtension
                 [
                     'label' => $metadata[FilterUtility::TRANSLATABLE_KEY]
                         ? $this->translator->trans($metadata['label'])
-                        : $metadata['label']
+                        : $metadata['label'],
+                    'cacheId' => $this->getFilterCacheId($rawConfig, $metadata),
                 ]
             );
 
@@ -148,6 +159,26 @@ class OrmFilterExtension extends AbstractExtension
             ->offsetAddToArray('state', ['filters' => $filtersState])
             ->offsetAddToArray('filters', $filtersMetaData)
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
+    }
+
+    /**
+     * @param array $rawGridConfig
+     * @param array $filterMetadata
+     *
+     * @return string|null
+     */
+    protected function getFilterCacheId(array $rawGridConfig, array $filterMetadata)
+    {
+        if (empty($filterMetadata['lazy'])) {
+            return null;
+        }
+
+        $rawOptions = ArrayUtil::getIn(
+            $rawGridConfig,
+            ['filters', 'columns', $filterMetadata['name'], 'options']
+        );
+
+        return $rawOptions ? md5(serialize($rawOptions)) : null;
     }
 
     /**

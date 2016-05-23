@@ -19,7 +19,7 @@ placeholders:
 
 items:
     template_datagrid_toolbar:
-        applicable: @oro_layout.helper->isTemplateRequest()
+        applicable: "@oro_layout.helper->isTemplateRequest()"
         template: OroDataGridBundle:js:toolbar.html.twig
     template_datagrid_toolbar_pagination:
         template: OroDataGridBundle:js:pagination.html.twig

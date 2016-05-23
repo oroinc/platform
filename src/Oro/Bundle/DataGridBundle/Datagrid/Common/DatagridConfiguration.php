@@ -4,14 +4,14 @@ namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\DataGridBundle\Common\Object;
+use Oro\Bundle\DataGridBundle\Common\DataObject;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DatagridConfiguration extends Object
+class DatagridConfiguration extends DataObject
 {
     const COLUMN_PATH = '[columns][%s]';
     const SORTER_PATH = '[sorters][columns][%s]';
@@ -32,6 +32,12 @@ class DatagridConfiguration extends Object
      * This option makes possible to skip apply of ACL adjustment to source query of datagrid.
      */
     const DATASOURCE_SKIP_ACL_APPLY_PATH = '[source][skip_acl_apply]';
+
+    /**
+     * This option sets what ACL permission will be applied to datasource if value is DATASOURCE_SKIP_ACL_APPLY_PATH
+     * is set to false. Default value of this setting is VIEW.
+     */
+    const DATASOURCE_ACL_APPLY_PERMISSION_PATH = '[source][acl_apply_permission]';
 
     /**
      * @return string
@@ -73,6 +79,27 @@ class DatagridConfiguration extends Object
         }
 
         return (bool)$result;
+    }
+
+    /**
+     * Gets ACL permission which should be applied to datasource if isDatasourceSkipAclApply() returns false.
+     *
+     * @return string
+     */
+    public function getDatasourceAclApplyPermission()
+    {
+        return $this->offsetGetByPath(self::DATASOURCE_ACL_APPLY_PERMISSION_PATH, 'VIEW');
+    }
+
+    /**
+     * Sets ACL permission which should be applied to datasource if isDatasourceSkipAclApply() returns false.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function setDatasourceAclApplyPermission($value)
+    {
+        return $this->offsetSetByPath(self::DATASOURCE_ACL_APPLY_PERMISSION_PATH, $value);
     }
 
     /**

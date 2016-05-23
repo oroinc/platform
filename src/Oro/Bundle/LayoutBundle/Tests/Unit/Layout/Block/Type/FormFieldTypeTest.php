@@ -157,7 +157,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
-            ['form_name' => $formName, 'field_path' => $formPath, 'visible' => new Condition\False()]
+            ['form_name' => $formName, 'field_path' => $formPath, 'visible' => new Condition\FalseCondition()]
         );
 
         $this->assertSame($formView, $view->vars['form']);

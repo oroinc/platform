@@ -127,13 +127,11 @@ define(function(require) {
 
         getSelect2Options: function() {
             var _this = this;
-            return {
-                placeholder: this.getPlaceholder(' '),
+            var options = _.omit(RelatedIdRelationEditorView.__super__.getSelect2Options.call(this), 'data');
+
+            return _.extend(options, {
                 allowClear: true,
-                openOnEnter: false,
-                selectOnBlur: false,
                 noFocus: true,
-                dropdownCssClass: 'inline-editor__select2-drop',
                 formatSelection: function(item) {
                     return item.label;
                 },
@@ -161,7 +159,7 @@ define(function(require) {
                         _this.makeRequest(options, autoCompleteUrlParameters);
                     }
                 }
-            };
+            });
         },
 
         getRawModelValue: function() {

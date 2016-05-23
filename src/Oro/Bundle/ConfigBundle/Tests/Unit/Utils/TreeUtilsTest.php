@@ -16,10 +16,12 @@ class TreeUtilsTest extends \PHPUnit_Framework_TestCase
     {
         $node1 = new GroupNodeDefinition('node1', array(), array());
         $node1->setLevel(1);
+        $node1->setPriority(20);
         $node2 = new GroupNodeDefinition('node2', array(), array());
         $node2->setLevel(2);
         $node3 = new GroupNodeDefinition('node3', array(), array($node2));
         $node3->setLevel(1);
+        $node3->setPriority(10);
 
         $root = new GroupNodeDefinition('node4', array(), array($node1, $node3));
         $root->setLevel(0);

@@ -72,14 +72,17 @@ define([
         },
 
         /**
-         * Sets focus on first form field
+         * Sets focus on first form field in case active element
+         * is not active on purpose (autofocus attribute)
          */
         initFocus: function() {
             var activeElement = document.activeElement;
+            if ($(activeElement)[0].hasAttribute('autofocus')) {
+                return;
+            }
+
             var delay = 200;
-
             this.$('form:first').focusFirstInput();
-
             if (!tools.isMobile() && activeElement === document.activeElement) {
                 _.delay(focusScrollElement, delay);
             }

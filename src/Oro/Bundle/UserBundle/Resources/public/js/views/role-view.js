@@ -84,11 +84,13 @@ define([
          */
         onSubmit: function(event) {
             var $form = this.$form;
-
-            if (!$form.valid()) {
+            var hasError = false;
+            _.each(this.$fields, function(field) {
+                hasError = hasError || !field.valid();
+            });
+            if (hasError) {
                 return;
             }
-
             if ($form.data('nohash') && !$form.data('sent')) {
                 $form.data('sent', true);
                 return;

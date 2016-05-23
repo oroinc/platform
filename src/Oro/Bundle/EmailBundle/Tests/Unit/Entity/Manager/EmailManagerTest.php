@@ -28,6 +28,9 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $mailboxManager;
+
     protected function setUp()
     {
         $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
@@ -50,11 +53,16 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->manager = new EmailManager(
             $this->em,
             $this->emailThreadManager,
             $this->emailThreadProvider,
-            $this->securityFacade
+            $this->securityFacade,
+            $this->mailboxManager
         );
     }
 
@@ -210,17 +218,28 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
 
         $repository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
             ->setMethods(
-                ['createQueryBuilder', 'andWhere', 'setParameter', 'getQuery', 'execute', 'expr', 'eq', 'getResult']
+                [
+                    'createQueryBuilder',
+                    'andWhere',
+                    'setParameter',
+                    'getQuery',
+                    'execute',
+                    'expr',
+                    'eq',
+                    'getResult',
+                    'andX'
+                ]
             )
             ->disableOriginalConstructor()
             ->getMock();
 
         $repository->expects($this->once())->method('createQueryBuilder')->will($this->returnValue($repository));
-        $repository->expects($this->exactly(3))->method('andWhere')->will($this->returnValue($repository));
+        $repository->expects($this->exactly(2))->method('andWhere')->will($this->returnValue($repository));
         $repository->expects($this->exactly(3))->method('setParameter')->will($this->returnValue($repository));
         $repository->expects($this->once())->method('getQuery')->will($this->returnValue($repository));
-        $repository->expects($this->exactly(3))->method('expr')->will($this->returnValue($repository));
+        $repository->expects($this->exactly(4))->method('expr')->will($this->returnValue($repository));
         $repository->expects($this->exactly(3))->method('eq')->will($this->returnValue($repository));
+        $repository->expects($this->exactly(1))->method('andX')->will($this->returnValue($repository));
 
         $this->em->expects($this->once())
             ->method('getRepository')

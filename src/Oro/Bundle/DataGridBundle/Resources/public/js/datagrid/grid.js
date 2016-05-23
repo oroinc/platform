@@ -14,6 +14,7 @@ define(function(require) {
     var GridFooter = require('./footer');
     var GridColumns = require('./columns');
     var Toolbar = require('./toolbar');
+    var SelectState = require('./select-state-model');
     var ActionColumn = require('./column/action-column');
     var SelectRowCell = require('oro/datagrid/cell/select-row-cell');
     var SelectAllHeaderCell = require('./header-cell/select-all-header-cell');
@@ -90,6 +91,8 @@ define(function(require) {
         /** @property true when no one column configured to be shown in th grid */
         noColumnsFlag: false,
 
+        selectState: null,
+
         /**
          * @property {Object} Default properties values
          */
@@ -148,7 +151,15 @@ define(function(require) {
             var opts = options || {};
             this.pluginManager = new PluginManager(this);
             if (options.plugins) {
-                this.pluginManager.enable(options.plugins);
+                for (var i = 0; i < options.plugins.length; i++) {
+                    var plugin = options.plugins[i];
+                    if (_.isFunction(plugin)) {
+                        this.pluginManager.enable(plugin);
+                    } else {
+                        this.pluginManager.create(plugin.constructor, plugin.options);
+                        this.pluginManager.enable(plugin.constructor);
+                    }
+                }
             }
 
             this.trigger('beforeParseOptions', options);
@@ -230,8 +241,6 @@ define(function(require) {
          * @param options
          */
         backgridInitialize: function(options) {
-            this.columns = options.columns;
-
             var filteredOptions = _.omit(
                 options,
                 ['el', 'id', 'attributes', 'className', 'tagName', 'events', 'themeOptions']
@@ -260,6 +269,12 @@ define(function(require) {
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
+                if ('selectState' in this.header.row.cells[0]) {
+                    this.selectState = this.header.row.cells[0].selectState;
+                }
+            }
+            if (this.selectState === null) {
+                this.selectState = new SelectState();
             }
 
             if (this.footer) {
@@ -276,6 +291,105 @@ define(function(require) {
                 }
                 this.render();
             });
+
+            this.listenTo(this.collection, {
+                'remove': this.onCollectionModelRemove,
+                'updateState': this.onCollectionUpdateState,
+                'backgrid:selected': this.onSelectRow,
+                'backgrid:selectAll': this.selectAll,
+                'backgrid:selectAllVisible': this.selectAllVisible,
+                'backgrid:selectNone': this.selectNone,
+                'backgrid:isSelected': this.isSelected,
+                'backgrid:getSelected': this.getSelected
+            });
+        },
+
+        onCollectionUpdateState: function() {
+            this.selectState.reset();
+        },
+
+        onCollectionModelRemove: function(model) {
+            this.selectState.removeRow(model);
+        },
+
+        onSelectRow: function(model, status) {
+            if (status === this.selectState.get('inset')) {
+                this.selectState.addRow(model);
+            } else {
+                this.selectState.removeRow(model);
+            }
+        },
+
+        /**
+         * Performs selection of all possible models:
+         *  - reset to initial state
+         *  - change type of set type as not-inset
+         *  - marks all models in collection as selected
+         *  start to collect models which have to be excluded
+         */
+        selectAll: function() {
+            this.collection.each(function(model) {
+                model.trigger('backgrid:select', model, true);
+            });
+            this.selectState.reset({'inset': false});
+        },
+
+        /**
+         * Reset selection of all possible models:
+         *  - reset to initial state
+         *  - change type of set type as inset
+         *  - marks all models in collection as not selected
+         *  start to collect models which have to be included
+         */
+        selectNone: function() {
+            this.collection.each(function(model) {
+                model.trigger('backgrid:select', model, false);
+            });
+            this.selectState.reset();
+        },
+
+        /**
+         * Performs selection of all visible models:
+         *  - if necessary reset to initial state
+         *  - marks all models in collection as selected
+         */
+        selectAllVisible: function() {
+            this.selectState.reset();
+            this.collection.each(function(model) {
+                model.trigger('backgrid:select', model, true);
+            });
+        },
+
+        /**
+         * Checks if model is selected
+         *  - updates passed obj {selected: true} or {selected: false}
+         *
+         * @param {Backbone.Model} model
+         * @param {Object} obj
+         */
+        isSelected: function(model, obj) {
+            if ($.isPlainObject(obj)) {
+                obj.selected = this.selectState.hasRow(model) === this.selectState.get('inset');
+            }
+        },
+
+        /**
+         * Collects selected models
+         *  - updates passed obj
+         *  {
+         *      inset: true,// or false
+         *      selected: [
+         *          // array of models' ids
+         *      ]
+         *  }
+         *
+         * @param {Object} obj
+         */
+        getSelected: function(obj) {
+            if ($.isEmptyObject(obj)) {
+                obj.selected = this.selectState.get('rows');
+                obj.inset = this.selectState.get('inset');
+            }
         },
 
         /**
@@ -378,6 +492,7 @@ define(function(require) {
 
             this.columns = options.columns = new GridColumns(options.columns);
             this.columns.sort();
+            this.trigger('columns:ready');
         },
 
         /**
@@ -436,13 +551,14 @@ define(function(require) {
         /**
          * Gets selection state
          *
-         * @returns {{selectedModels: *, inset: boolean}}
+         * @returns {{selectedIds: *, inset: boolean}}
          */
         getSelectionState: function() {
-            if (this.header) {
-                var selectAllHeader = this.header.row.cells[0];
-                return selectAllHeader.getSelectionState();
-            }
+            var state = {
+                selectedIds: this.selectState.get('rows'),
+                inset: this.selectState.get('inset')
+            };
+            return state;
         },
 
         /**
@@ -632,9 +748,9 @@ define(function(require) {
          * @private
          */
         _listenToContentEvents: function() {
-            this.listenTo(this.body, 'rowClicked', function(row) {
+            this.listenTo(this.body, 'rowClicked', function(row, options) {
                 this.trigger('rowClicked', this, row);
-                this._runRowClickAction(row);
+                this._runRowClickAction(row, options);
             });
             this.listenTo(this.columns, 'change:renderable', function() {
                 this.trigger('content:update');
@@ -652,9 +768,10 @@ define(function(require) {
          * Create row click action
          *
          * @param {orodatagrid.datagrid.Row} row
+         * @param {Object} options
          * @private
          */
-        _runRowClickAction: function(row) {
+        _runRowClickAction: function(row, options) {
             var config;
             if (!this.rowClickAction) {
                 return;
@@ -669,7 +786,7 @@ define(function(require) {
             }
             config = row.model.get('action_configuration');
             if (!config || config[action.name] !== false) {
-                action.run();
+                action.run(options);
             }
         },
 
@@ -743,6 +860,8 @@ define(function(require) {
                 mediator.trigger('grid_render:complete', this.$el);
                 this._resolveDeferredRender();
             }, this));
+
+            this.rendered = true;
 
             return this;
         },

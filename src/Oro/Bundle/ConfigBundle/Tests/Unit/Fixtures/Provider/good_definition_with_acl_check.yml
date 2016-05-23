@@ -5,11 +5,13 @@ oro_system_configuration:
             type: text
             options: []
             acl_resource: 'ALLOWED'
+            priority: 20
 
         some_another_field:
             data_type: string
             type: choice
             acl_resource: 'DENIED'
+            priority: 10
 
     groups:
         first_group:
