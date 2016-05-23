@@ -49,7 +49,14 @@ class TransitionScheduleHelper
             $queryBuilder->andWhere($dqlFilter);
         }
 
-        return $queryBuilder->getQuery()->getArrayResult();
+        $result = $queryBuilder->getQuery()->getArrayResult();
+
+        $ids = [];
+        foreach ($result as $row) {
+            $ids[] = $row['id'];
+        }
+
+        return $ids;
     }
 
     /**

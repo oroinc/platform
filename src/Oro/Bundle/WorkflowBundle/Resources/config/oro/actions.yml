@@ -17,3 +17,9 @@ action_groups:
                 array: $.workflowItemIds
                 value: $.id
                 actions:
+                    - @create_job:
+                        command: 'oro:workflow:transit'
+                        allow_duplicates: true
+                        arguments:
+                            '--workflow-item': $.id
+                            '--transition': $.transition.name
