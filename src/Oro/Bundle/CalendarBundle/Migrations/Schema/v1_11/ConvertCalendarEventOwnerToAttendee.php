@@ -29,7 +29,7 @@ class ConvertCalendarEventOwnerToAttendee extends ParametrizedMigrationQuery
     }
 
     /**
-     * This query inserts data into `oro_attendee` with related `oro_calendar_event id`, we should use `ce.id`,
+     * This query inserts data into `oro_calendar_event_attendee` with related `oro_calendar_event id`, we should use `ce.id`,
      * because in `updateCalendarEvents` we should set `related_attendee` and `calendar_event_id` will get
      * normal value in `updateAttendee`
      *
@@ -40,7 +40,7 @@ class ConvertCalendarEventOwnerToAttendee extends ParametrizedMigrationQuery
     protected function createAttendees(LoggerInterface $logger)
     {
         $sql = <<<EOD
-INSERT INTO oro_attendee
+INSERT INTO oro_calendar_event_attendee
 (user_owner_id, calendar_event_id, status_id, origin_id, type_id, email, display_name, created_at, updated_at)
 
 SELECT
@@ -63,7 +63,7 @@ EOD;
     }
 
     /**
-     * This query updates `oro_calendar_event` and sets `related_attendee` from `oro_attendee`
+     * This query updates `oro_calendar_event` and sets `related_attendee` from `oro_calendar_event_attendee`
      *
      * @param LoggerInterface $logger
      *
@@ -75,7 +75,7 @@ EOD;
 UPDATE oro_calendar_event AS ce
 SET related_attendee = (
     SELECT a.id
-    FROM oro_attendee AS a
+    FROM oro_calendar_event_attendee AS a
     WHERE a.calendar_event_id = ce.id
 );
 EOD;
@@ -85,7 +85,7 @@ EOD;
     }
 
     /**
-     * Update `oro_attendee` and set correct `calendar_event_id` using parent_id
+     * Update `oro_calendar_event_attendee` and set correct `calendar_event_id` using parent_id
      *
      * @param LoggerInterface $logger
      *
@@ -94,7 +94,7 @@ EOD;
     protected function updateAttendee(LoggerInterface $logger)
     {
         $sql = <<<EOD
-UPDATE oro_attendee AS a
+UPDATE oro_calendar_event_attendee AS a
 SET calendar_event_id = (
     SELECT CASE WHEN ce.parent_id IS NOT NULL THEN ce.parent_id ELSE ce.id END
     FROM oro_calendar_event AS ce

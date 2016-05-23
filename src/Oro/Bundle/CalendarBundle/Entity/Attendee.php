@@ -11,7 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository")
- * @ORM\Table(name="oro_attendee")
+ * @ORM\Table(name="oro_calendar_event_attendee")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={

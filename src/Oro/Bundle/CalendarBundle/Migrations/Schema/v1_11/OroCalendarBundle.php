@@ -44,7 +44,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
      */
     protected function createAttendee(Schema $schema)
     {
-        $table = $schema->createTable('oro_attendee');
+        $table = $schema->createTable('oro_calendar_event_attendee');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('calendar_event_id', 'integer', ['notnull' => true]);
@@ -64,7 +64,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
      */
     protected function addForeignKeys(Schema $schema)
     {
-        $table = $schema->getTable('oro_attendee');
+        $table = $schema->getTable('oro_calendar_event_attendee');
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
@@ -86,7 +86,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
      */
     protected function addEnums(Schema $schema)
     {
-        $table = $schema->getTable('oro_attendee');
+        $table = $schema->getTable('oro_calendar_event_attendee');
 
         $this->extendExtension->addEnumField(
             $schema,
@@ -136,7 +136,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
         $table->addIndex(['related_attendee']);
 
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_attendee'),
+            $schema->getTable('oro_calendar_event_attendee'),
             ['related_attendee'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
