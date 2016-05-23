@@ -59,7 +59,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * PRE_SUBMIT event handler
+     * Stores original parentEvent for later use
      *
      * @param FormEvent $event
      */
@@ -72,7 +72,8 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * POST_SUBMIT event handler
+     * Replaces newly created attendees by transformer with existing attendees
+     * to preserve all attributes of attendees (origin, invitation status).
      *
      * @param FormEvent $event
      */
@@ -105,7 +106,11 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * POST_SUBMIT event handler
+     * - creates/removes calendar events based on attendee changes
+     * - makes sure displayName is not empty
+     * - sets default attendee status
+     * - updates duplicated values of child events
+     * (It would be better to have separate entity for common data. Could be e.g. CalendarEventInfo)
      *
      * @param FormEvent $event
      */
@@ -135,6 +140,8 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Creates/removes calendar events based on attendee changes
+     *
      * @param CalendarEvent $parent
      */
     protected function updateCalendarEvents(CalendarEvent $parent)
@@ -200,6 +207,8 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Makes sure displayName is not empty
+     *
      * @param CalendarEvent $parent
      */
     protected function updateAttendeeDisplayNames(CalendarEvent $parent)

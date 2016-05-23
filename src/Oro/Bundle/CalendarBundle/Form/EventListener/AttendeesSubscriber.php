@@ -37,6 +37,9 @@ class AttendeesSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Makes sure indexes of attendees from request are equal to indexes of the same
+     * attendees so that in the end we end up with correct data.
+     *
      * @param FormEvent $event
      */
     public function fixSubmittedData(FormEvent $event)
@@ -71,6 +74,8 @@ class AttendeesSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Tries to search and bind users to attendees by email
+     *
      * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Form\AbstractType;
