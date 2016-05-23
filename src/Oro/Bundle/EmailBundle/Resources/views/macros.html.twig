@@ -418,12 +418,12 @@
                         <i class="fa {{ icon }}"></i> {{ oro_format_filename(attachment.fileName, 11, 4, 5) }}
                     </a>
                     <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
-                        <a class="no-hash" tabindex="-1" href="{{ attachmentUrl }}">
-                            {{ 'oro.email.attachment.save'|trans }}<span>({{ file_size(attachment.size) }})</span>
-                        </a>
                         {% if (isImage) %}
                             <a class="view-image no-hash" tabindex="-1" data-gallery="gallery-{{ galleryUid }}" href="{{ attachmentUrl }}">{{ 'oro.email.attachment.view'|trans }}</a>
                         {% endif %}
+                        <a class="no-hash" tabindex="-1" href="{{ attachmentUrl }}">
+                            {{ 'oro.email.attachment.save'|trans }}<span>({{ file_size(attachment.size) }})</span>
+                        </a>
                         {% if (canCopyToRecord) %}
                             {% set options = {
                                 'view': 'oroemail/js/app/views/email-attachment-link-view',

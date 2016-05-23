@@ -457,6 +457,8 @@ span.icon.grid .icon-paperclip {
           .dropdown-menu {
             padding: 5px 15px;
             a {
+              display: block;
+              text-align: left;
               span {
                 margin-left: 7px;
                 color: #777;
@@ -471,10 +473,6 @@ span.icon.grid .icon-paperclip {
               display: none;
             }
             @media only screen and (max-width: 500px) {
-              a {
-                display: block;
-                text-align: left;
-              }
               .view-image {
                 display: block;
               }
@@ -490,13 +488,17 @@ span.icon.grid .icon-paperclip {
       }
     }
     .email-attachments-list.name-only {
-      .email-attachments-file {
-        display: none;
-      }
-      .link-to-record {
-        .dropdown-menu {
-          .view-image {
-            display: inline;
+      .email-attachments-list-item {
+        margin-bottom: 0;
+        .email-attachments-file {
+          display: none;
+        }
+        .link-to-record {
+          padding-top: 0;
+          .dropdown-menu {
+            .view-image {
+              display: block;
+            }
           }
         }
       }
