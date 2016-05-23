@@ -11,9 +11,6 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class RecurrenceExtension extends \Twig_Extension
 {
-    /** @var DelegateStrategy */
-    protected $delegateStrategy;
-
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -26,16 +23,13 @@ class RecurrenceExtension extends \Twig_Extension
     /**
      * RecurrenceExtension constructor.
      *
-     * @param DelegateStrategy $delegateStrategy
      * @param TranslatorInterface $translator
      * @param Recurrence $model
      */
     public function __construct(
-        DelegateStrategy $delegateStrategy,
         TranslatorInterface $translator,
         Recurrence $model
     ) {
-        $this->delegateStrategy = $delegateStrategy;
         $this->translator = $translator;
         $this->model = $model;
     }
@@ -64,7 +58,7 @@ class RecurrenceExtension extends \Twig_Extension
      */
     public function getRecurrenceTextValue(Entity\Recurrence $recurrence)
     {
-        return $this->delegateStrategy->getTextValue($recurrence);
+        return $this->model->getTextValue($recurrence);
     }
 
     /**

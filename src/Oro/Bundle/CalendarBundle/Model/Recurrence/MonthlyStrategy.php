@@ -12,7 +12,6 @@ class MonthlyStrategy extends AbstractStrategy
      */
     public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->model->validateRecurrence($recurrence);
         $result = [];
         $occurrenceDate = $this->getFirstOccurrence($recurrence);
         $interval = $recurrence->getInterval();

@@ -12,7 +12,6 @@ class DailyStrategy extends AbstractStrategy
      */
     public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->model->validateRecurrence($recurrence);
         $result = [];
         $occurrenceDate = $recurrence->getStartTime();
         $fromStartInterval = 1;

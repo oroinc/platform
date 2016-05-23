@@ -15,7 +15,6 @@ class YearNthStrategy extends AbstractStrategy
      */
     public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->model->validateRecurrence($recurrence);
         $result = [];
         $startTime = $recurrence->getStartTime();
         $dayOfWeek = $recurrence->getDayOfWeek();
@@ -78,9 +77,9 @@ class YearNthStrategy extends AbstractStrategy
     public function getTextValue(Entity\Recurrence $recurrence)
     {
         $interval = (int)($recurrence->getInterval() / 12);
-        $instanceValue = $this->model->getInstanceRelativeValue($recurrence->getInstance());
+        $instanceValue = $this->getInstanceRelativeValue($recurrence->getInstance());
         $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
-        $day = $this->model->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
+        $day = $this->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
         $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
         $currentDate = new \DateTime();
         $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $currentDate->format('d'));
@@ -117,7 +116,7 @@ class YearNthStrategy extends AbstractStrategy
     {
         $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
-        $instanceRelativeValue = $this->model->getInstanceRelativeValue($instance);
+        $instanceRelativeValue = $this->getInstanceRelativeValue($instance);
         $month = date('M', mktime(0, 0, 0, $monthOfYear));
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
@@ -132,7 +131,7 @@ class YearNthStrategy extends AbstractStrategy
         $days = [];
         $currentInstance = 1;
         while (count($days) < $instance) {
-            $instanceRelativeValue = $this->model->getInstanceRelativeValue($currentInstance);
+            $instanceRelativeValue = $this->getInstanceRelativeValue($currentInstance);
             foreach ($dayOfWeek as $day) {
                 $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
             }

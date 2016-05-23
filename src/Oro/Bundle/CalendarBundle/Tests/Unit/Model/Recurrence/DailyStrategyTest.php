@@ -20,7 +20,6 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
             ->getMock();
-        $model = new Recurrence($this->validator);
         /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
@@ -45,7 +44,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new DailyStrategy($model, $translator, $dateTimeFormatter);
+        $this->strategy = new DailyStrategy($translator, $dateTimeFormatter);
     }
 
     public function testGetName()

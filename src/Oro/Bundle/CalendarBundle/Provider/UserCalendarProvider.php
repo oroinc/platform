@@ -22,7 +22,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
     protected $calendarEventNormalizer;
 
     /** @var StrategyInterface  */
-    protected $recurrenceStrategy;
+    protected $recurrenceModel;
 
     /** @var PropertyAccessor */
     protected $propertyAccessor;
@@ -33,18 +33,18 @@ class UserCalendarProvider extends AbstractCalendarProvider
      * @param DoctrineHelper $doctrineHelper
      * @param EntityNameResolver $entityNameResolver
      * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
-     * @param StrategyInterface $recurrenceStrategy
+     * @param Recurrence $recurrenceModel
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityNameResolver $entityNameResolver,
         AbstractCalendarEventNormalizer $calendarEventNormalizer,
-        StrategyInterface $recurrenceStrategy
+        Recurrence $recurrenceModel
     ) {
         parent::__construct($doctrineHelper);
         $this->entityNameResolver      = $entityNameResolver;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
-        $this->recurrenceStrategy       = $recurrenceStrategy;
+        $this->recurrenceModel         = $recurrenceModel;
     }
 
     /**
@@ -232,10 +232,10 @@ class UserCalendarProvider extends AbstractCalendarProvider
                     }
                 }
                 unset($item[$key]['calculatedEndTime']);
-                $occurrenceDates = $this->recurrenceStrategy->getOccurrences($recurrence, $start, $end);
+                $occurrenceDates = $this->recurrenceModel->getOccurrences($recurrence, $start, $end);
                 foreach ($occurrenceDates as $occurrenceDate) {
                     $newItem = $item;
-                    $newItem['recurrencePattern'] = $this->recurrenceStrategy->getTextValue($recurrence);
+                    $newItem['recurrencePattern'] = $this->recurrenceModel->getTextValue($recurrence);
                     $newItem['start'] = $occurrenceDate->format('c');
                     $endDate = new \DateTime($newItem['end']);
                     $endDate->setDate(

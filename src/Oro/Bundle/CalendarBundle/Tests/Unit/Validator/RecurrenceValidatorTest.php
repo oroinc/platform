@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\CalendarBundle\Validator\Constraints\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence as EntityRecurrence;
+use Oro\Bundle\CalendarBundle\Model\Recurrence as ModelRecurrence;
 use Oro\Bundle\CalendarBundle\Validator\RecurrenceValidator;
 
 class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
@@ -47,12 +48,16 @@ class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getValidator()
     {
-        $recurrenceStrategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
             ->getMock();
-        $recurrenceStrategy->expects($this->once())
+        $strategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
+            ->getMock();
+        $strategy->expects($this->once())
             ->method('getValidationErrorMessage');
 
-        $validator = new RecurrenceValidator($recurrenceStrategy);
+        $recurrenceModel = new ModelRecurrence($validator, $strategy);
+
+        $validator = new RecurrenceValidator($recurrenceModel);
         $validator->initialize($this->context);
 
         return $validator;

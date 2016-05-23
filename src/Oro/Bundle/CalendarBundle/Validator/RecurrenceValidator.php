@@ -4,29 +4,23 @@ namespace Oro\Bundle\CalendarBundle\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class RecurrenceValidator extends ConstraintValidator
 {
-    /** @var StrategyInterface  */
-    protected $recurrenceStrategy;
+    /** @var Recurrence  */
+    protected $recurrenceModel;
 
-    /**
-     * RecurrenceValidator constructor.
-     *
-     * @param StrategyInterface $recurrenceStrategy
-     */
-    public function __construct(StrategyInterface $recurrenceStrategy)
+
+    public function __construct(Recurrence $recurrenceModel)
     {
-        $this->recurrenceStrategy = $recurrenceStrategy;
+        $this->recurrenceModel = $recurrenceModel;
     }
 
     /**
      * Validates recurrence according to its recurrenceType.
      *
-     * @param Recurrence $value
+     * @param \Oro\Bundle\CalendarBundle\Entity\Recurrence $value
      *
      * @param Constraint $constraint
      */
@@ -36,7 +30,7 @@ class RecurrenceValidator extends ConstraintValidator
             $this->context->addViolation("Parameter 'endTime' date can't be earlier than startTime date.");
         }
 
-        if ($errorMessage = $this->recurrenceStrategy->getValidationErrorMessage($value)) {
+        if ($errorMessage = $this->recurrenceModel->getValidationErrorMessage($value)) {
             $this->context->addViolation($errorMessage);
         }
     }

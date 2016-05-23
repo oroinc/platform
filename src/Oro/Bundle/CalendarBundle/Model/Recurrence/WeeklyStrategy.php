@@ -15,7 +15,6 @@ class WeeklyStrategy extends AbstractStrategy
      */
     public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->model->validateRecurrence($recurrence);
         $result = [];
         $weekDays = $recurrence->getDayOfWeek();
 

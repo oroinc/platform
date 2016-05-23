@@ -12,12 +12,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence as RecurrenceEntity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -35,17 +36,17 @@ class EntityListener
     /** @var Calendar[] */
     protected $insertedCalendars = [];
 
-    /** @var StrategyInterface  */
-    protected $recurrenceStrategy;
+    /** @var Recurrence  */
+    protected $recurrenceModel;
 
     /**
      * @param ServiceLink $securityContextLink
-     * @param StrategyInterface $recurrenceStrategy
+     * @param StrategyInterface $recurrenceModel
      */
-    public function __construct(ServiceLink $securityContextLink, StrategyInterface $recurrenceStrategy)
+    public function __construct(ServiceLink $securityContextLink, Recurrence $recurrenceModel)
     {
         $this->securityContextLink = $securityContextLink;
-        $this->recurrenceStrategy = $recurrenceStrategy;
+        $this->recurrenceModel = $recurrenceModel;
     }
 
     /**
@@ -67,8 +68,8 @@ class EntityListener
             }
         }
 
-        if ($entity instanceof Recurrence) {
-            $entity->setCalculatedEndTime($this->recurrenceStrategy->getCalculatedEndTime($entity));
+        if ($entity instanceof RecurrenceEntity) {
+            $entity->setCalculatedEndTime($this->recurrenceModel->getCalculatedEndTime($entity));
         }
     }
 
@@ -78,8 +79,8 @@ class EntityListener
     public function prePersist(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        if ($entity instanceof Recurrence) {
-            $entity->setCalculatedEndTime($this->recurrenceStrategy->getCalculatedEndTime($entity));
+        if ($entity instanceof RecurrenceEntity) {
+            $entity->setCalculatedEndTime($this->recurrenceModel->getCalculatedEndTime($entity));
         }
     }
 

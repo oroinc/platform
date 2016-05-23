@@ -51,11 +51,11 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $securityContextLink->expects($this->any())->method('getService')
             ->will($this->returnValue($this->securityContext));
-        $recurrenceStrategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
+        $recurrenceModel = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new EntityListener($securityContextLink, $recurrenceStrategy);
+        $this->listener = new EntityListener($securityContextLink, $recurrenceModel);
     }
 
     /**

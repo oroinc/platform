@@ -18,7 +18,6 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
             ->getMock();
-        $model = new Recurrence($this->validator);
         /** @var \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\Translation\TranslatorInterface */
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
@@ -43,7 +42,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new WeeklyStrategy($model, $translator, $dateTimeFormatter);
+        $this->strategy = new WeeklyStrategy($translator, $dateTimeFormatter);
     }
 
     public function testGetName()

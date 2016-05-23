@@ -18,7 +18,6 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
             ->getMock();
-        $model = new Recurrence($this->validator);
         /** @var \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\Translation\TranslatorInterface */
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
@@ -42,7 +41,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
         $dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->strategy = new YearNthStrategy($model, $translator, $dateTimeFormatter);
+        $this->strategy = new YearNthStrategy($translator, $dateTimeFormatter);
     }
 
     public function testGetName()

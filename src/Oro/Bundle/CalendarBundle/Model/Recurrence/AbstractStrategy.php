@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\CalendarBundle\Entity;
-use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 abstract class AbstractStrategy implements StrategyInterface
 {
-    /** @var Recurrence */
-    protected $model;
-
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -20,16 +17,13 @@ abstract class AbstractStrategy implements StrategyInterface
     protected $dateTimeFormatter;
 
     /**
-     * @param Recurrence $model
      * @param TranslatorInterface $translator
      * @param DateTimeFormatter $formatter
      */
     public function __construct(
-        Recurrence $model,
         TranslatorInterface $translator,
         DateTimeFormatter $formatter
     ) {
-        $this->model = $model;
         $this->translator = $translator;
         $this->dateTimeFormatter = $formatter;
     }
@@ -127,6 +121,55 @@ abstract class AbstractStrategy implements StrategyInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Returns relative value for dayOfWeek of recurrence entity.
+     * It is used for generating textual representation
+     * of recurrences like:
+     * 'Yearly every 2 years on the first weekday of April',
+     * 'Monthly the fourth weekend of every 2 months' etc.
+     * In other words it returns textual representation of:
+     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$dayOfWeek
+     *
+     * Possible relative values:
+     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$dayOfWeek
+     *
+     * @param array $dayOfWeek
+     *
+     * @return string
+     */
+    public function getDayOfWeekRelativeValue(array $dayOfWeek)
+    {
+        sort($dayOfWeek);
+        sort(Recurrence::$weekends);
+        if (Recurrence::$weekends == $dayOfWeek) {
+            return 'weekend';
+        }
+
+        sort(Recurrence::$weekdays);
+        if (Recurrence::$weekdays == $dayOfWeek) {
+            return 'weekday';
+        }
+
+        if (count($dayOfWeek) == 7) {
+            return 'day';
+        }
+
+        //returns first element
+        return reset($dayOfWeek);
+    }
+
+    /**
+     * Returns recurrence instance relative value by its key.
+     *
+     * @param $key
+     *
+     * @return null|string
+     */
+    public function getInstanceRelativeValue($key)
+    {
+        return empty(Recurrence::$instanceRelativeValues[$key]) ? null : Recurrence::$instanceRelativeValues[$key];
     }
 
     /**

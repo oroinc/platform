@@ -50,7 +50,7 @@ services:
         class: %oro_calendar.listener.entity_listener.class%
         arguments:
             - '@oro_organization.link.security_context'
-            - '@oro_calendar.recurrence.strategy'
+            - '@oro_calendar.model.recurrence'
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
             - { name: doctrine.event_listener, event: prePersist }
@@ -111,7 +111,6 @@ services:
     oro_calendar.twig.recurrence:
         class: '%oro_calendar.twig.recurrence.class%'
         arguments:
-            - '@oro_calendar.recurrence.strategy.delegate'
             - '@translator'
             - '@oro_calendar.model.recurrence'
         tags:
@@ -162,7 +161,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_calendar.calendar_event_normalizer.user'
-            - '@oro_calendar.recurrence.strategy'
+            - '@oro_calendar.model.recurrence'
         public: false
         tags:
             - { name: oro_calendar.calendar_provider, alias: user }
@@ -295,7 +294,6 @@ services:
         abstract: true
         public: false
         arguments:
-            - '@oro_calendar.model.recurrence'
             - '@translator'
             - '@oro_locale.formatter.date_time'
 
@@ -307,36 +305,42 @@ services:
 
     oro_calendar.recurrence.strategy.daily:
         class: '%oro_calendar.strategy.daily.class%'
+        public: false
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.weekly:
         class: '%oro_calendar.strategy.weekly.class%'
+        public: false
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.monthly:
         class: '%oro_calendar.strategy.monthly.class%'
+        public: false
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.yearly:
         class: '%oro_calendar.strategy.yearly.class%'
+        public: false
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.monthnth:
         class: '%oro_calendar.strategy.monthnth.class%'
+        public: false
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.yearnth:
         class: '%oro_calendar.strategy.yearnth.class%'
+        public: false
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
@@ -344,11 +348,12 @@ services:
     oro_calendar.model.recurrence:
         arguments:
             - '@validator'
+            - '@oro_calendar.recurrence.strategy'
         class: '%oro_calendar.model.recurrence.class%'
 
     oro_calendar.validator.recurrence:
         class: '%oro_calendar.validator.recurrence.class%'
         arguments:
-            - '@oro_calendar.recurrence.strategy'
+            - '@oro_calendar.model.recurrence'
         tags:
             - { name: validator.constraint_validator, alias: oro_calendar.recurrence_validator }

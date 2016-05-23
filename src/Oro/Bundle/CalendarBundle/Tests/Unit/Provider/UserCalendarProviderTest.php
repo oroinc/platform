@@ -20,7 +20,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
     protected $calendarEventNormalizer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $recurrenceStrategy;
+    protected $recurrenceModel;
 
     /** @var UserCalendarProvider */
     protected $provider;
@@ -37,8 +37,8 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $this->recurrenceStrategy =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy')
+        $this->recurrenceModel =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence')
                 ->disableOriginalConstructor()
                 ->getMock();
 
@@ -46,7 +46,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper,
             $this->entityNameResolver,
             $this->calendarEventNormalizer,
-            $this->recurrenceStrategy
+            $this->recurrenceModel
         );
     }
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Model;
 
+use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -75,16 +76,20 @@ class Recurrence
     /** @var ValidatorInterface */
     protected $validator;
 
+    /** @var StrategyInterface  */
+    protected $recurrenceStrategy;
+
     /**
      * @param ValidatorInterface $validator
      */
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(ValidatorInterface $validator, StrategyInterface $recurrenceStrategy)
     {
         $this->validator = $validator;
+        $this->recurrenceStrategy = $recurrenceStrategy;
     }
 
     /** @var array */
-    protected static $instanceRelativeValues = [
+    public static $instanceRelativeValues = [
         self::INSTANCE_FIRST => 'first',
         self::INSTANCE_SECOND => 'second',
         self::INSTANCE_THIRD => 'third',
@@ -93,7 +98,7 @@ class Recurrence
     ];
 
     /** @var array */
-    protected static $weekdays = [
+    public static $weekdays = [
         self::DAY_MONDAY,
         self::DAY_TUESDAY,
         self::DAY_WEDNESDAY,
@@ -102,22 +107,10 @@ class Recurrence
     ];
 
     /** @var array */
-    protected static $weekends = [
+    public static $weekends = [
         self::DAY_SATURDAY,
         self::DAY_SUNDAY,
     ];
-
-    /**
-     * Returns recurrence instance relative value by its key.
-     *
-     * @param $key
-     *
-     * @return null|string
-     */
-    public function getInstanceRelativeValue($key)
-    {
-        return empty(self::$instanceRelativeValues[$key]) ? null : self::$instanceRelativeValues[$key];
-    }
 
     /**
      * Validates recurrence entity according to its validation rules.
@@ -146,40 +139,45 @@ class Recurrence
     }
 
     /**
-     * Returns relative value for dayOfWeek of recurrence entity.
-     * It is used for generating textual representation
-     * of recurrences like:
-     * 'Yearly every 2 years on the first weekday of April',
-     * 'Monthly the fourth weekend of every 2 months' etc.
-     * In other words it returns textual representation of:
-     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$dayOfWeek
+     * @param Entity\Recurrence $recurrence
+     * @param \DateTime $start
+     * @param \DateTime $end
      *
-     * Possible relative values:
-     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$dayOfWeek
-     *
-     * @param array $dayOfWeek
+     * @return \DateTime[]
+     */
+    public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
+    {
+        return $this->recurrenceStrategy->getOccurrences($recurrence, $start, $end);
+    }
+
+    /**
+     * @param Entity\Recurrence $recurrence
      *
      * @return string
      */
-    public function getDayOfWeekRelativeValue(array $dayOfWeek)
+    public function getTextValue(Entity\Recurrence $recurrence)
     {
-        sort($dayOfWeek);
-        sort(self::$weekends);
-        if (self::$weekends == $dayOfWeek) {
-            return 'weekend';
-        }
+        return $this->recurrenceStrategy->getTextValue($recurrence);
+    }
 
-        sort(self::$weekdays);
-        if (self::$weekdays == $dayOfWeek) {
-            return 'weekday';
-        }
+    /**
+     * @param Entity\Recurrence $recurrence
+     *
+     * @return \DateTime
+     */
+    public function getCalculatedEndTime(Entity\Recurrence $recurrence)
+    {
+        return $this->recurrenceStrategy->getCalculatedEndTime($recurrence);
+    }
 
-        if (count($dayOfWeek) == 7) {
-            return 'day';
-        }
-
-        //returns first element
-        return reset($dayOfWeek);
+    /**
+     * @param Entity\Recurrence $recurrence
+     *
+     * @return null|string
+     */
+    public function getValidationErrorMessage(Entity\Recurrence $recurrence)
+    {
+        return $this->recurrenceStrategy->getValidationErrorMessage($recurrence);
     }
 
     /**

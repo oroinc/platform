@@ -12,7 +12,6 @@ class MonthNthStrategy extends AbstractStrategy
      */
     public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->model->validateRecurrence($recurrence);
         $result = [];
         $dayOfWeek = $recurrence->getDayOfWeek();
         if ($dayOfWeek === null || count($dayOfWeek) === 0) {
@@ -75,9 +74,9 @@ class MonthNthStrategy extends AbstractStrategy
     public function getTextValue(Entity\Recurrence $recurrence)
     {
         $interval = $recurrence->getInterval();
-        $instanceValue = $this->model->getInstanceRelativeValue($recurrence->getInstance());
+        $instanceValue = $this->getInstanceRelativeValue($recurrence->getInstance());
         $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
-        $day = $this->model->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
+        $day = $this->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
         $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
 
         return $this->getFullRecurrencePattern(
@@ -110,7 +109,7 @@ class MonthNthStrategy extends AbstractStrategy
     {
         $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
-        $instanceRelativeValue = $this->model->getInstanceRelativeValue($instance);
+        $instanceRelativeValue = $this->getInstanceRelativeValue($instance);
         $month = $occurrenceDate->format('M');
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
@@ -125,7 +124,7 @@ class MonthNthStrategy extends AbstractStrategy
         $days = [];
         $currentInstance = 1;
         while (count($days) < $instance) {
-            $instanceRelativeValue = $this->model->getInstanceRelativeValue($currentInstance);
+            $instanceRelativeValue = $this->getInstanceRelativeValue($currentInstance);
             foreach ($daysOfWeek as $day) {
                 $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
             }
