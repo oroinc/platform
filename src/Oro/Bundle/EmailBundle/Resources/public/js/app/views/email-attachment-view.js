@@ -72,7 +72,7 @@ define(function(require) {
         typeChange: function() {
             this.$('input.attachment-type').val(this.model.get('type'));
         },
-        
+
         iconChange: function() {
             this.$('.filename .fa').addClass(this.model.get('icon'));
         }
