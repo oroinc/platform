@@ -73,13 +73,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 {
     use DatesAwareTrait;
 
-    /** @deprecated use constant with STATUS_ prefix */
+    /** @deprecated since 1.10 use constant with STATUS_ prefix */
     const NOT_RESPONDED        = self::STATUS_NOT_RESPONDED;
-    /** @deprecated use constant with STATUS_ prefix */
+    /** @deprecated since 1.10 use constant with STATUS_ prefix */
     const TENTATIVELY_ACCEPTED = self::STATUS_TENTATIVELY_ACCEPTED;
-    /** @deprecated use constant with STATUS_ prefix */
+    /** @deprecated since 1.10 use constant with STATUS_ prefix */
     const ACCEPTED             = self::STATUS_ACCEPTED;
-    /** @deprecated use constant with STATUS_ prefix */
+    /** @deprecated since 1.10 use constant with STATUS_ prefix */
     const DECLINED             = self::STATUS_DECLINED;
 
     const STATUS_NOT_RESPONDED        = 'none';
@@ -94,19 +94,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     const ORIGIN_SERVER        = 'server';
     const ORIGIN_EXTERNAL      = 'external';
 
-    /**
-     * @deprecated
-     */
-    protected $invitationStatuses = [
-        CalendarEvent::STATUS_NOT_RESPONDED,
-        CalendarEvent::STATUS_ACCEPTED,
-        CalendarEvent::STATUS_TENTATIVELY_ACCEPTED,
-        CalendarEvent::STATUS_DECLINED
-    ];
-
-    /**
-     * @deprecated
-     */
     protected $availableStatuses = [
         CalendarEvent::STATUS_ACCEPTED,
         CalendarEvent::STATUS_TENTATIVELY_ACCEPTED,
@@ -114,8 +101,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     ];
 
     /**
-     * @deprecated
-     *
      * @return array
      */
     public function getAvailableInvitationStatuses()
@@ -677,7 +662,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
-     * @deprecated
+     * @deprecated since 1.10 use $event->getRelatedAttendee()->getStatus() instead
      *
      * @return string|null
      */

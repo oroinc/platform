@@ -126,3 +126,22 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 
 ####PlatformBundle
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
+
+
+####CalendarEventBundle
+- constants `NOT_RESPONDED`, `TENTATIVELY_ACCEPTED`, `ACCEPTED`, `DECLINED` were deprecated in favor of these with `STATUS_` prefix
+- method `getInvitationStatus` was deprecated in favour of `getAttendee()->getStatus()`
+- method `setInvitationStatus` was removed
+- attendees of the event are now retrieved using `getAttendees` method on arbitrary event (parent/child)
+- some related notification templates were changed and now relates to attendees
+
+## Oro\Bundle\CalendarBundle\Form\Type\CalendarEvent[Api]Type
+- forms works with attendees instead of calendar events now
+- previous listeners were moved into subscribers
+
+## Oro\Bundle\CalendarBundle\Model\Email\EmailNotification, Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor
+- works with attendee or calendar event instead of just calendar event
+
+## Oro\Bundle\CalendarBundle\Provider\AbstractCalendarEventNormalizer, Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer, Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer
+- requires one more argument in constructor
+

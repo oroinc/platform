@@ -44,7 +44,7 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @deprecated since 1.10
+     * @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees'
      *
      * @param FormEvent $event
      */
@@ -65,7 +65,7 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @deprecated since 1.10
+     * @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees'
      *
      * @param FormEvent $event
      */

@@ -9,7 +9,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\EventListener\AttendeesSubscriber;
 use Oro\Bundle\CalendarBundle\Form\EventListener\ChildEventsSubscriber;
 use Oro\Bundle\CalendarBundle\Manager\CalendarEventManager;
@@ -121,7 +120,7 @@ class CalendarEventApiType extends CalendarEventType
             )
             ->add('origin');
 
-        /** @deprecated since 1.10 */
+        /** @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees' */
         $builder->add(
             'invitedUsers',
             'oro_user_multiselect',

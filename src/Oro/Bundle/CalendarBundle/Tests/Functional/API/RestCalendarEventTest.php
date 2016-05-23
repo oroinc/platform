@@ -596,7 +596,7 @@ class RestCalendarEventTest extends WebTestCase
      *
      * @return int
      *
-     * @deprecated since 1.10
+     * @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees'
      */
     public function testPostInvitedUsers()
     {
@@ -629,7 +629,7 @@ class RestCalendarEventTest extends WebTestCase
      *
      * @param int $id
      *
-     * @deprecated since 1.10
+     * @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees'
      */
     public function testGetAfterPostInvitedUsers($id)
     {
