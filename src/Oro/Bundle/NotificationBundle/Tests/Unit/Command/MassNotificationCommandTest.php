@@ -36,11 +36,7 @@ class MassNotificationCommandTest extends \PHPUnit_Framework_TestCase
 
         $commandTester = new CommandTester($command);
 
-        $commandTester->execute([
-            'command' => $command->getName(),
-            'title'   => $arg['title'],
-            'body'    => $arg['body']
-        ]);
+        $commandTester->execute(array_merge(['command' => $command->getName()], $arg));
     }
 
     /**
