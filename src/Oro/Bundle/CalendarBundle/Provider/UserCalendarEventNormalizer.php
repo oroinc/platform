@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
-use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
