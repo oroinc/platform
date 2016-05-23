@@ -143,8 +143,3 @@ services:
         class: Oro\Component\ConfigExpression\Condition\HasElements
         tags:
             - { name: oro_action.condition, alias: has_elements }
-
-    oro_action.expression.dump:
-        class: Oro\Bundle\ActionBundle\Condition\Dump
-        tags:
-            - { name: oro_action.condition, alias: dump }

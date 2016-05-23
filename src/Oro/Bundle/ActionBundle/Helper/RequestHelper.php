@@ -23,12 +23,12 @@ class RequestHelper
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRequestRoute()
     {
         if (null === ($request = $this->requestStack->getMasterRequest())) {
-            return;
+            return null;
         }
 
         $route = $request->get('_route');

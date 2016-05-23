@@ -7,8 +7,8 @@ operations:
             '@and':
                 - '@not_blank': $.data
                 - '@or':
-                    - '@blank': $.gridName
-                    - '@blank': $.requestRoute
+                    - '@blank': $.gridName # that operation should be displayed on single page, not on grid
+                    - '@blank': $.requestRoute # for operation execute route
                     - '@and':
                         - '@not_blank': $.routes[name]
                         - '@eq':
@@ -19,6 +19,10 @@ operations:
                 conditions:
                     '@not_blank': $.data
                 actions:
+                    - '@call_service_method':
+                        service: oro_action.helper.request
+                        method: getRequestRoute
+                        attribute: $.requestRoute
                     - '@call_service_method':
                         service: oro_entity_config.provider.entity
                         method: getClassName
@@ -33,10 +37,6 @@ operations:
                         conditions:
                             '@eq': [$.hasConfig, true]
                         actions:
-                            - '@call_service_method':
-                                service: oro_action.helper.request
-                                method: getRequestRoute
-                                attribute: $.requestRoute
                             - '@call_service_method':
                                 service: oro_entity_config.helper.entity_config
                                 method: getRoutes

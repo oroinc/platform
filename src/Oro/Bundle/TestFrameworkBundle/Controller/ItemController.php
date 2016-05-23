@@ -63,11 +63,8 @@ class ItemController extends Controller
      */
     protected function update(Item $item)
     {
-        $form = $this->createFormBuilder($item)
-            ->getForm();
-
         return [
-            'form' => $form->createView(),
+            'form' => $this->createFormBuilder($item)->getForm()->createView(),
             'entity' => $item,
         ];
     }

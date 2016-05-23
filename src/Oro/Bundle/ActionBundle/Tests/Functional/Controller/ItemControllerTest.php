@@ -32,6 +32,8 @@ class ItemControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         // no DELETE and UPDATE operations
+        $this->assertCount(0, $crawler->filter('a.action_button'));
+
         $this->assertCount(0, $crawler->filter('[operation-name="UPDATE"]'));
         $this->assertCount(0, $crawler->filter('[operation-name="DELETE"]'));
 
@@ -59,8 +61,7 @@ class ItemControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         // default DELETE and UPDATE operations
-        $this->assertCount(1, $crawler->filter('[operation-name="UPDATE"]'));
-        $this->assertCount(1, $crawler->filter('[operation-name="DELETE"]'));
+        $this->assertPageContainsOperations($crawler, ['UPDATE', 'DELETE']);
 
         // no default datagrid operations and mass actions, it's no index page for 'items-values-grid'
         $data = $this->assertDatagrid($crawler, 'items-values-grid');
@@ -88,8 +89,7 @@ class ItemControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         // default DELETE operation, no UPDATE operation
-        $this->assertCount(1, $crawler->filter('[operation-name="DELETE"]'));
-        $this->assertCount(0, $crawler->filter('[operation-name="UPDATE"]'));
+        $this->assertPageContainsOperations($crawler, ['DELETE']);
     }
 
     /**
@@ -112,5 +112,26 @@ class ItemControllerTest extends WebTestCase
         $options = json_decode($encodedOptions, true);
 
         return $options['data'];
+    }
+
+    /**
+     * @param Crawler $crawler
+     * @param array $operations
+     */
+    protected function assertPageContainsOperations(Crawler $crawler, array $operations)
+    {
+        $node = $crawler->filter('a.action-button');
+
+        $this->assertCount(count($operations), $node);
+
+        $router = $this->getContainer()->get('router');
+        $container = $node->parents()->parents()->html();
+
+        foreach ($operations as $operation) {
+            $this->assertContains(
+                $router->generate('oro_action_operation_execute', ['operationName' => $operation]),
+                $container
+            );
+        }
     }
 }
