@@ -62,7 +62,7 @@ define(function(require) {
             delete this._cachedCompoundQuery;
         },
 
-        get_cachedWidgetsByPriority: function() {
+        getWidgetsByPriority: function() {
             if (!this._cachedWidgetsByPriority) {
                 var self = this;
                 this._cachedWidgetsByPriority = [];
@@ -90,7 +90,7 @@ define(function(require) {
          */
         create: function($inputs) {
             var self = this;
-            var widgetsByPriority = this.get_cachedWidgetsByPriority();
+            var widgetsByPriority = this.getWidgetsByPriority();
 
             _.each($inputs, function(input) {
                 var $input = $(input);
@@ -166,7 +166,7 @@ define(function(require) {
         getCompoundQuery: function() {
             if (!this._cachedCompoundQuery) {
                 var queries = [];
-                var widgetsByPriority = this.get_cachedWidgetsByPriority();
+                var widgetsByPriority = this.getWidgetsByPriority();
                 for (var i = 0; i < widgetsByPriority.length; i++) {
                     var widget = widgetsByPriority[i];
                     queries.push(widget.selector);
