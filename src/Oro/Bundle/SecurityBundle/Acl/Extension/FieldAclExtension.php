@@ -5,6 +5,8 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Doctrine\ORM\Mapping\MappingException;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\Batch\Ace;
+use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
@@ -116,16 +118,13 @@ class FieldAclExtension extends EntityAclExtension
     public function getAccessLevelNames($object, $permissionName = null)
     {
         if ('CREATE' === $permissionName) {
-            // only system and none levels are applicable to new entities
+            // only system and none access levels are applicable to Create permission
             return AccessLevel::getAccessLevelNames(AccessLevel::SYSTEM_LEVEL);
         }
 
         $metadata = $this->getMetadata($object);
         if (!$metadata->hasOwner()) {
-            return [
-                AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
-                AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
-            ];
+            return AccessLevel::getAccessLevelNames(AccessLevel::SYSTEM_LEVEL);
         }
 
         if ($metadata->isBasicLevelOwned()) {
@@ -137,40 +136,6 @@ class FieldAclExtension extends EntityAclExtension
         }
 
         return AccessLevel::getAccessLevelNames($minLevel);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
-    {
-        $result = parent::getAllowedPermissions($oid);
-
-        $className = $oid->getType();
-
-        $entityMetadata = empty($this->metadataCache[$className]) ?
-            $this->doctrineHelper->getEntityMetadata($className) :
-            $this->metadataCache[$oid->getType()];
-
-        if (in_array('CREATE', $result, true)) {
-            try {
-                $isNullable = $entityMetadata->isNullable($fieldName);
-            } catch (MappingException $e) {
-                $isNullable = true;
-            }
-
-            // remove CREATE permission manipulations because this field is not nullable
-            if (!$isNullable && in_array('CREATE', $result, true)) {
-                foreach ($result as $index => $permission) {
-                    if ($permission === 'CREATE') {
-                        unset($result[$index]);
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $result;
     }
 
     /**

@@ -24,7 +24,6 @@ final class FieldMaskBuilder extends MaskBuilder
     const MASK_VIEW_LOCAL       = 4;      // 1 << 2     + IDENTITY
     const MASK_EDIT_LOCAL       = 8;      // 1 << 3     + IDENTITY
 
-
     // These access levels give a user access to records fields in all business units are assigned to the user
     // and all business units subordinate to business units are assigned to the user.
     const MASK_VIEW_DEEP        = 16;     // 1 << 4     + IDENTITY

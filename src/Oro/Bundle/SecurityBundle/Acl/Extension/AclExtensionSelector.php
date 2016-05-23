@@ -52,6 +52,24 @@ class AclExtensionSelector
     }
 
     /**
+     * Gets ACL extension by extension key
+     *
+     * @param string $extensionKey
+     *
+     * @return AclExtensionInterface|null
+     */
+    public function selectByExtensionKey($extensionKey)
+    {
+        foreach ($this->extensions as $extension) {
+            if ($extension->getExtensionKey() === $extensionKey) {
+                return $extension;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Gets ACL extension responsible for work with the given domain object
      *
      * @param mixed $val A domain object, ObjectIdentity, object identity descriptor (id:type) or ACL annotation

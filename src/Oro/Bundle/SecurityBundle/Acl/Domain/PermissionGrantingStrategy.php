@@ -11,8 +11,6 @@ use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
-use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 
 /**
  * The ACL extensions based permission granting strategy to apply to the access control list.
@@ -133,7 +131,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
         // return true if no any ACEs were found (grant access)
         if ($result === null) {
-            $result = true;
+            return true;
         }
 
         return $result;
@@ -179,14 +177,13 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $triggeredMask = 0;
         $result        = false;
 
+        $aclExt = $this->getContext()->getAclExtension();
         foreach ($sids as $sid) {
             foreach ($aces as $ace) {
                 if ($sid->equals($ace->getSecurityIdentity())) {
                     foreach ($masks as $requiredMask) {
                         if ($this->isAceApplicable($requiredMask, $ace, $acl)) {
                             $isGranting = $ace->isGranting();
-
-                            $aclExt = $this->getContext()->getAclExtension();
                             if ($sid instanceof RoleSecurityIdentity) {
                                 // give an additional chance for the appropriate ACL extension to decide
                                 // whether an access to a domain object is granted or not
@@ -214,6 +211,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                                 $triggeredAce  = $ace;
                                 $triggeredMask = $requiredMask;
                             }
+                        } elseif ($aclExt->getServiceBits($requiredMask) === $aclExt->getServiceBits($ace->getMask())) {
+                            $triggeredAce  = $ace;
+                            $triggeredMask = $requiredMask;
                         }
                     }
                 }

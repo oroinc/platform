@@ -38,24 +38,6 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
     }
 
     /**
-     * @param string                $className
-     * @param AclExtensionInterface $extension
-     *
-     * @return EntitySecurityMetadata
-     */
-    protected function getClassMetadata($className, $extension)
-    {
-        $entityClasses = array_filter(
-            $extension->getClasses(),
-            function (EntitySecurityMetadata $entityMetadata) use ($className) {
-                return $entityMetadata->getClassName() == $className;
-            }
-        );
-
-        return reset($entityClasses);
-    }
-
-    /**
      * @param SID    $sid
      * @param string $className
      *
@@ -153,6 +135,24 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
     }
 
     /**
+     * @param string                $className
+     * @param AclExtensionInterface $extension
+     *
+     * @return EntitySecurityMetadata
+     */
+    protected function getClassMetadata($className, $extension)
+    {
+        $entityClasses = array_filter(
+            $extension->getClasses(),
+            function (EntitySecurityMetadata $entityMetadata) use ($className) {
+                return $entityMetadata->getClassName() == $className;
+            }
+        );
+
+        return reset($entityClasses);
+    }
+
+    /**
      * Adds field permissions to the given $privilege.
      *
      * @param SID                   $sid
@@ -160,7 +160,7 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
      * @param OID                   $oid
      * @param \SplObjectStorage     $acls
      * @param AclExtensionInterface $extension
-     * @param null|string           $field
+     * @param string                $field
      */
     protected function addFieldPermissions(
         SID $sid,
@@ -168,7 +168,7 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
         OID $oid,
         \SplObjectStorage $acls,
         AclExtensionInterface $extension,
-        $field = null
+        $field
     ) {
         $allowedPermissions = $extension->getAllowedPermissions($oid, $field);
         $acl = $this->findAclByOid($acls, $oid);
@@ -180,5 +180,24 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
                 $privilege->addPermission(new AclPermission($permission, AccessLevel::SYSTEM_LEVEL));
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPermissionMasks($permissions, AclExtensionInterface $extension, array $maskBuilders)
+    {
+        // check if there are no full field permissions and add missing to calculate correct masks.
+        // This case can be if some field have no all the permissions. In this case we should grant access to the
+        // absent permissions.
+        $permissionNames = array_keys($maskBuilders);
+        foreach ($permissionNames as $permissionName) {
+            /** @var ArrayCollection $permissions */
+            if (!$permissions->containsKey($permissionName)) {
+                $permissions->add(new AclPermission($permissionName, AccessLevel::SYSTEM_LEVEL));
+            }
+        }
+
+        return parent::getPermissionMasks($permissions, $extension, $maskBuilders);
     }
 }
