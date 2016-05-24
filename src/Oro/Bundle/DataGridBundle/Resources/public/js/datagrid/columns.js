@@ -3,7 +3,7 @@ define(function(require) {
 
     var GridColumns;
     var Backgrid = require('backgrid');
-    var SimplifiedEventList = require('./simplified-cell-event-binding/SimplifiedEventList');
+    var SimplifiedEventList = require('./simplified-event-list');
 
     GridColumns = Backgrid.Columns.extend({
         comparator: 'order',
