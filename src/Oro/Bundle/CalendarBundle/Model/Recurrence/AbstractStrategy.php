@@ -37,7 +37,7 @@ abstract class AbstractStrategy implements StrategyInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function getOccurrencesPattern(Entity\Recurrence $recurrence)
+    protected function getOccurrencesPattern(Entity\Recurrence $recurrence)
     {
         $occurrences = $recurrence->getOccurrences();
         $result = '';

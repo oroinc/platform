@@ -116,8 +116,6 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 ->andWhere('1 = 0');
         }
 
-        $this->addRecurrencesConditions($qb, $start, $end);
-
         $items = $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
         $items = $this->getExpandedRecurrences($items, $start, $end);
 
@@ -291,38 +289,6 @@ class UserCalendarProvider extends AbstractCalendarProvider
         }
 
         return array_merge($regularEvents, $recurringEvents, $recurringExceptionEvents);
-    }
-
-    /**
-     * Adds conditions for getting recurrence events that could be out of filtering dates.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param \DateTime $startDate
-     * @param \DateTime $endDate
-     *
-     * @return self
-     */
-    protected function addRecurrencesConditions(QueryBuilder $queryBuilder, $startDate, $endDate)
-    {
-        //add condition that recurrence dates and filter dates are crossing
-        $expr = $queryBuilder->expr();
-        $queryBuilder->orWhere(
-            $expr->andX(
-                $expr->lte('r.startTime', ':endDate'),
-                $expr->gte('r.calculatedEndTime', ':startDate')
-            )
-        )
-        ->orWhere(
-            $expr->andX(
-                $expr->isNotNull('e.originalStart'),
-                $expr->lte('e.originalStart', ':endDate'),
-                $expr->gte('e.originalStart', ':startDate')
-            )
-        );
-        $queryBuilder->setParameter('startDate', $startDate);
-        $queryBuilder->setParameter('endDate', $endDate);
-
-        return $this;
     }
 
     /**
