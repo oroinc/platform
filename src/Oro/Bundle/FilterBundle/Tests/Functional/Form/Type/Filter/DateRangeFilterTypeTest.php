@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FilterBundle\Tests\Integration\Form\Type\Filter;
+namespace Oro\Bundle\FilterBundle\Tests\Functional\Form\Type\Filter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
