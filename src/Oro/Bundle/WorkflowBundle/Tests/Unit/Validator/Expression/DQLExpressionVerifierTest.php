@@ -45,7 +45,7 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')
-            ->setMethods(array('setFirstResult', 'setMaxResults', 'execute', 'getAST'))
+            ->setMethods(['setFirstResult', 'setMaxResults', 'execute', 'getAST'])
             ->setConstructorArgs([$this->em])
             ->getMockForAbstractClass();
 
