@@ -27,7 +27,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($id, $count, array $parameters = []) {
-                        return $id;
+                        return $id . implode($parameters);
                     }
                 )
             );
@@ -322,7 +322,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.daily'
+                'expected' => 'oro.calendar.recurrence.patterns.daily2'
             ],
             'with_occurrences' => [
                 'params' => [
@@ -331,7 +331,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.dailyoro.calendar.recurrence.patterns.occurrences'
+                'expected' => 'oro.calendar.recurrence.patterns.daily2oro.calendar.recurrence.patterns.occurrences3'
             ],
             'with_end_date' => [
                 'params' => [
@@ -340,7 +340,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.dailyoro.calendar.recurrence.patterns.end_date'
+                'expected' => 'oro.calendar.recurrence.patterns.daily2oro.calendar.recurrence.patterns.end_date'
             ]
         ];
     }

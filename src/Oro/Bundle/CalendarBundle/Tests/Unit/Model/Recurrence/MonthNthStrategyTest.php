@@ -25,7 +25,7 @@ class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($id, $count, array $parameters = []) {
-                        return $id;
+                        return $id . implode($parameters);
                     }
                 )
             );
@@ -318,7 +318,8 @@ class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.monthnth'
+                'expected' => 'oro.calendar.recurrence.patterns.monthnth2oro.calendar.recurrence.days'
+                    . '.sundayoro.calendar.recurrence.instances.third'
             ],
             'with_occurrences' => [
                 'params' => [
@@ -329,7 +330,8 @@ class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.monthnthoro.calendar.recurrence.patterns.occurrences'
+                'expected' => 'oro.calendar.recurrence.patterns.monthnth2oro.calendar.recurrence.days'
+                    . '.sundayoro.calendar.recurrence.instances.thirdoro.calendar.recurrence.patterns.occurrences3'
             ],
             'with_end_date' => [
                 'params' => [
@@ -340,7 +342,8 @@ class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.monthnthoro.calendar.recurrence.patterns.end_date'
+                'expected' => 'oro.calendar.recurrence.patterns.monthnth2oro.calendar.recurrence.days.'
+                    . 'sundayoro.calendar.recurrence.instances.thirdoro.calendar.recurrence.patterns.end_date'
             ]
         ];
     }
