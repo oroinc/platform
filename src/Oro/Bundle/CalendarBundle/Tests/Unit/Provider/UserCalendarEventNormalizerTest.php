@@ -92,6 +92,8 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return array
      */
     public function getCalendarEventsProvider()
@@ -410,6 +412,9 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     *
      * @param array $data
      *
      * @return CalendarEvent
