@@ -4,6 +4,7 @@ parameters:
     oro_calendar.calendar_event.form.handler.class:                Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler
     oro_calendar.calendar_event.form.handler.api.class:            Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler
     oro_calendar.oro_calendar_event_attendees.form.type.class:     Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesType
+    oro_calendar.oro_calendar_event_attendees_select.form.type.class: Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesSelectType
     oro_calendar.oro_calendar_event_attendees_api.form.type.class: Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesApiType
     oro_calendar.calendar_event.transformer.events_to_users.class: Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer
     oro_calendar.calendar_property.form.type.api.class:            Oro\Bundle\CalendarBundle\Form\Type\CalendarPropertyApiType
@@ -102,6 +103,18 @@ services:
             - '@oro_calendar.attendee_manager'
         tags:
             - { name: form.type, alias: oro_calendar_event_attendees }
+
+    oro_calendar.oro_calendar_event_attendees_select.form.type:
+        class: %oro_calendar.oro_calendar_event_attendees_select.form.type.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager
+            - @translator
+            - @oro_search.mapper
+            - @security.token_storage
+            - @event_dispatcher
+        tags:
+            - { name: form.type, alias: oro_calendar_event_attendees_select }
 
     oro_calendar.oro_calendar_event_attendees_api.form.type:
         class: %oro_calendar.oro_calendar_event_attendees_api.form.type.class%

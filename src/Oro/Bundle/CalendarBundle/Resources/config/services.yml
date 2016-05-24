@@ -281,3 +281,6 @@ services:
         tags:
             - { name: oro_workflow.action, alias: create_calendar_event }
 
+    oro_calendar.autocomplete.attendee_search_handler:
+        parent: oro_activity.form.handler.autocomplete
+        class: Oro\Bundle\CalendarBundle\Autocomplete\AttendeeSearchHandler
