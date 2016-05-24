@@ -60,7 +60,7 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $functions = $this->extension->getFunctions();
 
-        $this->assertCount(3, $functions);
+        $this->assertCount(4, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $this->assertInstanceOf('Twig_SimpleFunction', $functions[0]);
@@ -76,6 +76,10 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('block_row', $function->getName());
         $this->assertNull($function->getCallable());
         $this->assertEquals(LayoutExtension::RENDER_BLOCK_NODE_CLASS, $function->getNodeClass());
+        $function = $functions[3];
+        $this->assertEquals('layout_attr_merge', $function->getName());
+        $this->assertNotNull($function->getCallable());
+        $this->assertEquals([$this->extension, 'mergeAttributes'], $function->getCallable());
     }
 
     public function testGetFilters()
@@ -116,5 +120,78 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey($name, $view->vars);
             $this->assertEquals($value, $view->vars[$name]);
         }
+    }
+
+    /**
+     * @param array $attr
+     * @param array $defaultAttr
+     * @param array $expected
+     *
+     * @dataProvider attributeProvider
+     */
+    public function testMergeAttributes($attr, $defaultAttr, $expected)
+    {
+        $this->assertEquals($expected, $this->extension->mergeAttributes($attr, $defaultAttr));
+    }
+
+    /**
+     * @return array
+     */
+    public function attributeProvider()
+    {
+        return [
+            'attributes with tilde' => [
+                'attr'  => [
+                    'id' => 'someId',
+                    'name' => 'test',
+                    '~class' => 'testClass'
+                ],
+                'defaultAttr'   => [
+                    'autofocus' => true,
+                    'class' => ' input input_block'
+                ],
+                'expected'  => [
+                    'autofocus' => true,
+                    'class' => 'testClass input input_block',
+                    'id' => 'someId',
+                    'name' => 'test',
+                    '~class' => 'testClass'
+                ],
+            ],
+            'attributes with tilde value array' => [
+                'attr'  => [
+                    'id' => 'someId',
+                    'name' => 'test',
+                    '~class' => ['first' => 'testClass']
+                ],
+                'defaultAttr'   => [
+                    'autofocus' => true,
+                    'class' => 'input input_block'
+                ],
+                'expected'  => [
+                    'autofocus' => true,
+                    'class' => 'input input_block',
+                    'id' => 'someId',
+                    'name' => 'test',
+                    '~class' => ['first' => 'testClass']
+                ],
+            ],
+            'attributes without tilde' => [
+                'attr'  => [
+                    'id' => 'someId',
+                    'name' => 'test',
+                ],
+                'defaultAttr'   => [
+                    'autofocus' => true,
+                    'class' => 'input input_block'
+                ],
+                'expected'  => [
+                    'autofocus' => true,
+                    'class' => 'input input_block',
+                    'id' => 'someId',
+                    'name' => 'test',
+                ],
+            ],
+        ];
     }
 }
