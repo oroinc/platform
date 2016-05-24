@@ -185,7 +185,27 @@ define(function(require) {
                 /* jshint ignore:end */
             }
 
+            var oldClassName = cellCtor.prototype.className;
             var extended = cellCtor.extend({
+                constructor: function(options) {
+                    // column should be initialized to valid work of className generation
+                    this.column = options.column;
+                    cellCtor.apply(this, arguments);
+                },
+                className: _.isFunction(oldClassName) ?
+                    function() {
+                        var calculatedClassName = oldClassName.call(this);
+                        var addClassName = inlineEditingPlugin.isEditable(this) ?
+                            'editable view-mode prevent-text-selection-on-dblclick' :
+                            '';
+                        return (calculatedClassName ? calculatedClassName + ' ' : '') + addClassName;
+                    } :
+                    function() {
+                        var addClassName = inlineEditingPlugin.isEditable(this) ?
+                            'editable view-mode prevent-text-selection-on-dblclick' :
+                            '';
+                        return (oldClassName ? oldClassName + ' ' : '') + addClassName;
+                    },
                 events: _.extend(Object.create(oldEvents), {
                     'dblclick': _.partial(selectAndRun, 'enterEditModeIfNeeded', oldEvents.dblclick),
                     'mousedown [data-role=edit]': _.partial(selectAndRun, 'enterEditModeIfNeeded',
@@ -193,13 +213,6 @@ define(function(require) {
                     'click': _.partial(selectAndRun, _.noop, oldEvents.click),
                     'mouseenter': _.partial(selectAndRun, 'delayedIconRender', oldEvents.mouseenter)
                 }),
-
-                render: function() {
-                    cellCtor.prototype.render.apply(this, arguments);
-                    if (inlineEditingPlugin.isEditable(this)) {
-                        this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    }
-                },
 
                 delayedIconRender: function() {
                     if (!this.$el.find('> [data-role="edit"]').length) {
