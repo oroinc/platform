@@ -40,12 +40,12 @@ class CalendarEventRepository extends EntityRepository
     {
         $qb = $this->getEventListQueryBuilder($extraFields)
             ->addSelect('status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId, c.id as calendar')
-            ->addSelect('CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE origin.id as origin')
-            ->leftJoin('e.relatedAttendee', 'a')
+            ->addSelect('CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin')
+            ->leftJoin('e.relatedAttendee', 'relatedAttendee')
             ->leftJoin('e.parent', 'parent')
-            ->leftJoin('e.origin', 'origin')
+            ->leftJoin('e.origin', 'originEnum')
             ->leftJoin('parent.origin', 'parentOrigin')
-            ->leftJoin('a.status', 'status')
+            ->leftJoin('relatedAttendee.status', 'status')
             ->innerJoin('e.calendar', 'c');
 
         $this->addFilters($qb, $filters);
