@@ -35,7 +35,7 @@ class ProcessImport
      * @param array $processConfigurations
      * @return ProcessImportResult
      */
-    public function import(array $processConfigurations = null)
+    public function import(array $processConfigurations)
     {
         $importResult = new ProcessImportResult();
 
