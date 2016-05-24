@@ -51,7 +51,7 @@ define([
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
             var _this = this;
-            this.columns = options.columns;
+            _.extend(this, _.pick(options, ['themeOptions', 'template', 'columns']));
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(options) {
@@ -84,7 +84,6 @@ define([
                 };
             }
 
-            _.extend(this, _.pick(options, ['themeOptions', 'template']));
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
 
             Row.__super__.initialize.apply(this, arguments);
@@ -115,6 +114,8 @@ define([
             if (this.clickTimeout) {
                 clearTimeout(this.clickTimeout);
             }
+            delete this.cells;
+            delete this.columns;
             Row.__super__.dispose.call(this);
         },
 
@@ -236,12 +237,6 @@ define([
 
             return this;
         },
-
-        /**
-         * Cells is not removed from DOM by Chaplin.CollectionView or their realizations
-         * Do that manually as it is critical for FloatingHeader plugin
-         */
-        removeSubview: util.removeSubview,
 
         renderCustomTemplate: function() {
             var $checkbox;

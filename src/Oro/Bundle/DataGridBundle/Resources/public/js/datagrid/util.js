@@ -1,4 +1,4 @@
-define(['./columns', 'chaplin'], function(GridColumns, Chaplin) {
+define(['./columns'], function(GridColumns) {
     'use strict';
 
     return {
@@ -14,29 +14,6 @@ define(['./columns', 'chaplin'], function(GridColumns, Chaplin) {
             });
 
             return filteredColumns;
-        },
-
-        /**
-         * Cells is not removed from DOM by Chaplin.CollectionView or their realizations
-         * This function can be used as replacement for removeSubview() method
-         */
-        removeSubview: function(nameOrView) {
-            if (!nameOrView) {
-                return;
-            }
-            var byName = this.subviewsByName;
-            var view;
-            if (typeof nameOrView === 'string') {
-                view = byName[nameOrView];
-            } else {
-                view = nameOrView;
-            }
-            if (!view) {
-                return;
-            }
-            var $viewEl = view.$el;
-            Chaplin.CollectionView.prototype.removeSubview.call(this, nameOrView);
-            $viewEl.remove();
         }
     };
 });
