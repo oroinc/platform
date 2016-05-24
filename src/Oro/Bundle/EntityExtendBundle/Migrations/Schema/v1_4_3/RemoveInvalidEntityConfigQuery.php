@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_8;
+namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_4_3;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
