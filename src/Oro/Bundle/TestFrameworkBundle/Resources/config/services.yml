@@ -1,6 +1,8 @@
 parameters:
     test.client.class:         Oro\Bundle\TestFrameworkBundle\Test\Client
     search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
+    oro_test.entity.item.class: Oro\Bundle\TestFrameworkBundle\Entity\Item
+    oro_test.entity.item_value.class: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue
     oro_test.provider.exclusion_provider.class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
     oro_test.test_activity_activity_list.provider.class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
 
