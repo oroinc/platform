@@ -3,44 +3,40 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Command;
 
 use Oro\Bundle\NotificationBundle\Command\MassNotificationCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 
 class MassNotificationCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var TitleIndexUpdateCommand
+     * @var MassNotificationCommand
      */
     private $command;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Application
      */
-    private $container;
+    private $application;
 
     protected function setUp()
     {
+        $this->application = new Application();
         $this->command = new MassNotificationCommand();
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $this->command->setContainer($this->container);
-    }
-
-    public function testConfiguration()
-    {
-        $this->command->configure();
-
-        $this->assertNotEmpty($this->command->getDescription());
-        $this->assertNotEmpty($this->command->getName());
+        $this->application->add($this->command);
     }
 
     /**
      * @dataProvider provideMethod
      */
-    public function testExecute()
+    public function testExecute($arg)
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $command = $this->application
+                        ->find(MassNotificationCommand::COMMAND_NAME);
 
-        $this->command->execute($input, $output);
+        $commandTester = new CommandTester($command);
+
+        $commandTester->execute(array_merge(['command' => $command->getName()], $arg));
     }
 
     /**
@@ -51,8 +47,12 @@ class MassNotificationCommandTest extends \PHPUnit_Framework_TestCase
     public function provideMethod()
     {
         return [
-            'test title',
-            'test body',
+            [
+                [
+                    'title' => 'test title',
+                    'body'  => 'test body',
+                ]
+            ]
         ];
     }
 }

@@ -32,7 +32,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit_Framework_TestCa
             [
                 'integer',
                 [
-                    'type'    => 'number',
+                    'type'    => 'number-range',
                     'options' => [
                         'data_type' => NumberFilterType::DATA_INTEGER
                     ]
@@ -41,7 +41,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit_Framework_TestCa
             [
                 'smallint',
                 [
-                    'type'    => 'number',
+                    'type'    => 'number-range',
                     'options' => [
                         'data_type' => NumberFilterType::DATA_INTEGER
                     ]
@@ -50,7 +50,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit_Framework_TestCa
             [
                 'bigint',
                 [
-                    'type'    => 'number',
+                    'type'    => 'number-range',
                     'options' => [
                         'data_type' => NumberFilterType::DATA_INTEGER
                     ]
@@ -59,7 +59,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit_Framework_TestCa
             [
                 'decimal',
                 [
-                    'type'    => 'number',
+                    'type'    => 'number-range',
                     'options' => [
                         'data_type' => NumberFilterType::DATA_DECIMAL
                     ]
@@ -68,7 +68,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit_Framework_TestCa
             [
                 'float',
                 [
-                    'type'    => 'number',
+                    'type'    => 'number-range',
                     'options' => [
                         'data_type' => NumberFilterType::DATA_DECIMAL
                     ]
@@ -95,7 +95,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit_Framework_TestCa
             [
                 'money',
                 [
-                    'type' => 'number'
+                    'type' => 'number-range'
                 ]
             ],
             [
