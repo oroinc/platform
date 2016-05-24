@@ -146,10 +146,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
      */
     protected function updateCalendarEvents(CalendarEvent $parent)
     {
-        /** @var CalendarRepository $calendarRepository */
-        $calendarRepository = $this->registry->getRepository('OroCalendarBundle:Calendar');
-        $organizationId = $this->securityFacade->getOrganizationId();
-
         $attendeesByUserId = [];
         $attendees = $parent->getAttendees();
         foreach ($attendees as $attendee) {
@@ -192,18 +188,11 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             $calendarEventOwnerIds[] = $ownerId;
         }
 
-        $missingEventUserIds = array_diff($currentUserIds, $calendarEventOwnerIds);
-        if ($missingEventUserIds) {
-            $calendars = $calendarRepository->findDefaultCalendars($missingEventUserIds, $organizationId);
-            foreach ($calendars as $calendar) {
-                $event = new CalendarEvent();
-                $event->setCalendar($calendar);
-                $parent->addChildEvent($event);
-                if ($calendar->getOwner() && isset($attendeesByUserId[$calendar->getOwner()->getId()])) {
-                    $event->setRelatedAttendee($attendeesByUserId[$calendar->getOwner()->getId()]);
-                }
-            }
-        }
+        $this->createChildEvent(
+            $parent,
+            array_diff($currentUserIds, $calendarEventOwnerIds),
+            $attendeesByUserId
+        );
     }
 
     /**
@@ -241,5 +230,29 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
             ->find($status);
         $attendee->setStatus($statusEnum);
+    }
+
+    /**
+     * @param CalendarEvent $parent
+     * @param array         $missingEventUserIds
+     * @param array         $attendeesByUserId
+     */
+    protected function createChildEvent(CalendarEvent $parent, array $missingEventUserIds, array $attendeesByUserId)
+    {
+        if ($missingEventUserIds) {
+            /** @var CalendarRepository $calendarRepository */
+            $calendarRepository = $this->registry->getRepository('OroCalendarBundle:Calendar');
+            $organizationId     = $this->securityFacade->getOrganizationId();
+
+            $calendars = $calendarRepository->findDefaultCalendars($missingEventUserIds, $organizationId);
+            foreach ($calendars as $calendar) {
+                $event = new CalendarEvent();
+                $event->setCalendar($calendar);
+                $parent->addChildEvent($event);
+                if ($calendar->getOwner() && isset($attendeesByUserId[$calendar->getOwner()->getId()])) {
+                    $event->setRelatedAttendee($attendeesByUserId[$calendar->getOwner()->getId()]);
+                }
+            }
+        }
     }
 }

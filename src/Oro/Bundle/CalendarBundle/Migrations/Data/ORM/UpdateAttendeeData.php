@@ -47,7 +47,8 @@ class UpdateAttendeeData extends AbstractFixture implements DependentFixtureInte
         if (!in_array(
             'invitation_status',
             array_keys($connection->getSchemaManager()->listTableColumns('oro_calendar_event'))
-        )) {
+        )
+        ) {
             return;
         }
 
@@ -69,6 +70,6 @@ SET
     );
 ALTER TABLE oro_calendar_event DROP COLUMN IF EXISTS invitation_status;
 SQL
-);
+        );
     }
 }
