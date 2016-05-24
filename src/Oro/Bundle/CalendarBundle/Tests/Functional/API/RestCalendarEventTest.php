@@ -127,7 +127,7 @@ class RestCalendarEventTest extends WebTestCase
                         'email'       => 'simple_user@example.com',
                         'origin'      => 'client',
                         'status'      => 'none',
-                        'type'        => null,
+                        'type'        => 'optional',
                         'user_id'     => $user->getId()
                     ],
                     [
@@ -135,7 +135,7 @@ class RestCalendarEventTest extends WebTestCase
                         'email'       => 'admin@example.com',
                         'origin'      => 'client',
                         'status'      => 'accepted',
-                        'type'        => null,
+                        'type'        => 'optional',
                         'user_id'     => $adminUser->getId()
                     ],
                 ],
@@ -260,7 +260,7 @@ class RestCalendarEventTest extends WebTestCase
                         'email'       => $adminUser->getEmail(),
                         'origin'      => 'client',
                         'status'      => 'accepted',
-                        'type'        => null,
+                        'type'        => 'optional',
                         'user_id'     => $adminUser->getId()
                     ],
                 ],
@@ -342,7 +342,7 @@ class RestCalendarEventTest extends WebTestCase
                             'email'       => 'admin@example.com',
                             'origin'      => 'client',
                             'status'      => 'accepted',
-                            'type'        => null,
+                            'type'        => 'optional',
                         ],
                     ],
                 ],
@@ -582,7 +582,7 @@ class RestCalendarEventTest extends WebTestCase
                         'email'       => 'simple_user@example.com',
                         'origin'      => 'client',
                         'status'      => 'none',
-                        'type'        => null,
+                        'type'        => 'optional',
                         'user_id'     => $user->getId()
                     ],
                     [
@@ -590,7 +590,7 @@ class RestCalendarEventTest extends WebTestCase
                         'email'       => 'admin@example.com',
                         'origin'      => 'client',
                         'status'      => 'accepted',
-                        'type'        => null,
+                        'type'        => 'optional',
                         'user_id'     => $adminUser->getId()
                     ],
                 ],
