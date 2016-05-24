@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
-use Oro\Bundle\DataGridBundle\Common\Object;
+use Oro\Bundle\DataGridBundle\Common\DataObject;
 
-class ResultsObject extends Object
+class ResultsObject extends DataObject
 {
     /**
      * Path to total records parameter

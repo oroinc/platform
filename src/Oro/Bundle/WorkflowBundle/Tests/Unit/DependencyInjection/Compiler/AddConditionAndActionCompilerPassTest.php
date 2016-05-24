@@ -47,7 +47,7 @@ class AddConditionAndActionCompilerPassTest extends \PHPUnit_Framework_TestCase
         $definitionValueMap = array();
         $definitionBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
-            ->setMethods(array('setScope', 'replaceArgument', 'getClass', 'setPublic'));
+            ->setMethods(array('setScope', 'replaceArgument', 'getClass', 'setPublic', 'addMethodCall'));
 
         // service definitions
         foreach (array_keys(array_merge($this->conditionServices, $this->actionServices)) as $serviceId) {

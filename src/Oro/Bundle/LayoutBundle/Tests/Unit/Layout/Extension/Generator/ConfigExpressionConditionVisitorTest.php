@@ -18,7 +18,7 @@ class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     public function testVisit()
     {
-        $condition    = new ConfigExpressionConditionVisitor(new Condition\True());
+        $condition    = new ConfigExpressionConditionVisitor(new Condition\TrueCondition());
         $phpClass = PhpClass::create('LayoutUpdateClass');
         $visitContext = new VisitContext($phpClass);
 

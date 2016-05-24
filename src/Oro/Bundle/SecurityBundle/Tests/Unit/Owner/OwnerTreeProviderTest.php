@@ -39,7 +39,15 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($this->em);
 
-        $this->cache = $this->getMockForAbstractClass('Doctrine\Common\Cache\CacheProvider');
+        $this->cache = $this->getMockForAbstractClass(
+            'Doctrine\Common\Cache\CacheProvider',
+            array(),
+            '',
+            true,
+            true,
+            true,
+            array('fetch', 'save')
+        );
         $this->cache->expects($this->any())->method('fetch')->will($this->returnValue(false));
         $this->cache->expects($this->any())->method('save');
 
