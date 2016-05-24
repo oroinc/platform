@@ -101,6 +101,15 @@ oro_system_configuration:
                 tooltip: oro.email.form.tooltip.attachment_sync.max_size
                 required: true
 
+        oro_email.attachment_preview_limit:
+            data_type: number
+            type: number
+            priority: 40
+            options:
+                label: oro.email.system_configuration.attachment_sync.preview_limit.label
+                tooltip: oro.email.form.tooltip.attachment_sync.preview_limit
+                required: true
+
     tree:
         system_configuration:
             platform:
@@ -128,6 +137,7 @@ oro_system_configuration:
                                         children:
                                             - oro_email.attachment_sync_enable
                                             - oro_email.attachment_sync_max_size
+                                            - oro_email.attachment_preview_limit
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid
