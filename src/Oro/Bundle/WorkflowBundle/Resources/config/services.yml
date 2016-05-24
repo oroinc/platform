@@ -141,6 +141,7 @@ services:
     oro_workflow.handler.workflow_definition:
         class: Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler
         arguments:
+            - '@oro_workflow.configuration.builder.workflow_definition.handle'
             - '@oro_workflow.workflow_assembler'
             - '@doctrine'
             - '%oro_workflow.workflow_definition.entity.class%'
@@ -178,3 +179,8 @@ services:
 
     oro_workflow.generator.process_configuration:
         class: 'Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator'
+
+    oro_workflow.transition.schedule_helper:
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper'
+        arguments:
+            - '@doctrine'
