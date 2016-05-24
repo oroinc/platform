@@ -22,7 +22,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
     const NAME = 'oro:process:configuration:load';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -43,7 +43,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -153,6 +153,9 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * @param OutputInterface $output
+     */
     protected function processCronSchedules(OutputInterface $output)
     {
         $triggers = $this->getCronTriggers();
