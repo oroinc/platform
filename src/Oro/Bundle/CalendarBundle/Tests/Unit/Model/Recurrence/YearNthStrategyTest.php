@@ -25,7 +25,7 @@ class YearNthStrategyTest extends AbstractTestStrategy
             ->will(
                 $this->returnCallback(
                     function ($id, $count, array $parameters = []) {
-                        return $id;
+                        return $id . implode($parameters);
                     }
                 )
             );
@@ -351,7 +351,8 @@ class YearNthStrategyTest extends AbstractTestStrategy
                     'endTime' => null,
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.yearnth'
+                'expected' => 'oro.calendar.recurrence.patterns.yearnth0oro.calendar.recurrence.days'
+                    . '.saturdayoro.calendar.recurrence.instances.third'
             ],
             'with_occurrences' => [
                 'params' => [
@@ -363,7 +364,8 @@ class YearNthStrategyTest extends AbstractTestStrategy
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.yearnthoro.calendar.recurrence.patterns.occurrences'
+                'expected' => 'oro.calendar.recurrence.patterns.yearnth0oro.calendar.recurrence.days' .
+                    '.saturdayoro.calendar.recurrence.instances.thirdoro.calendar.recurrence.patterns.occurrences3'
             ],
             'with_end_date' => [
                 'params' => [
@@ -375,7 +377,8 @@ class YearNthStrategyTest extends AbstractTestStrategy
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.yearnthoro.calendar.recurrence.patterns.end_date'
+                'expected' => 'oro.calendar.recurrence.patterns.yearnth0oro.calendar.recurrence.days'
+                    . '.saturdayoro.calendar.recurrence.instances.thirdoro.calendar.recurrence.patterns.end_date'
             ]
         ];
     }

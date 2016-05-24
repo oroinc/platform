@@ -25,7 +25,7 @@ class YearlyStrategyTest extends AbstractTestStrategy
             ->will(
                 $this->returnCallback(
                     function ($id, $count, array $parameters = []) {
-                        return $id;
+                        return $id . implode($parameters);
                     }
                 )
             );
@@ -254,7 +254,7 @@ class YearlyStrategyTest extends AbstractTestStrategy
                     'endTime' => null,
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.yearly'
+                'expected' => 'oro.calendar.recurrence.patterns.yearly0'
             ],
             'with_occurrences' => [
                 'params' => [
@@ -265,7 +265,7 @@ class YearlyStrategyTest extends AbstractTestStrategy
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.yearlyoro.calendar.recurrence.patterns.occurrences'
+                'expected' => 'oro.calendar.recurrence.patterns.yearly0oro.calendar.recurrence.patterns.occurrences3'
             ],
             'with_end_date' => [
                 'params' => [
@@ -276,7 +276,7 @@ class YearlyStrategyTest extends AbstractTestStrategy
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.yearlyoro.calendar.recurrence.patterns.end_date'
+                'expected' => 'oro.calendar.recurrence.patterns.yearly0oro.calendar.recurrence.patterns.end_date'
             ]
         ];
     }

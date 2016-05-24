@@ -25,7 +25,7 @@ class MonthlyStrategyTest extends AbstractTestStrategy
             ->will(
                 $this->returnCallback(
                     function ($id, $count, array $parameters = []) {
-                        return $id;
+                        return $id . implode($parameters);
                     }
                 )
             );
@@ -245,7 +245,7 @@ class MonthlyStrategyTest extends AbstractTestStrategy
                     'endTime' => null,
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.monthly'
+                'expected' => 'oro.calendar.recurrence.patterns.monthly210'
             ],
             'with_occurrences' => [
                 'params' => [
@@ -255,7 +255,7 @@ class MonthlyStrategyTest extends AbstractTestStrategy
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.monthlyoro.calendar.recurrence.patterns.occurrences'
+                'expected' => 'oro.calendar.recurrence.patterns.monthly210oro.calendar.recurrence.patterns.occurrences3'
             ],
             'with_end_date' => [
                 'params' => [
@@ -265,7 +265,7 @@ class MonthlyStrategyTest extends AbstractTestStrategy
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.monthlyoro.calendar.recurrence.patterns.end_date'
+                'expected' => 'oro.calendar.recurrence.patterns.monthly210oro.calendar.recurrence.patterns.end_date'
             ]
         ];
     }

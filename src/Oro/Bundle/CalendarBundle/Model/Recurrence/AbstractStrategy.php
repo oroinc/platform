@@ -95,14 +95,14 @@ abstract class AbstractStrategy implements StrategyInterface
         $count,
         $translationParameters
     ) {
+        $translationParameters['%occurrences%'] = $this->getOccurrencesPattern($recurrence);
+        $translationParameters['%end_date%'] = $this->getEndDatePattern($recurrence);
+
         $result = $this->translator->transChoice(
             $translationId,
             $count,
             $translationParameters
         );
-
-        $result .= $this->getOccurrencesPattern($recurrence);
-        $result .= $this->getEndDatePattern($recurrence);
 
         return $result;
     }

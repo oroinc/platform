@@ -181,9 +181,6 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
-        $qb->expects($this->once())
-            ->method('expr')
-            ->willReturn(new Expr());
 
         $this->calendarEventNormalizer->expects($this->once())
             ->method('getCalendarEvents')
@@ -231,9 +228,6 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
-        $qb->expects($this->once())
-            ->method('expr')
-            ->willReturn(new Expr());
 
         $this->calendarEventNormalizer->expects($this->once())
             ->method('getCalendarEvents')

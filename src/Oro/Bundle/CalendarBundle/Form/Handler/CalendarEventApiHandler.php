@@ -66,10 +66,6 @@ class CalendarEventApiHandler
                 $originalChildren->add($childEvent);
             }
             $data = $this->request->request->all();
-            // @TODO move this transformation into form listener/data transformer/form filter.
-            if (isset($data['recurrence']['interval']) && $data['recurrence']['interval'] <= 0) {
-                $data['recurrence']['interval'] = 1;
-            }
             $this->form->submit($data);
 
             if ($this->form->isValid()) {

@@ -24,9 +24,8 @@ class CalendarEventRepository extends EntityRepository
     public function getUserEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [], $extraFields = [])
     {
         $qb = $this->getUserEventListQueryBuilder($filters, $extraFields);
-        $key = Recurrence::STRING_KEY;
-        $qb->addSelect("r.calculatedEndTime as {$key}calculatedEndTime");
         $this->addTimeIntervalFilter($qb, $startDate, $endDate);
+        $this->addRecurrencesConditions($qb, $startDate, $endDate);
 
         return $qb;
     }
@@ -235,6 +234,41 @@ class CalendarEventRepository extends EntityRepository
                 . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
                 . "r.instance as {$key}Instance, r.id as {$key}Id"
             );
+
+        return $this;
+    }
+
+    /**
+     * Adds conditions for getting recurrence events that could be out of filtering dates.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     *
+     * @return self
+     */
+    protected function addRecurrencesConditions(QueryBuilder $queryBuilder, $startDate, $endDate)
+    {
+        $key = Recurrence::STRING_KEY;
+        $queryBuilder->addSelect("r.calculatedEndTime as {$key}calculatedEndTime");
+
+        //add condition that recurrence dates and filter dates are crossing
+        $expr = $queryBuilder->expr();
+        $queryBuilder->orWhere(
+            $expr->andX(
+                $expr->lte('r.startTime', ':endDate'),
+                $expr->gte('r.calculatedEndTime', ':startDate')
+            )
+        )
+            ->orWhere(
+                $expr->andX(
+                    $expr->isNotNull('e.originalStart'),
+                    $expr->lte('e.originalStart', ':endDate'),
+                    $expr->gte('e.originalStart', ':startDate')
+                )
+            );
+        $queryBuilder->setParameter('startDate', $startDate);
+        $queryBuilder->setParameter('endDate', $endDate);
 
         return $this;
     }

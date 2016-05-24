@@ -27,7 +27,7 @@ class DailyStrategyTest extends AbstractTestStrategy
             ->will(
                 $this->returnCallback(
                     function ($id, $count, array $parameters = []) {
-                        return $id;
+                        return $id . implode($parameters);
                     }
                 )
             );
@@ -289,7 +289,7 @@ class DailyStrategyTest extends AbstractTestStrategy
                     'endTime' => null,
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.daily'
+                'expected' => 'oro.calendar.recurrence.patterns.daily2'
             ],
             'with_occurrences' => [
                 'params' => [
@@ -298,7 +298,7 @@ class DailyStrategyTest extends AbstractTestStrategy
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.dailyoro.calendar.recurrence.patterns.occurrences'
+                'expected' => 'oro.calendar.recurrence.patterns.daily2oro.calendar.recurrence.patterns.occurrences3'
             ],
             'with_end_date' => [
                 'params' => [
@@ -307,7 +307,7 @@ class DailyStrategyTest extends AbstractTestStrategy
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.dailyoro.calendar.recurrence.patterns.end_date'
+                'expected' => 'oro.calendar.recurrence.patterns.daily2oro.calendar.recurrence.patterns.end_date'
             ]
         ];
     }
