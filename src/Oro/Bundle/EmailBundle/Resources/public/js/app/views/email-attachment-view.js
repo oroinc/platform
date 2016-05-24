@@ -16,7 +16,8 @@ define(function(require) {
 
         listen: {
             'change:fileName model': 'fileNameChange',
-            'change:type model':     'typeChange'
+            'change:type model':     'typeChange',
+            'change:icon model':     'iconChange'
         },
 
         getTemplateFunction: function() {
@@ -50,6 +51,12 @@ define(function(require) {
                 if (value) {
                     self.model.set('fileName', value);
                     self.model.set('type', 3);
+                    var extension = value.substr(value.lastIndexOf('.') + 1);
+                    var icon = self.fileIcons['default'];
+                    if (extension && self.fileIcons[extension]) {
+                        icon = self.fileIcons[extension];
+                    }
+                    self.model.set('icon', icon);
                     self.$el.show();
 
                     self.collectionView.show();
@@ -64,6 +71,10 @@ define(function(require) {
 
         typeChange: function() {
             this.$('input.attachment-type').val(this.model.get('type'));
+        },
+
+        iconChange: function() {
+            this.$('.filename .fa').addClass(this.model.get('icon'));
         }
     });
 

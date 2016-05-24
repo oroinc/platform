@@ -3,26 +3,38 @@
 namespace Oro\Bundle\TestFrameworkBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class ItemController extends Controller
 {
     /**
      * @Route("/", name="oro_test_item_index")
+     * @Template
+     *
+     * @return array
      */
     public function indexAction()
     {
-        return new Response();
+        return [
+            'entity_class' => $this->container->getParameter('oro_test.entity.item.class'),
+        ];
     }
 
     /**
      * @Route("/view/{id}", name="oro_test_item_view", requirements={"id"="\d+"})
+     * @Template
+     *
+     * @param Item $item
+     * @return array
      */
-    public function viewAction()
+    public function viewAction(Item $item)
     {
-        return new Response();
+        return ['entity' => $item];
     }
 
     /**
@@ -35,17 +47,25 @@ class ItemController extends Controller
 
     /**
      * @Route("/update/{id}", name="oro_test_item_update", requirements={"id"="\d+"})
+     * @Template
+     *
+     * @param Item $item
+     * @return array
      */
-    public function updateAction()
+    public function updateAction(Item $item)
     {
-        return new Response();
+        return $this->update($item);
     }
 
     /**
-     * @Route("/delete/{id}", name="oro_test_item_delete", requirements={"id"="\d+"})
+     * @param Item $item
+     * @return array
      */
-    public function deleteAction()
+    protected function update(Item $item)
     {
-        return new Response();
+        return [
+            'form' => $this->createFormBuilder($item)->getForm()->createView(),
+            'entity' => $item,
+        ];
     }
 }
