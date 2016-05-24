@@ -21,8 +21,10 @@ class PublicCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $attendeeRepository->expects($this->any())
-            ->method('getAttendeeList')
-            ->will($this->returnValue([]));
+            ->method('getAttendeeListsByCalendarEventIds')
+            ->will($this->returnCallback(function (array $calendarEventIds) {
+                return array_fill_keys($calendarEventIds, []);
+            }));
 
         $doctrineHelper  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

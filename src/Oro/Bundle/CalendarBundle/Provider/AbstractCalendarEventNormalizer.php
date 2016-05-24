@@ -48,12 +48,17 @@ abstract class AbstractCalendarEventNormalizer
             $this->applyPermissions($resultItem, $calendarId);
         }
 
+        $calendarEventIds = array_map(
+            function ($calendarEvent) {
+                return $calendarEvent['id'];
+            },
+            $result
+        );
         /** @var AttendeeRepository $attendeeRepository */
         $attendeeRepository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Attendee');
+        $attendeeLists = $attendeeRepository->getAttendeeListsByCalendarEventIds($calendarEventIds);
         foreach ($result as $key => $calendarEvent) {
-            $result[$key]['attendees'] = $this->transformEntity(
-                $attendeeRepository->getAttendeeList($calendarEvent['id'])
-            );
+            $result[$key]['attendees'] = $this->transformEntity($attendeeLists[$calendarEvent['id']]);
         }
 
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');

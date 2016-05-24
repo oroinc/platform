@@ -4,7 +4,6 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class AttendeeRepository extends EntityRepository
@@ -52,20 +51,37 @@ class AttendeeRepository extends EntityRepository
     }
 
     /**
-     * @param CalendarEvent|int $calendarEvent
+     * @param array $calendarEventIds
      *
      * @return array
      */
-    public function getAttendeeList($calendarEvent)
+    public function getAttendeeListsByCalendarEventIds(array $calendarEventIds)
     {
-        return $this->createQueryBuilder('a')
-            ->select('a.displayName, a.email, a.createdAt, a.updatedAt, o.id AS origin, s.id as status, t.id as type')
-            ->leftJoin('a.origin', 'o')
-            ->leftJoin('a.status', 's')
-            ->leftJoin('a.type', 't')
-            ->where('a.calendarEvent = :calendar_event')
-            ->setParameter('calendar_event', $calendarEvent)
+        if (!$calendarEventIds) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('attendee');
+        $queryResult = $qb
+            ->select('attendee.displayName, attendee.email, attendee.createdAt, attendee.updatedAt')
+            ->addSelect('attendee_origin.id AS origin, attendee_status.id as status, attendee_type.id as type')
+            ->addSelect('event.id as calendarEventId')
+            ->join('attendee.calendarEvent', 'event')
+            ->leftJoin('attendee.origin', 'attendee_origin')
+            ->leftJoin('attendee.status', 'attendee_status')
+            ->leftJoin('attendee.type', 'attendee_type')
+            ->where($qb->expr()->in('event.id', ':calendar_event'))
+            ->setParameter('calendar_event', $calendarEventIds)
             ->getQuery()
             ->getArrayResult();
+
+        $result = [];
+        foreach ($queryResult as $row) {
+            $calendarEventId = $row['calendarEventId'];
+            unset($row['calendarEventId']);
+            $result[$calendarEventId][] = $row;
+        }
+
+        return $result += array_fill_keys($calendarEventIds, []);
     }
 }

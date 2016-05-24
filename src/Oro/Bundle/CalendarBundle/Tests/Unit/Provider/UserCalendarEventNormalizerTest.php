@@ -77,9 +77,9 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $attendeeRepository->expects($this->any())
-            ->method('getAttendeeList')
-            ->will($this->returnCallback(function ($calendarEvent) use ($attendees) {
-                return $attendees[$calendarEvent];
+            ->method('getAttendeeListsByCalendarEventIds')
+            ->will($this->returnCallback(function ($calendarEventIds) use ($attendees) {
+                return array_intersect_key($attendees, array_flip($calendarEventIds));
             }));
 
         $this->doctrineHelper->expects($this->any())
