@@ -26,6 +26,7 @@ class UpdateAttendeeData extends AbstractFixture implements DependentFixtureInte
     {
         $this->updateOrigin($manager);
         $this->updateStatus($manager);
+        $this->updateType($manager);
     }
 
     /**
@@ -71,5 +72,32 @@ SET
 ALTER TABLE oro_calendar_event DROP COLUMN IF EXISTS invitation_status;
 SQL
         );
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    protected function updateType(EntityManager $em)
+    {
+        $connection = $em->getConnection();
+
+        $query = <<<SQL
+UPDATE
+    oro_calendar_event_attendee AS a
+SET
+    type_id = (
+        SELECT
+            CASE
+                WHEN ce.parent_id IS NOT NULL THEN 'optional'
+                ELSE 'organizer'
+            END
+        FROM
+            oro_calendar_event ce
+        WHERE
+            ce.related_attendee = a.id
+    );
+ALTER TABLE oro_calendar_event DROP COLUMN IF EXISTS invitation_status;
+SQL;
+        $connection->executeQuery($query);
     }
 }

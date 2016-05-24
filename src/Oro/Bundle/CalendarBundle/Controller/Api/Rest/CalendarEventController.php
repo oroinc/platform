@@ -358,10 +358,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
         }
 
         // remove auxiliary attributes if any
-        unset($data['updatedAt']);
-        unset($data['editable']);
-        unset($data['removable']);
-        unset($data['notifiable']);
+        unset($data['updatedAt'], $data['editable'], $data['removable'], $data['notifiable']);
 
         return true;
     }
