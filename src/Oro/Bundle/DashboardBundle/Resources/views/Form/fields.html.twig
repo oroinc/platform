@@ -25,9 +25,8 @@
                         type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
                         value: valueConfig
                     };
-                    dateRangeFilter.setValue(value);
+                    dateRangeFilter.updateValue(value);
                     dateRangeFilter.render();
-                    dateRangeFilter._formatRawValue(value);
 
                     $('.datetime-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
                     $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
@@ -65,9 +64,8 @@
                         type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
                         value: valueConfig
                     };
-                    dateRangeFilter.setValue(value);
+                    dateRangeFilter.updateValue(value);
                     dateRangeFilter.render();
-                    dateRangeFilter._formatRawValue(value);
 
                     $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
                     $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');

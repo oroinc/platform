@@ -36,7 +36,7 @@ define(function(require) {
             var $list = this.$('.workflow-step-list');
             $container.width(10000);
             $list.css({float: 'left'});
-            $container.width($list.width());
+            $container.width($list.width() + 1/* floating pixel calculation compensation */);
             $list.css({float: 'none'});
         },
         updateMaxWidth: function() {
