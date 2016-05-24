@@ -61,7 +61,7 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
         // add inline data support
         $config->set(
             'URI.AllowedSchemes',
-            ['http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'data' => true]
+            ['http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'data' => true, 'tel' => true]
         );
         $config->set('Attr.AllowedFrameTargets', ['_blank']);
         $purifier = new \HTMLPurifier($config);
