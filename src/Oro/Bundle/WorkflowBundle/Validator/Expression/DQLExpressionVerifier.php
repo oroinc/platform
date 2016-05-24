@@ -22,11 +22,7 @@ class DQLExpressionVerifier implements ExpressionVerifierInterface
     }
 
     /**
-     * @param mixed $expression
-     *
-     * @throws ExpressionException
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function verify($expression)
     {

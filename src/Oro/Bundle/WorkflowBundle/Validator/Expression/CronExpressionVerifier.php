@@ -10,11 +10,7 @@ use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException
 class CronExpressionVerifier implements ExpressionVerifierInterface
 {
     /**
-     * @param mixed $expression
-     *
-     * @throws ExpressionException
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function verify($expression)
     {
