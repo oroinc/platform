@@ -56,5 +56,14 @@ define(function(require) {
         */
     };
 
+    /**
+     * Event binding on each cell gives perfomance slow down
+     *
+     * Please find support code in ../datagrid/row.js
+     */
+    Backgrid.Cell.prototype.simplifiedEventBinding = true;
+    Backgrid.Cell.prototype.delegateEvents = _.noop;
+    Backgrid.Cell.prototype.undelegateEvents = _.noop;
+
     return Backgrid;
 });
