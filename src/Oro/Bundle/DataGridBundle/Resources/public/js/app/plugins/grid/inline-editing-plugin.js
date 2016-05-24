@@ -190,13 +190,19 @@ define(function(require) {
                     'dblclick': _.partial(selectAndRun, 'enterEditModeIfNeeded', oldEvents.dblclick),
                     'mousedown [data-role=edit]': _.partial(selectAndRun, 'enterEditModeIfNeeded',
                                                             oldEvents['mousedown [data-role=edit]']),
-                    'click': _.partial(selectAndRun, _.noop, oldEvents.click)
+                    'click': _.partial(selectAndRun, _.noop, oldEvents.click),
+                    'mouseenter': _.partial(selectAndRun, 'delayedIconRender', oldEvents.mouseenter)
                 }),
 
                 render: function() {
                     cellCtor.prototype.render.apply(this, arguments);
                     if (inlineEditingPlugin.isEditable(this)) {
                         this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
+                    }
+                },
+
+                delayedIconRender: function() {
+                    if (!this.$el.find('> [data-role="edit"]').length) {
                         this.$el.append('<i data-role="edit" ' +
                             'class="icon-pencil skip-row-click hide-text inline-editor__edit-action"' +
                             'title="' + __('Edit') + '">' + __('Edit') + '</i>');
