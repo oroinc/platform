@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
  * Class MassNotificationCommand
  * Console command implementation
  *
- * @package Oro\Bundle\NavigationBundle\Command
+ * @package Oro\Bundle\NotificationBundle\Command
  */
 class MassNotificationCommand extends ContainerAwareCommand
 {

@@ -2,12 +2,3 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set gridName = 'mass-notification-grid' %}
 {% set pageTitle = 'oro.notification.massnotification.entity_plural_label'|trans %}
-
-{% block navButtons %}
-    {% if resource_granted('oro_notification_emailnotification_create') %}
-        {{ UI.addButton({
-            'path' : path('oro_notification_emailnotification_create'),
-            'entity_label' : 'oro.notification.emailnotification.entity_label'|trans
-        }) }}
-    {% endif %}
-{% endblock %}

@@ -1,20 +1,75 @@
 datagrid:
     mass-notification-grid:
-       options:
+        options:
           entity_pagination: true
-       acl_resource: oro_notification_massnotification_view
-       source:
-          type: orm
-          query:
-             select:
-                - e
-             from:
-                 - { table: OroNotificationBundle:MassNotification, alias: e }
-          columns:
-              id:
-                  label: oro.notification.massnotification.dummy_id.label
-              label:
-                  label: oro.notification.massnotification.dummy_label.label
+        acl_resource: oro_notification_massnotification_view
+        source:
+            type: orm
+            query:
+                select:
+                    - e.title
+                    - e.email
+                    - e.from
+                    - e.body
+                    - e.status
+                    - e.scheduledAt
+                    - e.processedAt
+                from:
+                    - { table: OroNotificationBundle:MassNotification, alias: e }
+
+        columns:
+            title:
+                label: oro.notification.massnotification.title.label
+                frontend_type: string
+            from:
+                label: oro.notification.massnotification.from.label
+                frontend_type: string
+            email:
+                label: oro.notification.massnotification.email.label
+                frontend_type: string
+            body:
+                label: oro.notification.massnotification.body.label
+                frontend_type: string
+            status:
+                label: oro.notification.massnotification.status.label
+                frontend_type: number
+            scheduledAt:
+                label: oro.notification.massnotification.scheduled_at.label
+                frontend_type: datetime
+            processedAt:
+                label: oro.notification.massnotification.processed_at.label
+                frontend_type: datetime
+
+        properties: ~
+
+        actions: ~
+
+        sorters:
+            columns:
+                title:
+                    data_name: e.title
+                processedAt:
+                    data_name: e.processedAt
+                scheduledAt:
+                    data_name: e.scheduledAt
+
+        filters:
+            columns:
+                title:
+                    type: string
+                    data_name: title
+                email:
+                    type: string
+                    data_name: email
+                from:
+                    type: string
+                    data_name: from
+                scheduledAt:
+                    type: datetime
+                    data_name: scheduledAt
+                processedAt:
+                    type: datetime
+                    data_name: processedAt
 
     email-notification-grid:
         options:

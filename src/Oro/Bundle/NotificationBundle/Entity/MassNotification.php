@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * EmailNotification
+ * MassNotification
  *
  * @ORM\Table("oro_notification_mass_notif")
  * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\MassNotificationRepository")
@@ -17,19 +17,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
+ *              "permissions"="VIEW",
  *              "group_name"=""
- *          },
- *          "note"={
- *              "immutable"=true
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
  *          }
  *      }
  * )
@@ -48,9 +37,58 @@ class MassNotification
     /**
      * @var string
      *
-     * @ORM\Column(name="label", type="string", length=255)
+     * @ORM\Column(name="email", type="string", length=255)
      */
-    protected $label;
+    protected $email;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="from", type="string", length=255)
+     */
+    protected $from;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="title", type="string", length=255)
+     */
+    protected $title;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="body", type="text", nullable=true)
+     */
+    protected $body;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    protected $scheduledAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    protected $processedAt;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="status", type="integer")
+     */
+    protected $status;
+
+    /**
+     * @var \Swift_Mime_Message
+     *
+     * @ORM\Column(name="message", type="object")
+     */
+    protected $message;
 
     /**
      * @return int
@@ -59,24 +97,135 @@ class MassNotification
     {
         return $this->id;
     }
+    
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
 
     /**
-     * @param string $label
+     * @param string $email
      * @return MassNotification
      */
-    public function setLabel($label)
+    public function setEmail($email)
     {
-        $this->label = $label;
+        $this->email = $email;
 
         return $this;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getFrom()
+    {
+        return $this->from;
+    }
+
+    /**
+     * @param string $from
+     */
+    public function setFrom($from)
+    {
+        $this->from = $from;
     }
 
     /**
      * @return string
      */
-    public function getLabel()
+    public function getTitle()
     {
-        return $this->label;
+        return $this->title;
     }
 
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * @param string $body
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getScheduledAt()
+    {
+        return $this->scheduledAt;
+    }
+
+    /**
+     * @param \DateTime $scheduledAt
+     */
+    public function setScheduledAt($scheduledAt)
+    {
+        $this->scheduledAt = $scheduledAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getProcessedAt()
+    {
+        return $this->processedAt;
+    }
+
+    /**
+     * @param \DateTime $processedAt
+     */
+    public function setProcessedAt($processedAt)
+    {
+        $this->processedAt = $processedAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return \Swift_Mime_Message
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * @param \Swift_Mime_Message $message
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
 }
