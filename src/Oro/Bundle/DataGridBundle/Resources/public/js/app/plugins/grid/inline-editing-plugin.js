@@ -38,9 +38,11 @@ define(function(require) {
             this.listenTo(this.main.collection, {
                 beforeFetch: this.beforeGridCollectionFetch
             });
-            this.listenTo(this.main.columns, {
-                'change:renderable': this.onColumnStateChange
-            });
+            if (this.main.columns) {
+                this.listenColumnEvents();
+            } else {
+                this.listenToOnce(this.main, 'columns:ready', this.listenColumnEvents);
+            }
             this.listenTo(mediator, {
                 'page:beforeChange': this.removeActiveEditorComponents,
                 'openLink:before': this.beforePageChange,
@@ -52,16 +54,26 @@ define(function(require) {
             var ConcreteApiAccessor = this.options.metadata.inline_editing.save_api_accessor['class'];
             this.saveApiAccessor = new ConcreteApiAccessor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
-            this.main.body.refresh();
+            if (this.main.rendered) {
+                this.main.body.refresh();
+            }
             InlineEditingPlugin.__super__.enable.call(this);
             $(window).on('beforeunload.' + this.cid, _.bind(this.onWindowUnload, this));
+        },
+
+        listenColumnEvents: function() {
+            this.listenTo(this.main.columns, {
+                'change:renderable': this.onColumnStateChange
+            });
         },
 
         disable: function() {
             $(window).off('.' + this.cid);
             this.removeActiveEditorComponents();
-            this.main.$el.removeClass('grid-editable');
-            this.main.body.refresh();
+            if (!this.manager.disposing) {
+                this.main.$el.removeClass('grid-editable');
+                this.main.body.refresh();
+            }
             InlineEditingPlugin.__super__.disable.call(this);
         },
 
