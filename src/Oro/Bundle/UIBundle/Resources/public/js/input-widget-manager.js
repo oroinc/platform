@@ -133,11 +133,12 @@ define(function(require) {
             if (!options) {
                 options = {};
             }
-            $input.attr('data-bound-input-widget', humanName || 'no-name');
             options.$el = $input;
             var widget = new Widget(options);
             if (!widget.isInitialized()) {
                 widget.dispose();
+            } else {
+                $input.attr('data-bound-input-widget', humanName || 'no-name');
             }
         },
 
