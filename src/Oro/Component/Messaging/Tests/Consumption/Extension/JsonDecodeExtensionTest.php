@@ -36,7 +36,7 @@ class JsonDecodeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('{}', $message->getBody());
     }
 
-    public function testShouldDecodeJsonMessageBodyAndSetBackItBackToMessage()
+    public function testShouldDecodeJsonMessageBodyAndSetItToLocalProperty()
     {
         $message = new NullMessage();
         $message->setHeaders(['content_type' => 'application/json']);
@@ -45,7 +45,8 @@ class JsonDecodeExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new JsonDecodeExtension();
         $extension->onPreReceived($this->createContextStub($message));
 
-        $this->assertSame(['foo' => 'fooVal'], $message->getBody());
+        $this->assertSame('{"foo": "fooVal"}', $message->getBody());
+        $this->assertSame(['foo' => 'fooVal'], $message->getLocalProperty('json_body'));
     }
 
     public function testThrowIfMessageBodyNotValidJson()

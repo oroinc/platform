@@ -21,6 +21,11 @@ class AmqpMessage implements Message
     /**
      * @var array
      */
+    private $localProperties;
+
+    /**
+     * @var array
+     */
     private $headers;
 
     /**
@@ -42,6 +47,7 @@ class AmqpMessage implements Message
     {
         $this->properties = [];
         $this->headers = [];
+        $this->localProperties = [];
 
         $this->redelivered = false;
     }
@@ -84,6 +90,30 @@ class AmqpMessage implements Message
     public function getProperty($name, $default = null)
     {
         return array_key_exists($name, $this->properties) ? $this->properties[$name] : $default;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLocalProperties()
+    {
+        return $this->localProperties;
+    }
+
+    /**
+     * @param array $localProperties
+     */
+    public function setLocalProperties(array $localProperties)
+    {
+        $this->localProperties = $localProperties;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLocalProperty($name, $default = null)
+    {
+        return array_key_exists($name, $this->localProperties) ? $this->localProperties[$name] : $default;
     }
 
     /**

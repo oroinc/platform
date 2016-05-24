@@ -28,8 +28,11 @@ class JsonDecodeExtension implements Extension
                 ));
             }
 
-            $message->setBody($body);
-            $context->getLogger()->debug('[JsonDecodeExtension] Set decoded body back to message');
+            $localProperties = $message->getLocalProperties();
+            $localProperties['json_body'] = $body;
+            $message->setLocalProperties($localProperties);
+            
+            $context->getLogger()->debug('[JsonDecodeExtension] Set json_body local property');
         }
     }
 }
