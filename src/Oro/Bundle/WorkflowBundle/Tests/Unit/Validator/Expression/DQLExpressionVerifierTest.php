@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Expression;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\QueryException;
@@ -17,15 +18,6 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
     /** @var ExpressionVerifierInterface */
     protected $verifier;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $hydrator;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $statement;
-
-    /** @var Configuration */
-    protected $configuration;
-
     public function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -33,21 +25,12 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->verifier = new DQLExpressionVerifier($this->em);
 
-        $this->hydrator = $this->getMockBuilder('\Doctrine\ORM\Internal\Hydration\AbstractHydrator')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $this->em->expects($this->any())->method('newHydrator')->willReturn($this->hydrator);
-        $this->hydrator->expects($this->any())->method('hydrateAll')->willReturn([]);
-
-        $this->configuration = new Configuration();
-
-        $this->em->expects($this->any())->method('getConfiguration')->willReturn($this->configuration);
+        $this->em->expects($this->any())->method('getConfiguration')->willReturn(new Configuration());
     }
 
     public function tearDown()
     {
-        unset($this->em, $this->verifier, $this->hydrator, $this->configuration, $this->statement);
+        unset($this->em, $this->verifier);
     }
 
     /**
@@ -57,7 +40,7 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
      */
     protected function createQuery($statementClass)
     {
-        $this->statement = $this->getMockBuilder($statementClass)
+        $statement = $this->getMockBuilder($statementClass)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -66,14 +49,14 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([$this->em])
             ->getMockForAbstractClass();
 
-        $query->expects($this->atLeastOnce())->method('getAST')->willReturn($this->statement);
+        $query->expects($this->atLeastOnce())->method('getAST')->willReturn($statement);
 
         return $query;
     }
 
     public function testValidSelectDQL()
     {
-        $expression = "SELECT * FROM OroWOrkflowBundle:WorkflowItem;";
+        $expression = 'SELECT * FROM OroWorkflowBundle:WorkflowItem';
 
         $query = $this->createQuery('Doctrine\ORM\Query\AST\SelectStatement');
 
@@ -92,7 +75,7 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
 
     public function testValidDeleteDQL()
     {
-        $expression = "DELETE FROM OroWOrkflowBundle:WorkflowItem;";
+        $expression = 'DELETE FROM OroWorkflowBundle:WorkflowItem';
 
         $query = $this->createQuery('Doctrine\ORM\Query\AST\DeleteStatement');
 
@@ -110,7 +93,7 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
 
     public function testValidUpdateDQL()
     {
-        $expression = "UPDATE OroWOrkflowBundle:WorkflowItem as wi SET wi.id = wi.id;";
+        $expression = 'UPDATE OroWorkflowBundle:WorkflowItem as wi SET wi.id = wi.id';
 
         $query = $this->createQuery('Doctrine\ORM\Query\AST\UpdateStatement');
 
@@ -128,7 +111,7 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
 
     public function testNonValidDQL()
     {
-        $expression = "Non Valid DQL;";
+        $expression = 'Non Valid DQL';
         $exception = new QueryException('WRONG DQL');
 
         $this->em->expects($this->atLeastOnce())
@@ -138,6 +121,24 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             'Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException',
+            $exception->getMessage()
+        );
+
+        $this->verifier->verify($expression);
+    }
+
+    public function testOtherException()
+    {
+        $expression = 'Non Valid DQL';
+        $exception = new DBALException('Something wrong');
+
+        $this->em->expects($this->atLeastOnce())
+            ->method('createQuery')
+            ->with($expression)
+            ->willThrowException($exception);
+
+        $this->setExpectedException(
+            'Doctrine\DBAL\DBALException',
             $exception->getMessage()
         );
 
