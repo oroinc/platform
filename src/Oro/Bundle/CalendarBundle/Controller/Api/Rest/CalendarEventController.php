@@ -25,10 +25,8 @@ use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\CalendarBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -302,34 +300,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
     /**
      * {@inheritdoc}
      */
-    protected function fixFormData(array &$data, $entity)
-    {
-        parent::fixFormData($data, $entity);
-
-        if (isset($data['allDay']) && ($data['allDay'] === 'false' || $data['allDay'] === '0')) {
-            $data['allDay'] = false;
-        }
-
-        // remove auxiliary attributes if any
-        unset($data['updatedAt']);
-        unset($data['editable']);
-        unset($data['removable']);
-        unset($data['notifiable']);
-
-        return true;
-    }
-
-    /**
-     * @return SystemCalendarConfig
-     */
-    protected function getCalendarConfig()
-    {
-        return $this->get('oro_calendar.system_calendar_config');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function handleUpdateRequest($id)
     {
         /** @var CalendarEvent $entity */
@@ -374,6 +344,34 @@ class CalendarEventController extends RestController implements ClassResourceInt
         }
 
         return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array &$data, $entity)
+    {
+        parent::fixFormData($data, $entity);
+
+        if (isset($data['allDay']) && ($data['allDay'] === 'false' || $data['allDay'] === '0')) {
+            $data['allDay'] = false;
+        }
+
+        // remove auxiliary attributes if any
+        unset($data['updatedAt']);
+        unset($data['editable']);
+        unset($data['removable']);
+        unset($data['notifiable']);
+
+        return true;
+    }
+
+    /**
+     * @return SystemCalendarConfig
+     */
+    protected function getCalendarConfig()
+    {
+        return $this->get('oro_calendar.system_calendar_config');
     }
 
     /**

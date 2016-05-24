@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Exception\RelatedAttendeeNotFoundException;
 use Oro\Bundle\CalendarBundle\Exception\StatusNotFoundException;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 
 /**
  * @Route("/event/ajax")
@@ -58,5 +59,32 @@ class AjaxCalendarEventController extends Controller
         $this->get('oro_calendar.send_processor.email')->sendRespondNotification($entity);
 
         return new JsonResponse(['successful' => true]);
+    }
+
+    /**
+     * @Route(
+     *      "/attendees-autocomplete-data/{id}",
+     *      name="oro_calendar_event_attendees_autocomplete_data",
+     *      options={"expose"=true}
+     * )
+     *
+     * @param int $id
+     *
+     * @return JsonResponse
+     */
+    public function attendeesAutocompleteDataAction($id)
+    {
+        $attendees = $this->getAttendeeManager()->loadAttendeesByCalendarEventId($id);
+        $data      = $this->getAttendeeManager()->attendeesToAutocompleteData($attendees);
+
+        return new JsonResponse($data);
+    }
+
+    /**
+     * @return AttendeeManager
+     */
+    protected function getAttendeeManager()
+    {
+        return $this->get('oro_calendar.attendee_manager');
     }
 }

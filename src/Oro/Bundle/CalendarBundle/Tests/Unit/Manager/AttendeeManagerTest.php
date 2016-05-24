@@ -40,10 +40,15 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->will($this->returnValue(true));
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->attendeeManager = new AttendeeManager(
             $this->usersConverter,
             $this->usersToAttendeesTransformer,
-            $this->securityFacade
+            $this->securityFacade,
+            $doctrineHelper
         );
     }
 

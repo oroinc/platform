@@ -4,6 +4,8 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class AttendeeRepository extends EntityRepository
@@ -51,37 +53,38 @@ class AttendeeRepository extends EntityRepository
     }
 
     /**
-     * @param array $calendarEventIds
+     * @param CalendarEvent|int $calendarEvent
      *
      * @return array
      */
-    public function getAttendeeListsByCalendarEventIds(array $calendarEventIds)
+    public function getAttendeeList($calendarEvent)
     {
-        if (!$calendarEventIds) {
-            return [];
-        }
-
-        $qb = $this->createQueryBuilder('attendee');
-        $queryResult = $qb
-            ->select('attendee.displayName, attendee.email, attendee.createdAt, attendee.updatedAt')
-            ->addSelect('attendee_origin.id AS origin, attendee_status.id as status, attendee_type.id as type')
-            ->addSelect('event.id as calendarEventId')
-            ->join('attendee.calendarEvent', 'event')
-            ->leftJoin('attendee.origin', 'attendee_origin')
-            ->leftJoin('attendee.status', 'attendee_status')
-            ->leftJoin('attendee.type', 'attendee_type')
-            ->where($qb->expr()->in('event.id', ':calendar_event'))
-            ->setParameter('calendar_event', $calendarEventIds)
+        return $this->createQueryBuilder('a')
+            ->select('a.displayName, a.email, a.createdAt, a.updatedAt, o.id AS origin, s.id as status, t.id as type')
+            ->leftJoin('a.origin', 'o')
+            ->leftJoin('a.status', 's')
+            ->leftJoin('a.type', 't')
+            ->where('a.calendarEvent = :calendar_event')
+            ->setParameter('calendar_event', $calendarEvent)
             ->getQuery()
             ->getArrayResult();
+    }
 
-        $result = [];
-        foreach ($queryResult as $row) {
-            $calendarEventId = $row['calendarEventId'];
-            unset($row['calendarEventId']);
-            $result[$calendarEventId][] = $row;
-        }
+    /**
+     * @param int $id
+     *
+     * @return Attendee[]
+     */
+    public function getAttendeesByCalendarEventId($id)
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('a')
+            ->innerJoin('a.calendarEvent', 'calendarEvent')
+            ->where('calendarEvent.id= :calendar_event_id')
+            ->setParameter('calendar_event_id', $id);
 
-        return $result += array_fill_keys($calendarEventIds, []);
+        $query = $qb->getQuery();
+
+        return $query->getResult();
     }
 }
