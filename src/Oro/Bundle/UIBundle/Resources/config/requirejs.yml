@@ -176,6 +176,7 @@ config:
         'oroui/js/app/views/datepicker/datetimepicker-view': 'bundles/oroui/js/app/views/datepicker/datetimepicker-view.js'
         'oroui/js/app/views/datepicker/datepicker-view': 'bundles/oroui/js/app/views/datepicker/datepicker-view.js'
         'oroui/js/app/views/zoomable-area-view': 'bundles/oroui/js/app/views/zoomable-area-view.js'
+        'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
 
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
