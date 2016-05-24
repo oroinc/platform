@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
@@ -35,8 +35,7 @@ class RootIdContextConfigurator implements ContextConfiguratorInterface
                 [
                     'root_id' => function (Options $options, $value) use ($request) {
                         if (null === $value && $request) {
-                            $value = $request->query->get('layout_root_id')
-                                ?: $request->request->get('layout_root_id');
+                            $value = $request->get('layout_root_id');
                         }
 
                         return $value;

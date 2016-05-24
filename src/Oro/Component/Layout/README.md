@@ -80,6 +80,7 @@ Also you can render only layout subtree instead of full tree.
 For this you should add `root_id` variable to context.
 
 ```php
+$context->getResolver()->setOptional(['root_id']);
 $context->set('root_id', 'some_block_id');
 ...
 echo $layout->render();

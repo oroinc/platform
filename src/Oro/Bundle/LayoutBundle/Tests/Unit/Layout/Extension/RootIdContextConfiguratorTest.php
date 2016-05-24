@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Component\Layout\LayoutContext;
-use Oro\Bundle\UIBundle\Layout\Extension\RootIdContextConfigurator;
+use Oro\Bundle\LayoutBundle\Layout\Extension\RootIdContextConfigurator;
 
 class RootIdContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,12 +45,6 @@ class RootIdContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->createRequest()->query->set('layout_root_id', 'query_root_id');
         $this->assertRootId('query_root_id');
-    }
-
-    public function testConfigureContextByRequest()
-    {
-        $this->createRequest()->request->set('layout_root_id', 'request_root_id');
-        $this->assertRootId('request_root_id');
     }
 
     public function testConfigureContextOverride()
