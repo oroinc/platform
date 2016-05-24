@@ -4,8 +4,10 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RequestHelper
+class DefaultOperationRequestHelper
 {
+    const DATAGRID_ROUTE = 'oro_datagrid_index';
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -32,6 +34,14 @@ class RequestHelper
         }
 
         $route = $request->get('_route');
+
+        if ($route === self::DATAGRID_ROUTE) {
+            $params = $request->query->get($request->get('gridName'));
+
+            if (isset($params['originalRoute'])) {
+                $route = $params['originalRoute'];
+            }
+        }
 
         return $route !== $this->applicationsHelper->getExecutionRoute() ? $route : null;
     }

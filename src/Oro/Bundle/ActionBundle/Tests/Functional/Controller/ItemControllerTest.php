@@ -92,6 +92,34 @@ class ItemControllerTest extends WebTestCase
         $this->assertPageContainsOperations($crawler, ['DELETE']);
     }
 
+    public function testDatagrid()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_datagrid_index',
+                [
+                    'gridName' => 'items-grid',
+                    'items-grid' => [
+                        'originalRoute' => 'oro_test_item_index'
+                    ]
+                ]
+            )
+        );
+
+        $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertCount(1, $data['data']);
+
+        $this->assertArrayHasKey('update', $data['data'][0]['action_configuration']);
+        $this->assertArrayHasKey('delete', $data['data'][0]['action_configuration']);
+        $this->assertInternalType('array', $data['data'][0]['action_configuration']['update']);
+        $this->assertInternalType('array', $data['data'][0]['action_configuration']['delete']);
+
+        $this->assertArrayHasKey('delete', $data['metadata']['massActions']);
+        $this->assertInternalType('array', $data['metadata']['massActions']['delete']);
+    }
+
     /**
      * @param Crawler $crawler
      * @param string $gridName

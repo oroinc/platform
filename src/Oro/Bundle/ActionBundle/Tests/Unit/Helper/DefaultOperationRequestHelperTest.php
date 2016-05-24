@@ -6,9 +6,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
-use Oro\Bundle\ActionBundle\Helper\RequestHelper;
+use Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper;
 
-class RequestHelperTest extends \PHPUnit_Framework_TestCase
+class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
     protected $requestStack;
@@ -16,7 +16,7 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper */
     protected $applicationsHelper;
 
-    /** @var RequestHelper */
+    /** @var DefaultOperationRequestHelper */
     protected $helper;
 
     /**
@@ -32,7 +32,7 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new RequestHelper($this->requestStack, $this->applicationsHelper);
+        $this->helper = new DefaultOperationRequestHelper($this->requestStack, $this->applicationsHelper);
     }
 
     /**
@@ -84,6 +84,17 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
                 ]),
                 'executionRoute' => 'execution_route',
                 'expected' => 'test_route',
+            ],
+            'exists route name with datagrid' => [
+                'masterRequest' => new Request([
+                    '_route' => DefaultOperationRequestHelper::DATAGRID_ROUTE,
+                    'gridName' => 'test-grid',
+                    'test-grid' => [
+                        'originalRoute' => 'test_original_route'
+                    ]
+                ]),
+                'executionRoute' => 'test_route',
+                'expected' => 'test_original_route',
             ],
         ];
     }

@@ -20,7 +20,7 @@ operations:
                     '@not_blank': $.data
                 actions:
                     - '@call_service_method':
-                        service: oro_action.helper.request
+                        service: oro_action.helper.default_operation_request
                         method: getRequestRoute
                         attribute: $.requestRoute
                     - '@call_service_method':

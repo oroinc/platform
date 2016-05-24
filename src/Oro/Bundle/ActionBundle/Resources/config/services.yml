@@ -34,8 +34,8 @@ services:
             - '@property_accessor'
             - '@request_stack'
 
-    oro_action.helper.request:
-        class: 'Oro\Bundle\ActionBundle\Helper\RequestHelper'
+    oro_action.helper.default_operation_request:
+        class: 'Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper'
         public: true
         arguments:
             - '@request_stack'
