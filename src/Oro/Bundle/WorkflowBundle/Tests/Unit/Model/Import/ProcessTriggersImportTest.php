@@ -129,8 +129,7 @@ class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
      */
     public function assertManagerRegistryCalled($entityClass)
     {
-        $this->managerRegistry
-            ->expects($this->once())
+        $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->with($entityClass)
             ->willReturn($this->objectManager);
@@ -141,8 +140,7 @@ class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
      */
     public function assertObjectManagerCalledForRepository($entityClass)
     {
-        $this->objectManager
-            ->expects($this->once())
+        $this->objectManager->expects($this->once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($this->repository);

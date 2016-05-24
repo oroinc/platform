@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectRepository;
+
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -12,6 +15,13 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessImport;
 
 class ProcessImportTest extends \PHPUnit_Framework_TestCase
 {
+    const CLASS_NAME = 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition';
+
+    /**
+     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $managerRegistry;
+
     /**
      * @var ProcessDefinitionsImport|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -29,14 +39,23 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->definitionImport = $this->getMockBuilder(
-            'Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport'
-        )->disableOriginalConstructor()->getMock();
+        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+
+        $this->definitionImport = $this
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->triggersImport = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->processImport = new ProcessImport($this->definitionImport, $this->triggersImport);
+
+        $this->processImport = new ProcessImport(
+            $this->managerRegistry,
+            $this->definitionImport,
+            $this->triggersImport,
+            self::CLASS_NAME
+        );
     }
 
     public function testImport()
@@ -50,16 +69,13 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
         $triggersImported = [new ProcessTrigger()];
         $createdSchedules = [new Schedule()];
 
-        $this->definitionImport->expects($this->once())->method('import')->with(['...definitions config'])
+        $this->definitionImport->expects($this->once())
+            ->method('import')
+            ->with(['...definitions config'])
             ->willReturn($definitionsImported);
 
         //definitions repository mock
-
-        $definitionsRepositoryMock = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()->getMock();
-        
-        $this->definitionImport->expects($this->once())->method('getDefinitionsRepository')
-            ->willReturn($definitionsRepositoryMock);
+        $definitionsRepositoryMock = $this->assertObjectManagerCalledForRepository(self::CLASS_NAME);
         $definitionsRepositoryMock->expects($this->once())->method('findAll')->willReturn(['...definitions here']);
 
         $this->triggersImport->expects($this->once())->method('import')->with(
@@ -76,5 +92,27 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($definitionsImported, $result->getDefinitions());
         $this->assertEquals($triggersImported, $result->getTriggers());
         $this->assertEquals($createdSchedules, $result->getSchedules());
+    }
+
+    /**
+     * @param string $entityClass
+     * @return ObjectRepository|\PHPUnit_Framework_MockObject_MockObject
+     */
+    public function assertObjectManagerCalledForRepository($entityClass)
+    {
+        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+
+        $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager->expects($this->once())
+            ->method('getRepository')
+            ->with($entityClass)
+            ->willReturn($repository);
+
+        $this->managerRegistry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn($objectManager);
+
+        return $repository;
     }
 }

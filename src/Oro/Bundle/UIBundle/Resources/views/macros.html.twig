@@ -889,7 +889,7 @@
                                 )|trans
                             }}:
                         {% endif %}
-                        {% if ownerPath is defined and resource_granted('VIEW', entity.owner) %}
+                        {% if ownerPath is defined and resource_granted('VIEW', owner) %}
                             {{ _self.renderUrl(ownerPath, ownerName) }}
                         {% else %}
                             {{ ownerName }}
