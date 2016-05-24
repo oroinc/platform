@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Validator\Expression;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\AST\SelectStatement;
+use Doctrine\ORM\Query\QueryException;
 
 use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException;
 
@@ -12,17 +13,16 @@ class DQLExpressionVerifier implements ExpressionVerifierInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    /**
+     * @param EntityManagerInterface $em
+     */
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
     }
 
     /**
-     * @param mixed $expression
-     *
-     * @throws ExpressionException
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function verify($expression)
     {
@@ -37,7 +37,7 @@ class DQLExpressionVerifier implements ExpressionVerifierInterface
             }
 
             return $expression;
-        } catch (\Exception $e) {
+        } catch (QueryException $e) {
             throw new ExpressionException($e->getMessage());
         }
     }
