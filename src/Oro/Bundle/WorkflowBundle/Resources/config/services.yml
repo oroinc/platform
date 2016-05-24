@@ -179,6 +179,5 @@ services:
 
     oro_workflow.transition.schedule_helper:
         class: 'Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper'
-        scope: prototype
         arguments:
             - '@doctrine'
