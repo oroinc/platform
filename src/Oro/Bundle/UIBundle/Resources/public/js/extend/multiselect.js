@@ -15,8 +15,8 @@ define([
          * @override
          */
         open: function() {
-            this.hasBeenOpened = true;
-            if (!this._isInitialized) {
+            if (!this.hasBeenOpened) {
+                this.hasBeenOpened = true;
                 this.refresh(true);
             }
             this._superApply(arguments);
@@ -45,7 +45,6 @@ define([
 
         refresh: function(init) {
             if (this.hasBeenOpened) {
-                this._isInitialized = true;
                 oldRefresh.call(this, init);
             }
         }
