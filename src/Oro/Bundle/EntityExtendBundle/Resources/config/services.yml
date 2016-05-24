@@ -494,3 +494,12 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_workflow.action, alias: request_enum_entity }
+
+    oro_entity.routing.options_resolver.old_options:
+        class: Oro\Bundle\EntityExtendBundle\Routing\OldOptionsRouteOptionsResolver
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: routing.options_resolver }
