@@ -175,6 +175,9 @@ class DataBlockBuilder
         if ($this->hasValue($config, 'description')) {
             $subBlock->setDescription($config['description']);
         }
+        if ($this->hasValue($config, 'tooltip')) {
+            $subBlock->setTooltip($config['tooltip']);
+        }
         if ($this->hasValue($config, 'priority')) {
             $subBlock->setPriority($config['priority']);
         }
