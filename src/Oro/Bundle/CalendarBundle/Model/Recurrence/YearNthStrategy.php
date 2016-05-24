@@ -81,7 +81,7 @@ class YearNthStrategy extends AbstractStrategy
         $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
         $day = $this->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
         $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
-        $currentDate = new \DateTime();
+        $currentDate = new \DateTime('now', $this->getTimeZone());
         $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $currentDate->format('d'));
         $month = $this->dateTimeFormatter->format($currentDate, null, \IntlDateFormatter::NONE, null, null, 'MMM');
 
@@ -114,7 +114,7 @@ class YearNthStrategy extends AbstractStrategy
      */
     protected function getNextOccurrence($interval, $dayOfWeek, $monthOfYear, $instance, \DateTime $date)
     {
-        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
+        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}", $this->getTimeZone());
 
         $instanceRelativeValue = $this->getInstanceRelativeValue($instance);
         $month = date('M', mktime(0, 0, 0, $monthOfYear));
@@ -122,7 +122,10 @@ class YearNthStrategy extends AbstractStrategy
         $nextDays = [];
         if ($instance === Recurrence::INSTANCE_FIRST || $instance === Recurrence::INSTANCE_LAST) {
             foreach ($dayOfWeek as $day) {
-                $nextDays[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
+                $nextDays[] = new \DateTime(
+                    "{$instanceRelativeValue} {$day} of {$month} {$year}",
+                    $this->getTimeZone()
+                );
             }
 
             return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
@@ -133,7 +136,7 @@ class YearNthStrategy extends AbstractStrategy
         while (count($days) < $instance) {
             $instanceRelativeValue = $this->getInstanceRelativeValue($currentInstance);
             foreach ($dayOfWeek as $day) {
-                $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
+                $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}", $this->getTimeZone());
             }
             $currentInstance++;
         }

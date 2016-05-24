@@ -226,7 +226,9 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 unset($items[$index]);
                 $recurrence = new Entity\Recurrence();
                 foreach ($item[$key] as $field => $value) {
-                    $value = in_array($field, $dateFields, true) && $value !== null ? new \DateTime($value) : $value;
+                    $value = in_array($field, $dateFields, true) && $value !== null
+                        ? new \DateTime($value, new \DateTimeZone('UTC'))
+                        : $value;
                     if ($field !== 'id') {
                         $propertyAccessor->setValue($recurrence, $field, $value);
                     }
@@ -237,7 +239,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
                     $newItem = $item;
                     $newItem['recurrencePattern'] = $this->recurrenceModel->getTextValue($recurrence);
                     $newItem['start'] = $occurrenceDate->format('c');
-                    $endDate = new \DateTime($newItem['end']);
+                    $endDate = new \DateTime($newItem['end'], new \DateTimeZone('UTC'));
                     $endDate->setDate(
                         $occurrenceDate->format('Y'),
                         $occurrenceDate->format('m'),
@@ -274,8 +276,10 @@ class UserCalendarProvider extends AbstractCalendarProvider
         foreach ($recurringOccurrenceEvents as $occurrence) {
             $exceptionFound = false;
             foreach ($recurringExceptionEvents as $key => $exception) {
+                $originalStartTime = new \DateTime($exception['originalStart']);
+                $start = new \DateTime($occurrence['start']);
                 if ((int)$exception['recurringEventId'] === (int)$occurrence['id'] &&
-                    new \DateTime($exception['originalStart']) == new \DateTime($occurrence['start'])
+                    $originalStartTime->getTimestamp() === $start->getTimestamp()
                 ) {
                     $exceptionFound = true;
                     if (empty($exception['isCancelled'])) {

@@ -16,6 +16,9 @@ abstract class AbstractStrategy implements StrategyInterface
     /** @var DateTimeFormatter */
     protected $dateTimeFormatter;
 
+    /** @var \DateTimeZone */
+    protected $timeZone;
+
     /**
      * @param TranslatorInterface $translator
      * @param DateTimeFormatter $formatter
@@ -37,7 +40,7 @@ abstract class AbstractStrategy implements StrategyInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function getOccurrencesPattern(Entity\Recurrence $recurrence)
+    protected function getOccurrencesPattern(Entity\Recurrence $recurrence)
     {
         $occurrences = $recurrence->getOccurrences();
         $result = '';
@@ -117,7 +120,7 @@ abstract class AbstractStrategy implements StrategyInterface
         } elseif (!empty($occurrences)) {
             $result = $this->getLastOccurrence($recurrence);
         } else {
-            $result = new \DateTime(Recurrence::MAX_END_DATE);
+            $result = new \DateTime(Recurrence::MAX_END_DATE, $this->getTimeZone());
         }
 
         return $result;
@@ -180,4 +183,16 @@ abstract class AbstractStrategy implements StrategyInterface
      * @return \DateTime
      */
     abstract public function getLastOccurrence(Entity\Recurrence $recurrence);
+
+    /**
+     * @return \DateTimeZone
+     */
+    protected function getTimeZone()
+    {
+        if ($this->timeZone === null) {
+            $this->timeZone = new \DateTimeZone('UTC');
+        }
+
+        return $this->timeZone;
+    }
 }

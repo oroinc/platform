@@ -8,7 +8,7 @@ use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\DailyStrategy;
 
-class DailyStrategyTest extends \PHPUnit_Framework_TestCase
+class DailyStrategyTest extends AbstractTestStrategy
 {
     /** @var DailyStrategy */
     protected $strategy;
@@ -63,39 +63,6 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array $params
-     * @param array $expected
-     *
-     * @dataProvider propertiesDataProvider
-     */
-    public function testGetOccurrences(array $params, array $expected)
-    {
-        // @TODO move method body to abstract test class
-        $expected = array_map(
-            function ($date) {
-                return new \DateTime($date);
-            },
-            $expected
-        );
-        $recurrence = new Entity\Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
-            ->setInterval($params['interval'])
-            ->setStartTime(new \DateTime($params['startTime']))
-            ->setEndTime(new \DateTime($params['endTime']))
-            ->setCalculatedEndTime(new \DateTime($params['endTime']));
-        if ($params['occurrences']) {
-            $recurrence->setOccurrences($params['occurrences']);
-        }
-
-        $result = $this->strategy->getOccurrences(
-            $recurrence,
-            new \DateTime($params['start']),
-            new \DateTime($params['end'])
-        );
-        $this->assertEquals($expected, $result);
-    }
-
-    /**
      * @param $recurrenceData
      * @param $expected
      *
@@ -135,7 +102,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -379,5 +346,13 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                 'expected' => new \DateTime('2016-05-06')
             ]
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getType()
+    {
+        return Recurrence::TYPE_DAILY;
     }
 }

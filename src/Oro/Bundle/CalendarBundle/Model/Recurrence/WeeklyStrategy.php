@@ -26,7 +26,10 @@ class WeeklyStrategy extends AbstractStrategy
         $this->sortWeekDays($weekDays);
 
         $firstDay = reset($weekDays);
-        $startTime = new \DateTime("previous $firstDay {$recurrence->getStartTime()->format('c')}");
+        $startTime = new \DateTime(
+            "previous $firstDay {$recurrence->getStartTime()->format('c')}",
+            $this->getTimeZone()
+        );
         /** @var float $fromStartInterval */
         $fromStartInterval = 0;
         $interval = $recurrence->getInterval();
@@ -35,7 +38,7 @@ class WeeklyStrategy extends AbstractStrategy
             $dateInterval = $start->diff($startTime);
             $fromStartInterval = floor(((int)$dateInterval->format('%a') + 1) / 7 / $interval) * count($weekDays);
             foreach ($weekDays as $day) {
-                $currentDay = new \DateTime($day);
+                $currentDay = new \DateTime($day, $this->getTimeZone());
                 if ($currentDay->format('w') < $recurrence->getStartTime()->format('w')) {
                     $fromStartInterval = $fromStartInterval == 0 ? $fromStartInterval : $fromStartInterval - 1;
                 }
@@ -43,7 +46,7 @@ class WeeklyStrategy extends AbstractStrategy
             $fullWeeks = ceil($fromStartInterval / count($weekDays)) * $interval;
         }
 
-        $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}");
+        $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}", $this->getTimeZone());
 
         while ($afterFullWeeksDate <= $end && $afterFullWeeksDate <= $recurrence->getCalculatedEndTime()) {
             foreach ($weekDays as $day) {
@@ -66,7 +69,7 @@ class WeeklyStrategy extends AbstractStrategy
                 $fromStartInterval = $next >= $recurrence->getStartTime() ? $fromStartInterval +1 : $fromStartInterval;
             }
             $fullWeeks += $interval;
-            $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}");
+            $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}", $this->getTimeZone());
         }
 
         return $result;
@@ -121,7 +124,7 @@ class WeeklyStrategy extends AbstractStrategy
             return $date;
         }
 
-        return new \DateTime("next {$day} {$date->format('c')}");
+        return new \DateTime("next {$day} {$date->format('c')}", $this->getTimeZone());
     }
 
     /**
@@ -134,8 +137,8 @@ class WeeklyStrategy extends AbstractStrategy
     protected function sortWeekDays(&$weekDays)
     {
         usort($weekDays, function ($item1, $item2) {
-            $date1 = new \DateTime($item1);
-            $date2 = new \DateTime($item2);
+            $date1 = new \DateTime($item1, $this->getTimeZone());
+            $date2 = new \DateTime($item2, $this->getTimeZone());
 
             if ($date1->format('w') === $date2->format('w')) {
                 return 0;
@@ -158,17 +161,20 @@ class WeeklyStrategy extends AbstractStrategy
 
         $this->sortWeekDays($weekDays);
         $firstDay = reset($weekDays);
-        $currentDay = new \DateTime($firstDay);
+        $currentDay = new \DateTime($firstDay, $this->getTimeZone());
         $startTime = $recurrence->getStartTime();
         if ($recurrence->getStartTime()->format('w') > $currentDay->format('w')) {
-            $startTime = new \DateTime("previous $firstDay {$recurrence->getStartTime()->format('c')}");
+            $startTime = new \DateTime(
+                "previous $firstDay {$recurrence->getStartTime()->format('c')}",
+                $this->getTimeZone()
+            );
         }
 
         $fullWeeks = (ceil($recurrence->getOccurrences() / count($weekDays)) - 1) * $recurrence->getInterval();
-        $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}");
+        $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}", $this->getTimeZone());
         $fromStartInterval = $fullWeeks / $recurrence->getInterval() * count($weekDays);
         foreach ($weekDays as $day) {
-            $currentDay = new \DateTime($day);
+            $currentDay = new \DateTime($day, $this->getTimeZone());
             if ($currentDay->format('w') < $recurrence->getStartTime()->format('w')) {
                 $fromStartInterval = $fromStartInterval == 0 ? $fromStartInterval : $fromStartInterval - 1;
             }
@@ -176,7 +182,7 @@ class WeeklyStrategy extends AbstractStrategy
 
         if ($fromStartInterval + count($weekDays) < $recurrence->getOccurrences()) {
             $fullWeeks += $recurrence->getInterval();
-            $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}");
+            $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}", $this->getTimeZone());
             $fromStartInterval += count($weekDays);
         }
 

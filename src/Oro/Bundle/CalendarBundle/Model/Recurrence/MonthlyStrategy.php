@@ -80,7 +80,7 @@ class MonthlyStrategy extends AbstractStrategy
      */
     protected function getNextOccurrence($interval, \DateTime $date)
     {
-        return new \DateTime("+{$interval} month {$date->format('c')}");
+        return new \DateTime("+{$interval} month {$date->format('c')}", $this->getTimeZone());
     }
 
     /**

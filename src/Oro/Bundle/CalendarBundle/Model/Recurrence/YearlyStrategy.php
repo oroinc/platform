@@ -24,7 +24,7 @@ class YearlyStrategy extends MonthlyStrategy
     public function getTextValue(Entity\Recurrence $recurrence)
     {
         $interval = (int)($recurrence->getInterval() / 12);
-        $currentDate = new \DateTime();
+        $currentDate = new \DateTime('now', $this->getTimeZone());
         $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $recurrence->getDayOfMonth());
         $date = $this->dateTimeFormatter->formatDay($currentDate);
 
@@ -79,14 +79,14 @@ class YearlyStrategy extends MonthlyStrategy
             return "Parameter 'monthOfYear' can't be empty for Yearly recurrence pattern.";
         }
 
-        $currentDate = new \DateTime();
+        $currentDate = new \DateTime('now', $this->getTimeZone());
         $dateString = $currentDate->format('Y')
             . '-' . $recurrence->getMonthOfYear()
             . '-' . $recurrence->getDayOfMonth();
 
         // Try to create DateTime object for checking if day/month of recurrence is valid.
         try {
-            new \DateTime($dateString);
+            new \DateTime($dateString, $this->getTimeZone());
         } catch (\Exception $exception) {
             return "Parameters 'dayOfMonth' and 'monthOfYear' values are invalid:"
             . " such date doesn't exist(Yearly recurrence pattern).";

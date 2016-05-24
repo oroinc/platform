@@ -80,7 +80,7 @@ class DailyStrategy extends AbstractStrategy
      */
     protected function getNextOccurrence($interval, \DateTime $date)
     {
-        return new \DateTime("+{$interval} day {$date->format('c')}");
+        return new \DateTime("+{$interval} day {$date->format('c')}", $this->getTimeZone());
     }
 
     /**

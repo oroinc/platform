@@ -6,7 +6,7 @@ use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\WeeklyStrategy;
 
-class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
+class WeeklyStrategyTest extends AbstractTestStrategy
 {
     /** @var WeeklyStrategy  */
     protected $strategy;
@@ -61,39 +61,6 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array $params
-     * @param array $expected
-     *
-     * @dataProvider propertiesDataProvider
-     */
-    public function testGetOccurrences(array $params, array $expected)
-    {
-        // @TODO move method body to abstract test class
-        $expected = array_map(
-            function ($date) {
-                return new \DateTime($date);
-            },
-            $expected
-        );
-        $recurrence = new Entity\Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_WEEKLY)
-            ->setInterval($params['interval'])
-            ->setDayOfWeek($params['daysOfWeek'])
-            ->setStartTime(new \DateTime($params['startTime']))
-            ->setEndTime(new \DateTime($params['endTime']))
-            ->setCalculatedEndTime(new \DateTime($params['endTime']));
-        if ($params['occurrences']) {
-            $recurrence->setOccurrences($params['occurrences']);
-        }
-        $result = $this->strategy->getOccurrences(
-            $recurrence,
-            new \DateTime($params['start']),
-            new \DateTime($params['end'])
-        );
-        $this->assertEquals($expected, $result);
-    }
-
-    /**
      * @param $recurrenceData
      * @param $expected
      *
@@ -105,8 +72,10 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
         $recurrence->setRecurrenceType(Recurrence::TYPE_WEEKLY)
             ->setInterval($recurrenceData['interval'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
-            ->setStartTime(new \DateTime($recurrenceData['startTime']))
-            ->setEndTime($recurrenceData['endTime'] === null ? null : new \DateTime($recurrenceData['endTime']))
+            ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setEndTime($recurrenceData['endTime'] === null
+                ? null
+                : new \DateTime($recurrenceData['endTime'], $this->getTimeZone()))
             ->setOccurrences($recurrenceData['occurrences']);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
@@ -124,11 +93,11 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
         $recurrence->setRecurrenceType(Recurrence::TYPE_WEEKLY)
             ->setInterval($recurrenceData['interval'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
-            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
             ->setOccurrences($recurrenceData['occurrences']);
 
         if (!empty($recurrenceData['endTime'])) {
-            $recurrence->setEndTime(new \DateTime($recurrenceData['endTime']));
+            $recurrence->setEndTime(new \DateTime($recurrenceData['endTime'], $this->getTimeZone()));
         }
 
         $this->assertEquals($expected, $this->strategy->getCalculatedEndTime($recurrence));
@@ -417,7 +386,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => null,
                 ],
-                'expected' => new \DateTime(Recurrence::MAX_END_DATE)
+                'expected' => new \DateTime(Recurrence::MAX_END_DATE, $this->getTimeZone())
             ],
             'with_end_date' => [
                 'params' => [
@@ -427,7 +396,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => '2016-05-12',
                     'occurrences' => null,
                 ],
-                'expected' => new \DateTime('2016-05-12')
+                'expected' => new \DateTime('2016-05-12', $this->getTimeZone())
             ],
             'with_occurrences' => [
                 'params' => [
@@ -437,7 +406,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 5,
                 ],
-                'expected' => new \DateTime('2016-05-23')
+                'expected' => new \DateTime('2016-05-23', $this->getTimeZone())
             ],
             'with_occurrences_1' => [
                 'params' => [
@@ -447,7 +416,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 5,
                 ],
-                'expected' => new \DateTime('2016-05-22')
+                'expected' => new \DateTime('2016-05-22', $this->getTimeZone())
             ],
             'with_occurrences_2' => [
                 'params' => [
@@ -457,7 +426,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 8,
                 ],
-                'expected' => new \DateTime('2016-06-17')
+                'expected' => new \DateTime('2016-06-17', $this->getTimeZone())
             ],
             'with_occurrences_3' => [
                 'params' => [
@@ -467,8 +436,16 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 111,
                 ],
-                'expected' => new \DateTime('2019-07-06')
+                'expected' => new \DateTime('2019-07-06', $this->getTimeZone())
             ]
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getType()
+    {
+        return Recurrence::TYPE_WEEKLY;
     }
 }

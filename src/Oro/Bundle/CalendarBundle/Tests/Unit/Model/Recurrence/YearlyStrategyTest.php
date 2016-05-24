@@ -6,7 +6,7 @@ use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\YearlyStrategy;
 
-class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
+class YearlyStrategyTest extends AbstractTestStrategy
 {
     /** @var YearlyStrategy  */
     protected $strategy;
@@ -60,40 +60,6 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array $params
-     * @param array $expected
-     *
-     * @dataProvider propertiesDataProvider
-     */
-    public function testGetOccurrences(array $params, array $expected)
-    {
-        // @TODO move method body to abstract test class
-        $expected = array_map(
-            function ($date) {
-                return new \DateTime($date);
-            },
-            $expected
-        );
-        $recurrence = new Entity\Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
-            ->setInterval($params['interval'])
-            ->setDayOfMonth($params['dayOfMonth'])
-            ->setMonthOfYear($params['monthOfYear'])
-            ->setStartTime(new \DateTime($params['startTime']))
-            ->setEndTime(new \DateTime($params['endTime']))
-            ->setCalculatedEndTime(new \DateTime($params['endTime']));
-        if ($params['occurrences']) {
-            $recurrence->setOccurrences($params['occurrences']);
-        }
-        $result = $this->strategy->getOccurrences(
-            $recurrence,
-            new \DateTime($params['start']),
-            new \DateTime($params['end'])
-        );
-        $this->assertEquals($expected, $result);
-    }
-
-    /**
      * @param $recurrenceData
      * @param $expected
      *
@@ -106,8 +72,10 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
             ->setInterval($recurrenceData['interval'])
             ->setDayOfMonth($recurrenceData['dayOfMonth'])
             ->setMonthOfYear($recurrenceData['monthOfYear'])
-            ->setStartTime(new \DateTime($recurrenceData['startTime']))
-            ->setEndTime($recurrenceData['endTime'] === null ? null : new \DateTime($recurrenceData['endTime']))
+            ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setEndTime($recurrenceData['endTime'] === null
+                ? null
+                : new \DateTime($recurrenceData['endTime'], $this->getTimeZone()))
             ->setOccurrences($recurrenceData['occurrences']);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
@@ -126,11 +94,11 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
             ->setInterval($recurrenceData['interval'])
             ->setDayOfMonth($recurrenceData['dayOfMonth'])
             ->setMonthOfYear($recurrenceData['monthOfYear'])
-            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
             ->setOccurrences($recurrenceData['occurrences']);
 
         if (!empty($recurrenceData['endTime'])) {
-            $recurrence->setEndTime(new \DateTime($recurrenceData['endTime']));
+            $recurrence->setEndTime(new \DateTime($recurrenceData['endTime'], $this->getTimeZone()));
         }
 
         $this->assertEquals($expected, $this->strategy->getCalculatedEndTime($recurrence));
@@ -328,7 +296,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => null,
                 ],
-                'expected' => new \DateTime(Recurrence::MAX_END_DATE)
+                'expected' => new \DateTime(Recurrence::MAX_END_DATE, $this->getTimeZone())
             ],
             'with_end_date' => [
                 'params' => [
@@ -339,7 +307,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => '2016-05-12',
                     'occurrences' => null,
                 ],
-                'expected' => new \DateTime('2016-05-12')
+                'expected' => new \DateTime('2016-05-12', $this->getTimeZone())
             ],
             'with_occurrences' => [
                 'params' => [
@@ -350,7 +318,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => new \DateTime('2020-04-10')
+                'expected' => new \DateTime('2020-04-10', $this->getTimeZone())
             ],
             'with_occurrences_1' => [
                 'params' => [
@@ -361,7 +329,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => new \DateTime('2022-04-05')
+                'expected' => new \DateTime('2022-04-05', $this->getTimeZone())
             ],
             'with_occurrences_2' => [
                 'params' => [
@@ -372,8 +340,16 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => null,
                     'occurrences' => 3,
                 ],
-                'expected' => new \DateTime('2020-04-08')
+                'expected' => new \DateTime('2020-04-08', $this->getTimeZone())
             ]
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getType()
+    {
+        return Recurrence::TYPE_YEARLY;
     }
 }
