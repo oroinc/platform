@@ -203,7 +203,7 @@ class OperationExtension extends AbstractExtension
         $context = $this->contextHelper->getContext();
 
         if (!empty($context['route'])) {
-            $config->offsetSet('options', ['urlParams' => ['originalRoute' => $context['route']]]);
+            $config->offsetSetByPath('[options][urlParams][originalRoute]', $context['route']);
         }
     }
 
