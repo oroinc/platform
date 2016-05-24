@@ -5,7 +5,7 @@ namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
-use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Tests\Unit\Stub\NoteStub;
 
 class NoteManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -111,7 +111,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
         $updatedBy->expects($this->once())->method('getId')->will($this->returnValue(100));
         $updatedBy->expects($this->once())->method('getAvatar')->will($this->returnValue(null));
 
-        $note = new Note();
+        $note = new NoteStub();
         $this->setId($note, 123);
         $note
             ->setMessage('test message')
