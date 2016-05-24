@@ -83,15 +83,15 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $hasSecurityConfigChanges = false;
         $wsseLifetime = 0;
 
-        if (isset($securityConfig['firewalls'])) {
-            $securityFirewalls = $securityConfig['firewalls'];
+        if (isset($securityConfig[0]['firewalls'])) {
+            $securityFirewalls = $securityConfig[0]['firewalls'];
             foreach ($securityFirewalls as $name => $config) {
                 if (!isset($config['wsse'])) {
                     continue;
                 }
                 if (!isset($config['wsse']['nonce_cache_service_id'])) {
                     $hasSecurityConfigChanges = true;
-                    $securityFirewalls[$name]['wsse']['nonce_cache_service_id'] =
+                    $securityConfig[0]['firewalls'][$name]['wsse']['nonce_cache_service_id'] =
                         self::DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID;
                 }
                 if (isset($config['wsse']['lifetime'])
