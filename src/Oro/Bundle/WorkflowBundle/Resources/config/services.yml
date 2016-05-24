@@ -182,3 +182,14 @@ services:
         scope: prototype
         arguments:
             - '@doctrine'
+            - '@oro_workflow.manager'
+
+    oro_workflow.generator.trigger_schedule_options_verifier:
+    	class: Oro\Bundle\WorkflowBundle\Generator\TriggerScheduleOptionsVerifier
+    	arguments: ['@oro_workflow.workflow_assembler', '@oro_workflow.transition.schedule_helper']
+
+    oro_workflow.generator.process_configuration_generator:
+    	class: Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator
+    	arguments:
+    	    - '@oro_workflow.generator.trigger_schedule_options_verifier'
+    	    - '%%oro_workflow.workflow_item.entity.class%'

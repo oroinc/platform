@@ -6,28 +6,69 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-
 class TransitionScheduleHelper
 {
     /** @var ManagerRegistry */
     protected $registry;
 
     /**
-     * @param ManagerRegistry $registry
+     * @var WorkflowManager
      */
-    public function __construct(ManagerRegistry $registry)
+    private $workflowManager;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param WorkflowManager $workflowManager
+     */
+    public function __construct(ManagerRegistry $registry, WorkflowManager $workflowManager)
     {
         $this->registry = $registry;
+        $this->workflowManager = $workflowManager;
+    }
+
+    public function getWorkflowItemIds($workflowName, $transitionName)
+    {
+        $workflow = $this->workflowManager->getWorkflow($workflowName);
+
+        $query = $this->createQuery(
+            $this->getRelatedSteps($workflow->getStepManager(), $transitionName),
+            $workflow->getDefinition()->getRelatedEntity(),
+            $workflow->getTransitionManager()->getTransition($transitionName)->getScheduleFilter()
+        );
+
+        $result = $query->getArrayResult();
+
+        $ids = [];
+        foreach ($result as $row) {
+            $ids[] = $row['id'];
+        }
+
+        return $ids;
     }
 
     /**
-     * @param WorkflowStep[] $workflowSteps
-     * @param string $entityClass
-     * @param string $dqlFilter
+     * @param StepManager $stepManager
+     * @param $transitionName
      * @return array
      */
-    public function getWorkflowItemIds(array $workflowSteps, $entityClass, $dqlFilter)
+    private function getRelatedSteps(StepManager $stepManager, $transitionName)
+    {
+        $relatedSteps = [];
+        foreach ($stepManager->getSteps() as $step) {
+            if (in_array($transitionName, $step->getAllowedTransitions(), true)) {
+                $relatedSteps[] = $step->getName();
+            }
+        }
+        return $relatedSteps;
+    }
+
+    /**
+     * @param array $workflowSteps
+     * @param string $entityClass
+     * @param string $dqlFilter optional dql WHERE clause
+     * @return array|\Doctrine\ORM\Query
+     */
+    public function createQuery(array $workflowSteps, $entityClass, $dqlFilter)
     {
         if (!$workflowSteps) {
             return [];
@@ -42,21 +83,14 @@ class TransitionScheduleHelper
             ->innerJoin('wi.definition', 'wd');
 
         $queryBuilder
-            ->where($queryBuilder->expr()->in('ws.id', ':workflowSteps'))
+            ->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
             ->setParameter('workflowSteps', $workflowSteps);
 
         if ($dqlFilter) {
             $queryBuilder->andWhere($dqlFilter);
         }
 
-        $result = $queryBuilder->getQuery()->getArrayResult();
-
-        $ids = [];
-        foreach ($result as $row) {
-            $ids[] = $row['id'];
-        }
-
-        return $ids;
+        return $queryBuilder->getQuery();
     }
 
     /**

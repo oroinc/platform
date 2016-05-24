@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Generator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class ProcessConfigurationGenerator
 {
@@ -20,23 +19,15 @@ class ProcessConfigurationGenerator
     private $workflowItemEntityClass;
 
     /**
-     * @var WorkflowAssembler
-     */
-    private $workflowAssembler;
-
-    /**
-     * @param WorkflowAssembler $workflowAssembler
      * @param TriggerScheduleOptionsVerifier $verifier
      * @param string $workflowItemEntityClass
      */
     public function __construct(
-        WorkflowAssembler $workflowAssembler,
         TriggerScheduleOptionsVerifier $verifier,
         $workflowItemEntityClass
     ) {
         $this->verifier = $verifier;
         $this->workflowItemEntityClass = $workflowItemEntityClass;
-        $this->workflowAssembler = $workflowAssembler;
     }
 
     /**
@@ -50,12 +41,17 @@ class ProcessConfigurationGenerator
         $processConfigurations = [];
         foreach ($this->getTransitionsConfigurations($workflowDefinition) as $transitionConfiguration) {
             if (array_key_exists('schedule', $transitionConfiguration)) {
-                //todo verify
+                $transitionName = $transitionConfiguration['name'];
+                
+                $this->verifier->verify($transitionConfiguration['schedule'], $workflowDefinition, $transitionName);
+                
+                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $processConfigurations = array_merge_recursive(
                     $processConfigurations,
                     $this->createProcessConfiguration(
-                        $transitionConfiguration,
-                        $workflowDefinition->getName()
+                        $workflowDefinition->getName(),
+                        $transitionName,
+                        $transitionConfiguration['schedule']['cron']
                     )
                 );
             }
@@ -63,14 +59,16 @@ class ProcessConfigurationGenerator
 
         return $processConfigurations;
     }
+
     /**
-     * @param array $transitionConfiguration
      * @param string $workflowName
+     * @param string $transitionName
+     * @param string $cronExpression
      * @return array
      */
-    private function createProcessConfiguration(array $transitionConfiguration, $workflowName)
+    private function createProcessConfiguration($workflowName, $transitionName, $cronExpression)
     {
-        $processName = $this->generateScheduledTransitionProcessName($workflowName, $transitionConfiguration['name']);
+        $processName = $this->generateScheduledTransitionProcessName($workflowName, $transitionName);
 
         $definitionConfiguration = [
             $processName => [
@@ -80,7 +78,11 @@ class ProcessConfigurationGenerator
                 'exclude_definitions' => [$processName],
                 'actions_configuration' => [
                     '@run_action_group' => [
-                        'action_group' => ''
+                        'action_group' => 'oro_workflow_transition_process_schedule',
+                        'parameters' => [
+                            'workflowName' => $workflowName,
+                            'transitionName' => $transitionName
+                        ]
                     ]
                 ],
                 'pre_conditions' => []
@@ -88,7 +90,7 @@ class ProcessConfigurationGenerator
         ];
 
         $triggerConfiguration = [
-            $processName => [['cron' => $transitionConfiguration['schedule']['cron']]]
+            $processName => [['cron' => $cronExpression]]
         ];
 
         return [
@@ -96,7 +98,6 @@ class ProcessConfigurationGenerator
             ProcessConfigurationProvider::NODE_TRIGGERS => $triggerConfiguration
         ];
     }
-
 
     /**
      * @param WorkflowDefinition $workflowDefinition

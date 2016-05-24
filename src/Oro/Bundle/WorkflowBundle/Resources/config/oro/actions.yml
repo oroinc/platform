@@ -1,25 +1,23 @@
 action_groups:
     oro_workflow_transition_process_schedule:
         parameters:
-            steps:
-                type: array
-            entity_class:
+            workflowName:
                 type: string
-            transition:
-                type: Oro\Bundle\WorkflowBundle\Model\Transition
+            transitionName:
+                type: string
         actions:
             - '@call_service_method':
                 service: oro_workflow.transition.schedule_helper
                 method: getWorkflowItemIds
-                method_parameters: [$.steps, $.entity_class, $.transition.scheduleFilter]
+                method_parameters: [$.workflowName, $.transitionName]
                 attribute: $.workflowItemIds
             - '@foreach':
                 array: $.workflowItemIds
                 value: $.id
                 actions:
-                    - @create_job:
+                    - '@create_job':
                         command: 'oro:workflow:transit'
                         allow_duplicates: true
                         arguments:
                             '--workflow-item': $.id
-                            '--transition': $.transition.name
+                            '--transition': $.transitionName
