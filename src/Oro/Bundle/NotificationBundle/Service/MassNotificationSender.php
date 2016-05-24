@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\NotificationBundle\Service;
 
+use Psr\Log\LoggerInterface;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 
 class MassNotificationSender extends EmailNotificationProcessor
 {
-    
     /**
      * @param string            $subject
      * @param string            $body
      * @param string            $from
      * @param LoggerInterface   $logger
      */
-    public function send($subject, $body, $from = null, $logger = null)
+    public function send($subject, $body, $from = null, LoggerInterface $logger = null)
     {
         if (!$logger) {
             $logger = $this->logger;
@@ -24,10 +24,10 @@ class MassNotificationSender extends EmailNotificationProcessor
 
         foreach ($this->getRecepientEmails() as $email) {
             $message = \Swift_Message::newInstance()
-                        ->setSubject($subject)
-                        ->setFrom($senderEmail, $senderName)
-                        ->setTo($email)
-                        ->setBody($body);
+                            ->setSubject($subject)
+                            ->setFrom($senderEmail, $senderName)
+                            ->setTo($email)
+                            ->setBody($body);
 
             $this->mailer->send($message);
         }

@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass;
+use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 
 class OroNotificationBundle extends Bundle
 {
@@ -18,7 +19,8 @@ class OroNotificationBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new TwigSandboxConfigurationPass());
         $container->addCompilerPass(new NotificationHandlerPass());
         $container->addCompilerPass(new EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
-}
+}   
