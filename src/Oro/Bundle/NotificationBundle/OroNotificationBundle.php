@@ -18,8 +18,7 @@ class OroNotificationBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-
-        $container->addCompilerPass(new TwigSandboxConfigurationPass());
+        
         $container->addCompilerPass(new NotificationHandlerPass());
         $container->addCompilerPass(new EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
