@@ -18,10 +18,9 @@ class SetOwnerForEmailTemplatesQuery extends ParametrizedSqlMigrationQuery
     {
         $qb = $this->connection->createQueryBuilder()
             ->update('oro_email_template')
-            ->set('user_owner_id', '(' . $this->getAdminUserQuery() . ')')
-            ->setParameter('role', User::ROLE_ADMINISTRATOR, Type::STRING);
+            ->set('user_owner_id', '(' . $this->getAdminUserQuery() . ')');
 
-        $this->addSql($qb);
+        $this->addSql($qb->getSQL(), ['role' => User::ROLE_ADMINISTRATOR], ['role' => Type::STRING]);
 
         parent::processQueries($logger, $dryRun);
     }

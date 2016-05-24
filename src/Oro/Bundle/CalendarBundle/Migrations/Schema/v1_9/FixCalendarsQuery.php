@@ -4,8 +4,6 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_9;
 
 use Psr\Log\LoggerInterface;
 
-use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class FixCalendarsQuery extends ParametrizedMigrationQuery
@@ -49,9 +47,10 @@ class FixCalendarsQuery extends ParametrizedMigrationQuery
             }
         }
 
+
         // remove calendars
         // as long as calendar events are also duplicated in all calendars there is no need to take care about them
-        $types = ['id' => TYPE::INTEGER];
+        $types = ['id' => \Doctrine\DBAL\Connection::PARAM_INT_ARRAY];
         $batches = array_chunk($calendarsForDeletion, 1000);
         foreach ($batches as $batch) {
             $params = ['id' => $batch];
