@@ -41,24 +41,66 @@ The **OroLayoutBundle** introduces a set of block types that allow to easily bui
 
 | Type name | Type class | Default HTML output |
 |-----------|------------|-------------|
-| `root` | [RootType.php](../../Layout/Block/Type/RootType.php) | `<html>` |
-| `head` | [HeadType.php](../../Layout/Block/Type/HeadType.php) | `<head>` |
+| `root` | | `<html>` |
+| `head` | | `<head>` |
 | `title` | [TitleType.php](../../Layout/Block/Type/TitleType.php) | `<title>` |
 | `meta` | [MetaType.php](../../Layout/Block/Type/MetaType.php) | `<meta>` |
 | `style` | [StyleType.php](../../Layout/Block/Type/StyleType.php) | `<style>` with content or `<link>` with external resource |
 | `script` | [ScriptType.php](../../Layout/Block/Type/ScriptType.php) | `<script>` |
 | `external_resource` | [ExternalResourceType.php](../../Layout/Block/Type/ExternalResourceType.php) | `<link>` |
-| `body` | [BodyType.php](../../Layout/Block/Type/BodyType.php) | `<body>` |
+| `body` | | `<body>` |
 | `form_start` | [FormStartType.php](../../Layout/Block/Type/FormStartType.php) | `<form>` |
 | `form_end` | [FormEndType.php](../../Layout/Block/Type/FormEndType.php) | `</form>` |
 | `form` | [FormType.php](../../Layout/Block/Type/FormType.php) | Adds form fields based on the Symfony form |
 | `form_field` | [FormFieldType.php](../../Layout/Block/Type/FormFieldType.php) |  Block will be rendered differently depending on the field type of the Symfony form |
-| `fieldset` | [FieldsetType.php](../../Layout/Block/Type/FieldsetType.php) | `<fieldset>` |
+| `fieldset` | | `<fieldset>` |
 | `link` | [LinkType.php](../../Layout/Block/Type/LinkType.php) | `<a>` |
-| `list` | [ListType.php](../../Layout/Block/Type/ListType.php) | `<ul>` |
+| `list` | | `<ul>` |
 | `ordered_list` | [OrderedListType.php](../../Layout/Block/Type/OrderedListType.php) | `<ol>` |
-| `list_item` | [ListItemType.php](../../Layout/Block/Type/ListItemType.php) | `<li>`, this block type can be used if you want to control rendering of `li` tag and its attributes |
-| `text` | [TextType.php](../../Layout/Block/Type/TextType.php) | Text node |
+| `list_item` | | `<li>`, this block type can be used if you want to control rendering of `li` tag and its attributes |
+| `text` | | Text node |
 | `input` | [InputType.php](../../Layout/Block/Type/InputType.php) | Input node |
-| `button` | [ButtonType.php](../../Layout/Block/Type/ButtonType.php) | `<button>` or `<input type="submit/reset/button">` |
-| `button_group` | [ButtonGroupType.php](../../Layout/Block/Type/ButtonGroupType.php) | Nothing, this is just a logical grouping of buttons. You can define how to render the button group in your application |
+| `button` | | `<button>` or `<input type="submit/reset/button">` |
+| `button_group` | | Nothing, this is just a logical grouping of buttons. You can define how to render the button group in your application |
+
+You can create custom block type by providing DI configuration for it. See below examples.
+
+Simple block type:
+```yaml
+services:
+    acme_demo.block_type.datetime:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptions, [{datetime: {required: true}, format: {default: 'd-m-Y'}}]]
+            - [setName, ['datetime']]
+        tags:
+             - { name: layout.block_type, alias: datetime }
+```
+
+Container block type:
+```yaml
+services:
+    acme_demo.block_type.sidebar:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['sidebar']]
+        tags:
+             - { name: layout.block_type, alias: sidebar }
+```
+
+Block type inherited from "text" type:
+```yaml
+services:
+    acme_demo.block_type.title:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptions, [{level: {default: 1}}]]
+            - [setName, ['title']]
+            - [setParent, ['text']]
+        tags:
+             - { name: layout.block_type, alias: title }
+```
+
+If you want to create block type with custom properties mapping extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType` or implement `Oro\Component\Layout\BlockTypeInterface`.
+
+It's recomended to place custom block types configuration to `Resource\config\block_type.yml` file in your bundle.
