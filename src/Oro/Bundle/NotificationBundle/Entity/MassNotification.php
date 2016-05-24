@@ -17,19 +17,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
+ *              "permissions"="VIEW",
  *              "group_name"=""
- *          },
- *          "note"={
- *              "immutable"=true
- *          },
- *          "comment"={
- *              "immutable"=true
- *          },
- *          "activity"={
- *              "immutable"=true
- *          },
- *          "attachment"={
- *              "immutable"=true
  *          }
  *      }
  * )
@@ -51,6 +40,13 @@ class MassNotification
      * @ORM\Column(name="email", type="string", length=255)
      */
     protected $email;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="from", type="string", length=255)
+     */
+    protected $from;
 
     /**
      * @var string
@@ -101,6 +97,14 @@ class MassNotification
     {
         return $this->id;
     }
+    
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
 
     /**
      * @param string $email
@@ -112,13 +116,21 @@ class MassNotification
 
         return $this;
     }
-
+    
     /**
      * @return string
      */
-    public function getEmail()
+    public function getFrom()
     {
-        return $this->email;
+        return $this->from;
+    }
+
+    /**
+     * @param string $from
+     */
+    public function setFrom($from)
+    {
+        $this->from = $from;
     }
 
     /**

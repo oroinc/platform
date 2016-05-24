@@ -46,11 +46,13 @@ oro:
             entity_plural_label:  Mass Notifications
             entity_description:   Represent mass email notifications
             title.label:          Title
+            from.label:           From
             body.label:           Body
             email.label:          Email
             status.label:         Status
             scheduled_at.label:   Scheduled At
             processed_at.label:   Processed At
+            action:               View Mass Notifications
 
         system_configuration:
             email_notification_sender_email: Sender Email

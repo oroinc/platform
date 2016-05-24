@@ -9,6 +9,7 @@ datagrid:
                 select:
                     - e.title
                     - e.email
+                    - e.from
                     - e.body
                     - e.status
                     - e.scheduledAt
@@ -19,6 +20,9 @@ datagrid:
         columns:
             title:
                 label: oro.notification.massnotification.title.label
+                frontend_type: string
+            from:
+                label: oro.notification.massnotification.from.label
                 frontend_type: string
             email:
                 label: oro.notification.massnotification.email.label
@@ -57,9 +61,9 @@ datagrid:
                 email:
                     type: string
                     data_name: email
-                title:
+                from:
                     type: string
-                    data_name: title
+                    data_name: from
                 scheduledAt:
                     type: datetime
                     data_name: scheduledAt
