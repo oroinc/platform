@@ -61,7 +61,7 @@ define(function(require) {
      *
      * Please find support code in ../datagrid/row.js
      */
-    Backgrid.Cell.prototype.simplifiedEventBinding = true;
+    Backgrid.Cell.simplifiedEventBinding = true;
     Backgrid.Cell.prototype.delegateEvents = _.noop;
     Backgrid.Cell.prototype.undelegateEvents = _.noop;
 
