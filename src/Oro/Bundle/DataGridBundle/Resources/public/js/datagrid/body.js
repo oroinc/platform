@@ -44,6 +44,9 @@ define([
                 this.rowClassName = opts.rowClassName;
             }
 
+            this.columns = options.columns;
+            this.filteredColumns = options.filteredColumns;
+
             this.backgridInitialize(opts);
         },
 
@@ -53,8 +56,6 @@ define([
          * @param {Object} options
          */
         backgridInitialize: function(options) {
-            this.columns = options.columns;
-
             this.row = options.row || Row;
             this.createRows();
 
@@ -82,12 +83,15 @@ define([
             });
             delete this.rows;
             delete this.columns;
+            delete this.filteredColumns;
+
             Body.__super__.dispose.call(this);
         },
 
         createRows: function() {
             this.rows = this.collection.map(function(model) {
                 var rowOptions = {
+                    collection: this.filteredColumns,
                     columns: this.columns,
                     model: model
                 };
