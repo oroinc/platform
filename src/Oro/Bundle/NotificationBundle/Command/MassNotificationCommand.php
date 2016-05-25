@@ -52,15 +52,10 @@ class MassNotificationCommand extends ContainerAwareCommand
     {
         $output->writeln($this->getDescription());
         
-        $sender = $this->getContainer()->get('oro_notification.mass_notification_sender');
-        
-        $result = $sender->send($input->getArgument('title'), $input->getArgument('body'));
+        $sender = $this->getContainer()->get('oro_notification.mass_notification_processor');
 
-        if($result) {
-            $output->writeln('Completed');
-        } else {
-            $output->writeln('Error');
-        }
+        $sender->send($input->getArgument('title'), $input->getArgument('body'));
 
+        $output->writeln('Completed');
     }
 }

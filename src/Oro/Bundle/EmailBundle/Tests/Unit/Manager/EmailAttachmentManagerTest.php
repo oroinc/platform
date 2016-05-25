@@ -58,6 +58,9 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $kernel;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $router;
+
     /**
      * @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -126,6 +129,10 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRootDir')
             ->willReturn('');
 
+        $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -171,6 +178,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
                     $this->em,
                     $this->kernel,
                     $this->securityFacadeLink,
+                    $this->router,
                     $this->configFileValidator,
                     $this->attachmentAssociationHelper
                 ]
@@ -234,6 +242,23 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
     }
 
+    public function testGetResizedImageUrl()
+    {
+        $emailAttachment = $this->getEmailAttachment();
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'oro_resize_email_attachment',
+                [
+                    'width' => 100,
+                    'height' => 50,
+                    'id' => 1,
+                ]
+            );
+        $this->emailAttachmentManager->getResizedImageUrl($emailAttachment, 100, 50);
+    }
+
     protected function getContentMock()
     {
         $content = $this->getMockBuilder('\stdClass')
@@ -252,12 +277,15 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
     protected function getEmailAttachment()
     {
         $emailAttachment = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailAttachment')
-            ->setMethods(['getContent', 'setFile', 'getFile'])
+            ->setMethods(['getContent', 'setFile', 'getFile', 'getId'])
             ->disableOriginalConstructor()
             ->getMock();
         $emailAttachment->expects($this->any())
             ->method('getContent')
             ->will($this->returnValue($this->getContentMock()));
+        $emailAttachment->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(1));
 
         return $emailAttachment;
     }
