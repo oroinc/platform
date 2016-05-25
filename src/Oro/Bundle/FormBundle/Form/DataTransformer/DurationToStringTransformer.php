@@ -41,8 +41,9 @@ class DurationToStringTransformer implements DataTransformerInterface
         try {
             $dateInterval = new \DateInterval('PT' . (int) $value . 'S');
             // since \DateInterval does not handle carryovers, we need to use \DateTime::diff
-            $dateTime = new \DateTimeImmutable();
-            $timeInterval = $dateTime->diff($dateTime->add($dateInterval));
+            $dateTime = new \DateTime();
+            $dateTimeDiff = clone $dateTime;
+            $timeInterval = $dateTimeDiff->diff($dateTime->add($dateInterval));
         } catch (\Exception $e) {
             throw new TransformationFailedException('Duration too long to convert.');
         }
