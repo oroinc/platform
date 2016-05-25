@@ -11,16 +11,16 @@ use Oro\Bundle\WorkflowBundle\Generator\TriggerScheduleOptionsVerifier;
 class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var TriggerScheduleOptionsVerifier|\PHPUnit_Framework_MockObject_MockObject */
-    private $verifier;
+    protected $verifier;
 
     /** @var string */
-    private $workflowItemEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem';
+    protected $workflowItemEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem';
 
     /** @var ProcessConfigurationGenerator */
-    private $generator;
+    protected $generator;
 
     /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */
-    private $workflowDefinition;
+    protected $workflowDefinition;
 
     protected function setUp()
     {

@@ -21,7 +21,7 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
         $stepThree = new Step();
         $stepThree->setName('step3');
         $stepThree->setOrder(3);
-        $steps = new ArrayCollection(array($stepTwo, $stepOne, $stepThree));
+        $steps = new ArrayCollection([$stepTwo, $stepOne, $stepThree]);
 
         $stepManager = new StepManager($steps);
         $ordered = $stepManager->getOrderedSteps();
@@ -43,17 +43,17 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
         $stepTwo = $this->getStepMock('step2');
 
         $stepManager = new StepManager();
-        $stepManager->setSteps(array($stepOne, $stepTwo));
+        $stepManager->setSteps([$stepOne, $stepTwo]);
         $steps = $stepManager->getSteps();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $steps);
-        $expected = array('step1' => $stepOne, 'step2' => $stepTwo);
+        $expected = ['step1' => $stepOne, 'step2' => $stepTwo];
         $this->assertEquals($expected, $steps->toArray());
 
-        $stepsCollection = new ArrayCollection(array('step1' => $stepOne, 'step2' => $stepTwo));
+        $stepsCollection = new ArrayCollection(['step1' => $stepOne, 'step2' => $stepTwo]);
         $stepManager->setSteps($stepsCollection);
         $steps = $stepManager->getSteps();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $steps);
-        $expected = array('step1' => $stepOne, 'step2' => $stepTwo);
+        $expected = ['step1' => $stepOne, 'step2' => $stepTwo];
         $this->assertEquals($expected, $steps->toArray());
     }
 
@@ -62,7 +62,7 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
         $step1 = $this->getStepMock('step1');
         $step2 = $this->getStepMock('step2');
 
-        $steps = new ArrayCollection(array($step1, $step2));
+        $steps = new ArrayCollection([$step1, $step2]);
         $stepManager = new StepManager($steps);
 
         $this->assertEquals($step1, $stepManager->getStep('step1'));
@@ -88,12 +88,31 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
         $startStep = new Step();
         $startStep->setName($testStartStep);
 
-        $stepManager = new StepManager(array($startStep));
+        $stepManager = new StepManager([$startStep]);
         $this->assertNull($stepManager->getStartStep());
         $this->assertFalse($stepManager->hasStartStep());
 
         $stepManager->setStartStepName($testStartStep);
         $this->assertEquals($startStep, $stepManager->getStartStep());
         $this->assertTrue($stepManager->hasStartStep());
+    }
+
+    public function testGetRelatedTransitionSteps()
+    {
+        $step1 = new Step();
+        $step1->setName('step1');
+        $step1->setAllowedTransitions(['transitionA']);
+        $step2 = new Step();
+        $step2->setName('step2');
+        $step2->setAllowedTransitions(['transitionC', 'transitionA']);
+        $step3 = new Step();
+        $step3->setName('step3');
+        $step3->setAllowedTransitions(['transitionC']);
+
+        $stepManager = new StepManager([$step1, $step2, $step3]);
+
+        $steps = $stepManager->getRelatedTransitionSteps('transitionA');
+
+        $this->assertEquals([$step1, $step2], $steps->getValues());
     }
 }

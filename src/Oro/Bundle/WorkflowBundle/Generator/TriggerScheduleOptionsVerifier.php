@@ -37,15 +37,14 @@ class TriggerScheduleOptionsVerifier
      */
     public function verify(array $options, WorkflowDefinition $workflowDefinition, $transitionName)
     {
-        $this->verifyOptions($options);
+        $this->validateOptions($options);
 
-        $options = $this->prepareExpressions($options, $workflowDefinition, $transitionName);
-
-        foreach ($this->optionVerifiers as $optionName => $optionVerifiers) {
-
-            foreach ($optionVerifiers as $verifier) {
-                /** @var ExpressionVerifierInterface $verifier */
-                $verifier->verify($options[$optionName]);
+        foreach ($this->prepareExpressions($options, $workflowDefinition, $transitionName) as $optionName => $value) {
+            if (array_key_exists($optionName, $this->optionVerifiers)) {
+                foreach ($this->optionVerifiers[$optionName] as $verifier) {
+                    /** @var ExpressionVerifierInterface $verifier */
+                    $verifier->verify($value);
+                }
             }
         }
     }
@@ -60,18 +59,16 @@ class TriggerScheduleOptionsVerifier
             $this->optionVerifiers[$option] = [];
         }
 
-        $this->optionVerifiers[] = $verifier;
+        $this->optionVerifiers[$option][] = $verifier;
     }
 
-    private function verifyOptions($expression)
+    /**
+     * @param array $options
+     * @throws \InvalidArgumentException
+     */
+    private function validateOptions(array $options)
     {
-        if (!is_array($expression) || $expression instanceof \ArrayAccess) {
-            throw new \InvalidArgumentException(
-                'Schedule options must be an array or implement interface \ArrayAccess'
-            );
-        }
-
-        if (!isset($expression['cron'])) {
+        if (!isset($options['cron'])) {
             throw new \InvalidArgumentException(
                 'Option "cron" is REQUIRED for transition schedule.'
             );
@@ -90,10 +87,8 @@ class TriggerScheduleOptionsVerifier
             $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
 
             $steps = [];
-            foreach ($workflow->getStepManager()->getSteps() as $step) {
-                if (in_array($transitionName, $step->getAllowedTransitions(), true)) {
-                    $steps[] = $step->getName();
-                }
+            foreach ($workflow->getStepManager()->getRelatedTransitionSteps($transitionName) as $step) {
+                $steps[] = $step->getName();
             }
 
             $query = $this->transitionScheduleHelper->createQuery(
@@ -103,8 +98,6 @@ class TriggerScheduleOptionsVerifier
             );
 
             $options['filter'] = $query->getDQL();
-
-            return $options;
         }
 
         return $options;

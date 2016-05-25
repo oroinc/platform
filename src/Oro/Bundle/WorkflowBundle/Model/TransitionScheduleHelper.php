@@ -54,11 +54,10 @@ class TransitionScheduleHelper
     private function getRelatedSteps(StepManager $stepManager, $transitionName)
     {
         $relatedSteps = [];
-        foreach ($stepManager->getSteps() as $step) {
-            if (in_array($transitionName, $step->getAllowedTransitions(), true)) {
-                $relatedSteps[] = $step->getName();
-            }
+        foreach ($stepManager->getRelatedTransitionSteps($transitionName) as $step) {
+            $relatedSteps[] = $step->getName();
         }
+
         return $relatedSteps;
     }
 
