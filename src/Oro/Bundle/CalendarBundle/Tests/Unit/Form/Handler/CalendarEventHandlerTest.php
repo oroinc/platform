@@ -113,7 +113,7 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function testProcessWithException2()
+    public function testProcessWithExceptionWithParent()
     {
         $this->entity->setParent(new CalendarEvent());
         $this->handler->process($this->entity);

@@ -96,7 +96,6 @@ SET
         WHERE
             ce.related_attendee = a.id
     );
-ALTER TABLE oro_calendar_event DROP COLUMN IF EXISTS invitation_status;
 SQL;
         $connection->executeQuery($query);
     }

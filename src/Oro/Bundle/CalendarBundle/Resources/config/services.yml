@@ -137,9 +137,6 @@ services:
     oro_calendar.attendee_manager:
         class: %oro_calendar.attendee_manager.class%
         arguments:
-            - @=service('oro_form.autocomplete.search_registry').getSearchHandler('organization_all_users')
-            - @oro_calendar.users_to_attendees.transformer
-            - @oro_security.security_facade
             - @oro_entity.doctrine_helper
 
     oro_calendar.calendar_property_provider:
