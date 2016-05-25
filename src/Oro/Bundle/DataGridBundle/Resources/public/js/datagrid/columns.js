@@ -3,15 +3,15 @@ define(function(require) {
 
     var GridColumns;
     var Backgrid = require('backgrid');
-    var SimplifiedEventList = require('./simplified-event-list');
+    var CellEventList = require('./cell-event-list');
 
     GridColumns = Backgrid.Columns.extend({
         comparator: 'order',
-        getSimplifiedEventList: function() {
-            if (!this.simplifiedEventList) {
-                this.simplifiedEventList = new SimplifiedEventList(this);
+        getCellEventList: function() {
+            if (!this.cellEventList) {
+                this.cellEventList = new CellEventList(this);
             }
-            return this.simplifiedEventList;
+            return this.cellEventList;
         }
     });
 

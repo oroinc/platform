@@ -84,7 +84,7 @@ define([
             }
 
             // code related to simplified event binding
-            this.simplifiedEvents = this.collection.getSimplifiedEventList();
+            this.simplifiedEvents = this.collection.getCellEventList();
             this.listenTo(this.simplifiedEvents, 'change', this.delegateEvents);
 
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
