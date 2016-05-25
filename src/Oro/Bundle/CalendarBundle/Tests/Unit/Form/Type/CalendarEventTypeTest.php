@@ -118,7 +118,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'attendees',
-                'oro_calendar_event_attendees',
+                'oro_calendar_event_attendees_select',
                 [
                     'required' => false,
                     'label' => 'oro.calendar.calendarevent.attendees.label',
