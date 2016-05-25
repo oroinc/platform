@@ -70,7 +70,9 @@ define([
                 return;
             }
             this.row.dispose();
+            delete this.row;
             delete this.columns;
+            delete this.filteredColumns;
             Header.__super__.dispose.apply(this, arguments);
         }
     });
