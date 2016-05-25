@@ -241,6 +241,10 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $repo = $this->registry
+            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE));
+
+
         $typeEnum = $this->registry
             ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE))
             ->find($type);

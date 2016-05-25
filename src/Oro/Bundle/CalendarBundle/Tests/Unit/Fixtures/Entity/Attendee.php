@@ -11,6 +11,7 @@ class Attendee extends BaseAttendee
 {
     protected $status;
     protected $origin;
+    protected $type;
 
     public function __construct($id = null)
     {
@@ -36,5 +37,15 @@ class Attendee extends BaseAttendee
     public function getOrigin()
     {
         return $this->origin;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
     }
 }
