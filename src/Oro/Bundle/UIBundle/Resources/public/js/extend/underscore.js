@@ -1,4 +1,4 @@
-define(['underscore'], function(_) {
+define(['underscore', 'asap'], function(_, asap) {
     'use strict';
 
     _.mixin({
@@ -43,6 +43,8 @@ define(['underscore'], function(_) {
             }
         }
     });
+
+    _.defer = asap;
 
     return _;
 });
