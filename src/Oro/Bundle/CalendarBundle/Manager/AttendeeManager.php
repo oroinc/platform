@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CalendarBundle\Manager;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
-use Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class AttendeeManager
@@ -26,9 +25,8 @@ class AttendeeManager
      */
     public function loadAttendeesByCalendarEventId($id)
     {
-        /** @var AttendeeRepository $attendeeRepository */
-        $attendeeRepository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Attendee');
-
-        return $attendeeRepository->getAttendeesByCalendarEventId($id);
+        return $this->doctrineHelper
+            ->getEntityRepository('OroCalendarBundle:Attendee')
+            ->getAttendeesByCalendarEventId($id);
     }
 }
