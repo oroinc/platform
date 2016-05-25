@@ -101,15 +101,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
                 $item = $event->getItem();
                 $text = $item['title'];
 
-                $result[] = json_encode(
-                    [
-                        'text' => $text,
-                        'id'   => json_encode([
-                            'entityClass' => ClassUtils::getClass($target),
-                            'entityId'    => $target->getId(),
-                        ])
-                    ]
-                );
+                $result[] = json_encode($this->getResult($text, $target));
             }
 
             $value = implode(';', $result);
@@ -166,5 +158,22 @@ class ContextsToViewTransformer implements DataTransformerInterface
         $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
+    }
+
+    /**
+     * @param string $text
+     * @param object $object
+     *
+     * @return array
+     */
+    protected function getResult($text, $object)
+    {
+        return [
+            'text' => $text,
+            'id'   => json_encode([
+                'entityClass' => ClassUtils::getClass($object),
+                'entityId'    => $object->getId(),
+            ])
+        ];
     }
 }

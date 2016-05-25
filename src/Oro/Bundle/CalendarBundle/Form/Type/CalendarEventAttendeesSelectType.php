@@ -84,7 +84,7 @@ class CalendarEventAttendeesSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['attr']['data-selected-data'] = $form->getViewData();
+        $view->vars['attr']['data-selected-data'] = $view->vars['value'];
     }
 
     /**
@@ -103,7 +103,7 @@ class CalendarEventAttendeesSelectType extends AbstractType
                 'minimumInputLength' => 0,
                 'route_name'         => 'oro_calendarevent_autocomplete_attendees',
                 'route_parameters'   => [
-                    'name' => 'name', // todo: check what name means
+                    'name' => 'name',
                 ],
             ],
         ]);

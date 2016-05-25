@@ -54,4 +54,15 @@ class ContextsToViewTransformer extends BaseTransformer
     {
         return null;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getResult($text, $object)
+    {
+        $result = parent::getResult($text, $object);
+        $result['hidden'] = !$object->getUser();
+
+        return $result;
+    }
 }

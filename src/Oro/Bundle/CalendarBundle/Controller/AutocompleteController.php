@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Validator\ConstraintViolation;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -24,7 +23,7 @@ class AutocompleteController extends Controller
      * @param string $activity The type of the activity entity.
      *
      * @return JsonResponse
-     * @throws HttpException|AccessDeniedHttpException
+     * @throws HttpException
      *
      * @Route("/attendees", name="oro_calendarevent_autocomplete_attendees")
      */
@@ -45,10 +44,6 @@ class AutocompleteController extends Controller
             foreach ($violations as $violation) {
                 $result['errors'][] = $violation->getMessage();
             }
-        }
-
-        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($autocompleteRequest->getName())) {
-            $result['errors'][] = 'Access denied.';
         }
 
         if (!empty($result['errors'])) {
