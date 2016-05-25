@@ -67,7 +67,7 @@ class TransitionScheduleHelper
      * @param string $dqlFilter optional dql WHERE clause
      * @return array|\Doctrine\ORM\Query
      */
-    public function createQuery(array $workflowSteps, $entityClass, $dqlFilter)
+    public function createQuery(array $workflowSteps, $entityClass, $dqlFilter = null)
     {
         if (!$workflowSteps) {
             return [];
