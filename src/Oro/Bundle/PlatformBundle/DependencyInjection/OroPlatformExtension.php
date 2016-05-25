@@ -62,7 +62,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         }
 
         // original security config has highest priority
-        if ($securityConfig) {
+        if ($securityConfig && $securityModified) {
             $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
         }
 
