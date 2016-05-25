@@ -349,7 +349,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
         $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with('OroCalendarBundle:CalendarEvent')
             ->will($this->returnValue($repo));
@@ -357,7 +357,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['getArrayResult'])
             ->getMockForAbstractClass();
-        $qb->expects($this->any())
+        $qb->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
         $arrayResultInc = 0;
@@ -366,7 +366,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                 ->method('getInvitedUsersByParentsQueryBuilder')
                 ->with($expectedParentEventIds)
                 ->will($this->returnValue($qb));
-            $query->expects($this->at($arrayResultInc++))
+            $query->expects($this->once())
                 ->method('getArrayResult')
                 ->will($this->returnValue($invitees));
         }

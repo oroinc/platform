@@ -96,7 +96,7 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
     protected function createStrategy($name)
     {
         $result = $this->getMock('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface');
-        $result->expects($this->any())
+        $result->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($name));
 
