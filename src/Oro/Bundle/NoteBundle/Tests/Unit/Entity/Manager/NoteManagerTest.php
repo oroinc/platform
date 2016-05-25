@@ -4,8 +4,9 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\NoteBundle\Entity\Note;;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
-use Oro\Bundle\NoteBundle\Tests\Unit\Stub\NoteStub;
+use Oro\Bundle\NoteBundle\Tests\Unit\Stub\AttachmentProviderStub;
 
 class NoteManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +26,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
     protected $attachmentManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $attachmentProvider;
+    protected $attachmentAssociationHelper;
 
     /** @var NoteManager */
     protected $manager;
@@ -44,19 +45,27 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->attachmentProvider  = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->attachmentManager  = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->attachmentAssociationHelper =
+            $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $attachmentProvider = new AttachmentProviderStub(
+            $this->em,
+            $this->attachmentAssociationHelper,
+            $this->attachmentManager
+        );
 
         $this->manager = new NoteManager(
             $this->em,
             $this->securityFacade,
             $this->aclHelper,
             $this->entityNameResolver,
-            $this->attachmentProvider,
+            $attachmentProvider,
             $this->attachmentManager
         );
     }
@@ -118,7 +127,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
         $updatedBy->expects($this->once())->method('getId')->will($this->returnValue(100));
         $updatedBy->expects($this->once())->method('getAvatar')->will($this->returnValue(null));
 
-        $note = new NoteStub();
+        $note = new Note();
         $this->setId($note, 123);
         $note
             ->setMessage('test message')
