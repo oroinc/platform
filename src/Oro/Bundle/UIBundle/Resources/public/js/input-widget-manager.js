@@ -181,7 +181,12 @@ define(function(require) {
          * Finds and initializes all input widgets in container
          */
         seekAndCreateWidgetsInContainer: function($container) {
-            var foundElements = $container.find(this.getCompoundQuery());
+            var foundElements = $container.find(this.getCompoundQuery()).filter(
+                ':not(' +
+                (this.noWidgetSelector ? (this.noWidgetSelector + ',') : '') +
+                '[data-bound-input-widget], [data-page-component-module], [data-bound-component]' +
+                ')'
+            );
             this.create(foundElements);
             $container.data('attachedWidgetsCount',
                 ($container.data('attachedWidgetsCount') || 0) + foundElements.length);
