@@ -115,6 +115,7 @@ define([
                 clearTimeout(this.clickTimeout);
             }
             delete this.columns;
+            delete this.cells;
             Row.__super__.dispose.call(this);
         },
 

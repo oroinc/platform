@@ -48,6 +48,17 @@ define([
             }
             HeaderRow.__super__.initialize.apply(this, arguments);
             this.cells = this.subviews;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            delete this.cells;
+            HeaderRow.__super__.dispose.call(this);
         }
     });
 
