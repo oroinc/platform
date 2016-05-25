@@ -32,7 +32,7 @@ class CronExpressionVerifierTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException(get_class($exception), $exception->getMessage());
         }
 
-        $this->assertTrue(true, $this->verifier->verify($expression));
+        $this->assertTrue($this->verifier->verify($expression));
     }
 
     /**
