@@ -49,31 +49,11 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test_pattern', $this->extension->getRecurrenceTextValue(new Entity\Recurrence()));
     }
     
-    public function testGetRecurrenceAttributesTextValueWithNA()
+    public function testGetRecurrenceTextValueWithNA()
     {
         $this->translator->expects($this->once())
             ->method('trans')
             ->willReturn('N/A');
-        $this->assertEquals('N/A', $this->extension->getRecurrenceAttributesTextValue(null, []));
-    }
-
-    public function testGetRecurrenceAttributesTextValue()
-    {
-        $this->strategy->expects($this->once())
-            ->method('getTextValue')
-            ->willReturn('test_pattern');
-        $this->assertEquals(
-            'test_pattern',
-            $this->extension->getRecurrenceAttributesTextValue(
-                1,
-                [
-                    'recurrence_type' => 'daily',
-                    'interval' => 1,
-                    'start_time' => date(DATE_RFC3339),
-                    'end_time' => date(DATE_RFC3339),
-                    'occurrences' => 2,
-                ]
-            )
-        );
+        $this->assertEquals('N/A', $this->extension->getRecurrenceTextValue(null));
     }
 }

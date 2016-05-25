@@ -6,16 +6,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
-use Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class RecurrenceExtension extends \Twig_Extension
 {
     /** @var TranslatorInterface */
     protected $translator;
-
-    /** @var PropertyAccessor */
-    protected $propertyAccessor;
 
     /** @var Recurrence */
     protected $model;
@@ -44,47 +39,24 @@ class RecurrenceExtension extends \Twig_Extension
                 $this,
                 'getRecurrenceTextValue'
             ),
-            'get_recurrence_attributes_text_value' => new \Twig_Function_Method(
-                $this,
-                'getRecurrenceAttributesTextValue'
-            ),
         ];
     }
 
     /**
-     * @param Entity\Recurrence $recurrence
-     *
-     * @return string
-     */
-    public function getRecurrenceTextValue(Entity\Recurrence $recurrence)
-    {
-        return $this->model->getTextValue($recurrence);
-    }
-
-    /**
-     * @param null|int $id
-     * @param array $attributes
+     * @param null|Entity\Recurrence $recurrence
      *
      * @return string
      *
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
-     * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
-    public function getRecurrenceAttributesTextValue($id, array $attributes)
+    public function getRecurrenceTextValue(Entity\Recurrence $recurrence = null)
     {
-        if ($id === null) {
-            return $this->translator->trans('oro.calendar.calendarevent.recurrence.na');
-        }
-        $propertyAccessor = $this->getPropertyAccessor();
-        $recurrence = new Entity\Recurrence();
-        foreach ($attributes as $attr => $value) {
-            $propertyAccessor->setValue($recurrence, $attr, $value);
+        $textValue = $this->translator->trans('oro.calendar.calendarevent.recurrence.na');
+        if ($recurrence) {
+            $textValue = $this->model->getTextValue($recurrence);
         }
 
-        $this->model->validateRecurrence($recurrence);
-
-        return $this->getRecurrenceTextValue($recurrence);
+        return $textValue;
     }
 
     /**
@@ -93,17 +65,5 @@ class RecurrenceExtension extends \Twig_Extension
     public function getName()
     {
         return 'oro_recurrence';
-    }
-
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
-    {
-        if ($this->propertyAccessor === null) {
-            $this->propertyAccessor = new PropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
     }
 }

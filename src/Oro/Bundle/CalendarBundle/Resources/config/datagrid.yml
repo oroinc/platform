@@ -5,6 +5,7 @@ datagrid:
             type: orm
             query:
                 select:
+                    - partial event.{ id, recurrence }
                     - event.id
                     - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT(owner.firstName, ' ',owner.lastName) END, '') AS name
                     - event.title
@@ -14,16 +15,6 @@ datagrid:
                     - parent.id as parentId
                     - owner.id as ownerId
                     - COUNT(children.id) as childrenCount
-                    - recurrence.id as recurrenceId
-                    - recurrence.recurrenceType as recurrenceType
-                    - recurrence.interval as recurrenceInterval
-                    - recurrence.instance as recurrenceInstance
-                    - recurrence.dayOfWeek as recurrenceDayOfWeek
-                    - recurrence.dayOfMonth as recurrenceDayOfMonth
-                    - recurrence.monthOfYear as recurrenceMonthOfYear
-                    - recurrence.startTime as recurrenceStartTime
-                    - recurrence.endTime as recurrenceEndTime
-                    - recurrence.occurrences as recurrenceOccurrences
                     - (CASE WHEN (recurrence.id IS NULL) THEN false ELSE true END) as is_recurrent
                 from:
                     - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
@@ -59,10 +50,10 @@ datagrid:
             is_recurrent:
                 label: oro.calendar.calendarevent.recurrence.alias.recurrent
                 frontend_type: boolean
-            recurrencePattern:
+            recurrence:
                 label: oro.calendar.calendarevent.recurrence.pattern
                 type: twig
-                template: OroCalendarBundle:CalendarEvent:Datagrid/Property/recurrencePattern.html.twig
+                template: OroCalendarBundle:CalendarEvent:Datagrid/Property/recurrence.html.twig
                 frontend_type: html
             invitationStatus:
                 label: oro.calendar.calendarevent.invitation_status.label
