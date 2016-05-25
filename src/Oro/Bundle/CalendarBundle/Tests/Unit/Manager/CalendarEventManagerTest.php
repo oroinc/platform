@@ -307,7 +307,7 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\CalendarBundle\Exception\RelatedAttendeeNotFoundException
+     * @expectedException \Oro\Bundle\CalendarBundle\Exception\CalendarEventRelatedAttendeeNotFoundException
      * @expectedExceptionMessage Calendar event does not have relatedAttendee
      */
     public function testChangeStatusWithEmptyRelatedAttendee()

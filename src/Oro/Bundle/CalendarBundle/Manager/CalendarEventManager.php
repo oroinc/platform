@@ -8,7 +8,7 @@ use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
-use Oro\Bundle\CalendarBundle\Exception\RelatedAttendeeNotFoundException;
+use Oro\Bundle\CalendarBundle\Exception\CalendarEventRelatedAttendeeNotFoundException;
 use Oro\Bundle\CalendarBundle\Exception\StatusNotFoundException;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -72,16 +72,16 @@ class CalendarEventManager
      * @param CalendarEvent $event
      * @param string $newStatus
      *
-     * @throws RelatedAttendeeNotFoundException
+     * @throws CalendarEventRelatedAttendeeNotFoundException
      * @throws StatusNotFoundException
      */
     public function changeStatus(CalendarEvent $event, $newStatus)
     {
         $relatedAttendee = $event->getRelatedAttendee();
         if (!$relatedAttendee) {
-            throw new RelatedAttendeeNotFoundException('Calendar event does not have relatedAttendee');
+            throw new CalendarEventRelatedAttendeeNotFoundException();
         }
-
+//related to: https://github.com/laboro/platform/pull/7530#discussion-diff-64249164R82 how it should be renamed? "RelatedAttendeeNotFoundForCalendarEventException"?
         $statusEnum = $this->doctrineHelper
             ->getEntityRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
             ->find($newStatus);
