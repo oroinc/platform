@@ -10,18 +10,14 @@ use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException
 class CronExpressionVerifier implements ExpressionVerifierInterface
 {
     /**
-     * @param mixed $expression
-     *
-     * @throws ExpressionException
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function verify($expression)
     {
         try {
             CronExpression::factory($expression, new FieldFactory());
 
-            return $expression;
+            return true;
         } catch (\InvalidArgumentException $e) {
             throw new ExpressionException($e->getMessage());
         }

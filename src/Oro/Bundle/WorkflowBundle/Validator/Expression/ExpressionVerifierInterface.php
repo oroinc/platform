@@ -7,11 +7,11 @@ use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException
 interface ExpressionVerifierInterface
 {
     /**
-     * @param mixed $expression
+     * @param string $expression
      *
      * @throws ExpressionException
      *
-     * @return mixed
+     * @return bool
      */
     public function verify($expression);
 }
