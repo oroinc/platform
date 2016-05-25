@@ -366,7 +366,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                 ->method('getInvitedUsersByParentsQueryBuilder')
                 ->with($expectedParentEventIds)
                 ->will($this->returnValue($qb));
-            $query->expects($this->at($arrayResultInc++))
+            $query->expects($this->once())
                 ->method('getArrayResult')
                 ->will($this->returnValue($invitees));
         }

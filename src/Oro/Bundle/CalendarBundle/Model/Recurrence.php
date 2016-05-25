@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CalendarBundle\Model;
 
 use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\CalendarBundle\Entity;
@@ -111,32 +110,6 @@ class Recurrence
         self::DAY_SATURDAY,
         self::DAY_SUNDAY,
     ];
-
-    /**
-     * Validates recurrence entity according to its validation rules.
-     *
-     * @param Entity\Recurrence $recurrence
-     *
-     * @return self
-     *
-     * @throws \RuntimeException
-     */
-    public function validateRecurrence(Entity\Recurrence $recurrence)
-    {
-        $errors = $this->validator->validate($recurrence);
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            /** @var ConstraintViolation $error */
-            foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
-            }
-
-            throw new \RuntimeException('Recurrence is invalid: ' . json_encode($errorMessages));
-        }
-
-        return $this;
-    }
 
     /**
      * @param Entity\Recurrence $recurrence
