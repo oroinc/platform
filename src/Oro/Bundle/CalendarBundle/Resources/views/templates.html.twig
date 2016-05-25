@@ -19,7 +19,7 @@
     </div>
 </script>
 
-{% import 'OroCalendarBundle::recurring-event.html.twig' as recurringEvent %}
+{% import 'OroCalendarBundle::recurringEvent.html.twig' as recurringEvent %}
 {{ recurringEvent.generateRecurrentEventNotifierTemplate() }}
 
 <script type="text/html" id="{{ id }}">
@@ -67,7 +67,7 @@
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
-    {% import 'OroCalendarBundle::recurring-event.html.twig' as recurringEvent %}
+    {% import 'OroCalendarBundle::recurringEvent.html.twig' as recurringEvent %}
     {% set data = [
             form_row(form.title),
             form_row(form.description),
