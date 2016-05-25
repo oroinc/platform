@@ -1,4 +1,4 @@
-define(['ororequirejs/lib/asap/asap'], function(asap) {
+define(['asap'], function(asap) {
     'use strict';
 
     requirejs.nextTick = asap;

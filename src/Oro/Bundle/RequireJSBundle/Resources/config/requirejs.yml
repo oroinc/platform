@@ -1,6 +1,7 @@
 config:
     shim:
-        'ororequirejs/lib/asap/asap':
+        'asap':
             exports: 'asap'
     paths:
-        'asap': 'bundles/ororequirejs/js/asap.js'
+        'asap': 'bundles/ororequirejs/lib/asap/asap.js'
+        'requirejs-asap-init': 'bundles/ororequirejs/js/requirejs-asap-init.js'
