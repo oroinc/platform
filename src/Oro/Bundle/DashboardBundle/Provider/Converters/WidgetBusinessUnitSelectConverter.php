@@ -83,7 +83,6 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
         $queryBuilder = $this->businessUnitRepository->createQueryBuilder('businessUnit');
 
         if ($aclClass && $aclPermission) {
-
             $businessUnitIds = $this
                 ->businessUnitAclProvider
                 ->getBusinessUnitIds($aclClass, $aclPermission);

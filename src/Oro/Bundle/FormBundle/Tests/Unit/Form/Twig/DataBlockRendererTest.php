@@ -38,7 +38,8 @@ class DataBlockRendererTest extends \PHPUnit_Framework_TestCase
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,
-                    'useSpan'     => true
+                    'useSpan'     => true,
+                    'tooltip'     => null
                 ),
             ),
             'description' => null
@@ -52,14 +53,16 @@ class DataBlockRendererTest extends \PHPUnit_Framework_TestCase
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,
-                    'useSpan'     => true
+                    'useSpan'     => true,
+                    'tooltip'     => null
                 ),
                 1 => array(
                     'code'        => 'second',
                     'title'       => 'Second SubBlock',
                     'data'        => array(null),
                     'description' => null,
-                    'useSpan'     => true
+                    'useSpan'     => true,
+                    'tooltip'     => null
                 ),
             ),
             'description' => 'some desc'
@@ -73,14 +76,16 @@ class DataBlockRendererTest extends \PHPUnit_Framework_TestCase
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,
-                    'useSpan'     => true
+                    'useSpan'     => true,
+                    'tooltip'     => null
                 ),
                 1 => array(
                     'code'        => 'first',
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,
-                    'useSpan'     => true
+                    'useSpan'     => true,
+                    'tooltip'     => null
                 ),
             ),
             'description' => null
