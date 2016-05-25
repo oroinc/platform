@@ -220,7 +220,8 @@ class ChildEventsSubscriber implements EventSubscriberInterface
      * @param Attendee|null $attendee
      * @param string        $status
      */
-    protected function setDefaultAttendeeStatus(Attendee $attendee = null, $status = CalendarEvent::STATUS_NONE) {
+    protected function setDefaultAttendeeStatus(Attendee $attendee = null, $status = CalendarEvent::STATUS_NONE)
+    {
         if (!$attendee || $attendee->getStatus()) {
             return;
         }
