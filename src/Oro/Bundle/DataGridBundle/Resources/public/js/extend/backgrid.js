@@ -5,6 +5,11 @@ define(function(require) {
     var Backgrid = require('orodatagrid/lib/backgrid/backgrid');
 
     /**
+     * Cells should be removed durung dispose cycle
+     */
+    Backgrid.Cell.prototype.keepElement = false;
+
+    /**
      * Copied from backgrid. Removed unused in our project code which slow downs rendering
      */
     Backgrid.Cell.prototype.initialize = function(options) {

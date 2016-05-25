@@ -18,7 +18,7 @@ define([
         var _len;
         var _len1;
         var _ref;
-        if (this.disposed) {
+        if (this.disposed || !this.$el) {
             return;
         }
 
@@ -33,7 +33,13 @@ define([
         Backbone.mediator.unsubscribe(null, null, this);
         this.off();
         this.stopListening();
-        this.$el.remove();
+
+        if (this.keepElement === false) {
+            this.$el.remove();
+        } else {
+            this.undelegateEvents();
+            this.$el.removeData();
+        }
 
         properties = ['el', '$el', 'options', 'model', 'collection', 'subviews', 'subviewsByName', '_callbacks'];
         for (_j = 0, _len1 = properties.length; _j < _len1; _j++) {
