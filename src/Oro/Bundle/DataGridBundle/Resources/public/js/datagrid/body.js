@@ -2,9 +2,8 @@ define([
     'underscore',
     'backgrid',
     './row',
-    '../pageable-collection',
-    './util'
-], function(_, Backgrid, Row, PageableCollection, util) {
+    '../pageable-collection'
+], function(_, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -46,7 +45,7 @@ define([
             }
 
             this.columns = options.columns;
-            this.filteredColumns = util.createFilteredColumnCollection(this.columns);
+            this.filteredColumns = options.filteredColumns;
 
             this.backgridInitialize(opts);
         },
@@ -84,8 +83,6 @@ define([
             });
             delete this.rows;
             delete this.columns;
-
-            this.filteredColumns.dispose();
             delete this.filteredColumns;
 
             Body.__super__.dispose.call(this);

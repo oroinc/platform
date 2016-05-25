@@ -30,6 +30,8 @@ define([
         /** @property {Boolean} */
         allowNoSorting: true,
 
+        keepElement: false,
+
         /**
          * Initialize.
          *

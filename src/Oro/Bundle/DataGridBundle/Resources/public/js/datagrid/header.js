@@ -3,9 +3,8 @@ define([
     'backbone',
     'backgrid',
     './header-row',
-    './header-cell/header-cell',
-    './util'
-], function(_, Backbone, Backgrid, HeaderRow, HeaderCell, util) {
+    './header-cell/header-cell'
+], function(_, Backbone, Backgrid, HeaderRow, HeaderCell) {
     'use strict';
 
     var Header;
@@ -49,7 +48,7 @@ define([
                 this.columns = new Backgrid.Columns(this.columns);
             }
 
-            this.filteredColumns = util.createFilteredColumnCollection(this.columns);
+            this.filteredColumns = options.filteredColumns;
 
             var rowOptions = {
                 columns: this.columns,
@@ -70,9 +69,10 @@ define([
             if (this.disposed) {
                 return;
             }
-            delete this.row.cells;
+            this.row.dispose();
             delete this.row;
             delete this.columns;
+            delete this.filteredColumns;
             Header.__super__.dispose.apply(this, arguments);
         }
     });

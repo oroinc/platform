@@ -23,6 +23,7 @@ define(function(require) {
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var util = require('./util');
 
     /**
      * Basic grid class.
@@ -175,6 +176,10 @@ define(function(require) {
             if (this.themeOptionsConfigurator) {
                 this.listenTo(this.columns, 'configureInitializeOptions', this.themeOptionsConfigurator);
             }
+
+            this.filteredColumns = util.createFilteredColumnCollection(this.columns);
+
+            options.filteredColumns = this.filteredColumns;
 
             this.trigger('beforeBackgridInitialize');
             this.backgridInitialize(options);
@@ -413,8 +418,13 @@ define(function(require) {
             _.each(this.columns.models, function(column) {
                 column.dispose();
             });
+
+            this.filteredColumns.dispose();
+            delete this.filteredColumns;
+
             this.columns.dispose();
             delete this.columns;
+
             delete this.refreshAction;
             delete this.resetAction;
             delete this.exportAction;

@@ -109,3 +109,6 @@ UPGRADE FROM 1.9 to 1.10
 ####ConfigExpression
 - The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
 - The class Oro\Component\ConfigExpression\Condition\True was renamed to TrueCondition
+
+####PlatformBundle
+- The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
