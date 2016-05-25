@@ -20,9 +20,11 @@ class AttendeeSearchHandler extends ContextSearchHandler
         );
 
         /** @var User[] $users */
-        $users = !$recordIds ? [] : $this->objectManager
-            ->getRepository('Oro\Bundle\UserBundle\Entity\User')
-            ->findById($recordIds);
+        $users = !$recordIds
+            ? []
+            : $this->objectManager
+                ->getRepository('Oro\Bundle\UserBundle\Entity\User')
+                ->findById($recordIds);
 
         $result = [];
         foreach ($users as $user) {
