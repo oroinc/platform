@@ -59,7 +59,17 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteMigrationQuery()
     {
-        $query = $this->getMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
+        $query = $this
+            ->getMockForAbstractClass(
+                'Oro\Bundle\MigrationBundle\Migration\MigrationQuery',
+                [],
+                '',
+                true,
+                true,
+                true,
+                ['setConnection', 'execute']
+            )
+        ;
 
         $query->expects($this->never())
             ->method('setConnection');

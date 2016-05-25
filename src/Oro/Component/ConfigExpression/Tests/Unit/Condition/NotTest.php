@@ -18,10 +18,10 @@ class NotTest extends \PHPUnit_Framework_TestCase
 
     public function testEvaluate()
     {
-        $this->assertSame($this->condition, $this->condition->initialize([new Condition\True()]));
+        $this->assertSame($this->condition, $this->condition->initialize([new Condition\TrueCondition()]));
         $this->assertFalse($this->condition->evaluate('anything'));
 
-        $this->assertSame($this->condition, $this->condition->initialize([new Condition\False()]));
+        $this->assertSame($this->condition, $this->condition->initialize([new Condition\FalseCondition()]));
         $this->assertTrue($this->condition->evaluate('anything'));
     }
 
@@ -32,7 +32,7 @@ class NotTest extends \PHPUnit_Framework_TestCase
 
         $this->condition->setMessage($currentConditionError);
 
-        $falseConditionWithError = new Condition\False();
+        $falseConditionWithError = new Condition\FalseCondition();
         $falseConditionWithError->setMessage($nestedConditionError);
 
         $errors = new ArrayCollection();
@@ -44,7 +44,7 @@ class NotTest extends \PHPUnit_Framework_TestCase
             $errors->get(0)
         );
 
-        $trueConditionWithError = new Condition\True();
+        $trueConditionWithError = new Condition\TrueCondition();
         $trueConditionWithError->setMessage($nestedConditionError);
 
         $errors = new ArrayCollection();
@@ -94,7 +94,7 @@ class NotTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\True()],
+                'options'  => [new Condition\TrueCondition()],
                 'message'  => null,
                 'expected' => [
                     '@not' => [
@@ -105,7 +105,7 @@ class NotTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [
-                'options'  => [new Condition\True()],
+                'options'  => [new Condition\TrueCondition()],
                 'message'  => 'Test',
                 'expected' => [
                     '@not' => [
@@ -136,12 +136,12 @@ class NotTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\True()],
+                'options'  => [new Condition\TrueCondition()],
                 'message'  => null,
                 'expected' => '$factory->create(\'not\', [$factory->create(\'true\', [])])'
             ],
             [
-                'options'  => [new Condition\True()],
+                'options'  => [new Condition\TrueCondition()],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'not\', [$factory->create(\'true\', [])])->setMessage(\'Test\')'
             ]

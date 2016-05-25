@@ -28,6 +28,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->manager = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\Manager')
+            ->setMethods(['getDashboards', 'findAllowedDashboards'])
             ->disableOriginalConstructor()
             ->getMock();
 

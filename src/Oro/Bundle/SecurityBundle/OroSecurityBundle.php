@@ -20,6 +20,24 @@ class OroSecurityBundle extends Bundle
     /**
      * {@inheritdoc}
      */
+    public function __construct()
+    {
+        // Replace original Acl\Domain\Entry on custom class
+        // to avoid php7 issue with unserialization of the reference object
+        // https://bugs.php.net/bug.php?id=71940
+        if (version_compare(PHP_VERSION, '7.0.0', '>=') && version_compare(PHP_VERSION, '7.0.6', '<')
+            && !class_exists('Symfony\Component\Security\Acl\Domain\Entry', false)
+        ) {
+            class_alias(
+                'Oro\Bundle\SecurityBundle\Acl\Domain\Entry',
+                'Symfony\Component\Security\Acl\Domain\Entry'
+            );
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

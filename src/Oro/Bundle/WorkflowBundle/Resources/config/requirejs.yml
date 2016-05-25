@@ -13,7 +13,8 @@ config:
         'oroworkflow/js/reset-handler':                             'bundles/oroworkflow/js/reset-handler.js'
         'oroworkflow/js/activation-handler':                        'bundles/oroworkflow/js/activation-handler.js'
 
-        'oroworkflow/js/app/modules/workflow-steps-module': 'bundles/oroworkflow/js/app/modules/workflow-steps-module.js'
+        'oroworkflow/js/app/modules/workflow-steps-module':          'bundles/oroworkflow/js/app/modules/workflow-steps-module.js'
+        'oroworkflow/js/app/views/page-element/workflow-steps-view': 'bundles/oroworkflow/js/app/views/page-element/workflow-steps-view.js'
 
         'oroworkflow/js/app/components/workflow-editor-component':  'bundles/oroworkflow/js/app/components/workflow-editor-component.js'
         'oro/datagrid/action/workflow-activate-action':             'bundles/oroworkflow/js/datagrid/action/workflow-activate-action.js'

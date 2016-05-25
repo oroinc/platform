@@ -25,7 +25,9 @@ class ObjectIdAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $accessor = new ObjectIdAccessor($this->doctrineHelper);
 
-        $obj = $this->getMock('Symfony\Component\Security\Acl\Model\DomainObjectInterface');
+        $obj = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\DomainObjectInterface')
+            ->setMethods(['getObjectIdentifier', 'getId'])
+            ->getMock();
         $obj
             ->expects($this->once())
             ->method('getObjectIdentifier')

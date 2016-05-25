@@ -36,19 +36,21 @@ class OroRichTextType extends AbstractType
      * @var array
      */
     public static $toolbars = [
-        self::TOOLBAR_SMALL   => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo'],
+        self::TOOLBAR_SMALL  => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo | fullscreen'],
         self::TOOLBAR_DEFAULT => [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo'
+            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
+             | fullscreen'
         ],
-        self::TOOLBAR_LARGE   => [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo'
+        self::TOOLBAR_LARGE => [
+            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
+            | fullscreen'
         ],
     ];
 
     /**
      * @var array
      */
-    public static $defaultPlugins = ['textcolor', 'code', 'link', 'bdesk_photo'];
+    public static $defaultPlugins = ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen'];
 
     /**
      * @param ConfigManager   $configManager
