@@ -24,6 +24,9 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $attachmentManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $attachmentProvider;
+
     /** @var NoteManager */
     protected $manager;
 
@@ -41,6 +44,9 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->attachmentProvider  = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->attachmentManager  = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -50,6 +56,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
             $this->securityFacade,
             $this->aclHelper,
             $this->entityNameResolver,
+            $this->attachmentProvider,
             $this->attachmentManager
         );
     }

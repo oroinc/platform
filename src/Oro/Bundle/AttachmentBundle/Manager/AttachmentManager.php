@@ -522,5 +522,4 @@ class AttachmentManager
     {
         return $this->getFileUrl($entity, 'attachment', $attachment, 'download', true);
     }
-
 }
