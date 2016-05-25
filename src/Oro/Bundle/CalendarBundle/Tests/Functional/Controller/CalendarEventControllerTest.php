@@ -38,7 +38,19 @@ class CalendarEventControllerTest extends WebTestCase
         $form['oro_calendar_event_form[description]'] = 'test description';
         $form['oro_calendar_event_form[start]']       = '2016-05-23T14:46:02Z';
         $form['oro_calendar_event_form[end]']         = '2016-05-23T15:46:02Z';
-        $form['oro_calendar_event_form[attendees]']   = sprintf('%s, %s', $user->getId(), $admin->getId());
+        $form['oro_calendar_event_form[attendees]']   = implode(
+            ';',
+            [
+                json_encode([
+                    'entityClass' => get_class($user),
+                    'entityId' => $user->getId(),
+                ]),
+                json_encode([
+                    'entityClass' => get_class($admin),
+                    'entityId' => $admin->getId(),
+                ])
+            ]
+        );
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
@@ -101,7 +113,19 @@ class CalendarEventControllerTest extends WebTestCase
         $form['oro_calendar_event_form[description]'] = 'test description';
         $form['oro_calendar_event_form[start]']       = '2016-05-23T14:46:02Z';
         $form['oro_calendar_event_form[end]']         = '2016-05-23T15:46:02Z';
-        $form['oro_calendar_event_form[attendees]']   = sprintf('%s, %s', $user->getId(), $admin->getId());
+        $form['oro_calendar_event_form[attendees]']   = implode(
+            ';',
+            [
+                json_encode([
+                    'entityClass' => get_class($user),
+                    'entityId' => $user->getId(),
+                ]),
+                json_encode([
+                    'entityClass' => get_class($admin),
+                    'entityId' => $admin->getId(),
+                ])
+            ]
+        );
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
