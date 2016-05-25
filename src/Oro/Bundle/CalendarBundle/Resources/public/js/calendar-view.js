@@ -690,9 +690,12 @@ define(function(require) {
                 }
                 options.scrollTime = scrollTime.startOf('hour').format('HH:mm:ss');
             }
-            // try to retrieve the last view for this calendar
-            var lastView =  this.getStorageKey() ? persistentStorage.getItem(this.getStorageKey()) : null;
-            options.defaultView =  lastView || 'agendaWeek';
+            // override fullcalendar lib defaults
+            if (!options.defaultView || options.defaultView == 'month') {
+                // try to retrieve the last view for this calendar
+                var lastView =  this.getStorageKey() ? persistentStorage.getItem(this.getStorageKey()) : null;
+                options.defaultView =  lastView || 'agendaWeek';
+            }
 
             var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
             var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
