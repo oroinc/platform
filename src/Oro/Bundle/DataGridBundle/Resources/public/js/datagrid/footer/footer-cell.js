@@ -24,6 +24,8 @@ define([
             '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>'
         ),
 
+        keepElement: false,
+
         /**
          * Initialize.
          */
