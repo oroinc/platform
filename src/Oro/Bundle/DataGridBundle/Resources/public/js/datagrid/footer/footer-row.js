@@ -53,6 +53,8 @@ define([
                 return;
             }
             delete this.cells;
+            delete this.columns;
+            delete this.dataCollection;
             FooterRow.__super__.dispose.call(this);
         }
     });

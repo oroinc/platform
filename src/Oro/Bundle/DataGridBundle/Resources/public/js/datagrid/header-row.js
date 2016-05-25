@@ -58,6 +58,8 @@ define([
                 return;
             }
             delete this.cells;
+            delete this.columns;
+            delete this.dataCollection;
             HeaderRow.__super__.dispose.call(this);
         }
     });
