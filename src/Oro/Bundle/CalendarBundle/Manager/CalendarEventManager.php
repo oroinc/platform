@@ -81,7 +81,7 @@ class CalendarEventManager
         if (!$relatedAttendee) {
             throw new CalendarEventRelatedAttendeeNotFoundException();
         }
-//related to: https://github.com/laboro/platform/pull/7530#discussion-diff-64249164R82 how it should be renamed? "RelatedAttendeeNotFoundForCalendarEventException"?
+
         $statusEnum = $this->doctrineHelper
             ->getEntityRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
             ->find($newStatus);
