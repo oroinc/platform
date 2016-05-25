@@ -14,6 +14,15 @@ oro.locale:
             district: "district"
             province: "province"
 
+    menu:
+        localization:
+            label: Localization
+        locales:
+            label: Locales
+
+    navigation:
+        view: 'Locale #%id%'
+
     system_configuration:
         groups:
             localization.title: 'Localization'

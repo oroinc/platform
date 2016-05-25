@@ -1,0 +1,26 @@
+oro_menu_config:
+    items:
+        localization:
+            label: 'oro.locale.menu.localization.label'
+            uri: '#'
+
+        locales:
+            label: 'oro.locale.menu.locales.label'
+            route: 'oro_locale_locale_index'
+            extras:
+                routes: ['/^oro_locale/']
+
+    tree:
+        application_menu:
+            children:
+                system_tab:
+                    children:
+                        localization:
+                            children:
+                                locales: ~
+
+oro_titles:
+    oro_locale_locale_index: ~
+    oro_locale_locale_view:   'orob.locale.navigation.view'
+    oro_locale_locale_update: 'orob.locale.navigation.view - oro.ui.edit'
+    oro_locale_locale_create: 'oro.ui.create_entity'
