@@ -33,12 +33,11 @@ class ProcessConfigurationGenerator
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @return array
-     * @internal param WorkflowDefinition $transitions
-     * @internal param Workflow $workflow
      */
     public function generateForScheduledTransition(WorkflowDefinition $workflowDefinition)
     {
         $processConfigurations = [];
+        $workflowName = $workflowDefinition->getName();
         foreach ($this->getTransitionsConfigurations($workflowDefinition) as $transitionConfiguration) {
             if (array_key_exists('schedule', $transitionConfiguration)) {
                 $transitionName = $transitionConfiguration['name'];
@@ -49,7 +48,7 @@ class ProcessConfigurationGenerator
                 $processConfigurations = array_merge_recursive(
                     $processConfigurations,
                     $this->createProcessConfiguration(
-                        $workflowDefinition->getName(),
+                        $workflowName,
                         $transitionName,
                         $transitionConfiguration['schedule']['cron']
                     )
@@ -72,7 +71,7 @@ class ProcessConfigurationGenerator
 
         $definitionConfiguration = [
             $processName => [
-                'Label' => sprintf('Scheduled Transition "%s"', $processName),
+                'label' => sprintf('Scheduled transition "%s"', $processName),
                 'entity' => $this->workflowItemEntityClass,
                 'order' => 0,
                 'exclude_definitions' => [$processName],
@@ -118,6 +117,6 @@ class ProcessConfigurationGenerator
      */
     protected function generateScheduledTransitionProcessName($workflowName, $transitionName)
     {
-        return sprintf('%s_%s_process', $workflowName, $transitionName);
+        return sprintf('%s_%s_schedule_process', $workflowName, $transitionName);
     }
 }

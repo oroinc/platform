@@ -185,24 +185,24 @@ services:
             - '@oro_workflow.manager'
 
     oro_workflow.validator_expression.dql_expression_verifier:
-    	class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier
-    	public: false
-    	arguments: ['@oro_email.email_address.entity_manager']
+        class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier
+        public: false
+        arguments: ['@oro_email.email_address.entity_manager']
 
     oro_workflow.validator_expression.cron_expression_verifier:
-    	class: Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier
+        class: Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier
 
     oro_workflow.generator.trigger_schedule_options_verifier:
-    	class: Oro\Bundle\WorkflowBundle\Generator\TriggerScheduleOptionsVerifier
-    	public: false
-    	arguments: ['@oro_workflow.workflow_assembler', '@oro_workflow.transition.schedule_helper']
-    	calls:
-    	    - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
-    	    - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
+        class: Oro\Bundle\WorkflowBundle\Generator\TriggerScheduleOptionsVerifier
+        public: false
+        arguments: ['@oro_workflow.workflow_assembler', '@oro_workflow.transition.schedule_helper']
+        calls:
+            - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
+            - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
 
     oro_workflow.generator.process_configuration_generator:
-    	class: Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator
-    	public: false
-    	arguments:
-    	    - '@oro_workflow.generator.trigger_schedule_options_verifier'
-    	    - '%%oro_workflow.workflow_item.entity.class%'
+        class: Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator
+        public: false
+        arguments:
+            - '@oro_workflow.generator.trigger_schedule_options_verifier'
+            - '%%oro_workflow.workflow_item.entity.class%'
