@@ -80,7 +80,8 @@ class AttendeeRepository extends EntityRepository
         $qb = $this->createQueryBuilder('a')
             ->select('a')
             ->innerJoin('a.calendarEvent', 'calendarEvent')
-            ->where('calendarEvent.id = :calendar_event_id')
+            ->leftJoin('a.user', 'user')
+            ->andWhere('calendarEvent.id = :calendar_event_id')
             ->setParameter('calendar_event_id', $id);
 
         $query = $qb->getQuery();
