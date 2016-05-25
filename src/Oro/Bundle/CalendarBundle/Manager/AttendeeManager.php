@@ -7,7 +7,6 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository;
 use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class AttendeeManager
@@ -43,30 +42,6 @@ class AttendeeManager
     }
 
     /**
-     * @param Attendee[]|\Traversable $attendees
-     *
-     * @return array
-     */
-    public function attendeesToAutocompleteData($attendees)
-    {
-        $transformedData = $this->usersToAttendeesTransformer->attendeesToUsers($attendees);
-        $disableUserRemoval = !$this->securityFacade->isGranted('oro_user_user_view');
-
-        $result = [];
-        foreach ($transformedData as $k => $item) {
-            $converted = $this->usersConverter->convertItem($item);
-
-            if (!$this->isAttendeeRemovable($attendees[$k], $disableUserRemoval)) {
-                $converted['locked'] = true;
-            }
-
-            $result[] = $converted;
-        }
-
-        return $result;
-    }
-
-    /**
      * @param string $id
      *
      * @return Attendee[]
@@ -77,16 +52,5 @@ class AttendeeManager
         $attendeeRepository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Attendee');
 
         return $attendeeRepository->getAttendeesByCalendarEventId($id);
-    }
-
-    /**
-     * @param Attendee $attendee
-     * @param bool     $disableUserRemoval
-     *
-     * @return bool
-     */
-    protected function isAttendeeRemovable(Attendee $attendee, $disableUserRemoval = false)
-    {
-        return !$disableUserRemoval && $attendee->getUser() instanceof User;
     }
 }

@@ -109,6 +109,7 @@ class CalendarEventType extends AbstractType
                 [
                     'required' => false,
                     'label'    => 'oro.calendar.calendarevent.attendees.label',
+                    'layout_template' => $options['layout_template'],
                 ]
             )
             ->add(

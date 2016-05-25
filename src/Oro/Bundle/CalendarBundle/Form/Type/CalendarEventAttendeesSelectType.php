@@ -2,63 +2,25 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\CalendarBundle\Form\Type\ContextsToViewTransformer;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 
 class CalendarEventAttendeesSelectType extends AbstractType
 {
-    /** @var EntityManager */
-    protected $entityManager;
-
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var ObjectMapper */
-    protected $mapper;
-
-    /* @var TokenStorageInterface */
-    protected $securityTokenStorage;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    /** @var DataTransformerInterface */
+    protected $attendeesToViewTransformer;
 
     /**
-     * @param EntityManager         $entityManager
-     * @param ConfigManager         $configManager
-     * @param TranslatorInterface   $translator
-     * @param ObjectMapper          $mapper
-     * @param TokenStorageInterface $securityTokenStorage
-     * @param EventDispatcherInterface $dispatcher
+     * @param DataTransformerInterface $attendeesToViewTransformer
      */
-    public function __construct(
-        EntityManager $entityManager,
-        ConfigManager $configManager,
-        TranslatorInterface $translator,
-        ObjectMapper $mapper,
-        TokenStorageInterface $securityTokenStorage,
-        EventDispatcherInterface $dispatcher
-    ) {
-        $this->entityManager        = $entityManager;
-        $this->configManager        = $configManager;
-        $this->translator           = $translator;
-        $this->mapper               = $mapper;
-        $this->securityTokenStorage = $securityTokenStorage;
-        $this->dispatcher           = $dispatcher;
+    public function __construct(DataTransformerInterface $attendeesToViewTransformer)
+    {
+        $this->attendeesToViewTransformer = $attendeesToViewTransformer;
     }
 
     /**
@@ -67,16 +29,7 @@ class CalendarEventAttendeesSelectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->resetViewTransformers();
-        $builder->addViewTransformer(
-            new ContextsToViewTransformer(
-                $this->entityManager,
-                $this->configManager,
-                $this->translator,
-                $this->mapper,
-                $this->securityTokenStorage,
-                $this->dispatcher
-            )
-        );
+        $builder->addViewTransformer($this->attendeesToViewTransformer);
     }
 
     /**
@@ -94,18 +47,27 @@ class CalendarEventAttendeesSelectType extends AbstractType
     {
         $resolver->setDefaults([
             'tooltip' => false,
-            'configs' => [
-                'placeholder'        => 'oro.user.form.choose_user',
-                'allowClear'         => true,
-                'multiple'           => true,
-                'separator'          => ';',
-                'forceSelectedData'  => true,
-                'minimumInputLength' => 0,
-                'route_name'         => 'oro_calendarevent_autocomplete_attendees',
-                'route_parameters'   => [
-                    'name' => 'name',
-                ],
-            ],
+            'layout_template' => false,
+            'configs' => function (Options $options, $value) {
+                $configs = [
+                    'placeholder'        => 'oro.user.form.choose_user',
+                    'allowClear'         => true,
+                    'multiple'           => true,
+                    'separator'          => ';',
+                    'forceSelectedData'  => true,
+                    'minimumInputLength' => 0,
+                    'route_name'         => 'oro_calendarevent_autocomplete_attendees',
+                    'route_parameters'   => [
+                        'name' => 'name',
+                    ],
+                ];
+
+                if ($options['layout_template']) {
+                    $configs['component'] = 'attendees';
+                }
+
+                return $configs;
+            }
         ]);
     }
 

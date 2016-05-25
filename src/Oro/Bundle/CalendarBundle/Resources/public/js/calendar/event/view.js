@@ -423,10 +423,10 @@ define([
             if (data.hasOwnProperty('attendees')) {
                 var attendees = this.eventDialog.form.find('[name="oro_calendar_event_form[attendees]"]')
                     .select2('data');
-                data.attendees = _.map(attendees, function(user) {
+                data.attendees = _.map(attendees, function(attendee) {
                     return {
-                        displayName: user.id ? user.fullName : user.email,
-                        email: user.email,
+                        displayName: attendee.displayName,
+                        email: attendee.email,
                         origin: 'server'
                     };
                 });

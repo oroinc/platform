@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Form\Type;
+namespace Oro\Bundle\CalendarBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer as BaseTransformer;
+use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class ContextsToViewTransformer extends BaseTransformer
+class AttendeesToViewTransformer extends ContextsToViewTransformer
 {
     /**
      * {@inheritdoc}
@@ -62,6 +62,8 @@ class ContextsToViewTransformer extends BaseTransformer
     {
         $result = parent::getResult($text, $object);
         $result['hidden'] = !$object->getUser();
+        $result['displayName'] = $object->getDisplayName();
+        $result['email'] = $object->getEmail();
 
         return $result;
     }

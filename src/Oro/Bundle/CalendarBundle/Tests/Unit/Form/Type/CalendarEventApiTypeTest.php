@@ -14,7 +14,6 @@ use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesApiType;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
-use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesType;
 use Oro\Bundle\ReminderBundle\Form\Type\MethodType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderCollectionType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType;
@@ -284,16 +283,6 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $transformer = $this
-            ->getMockBuilder('Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer')
-            ->disableOriginalConstructor()
-            ->setMethods(null)
-            ->getMock();
-
-        $attendeeManager = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $types = [
             new ReminderCollectionType($this->registry),
             new CollectionType($this->registry),
@@ -301,7 +290,6 @@ class CalendarEventApiTypeTest extends TypeTestCase
             new MethodType(new SendProcessorRegistry([])),
             new ReminderIntervalType(),
             new UnitType(),
-            new CalendarEventAttendeesType($transformer, $attendeeManager),
             new UserMultiSelectType($this->entityManager),
             new OroJquerySelect2HiddenType($this->entityManager, $searchRegistry, $configProvider),
             new Select2Type('hidden'),
