@@ -44,9 +44,9 @@ class MassNotification
     /**
      * @var string
      *
-     * @ORM\Column(name="from", type="string", length=255)
+     * @ORM\Column(name="sender", type="string", length=255)
      */
-    protected $from;
+    protected $sender;
 
     /**
      * @var string
@@ -120,17 +120,17 @@ class MassNotification
     /**
      * @return string
      */
-    public function getFrom()
+    public function getSender()
     {
-        return $this->from;
+        return $this->sender;
     }
 
     /**
-     * @param string $from
+     * @param string $sender
      */
-    public function setFrom($from)
+    public function setSender($sender)
     {
-        $this->from = $from;
+        $this->sender = $sender;
     }
 
     /**

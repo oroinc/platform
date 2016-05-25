@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass;
-use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
+use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\SwiftMailerEventCompilerPass;
 
 class OroNotificationBundle extends Bundle
 {
@@ -21,5 +21,6 @@ class OroNotificationBundle extends Bundle
         
         $container->addCompilerPass(new NotificationHandlerPass());
         $container->addCompilerPass(new EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new SwiftMailerEventCompilerPass());
     }
 }   

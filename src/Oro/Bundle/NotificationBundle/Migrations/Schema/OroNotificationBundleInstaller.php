@@ -99,7 +99,7 @@ class OroNotificationBundleInstaller implements Installation
         $table = $schema->createTable('oro_notification_mass_notif');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('email', 'string', ['length' => 255]);
-        $table->addColumn('from', 'string', ['length' => 255]);
+        $table->addColumn('sender', 'string', ['length' => 255]);
         $table->addColumn('title', 'string', ['length' => 255]);
         $table->addColumn('body', 'text', ['notnull' => false]);
         $table->addColumn('scheduledAt', 'datetime', []);

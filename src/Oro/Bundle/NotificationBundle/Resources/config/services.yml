@@ -17,6 +17,7 @@ parameters:
 
     # Listener classes
     oro_notification.doctrine_listener.class: Oro\Bundle\NotificationBundle\Provider\DoctrineListener
+    oro_notification.massnotification_listener.class: Oro\Bundle\NotificationBundle\EventListener\MassNotificationListener
 
     # Email notification form services
     oro_notification.form.type.email_notification.class: Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType
@@ -123,6 +124,13 @@ services:
             - { name: doctrine.event_listener, event: postUpdate }
             - { name: doctrine.event_listener, event: postRemove }
             - { name: doctrine.event_listener, event: postFlush }
+
+    oro_notification.massnotification_listener:
+        class: %oro_notification.massnotification_listener.class%
+        arguments:
+            - '@doctrine.orm.entity_manager'
+        tags:
+            - { name: swiftmailer.mailer.db_spool_mailer.plugin }
 
     # notification services
     oro_notification.manager:
