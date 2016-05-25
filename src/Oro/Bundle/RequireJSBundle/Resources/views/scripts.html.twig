@@ -20,12 +20,13 @@
     <script type="text/javascript" src="{{ asset(get_requirejs_build_path()) }}"></script>
 {% else %}
     <script type="text/javascript" src="{{ asset('bundles/ororequirejs/lib/require.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/ororequirejs/lib/asap/asap.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/ororequirejs/js/requirejs-asap-init.js') }}"></script>
     <script type="text/javascript">
         {{ get_requirejs_config() }}
     </script>
     <script type="text/javascript">
         {{ config_extend|raw }}
+    </script>
+    <script type="text/javascript">
+         require(['requirejs-asap-init']);
     </script>
 {% endif %}
