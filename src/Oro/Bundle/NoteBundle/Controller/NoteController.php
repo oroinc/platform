@@ -71,8 +71,8 @@ class NoteController extends Controller
      */
     public function infoAction(Note $entity)
     {
-        $manager = $this->getNoteManager();
-        $attachment = $manager->getAttachmentInfo($entity);
+        $attachmentProvider = $this->get('oro_attachment.provider.attachment');
+        $attachment = $attachmentProvider->getAttachmentInfo($entity);
         return ['entity' => $entity, 'attachment' => $attachment];
     }
 

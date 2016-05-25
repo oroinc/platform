@@ -4,15 +4,12 @@ namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class NoteManager
@@ -29,28 +26,28 @@ class NoteManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    /** @var AttachmentProvider */
+    protected $attachmentProvider;
 
     /**
      * @param EntityManager      $em
      * @param SecurityFacade     $securityFacade
      * @param AclHelper          $aclHelper
      * @param EntityNameResolver $entityNameResolver
-     * @param AttachmentManager  $attachmentManager
+     * @param AttachmentProvider  $attachmentProvider
      */
     public function __construct(
         EntityManager $em,
         SecurityFacade $securityFacade,
         AclHelper $aclHelper,
         EntityNameResolver $entityNameResolver,
-        AttachmentManager $attachmentManager
+        AttachmentProvider $attachmentProvider
     ) {
         $this->em                 = $em;
         $this->securityFacade     = $securityFacade;
         $this->aclHelper          = $aclHelper;
         $this->entityNameResolver = $entityNameResolver;
-        $this->attachmentManager  = $attachmentManager;
+        $this->attachmentManager  = $attachmentProvider;
     }
 
     /**
@@ -101,51 +98,8 @@ class NoteManager
         ];
         $this->addUser($result, 'createdBy', $entity->getOwner());
         $this->addUser($result, 'updatedBy', $entity->getUpdatedBy());
-        $result = array_merge($result, $this->getAttachmentInfo($entity));
+        $result = array_merge($result, $this->attachmentProvider->getAttachmentInfo($entity));
 
-        return $result;
-    }
-
-    /**
-     * @param Note $entity
-     * @param File    $attachment
-     *
-     * @return string
-     */
-    protected function getAttachmentURL($entity, $attachment)
-    {
-        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download', true);
-    }
-
-    /**
-     * @param $entity
-     *
-     * @return File
-     */
-    protected function getAttachment($entity)
-    {
-        $accessor   = PropertyAccess::createPropertyAccessor();
-        $attachment = $accessor->getValue($entity, 'attachment');
-
-        return $attachment;
-    }
-
-    /**
-     * @param Note $entity
-     *
-     * @return array
-     */
-    public function getAttachmentInfo(Note $entity)
-    {
-        $result     = [];
-        $attachment = $this->getAttachment($entity);
-        if ($attachment) {
-            $result = [
-                'attachmentURL'      => $this->getAttachmentURL($entity, $attachment),
-                'attachmentSize'     => $this->attachmentManager->getFileSize($attachment->getFileSize()),
-                'attachmentFileName' => $attachment->getOriginalFilename(),
-            ];
-        }
         return $result;
     }
 

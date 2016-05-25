@@ -511,4 +511,16 @@ class AttachmentManager
     {
         return sprintf('%s.%s', uniqid(), $extension);
     }
+
+    /**
+     * @param $entity
+     * @param File $attachment
+     *
+     * @return string
+     */
+    public function getAttachmentURL($entity, $attachment)
+    {
+        return $this->getFileUrl($entity, 'attachment', $attachment, 'download', true);
+    }
+
 }
