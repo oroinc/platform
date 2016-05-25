@@ -4,7 +4,6 @@ namespace Oro\Bundle\NotificationBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
 
 class SwiftMailerEventCompilerPass implements CompilerPassInterface
 {
@@ -12,6 +11,9 @@ class SwiftMailerEventCompilerPass implements CompilerPassInterface
     
     const TAGGED_SERVICE_NAME = 'swiftmailer.mailer.db_spool_mailer.plugin';
 
+    /**
+     * @param ContainerBuilder $container
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::SERVICE_ALIAS)) {
