@@ -33,7 +33,7 @@ class OroTimeIntervalType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
     }
 
-    private function preSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $event)
     {
         if ($this->isValidDuration($event->getData())) {
             return;
