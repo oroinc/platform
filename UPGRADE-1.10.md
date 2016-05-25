@@ -128,20 +128,22 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
 
 
-####CalendarEventBundle
-- constants `NOT_RESPONDED`, `TENTATIVELY_ACCEPTED`, `ACCEPTED`, `DECLINED` were deprecated in favor of these with `STATUS_` prefix
-- method `getInvitationStatus` was deprecated in favour of `getAttendee()->getStatus()`
-- method `setInvitationStatus` was removed
-- attendees of the event are now retrieved using `getAttendees` method on arbitrary event (parent/child)
-- some related notification templates were changed and now relates to attendees
+####OroCalendarBundleCalendarEvent
 
-## Oro\Bundle\CalendarBundle\Form\Type\CalendarEvent[Api]Type
-- forms works with attendees instead of calendar events now
-- previous listeners were moved into subscribers
-
-## Oro\Bundle\CalendarBundle\Model\Email\EmailNotification, Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor
-- works with attendee or calendar event instead of just calendar event
-
-## Oro\Bundle\CalendarBundle\Provider\AbstractCalendarEventNormalizer, Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer, Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer
-- requires one more argument in constructor
-
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::NOT_RESPONDED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_NONE`.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::TENTATIVELY_ACCEPTED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_TENTATIVE`.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::ACCEPTED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_ACCEPTED`.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::DECLINED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_DECLINED`.
+- `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getInvitationStatus` marked as deprecated. To get invitation status call methods `getRelatedAttendee()->getStatus()`.
+- Guests `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` of event are now represented via collection accessible by methods `getAttendees` and `setAttendees`. Before to get all guets it was required to get all user owners of child events from parent event. Now parent event holds collection of entities `Oro\Bundle\CalendarBundle\Entity\Attendee`. Every attendee entity could refer to `Oro\Bundle\UserBundle\Entity\User`, but it's optional.
+- All email templates of events notifications were updated: `Migrations/Data/ORM/data/emails/invitation`. 
+- Field `invitedUsers` in `Oro\Bundle\CalendarBundle\Form\Type\CalendarEvent[Api]Type` was deprecated. Use new field `attendees`. 
+- Signature of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType::__construct` method was changed. Before: `__construct()`. After: `__construct(ManagerRegistry $registry, SecurityFacade $securityFacade)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Methods of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType` were removed: `subscribeOnChildEvents`, `preSubmit`, `postSubmitChildEvents`, `postSubmit`, `setDefaultEventStatus`, `preSetData`. Separate subscriber classes were added to handle logic of event listeners. See classes in namespace `Oro\Bundle\CalendarBundle\Form\EventListeners`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType` class. 
+- Signature of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType::__construct` method was changed. Before: `__construct(CalendarEventManager $calendarEventManager)`. After: `__construct(CalendarEventManager $calendarEventManager, ManagerRegistry $registry, SecurityFacade $securityFacade, RequestStack $requestStack)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType::postSubmitData` method was moved to `Oro\Bundle\CalendarBundle\Form\EventListener\CalendarEventApiTypeSubscriber::postSubmitData`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventInviteesType` was removed. This can bring a `backward compatibility break` if you have own implementation of this class.
+- `Oro\Bundle\CalendarBundle\Model\Email\EmailNotification` and `Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor` were updated to support entity `Oro\Bundle\CalendarBundle\Entity\Attendee` additionally to `Oro\Bundle\CalendarBundle\Entity\CalendarEvent`.  
+- Signature of `Oro\Bundle\CalendarBundle\Provider\AbstractCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager)`. After: `__construct(ReminderManager $reminderManager, DoctrineHelper $doctrineHelper)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, DoctrineHelper $doctrineHelper)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, DoctrineHelper $doctrineHelper)`. This can bring a `backward compatibility break` if you have own implementation of this class.
