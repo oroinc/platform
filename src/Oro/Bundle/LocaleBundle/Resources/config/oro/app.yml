@@ -4,4 +4,3 @@ doctrine:
             date:     Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateType
             datetime: Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateTimeType
             time:     Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType
-            duration: Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\DurationType
