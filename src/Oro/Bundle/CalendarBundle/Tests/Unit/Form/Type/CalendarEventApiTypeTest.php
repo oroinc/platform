@@ -14,6 +14,7 @@ use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\ReminderBundle\Form\Type\MethodType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderCollectionType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType;
@@ -52,6 +53,12 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $userMeta->expects($this->any())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue('id'));
+        $eventMeta = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $eventMeta->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue('id'));
 
@@ -95,7 +102,17 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->method('getClassMetadata')
             ->with('OroUserBundle:User')
             ->will($this->returnValue($userMeta));
-
+        $emForEvent = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emForEvent->expects($this->any())
+            ->method('getClassMetadata')
+            ->with('OroCalendarBundle:CalendarEvent')
+            ->will($this->returnValue($eventMeta));
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($emForEvent);
+        
         return array(
             new PreloadedExtension(
                 $this->loadTypes(),
@@ -270,6 +287,7 @@ class CalendarEventApiTypeTest extends TypeTestCase
             new OroJquerySelect2HiddenType($this->entityManager, $searchRegistry, $configProvider),
             new Select2Type('hidden'),
             new RecurrenceFormType($recurrenceModel),
+            new EntityIdentifierType($this->registry),
         ];
 
         $keys = array_map(

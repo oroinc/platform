@@ -27,6 +27,15 @@ class Recurrence
     protected $id;
 
     /**
+     * @ORM\OneToOne(
+     *     targetEntity="Oro\Bundle\CalendarBundle\Entity\CalendarEvent",
+     *     mappedBy="recurrence",
+     *     orphanRemoval=true
+     * )
+     */
+    protected $calendarEvent;
+
+    /**
      * Determines what recurrence strategy must be used to calculate occurrences of recurring event,
      * to get textual representation etc. Possible values are: daily, weekly, monthly, monthnth, yearly, yearnth.
      *
@@ -180,6 +189,26 @@ class Recurrence
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param CalendarEvent $calendarEvent
+     *
+     * @return self
+     */
+    public function setCalendarEvent(CalendarEvent $calendarEvent)
+    {
+        $this->calendarEvent = $calendarEvent;
+
+        return $this;
+    }
+
+    /**
+     * @return CalendarEvent
+     */
+    public function getCalendarEvent()
+    {
+        return $this->calendarEvent;
     }
 
     /**

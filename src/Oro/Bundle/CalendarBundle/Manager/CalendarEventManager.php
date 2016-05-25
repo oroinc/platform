@@ -178,19 +178,6 @@ class CalendarEventManager
     }
 
     /**
-     * @param CalendarEvent $event
-     * @param $recurringEventId
-     */
-    public function setRecurringEvent(CalendarEvent $event, $recurringEventId)
-    {
-        $recurringEvent = $event->getRecurringEvent();
-        if (!$recurringEvent || $recurringEvent->getId() !== $recurringEventId) {
-            $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-            $event->setRecurringEvent($repo->find($recurringEventId));
-        }
-    }
-
-    /**
      * @param Recurrence $recurrence
      */
     public function removeRecurrence(Recurrence $recurrence)

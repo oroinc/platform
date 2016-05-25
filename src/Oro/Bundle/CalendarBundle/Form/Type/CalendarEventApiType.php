@@ -105,10 +105,12 @@ class CalendarEventApiType extends CalendarEventType
             )
             ->add(
                 'recurringEventId',
-                'integer',
+                'oro_entity_identifier',
                 [
                     'required' => false,
-                    'mapped'   => false
+                    'property_path' => 'recurringEvent',
+                    'class' => 'OroCalendarBundle:CalendarEvent',
+                    'multiple' => false,
                 ]
             )
             ->add(
@@ -185,10 +187,6 @@ class CalendarEventApiType extends CalendarEventType
         }
 
         $this->calendarEventManager->setCalendar($data, $calendarAlias, (int)$calendarId);
-        $recurringEventId = $form->get('recurringEventId')->getData();
-        if ($recurringEventId) {
-            $this->calendarEventManager->setRecurringEvent($data, (int)$recurringEventId);
-        }
     }
 
     /**
