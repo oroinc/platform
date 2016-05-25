@@ -5,6 +5,7 @@ namespace Oro\Bundle\NoteBundle\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
@@ -34,20 +35,23 @@ class NoteManager
      * @param SecurityFacade     $securityFacade
      * @param AclHelper          $aclHelper
      * @param EntityNameResolver $entityNameResolver
-     * @param AttachmentProvider  $attachmentProvider
+     * @param AttachmentProvider $attachmentProvider
+     * @param AttachmentManager  $attachmentManager
      */
     public function __construct(
         EntityManager $em,
         SecurityFacade $securityFacade,
         AclHelper $aclHelper,
         EntityNameResolver $entityNameResolver,
-        AttachmentProvider $attachmentProvider
+        AttachmentProvider $attachmentProvider,
+        AttachmentManager $attachmentManager
     ) {
         $this->em                 = $em;
         $this->securityFacade     = $securityFacade;
         $this->aclHelper          = $aclHelper;
         $this->entityNameResolver = $entityNameResolver;
-        $this->attachmentManager  = $attachmentProvider;
+        $this->attachmentProvider = $attachmentProvider;
+        $this->attachmentManager  = $attachmentManager;
     }
 
     /**

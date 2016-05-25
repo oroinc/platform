@@ -9,6 +9,7 @@ use FOS\RestBundle\Util\Codes;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -121,14 +122,58 @@ class NoteController extends Controller
             'saved'  => false
         ];
 
+        $this->fixUnnamedFormRequest($entity);
+
         if ($this->get('oro_note.form.handler.note')->process($entity)) {
             $responseData['saved'] = true;
             $responseData['model'] = $this->getNoteManager()->getEntityViewModel($entity);
         }
-        $responseData['form']       = $this->get('oro_note.form.note')->createView();
+        $responseData['form']       = $this->getForm()->createView();
         $responseData['formAction'] = $formAction;
 
         return $responseData;
+    }
+
+    /**
+     * Convert unnamed form request to format applicable for form.
+     * This method needed because get params pass to $_POST when unnamed form submitted
+     */
+    protected function fixUnnamedFormRequest()
+    {
+        $request  = $this->container->get('request');
+        $formName = $this->getForm()->getName();
+        $data     = empty($formName)
+            ? $request->request->all()
+            : $request->request->get($formName);
+
+
+        if (is_array($data)) {
+            unset($data['_widgetContainer']);
+            unset($data['_wid']);
+            if (empty($formName)) {
+                // save fixed values for unnamed form
+                foreach ($request->request->keys() as $key) {
+                    if (array_key_exists($key, $data)) {
+                        $request->request->set($key, $data[$key]);
+                    } else {
+                        $request->request->remove($key);
+                    }
+                }
+                foreach ($data as $key => $val) {
+                    if (!$request->request->has($key)) {
+                        $request->request->set($key, $data[$key]);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @return FormInterface
+     */
+    public function getForm()
+    {
+        return $this->get('oro_note.form.note');
     }
 
     /**
