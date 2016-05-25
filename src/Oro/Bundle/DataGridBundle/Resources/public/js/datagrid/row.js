@@ -2,9 +2,10 @@ define([
     'jquery',
     'underscore',
     'chaplin',
+    'backbone',
     'oroui/js/tools',
     './util'
-], function($, _, Chaplin, tools, util) {
+], function($, _, Chaplin, Backbone, tools, util) {
     'use strict';
 
     var Row;
@@ -28,12 +29,28 @@ define([
         autoRender: false,
         animationDuration: 0,
 
-        /** @property */
-        events: {
-            'mousedown': 'onMouseDown',
-            'mouseleave': 'onMouseLeave',
-            'mouseup': 'onMouseUp',
-            'click': 'onClick'
+        /**
+         * Override Chaplin delegate events to use events as function
+         * This code supports perfomance fix.
+         */
+        delegateEvents: Backbone.View.prototype.delegateEvents,
+        events: function() {
+            var resultEvents = {
+                'mousedown': 'onMouseDown',
+                'mouseleave': 'onMouseLeave',
+                'mouseup': 'onMouseUp',
+                'click': 'onClick'
+            };
+
+            var events = this.simplifiedEvents.getEventsMap();
+            for (var key in events) { // jshint forin:false
+                var match = key.match(delegateEventSplitter);
+                var eventName = match[1];
+                var selector = match[2];
+                resultEvents[eventName + ' ' + 'td' + (selector ? ' ' + selector : '')] =
+                    _.partial(this.delegateEventToCell, key);
+            }
+            return resultEvents;
         },
 
         DOUBLE_CLICK_WAIT_TIMEOUT: 170,
@@ -94,43 +111,6 @@ define([
         },
 
         /**
-         * @inheritDoc
-         */
-        setElement: function() {
-            if (this.$el) {
-                this.undelegateCellEvents();
-            }
-            Row.__super__.setElement.apply(this, arguments);
-        },
-
-        /**
-         * Removes bound cell events
-         */
-        undelegateCellEvents: function() {
-            this.$el.off('.cellDE' + this.cid);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        delegateEvents: function() {
-            this.undelegateCellEvents();
-            var events = this.simplifiedEvents.getEventsMap();
-            for (var key in events) { // jshint ignore:line
-                var match = key.match(delegateEventSplitter);
-                var eventName = match[1];
-                var selector = match[2];
-                eventName += '.cellDE' + this.cid;
-                if (selector === '') {
-                    this.$el.on(eventName, 'td', _.bind(this.delegateEventToCell, this, key));
-                } else {
-                    this.$el.on(eventName, 'td ' + selector, _.bind(this.delegateEventToCell, this, key));
-                }
-            }
-            Row.__super__.delegateEvents.apply(this, arguments);
-        },
-
-        /**
          * Run event handler on cell
          */
         delegateEventToCell: function(key, e) {
@@ -139,11 +119,12 @@ define([
             for (var i = 0; i < this.subviews.length; i++) {
                 var view = this.subviews[i];
                 if (view.el === tdEl) {
-                    if (key in view.events) {
+                    var events = _.isFunction(view.events) ? view.events.call(this) : view.events;
+                    if (key in events) { // jshint forin:false
                         // run event
-                        var method = view.events[key];
+                        var method = events[key];
                         if (!_.isFunction(method)) {
-                            method = view[view.events[key]];
+                            method = view[events[key]];
                         }
                         if (!method) {
                             break;

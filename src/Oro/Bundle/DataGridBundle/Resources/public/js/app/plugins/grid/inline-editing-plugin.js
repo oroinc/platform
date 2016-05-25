@@ -163,8 +163,8 @@ define(function(require) {
              * @param fnIfUneditable
              * @param e
              */
+            /* jshint ignore:start */
             function selectAndRun(fnIfEditable, fnIfUneditable, e) {
-                /* jshint ignore:start */
                 if (this.isEditable()) {
                     if (_.isString(fnIfEditable)) {
                         fnIfEditable = this[fnIfEditable];
@@ -182,6 +182,19 @@ define(function(require) {
                     }
                     fnIfUneditable.call(this, e);
                 }
+            }
+            /* jshint ignore:end */
+
+            function generateEventList() {
+                /* jshint ignore:start */
+                var oldEventsInternal = _.isFunction(oldEvents) ? oldEvents.call(this, arguments) : oldEvents;
+                return _.extend(Object.create(oldEventsInternal), {
+                    'dblclick': _.partial(selectAndRun, 'enterEditModeIfNeeded', oldEventsInternal.dblclick),
+                    'mousedown [data-role=edit]': _.partial(selectAndRun, 'enterEditModeIfNeeded',
+                        oldEventsInternal['mousedown [data-role=edit]']),
+                    'click': _.partial(selectAndRun, _.noop, oldEventsInternal.click),
+                    'mouseenter': _.partial(selectAndRun, 'delayedIconRender', oldEventsInternal.mouseenter)
+                });
                 /* jshint ignore:end */
             }
 
@@ -206,13 +219,7 @@ define(function(require) {
                             '';
                         return (oldClassName ? oldClassName + ' ' : '') + addClassName;
                     },
-                events: _.extend(Object.create(oldEvents), {
-                    'dblclick': _.partial(selectAndRun, 'enterEditModeIfNeeded', oldEvents.dblclick),
-                    'mousedown [data-role=edit]': _.partial(selectAndRun, 'enterEditModeIfNeeded',
-                                                            oldEvents['mousedown [data-role=edit]']),
-                    'click': _.partial(selectAndRun, _.noop, oldEvents.click),
-                    'mouseenter': _.partial(selectAndRun, 'delayedIconRender', oldEvents.mouseenter)
-                }),
+                events: _.isFunction(oldEvents) ? generateEventList : generateEventList(),
 
                 delayedIconRender: function() {
                     if (!this.$el.find('> [data-role="edit"]').length) {
