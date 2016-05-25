@@ -69,8 +69,7 @@ define([
             if (this.disposed) {
                 return;
             }
-            delete this.row.cells;
-            delete this.row;
+            this.row.dispose();
             delete this.columns;
             Header.__super__.dispose.apply(this, arguments);
         }
