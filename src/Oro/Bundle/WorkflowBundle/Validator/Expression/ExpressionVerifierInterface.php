@@ -11,7 +11,7 @@ interface ExpressionVerifierInterface
      *
      * @throws ExpressionException
      *
-     * @return string
+     * @return bool
      */
     public function verify($expression);
 }
