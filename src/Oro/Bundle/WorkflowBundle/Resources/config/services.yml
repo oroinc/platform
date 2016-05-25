@@ -200,7 +200,7 @@ services:
             - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
 
-    oro_workflow.generator.process_configuration_generator:
+    oro_workflow.generator.process_configuration:
         class: Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator
         public: false
         arguments:

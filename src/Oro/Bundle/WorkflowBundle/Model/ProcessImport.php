@@ -49,23 +49,27 @@ class ProcessImport
      * @param array $processConfigurations
      * @return ProcessImportResult
      */
-    public function import(array $processConfigurations)
+    public function import(array $processConfigurations = [])
     {
         $importResult = new ProcessImportResult();
 
-        $importResult->setDefinitions(
-            $this->definitionImport->import(
-                $processConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS]
-            )
-        );
+        if (array_key_exists(ProcessConfigurationProvider::NODE_DEFINITIONS, $processConfigurations)) {
+            $importResult->setDefinitions(
+                $this->definitionImport->import(
+                    $processConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS]
+                )
+            );
+        }
 
-        $importResult->setTriggers(
-            $this->triggersImport->import(
-                $processConfigurations[ProcessConfigurationProvider::NODE_TRIGGERS],
-                $this->getRepository()->findAll()
-            )
-        );
-        
+        if (array_key_exists(ProcessConfigurationProvider::NODE_TRIGGERS, $processConfigurations)) {
+            $importResult->setTriggers(
+                $this->triggersImport->import(
+                    $processConfigurations[ProcessConfigurationProvider::NODE_TRIGGERS],
+                    $this->getRepository()->findAll()
+                )
+            );
+        }
+
         $importResult->setSchedules($this->triggersImport->getCreatedSchedules());
 
         return $importResult;

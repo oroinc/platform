@@ -54,11 +54,11 @@ workflows:
                             label: 'First Attribute'
                             options:
                                 required: true
-        transition_definitions:
-            first_transition_definition:
                 schedule:
                     cron: 1 * * * *
                     filter: e.field < DATE_ADD(NOW(), 1, 'day')
+        transition_definitions:
+            first_transition_definition:
                 pre_conditions:
                     '@true': ~
                 conditions:

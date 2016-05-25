@@ -89,7 +89,6 @@ class TransitionAssembler extends BaseAbstractAssembler
                 $options = array();
             }
             $definitions[$name] = array(
-                'schedule' => $this->getOption($options, 'schedule', []),
                 'pre_conditions' => $this->getOption($options, 'pre_conditions', array()),
                 'conditions' => $this->getOption($options, 'conditions', array()),
                 'post_actions' => $this->getOption($options, 'post_actions', array())
@@ -149,9 +148,9 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setPostAction($postAction);
         }
 
-        if (!empty($definition['schedule'])) {
-            $transition->setScheduleCron($this->getOption($definition['schedule'], 'cron', null));
-            $transition->setScheduleFilter($this->getOption($definition['schedule'], 'filter', null));
+        if (!empty($options['schedule'])) {
+            $transition->setScheduleCron($this->getOption($options['schedule'], 'cron', null));
+            $transition->setScheduleFilter($this->getOption($options['schedule'], 'filter', null));
         }
 
         return $transition;

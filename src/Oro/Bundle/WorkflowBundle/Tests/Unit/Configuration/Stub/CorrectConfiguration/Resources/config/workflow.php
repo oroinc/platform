@@ -75,14 +75,14 @@ return array(
                         )
                     )
                 ),
+                'schedule' => [
+                    'cron' => '1 * * * *',
+                    'filter' => "e.field < DATE_ADD(NOW(), 1, 'day')"
+                ]
             )
         ),
         'transition_definitions' => array(
             'first_transition_definition' => array(
-                'schedule' => [
-                    'cron' => '1 * * * *',
-                    'filter' => "e.field < DATE_ADD(NOW(), 1, 'day')"
-                ],
                 'pre_conditions' => array(
                     '@true' => null
                 ),
