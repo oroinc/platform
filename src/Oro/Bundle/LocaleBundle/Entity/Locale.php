@@ -5,11 +5,17 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField; // required by DatesAwareTrait
 
 /**
  * @ORM\Entity()
  * @ORM\Table(name="oro_locale")
+ * @Config(
+ *      routeName="oro_locale_locale_index",
+ *      routeView="oro_locale_locale_view",
+ *      routeUpdate="oro_locale_locale_update"
+ * )
  * @ORM\HasLifecycleCallbacks()
  */
 class Locale

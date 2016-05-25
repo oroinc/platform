@@ -1,0 +1,38 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+
+{% oro_title_set({params : {"%id%": entity.id}}) %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_locale_locale_index'),
+        'indexLabel': 'oro.locale.locale.entity_plural_label'|trans,
+        'entityTitle': 'oro.locale.locale.navigation.view'|trans({
+            '%id%': entity.id|default('N/A'|trans)
+        })
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set localeWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'title': 'oro.locale.locale.widgets.locale_information'|trans,
+            'url': path('oro_locale_locale_info', {'id': entity.id})
+        }) }}
+    {% endset %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'oro.locale.locale.sections.general'|trans,
+            'class': 'active',
+            'subblocks': [{data: [localeWidget]}]
+        }
+    ] %}
+
+    {% set id = 'locale-view' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}

@@ -1,0 +1,29 @@
+datagrid:
+    locales-grid:
+        #acl_resource: oro_locale_locale_view
+        options:
+            entityHint:         locale
+            entity_pagination:  true
+        source:
+            type: orm
+            query:
+                select:
+                    - locale.id
+                from:
+                    - { table: %oro_locale.entity.locale.class%, alias: locale }
+        columns:
+            id:
+                label: oro.locale.locale.id.label
+        properties:
+            id: ~
+            view_link:
+                type:  url
+                route: oro_locale_locale_view
+                params: [ id ]
+        actions:
+            view:
+                type:           navigate
+                label:          oro.grid.action.view
+                link:           view_link
+                icon:           eye-open
+                #acl_resource:   orob_locale_locale_view
