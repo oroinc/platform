@@ -57,7 +57,6 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
             return $default;
         }
         $value['part'] = DateModifierInterface::PART_VALUE;
-
         if (!isset($value['value']['start']) && !isset($value['value']['end'])) {
             /** @var \DateTime $start */
             /** @var \DateTime $end */
@@ -65,6 +64,14 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
 
             $value['value']['start'] = $start->format('Y-m-d H:i:s');
             $value['value']['end']   = $end->format('Y-m-d H:i:s');
+        }
+
+        if (isset($value['value']['start']) && isset($value['value']['end'])) {
+            if ($value['value']['start'] > $value['value']['end']) {
+                $end = $value['value']['end'];
+                $value['value']['end'] = $value['value']['start'];
+                $value['value']['start'] = $end;
+            }
         }
 
         return parent::getConvertedValue($widgetConfig, $value);

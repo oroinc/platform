@@ -6,7 +6,7 @@ use Doctrine\Common\Util\Inflector;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\DataGridBundle\Common\Object;
+use Oro\Bundle\DataGridBundle\Common\DataObject;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 class ChannelTest extends \PHPUnit_Framework_TestCase
@@ -92,9 +92,9 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
         $value = $accessor->getValue($this->entity, $fieldName);
         $this->assertNotEmpty($value);
 
-        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Common\Object', $value);
+        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Common\DataObject', $value);
 
-        $newValue = Object::create([]);
+        $newValue = DataObject::create([]);
         $accessor->setValue($this->entity, $fieldName, $newValue);
         $this->assertNotSame($value, $this->entity->$referenceGetter());
 

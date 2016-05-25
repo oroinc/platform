@@ -375,9 +375,12 @@ define([
         },
 
         getEventFormData: function() {
+            var fieldNameFilterRegex = /^oro_calendar_event_form/;
             var fieldNameRegex = /\[(\w+)\]/g;
             var data = {};
-            var formData = this.eventDialog.form.serializeArray();
+            var formData = this.eventDialog.form.serializeArray().filter(function(item) {
+                return fieldNameFilterRegex.test(item.name);
+            });
             formData = formData.concat(this.eventDialog.form.find('input[type=checkbox]:not(:checked)')
                 .map(function() {
                     return {name: this.name, value: false};

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action;
 
-use Oro\Bundle\DataGridBundle\Common\Object;
+use Oro\Bundle\DataGridBundle\Common\DataObject;
 
-class ActionConfiguration extends Object
+class ActionConfiguration extends DataObject
 {
 }
