@@ -172,10 +172,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->method('andWhere')
             ->with('c.id IN (:visibleIds)')
             ->will($this->returnSelf());
-        $qb->expects($this->any())
-            ->method('orWhere')
-            ->will($this->returnSelf());
-        $qb->expects($this->any())
+        $qb->expects($this->once())
             ->method('setParameter')
             ->will($this->returnSelf());
         $qb->expects($this->once())
@@ -221,9 +218,6 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('andWhere')
             ->with('1 = 0')
-            ->will($this->returnSelf());
-        $qb->expects($this->any())
-            ->method('orWhere')
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('getQuery')
