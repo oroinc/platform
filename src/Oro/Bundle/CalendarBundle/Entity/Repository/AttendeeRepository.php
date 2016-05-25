@@ -69,23 +69,4 @@ class AttendeeRepository extends EntityRepository
             ->getQuery()
             ->getArrayResult();
     }
-
-    /**
-     * @param int $id
-     *
-     * @return Attendee[]
-     */
-    public function getAttendeesByCalendarEventId($id)
-    {
-        $qb = $this->createQueryBuilder('a')
-            ->select('a')
-            ->innerJoin('a.calendarEvent', 'calendarEvent')
-            ->leftJoin('a.user', 'user')
-            ->andWhere('calendarEvent.id = :calendar_event_id')
-            ->setParameter('calendar_event_id', $id);
-
-        $query = $qb->getQuery();
-
-        return $query->getResult();
-    }
 }

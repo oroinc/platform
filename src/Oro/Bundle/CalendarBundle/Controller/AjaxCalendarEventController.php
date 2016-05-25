@@ -41,15 +41,19 @@ class AjaxCalendarEventController extends Controller
         try {
             $this->get('oro_calendar.calendar_event_manager')->changeStatus($entity, $status);
         } catch (CalendarEventRelatedAttendeeNotFoundException $ex) {
-            return new JsonResponse([
-                'successfull' => false,
-                'message' => $ex->getMessage(),
-            ]);
+            return new JsonResponse(
+                [
+                    'successfull' => false,
+                    'message'     => $ex->getMessage(),
+                ]
+            );
         } catch (StatusNotFoundException $ex) {
-            return new JsonResponse([
-                'successfull' => false,
-                'message' => $ex->getMessage(),
-            ]);
+            return new JsonResponse(
+                [
+                    'successfull' => false,
+                    'message'     => $ex->getMessage(),
+                ]
+            );
         }
 
         $this->getDoctrine()
@@ -74,10 +78,9 @@ class AjaxCalendarEventController extends Controller
      */
     public function attendeesAutocompleteDataAction($id)
     {
-        $data = $this->get('oro_calendar.attendees_to_view_transformer')
-            ->transform($this->getAttendeeManager()->loadAttendeesByCalendarEventId($id));
-
-        $result = array_map(
+        $attendees = $this->getAttendeeManager()->loadAttendeesByCalendarEventId($id);
+        $data      = $this->get('oro_calendar.attendees_to_view_transformer')->transform($attendees);
+        $result    = array_map(
             function ($data) {
                 return json_decode($data, true);
             },

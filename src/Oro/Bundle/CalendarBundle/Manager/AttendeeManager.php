@@ -27,6 +27,6 @@ class AttendeeManager
     {
         return $this->doctrineHelper
             ->getEntityRepository('OroCalendarBundle:Attendee')
-            ->getAttendeesByCalendarEventId($id);
+            ->findBy(['calendarEvent'=>$id]);
     }
 }
