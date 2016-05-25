@@ -21,6 +21,6 @@ oro_menu_config:
 
 oro_titles:
     oro_locale_locale_index: ~
-    oro_locale_locale_view:   'orob.locale.navigation.view'
-    oro_locale_locale_update: 'orob.locale.navigation.view - oro.ui.edit'
+    oro_locale_locale_view:   'oro.locale.locale.navigation.view'
+    oro_locale_locale_update: 'oro.locale.locale.navigation.view - oro.ui.edit'
     oro_locale_locale_create: 'oro.ui.create_entity'
