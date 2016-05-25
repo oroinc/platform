@@ -2,6 +2,8 @@ oro_system_configuration:
     groups:
         email_notifications_settings:
             title: oro.notification.system_configuration.title
+        email_mass_notifications_settings:
+            title: oro.notification.system_configuration.mass_notification.title
 
     fields:
         oro_notification.email_notification_sender_email:
@@ -14,6 +16,21 @@ oro_system_configuration:
             type: text
             options:
                 label: oro.notification.system_configuration.email_notification_sender_name
+        oro_notification.mass_notification_template:
+            data_type: string
+            type: oro_email_system_template_list
+            priority: 20
+            options:
+                required: false
+                label: oro.notification.system_configuration.mass_notification.template
+                tooltip: oro.notification.system_configuration.mass_notification.template.tooltip
+        oro_notification.mass_notification_recipients:
+            data_type: string
+            type: textarea
+            priority: 10
+            options:
+                label: oro.notification.system_configuration.mass_notification.recipients
+                tooltip: oro.notification.system_configuration.mass_notification.recipients.tooltip
     tree:
         system_configuration:
             platform:
@@ -23,10 +40,15 @@ oro_system_configuration:
                             email_configuration:
                                 children:
                                     email_notifications_settings:
+                                        priority: 20
                                         children:
                                             - oro_notification.email_notification_sender_email
                                             - oro_notification.email_notification_sender_name
-
+                                    email_mass_notifications_settings:
+                                        priority: 10
+                                        children:
+                                            - oro_notification.mass_notification_recipients
+                                            - oro_notification.mass_notification_template
     api_tree:
         email_configuration:
             oro_notification.email_notification_sender_email: ~

@@ -74,7 +74,11 @@ class TranslatableEntityType extends AbstractType
 
             /** @var $entityManager EntityManager */
             $entityManager = $registry->getManager();
-            $idField = $entityManager->getClassMetadata($className)->getSingleIdentifierFieldName();
+            if (!empty($options['choice_value'])) {
+                $idField = $options['choice_value'];
+            } else {
+                $idField = $entityManager->getClassMetadata($className)->getSingleIdentifierFieldName();
+            }
 
             if (null !== $options['choices']) {
                 return new ObjectChoiceList($options['choices'], $options['property'], array(), null, $idField);

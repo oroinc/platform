@@ -58,3 +58,10 @@ oro:
             email_notification_sender_email: Sender Email
             email_notification_sender_name: Sender Name
             title: Notification Configuration
+            mass_notification:
+              title: Mass Notification Configuration
+              template: Email Template
+              template.tooltip: The default template to use for system notifications.
+              recipients: Recipients
+              recipients.tooltip: By default, if this field is empty, all active users recieve system mass notification emails. If you want mass notifications to be sent to certain email addresses only, please specify the email addresses list here, separated by semicolon (;)
+
