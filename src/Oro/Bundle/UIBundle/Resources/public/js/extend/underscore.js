@@ -1,4 +1,4 @@
-define(['underscore'], function(_) {
+define(['underscore', 'asap'], function(_, asap) {
     'use strict';
 
     _.mixin({
@@ -24,12 +24,7 @@ define(['underscore'], function(_) {
         }
     });
 
-    /**
-     * asap() should be exposed by requireJs bundle
-     */
-    if (window.asap) {
-        _.defer = window.asap;
-    }
+    _.defer = asap;
 
     return _;
 });
