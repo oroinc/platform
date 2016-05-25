@@ -180,7 +180,7 @@ define(function(require) {
 
         var selectedData;
         var dataIds;
-        var currentValue = tools.ensureArray(element.select2('val'));
+        var currentValue = tools.ensureArray(element.inputWidget('val'));
 
         if (config.forceSelectedData && element.data('selected-data')) {
             var data = element.data('selected-data');

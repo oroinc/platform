@@ -162,7 +162,7 @@ define(function(require) {
         },
 
         setValue: function(value) {
-            this.element.select2('val', value, true);
+            this.element.inputWidget('val', value, true);
         },
 
         formatChoice: function(value, template) {

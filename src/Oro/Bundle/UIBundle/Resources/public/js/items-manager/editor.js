@@ -6,7 +6,7 @@ define([
 
     function setValue($elem, value) {
         if ($elem.data('select2')) {
-            $elem.select2('val', value);
+            $elem.inputWidget('val', value);
         } else {
             $elem.val(value);
         }

@@ -29,10 +29,10 @@ define([
                 return;
             }
 
-            var data = this.$contextEl.select2('data');
+            var data = this.$contextEl.inputWidget('valData');
             this.$el.data('organization', _.result(organizations, id, null));
             data.push(contexts[id]);
-            this.$contextEl.select2('data', data);
+            this.$contextEl.inputWidget('valData', data);
         },
 
         _onchange: function(e) {
@@ -40,7 +40,7 @@ define([
             var searchChoice = this.$el.data('search-choice');
             searchChoice.data = {id: '', text: ''};
 
-            var data = this.$contextEl.select2('data');
+            var data = this.$contextEl.inputWidget('valData');
             if (e.added) {
                 this.$el.trigger('recipient:add', e.added.id);
             }
@@ -51,10 +51,10 @@ define([
                     var newData = _.reject(data, function(item) {
                         return item.id === contexts[e.removed.id].id;
                     });
-                    this.$contextEl.select2('data', newData);
+                    this.$contextEl.inputWidget('valData', newData);
                 }
 
-                if (_.isEmpty(this.$el.select2('data'))) {
+                if (_.isEmpty(this.$el.inputWidget('valData'))) {
                     this.$el.data('organization', null);
                 }
             }
@@ -94,7 +94,7 @@ define([
                 if (!this.results.find('.select2-highlighted').length) {
                     var val = this.search.val();
                     if (val) {
-                        var valueExistsAlready = _.some(this.opts.element.select2('data'), function(item) {
+                        var valueExistsAlready = _.some(this.opts.element.inputWidget('valData'), function(item) {
                             return val === item.id;
                         });
 

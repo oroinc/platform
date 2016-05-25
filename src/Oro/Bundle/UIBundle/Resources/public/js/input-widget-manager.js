@@ -190,7 +190,7 @@ define(function(require) {
          * Example of usage:
          *     $(':input').inputWidget('create');//create widgets
          *     $(':input').inputWidget('refresh');//update widget, for example after input value change
-         *     $(':input:first').inputWidget('getContainer');//get widget root element
+         *     $(':input:first').inputWidget('container');//get widget root element
          *     $(':input').inputWidget('setWidth', 100);//set widget width
          *     $(':input').inputWidget('dispose');//destroy widgets and dispose widget instance
          *

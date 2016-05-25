@@ -338,7 +338,7 @@ define([
 
                     if ($item.data('select2')) {
                         // select2 is already initialized
-                        selectedData = $item.select2('data');
+                        selectedData = $item.inputWidget('valData');
                     }
                     if (!_.isEmpty(selectedData) && $.isPlainObject(selectedData)) {
                         itemData.selectedData = [selectedData];

@@ -28,7 +28,6 @@ define([
             this.$simpleEl = $(options.simpleEl);
 
             this.target.closest('.controls').append(this.$simpleEl);
-            this.targetWidget = this.target.inputWidget('getContainer');
             this.$simpleEl.attr('type', 'text');
 
             this.showSelect = options.showSelect;
@@ -54,9 +53,9 @@ define([
                 if (this.regionRequired) {
                     this.addRequiredFlag(this.$simpleEl);
                 }
-                this.target.select2('container').show();
+                this.target.inputWidget('show');
             } else {
-                this.target.select2('container').hide();
+                this.target.inputWidget('hide');
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }
@@ -115,9 +114,7 @@ define([
             if (this.collection.models.length > 0) {
                 this.target.show();
                 this.displaySelect2(true);
-                if (this.targetWidget) {
-                    this.targetWidget.show();
-                }
+                this.target.inputWidget('show');
 
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
@@ -129,9 +126,7 @@ define([
                 this.target.hide();
                 this.target.val('');
                 this.displaySelect2(false);
-                if (this.targetWidget) {
-                    this.targetWidget.hide();
-                }
+                this.target.inputWidget('hide');
                 this.$simpleEl.show();
             }
             this.$el.trigger('value:changed');

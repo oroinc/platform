@@ -68,7 +68,7 @@ define([
      */
     function getErrorTarget(element) {
         var $target = $(validationBelongs(element));
-        var $widgetContainer = $target.inputWidget('getContainer');
+        var $widgetContainer = $target.inputWidget('container');
         if ($widgetContainer) {
             $target = $widgetContainer;
         } else if ($target.parent().is('.input-append, .input-prepend')) {

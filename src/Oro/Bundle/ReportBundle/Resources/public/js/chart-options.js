@@ -91,7 +91,7 @@ define(function(require) {
                     var name = _.first(value.split('('));
                     if (!_.findWhere(self.items, {name: name})) {
                         if ($input.data('select2')) {
-                            $input.select2('val', '');
+                            $input.inputWidget('val', '');
                         } else {
                             $input.val('');
                         }

@@ -61,7 +61,7 @@ define(function(require) {
                 };
                 // set value
                 selectorEl.on('select2-data-request.' + entitySelectDialog._wid, onDataRequest);
-                selectorEl.select2('val', data.model.get(existingEntityGridId), true);
+                selectorEl.inputWidget('val', data.model.get(existingEntityGridId), true);
                 // if there was no data request sent to server
                 if (!loadingStarted) {
                     onSelect();
@@ -97,7 +97,7 @@ define(function(require) {
             });
 
             var processSelectedEntities = function(id) {
-                selectorEl.select2('val', id, true);
+                selectorEl.inputWidget('val', id, true);
                 entityCreateDialog.remove();
                 selectorEl.select2('focus');
             };
@@ -119,10 +119,10 @@ define(function(require) {
                 urlParts = newParts;
             },
             setSelection: function(value) {
-                selectorEl.select2('val', value);
+                selectorEl.inputWidget('val', value);
             },
             getSelection: function() {
-                return selectorEl.select2('val');
+                return selectorEl.inputWidget('val');
             }
         };
     };

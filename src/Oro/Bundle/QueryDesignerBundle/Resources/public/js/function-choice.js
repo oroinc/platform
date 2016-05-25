@@ -125,7 +125,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             } else {
                 $elem.attr('disabled', flag);
             }
-            var $widgetContainer = $elem.inputWidget('getContainer');
+            var $widgetContainer = $elem.inputWidget('container');
             if ($widgetContainer) {
                 $widgetContainer.toggleClass('disabled', flag);
             }

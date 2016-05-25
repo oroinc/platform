@@ -80,11 +80,11 @@ define(function(require) {
         reset: function() {
             DictionaryFilter.__super__.reset.apply(this, arguments);
             var select2element = this.$el.find(this.elementSelector);
-            var data = select2element.select2('data');
+            var data = select2element.inputWidget('valData');
             if (data.length) {
                 this.previousData = data;
             }
-            select2element.select2('data',  null);
+            select2element.inputWidget('valData',  null);
         },
 
         /**
@@ -174,7 +174,7 @@ define(function(require) {
                     self.applyValue();
                 });
             }
-            select2element.select2('data',  values);
+            select2element.inputWidget('valData',  values);
 
             this._criteriaRenderd = true;
         },
@@ -281,7 +281,7 @@ define(function(require) {
         _readDOMValue: function() {
             var value;
             if (this.isInitSelect2) {
-                value = this.$el.find('.select-values-autocomplete').select2('val');
+                value = this.$el.find('.select-values-autocomplete').inputWidget('val');
             } else {
                 value = null;
             }
@@ -341,7 +341,7 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var data = this.$(this.elementSelector).select2('data');
+            var data = this.$(this.elementSelector).inputWidget('valData');
             if (!data.length) {
                 data = this.previousData.length ? this.previousData : this.initialData;
             }

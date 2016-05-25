@@ -40,7 +40,7 @@ define(function(require) {
 
         refreshOnChange: false,
 
-        overrideJqueryMethods: ['val'],
+        overrideJqueryMethods: ['val', 'hide', 'show'],
 
         /**
          * @inheritDoc
@@ -50,8 +50,7 @@ define(function(require) {
             this.initializeWidget();
 
             if (this.isInitialized()) {
-                this.findContainer();
-                this.getContainer().addClass(this.containerClass);
+                this.container().addClass(this.containerClass);
             }
         },
 
@@ -122,15 +121,17 @@ define(function(require) {
         /**
          * Find widget root element
          */
-        findContainer: function() {},
+        findContainer: function() {
+            throw Error('"findContainer" method have to be defined in the child view');
+        },
 
         /**
          * Get widget root element
          *
          * @returns {jQuery}
          */
-        getContainer: function() {
-            return this.$container;
+        container: function() {
+            return this.$container || (this.$container = this.findContainer());
         },
 
         /**
@@ -139,9 +140,7 @@ define(function(require) {
          * @param {mixed} width
          */
         setWidth: function(width) {
-            if (this.getContainer()) {
-                this.getContainer().width(width);
-            }
+            this.container().width(width);
         },
 
         /**
@@ -154,6 +153,14 @@ define(function(require) {
                 this.disposeWidget();
                 this.initializeWidget();
             }
+        },
+
+        hide: function() {
+            this.container().hide();
+        },
+
+        show: function() {
+            this.container().show();
         },
 
         _addEvent: function(eventName, callback) {

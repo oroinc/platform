@@ -254,7 +254,7 @@ define([
 
             if (this.filter && !this.filter.isEmptyValue()) {
                 value = {
-                    columnName: base64.encode(this.element.find('input.select').select2('val')),
+                    columnName: base64.encode(this.element.find('input.select').inputWidget('val')),
                     criterion: this._getFilterCriterion()
                 };
             } else {

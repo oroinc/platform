@@ -19,7 +19,7 @@ define(function(require) {
             UniformSelectInputWidget.__super__.initializeWidget.apply(this, arguments);
             if (this.$el.is('.error:not([multiple])')) {
                 this.$el.removeClass('error');
-                this.findContainer().addClass('error');
+                this.container().addClass('error');
             }
         },
 
@@ -35,7 +35,7 @@ define(function(require) {
          * @inheritDoc
          */
         findContainer: function() {
-            this.$container = this.$el.parent('.selector');
+            return this.$el.parent('.selector');
         },
 
         /**

@@ -56,7 +56,7 @@ define(function(require) {
 
         resetForm: function() {
             this.editViewId = null;
-            this.entityFieldSelectEl.select2('val', '');
+            this.entityFieldSelectEl.inputWidget('val', '');
             this.form.get(0).reset();
             this.submitBtn.html('<i class="icon-plus"></i> ' + __('Add'));
             this.resetBtn.addClass('hide');

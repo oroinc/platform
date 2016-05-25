@@ -25,7 +25,7 @@ define(function(require) {
             UniformFileInputWidget.__super__.initializeWidget.apply(this, arguments);
             if (this.$el.is('.error')) {
                 this.$el.removeClass('error');
-                this.findContainer().addClass('error');
+                this.container().addClass('error');
             }
         },
 
@@ -41,7 +41,7 @@ define(function(require) {
          * @inheritDoc
          */
         findContainer: function() {
-            this.$container = this.$el.parent('.uploader');
+            return this.$el.parent('.uploader');
         }
     });
 

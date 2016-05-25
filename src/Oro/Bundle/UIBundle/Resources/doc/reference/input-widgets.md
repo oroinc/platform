@@ -28,7 +28,7 @@ var UniformSelectInputWidget = AbstractInputWidget.extend({
     },
 
     findContainer: function() {
-        this.$container = this.$el.parent('.selector');
+        return this.$el.parent('.selector');
     }
 });
 
