@@ -4,7 +4,7 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\NoteBundle\Entity\Note;;
+use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Tests\Unit\Stub\AttachmentProviderStub;
 
