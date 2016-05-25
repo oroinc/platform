@@ -116,15 +116,18 @@ class LayoutExtension extends \Twig_Extension
      */
     public function mergeAttributes(array $attr, array $defaultAttr)
     {
-        foreach ($attr as $key => $value) {
-            if (strpos($key, '~') !== false && !is_array($value)) {
-                $defaultAttr['class'] = $value.$defaultAttr['class'];
+        foreach ($defaultAttr as $key => $value) {
+            if ($key[0] === '~') {
+                $key = substr($key, 1);
+                if (array_key_exists($key, $attr)) {
+                    $attr[$key] .= $value;
+                }
             }
-            if (!array_key_exists($key, $defaultAttr)) {
-                $defaultAttr[$key] = $value;
+            if (!array_key_exists($key, $attr)) {
+                $attr[$key] = $value;
             }
         }
-        return $defaultAttr;
+        return $attr;
     }
 
     /**

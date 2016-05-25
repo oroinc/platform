@@ -144,25 +144,23 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
                 'attr'  => [
                     'id' => 'someId',
                     'name' => 'test',
-                    '~class' => 'testClass'
+                    'class' => 'testClass'
                 ],
                 'defaultAttr'   => [
                     'autofocus' => true,
-                    'class' => ' input input_block'
+                    '~class' => ' input input_block'
                 ],
                 'expected'  => [
                     'autofocus' => true,
                     'class' => 'testClass input input_block',
                     'id' => 'someId',
                     'name' => 'test',
-                    '~class' => 'testClass'
                 ],
             ],
-            'attributes with tilde value array' => [
+            'attributes without tilde' => [
                 'attr'  => [
                     'id' => 'someId',
                     'name' => 'test',
-                    '~class' => ['first' => 'testClass']
                 ],
                 'defaultAttr'   => [
                     'autofocus' => true,
@@ -173,16 +171,16 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
                     'class' => 'input input_block',
                     'id' => 'someId',
                     'name' => 'test',
-                    '~class' => ['first' => 'testClass']
                 ],
             ],
-            'attributes without tilde' => [
+            'attributes default' => [
                 'attr'  => [
                     'id' => 'someId',
                     'name' => 'test',
                 ],
                 'defaultAttr'   => [
                     'autofocus' => true,
+                    'name' => 'default_value',
                     'class' => 'input input_block'
                 ],
                 'expected'  => [
