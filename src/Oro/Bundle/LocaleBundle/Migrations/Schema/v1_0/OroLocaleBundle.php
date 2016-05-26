@@ -1,26 +1,14 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Migrations\Schema;
+namespace Oro\Bundle\LocaleBundle\Migrations\Schema\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- */
-class OroLocaleBundleInstaller implements Installation
+class OroLocaleBundle implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMigrationVersion()
-    {
-        return 'v1_0';
-    }
-
     /**
      * {@inheritdoc}
      */
