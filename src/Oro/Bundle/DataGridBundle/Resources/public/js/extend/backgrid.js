@@ -66,7 +66,7 @@ define(function(require) {
      *
      * Please find support code in ../datagrid/row.js
      */
-    Backgrid.Cell.prototype.simplifiedEventBinding = true;
+    Backgrid.Cell.prototype.delegatedEventBinding = true;
     var oldDelegateEvents = Backgrid.Cell.prototype.delegateEvents;
     Backgrid.Cell.prototype.delegateEvents = function() {
         if (_.isFunction(this.events)) {
