@@ -46,7 +46,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
     {
         $table = $schema->createTable('oro_calendar_event_attendee');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('user_id', 'integer', ['notnull' => false]);
         $table->addColumn('calendar_event_id', 'integer', ['notnull' => true]);
         $table->addColumn('email', 'string', ['notnull' => true, 'length' => 255]);
         $table->addColumn('display_name', 'string', ['notnull' => false, 'length' => 255]);
@@ -55,7 +55,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
 
         $table->setPrimaryKey(['id']);
 
-        $table->addIndex(['user_owner_id']);
+        $table->addIndex(['user_id']);
         $table->addIndex(['calendar_event_id']);
     }
 
@@ -68,7 +68,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
-            ['user_owner_id'],
+            ['user_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );

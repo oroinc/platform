@@ -75,7 +75,7 @@ class Attendee extends ExtendAttendee
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
     protected $user;
 
@@ -126,7 +126,6 @@ class Attendee extends ExtendAttendee
     {
         return $this->id;
     }
-
 
     /**
      * @return string

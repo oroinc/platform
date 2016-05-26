@@ -41,7 +41,7 @@ class ConvertCalendarEventOwnerToAttendee extends ParametrizedMigrationQuery
     {
         $sql = <<<EOD
 INSERT INTO oro_calendar_event_attendee
-(user_owner_id, calendar_event_id, status_id, origin_id, type_id, email, display_name, created_at, updated_at)
+(user_id, calendar_event_id, status_id, origin_id, type_id, email, display_name, created_at, updated_at)
 
 SELECT
     c.user_owner_id,
