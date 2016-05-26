@@ -111,6 +111,20 @@ UPGRADE FROM 1.9 to 1.10
 - The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
 - The class Oro\Component\ConfigExpression\Condition\True was renamed to TrueCondition
 
+####UiBundle
+- Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) plugin by Sachin N.
+
+Gallery view for a group of `<a>` elements can be triggered by adding 'data-gallery' attribute with unique gallery id.
+
+```
+<a href="sample1.jpg" data-gallery="unique-id"></a>
+<a href="sample2.jpg" data-gallery="unique-id"></a>
+```
+
+####EmailBundle
+- Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
+- Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
+
 ####PlatformBundle
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
 
