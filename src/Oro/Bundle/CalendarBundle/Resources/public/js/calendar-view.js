@@ -47,7 +47,7 @@ define(function(require) {
         options: {
             timezone: localeSettings.getTimeZone(),
             eventsOptions: {
-                defaultView: 'month',
+                defaultView: 'agendaWeek',
                 allDayText: __('oro.calendar.control.all_day'),
                 buttonText: {
                     today: __('oro.calendar.control.today'),
@@ -74,7 +74,8 @@ define(function(require) {
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
-                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
+                recoverView: true
             },
             connectionsOptions: {
                 collection: null,
@@ -128,6 +129,23 @@ define(function(require) {
             // set options for new events
             this.options.newEventEditable = this.options.eventsOptions.editable;
             this.options.newEventRemovable = this.options.eventsOptions.removable;
+
+            if (this.options.eventsOptions.recoverView) {
+                // try to retrieve the last view for this calendar
+                var viewKey = this.getStorageKey('defaultView');
+                var dateKey = this.getStorageKey('defaultDate');
+
+                var defaultView = persistentStorage.getItem(viewKey);
+                var defaultDate = persistentStorage.getItem(dateKey);
+
+                if (defaultView) {
+                    this.options.eventsOptions.defaultView =  defaultView;
+                }
+
+                if (defaultDate && !isNaN(defaultDate)) {
+                    this.options.eventsOptions.defaultDate =  moment.unix(defaultDate);
+                }
+            }
 
             // subscribe to event collection events
             this.listenTo(this.collection, 'add', this.onEventAdded);
@@ -690,12 +708,6 @@ define(function(require) {
                 }
                 options.scrollTime = scrollTime.startOf('hour').format('HH:mm:ss');
             }
-            // override fullcalendar lib defaults
-            if (!options.defaultView || options.defaultView == 'month') {
-                // try to retrieve the last view for this calendar
-                var lastView =  this.getStorageKey() ? persistentStorage.getItem(this.getStorageKey()) : null;
-                options.defaultView =  lastView || 'agendaWeek';
-            }
 
             var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
             var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
@@ -814,11 +826,18 @@ define(function(require) {
             var dayCol;
             var calendarElement = this.getCalendarElement();
             var currentView = calendarElement.fullCalendar('getView');
-            var key = this.getStorageKey();
+            var currentDate = calendarElement.fullCalendar('getDate');
+            var viewKey = this.getStorageKey('defaultView');
+            var dateKey = this.getStorageKey('defaultDate');
 
-            if (key) {
-                persistentStorage.setItem(key, currentView.name)
+            if (this.options.eventsOptions.recoverView) {
+                persistentStorage.setItem(viewKey, currentView.name);
+
+                if (!isNaN(currentDate)) {
+                    persistentStorage.setItem(dateKey, currentDate.unix());
+                }
             }
+
             // shown interval in calendar timezone
             var shownInterval = {
                 start: currentView.intervalStart.clone().utc(),
@@ -932,10 +951,10 @@ define(function(require) {
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
         },
 
-        getStorageKey: function() {
-            var calId = this.options.calendar;
+        getStorageKey: function(item) {
+            var calendarId = this.options.calendar;
 
-            return calId ? 'calendarView' + calId : '';
+            return calendarId ? item + calendarId : '';
         }
     });
 
