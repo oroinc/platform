@@ -203,4 +203,9 @@ class OptionsResolver
     {
         return $this->optionsResolver->count();
     }
+
+    public function __clone()
+    {
+        $this->optionsResolver = clone $this->optionsResolver;
+    }
 }
