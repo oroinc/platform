@@ -15,21 +15,21 @@ define(['underscore', 'backbone'], function(_, Backbone) {
     CellEventList.prototype = {
         getEventsMap: function() {
             if (!this.cachedEventList) {
-                var simplifiedCellEvents = {};
+                var cellEventsList = {};
                 this.columns.each(function(column) {
                     if (!column.get('renderable')) {
                         return;
                     }
                     var cellCtor = column.get('cell');
-                    if (cellCtor.prototype.simplifiedEventBinding) {
+                    if (!_.isFunction(cellCtor.prototype.events)) {
                         for (var eventName in cellCtor.prototype.events) { // jshint ignore:line
-                            if (!simplifiedCellEvents.hasOwnProperty(eventName)) {
-                                simplifiedCellEvents[eventName] = true;
+                            if (!cellEventsList.hasOwnProperty(eventName)) {
+                                cellEventsList[eventName] = true;
                             }
                         }
                     }
                 });
-                this.cachedEventList = simplifiedCellEvents;
+                this.cachedEventList = cellEventsList;
             }
             return this.cachedEventList;
         }

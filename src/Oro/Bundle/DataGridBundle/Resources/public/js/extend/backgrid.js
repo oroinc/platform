@@ -66,9 +66,18 @@ define(function(require) {
      *
      * Please find support code in ../datagrid/row.js
      */
-    Backgrid.Cell.prototype.simplifiedEventBinding = true;
-    Backgrid.Cell.prototype.delegateEvents = _.noop;
-    Backgrid.Cell.prototype.undelegateEvents = _.noop;
+    var oldDelegateEvents = Backgrid.Cell.prototype.delegateEvents;
+    Backgrid.Cell.prototype.delegateEvents = function() {
+        if (_.isFunction(this.events)) {
+            oldDelegateEvents.call(this);
+        }
+    };
+    var oldUndelegateEvents = Backgrid.Cell.prototype.undelegateEvents;
+    Backgrid.Cell.prototype.undelegateEvents = function() {
+        if (_.isFunction(this.events)) {
+            oldUndelegateEvents.call(this);
+        }
+    };
 
     return Backgrid;
 });
