@@ -11,6 +11,7 @@ define(function(require) {
     var gridViewsBuilder = require('../../../inline-editing/builder');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var Modal = require('oroui/js/modal');
+    var DynamicEventList = require('./inline-editing-plugin/dynamic-event-list');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
@@ -154,51 +155,13 @@ define(function(require) {
         patchCellConstructor: function(column) {
             var cellCtor = column.get('cell');
             var inlineEditingPlugin = this;
-            var oldEvents = cellCtor.prototype.events;
-
-            /**
-             * Select one of two handlers and run it
-             *
-             * @param fnIfEditable
-             * @param fnIfUneditable
-             * @param e
-             */
-            /* jshint ignore:start */
-            function selectAndRun(fnIfEditable, fnIfUneditable, e) {
-                if (this.isEditable()) {
-                    if (_.isString(fnIfEditable)) {
-                        fnIfEditable = this[fnIfEditable];
-                    }
-                    if (!fnIfEditable) {
-                        return;
-                    }
-                    fnIfEditable.call(this, e);
-                } else {
-                    if (_.isString(fnIfUneditable)) {
-                        fnIfUneditable = this[fnIfUneditable];
-                    }
-                    if (!fnIfUneditable) {
-                        return;
-                    }
-                    fnIfUneditable.call(this, e);
-                }
-            }
-            /* jshint ignore:end */
-
-            function generateEventList() {
-                /* jshint ignore:start */
-                var oldEventsInternal = _.isFunction(oldEvents) ? oldEvents.call(this, arguments) : oldEvents;
-                return _.extend(Object.create(oldEventsInternal), {
-                    'dblclick': _.partial(selectAndRun, 'enterEditModeIfNeeded', oldEventsInternal.dblclick),
-                    'mousedown [data-role=edit]': _.partial(selectAndRun, 'enterEditModeIfNeeded',
-                        oldEventsInternal['mousedown [data-role=edit]']),
-                    'click': _.partial(selectAndRun, _.noop, oldEventsInternal.click),
-                    'mouseenter': _.partial(selectAndRun, 'delayedIconRender', oldEventsInternal.mouseenter)
-                });
-                /* jshint ignore:end */
-            }
-
             var oldClassName = cellCtor.prototype.className;
+            var dynamicEventsList = new DynamicEventList(cellCtor, 'isEditable', {
+                'dblclick': 'enterEditModeIfNeeded',
+                'mousedown [data-role=edit]': 'enterEditModeIfNeeded',
+                'click': _.noop,
+                'mouseenter': 'delayedIconRender'
+            });
             var extended = cellCtor.extend({
                 constructor: function(options) {
                     // column should be initialized to valid work of className generation
@@ -219,7 +182,7 @@ define(function(require) {
                             '';
                         return (oldClassName ? oldClassName + ' ' : '') + addClassName;
                     },
-                events: _.isFunction(oldEvents) ? generateEventList : generateEventList(),
+                events: dynamicEventsList.generateDeclaration(),
 
                 delayedIconRender: function() {
                     if (!this.$el.find('> [data-role="edit"]').length) {
@@ -235,7 +198,7 @@ define(function(require) {
                 },
 
                 enterEditModeIfNeeded: function(e) {
-                    if (this.isEditable(this)) {
+                    if (this.isEditable()) {
                         inlineEditingPlugin.enterEditMode(this);
                     }
                     e.preventDefault();

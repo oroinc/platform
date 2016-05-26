@@ -21,8 +21,10 @@ define(['underscore', 'backbone'], function(_, Backbone) {
                         return;
                     }
                     var cellCtor = column.get('cell');
-                    if (!_.isFunction(cellCtor.prototype.events)) {
-                        for (var eventName in cellCtor.prototype.events) { // jshint ignore:line
+                    if (cellCtor.prototype.simplifiedEventBinding && !_.isFunction(cellCtor.prototype.events)) {
+                        var events = cellCtor.prototype.events;
+                        // prevent CS error 'cause we must completely repeat Backbone behaviour
+                        for (var eventName in events) { // jshint forin:false
                             if (!cellEventsList.hasOwnProperty(eventName)) {
                                 cellEventsList[eventName] = true;
                             }

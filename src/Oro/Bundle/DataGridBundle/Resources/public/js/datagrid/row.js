@@ -35,14 +35,10 @@ define([
          */
         delegateEvents: Backbone.View.prototype.delegateEvents,
         events: function() {
-            var resultEvents = {
-                'mousedown': 'onMouseDown',
-                'mouseleave': 'onMouseLeave',
-                'mouseup': 'onMouseUp',
-                'click': 'onClick'
-            };
+            var resultEvents = {};
 
             var events = this.simplifiedEvents.getEventsMap();
+            // prevent CS error 'cause we must completely repeat Backbone behaviour
             for (var key in events) { // jshint forin:false
                 var match = key.match(delegateEventSplitter);
                 var eventName = match[1];
@@ -50,6 +46,14 @@ define([
                 resultEvents[eventName + ' ' + 'td' + (selector ? ' ' + selector : '')] =
                     _.partial(this.delegateEventToCell, key);
             }
+
+            // the order is important, please do not move up
+            _.extend(resultEvents, {
+                'mousedown': 'onMouseDown',
+                'mouseleave': 'onMouseLeave',
+                'mouseup': 'onMouseUp',
+                'click': 'onClick'
+            });
             return resultEvents;
         },
 
@@ -119,7 +123,10 @@ define([
             for (var i = 0; i < this.subviews.length; i++) {
                 var view = this.subviews[i];
                 if (view.el === tdEl) {
-                    var events = _.isFunction(view.events) ? view.events.call(this) : view.events;
+                    // events cannot be function
+                    // this kind of cell views are filtered in CellEventList.getEventsMap()
+                    var events = view.events;
+                    // prevent CS error 'cause we must completely repeat Backbone behaviour
                     if (key in events) { // jshint forin:false
                         // run event
                         var method = events[key];
@@ -131,6 +138,10 @@ define([
                         }
                         e.delegateTarget = tdEl;
                         method.call(view, e);
+                        // must stop immediate propagation because of redelegation
+                        if (e.isPropagationStopped()) {
+                            e.stopImmediatePropagation();
+                        }
                     }
                     break;
                 }
