@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Command;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+
+use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,6 +16,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
+use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 
 class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
 {
@@ -54,10 +56,59 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
                 $this->getEmailEntityManager()->clear();
             });
 
+        $dependenseJob = null;
+
         foreach ($owners as $owner) {
-            $emails = $this->getEmailOwnersProvider()->getEmailsByOwnerEntity($owner);
-            foreach ($emails as $email) {
-                $this->getEmailActivityManager()->addAssociation($email, $owner);
+            $emailsQB = $this->getEmailOwnersProvider()->getQBEmailsByOwnerEntity($owner);
+
+            foreach ($emailsQB as $emailQB)
+            {
+                $emailId = [];
+                $emails = (new BufferedQueryResultIterator($emailQB))
+                    ->setBufferSize(100)
+                    ->setPageCallback(function () use($output, &$owner, $input, &$emailId, &$dependenseJob) {
+                        $this->getEmailEntityManager()->clear('Oro\Bundle\EmailBundle\Entity\Email');
+                        $this->getEmailEntityManager()->clear('Oro\Bundle\EmailBundle\Entity\EmailBody');
+                        $this->getEmailEntityManager()->clear('OroCRM\Bundle\ContactBundle\Entity\Contact');
+                        $this->getEmailEntityManager()->clear('Oro\Bundle\ActivityListBundle\Entity\ActivityList');
+                        $this->getEmailEntityManager()->clear('Oro\Bundle\EmailBundle\Entity\EmailThread');
+                        $this->getEmailEntityManager()->clear('OroEntityProxy\OroEmailBundle\EmailAddressProxy');
+                        $this->getEmailEntityManager()->clear('OroCRM\Bundle\ContactBundle\Entity\ContactPhone');
+
+
+                        foreach ($emailId as $id) {
+                            $arguments[] = '--id='.$id;
+                        }
+                        $arguments[] = '--targetClass=' . $input->getArgument(static::OWNER_CLASS_ARGUMENT);
+                        $arguments[] = '--targetId=' . $owner->getId();
+
+                        $job = new Job(AddAssociationCommand::COMMAND_NAME, $arguments);
+                        if ($dependenseJob) {
+                            $job->addDependency($dependenseJob);
+                        }
+
+                        $this->getDoctrineHelper()->getEntityManager($job)->persist($job);
+                        $this->getDoctrineHelper()->getEntityManager($job)->flush();
+                        $emailId = [];
+
+                        $dependenseJob = $job;
+
+                        $mem_usage = memory_get_usage(true);
+                        $output->writeln(sprintf(
+                            '<info>Usage memory %s.</info>',
+                            round($mem_usage/1048576,2)." megabytes"
+                        ));
+                    });
+
+                $output->writeln(sprintf(
+                        '<info>Email count %d.</info>',
+                        count($emails)
+                    )
+                );
+                
+                foreach ($emails as $email) {
+                    $emailId[] = $email->getId();
+                }
             }
 
             $output->writeln(sprintf(
@@ -82,6 +133,14 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
     protected function getEmailOwnersProvider()
     {
         return $this->getContainer()->get('oro_email.provider.emailowners.provider');
+    }
+
+    /**
+     * @return ScheduleManager
+     */
+    protected function getScheduleManager()
+    {
+        return $this->getContainer()->get('oro_cron.schedule_manager');
     }
 
     /**
