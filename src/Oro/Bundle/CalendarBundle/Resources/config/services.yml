@@ -44,6 +44,7 @@ parameters:
     oro_calendar.model.recurrence.class:                         Oro\Bundle\CalendarBundle\Model\Recurrence
 
     oro_calendar.validator.recurrence.class:                     Oro\Bundle\CalendarBundle\Validator\RecurrenceValidator
+    oro_calendar.validator.calendar_event.class:                 Oro\Bundle\CalendarBundle\Validator\CalendarEventValidator
 
 services:
     oro_calendar.listener.entity_listener:
@@ -357,3 +358,8 @@ services:
             - '@oro_calendar.model.recurrence'
         tags:
             - { name: validator.constraint_validator, alias: oro_calendar.recurrence_validator }
+
+    oro_calendar.validator.calendar_event:
+        class: '%oro_calendar.validator.calendar_event.class%'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_calendar.calendar_event_validator }

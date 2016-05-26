@@ -7,7 +7,7 @@ use Oro\Bundle\CalendarBundle\Entity\Recurrence as EntityRecurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence as ModelRecurrence;
 use Oro\Bundle\CalendarBundle\Validator\RecurrenceValidator;
 
-class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
+class RecurrenceValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Recurrence */
     protected $constraint;

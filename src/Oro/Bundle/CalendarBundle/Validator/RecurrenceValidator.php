@@ -11,7 +11,11 @@ class RecurrenceValidator extends ConstraintValidator
     /** @var Recurrence  */
     protected $recurrenceModel;
 
-
+    /**
+     * RecurrenceValidator constructor.
+     *
+     * @param Recurrence $recurrenceModel
+     */
     public function __construct(Recurrence $recurrenceModel)
     {
         $this->recurrenceModel = $recurrenceModel;
