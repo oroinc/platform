@@ -23,6 +23,10 @@ define(function(require) {
             EmailAttachmentListRowView.__super__.render.call(this);
 
             this.$el.attr('data-type', this.model.get('type'));
+            this.$el.find('[data-toggle="popover"]').popover({
+                html: true,
+                delay: {show: 300, hide: 100} //delay for image loading
+            });
         },
 
         getTemplateFunction: function() {

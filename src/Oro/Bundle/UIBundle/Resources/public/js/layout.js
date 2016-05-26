@@ -162,7 +162,7 @@ define(function(require) {
          * @param {jQuery=} $container
          */
         styleForm: function($container) {
-            $container.find('input:file,input:checkbox,input:radio,select:not(.select2)').inputWidget('create');
+            $container.inputWidget('seekAndCreate');
             $container.one('content:changed', _.bind(this.styleForm, this, $container));
         },
 
@@ -172,15 +172,7 @@ define(function(require) {
          * @param {jQuery=} $container
          */
         unstyleForm: function($container) {
-            $container.find('input:file,input:checkbox,input:radio,select:not(.select2)').inputWidget('dispose');
-
-            // removes select2 plugin from elements
-            $container.find('.select2-container').each(function() {
-                var $this = $(this);
-                if ($this.data('select2')) {
-                    $this.select2('destroy');
-                }
-            });
+            $container.inputWidget('seekAndDestroy');
         },
 
         onPageRendered: function(cb) {

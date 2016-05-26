@@ -1,6 +1,13 @@
 UPGRADE FROM 1.9 to 1.10
 ========================
 
+####TestFrameworkBundle
+- All tests run with debug true, hence in case of exception you will see a detailed information about it. Previously it was like on prod.
+- All connections, tests internally share one pdo connection to database.
+- Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::cleanUpConnections method was removed.
+- Oro\Bundle\TestFrameworkBundle\Test\Client::startTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
+- Oro\Bundle\TestFrameworkBundle\Test\Client::rollbackTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
+
 ####EntityBundle:
 - The implementation of `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` was changed. Now the loaded entity aliases is saved into a cache that gives significant performance gain. Also, from now, you can implement `Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface` to create aliases for any entities not only for ORM entities.
 
@@ -10,6 +17,10 @@ UPGRADE FROM 1.9 to 1.10
 ####DashboardBundle:
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
 - Added new class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter`.
+
+####DataGridBundle:
+- Events `Oro\Bundle\DataGridBundle\Event\OrmResultBefore` second constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
+- Event `Oro\Bundle\DataGridBundle\Event\OrmResultAfter` third constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
 
 ####EntityBundle:
 - The constructor of the `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` class was changed. Before: `__construct(ManagerRegistry $doctrine, $debug)`. After: `__construct(DoctrineHelper $doctrineHelper, ManagerBagInterface $managerBag, $debug)`.
@@ -100,9 +111,26 @@ UPGRADE FROM 1.9 to 1.10
 ####DataGridBundle
 - The class Oro\Bundle\DataGridBundle\Common\Object was renamed to DataObject
 - Changed priority in next extensions:
-    * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260 
+    * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260
     * Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier from -251 to -261
-    
+
 ####ConfigExpression
 - The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
 - The class Oro\Component\ConfigExpression\Condition\True was renamed to TrueCondition
+
+####UiBundle
+- Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) plugin by Sachin N.
+
+Gallery view for a group of `<a>` elements can be triggered by adding 'data-gallery' attribute with unique gallery id.
+
+```
+<a href="sample1.jpg" data-gallery="unique-id"></a>
+<a href="sample2.jpg" data-gallery="unique-id"></a>
+```
+
+####EmailBundle
+- Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
+- Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
+
+####PlatformBundle
+- The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
