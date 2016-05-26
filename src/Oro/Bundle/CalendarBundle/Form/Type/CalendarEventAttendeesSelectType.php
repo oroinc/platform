@@ -40,20 +40,22 @@ class CalendarEventAttendeesSelectType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['attr']['data-selected-data'] = $view->vars['value'];
-        $view->vars['excluded'] = array_filter(array_map(
-            function (Attendee $attendee) {
-                $user = $attendee->getUser();
-                if ($user) {
-                    return json_encode([
-                        'entityClass' => 'Oro\Bundle\UserBundle\Entity\User',
-                        'entityId' => $user->getId(),
-                    ]);
-                }
+        if ($form->getData()) {
+            $view->vars['excluded'] = array_filter(array_map(
+                function (Attendee $attendee) {
+                    $user = $attendee->getUser();
+                    if ($user) {
+                        return json_encode([
+                            'entityClass' => 'Oro\Bundle\UserBundle\Entity\User',
+                            'entityId' => $user->getId(),
+                        ]);
+                    }
 
-                return null;
-            },
-            $form->getData()->toArray()
-        ));
+                    return null;
+                },
+                $form->getData()->toArray()
+            ));
+        }
     }
 
     /**
