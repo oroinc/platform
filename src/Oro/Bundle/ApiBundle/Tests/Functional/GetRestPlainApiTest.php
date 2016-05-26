@@ -64,8 +64,6 @@ class GetRestPlainApiTest extends ApiTestCase
                 $this->checkDeleteRequest($entityAlias, $id, $excludedActions);
             }
         }
-
-        self::cleanUpConnections();
     }
 
     /**
@@ -116,8 +114,6 @@ class GetRestPlainApiTest extends ApiTestCase
                 }
             }
         }
-
-        self::cleanUpConnections();
     }
 
     /**
