@@ -273,7 +273,8 @@ define([
                 }
                 if (modelData.recurrence &&
                     name.indexOf('[title]') === -1 &&
-                    name.indexOf('[description]') === -1) {
+                    name.indexOf('[description]') === -1 &&
+                    name.indexOf('[contexts]') === -1) {
                     input.attr('disabled', true);
                 }
             });

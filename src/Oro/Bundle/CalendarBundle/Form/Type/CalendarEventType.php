@@ -25,6 +25,7 @@ class CalendarEventType extends AbstractType
     protected $editableFieldsForRecurrence = [
         'title',
         'description',
+        'contexts',
     ];
 
     /**
