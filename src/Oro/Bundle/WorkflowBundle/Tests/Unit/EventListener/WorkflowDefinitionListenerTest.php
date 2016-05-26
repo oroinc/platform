@@ -9,13 +9,15 @@ use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionListener;
 use Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\ProcessImport;
 
+use Oro\Component\DependencyInjection\ServiceLink;
+
 class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessConfigurationGenerator */
     protected $generator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessImport */
-    protected $import;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ServiceLink */
+    protected $importLink;
 
     /** @var WorkflowDefinitionListener */
     protected $listener;
@@ -26,16 +28,16 @@ class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->import = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessImport')
+        $this->importLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new WorkflowDefinitionListener($this->generator, $this->import);
+        $this->listener = new WorkflowDefinitionListener($this->generator, $this->importLink);
     }
 
     protected function tearDown()
     {
-        unset($this->listener, $this->generator, $this->import);
+        unset($this->listener, $this->generator, $this->importLink);
     }
 
     public function testPostPersist()
@@ -76,6 +78,24 @@ class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Instance of Oro\Bundle\WorkflowBundle\Model\ProcessImport expected.
+     */
+    public function testProcessImportException()
+    {
+        $entity = new WorkflowDefinition();
+
+        $this->generator->expects($this->once())
+            ->method('generateForScheduledTransition')
+            ->with($entity)
+            ->willReturn(['configuration']);
+
+        $this->importLink->expects($this->once())->method('getService')->willReturn(new \stdClass());
+
+        $this->listener->postPersist($this->createEvent($entity));
+    }
+
+    /**
      * @param object $entity
      * @return LifecycleEventArgs|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -101,12 +121,20 @@ class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
             ->with($workflowDefinition)
             ->willReturn($configuration);
 
-        $this->import->expects($this->once())->method('import')->with($configuration);
+        /** @var ProcessImport|\PHPUnit_Framework_MockObject_MockObject $import */
+        $import = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessImport')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $import->expects($this->once())->method('import')->with($configuration);
+
+        $this->importLink->expects($this->once())
+            ->method('getService')
+            ->willReturn($import);
     }
 
     protected function assertImportNotExecuted()
     {
         $this->generator->expects($this->never())->method($this->anything());
-        $this->import->expects($this->never())->method($this->anything());
+        $this->importLink->expects($this->never())->method($this->anything());
     }
 }
