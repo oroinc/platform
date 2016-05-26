@@ -1,7 +1,7 @@
 <?php
-namespace Oro\Component\MessageQueue\ZeroConfig;
+namespace Oro\Component\MessageQueue\ZeroConfig\Meta;
 
-class Topic
+class TopicMeta
 {
     /**
      * @var string
@@ -12,15 +12,22 @@ class Topic
      * @var string
      */
     private $description;
+    
+    /**
+     * @var string[]
+     */
+    private $subscribers;
 
     /**
      * @param string $name
      * @param string $description
+     * @param string[] $subscribers
      */
-    public function __construct($name, $description)
+    public function __construct($name, $description = '', array $subscribers = [])
     {
         $this->name = $name;
         $this->description = $description;
+        $this->subscribers = $subscribers;
     }
 
     /**
@@ -37,5 +44,13 @@ class Topic
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSubscribers()
+    {
+        return $this->subscribers;
     }
 }

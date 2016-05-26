@@ -2,7 +2,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\ZeroConfig\TopicRegistry;
+use Oro\Component\MessageQueue\ZeroConfig\Meta\TopicMetaRegistry;
 
 class TopicRegistryTest extends WebTestCase
 {
@@ -13,8 +13,8 @@ class TopicRegistryTest extends WebTestCase
     
     public function testCouldBeGetFromContainerAsService()
     {
-        $connection = $this->getContainer()->get('oro_message_queue.zero_config.topic_registry');
+        $connection = $this->getContainer()->get('oro_message_queue.zero_config.meta.topic_meta_registry');
         
-        $this->assertInstanceOf(TopicRegistry::class, $connection);
+        $this->assertInstanceOf(TopicMetaRegistry::class, $connection);
     }
 }

@@ -36,8 +36,8 @@ services:
         calls:
             - ['setContainer', ['@service_container']]
 
-    oro_message_queue.zero_config.topic_registry:
-        class: 'Oro\Component\MessageQueue\ZeroConfig\TopicRegistry'
+    oro_message_queue.zero_config.meta.topic_meta_registry:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\Meta\TopicMetaRegistry'
         public: true
         arguments: [[]]
 
@@ -78,10 +78,9 @@ services:
         tags:
             - { name: 'console.command' }
 
-    oro_message_queue.zero_config.topics_debug_messages:
-        class: 'Oro\Component\MessageQueue\ZeroConfig\TopicsDebugCommand'
+    oro_message_queue.zero_config.meta.meta_info_command:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\Meta\MetaInfoCommand'
         arguments:
-            - '@oro_message_queue.zero_config.topic_registry'
-            - '@oro_message_queue.zero_config.router'
+            - '@oro_message_queue.zero_config.meta.topic_meta_registry'
         tags:
             - { name: 'console.command' }
