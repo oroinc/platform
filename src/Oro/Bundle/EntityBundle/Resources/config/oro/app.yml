@@ -5,7 +5,7 @@ doctrine:
             money:   Oro\DBAL\Types\MoneyType
             object:  Oro\DBAL\Types\ObjectType
             array:   Oro\DBAL\Types\ArrayType
-
+            duration: Oro\Bundle\EntityBundle\DoctrineExtensions\DBAL\Types\DurationType
     orm:
         dql:
             datetime_functions:

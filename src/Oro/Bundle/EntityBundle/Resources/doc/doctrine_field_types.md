@@ -33,3 +33,17 @@ You can use this field type like:
 This two data types are available in extend fields. You can create new fields with this types. Additionally in view pages, in grids and in edit pages this fields will be automatically formatted with currency or percent formatters.
 
 In grid, for percent data type will be automatically generated percent filter.
+
+
+**duration** field type allow to store time duration in seconds. It's an alias to integer type.
+
+You can use this field type like:
+
+```php
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="duration", type="duration")
+     */
+    protected $duration;
+```
