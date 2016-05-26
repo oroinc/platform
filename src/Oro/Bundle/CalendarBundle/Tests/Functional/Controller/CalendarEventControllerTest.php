@@ -117,12 +117,12 @@ class CalendarEventControllerTest extends WebTestCase
             ';',
             [
                 json_encode([
-                    'entityClass' => get_class($user),
-                    'entityId' => $user->getId(),
+                    'entityClass' => 'Oro\Bundle\CalendarBundle\Entity\Attendee',
+                    'entityId' => $param['attendees'][0],
                 ]),
                 json_encode([
-                    'entityClass' => get_class($admin),
-                    'entityId' => $admin->getId(),
+                    'entityClass' => 'Oro\Bundle\CalendarBundle\Entity\Attendee',
+                    'entityId' => $param['attendees'][1],
                 ])
             ]
         );
