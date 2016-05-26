@@ -34,6 +34,9 @@ class Theme
     /** @var array */
     protected $data = [];
 
+    /** @var ThemeImageType[] */
+    protected $imageTypes = [];
+
     /**
      * @param string $name
      * @param        $parentTheme
