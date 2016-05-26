@@ -10,6 +10,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
+
 class CalendarEventAttendeesSelectType extends AbstractType
 {
     /** @var DataTransformerInterface */
@@ -38,6 +40,20 @@ class CalendarEventAttendeesSelectType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['attr']['data-selected-data'] = $view->vars['value'];
+        $view->vars['excluded'] = array_filter(array_map(
+            function (Attendee $attendee) {
+                $user = $attendee->getUser();
+                if ($user) {
+                    return json_encode([
+                        'entityClass' => 'Oro\Bundle\UserBundle\Entity\User',
+                        'entityId' => $user->getId(),
+                    ]);
+                }
+
+                return null;
+            },
+            $form->getData()->toArray()
+        ));
     }
 
     /**
