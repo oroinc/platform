@@ -1,6 +1,12 @@
 file-icons:
     default: icon-file-alt
-    doc: icon-file-alt
-    docx: icon-file-alt
-    xls: icon-file-alt
-    xlsx: icon-file-alt
+    doc: fa-file-text-o
+    docx: fa-file-text-o
+    xls: fa-file-excel-o
+    xlsx: fa-file-excel-o
+    pdf: fa-file-pdf-o
+    png: fa-file-image-o
+    jpg: fa-file-image-o
+    jpeg: fa-file-image-o
+    gif: fa-file-image-o
+    mp4: fa-file-movie-o

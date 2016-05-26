@@ -478,8 +478,9 @@ define(function(require) {
          */
         _updateRangeFilter: function(value, updateDom) {
             var oldValue = tools.deepClone(value);
+            var type = parseInt(value.type);
             if (value.value &&
-                (value.type == this.typeValues.between || value.type == this.typeValues.notBetween)) {
+                (type === this.typeValues.between || type === this.typeValues.notBetween)) {
                 if (value.value.start && value.value.end) {
                     //if both dates are filled
                     if (!this.dateVariableHelper.isDateVariable(value.value.end) &&
@@ -496,9 +497,9 @@ define(function(require) {
                 } else {
                     if (value.value.start || value.value.end) {
                         //if only one date is filled replace filter type to less than or more than
-                        if (value.type == this.typeValues.between) {
+                        if (type === this.typeValues.between) {
                             value.type = value.value.end ? this.typeValues.lessThan : this.typeValues.moreThan;
-                        } else if (value.type == this.typeValues.notBetween) {
+                        } else if (type === this.typeValues.notBetween) {
                             if (!value.value.end) {
                                 //less than type expects end date
                                 value.type = this.typeValues.lessThan;

@@ -103,9 +103,17 @@
                     {{ 'oro.email.body_is_unavailable'|trans }}
                 {% endif %}
                 {% if email.emailBody %}
-                    <ul class="email-attachments-list">
-                        {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
-                    </ul>
+                    {% set aCount = email.emailBody.attachments|length %}
+                    {% set previewLimit = oro_config_value('oro_email.attachment_preview_limit') %}
+                    {% if aCount %}
+                        <div class="email-attachments-list-cont">
+                            <h6 class="pull-left">{{ aCount }} {{ aCount > 1 ? 'oro.attachment.entity_plural_label'|trans : 'oro.attachment.entity_label'|trans }}</h6>
+                            <a class="pull-left no-hash" href="{{ path('oro_email_body_attachments', {id: email.emailBody.id}) }}">{{ 'oro.email.attachment.download_all'|trans }}</a>
+                            <ul class="email-attachments-list thumbnails {{ aCount > previewLimit ? 'name-only' : ''  }}">
+                                {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
+                            </ul>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
             {%- set commentsData -%}
