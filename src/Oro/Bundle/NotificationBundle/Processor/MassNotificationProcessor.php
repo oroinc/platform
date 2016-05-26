@@ -63,16 +63,16 @@ class MassNotificationProcessor extends AbstractNotificationProcessor
     /**
      * @param string            $subject
      * @param string            $body
-     * @param string            $from
+     * @param string            $sender
      * @param LoggerInterface   $logger
      */
-    public function send($subject, $body, $from = null, LoggerInterface $logger = null)
+    public function send($subject, $body, $sender = null, LoggerInterface $logger = null)
     {
         if (!$logger) {
             $logger = $this->logger;
         }
 
-        $senderEmail = $from ? $from : $this->cm->get('oro_notification.email_notification_sender_email');
+        $senderEmail = $sender ? $sender : $this->cm->get('oro_notification.email_notification_sender_email');
         $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
 
         foreach ($this->getRecipientEmails() as $email) {
@@ -135,10 +135,21 @@ class MassNotificationProcessor extends AbstractNotificationProcessor
      */
     protected function getRecipientEmails()
     {
-        return [
-            'pusachev@magecore.com',
-            'webcodekeeper@hotmail.com',
-        ];
+        $recipients = $this->cm->get('oro_notification.mass_notification_recipients');
+
+        if (!$recipients) {
+           return $this->getRecipientsFromDB();
+        }
+
+        return explode(';', $recipients);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getRecipientsFromDB()
+    {
+        return $this->em->getRepository('OroUserBundle:User')->getActiveUserEmails();
     }
 
 }
