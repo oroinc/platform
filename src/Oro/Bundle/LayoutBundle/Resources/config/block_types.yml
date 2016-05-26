@@ -153,7 +153,7 @@ services:
     oro_layout.block_type.list_item:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
-            - [setOptions, [{own_template: {default: true, allowed_values: [true]}}]]
+            - [setOptions, [{own_template: {default: true}}]]
             - [setName, ['list_item']]
         tags:
              - { name: layout.block_type, alias: list_item }

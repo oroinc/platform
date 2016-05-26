@@ -61,12 +61,6 @@ abstract class AbstractType implements BlockTypeInterface
             if (array_key_exists('default', $settings)) {
                 $resolver->setDefault($name, $settings['default']);
             }
-            if (isset($settings['normalizers'])) {
-                $resolver->setNormalizer($name, $settings['normalizers']);
-            }
-            if (array_key_exists('allowed_values', $settings)) {
-                $resolver->setAllowedValues($name, $settings['allowed_values']);
-            }
         }
     }
 

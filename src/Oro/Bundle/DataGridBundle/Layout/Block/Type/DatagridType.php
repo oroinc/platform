@@ -37,10 +37,8 @@ class DatagridType extends AbstractType
             ->setDefaults([
                 'grid_parameters' => [],
                 'grid_render_parameters' => []
-            ])
-            ->setNormalizer('grid_parameters', function (Options $options, $value) {
-                return array_merge(['enableFullScreenLayout' => true], $value);
-            });
+            ]);
+        ;
     }
 
     /**
