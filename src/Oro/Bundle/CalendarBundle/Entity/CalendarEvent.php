@@ -13,6 +13,7 @@ use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderData;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
@@ -73,23 +74,29 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 {
     use DatesAwareTrait;
 
-    const NOT_RESPONDED        = 'not_responded';
-    const TENTATIVELY_ACCEPTED = 'tentatively_accepted';
-    const ACCEPTED             = 'accepted';
-    const DECLINED             = 'declined';
-    const WITHOUT_STATUS       = null;
+    /** @deprecated since 1.10 use constant with STATUS_ prefix */
+    const NOT_RESPONDED        = self::STATUS_NONE;
+    /** @deprecated since 1.10 use constant with STATUS_ prefix */
+    const TENTATIVELY_ACCEPTED = self::STATUS_TENTATIVE;
+    /** @deprecated since 1.10 use constant with STATUS_ prefix */
+    const ACCEPTED             = self::STATUS_ACCEPTED;
+    /** @deprecated since 1.10 use constant with STATUS_ prefix */
+    const DECLINED             = self::STATUS_DECLINED;
 
-    protected $invitationStatuses = [
-        CalendarEvent::NOT_RESPONDED,
-        CalendarEvent::ACCEPTED,
-        CalendarEvent::TENTATIVELY_ACCEPTED,
-        CalendarEvent::DECLINED
-    ];
+    const STATUS_NONE      = 'none';
+    const STATUS_TENTATIVE = 'tentative';
+    const STATUS_ACCEPTED  = 'accepted';
+    const STATUS_DECLINED  = 'declined';
+
+    const ORIGIN_ENUM_CODE = 'calendar_event_origin';
+    const ORIGIN_CLIENT    = 'client';
+    const ORIGIN_SERVER    = 'server';
+    const ORIGIN_EXTERNAL  = 'external';
 
     protected $availableStatuses = [
-        CalendarEvent::ACCEPTED,
-        CalendarEvent::TENTATIVELY_ACCEPTED,
-        CalendarEvent::DECLINED
+        CalendarEvent::STATUS_ACCEPTED,
+        CalendarEvent::STATUS_TENTATIVE,
+        CalendarEvent::STATUS_DECLINED
     ];
 
     /**
@@ -244,18 +251,32 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $reminders;
 
     /**
-     * @var string
+     * Contains list of all attendees of the event. This property is empty for all child events and
+     * value of the one from parentEvent is used since all (parent, child) events have the same attendees
+     * (so there is no need for some synchronization mechanism in case attendees changes).
      *
-     * @ORM\Column(name="invitation_status", type="string", length=32, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
+     * @var Collection|Attendee[]
+     *
+     * @ORM\OneToMany(
+     *     targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee",
+     *     mappedBy="calendarEvent",
+     *     cascade={"all"},
+     *     orphanRemoval=true
      * )
+     * @ORM\OrderBy({"displayName"="ASC"})
      */
-    protected $invitationStatus;
+    protected $attendees;
+
+    /**
+     * Attendee associated with this event (one attendee from attendees property having calendar owner in user property)
+     * It can be null for parent event in case creator of the event is not among attendees.
+     *
+     * @var Attendee
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee", cascade={"persist"})
+     * @ORM\JoinColumn(name="related_attendee", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $relatedAttendee;
 
     /**
      * Defines recurring event rules. Only original recurring event has this relation not empty.
@@ -333,6 +354,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 
         $this->reminders   = new ArrayCollection();
         $this->childEvents = new ArrayCollection();
+        $this->attendees   = new ArrayCollection();
         $this->recurringEventExceptions  = new ArrayCollection();
     }
 
@@ -710,23 +732,46 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
+     * @deprecated since 1.10 use $event->getRelatedAttendee()->getStatus() instead
+     *
      * @return string|null
      */
     public function getInvitationStatus()
     {
-        return $this->invitationStatus;
+        if (!$this->relatedAttendee) {
+            return static::STATUS_NONE;
+        }
+
+        $status = $this->relatedAttendee->getStatus();
+
+        return $status
+            ? $status->getId()
+            : static::STATUS_NONE;
     }
 
     /**
-     * @param string|null $invitationStatus
+     * @return Collection|Attendee[]
      */
-    public function setInvitationStatus($invitationStatus)
+    public function getAttendees()
     {
-        if ($this->isValid($invitationStatus)) {
-            $this->invitationStatus = $invitationStatus;
-        } else {
-            throw new \LogicException(sprintf('Investigation status "%s" is not supported', $invitationStatus));
+        return $this->getRealCalendarEvent()->attendees;
+    }
+
+    /**
+     * Returns all attendees except related attendee for parent calendar event or empty collection
+     * if the event is child
+     *
+     * @return Collection|Attendee[]
+     */
+    public function getChildAttendees()
+    {
+        if ($this->parent) {
+            return new ArrayCollection();
         }
+
+        return $this->attendees->filter(function (Attendee $attendee) {
+            return !$this->relatedAttendee || $attendee->getEmail() !== $this->relatedAttendee->getEmail();
+        });
     }
 
     /**
@@ -864,12 +909,72 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
     
     /**
-     * @param string|null $invitationStatus
-     * @return bool
+     * @param Collection|Attendee[] $attendees
+     *
+     * @return CalendarEvent
      */
-    protected function isValid($invitationStatus)
+    public function setAttendees(Collection $attendees)
     {
-        return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->invitationStatuses);
+        $this->getRealCalendarEvent()->attendees = $attendees;
+
+        return $this;
+    }
+
+    /**
+     * @param Attendee $attendee
+     *
+     * @return CalendarEvent
+     */
+    public function addAttendee(Attendee $attendee)
+    {
+        $attendees = $this->getRealCalendarEvent()->attendees;
+        if (!$attendees->contains($attendee)) {
+            $attendee->setCalendarEvent($this);
+            $attendees->add($attendee);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove child calendar event
+     *
+     * @param Attendee $attendee
+     *
+     * @return CalendarEvent
+     */
+    public function removeAttendee(Attendee $attendee)
+    {
+        if ($this->getRealCalendarEvent()->attendees->contains($attendee)) {
+            $event = $this->getEventByAttendee($attendee);
+            if ($event) {
+                $event->relatedAttendee = null;
+            }
+            $this->getRealCalendarEvent()->attendees->removeElement($attendee);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Attendee
+     */
+    public function getRelatedAttendee()
+    {
+        return $this->relatedAttendee;
+    }
+
+    /**
+     * @param Attendee $relatedAttendee
+     *
+     * @return CalendarEvent
+     */
+    public function setRelatedAttendee(Attendee $relatedAttendee)
+    {
+        $this->relatedAttendee = $relatedAttendee;
+        $this->addAttendee($relatedAttendee);
+
+        return $this;
     }
 
     /**
@@ -878,6 +983,34 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function __toString()
     {
         return (string)$this->getTitle();
+    }
+
+    /**
+     * @param Attendee $attendee
+     *
+     * @return CalendarEvent|null
+     */
+    protected function getEventByAttendee(Attendee $attendee)
+    {
+        $events = $this->getRealCalendarEvent()->getChildEvents()->toArray();
+        $events[] = $this->getRealCalendarEvent();
+
+        return ArrayUtil::find(
+            function (CalendarEvent $event) use ($attendee) {
+                $relatedAttendee = $event->getRelatedAttendee();
+
+                return $relatedAttendee && $relatedAttendee->getId() === $attendee->getId();
+            },
+            $events
+        );
+    }
+
+    /**
+     * @return CalendarEvent
+     */
+    protected function getRealCalendarEvent()
+    {
+        return $this->getParent() ?: $this;
     }
 
     /**

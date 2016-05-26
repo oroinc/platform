@@ -30,6 +30,9 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var ActivityManager */
     protected $activityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $usersToAttendeesTransformer;
+
     protected function setUp()
     {
         $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
@@ -44,6 +47,11 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->usersToAttendeesTransformer = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -81,7 +89,8 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             $this->request,
             $this->om,
             $this->emailSendProcessor,
-            $this->activityManager
+            $this->activityManager,
+            $this->usersToAttendeesTransformer
         );
         $handler->process($this->obj);
     }
@@ -98,7 +107,8 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             $this->request,
             $this->om,
             $this->emailSendProcessor,
-            $this->activityManager
+            $this->activityManager,
+            $this->usersToAttendeesTransformer
         );
         $handler->process($this->obj);
     }

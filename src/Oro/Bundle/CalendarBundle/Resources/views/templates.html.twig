@@ -82,7 +82,8 @@
             '<% } %>',
             form_row(form.backgroundColor),
             form.calendarUid is defined ? form_row(form.calendarUid) : null,
-            form_row(form.childEvents)|replace({'childEvents': 'invitedUsers'}),
+            form_row(form.attendees),
+            form_row(form.reminders),
             '<% if (!recurrence) { %>' ~ form_row(form.reminders) ~ '<% } %>',
             form_row(form.notifyInvitedUsers)
         ]

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class UserRepository extends EntityRepository implements EmailAwareRepository
 {
@@ -142,5 +143,31 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ->orderBy('u.username');
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param string[] $emails
+     *
+     * @return User[]
+     */
+    public function findUsersByEmails(array $emails)
+    {
+        if (!$emails) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('u');
+
+        return $qb
+            ->select('u')
+            ->leftJoin('u.emails', 'e')
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->in('e.email', $emails),
+                    $qb->expr()->in('u.email', $emails)
+                )
+            )
+            ->getQuery()
+            ->getResult();
     }
 }

@@ -24,9 +24,9 @@ class AjaxCalendarEventControllerTest extends WebTestCase
     public function testChangeInvitationStatus()
     {
         $availableStatuses = [
-            CalendarEvent::ACCEPTED,
-            CalendarEvent::TENTATIVELY_ACCEPTED,
-            CalendarEvent::DECLINED
+            CalendarEvent::STATUS_ACCEPTED,
+            CalendarEvent::STATUS_TENTATIVE,
+            CalendarEvent::STATUS_DECLINED
         ];
 
         foreach ($availableStatuses as $status) {
@@ -42,7 +42,9 @@ class AjaxCalendarEventControllerTest extends WebTestCase
             $data = json_decode($response->getContent(), true);
             $this->assertTrue($data['successful']);
             $calendarEvent = $this->getCalendarEventByTitle(LoadCalendarEventData::CALENDAR_EVENT_TITLE);
-            $this->assertEquals($status, $calendarEvent->getInvitationStatus());
+            $this->assertNotNull($calendarEvent->getRelatedAttendee());
+            $this->assertNotNull($calendarEvent->getRelatedAttendee()->getStatus());
+            $this->assertEquals($status, $calendarEvent->getRelatedAttendee()->getStatus()->getId());
         }
     }
 

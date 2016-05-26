@@ -32,17 +32,19 @@ class ActionPermissionProvider
         $parentId = $record->getValue('parentId');
         $ownerId = $record->getValue('ownerId');
         $childrenCount = $record->getValue('childrenCount');
+        $origin = $record->getValue('originId');
 
-        $isEditable = !$invitationStatus || ($invitationStatus && !$parentId);
+        $isEditable = (!$invitationStatus || ($invitationStatus && !$parentId))
+            && $origin !== CalendarEvent::ORIGIN_EXTERNAL;
 
-        return array(
+        return [
             'accept'      => $this->isAvailableResponseButton(
                 $user,
                 $parentId,
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::ACCEPTED
+                CalendarEvent::STATUS_ACCEPTED
             ),
             'decline'     => $this->isAvailableResponseButton(
                 $user,
@@ -50,7 +52,7 @@ class ActionPermissionProvider
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::DECLINED
+                CalendarEvent::STATUS_DECLINED
             ),
             'tentatively' => $this->isAvailableResponseButton(
                 $user,
@@ -58,11 +60,11 @@ class ActionPermissionProvider
                 $ownerId,
                 $childrenCount,
                 $invitationStatus,
-                CalendarEvent::TENTATIVELY_ACCEPTED
+                CalendarEvent::STATUS_TENTATIVE
             ),
             'view'        => true,
             'update'      => $isEditable
-        );
+        ];
     }
 
     /**

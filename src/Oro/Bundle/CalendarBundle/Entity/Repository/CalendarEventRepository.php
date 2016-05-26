@@ -42,14 +42,14 @@ class CalendarEventRepository extends EntityRepository
     public function getUserEventListQueryBuilder($filters = [], $extraFields = [])
     {
         $qb = $this->getEventListQueryBuilder($extraFields)
-            ->addSelect(
-                'e.invitationStatus',
-                'IDENTITY(e.parent) AS parentEventId',
-                'c.id as calendar',
-                'IDENTITY(e.recurringEvent) AS recurringEventId',
-                'e.originalStart',
-                'e.isCancelled'
-            )
+            ->addSelect('status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId, c.id as calendar')
+            ->addSelect('CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin')
+            ->addSelect('IDENTITY(e.recurringEvent) AS recurringEventId, e.originalStart, e.isCancelled')
+            ->leftJoin('e.relatedAttendee', 'relatedAttendee')
+            ->leftJoin('e.parent', 'parent')
+            ->leftJoin('e.origin', 'originEnum')
+            ->leftJoin('parent.origin', 'parentOrigin')
+            ->leftJoin('relatedAttendee.status', 'status')
             ->innerJoin('e.calendar', 'c');
 
         $this->addRecurrenceData($qb);

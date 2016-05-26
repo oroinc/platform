@@ -22,7 +22,7 @@ oro:
         view:                       View event
 
         action:
-            public_calendar_management: 
+            public_calendar_management:
                 label: Manage system calendars
                 description: If set to None, the user can see system calendars, but cannot create/edit/delete them
             public_calendar_event_management:
@@ -116,6 +116,9 @@ oro:
             system_calendar.label:   System Calendar
             invitation.label:        Guests
             invitation_status.label: Invitation status
+            attendees.label: Guests
+            related_attendee.label: Related Attendee
+            origin.label: Origin
             recurrence.label:      Recurrence
             recurrence.alias.repeat: Repeat
             recurrence.alias.recurrent: Recurrent
@@ -133,13 +136,13 @@ oro:
             delete_event:         Delete {{ entity }}
 
             statuses:
-                not_responded:        Not responded
-                tentatively_accepted: Tentatively accepted
+                none:                 Not responded
+                tentative:            Tentatively accepted
                 accepted:             Accepted
                 declined:             Declined
 
             actions:
-                tentatively_accepted: Tentative
+                tentative:            Tentative
                 accepted:             Accept
                 declined:             Decline
 
@@ -158,6 +161,23 @@ oro:
             visible.label:          Visible
             color.label:            Color
             background_color.label: Background
+
+        attendee:
+            entity_label: Attendee
+            entity_plural_label: Guests
+            calendar_event.label: Calendar Event
+            display_name.label: Display Name
+            email.label: Email
+            id.label: Id
+            user.label: User
+            organization.label: Organization
+            origin.label: Origin
+            owner.label: Owner
+            status.label: Status
+            type.label: Type
+
+        autocomplete:
+            attendees: Calendar event Guests
 
         #
         # Oro/Bundle/CalendarBundle/Entity/Recurrence

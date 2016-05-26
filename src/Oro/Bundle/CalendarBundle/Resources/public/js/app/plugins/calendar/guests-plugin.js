@@ -45,10 +45,10 @@ define(function(require) {
          */
         hasLoadedGuestEvents: function(parentEventModel) {
             var result = false;
-            var guests = parentEventModel.get('invitedUsers');
+            var guests = parentEventModel.get('attendees');
             guests = _.isNull(guests) ? [] : guests;
-            if (parentEventModel.hasChanged('invitedUsers') && !_.isEmpty(parentEventModel.previous('invitedUsers'))) {
-                guests = _.union(guests, parentEventModel.previous('invitedUsers'));
+            if (parentEventModel.hasChanged('attendees') && !_.isEmpty(parentEventModel.previous('attendees'))) {
+                guests = _.union(guests, parentEventModel.previous('attendees'));
             }
             if (!_.isEmpty(guests)) {
                 result = Boolean(this.main.getConnectionCollection().find(function(connection) {
@@ -93,7 +93,7 @@ define(function(require) {
             var updatedAttrs;
             eventModel.set('editable', eventModel.get('editable') && !this.hasParentEvent(eventModel), {silent: true});
             if (this.hasLoadedGuestEvents(eventModel)) {
-                if (eventModel.hasChanged('invitedUsers')) {
+                if (eventModel.hasChanged('attendees')) {
                     eventModel.once('sync', this.main.updateEvents, this.main);
                     return;
                 }

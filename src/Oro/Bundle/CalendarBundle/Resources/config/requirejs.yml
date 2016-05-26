@@ -22,6 +22,7 @@ config:
         'orocalendar/js/app/components/dashboard-calendar-component': 'bundles/orocalendar/js/app/components/dashboard-calendar-component.js'
         'orocalendar/js/app/modules/calendar-module': 'bundles/orocalendar/js/app/modules/calendar-module.js'
         'orocalendar/js/validator/dateearlierthan': 'bundles/orocalendar/js/validator/dateearlierthan.js'
+        'oro/select2-attendees-component': 'bundles/orocalendar/js/app/components/select2-attendees-component.js'
         'orocalendar/js/app/views/recurring-event-notifier-view': 'bundles/orocalendar/js/app/views/recurring-event-notifier-view.js'
     appmodules:
         - orocalendar/js/app/modules/calendar-module

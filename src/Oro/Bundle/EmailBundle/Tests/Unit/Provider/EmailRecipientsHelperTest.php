@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EmailBundle\Model\RecipientEntity;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
@@ -157,6 +159,80 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
                 [
                     new Recipient('recipient2@example.com', 'Recipient2 <recipient2@example.com>'),
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider recipientsFromResultProvider
+     */
+    public function testRecipientsFromResult(array $result, $entityClass, array $expectedRecipients)
+    {
+        $this->assertEquals(
+            $expectedRecipients,
+            $this->emailRecipientsHelper->recipientsFromResult($result, $entityClass)
+        );
+    }
+
+    public function recipientsFromResultProvider()
+    {
+        return [
+            [
+                [
+                    [
+                        'name'  => 'Recipient',
+                        'email' => 'recipient@example.com',
+                        'entityId'     => 1,
+                        'organization' => 'org',
+                    ],
+                ],
+                'Class',
+                [
+                    'Recipient <recipient@example.com>|Class|org' => new CategorizedRecipient(
+                        'recipient@example.com',
+                        'Recipient <recipient@example.com>',
+                        new RecipientEntity(
+                            'Class',
+                            1,
+                            'Recipient',
+                            'org'
+                        )
+                    )
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider plainRecipientsFromResultProvider
+     */
+    public function testRlainRecipientsFromResult(array $result, $entityClass, array $expectedRecipients)
+    {
+        $this->assertEquals(
+            $expectedRecipients,
+            $this->emailRecipientsHelper->plainRecipientsFromResult($result, $entityClass)
+        );
+    }
+
+    public function plainRecipientsFromResultProvider()
+    {
+        return [
+            [
+                [
+                    [
+                        'name'  => 'Recipient',
+                        'email' => 'recipient@example.com',
+                        'entityId'     => 1,
+                        'organization' => 'org',
+                    ],
+                ],
+                'Class',
+                [
+                    'recipient@example.com' => new CategorizedRecipient(
+                        'recipient@example.com',
+                        'Recipient <recipient@example.com>'
+                    )
+                ]
             ],
         ];
     }

@@ -78,17 +78,18 @@ class ContextsToViewTransformer implements DataTransformerInterface
                 ) {
                     continue;
                 }
-                $text = [];
+
                 if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
+                    $text = [];
                     foreach ($fields as $field) {
                         $text[] = $this->mapper->getFieldValue($target, $field);
                     }
+                } elseif (method_exists($target, '__toString')) {
+                    $text = [(string) $target];
+                } else {
+                    $text = [$this->translator->trans('oro.entity.item', ['%id%' => $target->getId()])];
                 }
-                $text = array_filter($text);
-                $text = $text
-                    ? implode(' ', $text)
-                    : $this->translator->trans('oro.entity.item', ['%id%' => $target->getId()]);
-
+                $text = implode(' ', $text);
                 if ($label = $this->getClassLabel($targetClass)) {
                     $text .= ' (' . $label . ')';
                 }
@@ -100,15 +101,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
                 $item = $event->getItem();
                 $text = $item['title'];
 
-                $result[] = json_encode(
-                    [
-                        'text' => $text,
-                        'id'   => json_encode([
-                            'entityClass' => ClassUtils::getClass($target),
-                            'entityId'    => $target->getId(),
-                        ])
-                    ]
-                );
+                $result[] = json_encode($this->getResult($text, $target));
             }
 
             $value = implode(';', $result);
@@ -165,5 +158,22 @@ class ContextsToViewTransformer implements DataTransformerInterface
         $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
+    }
+
+    /**
+     * @param string $text
+     * @param object $object
+     *
+     * @return array
+     */
+    protected function getResult($text, $object)
+    {
+        return [
+            'text' => $text,
+            'id'   => json_encode([
+                'entityClass' => ClassUtils::getClass($object),
+                'entityId'    => $object->getId(),
+            ])
+        ];
     }
 }

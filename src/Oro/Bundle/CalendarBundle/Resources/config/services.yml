@@ -13,10 +13,12 @@ parameters:
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
     oro_calendar.twig.recurrence.class:                          Oro\Bundle\CalendarBundle\Twig\RecurrenceExtension
     oro_calendar.provider.calendar_config.class:                 Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider
+    oro_calendar.provider.attendee_email_recipients.class:       Oro\Bundle\CalendarBundle\Provider\AttendeeEmailRecipientsProvider
     oro_calendar.owner_assignment_checker.calendar.class:        Oro\Bundle\CalendarBundle\Ownership\CalendarOwnerAssignmentChecker
     oro_calendar.activity_list.provider.class:                   Oro\Bundle\CalendarBundle\Provider\CalendarEventActivityListProvider
     oro_calendar.calendar_event_manager.class:                   Oro\Bundle\CalendarBundle\Manager\CalendarEventManager
     oro_calendar.calendar_manager.class:                         Oro\Bundle\CalendarBundle\Manager\CalendarManager
+    oro_calendar.attendee_manager.class:                         Oro\Bundle\CalendarBundle\Manager\AttendeeManager
     oro_calendar.calendar_property_provider.class:               Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider
     oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
     oro_calendar.calendar_provider.system.class:                 Oro\Bundle\CalendarBundle\Provider\SystemCalendarProvider
@@ -122,6 +124,14 @@ services:
         arguments:
             - '@oro_locale.settings'
 
+    oro_calendar.provider.attendee_email_recipients:
+        class: %oro_calendar.provider.attendee_email_recipients.class%
+        arguments:
+            - '@doctrine'
+            - '@oro_email.provider.email_recipients.helper'
+        tags:
+            - { name: oro_email.recipients_provider, priority: 50 }
+
     oro_calendar.owner_assignment_checker.calendar:
         class: %oro_calendar.owner_assignment_checker.calendar.class%
         tags:
@@ -148,6 +158,11 @@ services:
         class: %oro_calendar.calendar_manager.class%
         arguments:
             - '@oro_calendar.calendar_property_provider'
+
+    oro_calendar.attendee_manager:
+        class: %oro_calendar.attendee_manager.class%
+        arguments:
+            - '@oro_entity.doctrine_helper'
 
     oro_calendar.calendar_property_provider:
         class: %oro_calendar.calendar_property_provider.class%
@@ -201,12 +216,14 @@ services:
         arguments:
             - '@oro_reminder.entity.manager'
             - '@oro_security.security_facade'
+            - '@oro_entity.doctrine_helper'
 
     oro_calendar.calendar_event_normalizer.public:
         class: %oro_calendar.calendar_event_normalizer.public.class%
         arguments:
             - '@oro_reminder.entity.manager'
             - '@oro_security.security_facade'
+            - '@oro_entity.doctrine_helper'
 
     oro_calendar.autocomplete.user_calendar_handler:
         class: %oro_calendar.autocomplete.user_calendar_handler.class%
@@ -288,6 +305,10 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_workflow.action, alias: create_calendar_event }
+
+    oro_calendar.autocomplete.attendee_search_handler:
+        parent: oro_activity.form.handler.autocomplete
+        class: Oro\Bundle\CalendarBundle\Autocomplete\AttendeeSearchHandler
 
     # Recurrence Strategies
     oro_calendar.recurrence.strategy.abstract:

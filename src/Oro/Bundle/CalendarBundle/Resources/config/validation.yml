@@ -13,6 +13,8 @@ Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
         end:
             - DateTime:     ~
             - NotBlank:     ~
+        attendees:
+            - Valid: ~
 
 Oro\Bundle\CalendarBundle\Entity\CalendarProperty:
     properties:
@@ -32,6 +34,18 @@ Oro\Bundle\CalendarBundle\Entity\SystemCalendar:
     properties:
         name:
             - NotBlank:     ~
+            - Length:
+                max: 255
+
+Oro\Bundle\CalendarBundle\Entity\Attendee:
+    properties:
+        origin:
+            - NotBlank:     ~
+        email:
+            - NotBlank:     ~
+            - Length:
+                max: 255
+        displayName:
             - Length:
                 max: 255
 

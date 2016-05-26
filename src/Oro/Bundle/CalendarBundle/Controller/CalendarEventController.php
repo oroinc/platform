@@ -9,7 +9,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 /**
@@ -151,12 +150,12 @@ class CalendarEventController extends Controller
             $saved = true;
         }
 
-        return array(
+        return [
             'entity'     => $entity,
             'saved'      => $saved,
             'form'       => $this->get('oro_calendar.calendar_event.form.handler')->getForm()->createView(),
             'formAction' => $formAction
-        );
+        ];
     }
 
     /**

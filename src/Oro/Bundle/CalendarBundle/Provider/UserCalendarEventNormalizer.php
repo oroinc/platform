@@ -4,21 +4,20 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Doctrine\ORM\AbstractQuery;
 
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 {
     /** @var SecurityFacade */
     protected $securityFacade;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
 
     /** @var PropertyAccessor */
     protected $propertyAccessor;
@@ -33,9 +32,8 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         SecurityFacade $securityFacade,
         DoctrineHelper $doctrineHelper
     ) {
-        parent::__construct($reminderManager);
+        parent::__construct($reminderManager, $doctrineHelper);
         $this->securityFacade = $securityFacade;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -72,11 +70,10 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
      */
     protected function serializeCalendarEvent(CalendarEvent $event, array $extraFields = [])
     {
-        $propertyAccessor = $this->getPropertyAccessor();
         $extraValues = [];
 
         foreach ($extraFields as $field) {
-            $extraValues[$field] = $propertyAccessor->getValue($event, $field);
+            $extraValues[$field] = $this->getObjectValue($event, $field);
         }
 
         if ($recurrence = $event->getRecurrence()) {
@@ -111,42 +108,12 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'recurringEventId' => $event->getRecurringEvent() ? $event->getRecurringEvent()->getId() : null,
                 'originalStart'    => $event->getOriginalStart(),
                 'isCancelled'      => $event->getIsCancelled(),
+                'origin'           => $event->getOrigin()
+                    ? $event->getOrigin()->getId()
+                    : null
             ],
-            $extraValues
+            $this->prepareExtraValues($event, $extraValues)
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function applyAdditionalData(&$items, $calendarId)
-    {
-        $parentEventIds = $this->getParentEventIds($items);
-        if ($parentEventIds) {
-            /** @var CalendarEventRepository $repo */
-            $repo     = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-            $invitees = $repo->getInvitedUsersByParentsQueryBuilder($parentEventIds)
-                ->getQuery()
-                ->getArrayResult();
-
-            $groupedInvitees = [];
-            foreach ($invitees as $invitee) {
-                $groupedInvitees[$invitee['parentEventId']][] = $invitee;
-            }
-
-            foreach ($items as &$item) {
-                $item['invitedUsers'] = [];
-                if (isset($groupedInvitees[$item['id']])) {
-                    foreach ($groupedInvitees[$item['id']] as $invitee) {
-                        $item['invitedUsers'][] = $invitee['userId'];
-                    }
-                }
-            }
-        } else {
-            foreach ($items as &$item) {
-                $item['invitedUsers'] = [];
-            }
-        }
     }
 
     /**
@@ -164,8 +131,9 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         $item['notifiable'] =
             !empty($item['invitationStatus'])
             && empty($item['parentEventId'])
-            && empty($item['recurrence'])
-            && !empty($item['invitedUsers']);
+            && !empty($item['attendees'])
+            && $item['origin'] === CalendarEvent::ORIGIN_SERVER
+            && empty($item['recurrence']);
     }
 
     /**
@@ -245,5 +213,55 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         return $this;
+    }
+
+    /**
+     * @param mixed $object
+     * @param string $propertyPath
+     *
+     * @return mixed|null
+     */
+    protected function getObjectValue($object, $propertyPath)
+    {
+        $propertyAccessor = $this->getPropertyAccessor();
+
+        try {
+            return $propertyAccessor->getValue($object, $propertyPath);
+        } catch (InvalidPropertyPathException $e) {
+            return null;
+        } catch (NoSuchPropertyException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param CalendarEvent $event
+     * @param array         $extraValues
+     *
+     * @return array
+     */
+    protected function prepareExtraValues(CalendarEvent $event, array $extraValues)
+    {
+        $extraValues['attendees']    = [];
+        $extraValues['invitedUsers'] = [];
+
+        foreach ($event->getAttendees() as $attendee) {
+            $extraValues['attendees'][] = $this->transformEntity([
+                'displayName' => $attendee->getDisplayName(),
+                'email'       => $attendee->getEmail(),
+                'user_id'     => $this->getObjectValue($attendee, 'user.id'),
+                'createdAt'   => $attendee->getCreatedAt(),
+                'updatedAt'   => $attendee->getUpdatedAt(),
+                'origin'      => $this->getObjectValue($attendee, 'origin.id'),
+                'status'      => $this->getObjectValue($attendee, 'status.id'),
+                'type'        => $this->getObjectValue($attendee, 'type.id'),
+            ]);
+
+            if ($attendee->getUser()) {
+                $extraValues['invitedUsers'][] = $attendee->getUser()->getId();
+            }
+        }
+
+        return $extraValues;
     }
 }

@@ -55,10 +55,10 @@
                     recurrencePattern,
                     form_row(form.backgroundColor),
                     form.calendarUid is defined ? form_row(form.calendarUid) : null,
-                    form_row(form.childEvents),
+                    form_row(form.attendees),
                     entity.recurrence is null ? form_row(form.reminders) : null,
                     form_row(form.notifyInvitedUsers),
-                    entity.invitationStatus and entity.parent is null and entity.childEvents is not empty and entity.recurrence is null ? invitations.notifyGuestsComponent() : null,
+                    entity.relatedAttendee  and entity.relatedAttendee.status and entity.parent is null and entity.childAttendees is not empty and entity.recurrence is null ? invitations.notifyGuestsComponent() : null,
                     entity.recurrence is not null ? recurringEvent.notifyRecurringEventEditComponent() : null
                 ]
             }

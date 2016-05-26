@@ -5,7 +5,8 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\CalendarEvent;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -61,7 +62,16 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $transformer = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer')
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
+
         $this->entity  = new CalendarEvent();
+        $origin        = new TestEnumValue(CalendarEvent::ORIGIN_SERVER, CalendarEvent::ORIGIN_SERVER);
+        $this->entity->setOrigin($origin);
+        
         $this->handler = new CalendarEventHandler(
             $this->form,
             $this->request,
@@ -69,7 +79,8 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             $this->activityManager,
             $this->entityRoutingHelper,
             $this->securityFacade,
-            $this->emailSendProcessor
+            $this->emailSendProcessor,
+            $transformer
         );
     }
 
@@ -86,6 +97,26 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->handler->process($this->entity)
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     */
+    public function testProcessWithException()
+    {
+        $origin = new TestEnumValue(CalendarEvent::ORIGIN_EXTERNAL, CalendarEvent::ORIGIN_EXTERNAL);
+        $this->entity->setOrigin($origin);
+
+        $this->handler->process($this->entity);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     */
+    public function testProcessWithExceptionWithParent()
+    {
+        $this->entity->setParent(new CalendarEvent());
+        $this->handler->process($this->entity);
     }
 
     /**
@@ -163,16 +194,13 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage Both logged in user and organization must be defined.
      */
-    public function testProcessGetRequestWithoutCurrentUser($method)
+    public function testProcessRequestWithoutCurrentUser($method)
     {
         $this->request->setMethod($method);
 
-        $this->form->expects($this->once())
+        $this->form->expects($this->never())
             ->method('submit')
             ->with($this->identicalTo($this->request));
-        $this->form->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue(true));
 
         $this->securityFacade->expects($this->once())
             ->method('getLoggedUser')

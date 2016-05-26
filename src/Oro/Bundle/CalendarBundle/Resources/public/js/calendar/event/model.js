@@ -30,7 +30,7 @@ define([
             reminders: {},
             parentEventId: null,
             invitationStatus: null,
-            invitedUsers: null,
+            attendees: null,
             editable: false,
             removable: false,
             calendarAlias: null,
@@ -93,8 +93,7 @@ define([
                 ),
                 attrs || {}
             );
-            modelData.invitedUsers = modelData.invitedUsers ? modelData.invitedUsers.join(',') : undefined;
-
+            
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);
 
@@ -131,8 +130,8 @@ define([
 
         getInvitationStatus: function() {
             var invitationStatus = this.get('invitationStatus');
-            var invitedUsers = this.get('invitedUsers');
-            if (!invitationStatus && invitedUsers && invitedUsers.length) {
+            var attendees = this.get('attendees');
+            if (!invitationStatus && attendees && attendees.length) {
                 invitationStatus = 'accepted';
             }
             return invitationStatus;

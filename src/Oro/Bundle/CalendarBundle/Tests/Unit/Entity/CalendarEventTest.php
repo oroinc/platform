@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
+use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\ReminderBundle\Model\ReminderData;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -52,22 +56,26 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             ['backgroundColor', '#FF0000'],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
-            ['invitationStatus', CalendarEvent::NOT_RESPONDED],
+            ['invitationStatus', CalendarEvent::STATUS_NONE],
             ['recurrence', new Recurrence()],
             ['originalStart', new \DateTime()],
             ['isCancelled', true],
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testNotValidInvitationStatusSetter()
+    public function testInvitationStatus()
     {
-        $obj = new CalendarEvent();
+        $attendee      = new Attendee();
+        $calendarEvent = new CalendarEvent();
+        $calendarEvent->setRelatedAttendee($attendee);
 
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $accessor->setValue($obj, 'invitationStatus', 'wrong');
+        $attendee->setStatus(new TestEnumValue(CalendarEvent::STATUS_ACCEPTED, CalendarEvent::STATUS_ACCEPTED));
+        $this->assertEquals(CalendarEvent::ACCEPTED, $calendarEvent->getInvitationStatus());
+
+        $attendee->setStatus(
+            new TestEnumValue(CalendarEvent::STATUS_TENTATIVE, CalendarEvent::STATUS_TENTATIVE)
+        );
+        $this->assertEquals(CalendarEvent::STATUS_TENTATIVE, $calendarEvent->getInvitationStatus());
     }
 
     public function testChildren()
@@ -123,8 +131,11 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAvailableInvitationStatuses($status, $expected)
     {
+        $attendee = new Attendee();
+        $attendee->setStatus(new TestEnumValue($status, $status));
+
         $event = new CalendarEvent();
-        $event->setInvitationStatus($status);
+        $event->setRelatedAttendee($attendee);
         $actual = $event->getAvailableInvitationStatuses();
         $this->assertEmpty(array_diff($expected, $actual));
     }
@@ -135,35 +146,35 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
     public function getAvailableDataProvider()
     {
         return [
-            'not responded' => [
-                'status' => CalendarEvent::NOT_RESPONDED,
+            'not responded'          => [
+                'status'   => CalendarEvent::STATUS_NONE,
                 'expected' => [
-                    CalendarEvent::ACCEPTED,
-                    CalendarEvent::TENTATIVELY_ACCEPTED,
-                    CalendarEvent::DECLINED,
-                ]
+                    CalendarEvent::STATUS_ACCEPTED,
+                    CalendarEvent::STATUS_TENTATIVE,
+                    CalendarEvent::STATUS_DECLINED,
+                ],
             ],
-            'declined' => [
-                'status' => CalendarEvent::DECLINED,
+            'declined'               => [
+                'status'   => CalendarEvent::STATUS_DECLINED,
                 'expected' => [
-                    CalendarEvent::ACCEPTED,
-                    CalendarEvent::TENTATIVELY_ACCEPTED,
-                ]
+                    CalendarEvent::STATUS_ACCEPTED,
+                    CalendarEvent::STATUS_TENTATIVE,
+                ],
             ],
-            'accepted' => [
-                'status' => CalendarEvent::ACCEPTED,
+            'accepted'               => [
+                'status'   => CalendarEvent::STATUS_ACCEPTED,
                 'expected' => [
-                    CalendarEvent::TENTATIVELY_ACCEPTED,
-                    CalendarEvent::DECLINED,
-                ]
+                    CalendarEvent::STATUS_TENTATIVE,
+                    CalendarEvent::STATUS_DECLINED,
+                ],
             ],
             'tentatively available ' => [
-                'status' => CalendarEvent::TENTATIVELY_ACCEPTED,
+                'status'   => CalendarEvent::STATUS_TENTATIVE,
                 'expected' => [
-                    CalendarEvent::ACCEPTED,
-                    CalendarEvent::DECLINED,
-                ]
-            ]
+                    CalendarEvent::STATUS_ACCEPTED,
+                    CalendarEvent::STATUS_DECLINED,
+                ],
+            ],
         ];
     }
 
@@ -297,7 +308,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
 
     public function testIsUpdatedFlags()
     {
-        $date = new \DateTime('2012-12-12 12:12:12');
+        $date          = new \DateTime('2012-12-12 12:12:12');
         $calendarEvent = new CalendarEvent();
         $calendarEvent->setUpdatedAt($date);
 
@@ -311,6 +322,91 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($calendarEvent->isUpdatedAtSet());
     }
+
+    public function testAttendees()
+    {
+        $attendee  = $this->getMock('Oro\Bundle\CalendarBundle\Entity\Attendee');
+        $attendees = new ArrayCollection([$attendee]);
+
+        $calendarEvent = new CalendarEvent();
+        $calendarEvent->setAttendees($attendees);
+
+        $this->assertCount(1, $calendarEvent->getAttendees());
+
+        $calendarEvent->addAttendee(clone $attendee);
+
+        $this->assertCount(2, $calendarEvent->getAttendees());
+
+        foreach ($calendarEvent->getAttendees() as $item) {
+            $this->assertInstanceOf('Oro\Bundle\CalendarBundle\Entity\Attendee', $item);
+        }
+
+        $calendarEvent->removeAttendee($attendee);
+
+        $this->assertCount(1, $calendarEvent->getAttendees());
+    }
+
+    public function testRelatedAttendee()
+    {
+        $attendee      = $this->getMock('Oro\Bundle\CalendarBundle\Entity\Attendee');
+        $calendarEvent = new CalendarEvent();
+        $calendarEvent->setRelatedAttendee($attendee);
+
+        $this->assertInstanceOf('Oro\Bundle\CalendarBundle\Entity\Attendee', $calendarEvent->getRelatedAttendee());
+    }
+
+    /**
+     * @dataProvider childAttendeesProvider
+     */
+    public function testGetChildAttendees(CalendarEvent $event, array $expectedAttendees)
+    {
+        $this->assertEquals($expectedAttendees, array_values($event->getChildAttendees()->toArray()));
+    }
+
+    public function childAttendeesProvider()
+    {
+        $attendee1 = (new Attendee())->setEmail('first@example.com');
+        $attendee2 = (new Attendee())->setEmail('second@example.com');
+        $attendee3 = (new Attendee())->setemail('third@example.com');
+
+        return [
+            'event without realted attendee' => [
+                (new CalendarEvent())
+                    ->setAttendees(
+                        new ArrayCollection(
+                            [
+                                $attendee1,
+                                $attendee2,
+                                $attendee3,
+                            ]
+                        )
+                    ),
+                [
+                    $attendee1,
+                    $attendee2,
+                    $attendee3,
+                ],
+            ],
+            'event with related attendee'    => [
+                (new CalendarEvent())
+                    ->setAttendees(
+                        new ArrayCollection(
+                            [
+                                $attendee1,
+                                $attendee2,
+                                $attendee3,
+                            ]
+                        )
+                    )
+                    ->setRelatedAttendee($attendee1),
+                [
+                    $attendee2,
+                    $attendee3,
+                ],
+            ],
+        ];
+    }
+
 
     public function testExceptions()
     {
