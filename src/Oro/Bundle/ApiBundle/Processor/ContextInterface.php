@@ -238,23 +238,29 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Checks whether a configuration of an entity exists.
      *
+     * @param string|null $className
+     *
      * @return bool
      */
-    public function hasConfig();
+    public function hasConfig($className = null);
 
     /**
      * Gets a configuration of an entity.
      *
+     * @param string|null $className
+     *
      * @return EntityDefinitionConfig|null
      */
-    public function getConfig();
+    public function getConfig($className = null);
 
     /**
      * Sets a configuration of an entity.
      *
+     * @param string|null $className
+     *
      * @param EntityDefinitionConfig|null $definition
      */
-    public function setConfig(EntityDefinitionConfig $definition = null);
+    public function setConfig(EntityDefinitionConfig $definition = null, $className = null);
 
     /**
      * Checks whether a configuration of filters for an entity exists.
@@ -313,22 +319,24 @@ interface ContextInterface extends ComponentContextInterface
      * Gets a configuration from the given section.
      *
      * @param string $configSection
+     * @param string|null $className
      *
      * @return mixed
      *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function getConfigOf($configSection);
+    public function getConfigOf($configSection, $className = null);
 
     /**
      * Sets a configuration for the given section.
      *
      * @param string $configSection
+     * @param string|null $className
      * @param mixed  $config
      *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function setConfigOf($configSection, $config);
+    public function setConfigOf($configSection, $config, $className = null);
 
     /**
      * Gets a list of requests for additional metadata info.
@@ -374,21 +382,27 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Checks whether metadata of an entity exists.
      *
+     * @param string|null $className
+     *
      * @return bool
      */
-    public function hasMetadata();
+    public function hasMetadata($className = null);
 
     /**
      * Gets metadata of an entity.
      *
+     * @param string|null $className
+     *
      * @return EntityMetadata|null
      */
-    public function getMetadata();
+    public function getMetadata($className = null);
 
     /**
      * Sets metadata of an entity.
      *
+     * @param string|null         $className
+     *
      * @param EntityMetadata|null $metadata
      */
-    public function setMetadata(EntityMetadata $metadata = null);
+    public function setMetadata(EntityMetadata $metadata = null, $className = null);
 }
