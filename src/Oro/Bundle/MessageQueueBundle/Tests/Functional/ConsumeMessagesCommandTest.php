@@ -13,8 +13,8 @@ class ConsumeMessagesCommandTest extends WebTestCase
 
     public function testCouldBeGetFromContainerAsService()
     {
-        $queueConsumer = $this->getContainer()->get('oro_message_queue.zero_config.consume_messages_command');
+        $command = $this->getContainer()->get('oro_message_queue.zero_config.consume_messages_command');
 
-        $this->assertInstanceOf(ConsumeMessagesCommand::class, $queueConsumer);
+        $this->assertInstanceOf(ConsumeMessagesCommand::class, $command);
     }
 }

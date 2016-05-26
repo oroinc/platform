@@ -50,6 +50,18 @@ class Router implements RuterInterface
     }
 
     /**
+     * @internal
+     *
+     * @param string $topicName
+     *
+     * @return array
+     */
+    public function getTopicSubscribers($topicName)
+    {
+        return array_key_exists($topicName, $this->routes) ? $this->routes[$topicName] : [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function route(Message $message)

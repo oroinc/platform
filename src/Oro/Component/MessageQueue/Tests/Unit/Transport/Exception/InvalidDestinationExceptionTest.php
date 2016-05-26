@@ -24,7 +24,7 @@ class InvalidDestinationExceptionTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowIfAssertDestinationInstanceOfNotSameAsExpected()
     {
-        $this->setExpectedException(InvalidDestinationException::class, 'A destination is not understood. Destination must be an instance of Oro\Component\MessageQueue\Tests\Transport\Exception\DestinationBar but it is Oro\Component\MessageQueue\Tests\Transport\Exception\DestinationFoo.');
+        $this->setExpectedException(InvalidDestinationException::class, 'A destination is not understood. Destination must be an instance of Oro\Component\MessageQueue\Tests\Unit\Transport\Exception\DestinationBar but it is Oro\Component\MessageQueue\Tests\Unit\Transport\Exception\DestinationFoo.');
 
         InvalidDestinationException::assertDestinationInstanceOf(new DestinationFoo(), DestinationBar::class);
     }
