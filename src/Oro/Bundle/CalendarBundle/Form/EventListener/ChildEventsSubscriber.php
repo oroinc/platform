@@ -260,10 +260,14 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             $calendarRepository = $this->registry->getRepository('OroCalendarBundle:Calendar');
             $organizationId     = $this->securityFacade->getOrganizationId();
 
-            $calendars = $calendarRepository->findDefaultCalendars($missingEventUserIds, $organizationId);
+            $calendars  = $calendarRepository->findDefaultCalendars($missingEventUserIds, $organizationId);
+            $originEnum = $this->registry
+                ->getRepository(ExtendHelper::buildEnumValueClassName(CalendarEvent::ORIGIN_ENUM_CODE))
+                ->find(CalendarEvent::ORIGIN_SERVER);
             foreach ($calendars as $calendar) {
                 $event = new CalendarEvent();
                 $event->setCalendar($calendar);
+                $event->setOrigin($originEnum);
                 $parent->addChildEvent($event);
                 if ($calendar->getOwner() && isset($attendeesByUserId[$calendar->getOwner()->getId()])) {
                     $event->setRelatedAttendee($attendeesByUserId[$calendar->getOwner()->getId()]);

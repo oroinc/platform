@@ -4,8 +4,6 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class AttendeeRepository extends EntityRepository

@@ -22,7 +22,7 @@ class AjaxCalendarEventController extends Controller
      *      name="oro_calendar_event_accepted",
      *      requirements={"id"="\d+"}, defaults={"status"="accepted"})
      * @Route("/tentative/{id}",
-     *      name="oro_calendar_event_tentatively_accepted",
+     *      name="oro_calendar_event_tentative",
      *      requirements={"id"="\d+"}, defaults={"status"="tentative"})
      * @Route("/declined/{id}",
      *      name="oro_calendar_event_declined",

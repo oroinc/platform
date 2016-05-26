@@ -678,15 +678,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
-     * @return CalendarEvent
-     */
-    public function getRealCalendarEvent()
-    {
-        return $this->getParent() ?: $this;
-    }
-
-
-    /**
      * @return Collection|Attendee[]
      */
     public function getAttendees()
@@ -803,5 +794,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
             },
             $events
         );
+    }
+
+    /**
+     * @return CalendarEvent
+     */
+    protected function getRealCalendarEvent()
+    {
+        return $this->getParent() ?: $this;
     }
 }

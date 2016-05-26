@@ -347,23 +347,6 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Bundle\CalendarBundle\Entity\Attendee', $calendarEvent->getRelatedAttendee());
     }
 
-    public function testGetRealCalendarEventWithParent()
-    {
-        $calendarEvent1 = new CalendarEvent();
-        $calendarEvent2 = new CalendarEvent();
-
-        $calendarEvent1->setParent($calendarEvent2);
-
-        $this->assertSame($calendarEvent1->getRealCalendarEvent(), $calendarEvent2);
-    }
-
-    public function testGetRealCalendarEventWithoutParent()
-    {
-        $calendarEvent1 = new CalendarEvent();
-
-        $this->assertSame($calendarEvent1->getRealCalendarEvent(), $calendarEvent1);
-    }
-
     /**
      * @dataProvider childAttendeesProvider
      */

@@ -106,7 +106,7 @@ datagrid:
                 params:     [ id ]
             tentatively_link:
                 type:       url
-                route:      oro_calendar_event_tentatively_accepted
+                route:      oro_calendar_event_tentative
                 params:     [ id ]
             decline_link:
                 type:       url

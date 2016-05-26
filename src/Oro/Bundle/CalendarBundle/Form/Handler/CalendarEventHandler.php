@@ -95,7 +95,7 @@ class CalendarEventHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            // clone attendees to have have original attendees at disposal later
+            // create array collection of attendees to have have original attendees at disposal later
             $originalAttendees = new ArrayCollection($entity->getAttendees()->toArray());
 
             $this->ensureCalendarSet($entity);

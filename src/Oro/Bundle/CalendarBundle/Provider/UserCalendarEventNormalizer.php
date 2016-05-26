@@ -88,8 +88,8 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'invitationStatus' => $event->getInvitationStatus(),
                 'parentEventId'    => $event->getParent() ? $event->getParent()->getId() : null,
                 'calendar'         => $event->getCalendar() ? $event->getCalendar()->getId() : null,
-                'origin'           => $event->getRealCalendarEvent()->getOrigin()
-                    ? $event->getRealCalendarEvent()->getOrigin()->getId()
+                'origin'           => $event->getOrigin()
+                    ? $event->getOrigin()->getId()
                     : null
             ],
             $this->prepareExtraValues($event, $extraValues)
