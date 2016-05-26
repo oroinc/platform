@@ -2,20 +2,20 @@
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
 use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
 use Oro\Component\MessageQueue\Transport\Queue;
 
 interface Session
 {
     /**
-     * @return MessageProducer
+     * @return TransportMessageProducer
      */
-    public function createProducer();
+    public function createTransportMessageProducer();
 
     /**
-     * @return FrontProducer
+     * @return MessageProducer
      */
-    public function createFrontProducer();
+    public function createMessageProducer();
 
     /**
      * @return Message

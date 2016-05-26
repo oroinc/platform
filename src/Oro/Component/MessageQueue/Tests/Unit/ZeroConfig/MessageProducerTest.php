@@ -1,18 +1,18 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 
-use Oro\Component\MessageQueue\Transport\MessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
-use Oro\Component\MessageQueue\ZeroConfig\FrontProducer;
+use Oro\Component\MessageQueue\ZeroConfig\MessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\Config;
 use Oro\Component\MessageQueue\ZeroConfig\Session;
 
-class FrontProducerTest extends \PHPUnit_Framework_TestCase
+class MessageProducerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new FrontProducer($this->createSessionStub());
+        new MessageProducer($this->createSessionStub());
     }
 
     public function testShouldSendMessageAndCreateSchema()
@@ -22,7 +22,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
 
-        $messageProducer = $this->createMessageProducer();
+        $messageProducer = $this->createTransportMessageProducer();
         $messageProducer
             ->expects($this->once())
             ->method('send')
@@ -31,7 +31,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
 
-        $producer = new FrontProducer($session);
+        $producer = new MessageProducer($session);
         $producer->send('topic', 'message');
 
         $expectedProperties = [
@@ -50,7 +50,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
 
-        $messageProducer = $this->createMessageProducer();
+        $messageProducer = $this->createTransportMessageProducer();
         $messageProducer
             ->expects($this->once())
             ->method('send')
@@ -58,7 +58,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
 
-        $producer = new FrontProducer($session);
+        $producer = new MessageProducer($session);
         $producer->send('topic', null);
 
         $this->assertSame('', $message->getBody());
@@ -72,7 +72,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
 
-        $messageProducer = $this->createMessageProducer();
+        $messageProducer = $this->createTransportMessageProducer();
         $messageProducer
             ->expects($this->once())
             ->method('send')
@@ -80,7 +80,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
 
-        $producer = new FrontProducer($session);
+        $producer = new MessageProducer($session);
         $producer->send('topic', 'message');
 
         $this->assertSame('message', $message->getBody());
@@ -94,7 +94,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
 
-        $messageProducer = $this->createMessageProducer();
+        $messageProducer = $this->createTransportMessageProducer();
         $messageProducer
             ->expects($this->once())
             ->method('send')
@@ -102,7 +102,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
 
-        $producer = new FrontProducer($session);
+        $producer = new MessageProducer($session);
         $producer->send('topic', ['foo' => 'fooVal']);
 
         $this->assertSame('{"foo":"fooVal"}', $message->getBody());
@@ -116,7 +116,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
 
-        $messageProducer = $this->createMessageProducer();
+        $messageProducer = $this->createTransportMessageProducer();
         $messageProducer
             ->expects($this->never())
             ->method('send')
@@ -124,7 +124,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
 
         $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
 
-        $producer = new FrontProducer($session);
+        $producer = new MessageProducer($session);
 
         $this->setExpectedException(
             \InvalidArgumentException::class,
@@ -156,7 +156,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
         ;
         $sessionMock
             ->expects($this->any())
-            ->method('createProducer')
+            ->method('createTransportMessageProducer')
             ->will($this->returnValue($messageProducer))
         ;
 
@@ -164,10 +164,10 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducer
+     * @return \PHPUnit_Framework_MockObject_MockObject|TransportMessageProducer
      */
-    protected function createMessageProducer()
+    protected function createTransportMessageProducer()
     {
-        return $this->getMock(MessageProducer::class, [], [], '', false);
+        return $this->getMock(TransportMessageProducer::class, [], [], '', false);
     }
 }

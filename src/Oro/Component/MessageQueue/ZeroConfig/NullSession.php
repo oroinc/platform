@@ -37,7 +37,7 @@ class NullSession implements Session
     /**
      * {@inheritdoc}
      */
-    public function createProducer()
+    public function createTransportMessageProducer()
     {
         return $this->session->createProducer();
     }
@@ -45,9 +45,9 @@ class NullSession implements Session
     /**
      * {@inheritdoc}
      */
-    public function createFrontProducer()
+    public function createMessageProducer()
     {
-        return new FrontProducer($this, $this->config);
+        return new MessageProducer($this, $this->config);
     }
 
     /**

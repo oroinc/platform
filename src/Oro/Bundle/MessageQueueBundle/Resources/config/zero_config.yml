@@ -11,9 +11,9 @@ services:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.zero_config.config'
 
-    oro_message_queue.zero_config.front_producer:
-        class: 'Oro\Component\MessageQueue\ZeroConfig\FrontProducer'
-        factory: ['@oro_message_queue.zero_config.session', 'createFrontProducer']
+    oro_message_queue.zero_config.message_producer:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\MessageProducer'
+        factory: ['@oro_message_queue.zero_config.session', 'createMessageProducer']
 
     oro_message_queue.zero_config.router:
         class: 'Oro\Component\MessageQueue\ZeroConfig\Router'

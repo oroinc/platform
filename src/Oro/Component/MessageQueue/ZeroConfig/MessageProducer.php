@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
-class FrontProducer
+class MessageProducer
 {
     /**
      * @var Session
@@ -53,6 +53,6 @@ class FrontProducer
 
         $queue = $this->session->createQueue($config->getRouterQueueName());
         
-        $this->session->createProducer()->send($queue, $message);
+        $this->session->createTransportMessageProducer()->send($queue, $message);
     }
 }
