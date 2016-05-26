@@ -40,19 +40,11 @@ class AmqpSession implements Session
     /**
      * {@inheritdoc}
      */
-    public function createTransportMessageProducer()
+    public function createProducer()
     {
-        return $this->session->createProducer();
+        return new MessageProducer($this->session->createProducer(), $this);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createMessageProducer()
-    {
-        return new MessageProducer($this, $this->config);
-    }
-
+    
     /**
      * @param string $queueName
      *

@@ -4,6 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession as TransportAmqpSession;
+use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\MessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\AmqpSession;
 use Oro\Component\MessageQueue\ZeroConfig\Config;
@@ -43,19 +44,11 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
         $transportSession
             ->expects($this->once())
             ->method('createProducer')
-            ->will($this->returnValue('producer-instance'))
+            ->will($this->returnValue($this->getMock(TransportMessageProducer::class)))
         ;
 
         $session = new AmqpSession($transportSession, new Config('', '', '', '', ''));
-        $result = $session->createTransportMessageProducer();
-
-        $this->assertEquals('producer-instance', $result);
-    }
-
-    public function testShouldCreateFrontProducerInstance()
-    {
-        $session = new AmqpSession($this->createTransportSessionMock(), new Config('', '', '', '', ''));
-        $result = $session->createMessageProducer();
+        $result = $session->createProducer();
 
         $this->assertInstanceOf(MessageProducer::class, $result);
     }

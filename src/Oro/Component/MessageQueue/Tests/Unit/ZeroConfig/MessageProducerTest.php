@@ -12,7 +12,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new MessageProducer($this->createSessionStub());
+        new MessageProducer($this->createTransportMessageProducer(), $this->createSessionStub());
     }
 
     public function testShouldSendMessageAndCreateSchema()
@@ -29,10 +29,10 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($queue), $this->identicalTo($message))
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
+        $session = $this->createSessionStub($message, $config, $queue);
 
-        $producer = new MessageProducer($session);
-        $producer->send('topic', 'message');
+        $producer = new MessageProducer($messageProducer, $session);
+        $producer->sendTo('topic', 'message');
 
         $expectedProperties = [
             'oro.message_queue.zero_config.topic_name' => 'topic',
@@ -56,10 +56,10 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
+        $session = $this->createSessionStub($message, $config, $queue);
 
-        $producer = new MessageProducer($session);
-        $producer->send('topic', null);
+        $producer = new MessageProducer($messageProducer, $session);
+        $producer->sendTo('topic', null);
 
         $this->assertSame('', $message->getBody());
         $this->assertSame('text/plain', $message->getHeader('content_type'));
@@ -78,10 +78,10 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
+        $session = $this->createSessionStub($message, $config, $queue);
 
-        $producer = new MessageProducer($session);
-        $producer->send('topic', 'message');
+        $producer = new MessageProducer($messageProducer, $session);
+        $producer->sendTo('topic', 'message');
 
         $this->assertSame('message', $message->getBody());
         $this->assertSame('text/plain', $message->getHeader('content_type'));
@@ -100,10 +100,10 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
+        $session = $this->createSessionStub($message, $config, $queue);
 
-        $producer = new MessageProducer($session);
-        $producer->send('topic', ['foo' => 'fooVal']);
+        $producer = new MessageProducer($messageProducer, $session);
+        $producer->sendTo('topic', ['foo' => 'fooVal']);
 
         $this->assertSame('{"foo":"fooVal"}', $message->getBody());
         $this->assertSame('application/json', $message->getHeader('content_type'));
@@ -122,21 +122,21 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue, $messageProducer);
+        $session = $this->createSessionStub($message, $config, $queue);
 
-        $producer = new MessageProducer($session);
+        $producer = new MessageProducer($messageProducer, $session);
 
         $this->setExpectedException(
             \InvalidArgumentException::class,
             'The message\'s body must be either null, scalar or array. Got: stdClass'
         );
-        $producer->send('topic', new \stdClass());
+        $producer->sendTo('topic', new \stdClass());
     }
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Session
      */
-    protected function createSessionStub($message = null, $config = null, $queue = null, $messageProducer = null)
+    protected function createSessionStub($message = null, $config = null, $queue = null)
     {
         $sessionMock = $this->getMock(Session::class, [], [], '', false);
         $sessionMock
@@ -153,11 +153,6 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('createQueue')
             ->will($this->returnValue($queue))
-        ;
-        $sessionMock
-            ->expects($this->any())
-            ->method('createTransportMessageProducer')
-            ->will($this->returnValue($messageProducer))
         ;
 
         return $sessionMock;

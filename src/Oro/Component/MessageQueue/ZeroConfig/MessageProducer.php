@@ -1,18 +1,29 @@
 <?php
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
-class MessageProducer
+use Oro\Component\MessageQueue\Transport\Destination;
+use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
+
+class MessageProducer implements TransportMessageProducer
 {
+    /**
+     * @var TransportMessageProducer
+     */
+    protected $messageProducer;
+
     /**
      * @var Session
      */
     protected $session;
 
     /**
-     * @param Session $session
+     * @param TransportMessageProducer $messageProducer
+     * @param Session                  $session
      */
-    public function __construct(Session $session)
+    public function __construct(TransportMessageProducer $messageProducer, Session $session)
     {
+        $this->messageProducer = $messageProducer;
         $this->session = $session;
     }
 
@@ -20,7 +31,7 @@ class MessageProducer
      * @param string $topic
      * @param string $body
      */
-    public function send($topic, $body)
+    public function sendTo($topic, $body)
     {
         if (is_scalar($body) || is_null($body)) {
             $contentType = 'text/plain';
@@ -53,6 +64,14 @@ class MessageProducer
 
         $queue = $this->session->createQueue($config->getRouterQueueName());
         
-        $this->session->createTransportMessageProducer()->send($queue, $message);
+        $this->send($queue, $message);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function send(Destination $destination, Message $message)
+    {
+        $this->messageProducer->send($destination, $message);
     }
 }

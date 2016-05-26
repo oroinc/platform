@@ -13,7 +13,7 @@ services:
 
     oro_message_queue.zero_config.message_producer:
         class: 'Oro\Component\MessageQueue\ZeroConfig\MessageProducer'
-        factory: ['@oro_message_queue.zero_config.session', 'createMessageProducer']
+        factory: ['@oro_message_queue.zero_config.session', 'createProducer']
 
     oro_message_queue.zero_config.router:
         class: 'Oro\Component\MessageQueue\ZeroConfig\Router'
