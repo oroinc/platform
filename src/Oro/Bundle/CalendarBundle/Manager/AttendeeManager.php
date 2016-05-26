@@ -39,6 +39,10 @@ class AttendeeManager
      */
     public function createAttendeeExclusions($attendees)
     {
+        if (!$attendees) {
+            return [];
+        }
+
         if ($attendees instanceof Collection) {
             $attendees = $attendees->toArray();
         }
