@@ -50,7 +50,7 @@ oro:
 
         info:
             new_field.label:     New Field
-            records_count.label: Number of records: %count%
+            records_count.label: 'Number of records: %count%'
 
         form:
             name.label: Name

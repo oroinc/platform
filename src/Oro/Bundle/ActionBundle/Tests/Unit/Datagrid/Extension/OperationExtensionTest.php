@@ -15,6 +15,7 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 class OperationExtensionTest extends AbstractExtensionTest
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
+    const TEST_ROUTE = 'test_route';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|MassActionProviderRegistry */
     protected $massActionProviderRegistry;
@@ -33,6 +34,18 @@ class OperationExtensionTest extends AbstractExtensionTest
         $contextHelper->expects($this->any())
             ->method('getActionData')
             ->willReturn(new ActionData(['data' => ['param'], 'key1' => 'value1', 'key2' => 2]));
+        $contextHelper->expects($this->any())
+            ->method('getContext')
+            ->willReturn(
+                [
+                    ContextHelper::ROUTE_PARAM => self::TEST_ROUTE,
+                    ContextHelper::ENTITY_ID_PARAM => null,
+                    ContextHelper::ENTITY_CLASS_PARAM => null,
+                    ContextHelper::DATAGRID_PARAM => null,
+                    ContextHelper::GROUP_PARAM => null,
+                    ContextHelper::FROM_URL_PARAM => null,
+                ]
+            );
 
         $provider = $this->getMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
         $provider->expects($this->any())
@@ -94,6 +107,13 @@ class OperationExtensionTest extends AbstractExtensionTest
         $this->assertEquals($expected, $this->extension->isApplicable($config));
 
         if ($expected) {
+            $options = $config->offsetGetOr('options');
+
+            $this->assertInternalType('array', $options);
+            $this->assertArrayHasKey('urlParams', $options);
+            $this->assertArrayHasKey('originalRoute', $options['urlParams']);
+            $this->assertEquals(self::TEST_ROUTE, $options['urlParams']['originalRoute']);
+
             $this->assertNotEmpty($config->offsetGetOr('actions'));
             $this->assertNotEmpty($config->offsetGetOr('action_configuration'));
 
@@ -145,35 +165,16 @@ class OperationExtensionTest extends AbstractExtensionTest
      */
     public function isApplicableProvider()
     {
-        $operation1 = $this->createOperation(
-            'test_operation',
-            true,
-            [
-                'getDatagridOptions' => ['mass_action_provider' => self::PROVIDER_ALIAS]
-            ]
-        );
-
-        $operation2 = $this->createOperation(
-            'test_operation',
-            true,
-            [
-                'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
-            ]
-        );
-
-        $operation3 = $this->createOperation(
-            'action3',
-            true,
-            [
-                'getName' => 'action3',
-                'getLabel' => 'Action 3 label'
-            ]
-        );
-
         return [
             'applicable with provider' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['test_operation' => $operation1],
+                'actions' => ['test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action_provider' => self::PROVIDER_ALIAS]
+                    ]
+                )],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
@@ -181,7 +182,13 @@ class OperationExtensionTest extends AbstractExtensionTest
             ],
             'applicable with single mass action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['test_operation' => $operation2],
+                'actions' => ['test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
+                    ]
+                )],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
@@ -189,7 +196,14 @@ class OperationExtensionTest extends AbstractExtensionTest
             ],
             'applicable with single action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['action3' => $operation3],
+                'actions' => ['action3' => $this->createOperation(
+                    'action3',
+                    true,
+                    [
+                        'getName' => 'action3',
+                        'getLabel' => 'Action 3 label'
+                    ]
+                )],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'actions' => ['action3' => $this->getRowActionConfig('action3', 'Action 3 label')],
@@ -197,7 +211,20 @@ class OperationExtensionTest extends AbstractExtensionTest
             ],
             'should not replace existing default action' => [
                 'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
-                'actions' => ['action3' => $operation3, 'test_operation' => $operation2],
+                'actions' => ['action3' => $this->createOperation(
+                    'action3',
+                    true,
+                    [
+                        'getName' => 'action3',
+                        'getLabel' => 'Action 3 label'
+                    ]
+                ), 'test_operation' => $this->createOperation(
+                    'test_operation',
+                    true,
+                    [
+                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
+                    ]
+                )],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'actions' => [
@@ -219,10 +246,6 @@ class OperationExtensionTest extends AbstractExtensionTest
      */
     public function getRowConfigurationProvider()
     {
-        $operationAllowed1 = $this->createOperation('operation1', true);
-        $operationAllowed2 = $this->createOperation('operation2', true);
-        $operationNotAllowed = $this->createOperation('operation3', false);
-
         return [
             'no actions' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
@@ -243,7 +266,10 @@ class OperationExtensionTest extends AbstractExtensionTest
             '2 allowed actions' => [
                 'config' => DatagridConfiguration::create([]),
                 'record' => new ResultRecord(['id' => 2]),
-                'actions' => ['action1' => $operationAllowed1, 'action2' => $operationAllowed2],
+                'actions' => [
+                    'action1' => $this->createOperation('operation1', true),
+                    'action2' => $this->createOperation('operation2', true)
+                ],
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action2' => ['option1' => 'value1', 'option2' => 'value2'],
@@ -253,7 +279,10 @@ class OperationExtensionTest extends AbstractExtensionTest
             '1 allowed action' => [
                 'config' => DatagridConfiguration::create([]),
                 'record' => new ResultRecord(['id' => 3]),
-                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
+                'actions' => [
+                    'action1' => $this->createOperation('operation1', true),
+                    'action3' => $this->createOperation('operation3', false)
+                ],
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false
@@ -269,7 +298,10 @@ class OperationExtensionTest extends AbstractExtensionTest
                     ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
-                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
+                'actions' => [
+                    'action1' => $this->createOperation('operation1', true),
+                    'action3' => $this->createOperation('operation3', false)
+                ],
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false,
@@ -289,7 +321,10 @@ class OperationExtensionTest extends AbstractExtensionTest
                     },
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
-                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
+                'actions' => [
+                    'action1' => $this->createOperation('operation1', true),
+                    'action3' => $this->createOperation('operation3', false)
+                ],
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false,

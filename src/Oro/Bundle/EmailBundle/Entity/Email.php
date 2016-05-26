@@ -88,7 +88,9 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
-     * @ORM\Column(name="subject", type="string", length=500)
+     * Max length is 998 see RFC 2822, section 2.1.1 (https://tools.ietf.org/html/rfc2822#section-2.1.1)
+     *
+     * @ORM\Column(name="subject", type="string", length=998)
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */

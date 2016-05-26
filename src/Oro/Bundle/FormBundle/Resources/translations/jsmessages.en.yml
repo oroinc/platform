@@ -3,6 +3,7 @@ Remove: Remove
 Add: Add
 "Select {{ entity }}": "Select {{ entity }}"
 "Create {{ entity }}": "Create {{ entity }}"
+"Please select": "Please select"
 oro:
     form:
         choose_date: Choose a date

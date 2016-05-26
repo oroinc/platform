@@ -50,11 +50,6 @@ class LoggableManagerTest extends AbstractMetadataTest
             ->disableOriginalConstructor()
             ->getMock();
 
-        $provider
-            ->expects($this->any())
-            ->method('isConfigurable')
-            ->will($this->returnValue(false));
-
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
         $securityContextLink =
