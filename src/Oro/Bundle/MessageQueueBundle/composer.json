@@ -1,0 +1,22 @@
+{
+    "name": "oro/message-queue-bundle",
+    "type": "symfony-bundle",
+    "description": "ORO Message Queue Bundle",
+    "keywords": ["ORO", "Messaging", "Queue", "AMQP"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.9",
+        "symfony/framework-bundle": "2.3.*",
+        "oro/message-queue": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\MessageQueueBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/MessageQueueBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

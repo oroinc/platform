@@ -1,0 +1,38 @@
+services:
+    oro_message_queue.consumption.extensions:
+        class: 'Oro\Component\MessageQueue\Consumption\Extensions'
+        public: false
+        arguments:
+            - []
+
+    oro_message_queue.consumption.signal_extension:
+        class: 'Oro\Component\MessageQueue\Consumption\Extension\SignalExtension'
+        public: false
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.json_decode_extension:
+        class: 'Oro\Component\MessageQueue\Consumption\Extension\JsonDecodeExtension'
+        public: false
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.delay_redelivered_message_amqp_extension:
+        class: 'Oro\Component\MessageQueue\Consumption\Extension\DelayRedeliveredMessageAmqpExtension'
+        public: false
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.queue_consumer:
+        class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
+        arguments:
+            - '@oro_message_queue.transport.connection'
+            - '@oro_message_queue.consumption.extensions'
+
+    oro_message_queue.command.consume_messages:
+        class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
+        arguments:
+            - '@oro_message_queue.consumption.queue_consumer'
+        tags:
+            - { name: 'console.command' }
+

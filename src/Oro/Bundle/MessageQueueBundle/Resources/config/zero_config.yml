@@ -1,0 +1,74 @@
+services:
+    oro_message_queue.zero_config.config:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\Config'
+        public: false
+
+    oro_message_queue.zero_config.session:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\Session'
+        public: false
+        factory: ['Oro\Component\MessageQueue\ZeroConfig\SessionFactory', 'create']
+        arguments:
+            - '@oro_message_queue.transport.connection'
+            - '@oro_message_queue.zero_config.config'
+
+    oro_message_queue.zero_config.front_producer:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\FrontProducer'
+        factory: ['@oro_message_queue.zero_config.session', 'createFrontProducer']
+
+    oro_message_queue.zero_config.router:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\Router'
+        public: false
+        arguments:
+            - '@oro_message_queue.zero_config.session'
+            - []
+
+    oro_message_queue.zero_config.route_message_processor:
+        class: 'Oro\Component\MessageQueue\Router\RouterMessageProcessor'
+        public: true
+        arguments:
+            - '@oro_message_queue.zero_config.router'
+        tags:
+            - { name: 'oro_message_queue.zero_config.message_processor', topicName: '__router__' }
+
+    oro_message_queue.zero_config.message_processor_registry:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\ContainerAwareMessageProcessorRegistry'
+        public: false
+        calls:
+            - ['setContainer', ['@service_container']]
+
+    oro_message_queue.zero_config.delegate_message_processor:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\DelegateMessageProcessor'
+        public: false
+        arguments:
+            - '@oro_message_queue.zero_config.message_processor_registry'
+
+    oro_message_queue.zero_config.extension.create_queue:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\ConsumptionExtension\CreateQueueExtension'
+        public: false
+        arguments:
+            - '@oro_message_queue.zero_config.session'
+
+    oro_message_queue.zero_config.extensions:
+        class: 'Oro\Component\MessageQueue\Consumption\Extensions'
+        public: false
+        arguments:
+            -
+                - '@oro_message_queue.consumption.extensions'
+                - '@oro_message_queue.zero_config.extension.create_queue'
+
+    oro_message_queue.zero_config.queue_consumer:
+        class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
+        public: false
+        arguments:
+            - '@oro_message_queue.transport.connection'
+            - '@oro_message_queue.zero_config.extensions'
+
+    oro_message_queue.zero_config.consume_messages_command:
+        class: 'Oro\Component\MessageQueue\ZeroConfig\ConsumeMessagesCommand'
+        public: true
+        arguments:
+            - '@oro_message_queue.zero_config.queue_consumer'
+            - '@oro_message_queue.zero_config.delegate_message_processor'
+            - '@oro_message_queue.zero_config.session'
+        tags:
+            - { name: 'console.command' }
