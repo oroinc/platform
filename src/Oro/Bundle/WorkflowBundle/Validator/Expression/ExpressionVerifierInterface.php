@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException
 interface ExpressionVerifierInterface
 {
     /**
-     * @param string $expression
+     * @param mixed $expression
      *
      * @throws ExpressionException
      *

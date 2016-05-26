@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 
 class TransitionScheduleHelper
@@ -11,9 +12,7 @@ class TransitionScheduleHelper
     /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var WorkflowManager
-     */
+    /** @var WorkflowManager */
     private $workflowManager;
 
     /**
@@ -26,6 +25,11 @@ class TransitionScheduleHelper
         $this->workflowManager = $workflowManager;
     }
 
+    /**
+     * @param string $workflowName
+     * @param string $transitionName
+     * @return array
+     */
     public function getWorkflowItemIds($workflowName, $transitionName)
     {
         $workflow = $this->workflowManager->getWorkflow($workflowName);
@@ -65,7 +69,7 @@ class TransitionScheduleHelper
      * @param array $workflowSteps
      * @param string $entityClass
      * @param string $dqlFilter optional dql WHERE clause
-     * @return array|\Doctrine\ORM\Query
+     * @return array|Query
      */
     public function createQuery(array $workflowSteps, $entityClass, $dqlFilter = null)
     {
@@ -73,16 +77,14 @@ class TransitionScheduleHelper
             return [];
         }
 
-        $queryBuilder = $this
-            ->getEntityRepositoryForClass($entityClass)
+        $queryBuilder = $this->getEntityRepositoryForClass($entityClass)
             ->createQueryBuilder('e')
             ->select('wi.id')
             ->innerJoin('e.workflowItem', 'wi')
             ->innerJoin('e.workflowStep', 'ws')
             ->innerJoin('wi.definition', 'wd');
 
-        $queryBuilder
-            ->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
+        $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
             ->setParameter('workflowSteps', $workflowSteps);
 
         if ($dqlFilter) {
@@ -98,8 +100,6 @@ class TransitionScheduleHelper
      */
     private function getEntityRepositoryForClass($entityClass)
     {
-        return $this->registry
-            ->getManagerForClass($entityClass)
-            ->getRepository($entityClass);
+        return $this->registry->getManagerForClass($entityClass)->getRepository($entityClass);
     }
 }

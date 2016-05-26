@@ -37,6 +37,7 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataGenerateForScheduledTransition
+     *
      * @param array $transitionConfigurations
      * @param array $expects
      */
@@ -50,9 +51,16 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
             ->willReturn('workflow_name');
 
         $this->verifier->expects(
-            $this->exactly(\count(\array_filter($transitionConfigurations, function ($v) {
-                return array_key_exists('schedule', $v);
-            })))
+            $this->exactly(
+                count(
+                    array_filter(
+                        $transitionConfigurations,
+                        function ($v) {
+                            return array_key_exists('schedule', $v);
+                        }
+                    )
+                )
+            )
         )->method('verify');
 
         $generated = $this->generator->generateForScheduledTransition($this->workflowDefinition);

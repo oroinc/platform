@@ -8,24 +8,18 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class ProcessConfigurationGenerator
 {
-    /**
-     * @var TriggerScheduleOptionsVerifier
-     */
+    /** @var TriggerScheduleOptionsVerifier */
     private $verifier;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $workflowItemEntityClass;
 
     /**
      * @param TriggerScheduleOptionsVerifier $verifier
      * @param string $workflowItemEntityClass
      */
-    public function __construct(
-        TriggerScheduleOptionsVerifier $verifier,
-        $workflowItemEntityClass
-    ) {
+    public function __construct(TriggerScheduleOptionsVerifier $verifier, $workflowItemEntityClass)
+    {
         $this->verifier = $verifier;
         $this->workflowItemEntityClass = $workflowItemEntityClass;
     }

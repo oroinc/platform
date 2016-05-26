@@ -39,7 +39,9 @@ class TriggerScheduleOptionsVerifier
     {
         $this->validateOptions($options);
 
-        foreach ($this->prepareExpressions($options, $workflowDefinition, $transitionName) as $optionName => $value) {
+        $expressions = $this->prepareExpressions($options, $workflowDefinition, $transitionName);
+
+        foreach ($expressions as $optionName => $value) {
             if (array_key_exists($optionName, $this->optionVerifiers)) {
                 foreach ($this->optionVerifiers[$optionName] as $verifier) {
                     /** @var ExpressionVerifierInterface $verifier */
@@ -69,9 +71,7 @@ class TriggerScheduleOptionsVerifier
     private function validateOptions(array $options)
     {
         if (!isset($options['cron'])) {
-            throw new \InvalidArgumentException(
-                'Option "cron" is REQUIRED for transition schedule.'
-            );
+            throw new \InvalidArgumentException('Option "cron" is REQUIRED for transition schedule.');
         }
     }
 
@@ -91,13 +91,11 @@ class TriggerScheduleOptionsVerifier
                 $steps[] = $step->getName();
             }
 
-            $query = $this->transitionScheduleHelper->createQuery(
+            $options['filter'] = $this->transitionScheduleHelper->createQuery(
                 $steps,
                 $workflowDefinition->getRelatedEntity(),
                 $options['filter']
             );
-
-            $options['filter'] = $query->getDQL();
         }
 
         return $options;

@@ -186,8 +186,6 @@ services:
 
     oro_workflow.validator_expression.dql_expression_verifier:
         class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier
-        public: false
-        arguments: ['@oro_email.email_address.entity_manager']
 
     oro_workflow.validator_expression.cron_expression_verifier:
         class: Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier

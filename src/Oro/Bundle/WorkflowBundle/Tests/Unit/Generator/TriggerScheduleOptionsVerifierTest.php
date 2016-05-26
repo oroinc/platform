@@ -26,18 +26,19 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
-            ->disableOriginalConstructor()->getMock();
-        $this->transitionScheduleHelper = $this->getMockBuilder(
-            'Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper'
-        )->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->transitionScheduleHelper = $this
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->verifier = new TriggerScheduleOptionsVerifier(
-            $this->workflowAssembler,
-            $this->transitionScheduleHelper
-        );
+        $this->verifier = new TriggerScheduleOptionsVerifier($this->workflowAssembler, $this->transitionScheduleHelper);
     }
 
     public function testVerify()
@@ -47,38 +48,42 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface'
         );
         $expressionVerifier->expects($this->once())->method('verify');
+
         $this->verifier->addOptionVerifier('cron', $expressionVerifier);
         $this->verifier->verify(['cron' => 'expression value'], $this->workflowDefinition, 'transition_name');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Option "cron" is REQUIRED for transition schedule.
+     */
     public function testVerifyExceptions()
     {
-        $this->setExpectedException('InvalidArgumentException', 'Option "cron" is REQUIRED for transition schedule.');
         $this->verifier->verify([], $this->workflowDefinition, 'transition_name');
     }
 
     public function testPrepareFilterExpression()
     {
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflowAssembler->expects($this->once())
-            ->method('assemble')->with($this->workflowDefinition, false)
-            ->willReturn($workflow);
-
-        $stepsManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\StepManager')->getMock();
-
-        $workflow->expects($this->once())
-            ->method('getStepManager')
-            ->willReturn($stepsManager);
-
         $step = new Step();
         $step->setName('step1');
+
+        $stepsManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\StepManager')
+            ->disableOriginalConstructor()
+            ->getMock();
         $stepsManager->expects($this->once())
             ->method('getRelatedTransitionSteps')
             ->with('transitionName')
             ->willReturn([$step]);
+
+        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflow->expects($this->once())->method('getStepManager')->willReturn($stepsManager);
+
+        $this->workflowAssembler->expects($this->once())
+            ->method('assemble')
+            ->with($this->workflowDefinition, false)
+            ->willReturn($workflow);
 
         $this->workflowDefinition->expects($this->once())->method('getRelatedEntity')->willReturn('EntityClass');
 
@@ -92,16 +97,13 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
             ->with(['step1'], 'EntityClass', 'filterDQL')
             ->willReturn($query);
 
-        $query->expects($this->once())->method('getDQL')->willReturn('preparedDql');
-
         /** @var ExpressionVerifierInterface|\PHPUnit_Framework_MockObject_MockObject $expressionVerifier */
         $expressionVerifier = $this->getMock(
             'Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface'
         );
+        $expressionVerifier->expects($this->once())->method('verify')->with($query);
 
         $this->verifier->addOptionVerifier('filter', $expressionVerifier);
-        $expressionVerifier->expects($this->once())->method('verify')->with('preparedDql');
-
         $this->verifier->verify(['cron' => '', 'filter' => 'filterDQL'], $this->workflowDefinition, 'transitionName');
     }
 }
