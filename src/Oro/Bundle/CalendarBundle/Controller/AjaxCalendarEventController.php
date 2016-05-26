@@ -18,16 +18,13 @@ use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 class AjaxCalendarEventController extends Controller
 {
     /**
-     * @Route("/accept/{id}",
+     * @Route("/accepted/{id}",
      *      name="oro_calendar_event_accepted",
      *      requirements={"id"="\d+"}, defaults={"status"="accepted"})
-     * @Route("/tentatively/{id}",
+     * @Route("/tentative/{id}",
      *      name="oro_calendar_event_tentatively_accepted",
      *      requirements={"id"="\d+"}, defaults={"status"="tentative"})
-     * @Route("/tentatively/{id}",
-     *      name="oro_calendar_event_tentative",
-     *      requirements={"id"="\d+"}, defaults={"status"="tentative"})
-     * @Route("/decline/{id}",
+     * @Route("/declined/{id}",
      *      name="oro_calendar_event_declined",
      *      requirements={"id"="\d+"}, defaults={"status"="declined"})
      *
