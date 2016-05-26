@@ -10,7 +10,7 @@ Table of Contents
 Overview
 --------
 
-The Symfony [Validation Component](http://symfony.com/doc/current/book/validation.html) and [Forms Component](http://symfony.com/doc/current/book/forms.html) are used to validate and transform input data to an entity in [create](./actions.md#create-action) and [update][create](./actions.md#update-action) actions.
+The Symfony [Validation Component](http://symfony.com/doc/current/book/validation.html) and [Forms Component](http://symfony.com/doc/current/book/forms.html) are used to validate and transform input data to an entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 
 Validation
 ----------
