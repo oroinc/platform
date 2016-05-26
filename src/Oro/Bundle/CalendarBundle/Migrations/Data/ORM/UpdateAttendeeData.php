@@ -62,7 +62,8 @@ SET
             CASE
                 WHEN ce.invitation_status = 'accepted' OR ce.invitation_status = 'declined' THEN ce.invitation_status
                 WHEN ce.invitation_status = 'tentatively_accepted' THEN 'tentative'
-                ELSE 'none'
+                WHEN ce.invitation_status = 'not_responded' THEN 'none'
+                ELSE 'accepted'
             END
         FROM
             oro_calendar_event ce
