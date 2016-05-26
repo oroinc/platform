@@ -1,3 +1,4 @@
+{# Build attendees list #}
 {% macro calendar_event_invitation(parentEvent) %}
     <div class="row-fluid">
         <div class="responsive-block">
@@ -10,6 +11,7 @@
     </div>
 {% endmacro %}
 
+{# build attendee #}
 {% macro build_invitation_link(attendee) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
         {% set invitationStatus = attendee.status ? attendee.status.id : null %}
@@ -27,7 +29,11 @@
                         'path'  : path('oro_user_view', {'id': attendee.user.id })
                     }) }}
                 {% else %}
-                    {{ attendee.email }}
+                    {% if attendee.displayName is not empty and attendee.displayName != attendee.email %}
+                        {{ attendee.displayName }} ({{ attendee.email }})
+                    {% else %}
+                        {{ attendee.email }}
+                    {% endif %}
                 {% endif %}
             </span>
         </li>
