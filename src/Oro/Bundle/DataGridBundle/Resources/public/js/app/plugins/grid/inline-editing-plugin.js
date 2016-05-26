@@ -156,7 +156,7 @@ define(function(require) {
             var cellCtor = column.get('cell');
             var inlineEditingPlugin = this;
             var oldClassName = cellCtor.prototype.className;
-            var dynamicEventsList = new SplitEventList(cellCtor, 'isEditable', {
+            var splitEventsList = new SplitEventList(cellCtor, 'isEditable', {
                 'dblclick': 'enterEditModeIfNeeded',
                 'mousedown [data-role=edit]': 'enterEditModeIfNeeded',
                 'click': _.noop,
@@ -182,7 +182,7 @@ define(function(require) {
                             '';
                         return (oldClassName ? oldClassName + ' ' : '') + addClassName;
                     },
-                events: dynamicEventsList.generateDeclaration(),
+                events: splitEventsList.generateDeclaration(),
 
                 delayedIconRender: function() {
                     if (!this.$el.find('> [data-role="edit"]').length) {
