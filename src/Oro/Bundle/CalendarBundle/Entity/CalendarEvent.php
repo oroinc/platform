@@ -87,7 +87,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     const STATUS_ACCEPTED  = 'accepted';
     const STATUS_DECLINED  = 'declined';
 
-    const ORIGIN_ENUM_CODE = 'oro_cal_event_origin';
+    const ORIGIN_ENUM_CODE = 'calendar_event_origin';
     const ORIGIN_CLIENT    = 'client';
     const ORIGIN_SERVER    = 'server';
     const ORIGIN_EXTERNAL  = 'external';
