@@ -31,7 +31,7 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
      */
     public function getMigrationVersion()
     {
-        return 'v1_11s';
+        return 'v1_11';
     }
 
     /**
