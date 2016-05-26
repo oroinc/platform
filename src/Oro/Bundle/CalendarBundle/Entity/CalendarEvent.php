@@ -686,6 +686,9 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
+     * Returns all attendees except related attendee for parent calendar event or empty collection
+     * if the event is child
+     *
      * @return Collection|Attendee[]
      */
     public function getChildAttendees()
