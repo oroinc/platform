@@ -45,7 +45,7 @@ class MassNotificationTest extends \PHPUnit_Framework_TestCase
         $message = $this->getMock('Swift_Mime_Message');
         return [
             'email'       => ['email', 'test@test.com', 'test@test.com'],
-            'from'        => ['from', 'from@test.com', 'from@test.com'],
+            'sender'      => ['sender', 'from@test.com', 'from@test.com'],
             'body'        => ['body', 'test body', 'test body'],
             'title'       => ['title', 'test title', 'test title'],
             'scheduledAt' => ['scheduledAt', $date, $date],

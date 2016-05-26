@@ -22,7 +22,7 @@ datagrid:
                 label: oro.notification.massnotification.title.label
                 frontend_type: string
             sender:
-                label: oro.notification.massnotification.from.label
+                label: oro.notification.massnotification.sender.label
                 frontend_type: string
             email:
                 label: oro.notification.massnotification.email.label
@@ -32,7 +32,9 @@ datagrid:
                 frontend_type: string
             status:
                 label: oro.notification.massnotification.status.label
-                frontend_type: number
+                frontend_type: string
+                type: callback
+                callable: "@oro_notification.mass_notification_status_formatter->format"
             scheduledAt:
                 label: oro.notification.massnotification.scheduled_at.label
                 frontend_type: datetime
@@ -57,19 +59,25 @@ datagrid:
             columns:
                 title:
                     type: string
-                    data_name: title
+                    data_name: e.title
                 email:
                     type: string
-                    data_name: email
+                    data_name: e.email
                 sender:
                     type: string
-                    data_name: sender
+                    data_name: e.sender
+                status:
+                    type: choice
+                    data_name: e.status
+                    options:
+                        field_options:
+                            choices: "@oro_notification.mass_notification_status_formatter->getStatusLabels"
                 scheduledAt:
                     type: datetime
-                    data_name: scheduledAt
+                    data_name: e.scheduledAt
                 processedAt:
                     type: datetime
-                    data_name: processedAt
+                    data_name: e.processedAt
 
     email-notification-grid:
         options:

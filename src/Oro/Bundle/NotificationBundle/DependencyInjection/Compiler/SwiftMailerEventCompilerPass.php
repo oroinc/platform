@@ -17,7 +17,7 @@ class SwiftMailerEventCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::SERVICE_ALIAS)) {
-           return;
+            return;
         }
 
         $definition = $container->getDefinition(self::SERVICE_ALIAS);

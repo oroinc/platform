@@ -46,7 +46,7 @@ oro:
             entity_plural_label:  Mass Notifications
             entity_description:   Represent mass email notifications
             title.label:          Title
-            from.label:           From
+            sender.label:         From
             body.label:           Body
             email.label:          Email
             status.label:         Status

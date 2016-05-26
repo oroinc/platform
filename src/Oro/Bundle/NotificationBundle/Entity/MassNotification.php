@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -25,6 +24,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class MassNotification
 {
+    const STATUS_FAILED  = 1;
+    const STATUS_SUCCESS = 2;
+
     /**
      * @var integer
      *

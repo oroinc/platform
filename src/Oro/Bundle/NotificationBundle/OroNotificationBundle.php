@@ -23,4 +23,4 @@ class OroNotificationBundle extends Bundle
         $container->addCompilerPass(new EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new SwiftMailerEventCompilerPass());
     }
-}   
+}
