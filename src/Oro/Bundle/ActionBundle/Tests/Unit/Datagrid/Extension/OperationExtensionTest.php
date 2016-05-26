@@ -15,6 +15,7 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 class OperationExtensionTest extends AbstractExtensionTest
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
+    const TEST_ROUTE = 'test_route';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|MassActionProviderRegistry */
     protected $massActionProviderRegistry;
@@ -33,6 +34,18 @@ class OperationExtensionTest extends AbstractExtensionTest
         $contextHelper->expects($this->any())
             ->method('getActionData')
             ->willReturn(new ActionData(['data' => ['param'], 'key1' => 'value1', 'key2' => 2]));
+        $contextHelper->expects($this->any())
+            ->method('getContext')
+            ->willReturn(
+                [
+                    ContextHelper::ROUTE_PARAM => self::TEST_ROUTE,
+                    ContextHelper::ENTITY_ID_PARAM => null,
+                    ContextHelper::ENTITY_CLASS_PARAM => null,
+                    ContextHelper::DATAGRID_PARAM => null,
+                    ContextHelper::GROUP_PARAM => null,
+                    ContextHelper::FROM_URL_PARAM => null,
+                ]
+            );
 
         $provider = $this->getMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
         $provider->expects($this->any())
@@ -94,6 +107,13 @@ class OperationExtensionTest extends AbstractExtensionTest
         $this->assertEquals($expected, $this->extension->isApplicable($config));
 
         if ($expected) {
+            $options = $config->offsetGetOr('options');
+
+            $this->assertInternalType('array', $options);
+            $this->assertArrayHasKey('urlParams', $options);
+            $this->assertArrayHasKey('originalRoute', $options['urlParams']);
+            $this->assertEquals(self::TEST_ROUTE, $options['urlParams']['originalRoute']);
+
             $this->assertNotEmpty($config->offsetGetOr('actions'));
             $this->assertNotEmpty($config->offsetGetOr('action_configuration'));
 

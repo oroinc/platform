@@ -103,9 +103,23 @@ UPGRADE FROM 1.9 to 1.10
 ####DataGridBundle
 - The class Oro\Bundle\DataGridBundle\Common\Object was renamed to DataObject
 - Changed priority in next extensions:
-    * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260 
+    * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260
     * Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier from -251 to -261
-    
+
 ####ConfigExpression
 - The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
 - The class Oro\Component\ConfigExpression\Condition\True was renamed to TrueCondition
+
+####UiBundle
+- Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) plugin by Sachin N.
+
+Gallery view for a group of `<a>` elements can be triggered by adding 'data-gallery' attribute with unique gallery id.
+
+```
+<a href="sample1.jpg" data-gallery="unique-id"></a>
+<a href="sample2.jpg" data-gallery="unique-id"></a>
+```
+
+####EmailBundle
+- Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
+- Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
