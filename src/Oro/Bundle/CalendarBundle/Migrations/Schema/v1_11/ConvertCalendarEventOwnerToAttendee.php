@@ -41,7 +41,8 @@ class ConvertCalendarEventOwnerToAttendee extends ParametrizedMigrationQuery
     {
         $sql = <<<EOD
 INSERT INTO oro_calendar_event_attendee
-(user_id, calendar_event_id, status_id, origin_id, type_id, email, display_name, created_at, updated_at)
+(user_id, calendar_event_id, status_id, origin_id, type_id, email, display_name, created_at, updated_at,
+    serialized_data)
 
 SELECT
     c.user_owner_id,
@@ -51,8 +52,9 @@ SELECT
     NULL,
     u.email,
     CONCAT(u.first_name, ' ', u.last_name),
-    'now',
-    'now'
+    NOW(),
+    NOW(),
+    'Tjs='
 FROM oro_calendar_event AS ce
     LEFT JOIN oro_calendar c ON ce.calendar_id = c.id
     LEFT JOIN oro_user u ON c.user_owner_id = u.id;
