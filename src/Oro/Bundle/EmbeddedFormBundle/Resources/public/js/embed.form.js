@@ -10,10 +10,10 @@ var ORO = (function(ORO) {
     IframeEmbeddedForm.prototype = {
         show: function() {
             var iframe = document.createElement('iframe');
-            iframe.src = options.src;
-            iframe.width = options.width;
-            iframe.height = options.height;
-            iframe.frameBorder = options.frameBorder;
+            iframe.src = this.options.src;
+            iframe.width = this.options.width;
+            iframe.height = this.options.height;
+            iframe.frameBorder = this.options.frameBorder;
 
             this.container.innerHTML = '';
             this.container.appendChild(iframe);
@@ -86,7 +86,7 @@ var ORO = (function(ORO) {
 
     ORO.EmbedForm = function(options) {
         if (options.hasOwnProperty('iframe')) {
-            var embeddedForm = new IframeEmbeddedForm(options.container, options.xhr);
+            var embeddedForm = new IframeEmbeddedForm(options.container, options.iframe);
             embeddedForm.show();
 
             return;
