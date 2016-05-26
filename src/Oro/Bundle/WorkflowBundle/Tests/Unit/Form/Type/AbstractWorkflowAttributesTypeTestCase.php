@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
@@ -118,7 +119,8 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         AttributeGuesser $attributeGuesser = null,
         DefaultValuesListener $defaultValuesListener = null,
         InitActionsListener $initActionListener = null,
-        RequiredAttributesListener $requiredAttributesListener = null
+        RequiredAttributesListener $requiredAttributesListener = null,
+        EventDispatcherInterface $dispatcher = null
     ) {
         if (!$workflowRegistry) {
             $workflowRegistry = $this->createWorkflowRegistryMock();
@@ -135,6 +137,9 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         if (!$requiredAttributesListener) {
             $requiredAttributesListener = $this->createRequiredAttributesListenerMock();
         }
+        if (!$dispatcher) {
+            $dispatcher = $this->createDispatcherMock();
+        }
 
         return new WorkflowAttributesType(
             $workflowRegistry,
@@ -142,7 +147,8 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             $defaultValuesListener,
             $initActionListener,
             $requiredAttributesListener,
-            new ContextAccessor()
+            new ContextAccessor(),
+            $dispatcher
         );
     }
 
@@ -190,6 +196,13 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener')
             ->disableOriginalConstructor()
             ->setMethods(array('initialize', 'onPreSetData', 'onSubmit'))
+            ->getMock();
+    }
+
+    protected function createDispatcherMock()
+    {
+        return $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            ->disableOriginalConstructor()
             ->getMock();
     }
 }
