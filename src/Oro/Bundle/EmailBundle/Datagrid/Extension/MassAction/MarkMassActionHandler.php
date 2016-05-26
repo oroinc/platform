@@ -125,10 +125,18 @@ class MarkMassActionHandler implements MassActionHandlerInterface
                 $folderType = $data['filters']['folder']['value'];
             }
 
+            $organization = $this->securityFacade->getOrganization();
+
             $queryBuilder = $this
                 ->entityManager
                 ->getRepository('OroEmailBundle:EmailUser')
-                ->getEmailUserBuilderForMassAction($emailUserIds, $this->user, $folderType, $isAllSelected);
+                ->getEmailUserBuilderForMassAction(
+                    $emailUserIds,
+                    $this->user,
+                    $folderType,
+                    $isAllSelected,
+                    $organization
+                );
 
             $result = $queryBuilder->getQuery()->iterate();
             foreach ($result as $entity) {
