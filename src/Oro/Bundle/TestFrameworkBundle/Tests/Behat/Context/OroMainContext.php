@@ -169,10 +169,10 @@ JS;
     }
 
     /**
-     * @Given /^(?:|I )follow the menu "(?P<path>(?:[^"]|\\")*)"$/
+     * @Given /^(?:|I )open the menu "(?P<path>(?:[^"]|\\")*)" and click "(?P<linkLocator>(?:[^"]|\\")*)"$/
      */
-    public function iFollowTheMenu($path)
+    public function iOpenTheMenuAndClick($path, $linkLocator)
     {
-        $this->elementFactory->createElement('MainMenu')->follow($path);
+        $this->elementFactory->createElement('MainMenu')->openAndClick($path, $linkLocator);
     }
 }

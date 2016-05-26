@@ -7,7 +7,11 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class MainMenu extends Element
 {
-    public function follow($path)
+    /**
+     * @param string $path
+     * @param string $linkLocator
+     */
+    public function openAndClick($path, $linkLocator)
     {
         $items = explode('->', $path);
         $that = $this;
@@ -15,8 +19,10 @@ class MainMenu extends Element
         while ($item = array_shift($items)) {
             /** @var NodeElement $link */
             $link = $that->findLink(trim($item));
-            $link->click();
+            $link->mouseOver();
             $that = $link->getParent();
         }
+
+        $that->findLink($linkLocator)->click();
     }
 }
