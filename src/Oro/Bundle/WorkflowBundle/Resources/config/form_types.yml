@@ -31,6 +31,7 @@ services:
             - '@oro_workflow.form.event_listener.init_actions'
             - '@oro_workflow.form.event_listener.required_attributes'
             - '@oro_action.context_accessor'
+            - '@event_dispatcher'
         tags:
             - { name: form.type, alias: oro_workflow_attributes }
 
