@@ -102,6 +102,26 @@ define(function(require) {
                 'init_instance_callback': function(editor) {
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
+                    if (!tools.isMobile()) {
+                        self.tinymceInstance.on('FullscreenStateChanged', function(e) {
+                            if (e.state) {
+                                var rect = $('#container').get(0).getBoundingClientRect();
+                                var css = {
+                                    top: rect.top + 'px',
+                                    left: rect.left + 'px',
+                                    right: Math.max(window.innerWidth - rect.right, 0) + 'px'
+                                };
+
+                                var rules = _.map(_.pairs(css), function(item) {
+                                    return item.join(': ');
+                                }).join('; ');
+                                tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
+                                self.$el.after($('<div />', {class: 'mce-fullscreen-overlay'}));
+                            } else {
+                                self.$el.siblings('.mce-fullscreen-overlay').remove();
+                            }
+                        });
+                    }
                     _.defer(function() {
                         /**
                          * fixes jumping dialog on refresh page
