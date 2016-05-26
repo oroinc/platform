@@ -154,7 +154,6 @@ class Processor
         $messageId = '<' . $message->generateId() . '>';
 
         if ($origin === null) {
-            $this->emailOriginHelper->setEmailModel($model);
             $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
         }
         $this->processSend($message, $origin);
