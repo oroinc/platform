@@ -265,55 +265,68 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Checks whether a configuration of filters for an entity exists.
      *
+     * @param string|null $className
+     *
      * @return bool
      */
-    public function hasConfigOfFilters();
+    public function hasConfigOfFilters($className = null);
 
     /**
      * Gets a configuration of filters for an entity.
      *
+     * @param string|null $className
+     *
      * @return FiltersConfig|null
      */
-    public function getConfigOfFilters();
+    public function getConfigOfFilters($className = null);
 
     /**
      * Sets a configuration of filters for an entity.
      *
+     * @param string|null $className
+     *
      * @param FiltersConfig|null $config
      */
-    public function setConfigOfFilters(FiltersConfig $config = null);
+    public function setConfigOfFilters(FiltersConfig $config = null, $className = null);
 
     /**
      * Checks whether a configuration of sorters for an entity exists.
      *
+     * @param string|null $className
+     *
      * @return bool
      */
-    public function hasConfigOfSorters();
+    public function hasConfigOfSorters($className = null);
 
     /**
      * Gets a configuration of sorters for an entity.
      *
+     * @param string|null $className
+     *
      * @return SortersConfig|null
      */
-    public function getConfigOfSorters();
+    public function getConfigOfSorters($className = null);
 
     /**
      * Sets a configuration of sorters for an entity.
      *
+     * @param string|null $className
+     *
      * @param SortersConfig|null $config
      */
-    public function setConfigOfSorters(SortersConfig $config = null);
+    public function setConfigOfSorters(SortersConfig $config = null, $className = null);
 
     /**
      * Checks whether a configuration of the given section exists.
      *
      * @param string $configSection
+     * @param string|null $className
      *
      * @return bool
      *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function hasConfigOf($configSection);
+    public function hasConfigOf($configSection, $className = null);
 
     /**
      * Gets a configuration from the given section.

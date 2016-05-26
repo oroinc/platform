@@ -97,6 +97,23 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function remove($key)
+    {
+        $this->ensureRequestParsed();
+
+        $key = strtolower($key);
+        $delimPos = strpos($key, '[');
+        $group = false !== $delimPos && substr($key, -1) === ']'
+            ? substr($key, 0, $delimPos)
+            : $key;
+
+        unset($this->parameters[$key]);
+        unset($this->groups[$group][$key]);
+    }
+
+    /**
      * @param string $operator
      *
      * @return string

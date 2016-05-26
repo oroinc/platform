@@ -424,59 +424,59 @@ class Context extends ApiContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function hasConfigOfFilters()
+    public function hasConfigOfFilters($className = null)
     {
-        return $this->hasConfigOf(FiltersConfigExtra::NAME);
+        return $this->hasConfigOf(FiltersConfigExtra::NAME, $className);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigOfFilters()
+    public function getConfigOfFilters($className = null)
     {
-        return $this->getConfigOf(FiltersConfigExtra::NAME);
+        return $this->getConfigOf(FiltersConfigExtra::NAME, $className);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setConfigOfFilters(FiltersConfig $config = null)
+    public function setConfigOfFilters(FiltersConfig $config = null, $className = null)
     {
-        $this->setConfigOf(FiltersConfigExtra::NAME, $config);
+        $this->setConfigOf(FiltersConfigExtra::NAME, $config, $className);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasConfigOfSorters()
+    public function hasConfigOfSorters($className = null)
     {
-        return $this->hasConfigOf(SortersConfigExtra::NAME);
+        return $this->hasConfigOf(SortersConfigExtra::NAME, $className);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigOfSorters()
+    public function getConfigOfSorters($className = null)
     {
-        return $this->getConfigOf(SortersConfigExtra::NAME);
+        return $this->getConfigOf(SortersConfigExtra::NAME, $className);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setConfigOfSorters(SortersConfig $config = null)
+    public function setConfigOfSorters(SortersConfig $config = null, $className = null)
     {
-        $this->setConfigOf(SortersConfigExtra::NAME, $config);
+        $this->setConfigOf(SortersConfigExtra::NAME, $config, $className);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasConfigOf($configSection)
+    public function hasConfigOf($configSection, $className = null)
     {
         $this->assertConfigSection($configSection);
 
-        return $this->has(self::CONFIG_PREFIX . $configSection);
+        return $this->has(self::CONFIG_PREFIX . $configSection . $className);
     }
 
     /**
@@ -759,7 +759,7 @@ class Context extends ApiContext implements ContextInterface
             );
             $this->processLoadedMetadata($metadata, $className);
         } catch (\Exception $e) {
-            $this->processLoadedMetadata(null);
+            $this->processLoadedMetadata(null, $className);
 
             throw $e;
         }
