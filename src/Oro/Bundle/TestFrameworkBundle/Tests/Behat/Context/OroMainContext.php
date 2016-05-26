@@ -167,4 +167,12 @@ JS;
     {
         $this->elementFactory->createElement($formName)->fill($table);
     }
+
+    /**
+     * @Given /^(?:|I )follow the menu "(?P<path>(?:[^"]|\\")*)"$/
+     */
+    public function iFollowTheMenu($path)
+    {
+        $this->elementFactory->createElement('MainMenu')->follow($path);
+    }
 }
