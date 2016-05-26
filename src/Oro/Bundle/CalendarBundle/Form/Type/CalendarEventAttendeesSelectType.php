@@ -10,19 +10,24 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 
 class CalendarEventAttendeesSelectType extends AbstractType
 {
+    /** @var AttendeeManager */
+    protected $attendeeManager;
+
     /** @var DataTransformerInterface */
     protected $attendeesToViewTransformer;
 
     /**
      * @param DataTransformerInterface $attendeesToViewTransformer
+     * @param AttendeeManager $attendeeManager
      */
-    public function __construct(DataTransformerInterface $attendeesToViewTransformer)
+    public function __construct(DataTransformerInterface $attendeesToViewTransformer, AttendeeManager $attendeeManager)
     {
         $this->attendeesToViewTransformer = $attendeesToViewTransformer;
+        $this->attendeeManager = $attendeeManager;
     }
 
     /**
@@ -41,20 +46,7 @@ class CalendarEventAttendeesSelectType extends AbstractType
     {
         $view->vars['attr']['data-selected-data'] = $view->vars['value'];
         if ($form->getData()) {
-            $view->vars['excluded'] = array_filter(array_map(
-                function (Attendee $attendee) {
-                    $user = $attendee->getUser();
-                    if ($user) {
-                        return json_encode([
-                            'entityClass' => 'Oro\Bundle\UserBundle\Entity\User',
-                            'entityId' => $user->getId(),
-                        ]);
-                    }
-
-                    return null;
-                },
-                $form->getData()->toArray()
-            ));
+            $view->vars['excluded'] = $this->attendeeManager->createAttendeeExclusions($form->getData());
         }
     }
 

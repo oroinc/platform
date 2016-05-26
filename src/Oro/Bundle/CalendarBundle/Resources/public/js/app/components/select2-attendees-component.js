@@ -8,6 +8,8 @@ define(function(require) {
     var Select2AttendeesComponent = Select2AutocompleteComponent.extend({
         setConfig: function(config) {
             config = Select2AttendeesComponent.__super__.setConfig.apply(this, arguments);
+
+            var that = this;
             config.initSelection = function(element, callback) {
                 $.ajax({
                     url: routing.generate(
@@ -15,10 +17,11 @@ define(function(require) {
                         {id: element.val()}
                     ),
                     type: 'GET',
-                    success: function(data) {
-                        callback(data);
+                    success:  $.proxy(function(data) {
+                        that.excluded = data.excluded;
+                        callback(data.result);
                         element.trigger('select2-data-loaded');
-                    }
+                    }, this)
                 });
             };
 

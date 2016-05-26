@@ -75,16 +75,18 @@ class AjaxCalendarEventController extends Controller
      */
     public function attendeesAutocompleteDataAction($id)
     {
-        $attendees = $this->getAttendeeManager()->loadAttendeesByCalendarEventId($id);
-        $data      = $this->get('oro_calendar.attendees_to_view_transformer')->transform($attendees);
-        $result    = array_map(
-            function ($data) {
-                return json_decode($data, true);
-            },
-            explode(';', $data)
-        );
+        $attendeeManager = $this->getAttendeeManager();
+        $attendees = $attendeeManager->loadAttendeesByCalendarEventId($id);
 
-        return new JsonResponse($result);
+        return new JsonResponse([
+            'result'   => array_map(
+                function ($data) {
+                    return json_decode($data, true);
+                },
+                explode(';', $this->get('oro_calendar.attendees_to_view_transformer')->transform($attendees))
+            ),
+            'excluded' => $attendeeManager->createAttendeeExclusions($attendees),
+        ]);
     }
 
     /**
