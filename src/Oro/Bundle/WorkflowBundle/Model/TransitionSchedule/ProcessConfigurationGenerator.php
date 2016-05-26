@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Generator;
+namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;

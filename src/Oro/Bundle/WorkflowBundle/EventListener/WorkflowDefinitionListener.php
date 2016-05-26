@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\ProcessImport;
 
 class WorkflowDefinitionListener
@@ -23,7 +23,7 @@ class WorkflowDefinitionListener
     public function __construct(ProcessConfigurationGenerator $generator, ProcessImport $import)
     {
         $this->generator = $generator;
-        $this->import = $import;
+        $this->import = $import; //todo wrap import to sync
     }
 
     /**

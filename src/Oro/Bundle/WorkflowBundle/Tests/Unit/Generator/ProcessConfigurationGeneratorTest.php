@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Generator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator;
-use Oro\Bundle\WorkflowBundle\Generator\TriggerScheduleOptionsVerifier;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier;
 
 class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $workflowItemEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem';
 
-    /** @var ProcessConfigurationGenerator */
+    /** @var \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator */
     protected $generator;
 
     /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */
@@ -24,7 +24,7 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->verifier = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Generator\TriggerScheduleOptionsVerifier')
+        $this->verifier = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -32,7 +32,7 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->generator = new ProcessConfigurationGenerator($this->verifier, $this->workflowItemEntityClass);
+        $this->generator = new \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator($this->verifier, $this->workflowItemEntityClass);
     }
 
     /**

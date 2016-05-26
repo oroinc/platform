@@ -1,9 +1,8 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Generator;
+namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
 
@@ -15,19 +14,19 @@ class TriggerScheduleOptionsVerifier
     /** @var WorkflowAssembler */
     private $workflowAssembler;
 
-    /** @var TransitionScheduleHelper */
-    private $transitionScheduleHelper;
+    /** @var TransitionQueryFactory */
+    private $queryFactory;
 
     /**
      * @param WorkflowAssembler $workflowAssembler
-     * @param TransitionScheduleHelper $transitionScheduleHelper
+     * @param TransitionQueryFactory $queryFactory
      */
     public function __construct(
         WorkflowAssembler $workflowAssembler,
-        TransitionScheduleHelper $transitionScheduleHelper
+        TransitionQueryFactory $queryFactory
     ) {
         $this->workflowAssembler = $workflowAssembler;
-        $this->transitionScheduleHelper = $transitionScheduleHelper;
+        $this->queryFactory = $queryFactory;
     }
 
     /**
@@ -91,11 +90,12 @@ class TriggerScheduleOptionsVerifier
                 $steps[] = $step->getName();
             }
 
-            $options['filter'] = $this->transitionScheduleHelper->createQuery(
+            $options['filter'] = $this->queryFactory->create(
                 $steps,
                 $workflowDefinition->getRelatedEntity(),
                 $options['filter']
             );
+            
         }
 
         return $options;

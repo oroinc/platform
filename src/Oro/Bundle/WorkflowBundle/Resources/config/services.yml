@@ -141,7 +141,6 @@ services:
     oro_workflow.handler.workflow_definition:
         class: Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler
         arguments:
-            - '@oro_workflow.configuration.builder.workflow_definition.handle'
             - '@oro_workflow.workflow_assembler'
             - '@doctrine'
             - '%oro_workflow.workflow_definition.entity.class%'
@@ -177,11 +176,17 @@ services:
             - '@oro_workflow.process.import.triggers'
             - '%oro_workflow.process_definition.entity.class%'
 
-    oro_workflow.transition.schedule_helper:
-        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper'
-        public: true
+    oro_workflow.transition_schedule.query_factory:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory
+        public: false
         arguments:
             - '@doctrine'
+
+    oro_workflow.transition_schedule.items_fetcher:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher
+        public: true
+        arguments:
+            - '@oro_workflow.transition_schedule.query_factory'
             - '@oro_workflow.manager'
 
     oro_workflow.validator_expression.dql_expression_verifier:
@@ -191,16 +196,16 @@ services:
         class: Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier
 
     oro_workflow.generator.trigger_schedule_options_verifier:
-        class: Oro\Bundle\WorkflowBundle\Generator\TriggerScheduleOptionsVerifier
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier
         public: false
-        arguments: ['@oro_workflow.workflow_assembler', '@oro_workflow.transition.schedule_helper']
+        arguments: ['@oro_workflow.workflow_assembler', '@oro_workflow.transition_schedule.query_factory']
         calls:
             - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
 
-    oro_workflow.generator.process_configuration:
-        class: Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator
+    oro_workflow.transition_schedule.process_configuration_generator:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator
         public: false
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
-            - '%%oro_workflow.workflow_item.entity.class%'
+            - '%oro_workflow.workflow_item.entity.class%'

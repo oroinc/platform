@@ -6,7 +6,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionListener;
-use Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\ProcessImport;
 
 class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
@@ -22,7 +22,7 @@ class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->generator = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Generator\ProcessConfigurationGenerator')
+        $this->generator = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator')
             ->disableOriginalConstructor()
             ->getMock();
 

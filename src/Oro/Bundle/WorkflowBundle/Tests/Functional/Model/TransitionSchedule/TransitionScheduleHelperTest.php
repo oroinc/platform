@@ -1,17 +1,13 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model;
+namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model\TransitionSchedule;
 
 use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
@@ -26,7 +22,7 @@ class TransitionScheduleHelperTest extends WebTestCase
     /** @var WorkflowAwareEntity */
     private $entity;
 
-    /** @var TransitionScheduleHelper */
+    /** @var ItemsFetcher */
     private $helper;
 
     protected function setUp()
@@ -44,7 +40,7 @@ class TransitionScheduleHelperTest extends WebTestCase
 
         $this->entity = $this->getRepositoryForClass('OroTestFrameworkBundle:WorkflowAwareEntity')
             ->findOneBy([], ['id' => 'DESC']);
-        $this->helper = $this->getContainer()->get('oro_workflow.transition.schedule_helper');
+        $this->helper = $this->getContainer()->get('oro_workflow.transition_schedule.items_fetcher');
     }
 
     /**
@@ -55,7 +51,7 @@ class TransitionScheduleHelperTest extends WebTestCase
      * @param bool $withFilter
      * @param int $expectedCount
      */
-    public function testGetWorkflowItemIds($entityClass, $withSteps, $withFilter, $expectedCount)
+    public function testFetch($entityClass, $withSteps, $withFilter, $expectedCount)
     {
         $steps = $withSteps ? [$this->step] : [];
         $filter = '';
@@ -63,7 +59,7 @@ class TransitionScheduleHelperTest extends WebTestCase
             $filter = 'e.id = ' . $this->entity->getId();
         }
 
-        $ids = $this->helper->getWorkflowItemIds($steps, $entityClass, $filter);
+        $ids = $this->helper->fetch($steps, $entityClass, $filter);
 
         $this->assertCount($expectedCount, $ids);
         if ($withFilter) {

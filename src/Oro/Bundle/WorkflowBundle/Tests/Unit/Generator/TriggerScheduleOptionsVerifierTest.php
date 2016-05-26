@@ -3,9 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Generator;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Generator\TriggerScheduleOptionsVerifier;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier;
 use Oro\Bundle\WorkflowBundle\Model\Step;
-use Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
 
@@ -14,10 +14,10 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowAssembler;
 
-    /** @var TransitionScheduleHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher|\PHPUnit_Framework_MockObject_MockObject */
     protected $transitionScheduleHelper;
 
-    /** @var TriggerScheduleOptionsVerifier */
+    /** @var \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier */
     protected $verifier;
 
     /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */
@@ -30,7 +30,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->transitionScheduleHelper = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper')
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionScheduleHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -93,7 +93,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
 
         $this->transitionScheduleHelper->expects($this->once())
-            ->method('createQuery')
+            ->method('create')
             ->with(['step1'], 'EntityClass', 'filterDQL')
             ->willReturn($query);
 

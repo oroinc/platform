@@ -4,12 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\WorkflowBundle\Model\TransitionScheduleHelper;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class TransitionScheduleHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TransitionScheduleHelper */
+    /** @var ItemsFetcher */
     protected $helper;
 
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
@@ -26,7 +26,7 @@ class TransitionScheduleHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new TransitionScheduleHelper($this->registry, $this->workflowManager);
+        $this->helper = new ItemsFetcher($this->registry, $this->workflowManager);
     }
 
     protected function tearDown()
