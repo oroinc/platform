@@ -18,7 +18,7 @@ class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
             case 'smallint':
             case 'bigint':
                 $options = [
-                    'type'    => 'number',
+                    'type'    => 'number-range',
                     'options' => [
                         'data_type' => NumberFilterType::DATA_INTEGER
                     ]
@@ -27,7 +27,7 @@ class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
             case 'decimal':
             case 'float':
                 $options = [
-                    'type'    => 'number',
+                    'type'    => 'number-range',
                     'options' => [
                         'data_type' => NumberFilterType::DATA_DECIMAL
                     ]
@@ -50,7 +50,7 @@ class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
                 break;
             case 'money':
                 $options = [
-                    'type' => 'number'
+                    'type' => 'number-range'
                 ];
                 break;
             case 'percent':

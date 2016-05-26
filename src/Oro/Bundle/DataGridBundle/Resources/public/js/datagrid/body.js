@@ -44,6 +44,9 @@ define([
                 this.rowClassName = opts.rowClassName;
             }
 
+            this.columns = options.columns;
+            this.filteredColumns = options.filteredColumns;
+
             this.backgridInitialize(opts);
         },
 
@@ -53,8 +56,6 @@ define([
          * @param {Object} options
          */
         backgridInitialize: function(options) {
-            this.columns = options.columns;
-
             this.row = options.row || Row;
             this.createRows();
 
@@ -68,8 +69,6 @@ define([
             this.listenTo(collection, 'reset', this.refresh);
             this.listenTo(collection, 'backgrid:sort', this.sort);
             this.listenTo(collection, 'backgrid:edited', this.moveToNextCell);
-
-            this._listenToRowsEvents(this.rows);
         },
 
         /**
@@ -84,17 +83,22 @@ define([
             });
             delete this.rows;
             delete this.columns;
+            delete this.filteredColumns;
+
             Body.__super__.dispose.call(this);
         },
 
         createRows: function() {
             this.rows = this.collection.map(function(model) {
                 var rowOptions = {
+                    collection: this.filteredColumns,
                     columns: this.columns,
                     model: model
                 };
                 this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
-                return new this.row(rowOptions);
+                var row = new this.row(rowOptions);
+                this.attachListenerToSingleRow(row);
+                return row;
             }, this);
         },
 
@@ -102,14 +106,12 @@ define([
          * @inheritDoc
          */
         refresh: function() {
-            this._stopListeningToRowsEvents(this.rows);
             _.each(this.rows, function(row) {
                 // dispose in Chaplin's way, instead of Backbone's remove
                 row.dispose();
             });
             this.rows = [];
             this.backgridRefresh();
-            this._listenToRowsEvents(this.rows);
             return this;
         },
 
@@ -134,42 +136,8 @@ define([
             Body.__super__.insertRow.apply(this, arguments);
             var index = collection.indexOf(model);
             if (index < this.rows.length) {
-                this._listenToOneRowEvents(this.rows[index]);
+                this.attachListenerToSingleRow(this.rows[index]);
             }
-        },
-
-        /**
-         * @inheritDoc
-         */
-        removeRow: function(model, collection, options) {
-            if (options && !_.isUndefined(options.index)) {
-                this._stopListeningToOneRowEvents(this.rows[options.index]);
-            }
-            Body.__super__.removeRow.apply(this, arguments);
-        },
-
-        /**
-         * Listen to events of rows list
-         *
-         * @param {Array} rows
-         * @private
-         */
-        _listenToRowsEvents: function(rows) {
-            _.each(rows, function(row) {
-                this._listenToOneRowEvents(row);
-            }, this);
-        },
-
-        /**
-         * Stop listening  to events of rows list
-         *
-         * @param {Array} rows
-         * @private
-         */
-        _stopListeningToRowsEvents: function(rows) {
-            _.each(rows, function(row) {
-                this._stopListeningToOneRowEvents(row);
-            }, this);
         },
 
         /**
@@ -178,20 +146,10 @@ define([
          * @param {Backgrid.Row} row
          * @private
          */
-        _listenToOneRowEvents: function(row) {
-            this.listenTo(row, 'clicked', function(row, options) {
+        attachListenerToSingleRow: function(row) {
+            row.on('clicked', function(row, options) {
                 this.trigger('rowClicked', row, options);
-            });
-        },
-
-        /**
-         * Stop listening to events of row
-         *
-         * @param {Backgrid.Row} row
-         * @private
-         */
-        _stopListeningToOneRowEvents: function(row) {
-            this.stopListening(row);
+            }, this);
         },
 
         /**
