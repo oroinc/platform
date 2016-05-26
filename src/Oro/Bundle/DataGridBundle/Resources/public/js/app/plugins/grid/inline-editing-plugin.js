@@ -11,7 +11,7 @@ define(function(require) {
     var gridViewsBuilder = require('../../../inline-editing/builder');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var Modal = require('oroui/js/modal');
-    var DynamicEventList = require('./inline-editing-plugin/dynamic-event-list');
+    var SplitEventList = require('./inline-editing-plugin/split-event-list');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
@@ -156,7 +156,7 @@ define(function(require) {
             var cellCtor = column.get('cell');
             var inlineEditingPlugin = this;
             var oldClassName = cellCtor.prototype.className;
-            var dynamicEventsList = new DynamicEventList(cellCtor, 'isEditable', {
+            var dynamicEventsList = new SplitEventList(cellCtor, 'isEditable', {
                 'dblclick': 'enterEditModeIfNeeded',
                 'mousedown [data-role=edit]': 'enterEditModeIfNeeded',
                 'click': _.noop,
