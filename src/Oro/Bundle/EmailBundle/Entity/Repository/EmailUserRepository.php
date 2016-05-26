@@ -189,8 +189,13 @@ class EmailUserRepository extends EntityRepository
      *
      * @return QueryBuilder
      */
-    public function getEmailUserBuilderForMassAction($ids, User $user, $folderType, $isAllSelected, $organization)
-    {
+    public function getEmailUserBuilderForMassAction(
+        $ids,
+        User $user,
+        $folderType,
+        $isAllSelected,
+        Organization $organization
+    ) {
         $queryBuilder = $this->createQueryBuilder('eu');
         $queryBuilder->join('eu.email', 'e');
 
