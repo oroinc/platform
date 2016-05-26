@@ -149,7 +149,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         $fieldType = 'manyToOne';
 
         if (!empty($data['field'])) {
-            $value->$data['field'] = $data['title'];
+            $value->{$data['field']} = $data['title'];
         }
         $value->expects($this->any())
             ->method('getId')
@@ -276,55 +276,55 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
                     'class' => 'Oro\Bundle\UserBundle\Entity\User',
                     'id' => 42,
                     'field' => 'username',
-                    'title' => $expectedTitle = 'test title'
+                    'title' => 'test title'
                 ],
-                'expected' => $expectedTitle
+                'expected' => 'test title'
             ],
             'entity class exists, route exists, permission granted' => [
                 'data' => [
                     'viewPageRoute'  => 'test',
                     'isCustomEntity' => false,
-                    'id' => $id = 54,
-                    'url' => $link = "/test-route/{$id}",
+                    'id' => 54,
+                    'url' => "/test-route/54",
                     'class' => 'Oro\Bundle\UserBundle\Entity\User',
                     'routeClassParam' => null,
                     'field' => 'username',
-                    'title' => $expectedTitle = 'test title',
+                    'title' => 'test title',
                     'permissionsGranted' => true
                 ],
                 'expected' => [
-                    'link' => $link,
-                    'title' => $expectedTitle
+                    'link' => "/test-route/54",
+                    'title' => 'test title'
                 ]
             ],
             'entity class exists, route exist, but permission not granted' => [
                 'data' => [
                     'viewPageRoute'  => 'test',
                     'isCustomEntity' => false,
-                    'id' => $id = 54,
-                    'url' => $link = "/test-route/{$id}",
+                    'id' => 54,
+                    'url' => "/test-route/54",
                     'class' => 'Oro\Bundle\UserBundle\Entity\User',
                     'routeClassParam' => null,
                     'field' => 'username',
-                    'title' => $expectedTitle = 'test title'
+                    'title' => 'test title'
                 ],
-                'expected' => $expectedTitle
+                'expected' => 'test title'
             ],
             'entity class extend, permission granted' => [
                 'data' => [
                     'viewPageRoute'  => ExtendFieldValueRenderListener::ENTITY_VIEW_ROUTE,
                     'isCustomEntity' => true,
-                    'id' => $id = 22,
-                    'url' => $link = "/test-route/{$id}",
+                    'id' => 22,
+                    'url' => "/test-route/22",
                     'class' => 'Oro\Bundle\UserBundle\Entity\User',
                     'routeClassParam' => 'Oro_Bundle_UserBundle_Entity_User',
                     'field' => 'username',
-                    'title' => $expectedTitle = 'test title',
+                    'title' => 'test title',
                     'permissionsGranted' => true
                 ],
                 'expected' => [
-                    'link' => $link,
-                    'title' => $expectedTitle
+                    'link' => "/test-route/22",
+                    'title' => 'test title'
                 ]
             ],
         ];

@@ -178,7 +178,7 @@ JS;
     }
 
     /**
-     * Reload current page specified in redirect URL
+     * Reload current page
      *
      * @return $this
      */
@@ -186,9 +186,11 @@ JS;
     {
         if (!is_null($this->redirectUrl)) {
             $this->test->url($this->redirectUrl);
-            $this->waitPageToLoad();
-            $this->waitForAjax();
+        } else {
+            $this->test->refresh();
         }
+        $this->waitPageToLoad();
+        $this->waitForAjax();
 
         return $this;
     }

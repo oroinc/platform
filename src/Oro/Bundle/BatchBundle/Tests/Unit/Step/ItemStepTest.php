@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step;
 
+use Akeneo\Bundle\BatchBundle\Job\ExitStatus;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 
@@ -50,6 +51,9 @@ class ItemStepTest extends \PHPUnit_Framework_TestCase
         $stepExecution->expects($this->any())
             ->method('getStatus')
             ->will($this->returnValue(new BatchStatus(BatchStatus::STARTING)));
+        $stepExecution->expects($this->any())
+            ->method('getExitStatus')
+            ->will($this->returnValue(new ExitStatus()));
 
         $reader = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Tests\\Unit\\Step\\Stub\\ReaderStub')
             ->setMethods(array('setStepExecution', 'read'))
