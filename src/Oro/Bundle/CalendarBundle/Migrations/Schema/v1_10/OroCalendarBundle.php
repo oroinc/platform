@@ -156,20 +156,20 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
     {
         $table = $schema->getTable('oro_calendar_event');
 
-        $table->addColumn('related_attendee', 'integer', ['notnull' => false]);
+        $table->addColumn('related_attendee_id', 'integer', ['notnull' => false]);
         $table->addColumn('original_start_at', 'datetime', ['notnull' => false]);
         $table->addColumn('recurring_event_id', 'integer', ['notnull' => false]);
         $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
         $table->addColumn('is_cancelled', 'boolean', ['default' => false]);
 
-        $table->addIndex(['related_attendee']);
+        $table->addIndex(['related_attendee_id']);
         $table->addIndex(['original_start_at'], 'oro_calendar_event_osa_idx');
 
         $table->addUniqueIndex(['recurrence_id'], 'UNIQ_2DDC40DD2C414CE8');
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_calendar_event_attendee'),
-            ['related_attendee'],
+            ['related_attendee_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
