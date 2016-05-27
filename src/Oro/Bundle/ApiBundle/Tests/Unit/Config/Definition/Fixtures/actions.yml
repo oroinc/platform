@@ -21,6 +21,16 @@ null_action_default_exclude:
             delete:
                 exclude: false
 
+exclude_false:
+    config:
+        actions:
+            delete:
+                exclude: false
+    expected:
+        actions:
+            delete:
+                exclude: false
+
 exclude_true:
     config:
         actions:
@@ -187,3 +197,169 @@ actions_collections:
                 acl_resource: delete_acl_resource
             update:
                 exclude: false
+
+field_exclude:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        exclude: true
+                    field2:
+                        exclude: false
+                    field3:
+                        exclude: ~
+    expected:
+        actions:
+            create:
+                fields:
+                    field1:
+                        exclude: true
+                    field2:
+                        exclude: false
+                    field3:
+                        exclude: true
+
+invalid_field_exclude:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        exclude: 123
+    expected: []
+    error: 'Invalid type for path "entity.actions.create.fields.field1.exclude". Expected boolean, but got integer.'
+
+entity_null_form_type:
+    config:
+        actions:
+            create:
+                form_type: ~
+    expected:
+        actions:
+            create: []
+
+entity_empty_form_type:
+    config:
+        actions:
+            create:
+                form_type: ""
+    expected:
+        actions:
+            create: []
+
+entity_form_type:
+    config:
+        actions:
+            create:
+                form_type: integer
+    expected:
+        actions:
+            create:
+                form_type: integer
+
+entity_null_form_options:
+    config:
+        actions:
+            create:
+                form_options: ~
+    expected:
+        actions:
+            create: []
+
+entity_empty_form_options:
+    config:
+        actions:
+            create:
+                form_options: []
+    expected:
+        actions:
+            create: []
+
+entity_form:
+    config:
+        actions:
+            create:
+                form_type: integer
+                form_options:
+                    option1: value1
+    expected:
+        actions:
+            create:
+                form_type: integer
+                form_options:
+                    option1: value1
+
+invalid_entity_form_type:
+    config:
+        actions:
+            create:
+                form_type: []
+    expected: []
+    error: 'Invalid type for path "entity.actions.create.form_type". Expected scalar, but got array.'
+
+invalid_entity_form_options:
+    config:
+        actions:
+            create:
+                form_options: test
+    expected: []
+    error: 'Invalid type for path "entity.actions.create.form_options". Expected array, but got string'
+
+field_form:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        form_type: ~
+                    field2:
+                        form_type: ""
+                    field3:
+                        form_type: integer
+                    field4:
+                        form_type: integer
+                        form_options: ~
+                    field5:
+                        form_type: integer
+                        form_options: []
+                    field6:
+                        form_type: integer
+                        form_options:
+                            option1: value1
+    expected:
+        actions:
+            create:
+                fields:
+                    field1: []
+                    field2: []
+                    field3:
+                        form_type: integer
+                    field4:
+                        form_type: integer
+                    field5:
+                        form_type: integer
+                    field6:
+                        form_type: integer
+                        form_options:
+                            option1: value1
+
+invalid_field_form_type:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        form_type: []
+    expected: []
+    error: 'Invalid type for path "entity.actions.create.fields.field1.form_type". Expected scalar, but got array.'
+
+invalid_field_form_options:
+    config:
+        actions:
+            create:
+                fields:
+                    field1:
+                        form_options: test
+    expected: []
+    error: 'Invalid type for path "entity.actions.create.fields.field1.form_options". Expected array, but got string'

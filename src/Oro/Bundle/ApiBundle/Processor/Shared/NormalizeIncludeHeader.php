@@ -6,6 +6,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
+/**
+ * Splits the value of "X-Include" request header into an array by ";".
+ */
 class NormalizeIncludeHeader implements ProcessorInterface
 {
     /**

@@ -63,6 +63,9 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
 
         $classMetadata->expects($this->once())
             ->method('getFieldNames')
@@ -101,13 +104,16 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
         $expectedMetadata->setInheritedType(false);
         $expectedMetadata->setIdentifierFieldNames(['id']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
         $idField = new FieldMetadata();
         $idField->setName('id');
         $idField->setDataType('integer');
+        $idField->setIsNullable(false);
         $expectedMetadata->addField($idField);
         $nameField = new FieldMetadata();
         $nameField->setName('name');
         $nameField->setDataType('string');
+        $nameField->setIsNullable(false);
         $expectedMetadata->addField($nameField);
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
@@ -142,6 +148,9 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
 
         $classMetadata->expects($this->once())
             ->method('getFieldNames')
@@ -230,19 +239,23 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
         $expectedMetadata->setInheritedType(false);
         $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
         $field1 = new FieldMetadata();
         $field1->setName('field1');
         $field1->setDataType('integer');
+        $field1->setIsNullable(false);
         $expectedMetadata->addField($field1);
         $field3 = new FieldMetadata();
         $field3->setName('field3');
         $field3->setDataType('string');
+        $field3->setIsNullable(false);
         $expectedMetadata->addField($field3);
         $association1 = new AssociationMetadata();
         $association1->setTargetClassName('Test\Association1Target');
         $association1->setAcceptableTargetClassNames(['Test\Association1Target']);
         $association1->setName('association1');
         $association1->setDataType('integer');
+        $association1->setIsNullable(true);
         $association1->setIsCollection(false);
         $expectedMetadata->addAssociation($association1);
         $association3 = new AssociationMetadata();
@@ -250,6 +263,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $association3->setAcceptableTargetClassNames(['Test\Association3Target1', 'Test\Association3Target2']);
         $association3->setName('association3');
         $association3->setDataType('string');
+        $association3->setIsNullable(true);
         $association3->setIsCollection(true);
         $expectedMetadata->addAssociation($association3);
 
