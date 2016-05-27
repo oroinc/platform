@@ -21,7 +21,7 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->attendeeRelationManager = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager')
             ->disableOriginalConstructor()
             ->getMock();
 

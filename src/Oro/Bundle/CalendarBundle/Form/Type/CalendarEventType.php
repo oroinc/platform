@@ -123,16 +123,15 @@ class CalendarEventType extends AbstractType
             );
 
         $builder->addEventSubscriber(new CalendarUidSubscriber());
-        $builder->addEventSubscriber(new ChildEventsSubscriber($builder, $this->registry, $this->securityFacade));
+        $builder->addEventSubscriber(new ChildEventsSubscriber($this->registry, $this->securityFacade));
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            $calendarEvent = $event->getData();
+            if (!$calendarEvent) {
+                return;
+            }
 
-//        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-//            $calendarEvent = $event->getData();
-//            if (!$calendarEvent) {
-//                return;
-//            }
-//
-//            $this->setDefaultOrigin($calendarEvent);
-//        }, 10);
+            $this->setDefaultOrigin($calendarEvent);
+        }, 10);
     }
 
     /**

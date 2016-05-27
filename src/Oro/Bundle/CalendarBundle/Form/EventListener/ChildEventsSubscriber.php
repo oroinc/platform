@@ -35,23 +35,15 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     ];
 
     /**
-     * @param FormBuilderInterface $builder
      * @param ManagerRegistry $registry
      * @param SecurityFacade $securityFacade
-     * @param string $childEventsFieldName
      */
     public function __construct(
-        FormBuilderInterface $builder,
         ManagerRegistry $registry,
-        SecurityFacade $securityFacade,
-        $childEventsFieldName = 'attendees'
+        SecurityFacade $securityFacade
     ) {
         $this->registry= $registry;
         $this->securityFacade = $securityFacade;
-
-        // get existing events
-        $builder->get($childEventsFieldName)
-            ->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitChildEvents']);
     }
 
     /**
@@ -189,8 +181,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->setDefaultOrigin($parentEvent);
-
         $this->setDefaultAttendeeStatus($parentEvent->getRelatedAttendee(), CalendarEvent::STATUS_ACCEPTED);
         $this->setDefaultAttendeeType($parentEvent->getRelatedAttendee());
         foreach ($parentEvent->getChildEvents() as $calendarEvent) {
@@ -205,33 +195,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         foreach ($parentEvent->getChildAttendees() as $attendee) {
             $this->setDefaultAttendeeStatus($attendee);
             $this->setDefaultAttendeeType($attendee);
-        }
-    }
-
-    /**
-     * @param CalendarEvent $event
-     */
-    protected function setDefaultOrigin(CalendarEvent $event)
-    {
-        if (!$event->getOrigin()) {
-            $calendarEventServer = $this->registry
-                ->getRepository(ExtendHelper::buildEnumValueClassName(CalendarEvent::ORIGIN_ENUM_CODE))
-                ->find(CalendarEvent::ORIGIN_SERVER);
-
-            $event->setOrigin($calendarEventServer);
-        }
-
-        $attendeeServer = $this->registry
-            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
-            ->find(Attendee::ORIGIN_SERVER);
-
-        $attendees = $event->getAttendees();
-        foreach ($attendees as $attendee) {
-            if ($attendee->getOrigin()) {
-                continue;
-            }
-
-            $attendee->setOrigin($attendeeServer);
         }
     }
 

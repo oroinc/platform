@@ -165,13 +165,7 @@ class CalendarEventApiType extends CalendarEventType
                 $this->requestStack
             )
         );
-        $builder->addEventSubscriber(
-            new ChildEventsSubscriber(
-                $builder,
-                $this->registry,
-                $this->securityFacade
-            )
-        );
+        $builder->addEventSubscriber(new ChildEventsSubscriber($this->registry, $this->securityFacade));
     }
 
     /**
