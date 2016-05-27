@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Event;
 
 use Oro\Bundle\WorkflowBundle\Event\TransitionsAttributeEvent;
-use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\WorkflowBundle\Model\Attribute;
 
 class TransitionsAttributeEventTest extends \PHPUnit_Framework_TestCase
 {
