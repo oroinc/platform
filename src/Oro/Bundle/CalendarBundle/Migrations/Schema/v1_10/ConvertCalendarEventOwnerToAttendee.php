@@ -87,7 +87,7 @@ EOD;
     {
         $sql = <<<EOD
 UPDATE oro_calendar_event AS ce
-SET related_attendee = (
+SET related_attendee_id = (
     SELECT a.id
     FROM oro_calendar_event_attendee AS a
     WHERE a.calendar_event_id = ce.id

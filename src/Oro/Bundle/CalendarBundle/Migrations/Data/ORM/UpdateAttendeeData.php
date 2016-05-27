@@ -68,7 +68,7 @@ SET
         FROM
             oro_calendar_event ce
         WHERE
-            ce.related_attendee = a.id
+            ce.related_attendee_id = a.id
     );
 ALTER TABLE oro_calendar_event DROP COLUMN IF EXISTS invitation_status;
 SQL
@@ -95,7 +95,7 @@ SET
         FROM
             oro_calendar_event ce
         WHERE
-            ce.related_attendee = a.id
+            ce.related_attendee_id = a.id
     );
 SQL;
         $connection->executeQuery($query);
