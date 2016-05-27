@@ -73,23 +73,29 @@ define([
                 attrs[key] = val;
             }
 
+            var fields = [
+                'id',
+                'editable',
+                'removable',
+                'calendarUid',
+                'parentEventId',
+                'invitationStatus',
+                'recurrence',
+                'recurrencePattern',
+                'recurringEventId',
+                'originalStart',
+                'isCancelled'
+            ];
+
+            if (this.get('recurrence')) {
+                fields.push("start", "end");
+            }
+
             modelData = _.extend(
                 {id: this.originalId},
                 _.omit(
                     this.toJSON(),
-                    [
-                        'id',
-                        'editable',
-                        'removable',
-                        'calendarUid',
-                        'parentEventId',
-                        'invitationStatus',
-                        'recurrence',
-                        'recurrencePattern',
-                        'recurringEventId',
-                        'originalStart',
-                        'isCancelled'
-                    ]
+                    fields
                 ),
                 attrs || {}
             );

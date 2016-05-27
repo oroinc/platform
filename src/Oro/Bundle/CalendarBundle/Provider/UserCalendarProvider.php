@@ -244,6 +244,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
                         $occurrenceDate->format('d')
                     );
                     $newItem['end'] = $endDate->format('c');
+                    $newItem['removable'] = false;
                     $occurrences[] = $newItem;
                 }
             }

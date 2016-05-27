@@ -228,6 +228,50 @@ class MonthlyStrategyTest extends AbstractTestStrategy
                 'expected' => [
                 ],
             ],
+            /**
+             * |-----|
+             *   |-|
+             */
+            'start < startTime < endTime < end with 31 day' => [
+                'params' => [
+                    'interval' => 1,
+                    'dayOfMonth' => 31,
+                    'occurrences' => null,
+                    'start' => '2016-01-01',
+                    'end' => '2016-10-01',
+                    'startTime' => '2016-01-25',
+                    'endTime' => '2016-08-01',
+                ],
+                'expected' => [
+                    '2016-01-31',
+                    '2016-02-29',
+                    '2016-03-31',
+                    '2016-04-30',
+                    '2016-05-31',
+                    '2016-06-30',
+                    '2016-07-31',
+                ],
+            ],
+            /**
+             * |-----|
+             *   |-|
+             */
+            'start < startTime < endTime < end with 30 day and february' => [
+                'params' => [
+                    'interval' => 1,
+                    'dayOfMonth' => 30,
+                    'occurrences' => null,
+                    'start' => '2015-01-01',
+                    'end' => '2015-05-01',
+                    'startTime' => '2015-01-20',
+                    'endTime' => '2015-04-01',
+                ],
+                'expected' => [
+                    '2015-01-30',
+                    '2015-02-28',
+                    '2015-03-30',
+                ],
+            ],
         ];
     }
 
