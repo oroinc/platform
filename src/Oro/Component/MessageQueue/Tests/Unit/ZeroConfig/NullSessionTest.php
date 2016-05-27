@@ -4,7 +4,8 @@ namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\Null\NullSession as TransportNullSession;
-use Oro\Component\MessageQueue\ZeroConfig\FrontProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
+use Oro\Component\MessageQueue\ZeroConfig\MessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\NullSession;
 use Oro\Component\MessageQueue\ZeroConfig\Config;
 
@@ -39,21 +40,13 @@ class NullSessionTest extends \PHPUnit_Framework_TestCase
         $transportSession
             ->expects($this->once())
             ->method('createProducer')
-            ->will($this->returnValue('producer-instance'))
+            ->will($this->returnValue($this->getMock(TransportMessageProducer::class)))
         ;
 
         $session = new NullSession($transportSession, new Config('', '', '', '', ''));
         $result = $session->createProducer();
 
-        $this->assertEquals('producer-instance', $result);
-    }
-
-    public function testShouldCreateFrontProducerInstance()
-    {
-        $session = new NullSession($this->createTransportSessionMock(), new Config('', '', '', '', ''));
-        $result = $session->createFrontProducer();
-
-        $this->assertInstanceOf(FrontProducer::class, $result);
+        $this->assertInstanceOf(MessageProducer::class, $result);
     }
 
     public function testShouldReturnConfigInstance()
