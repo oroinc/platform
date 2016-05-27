@@ -354,8 +354,10 @@ Transition configuration has next options:
         - **wd** - WorkflowDefinition
         - **wi** - WorkflowItem
         - **ws** - WorkflowStep
+
     Transition for the entity is performing by schedule only if in a moment of performing workflow for this entity is 
     at the appropriate step and all other conditions are met.
+
 * **transition_definition**
     *string*
     Name of associated transition definition.
