@@ -171,13 +171,6 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: organization_users, acl_resource: oro_user_user_view }
 
-    oro_user.autocomplete.all_user.organization_search_handler:
-        parent: oro_user.autocomplete.user.organization_search_handler
-        calls:
-           - [includeCurrentUser]
-        tags:
-            - { name: oro_form.autocomplete.search_handler, alias: organization_all_users, acl_resource: oro_user_user_view }
-
     oro_user.autocomplete.user.search_without_current_handler:
         class: %oro_user.autocomplete.user.search_without_current_handler.class%
         parent: oro_form.autocomplete.full_name.search_handler
