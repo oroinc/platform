@@ -160,7 +160,7 @@ services:
             - '@oro_email.mailer.processor'
         calls:
             - [ setEnv, [%kernel.environment%] ]
-            - [ setMessageLimit, [100] ]
+            - [ setMessageLimit, [0] ]
 
     oro_notification.email_handler:
         class: %oro_notification.email_handler.class%

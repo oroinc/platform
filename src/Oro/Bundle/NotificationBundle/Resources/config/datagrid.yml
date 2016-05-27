@@ -62,6 +62,8 @@ datagrid:
                     data_name: e.processedAt
                 scheduledAt:
                     data_name: e.scheduledAt
+            default:
+                processedAt: DESC
 
         filters:
             columns:
