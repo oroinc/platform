@@ -50,6 +50,11 @@ class BuildRouteRegistryPass implements CompilerPassInterface
                 $destinationName = empty($params['destinationName']) ? null : $params['destinationName'];
 
                 $configs[$topicName][] = [$processorName, $destinationName];
+            } else {
+                throw new \LogicException(sprintf(
+                    'Topic subscriber configuration is invalid. "%s"',
+                    json_encode($class::getSubscribedTopics())
+                ));
             }
         }
     }
