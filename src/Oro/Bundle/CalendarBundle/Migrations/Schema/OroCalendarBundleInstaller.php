@@ -31,7 +31,7 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
      */
     public function getMigrationVersion()
     {
-        return 'v1_11';
+        return 'v1_10';
     }
 
     /**
@@ -238,13 +238,13 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('parent_id', 'integer', ['default' => null, 'notnull' => false]);
-        $table->addColumn('related_attendee', 'integer', ['notnull' => false]);
+        $table->addColumn('related_attendee_id', 'integer', ['notnull' => false]);
         $table->addColumn('recurring_event_id', 'integer', ['notnull' => false]);
         $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
         $table->addColumn('original_start_at', 'datetime', ['notnull' => false]);
         $table->addColumn('is_cancelled', 'boolean', ['default' => false]);
-        
-        $table->addIndex(['related_attendee']);
+
+        $table->addIndex(['related_attendee_id']);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
         $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_sys_calendar_event_idx', []);
@@ -253,7 +253,7 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addIndex(['original_start_at'], 'oro_calendar_event_osa_idx');
 
         $table->addUniqueIndex(['recurrence_id'], 'UNIQ_2DDC40DD2C414CE8');
-        
+
         $table->setPrimaryKey(['id']);
     }
 
@@ -323,7 +323,7 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_calendar_event_attendee'),
-            ['related_attendee'],
+            ['related_attendee_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
