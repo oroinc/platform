@@ -427,7 +427,7 @@ define([
                     return {
                         displayName: attendee.displayName,
                         email: attendee.email,
-                        origin: 'server'
+                        origin: attendee.origin ? attendee.origin : 'server'
                     };
                 });
             }
