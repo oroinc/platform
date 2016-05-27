@@ -56,7 +56,7 @@ class YearlyStrategy extends MonthlyStrategy
         $occurrenceDate->setDate($occurrenceDate->format('Y'), $monthOfYear, $dayOfMonth);
 
         if ($occurrenceDate < $recurrence->getStartTime()) {
-            $occurrenceDate = $this->getNextOccurrence($interval, $occurrenceDate);
+            $occurrenceDate = $this->getNextOccurrence($interval, $recurrence->getDayOfMonth(), $occurrenceDate);
         }
 
         return $occurrenceDate;
@@ -80,14 +80,10 @@ class YearlyStrategy extends MonthlyStrategy
         }
 
         $currentDate = new \DateTime('now', $this->getTimeZone());
-        $dateString = $currentDate->format('Y')
-            . '-' . $recurrence->getMonthOfYear()
-            . '-' . $recurrence->getDayOfMonth();
+        $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), 1);
+        $daysInMonth = (int)$currentDate->format('t');
 
-        // Try to create DateTime object for checking if day/month of recurrence is valid.
-        try {
-            new \DateTime($dateString, $this->getTimeZone());
-        } catch (\Exception $exception) {
+        if ($daysInMonth < $recurrence->getDayOfMonth()) {
             return "Parameters 'dayOfMonth' and 'monthOfYear' values are invalid:"
             . " such date doesn't exist(Yearly recurrence pattern).";
         }

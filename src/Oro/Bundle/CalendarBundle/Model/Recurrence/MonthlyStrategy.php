@@ -16,12 +16,13 @@ class MonthlyStrategy extends AbstractStrategy
         $occurrenceDate = $this->getFirstOccurrence($recurrence);
         $interval = $recurrence->getInterval();
         $fromStartInterval = 1;
+        $dayOfMonth = $recurrence->getDayOfMonth();
 
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
             $fromStartInterval = (int)$dateInterval->format('%y') * 12 + (int)$dateInterval->format('m');
             $fromStartInterval = floor($fromStartInterval / $interval);
-            $occurrenceDate = $this->getNextOccurrence($fromStartInterval++ * $interval, $occurrenceDate);
+            $occurrenceDate = $this->getNextOccurrence($fromStartInterval++ * $interval, $dayOfMonth, $occurrenceDate);
         }
 
         $occurrences = $recurrence->getOccurrences();
@@ -33,7 +34,7 @@ class MonthlyStrategy extends AbstractStrategy
                 $result[] = $occurrenceDate;
             }
             $fromStartInterval++;
-            $occurrenceDate = $this->getNextOccurrence($interval, $occurrenceDate);
+            $occurrenceDate = $this->getNextOccurrence($interval, $dayOfMonth, $occurrenceDate);
         }
 
         return $result;
@@ -78,9 +79,17 @@ class MonthlyStrategy extends AbstractStrategy
      *
      * @return \DateTime
      */
-    protected function getNextOccurrence($interval, \DateTime $date)
+    protected function getNextOccurrence($interval, $dayOfMonth, \DateTime $date)
     {
-        return new \DateTime("+{$interval} month {$date->format('c')}", $this->getTimeZone());
+        $currentDate = clone $date;
+        $currentDate->setDate($currentDate->format('Y'), $currentDate->format('m'), 1);
+
+        $result = new \DateTime("+{$interval} month {$currentDate->format('c')}", $this->getTimeZone());
+        $daysInMonth = (int)$result->format('t');
+        $dayOfMonth = ($daysInMonth < $dayOfMonth) ? $daysInMonth : $dayOfMonth;
+        $result->setDate($result->format('Y'), $result->format('m'), $dayOfMonth);
+
+        return $result;
     }
 
     /**
@@ -94,10 +103,16 @@ class MonthlyStrategy extends AbstractStrategy
     {
         $dayOfMonth = $recurrence->getDayOfMonth();
         $occurrenceDate = clone $recurrence->getStartTime();
+        $daysInMonth = (int)$occurrenceDate->format('t');
+        $dayOfMonth = ($daysInMonth < $dayOfMonth) ? $daysInMonth : $dayOfMonth;
         $occurrenceDate->setDate($occurrenceDate->format('Y'), $occurrenceDate->format('m'), $dayOfMonth);
 
         if ($occurrenceDate->format('d') < $recurrence->getStartTime()->format('d')) {
-            $occurrenceDate = $this->getNextOccurrence($recurrence->getInterval(), $occurrenceDate);
+            $occurrenceDate = $this->getNextOccurrence(
+                $recurrence->getInterval(),
+                $recurrence->getDayOfMonth(),
+                $occurrenceDate
+            );
         }
 
         return $occurrenceDate;
@@ -112,6 +127,7 @@ class MonthlyStrategy extends AbstractStrategy
 
         return $this->getNextOccurrence(
             ($recurrence->getOccurrences() - 1) * $recurrence->getInterval(),
+            $recurrence->getDayOfMonth(),
             $occurrenceDate
         );
     }
