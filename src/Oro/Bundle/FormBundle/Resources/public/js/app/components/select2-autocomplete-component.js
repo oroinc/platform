@@ -21,25 +21,23 @@ define(function(require) {
 
         setConfig: function(config) {
             config = Select2AutocompleteComponent.__super__.setConfig.apply(this, arguments);
-            /* 'renderedPropertyName' option helps to select create a new data item with proper field name
-             *  to be rendered properly in the item template
-             */
-            var propName = config.renderedPropertyName || 'name';
             /* 'allowCreateNew' option says to select2 to propose to select new item created with value in search field
              */
             if (config.allowCreateNew) {
+                /* 'renderedPropertyName' option helps to select create a new data item with proper field name
+                 *  to be rendered properly in the item template
+                 */
+                var propName = config.renderedPropertyName || 'name';
                 config.createSearchChoice = function(value, results) {
                     return _.object([['id', null], [propName, value]]);
                 };
+                /* In case we create new items we can't use plain id in input value because a new item hasn't it yet
+                 * So value is a JSON with value property containing user input text, like {value: "My new item"}
+                 */
+                config.id = function(e) {
+                    return e.id !== null ? e.id : JSON.stringify({value: e[propName]});
+                };
             }
-
-            /* In case we create new items we can't use plain id in input value because a new item hasn't it yet
-             * So value is a JSON with value property containing user input text, like {value: "My new item"}
-             */
-            config.id = function(e) {
-                return e.id !== null ? e.id : JSON.stringify({value: e[propName]});
-            };
-
             return config;
         },
 
