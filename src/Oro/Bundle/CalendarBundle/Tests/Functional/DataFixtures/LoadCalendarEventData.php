@@ -3,16 +3,28 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
-class LoadCalendarEventData extends AbstractFixture
+class LoadCalendarEventData extends AbstractFixture implements DependentFixtureInterface
 {
     const CALENDAR_EVENT_TITLE = 'Regular event not in start:end range';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [
+            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData'
+        ];
+    }
 
     /**
      * {@inheritdoc}
@@ -29,8 +41,15 @@ class LoadCalendarEventData extends AbstractFixture
         $data = Yaml::parse(file_get_contents($fileName));
 
         foreach ($data as $item) {
-            $start = new \DateTime(gmdate(DATE_RFC3339, strtotime($item['start'])));
-            $event = new CalendarEvent();
+            $start    = new \DateTime(gmdate(DATE_RFC3339, strtotime($item['start'])));
+            $event    = new CalendarEvent();
+            $attendee = new Attendee();
+            $userName = 'user'.mt_rand(0, 100);
+            $attendee->setEmail($userName.'@example.com');
+            $attendee->setDisplayName($userName);
+            $attendee->setUser($this->getReference('simple_user'));
+            $event->setRelatedAttendee($attendee);
+
             $event->setCalendar($calendar)
                 ->setTitle($item['title'])
                 ->setStart($start)
