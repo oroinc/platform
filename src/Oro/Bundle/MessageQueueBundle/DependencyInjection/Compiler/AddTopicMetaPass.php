@@ -43,15 +43,15 @@ class AddTopicMetaPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $registryId = 'oro_message_queue.zero_config.meta.topic_meta_registry';
+        $metaRegistryId = 'oro_message_queue.zero_config.meta.topic_meta_registry';
         
-        if (false == $container->hasDefinition($registryId)) {
+        if (false == $container->hasDefinition($metaRegistryId)) {
             return;
         }
 
-        $topicRegistry = $container->getDefinition($registryId);
+        $metaRegistry = $container->getDefinition($metaRegistryId);
         
-        $topicRegistry->replaceArgument(0, array_merge_recursive($topicRegistry->getArgument(0), $this->topicsMeta));
+        $metaRegistry->replaceArgument(0, array_merge_recursive($metaRegistry->getArgument(0), $this->topicsMeta));
     }
 
     /**

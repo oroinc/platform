@@ -40,7 +40,7 @@ class RouterMessageProcessor implements MessageProcessor, TopicSubscriber
     public static function getSubscribedTopics()
     {
         return [
-            '__topic__',
+            '__router__',
         ];
     }
 }

@@ -2,6 +2,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
+use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriber;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -209,4 +210,98 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
     }
+
+    public function testShouldBuildMetaFromSubscriberIfOnlyTopicNameSpecified()
+    {
+        $container = new ContainerBuilder();
+
+        $processor = new Definition(OnlyTopicNameTopicSubscriber::class);
+        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $container->setDefinition('processor-id', $processor);
+
+        $topicMetaRegistry = new Definition();
+        $topicMetaRegistry->setArguments([[]]);
+        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+
+        $pass = new BuildTopicMetaSubscribersPass();
+        $pass->process($container);
+
+        $expectedValue = [
+            'topic-subscriber-name' => ['subscribers' => ['processor-id']],
+        ];
+
+        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+    }
+
+    public function testShouldBuildMetaFromSubscriberIfProcessorNameSpecified()
+    {
+        $container = new ContainerBuilder();
+
+        $processor = new Definition(ProcessorNameTopicSubscriber::class);
+        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $container->setDefinition('processor-id', $processor);
+
+        $topicMetaRegistry = new Definition();
+        $topicMetaRegistry->setArguments([[]]);
+        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+
+        $pass = new BuildTopicMetaSubscribersPass();
+        $pass->process($container);
+
+        $expectedValue = [
+            'topic-subscriber-name' => ['subscribers' => ['subscriber-processor-name']],
+        ];
+
+        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+    }
+
+    public function testShouldThrowExceptionWhenTopicSubscriberConfigurationIsInvalid()
+    {
+        $this->setExpectedException(\LogicException::class, 'Topic subscriber configuration is invalid. "[12345]"');
+
+        $container = new ContainerBuilder();
+
+        $processor = new Definition(InvalidTopicSubscriber::class);
+        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $container->setDefinition('processor-id', $processor);
+
+        $topicMetaRegistry = new Definition();
+        $topicMetaRegistry->setArguments([[]]);
+        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+
+        $pass = new BuildTopicMetaSubscribersPass();
+        $pass->process($container);
+    }
 }
+
+// @codingStandardsIgnoreStart
+
+class OnlyTopicNameTopicSubscriber implements TopicSubscriber
+{
+    public static function getSubscribedTopics()
+    {
+        return ['topic-subscriber-name'];
+    }
+}
+
+class ProcessorNameTopicSubscriber implements TopicSubscriber
+{
+    public static function getSubscribedTopics()
+    {
+        return [
+            'topic-subscriber-name' => [
+                'processorName' => 'subscriber-processor-name'
+            ],
+        ];
+    }
+}
+
+class InvalidTopicSubscriber implements TopicSubscriber
+{
+    public static function getSubscribedTopics()
+    {
+        return [12345];
+    }
+}
+
+// @codingStandardsIgnoreEnd
