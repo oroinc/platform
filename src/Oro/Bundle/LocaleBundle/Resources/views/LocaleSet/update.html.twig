@@ -9,20 +9,14 @@
 {% set formAction = entity.id ? path('oro_locale_localeset_update', { 'id': entity.id }) : path('oro_locale_localeset_create')  %}
 
 {% block pageHeader %}
-    {% if entity.id %}
-        {% set breadcrumbs = {
-            'entity':      entity,
-            'indexPath':   path('oro_locale_localeset_index'),
-            'indexLabel': 'oro.locale.localeset.entity_plural_label'|trans,
-            'entityTitle': 'oro.locale.localeset.navigation.view'|trans({
-                '%name%': entity.name|default('N/A'|trans)
-            })
-        } %}
-        {{ parent() }}
-    {% else %}
-        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.locale.localeset.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
-    {% endif %}
+    {% set breadcrumbs = {
+        'entity':      entity,
+        'indexPath':   path('oro_locale_localeset_index'),
+        'indexLabel': 'oro.locale.localeset.entity_plural_label'|trans,
+        'entityTitle': entity.id ? 'oro.locale.localeset.navigation.view'|trans({'%name%': entity.name}) : 'oro.ui.create_entity'|trans({'%entityName%': 'oro.locale.localeset.entity_label'|trans})
+    } %}
+
+    {{ parent() }}
 {% endblock pageHeader %}
 
 {% block navButtons %}
