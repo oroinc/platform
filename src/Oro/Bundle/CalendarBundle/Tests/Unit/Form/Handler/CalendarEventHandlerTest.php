@@ -71,7 +71,7 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->entity  = new CalendarEvent();
         $origin        = new TestEnumValue(CalendarEvent::ORIGIN_SERVER, CalendarEvent::ORIGIN_SERVER);
         $this->entity->setOrigin($origin);
-        
+
         $this->handler = new CalendarEventHandler(
             $this->form,
             $this->request,
@@ -171,9 +171,11 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
-        $this->form->expects($this->exactly(2))
-            ->method('has')
-            ->will($this->returnValue(false));
+        $this->form->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+        $this->form->expects($this->once())
+            ->method('getData');
         $this->entityRoutingHelper->expects($this->once())
             ->method('getEntityClassName')
             ->will($this->returnValue(null));
@@ -276,10 +278,11 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        $this->form->expects($this->exactly(2))
-            ->method('has')
-            ->will($this->returnValue(false));
-
+        $this->form->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+        $this->form->expects($this->once())
+            ->method('getData');
         $this->om->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($this->entity));
@@ -338,10 +341,12 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->activityManager->expects($this->once())
             ->method('addActivityTarget')
             ->with($this->identicalTo($this->entity), $this->identicalTo($targetEntity));
-        $this->form->expects($this->exactly(2))
-            ->method('has')
-            ->will($this->returnValue(false));
 
+        $this->form->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+        $this->form->expects($this->once())
+            ->method('getData');
         $this->om->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($this->entity));

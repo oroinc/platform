@@ -20,11 +20,6 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
-        $formBuilder->expects($this->any())
-            ->method('get')
-            ->will($this->returnSelf());
-
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -48,60 +43,9 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->childEventsSubscriber = new ChildEventsSubscriber(
-            $formBuilder,
             $registry,
             $securityFacade
         );
-    }
-
-    public function testPreSubmit()
-    {
-        $calendarEvent = new CalendarEvent();
-        $calendarEvent->setTitle('test');
-
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
-        $form->expects($this->any())
-            ->method('getData')
-            ->will($this->returnValue($calendarEvent));
-
-        $this->assertAttributeEmpty('parentEvent', $this->childEventsSubscriber);
-        $this->childEventsSubscriber->preSubmit(new FormEvent($form, []));
-        $this->assertAttributeEquals($calendarEvent, 'parentEvent', $this->childEventsSubscriber);
-    }
-
-    public function testPostSubmitChildEvents()
-    {
-        $firstAttendee = new Attendee();
-        $firstAttendee->setUser(new User(1));
-
-        $secondAttendee = new Attendee();
-        $secondAttendee->setUser(new User(2));
-
-        $firstExistingAttendee = new Attendee();
-        $firstExistingAttendee->setUser(new User(1));
-
-        $parentEvent = new CalendarEvent();
-        $parentEvent->addAttendee($firstExistingAttendee);
-        $parentEvent->addAttendee($secondAttendee);
-
-        $parentForm = $this->getMock('Symfony\Component\Form\FormInterface');
-        $parentForm->expects($this->any())
-            ->method('getData')
-            ->will($this->returnValue($parentEvent));
-
-        $attendees = new ArrayCollection([$firstAttendee, $secondAttendee]);
-
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
-        $form->expects($this->any())
-            ->method('getData')
-            ->will($this->returnValue($attendees));
-
-        $this->childEventsSubscriber->preSubmit(new FormEvent($parentForm, []));
-        $this->childEventsSubscriber->postSubmitChildEvents(new FormEvent($form, []));
-
-        $this->assertCount(2, $attendees);
-        $this->assertEquals($firstExistingAttendee, $attendees[0]);
-        $this->assertEquals($secondAttendee, $attendees[1]);
     }
 
     public function testOnSubmit()
@@ -233,7 +177,7 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->childEventsSubscriber->postSubmit(new FormEvent($form, []));
 
-        $this->assertEquals('first last', $attendees->get(0)->getDisplayName());
+        $this->assertEquals('attendee@example.com', $attendees->get(0)->getDisplayName());
         $this->assertEquals('attendee2@example.com', $attendees->get(1)->getDisplayName());
     }
 

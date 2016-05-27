@@ -67,7 +67,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
-            . ' CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin'
+            . ' CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
             . ' e.originalStart, e.isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
@@ -77,6 +77,11 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.instance as {$key}Instance, r.id as recurrenceId,"
             . " r.calculatedEndTime as {$key}calculatedEndTime"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            . ' LEFT JOIN e.relatedAttendee relatedAttendee'
+            . ' LEFT JOIN e.parent parent'
+            . ' LEFT JOIN e.origin originEnum'
+            . ' LEFT JOIN parent.origin parentOrigin'
+            . ' LEFT JOIN relatedAttendee.status status'
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
@@ -107,7 +112,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
-            . ' CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin'
+            . ' CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
             . ' e.originalStart, e.isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
@@ -156,7 +161,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
-            . ' CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin'
+            . ' CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
             . ' e.originalStart, e.isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
@@ -206,7 +211,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt, e.status,'
             . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
-            . ' CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin'
+            . ' CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
             . ' e.originalStart, e.isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"

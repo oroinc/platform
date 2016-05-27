@@ -56,7 +56,6 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             ['backgroundColor', '#FF0000'],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
-            ['invitationStatus', CalendarEvent::STATUS_NONE],
             ['recurrence', new Recurrence()],
             ['originalStart', new \DateTime()],
             ['isCancelled', true],
