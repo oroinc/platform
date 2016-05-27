@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory;
 
 class TransitionQueryFactoryTest extends \PHPUnit_Framework_TestCase

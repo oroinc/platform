@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
+
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class TransitionQueryFactory
@@ -23,7 +24,8 @@ class TransitionQueryFactory
      * @param array $workflowSteps
      * @param string $entityClass
      * @param string $dqlFilter optional dql WHERE clause
-     * @return array|Query
+     * @return Query
+     * @throws \InvalidArgumentException
      */
     public function create(array $workflowSteps, $entityClass, $dqlFilter = null)
     {

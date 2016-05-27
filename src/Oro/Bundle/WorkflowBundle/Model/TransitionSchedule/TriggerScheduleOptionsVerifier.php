@@ -70,7 +70,7 @@ class TriggerScheduleOptionsVerifier
     private function validateOptions(array $options)
     {
         if (!isset($options['cron'])) {
-            throw new \InvalidArgumentException('Option "cron" is REQUIRED for transition schedule.');
+            throw new \InvalidArgumentException('Option "cron" is required for transition schedule.');
         }
     }
 

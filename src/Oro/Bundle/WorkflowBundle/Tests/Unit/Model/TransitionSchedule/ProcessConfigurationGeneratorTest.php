@@ -76,15 +76,12 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
         return [
             'gen_all_cases' => [
                 [
-                    'transitionOne' => [
-                        'name' => 'transition_one',
+                    'transition_one' => [
                         'schedule' => ['cron' => '42 * * * *']
                     ],
-                    'transitionTwo' => [
-                        'name' => 'transition_wont_be_managed'
+                    'transition_wont_be_managed' => [
                     ],
-                    'transitionThree' => [
-                        'name' => 'transition_three',
+                    'transition_three' => [
                         'schedule' => ['cron' => '* * * * *']
                     ]
                 ],

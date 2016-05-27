@@ -54,7 +54,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Option "cron" is REQUIRED for transition schedule.
+     * @expectedExceptionMessage Option "cron" is required for transition schedule.
      */
     public function testVerifyExceptions()
     {

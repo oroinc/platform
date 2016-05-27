@@ -32,18 +32,16 @@ class ProcessConfigurationGenerator
     {
         $processConfigurations = [];
         $workflowName = $workflowDefinition->getName();
-        foreach ($this->getTransitionsConfigurations($workflowDefinition) as $transitionConfiguration) {
+        foreach ($this->getTransitionsConfigurations($workflowDefinition) as $name => $transitionConfiguration) {
             if (array_key_exists('schedule', $transitionConfiguration)) {
-                $transitionName = $transitionConfiguration['name'];
-
-                $this->verifier->verify($transitionConfiguration['schedule'], $workflowDefinition, $transitionName);
+                $this->verifier->verify($transitionConfiguration['schedule'], $workflowDefinition, $name);
 
                 /** @noinspection SlowArrayOperationsInLoopInspection */
                 $processConfigurations = array_merge_recursive(
                     $processConfigurations,
                     $this->createProcessConfiguration(
                         $workflowName,
-                        $transitionName,
+                        $name,
                         $transitionConfiguration['schedule']['cron']
                     )
                 );

@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
@@ -53,7 +54,10 @@ class ItemsFetcherTest extends \PHPUnit_Framework_TestCase
         $transitionManager = $this->getMockBuilder('\Oro\Bundle\WorkflowBundle\Model\TransitionManager')
             ->disableOriginalConstructor()->getMock();
         /** @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject $query */
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')->disableOriginalConstructor()->getMock();
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->setMethods(['getArrayResult'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
 
         $workflowName = 'test_workflow';
         $transitionName = 'test_transition';
