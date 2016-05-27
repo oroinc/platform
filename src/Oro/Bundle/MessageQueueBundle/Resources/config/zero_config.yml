@@ -15,6 +15,9 @@ services:
         class: 'Oro\Component\MessageQueue\ZeroConfig\MessageProducer'
         factory: ['@oro_message_queue.zero_config.session', 'createProducer']
 
+    oro_message_queue.message_producer:
+        alias: 'oro_message_queue.zero_config.message_producer'
+
     oro_message_queue.zero_config.router:
         class: 'Oro\Component\MessageQueue\ZeroConfig\Router'
         public: false
