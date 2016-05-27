@@ -30,7 +30,7 @@ class CalendarEventControllerTest extends WebTestCase
     public function testCreateAction()
     {
         $this->client->useHashNavigation(true);
-        
+
         $crawler = $this->client->request('GET', $this->getUrl('oro_calendar_event_create'));
         $form    = $crawler->selectButton('Save and Close')->form();
         $user    = $this->getReference('simple_user');
