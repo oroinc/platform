@@ -40,7 +40,7 @@ define(function(require) {
 
         refreshOnChange: false,
 
-        overrideJqueryMethods: ['val', 'hide', 'show'],
+        overrideJqueryMethods: ['val', 'hide', 'show', 'focus', 'width'],
 
         /**
          * @inheritDoc
@@ -139,7 +139,7 @@ define(function(require) {
          *
          * @param {mixed} width
          */
-        setWidth: function(width) {
+        width: function(width) {
             this.container().width(width);
         },
 

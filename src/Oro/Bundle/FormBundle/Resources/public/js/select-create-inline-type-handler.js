@@ -51,7 +51,7 @@ define(function(require) {
                 var loadingStarted = false;
                 var onSelect = function() {
                     entitySelectDialog.remove();
-                    selectorEl.select2('focus');
+                    selectorEl.inputWidget('focus');
                     selectorEl.off('select2-data-loaded.' + entitySelectDialog._wid, onSelect);
                 };
                 var onDataRequest = function() {
@@ -99,7 +99,7 @@ define(function(require) {
             var processSelectedEntities = function(id) {
                 selectorEl.inputWidget('val', id, true);
                 entityCreateDialog.remove();
-                selectorEl.select2('focus');
+                selectorEl.inputWidget('focus');
             };
 
             entityCreateDialog.on('formSave', _.bind(processSelectedEntities, this));

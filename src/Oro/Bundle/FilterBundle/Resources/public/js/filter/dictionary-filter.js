@@ -367,7 +367,7 @@ define(function(require) {
          * @inheritDoc
          */
         _hideCriteria: function() {
-            this.$el.find(this.elementSelector).select2('close');
+            this.$el.find(this.elementSelector).inputWidget('close');
             DictionaryFilter.__super__._hideCriteria.apply(this, arguments);
         }
     });

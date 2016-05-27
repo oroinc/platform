@@ -138,7 +138,7 @@ define(function(require) {
                         if (prestine) {
                             e.stopImmediatePropagation();
                             e.preventDefault();
-                            _this.$('input[name=value]').select2('close');
+                            _this.$('input[name=value]').inputWidget('close');
                             _this.onGenericEnterKeydown(e);
                         } else if (!select2options.multiple) {
                             _this.$('input[name=value]').on('select2-selecting', function(event) {
@@ -150,7 +150,7 @@ define(function(require) {
                     case _this.TAB_KEY_CODE:
                         e.stopImmediatePropagation();
                         e.preventDefault();
-                        _this.$('input[name=value]').select2('close');
+                        _this.$('input[name=value]').inputWidget('close');
                         _this.onGenericTabKeydown(e);
                         break;
                 }
@@ -172,7 +172,7 @@ define(function(require) {
         },
 
         updatePosition: function() {
-            this.$('input[name=value]').select2('positionDropdown');
+            this.$('input[name=value]').inputWidget('updatePosition');
         },
 
         /**
@@ -208,7 +208,7 @@ define(function(require) {
             this._isFocused = false;
             this.$('.select2-focusser').off(this.eventNamespace());
             this.$('input.select2-input').off(this.eventNamespace());
-            this.$('input[name=value]').select2('destroy');
+            this.$('input[name=value]').inputWidget('dispose');
             SelectEditorView.__super__.dispose.call(this);
         },
 
@@ -243,7 +243,7 @@ define(function(require) {
 
         focus: function() {
             var isFocused = this.isFocused();
-            this.$('input[name=value]').select2('open');
+            this.$('input[name=value]').inputWidget('open');
             if (!isFocused) {
                 // trigger custom focus event as select2 doesn't trigger 'select2-focus' when focused manually
                 this.trigger('focus');

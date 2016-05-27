@@ -120,7 +120,7 @@ define([
                 var $choice = $(this);
 
                 $el.one('change', function(e) {
-                    $el.select2('search', e.removed.text);
+                    $el.inputWidget('search', e.removed.text);
                 });
                 $choice.find('.select2-search-choice-close').click();
             });

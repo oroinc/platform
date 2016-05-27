@@ -26,13 +26,13 @@ define(function(require) {
 
         render: function() {
             this.undelegateEvents();
+            this.$el.prop('readonly', this.$el.is('[readonly]'));
             this.$el.select2(this.select2Config).trigger('select2-init');
-            this.$el.select2('readonly', this.$el.is('[readonly]'));
             this.delegateEvents();
         },
 
         dispose: function() {
-            this.$el.select2('close').select2('destroy');
+            this.$el.inputWidget('dispose');
         }
     });
 

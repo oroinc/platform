@@ -41,8 +41,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        setWidth: function(width) {
-            UniformSelectInputWidget.__super__.setWidth.apply(this, arguments);
+        width: function(width) {
+            UniformSelectInputWidget.__super__.width.apply(this, arguments);
             this.$container.find('span').width(width);
         },
 
