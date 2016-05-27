@@ -1,9 +1,10 @@
 define([
+    'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/app/views/base/view',
     'oroui/js/modal'
-], function(_, __, BaseView, Modal) {
+], function($, _, __, BaseView, Modal) {
     'use strict';
 
     var RecurringEventNotifierView = BaseView.extend({
