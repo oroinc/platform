@@ -30,7 +30,7 @@ class OroDurationTypeTest extends FormIntegrationTestCase
     public function testSetDefaultOptions()
     {
         $expectedOptions = [
-            'tooltip' => 'oro.form.duration.tooltip',
+            'tooltip' => 'oro.form.oro_duration.tooltip',
             'type' => 'text',
         ];
 
