@@ -233,6 +233,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             $this->applyPermissions($resultItem, $calendarId);
         }
 
+        $this->addAttendeesToCalendarEvents($result);
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
         return $result;

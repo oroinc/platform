@@ -140,7 +140,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'updatedAt'        => null,
                         'parentEventId'    => null,
                         'invitationStatus' => null,
-                        'attendees'     => [],
+                        'attendees'        => [],
                         'editable'         => true,
                         'removable'        => true,
                         'notifiable'       => false,
@@ -163,7 +163,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'updatedAt'        => null,
                         'parentEventId'    => null,
                         'invitationStatus' => null,
-                        'origin'         => CalendarEvent::ORIGIN_SERVER
+                        'origin'           => CalendarEvent::ORIGIN_SERVER
                     ],
                 ],
                 'attendees'                => [
@@ -334,9 +334,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'notifiable'       => true,
                     'origin'           => CalendarEvent::ORIGIN_SERVER,
                     'invitedUsers'     => [],
-                    'recurringEventId' => null,
-                    'originalStart'    => null,
-                    'isCancelled'      => false,
                     'attendees'        => [
                         [
                             'displayName' => 'user',
@@ -349,6 +346,9 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                             'type'        => null,
                         ]
                     ],
+                    'recurringEventId' => null,
+                    'originalStart'    => null,
+                    'isCancelled'      => false,
                 ]
             ],
             'another calendar'       => [
@@ -393,37 +393,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
         ];
-    }
-
-    protected function setGetInvitedUsersExpectations($invitees, $expectedParentEventIds)
-    {
-        if (!empty($expectedParentEventIds)) {
-            $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $repo->expects($this->once())
-                ->method('getInvitedUsersByParentsQueryBuilder')
-                ->with($expectedParentEventIds)
-                ->will($this->returnValue($qb));
-            $this->doctrineHelper->expects($this->once())
-                ->method('getEntityRepository')
-                ->with('OroCalendarBundle:CalendarEvent')
-                ->will($this->returnValue($repo));
-
-            $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-                ->disableOriginalConstructor()
-                ->setMethods(['getArrayResult'])
-                ->getMockForAbstractClass();
-            $qb->expects($this->once())
-                ->method('getQuery')
-                ->will($this->returnValue($query));
-            $query->expects($this->once())
-                ->method('getArrayResult')
-                ->will($this->returnValue($invitees));
-        }
     }
 
     /**
