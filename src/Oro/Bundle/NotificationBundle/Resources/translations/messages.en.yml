@@ -53,6 +53,7 @@ oro:
             scheduled_at.label:   Scheduled At
             processed_at.label:   Processed At
             action:               View Mass Notifications
+            block.info:           Notification Details
 
         system_configuration:
             email_notification_sender_email: Sender Email

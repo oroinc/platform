@@ -3,6 +3,7 @@
 namespace  Oro\Bundle\NotificationBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
@@ -24,22 +25,31 @@ class MassNotificationCommand extends ContainerAwareCommand
     public function configure()
     {
         $this->setName(self::COMMAND_NAME)
-            ->addArgument(
+            ->setDescription('Send mass notifications to users')
+            ->addOption(
                 'subject',
-                InputArgument::REQUIRED,
-                'Set title for message'
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Subject of notification email. If emtpy, subject from configured template is used'
             )
-            ->addArgument(
+            ->addOption(
                 'message',
-                InputArgument::REQUIRED,
-                'Set body message'
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Notification message to send'
             )
-            ->addArgument(
-                'sender',
-                InputArgument::OPTIONAL,
-                'Who send message'
+            ->addOption(
+                'sender_name',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Notification sender name'
+            )
+            ->addOption(
+                'sender_email',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Notification sender email'
             );
-        $this->setDescription('Send mass notification for users');
     }
 
     /**
@@ -53,24 +63,16 @@ class MassNotificationCommand extends ContainerAwareCommand
     {
         $output->writeln($this->getDescription());
 
-        $helper = $this->getHelper('question');
-
-        $subject = $input->getArgument('subject');
-        $message = $input->getArgument('message');
-
-        if (!$subject || empty($subject)) {
-            $subject = $helper->ask($input, $output, $this->getHelperQuestions('Please enter a subject: '));
-        }
-
-        if (!$message || empty($message)) {
-            $subject = $helper->ask($input, $output, $this->getHelperQuestions('Please enter a message: '));
-        }
+        $subject = $input->getOption('subject');
+        $message = $input->getOption('message');
+        $senderName = $input->getOption('sender_name');
+        $senderEmail = $input->getOption('sender_email');
 
         $service = $this->getContainer()->get('oro_notification.mass_notification_processor');
 
-        $service->send($message, $subject);
+        $count = $service->send($message, $subject, $senderEmail, $senderEmail);
 
-        $output->writeln('Notifications have been added to the queue');
+        $output->writeln(sprintf('%s notifications have been added to the queue', $count));
     }
 
     /**

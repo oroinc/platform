@@ -7,10 +7,10 @@ datagrid:
             type: orm
             query:
                 select:
+                    - e.id
                     - e.subject
                     - e.email
                     - e.sender
-                    - e.body
                     - e.status
                     - e.scheduledAt
                     - e.processedAt
@@ -27,9 +27,6 @@ datagrid:
             email:
                 label: oro.notification.massnotification.email.label
                 frontend_type: string
-            body:
-                label: oro.notification.massnotification.body.label
-                frontend_type: string
             status:
                 label: oro.notification.massnotification.status.label
                 frontend_type: string
@@ -42,9 +39,20 @@ datagrid:
                 label: oro.notification.massnotification.processed_at.label
                 frontend_type: datetime
 
-        properties: ~
-
-        actions: ~
+        properties:
+            id: ~
+            view_link:
+                type:       url
+                route:      oro_notification_massnotification_view
+                params:     [ id ]
+        actions:
+            view:
+                acl_resource: oro_notification_massnotification_view
+                type:         navigate
+                label:        oro.grid.action.view
+                icon:         eye-open
+                link:         view_link
+                rowAction:    true
 
         sorters:
             columns:
