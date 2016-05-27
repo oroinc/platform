@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+
+use Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType;
 
 class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroTimeIntervalType */
+    /**
+     * @var OroTimeIntervalType
+     */
     protected $type;
 
     protected function setUp()
@@ -24,17 +27,20 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('text', $this->type->getParent());
+        $this->assertEquals('time', $this->type->getParent());
     }
 
     public function testSetDefaultOptions()
     {
-        $expectedOptions = [
-            'tooltip' => 'oro.form.oro_time_interval.tooltip',
-            'type' => 'text',
-        ];
+        $expectedOptions = array(
+            'widget'         => 'single_text',
+            'with_seconds'   => true,
+            'model_timezone' => 'UTC',
+            'view_timezone'  => 'UTC',
+        );
 
         $form = $this->factory->create($this->type);
+        $form->submit(new \DateTime());
 
         $options = $form->getConfig()->getOptions();
         foreach ($expectedOptions as $name => $expectedValue) {
@@ -43,59 +49,12 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @dataProvider submitDataProvider
-     *
-     * @param $value
-     * @param $expected
-     */
-    public function testSubmit($value, $expected)
+    public function testBuildView()
     {
         $form = $this->factory->create($this->type);
-        $form->submit($value);
-        $data = $form->getData();
+        $form->submit(new \DateTime());
+        $view = $form->createView();
 
-        $this->assertEquals($expected, $data);
-    }
-
-    public function submitDataProvider()
-    {
-        return [
-            'default' => [
-                '1:30', // 1 min 30 sec
-                90,
-            ],
-            'BC datetime should pass trough' => [
-                '1h 30m',
-                5400,
-            ],
-            'invalid' => [
-                'test', 0
-            ]
-        ];
-    }
-
-    public function testSubmitInvalidData()
-    {
-        $form = $this->factory->create($this->type);
-        $form->submit('invalid');
-        $errors = $form->getErrors();
-
-        $this->assertCount(1, $errors);
-    }
-
-    public function testConfigureOptions()
-    {
-        $expectedOptions = [
-            'tooltip' => 'test',
-        ];
-
-        $form = $this->factory->create($this->type, null, $expectedOptions);
-
-        $options = $form->getConfig()->getOptions();
-        foreach ($expectedOptions as $name => $expectedValue) {
-            $this->assertArrayHasKey($name, $options);
-            $this->assertEquals($expectedValue, $options[$name]);
-        }
+        $this->assertEquals('text', $view->vars['type']);
     }
 }

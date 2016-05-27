@@ -11,12 +11,14 @@ Form components are form types, data transformers and event listeners.
 * **Form / Type / OroIconType** (name = oro_icon_select) - provide icon selector (based on genemu_jqueryselect2_hidden), supports autocomplete;
 * **Form / Type / EntityIdentifierType** (name = oro_entity_identifier) - converts string or array of entity IDs to existing entities of specified type.
 * **Form / Type / OroJquerySelect2HiddenType** (name = oro_jqueryselect2_hidden) - supports autocompletition ([more details](./autocomplete_form_type.md))
+* **Form / Type / OroDurationType** (name = oro_duration) - time duration field type, supports column style #:#:# and JIRA style #h #m #s time encodings
 
 ### Data Transformers
 
 * **Form / DataTransformer / ArrayToStringTransformer** - converts array to string and back;
 * **Form / DataTransformer / EntitiesToIdsTransformer** - converts entity IDs to entities and back.
 * **Form / DataTransformer / EntityToIdTransformer** - converts entity ID to entity and back.
+* **Form / DataTransformer / DurationToStringTransformer** - converts numeric duration (in seconds) to string and back.
 
 
 ### Event Subscribers
@@ -34,6 +36,7 @@ parameters:
     oro_form.type.datetime.class:          Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
     oro_form.type.entity_identifier.class: Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
     oro_form.type.jqueryselect2_hidden.class: Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType
+    oro_form.type.duration.class:          Oro\Bundle\FormBundle\Form\Type\OroDurationType
 
 services:
     oro_form.type.date:
@@ -59,4 +62,9 @@ services:
             - @oro_form.autocomplete.configuration
         tags:
             - { name: form.type, alias: oro_jqueryselect2_hidden }
+
+    oro_form.type.duration:
+        class: '%oro_form.type.duration.class%'
+        tags:
+            - { name: form.type, alias: oro_duration }
 ```

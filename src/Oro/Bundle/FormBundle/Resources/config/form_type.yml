@@ -2,6 +2,7 @@ parameters:
     oro_form.type.date.class:                                    Oro\Bundle\FormBundle\Form\Type\OroDateType
     oro_form.type.datetime.class:                                Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
     oro_form.type.time_interval.class:                           Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType
+    oro_form.type.duration.class:                                Oro\Bundle\FormBundle\Form\Type\OroDurationType
     oro_form.type.money.class:                                   Oro\Bundle\FormBundle\Form\Type\OroMoneyType
     oro_form.type.percent.class:                                 Oro\Bundle\FormBundle\Form\Type\OroPercentType
     oro_form.type.entity_identifier.class:                       Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
@@ -41,7 +42,6 @@ parameters:
 
     oro_form.validator.entity_class.class:                       Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator
     oro_form.validator.related_entity.class:                     Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator
-    oro_form.validator.duration.class:                           Oro\Bundle\FormBundle\Validator\Constraints\DurationValidator
 
 services:
     # Form types
@@ -59,6 +59,11 @@ services:
         class: %oro_form.type.time_interval.class%
         tags:
             - { name: form.type, alias: oro_time_interval }
+
+    oro_form.type.duration:
+        class: '%oro_form.type.duration.class%'
+        tags:
+            - { name: form.type, alias: oro_duration }
 
     oro_form.type.money:
         class: %oro_form.type.money.class%
