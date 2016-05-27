@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\WorkflowBundle\Model\Attribute;
 
 class TransitionsAttributeEvent extends Event
 {
