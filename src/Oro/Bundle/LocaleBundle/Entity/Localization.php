@@ -170,18 +170,6 @@ class Localization implements DatesAwareInterface
     }
 
     /**
-     * @param Collection|Localization[] $childLocalizations
-     *
-     * @return $this
-     */
-    public function setChildLocalizations($childLocalizations)
-    {
-        $this->childLocalizations = $childLocalizations;
-
-        return $this;
-    }
-
-    /**
      * @return Collection|Localization[]
      */
     public function getChildLocalizations()
@@ -195,7 +183,7 @@ class Localization implements DatesAwareInterface
      */
     public function addChildLocalization(Localization $localization)
     {
-        if (!$this->hasChildLocalization($localization)) {
+        if (!$this->childLocalizations->contains($localization)) {
             $this->childLocalizations->add($localization);
         }
 
@@ -208,20 +196,11 @@ class Localization implements DatesAwareInterface
      */
     public function removeChildLocalization(Localization $localization)
     {
-        if ($this->hasChildLocalization($localization)) {
+        if ($this->childLocalizations->contains($localization)) {
             $this->childLocalizations->removeElement($localization);
             $localization->setParentLocalization(null);
         }
 
         return $this;
-    }
-
-    /**
-     * @param Localization $localization
-     * @return boolean
-     */
-    public function hasChildLocalization(Localization $localization)
-    {
-        return $this->childLocalizations->contains($localization);
     }
 }
