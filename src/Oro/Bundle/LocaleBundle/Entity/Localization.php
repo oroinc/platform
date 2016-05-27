@@ -50,16 +50,16 @@ class Localization implements DatesAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="i18n_code", type="string", length=64, nullable=false)
+     * @ORM\Column(name="language_code", type="string", length=64, nullable=false)
      */
-    protected $i18nCode;
+    protected $languageCode;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="l10n_code", type="string", length=64, nullable=false)
+     * @ORM\Column(name="formatting_code", type="string", length=64, nullable=false)
      */
-    protected $l10nCode;
+    protected $formattingCode;
 
     /**
      * @var Localization
@@ -82,26 +82,6 @@ class Localization implements DatesAwareInterface
     }
 
     /**
-     * @param string $i18nCode
-     *
-     * @return $this
-     */
-    public function setI18nCode($i18nCode)
-    {
-        $this->i18nCode = $i18nCode;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getI18nCode()
-    {
-        return $this->i18nCode;
-    }
-
-    /**
      * @param int $id
      *
      * @return $this
@@ -121,14 +101,15 @@ class Localization implements DatesAwareInterface
         return $this->id;
     }
 
+
     /**
-     * @param string $l10nCode
+     * @param string $languageCode
      *
      * @return $this
      */
-    public function setL10nCode($l10nCode)
+    public function setLanguageCode($languageCode)
     {
-        $this->l10nCode = $l10nCode;
+        $this->languageCode = $languageCode;
 
         return $this;
     }
@@ -136,9 +117,29 @@ class Localization implements DatesAwareInterface
     /**
      * @return string
      */
-    public function getL10nCode()
+    public function getLanguageCode()
     {
-        return $this->l10nCode;
+        return $this->languageCode;
+    }
+
+    /**
+     * @param string $formattingCode
+     *
+     * @return $this
+     */
+    public function setFormattingCode($formattingCode)
+    {
+        $this->formattingCode = $formattingCode;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormattingCode()
+    {
+        return $this->formattingCode;
     }
 
     /**

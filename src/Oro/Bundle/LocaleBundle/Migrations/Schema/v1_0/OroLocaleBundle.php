@@ -32,8 +32,8 @@ class OroLocaleBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('parent_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 64]);
-        $table->addColumn('i18n_code', 'string', ['length' => 64]);
-        $table->addColumn('l10n_code', 'string', ['length' => 64]);
+        $table->addColumn('language_code', 'string', ['length' => 64]);
+        $table->addColumn('formatting_code', 'string', ['length' => 64]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);

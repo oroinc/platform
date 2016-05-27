@@ -15,8 +15,8 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyAccessors(new Localization(), [
             ['id', 1],
             ['name', 'test_name'],
-            ['i18nCode', 'i18n_test_code'],
-            ['l10nCode', 'l10n_test_code'],
+            ['languageCode', 'language_test_code'],
+            ['formattingCode', 'formatting_test_code'],
             ['parentLocalization', new Localization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],

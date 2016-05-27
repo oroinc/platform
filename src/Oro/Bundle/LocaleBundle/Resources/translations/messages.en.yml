@@ -2,12 +2,12 @@ oro.locale:
     localeset:
         entity_label: 'Localization'
         entity_plural_label: 'Localizations'
-        entity_description: 'Holds i18n_code, l10n_code and parent localization'
+        entity_description: 'Holds language code, formatting code and parent localization'
 
         id.label: 'Id'
         name.label: 'Name'
-        i18n_code.label: 'Language'
-        l10n_code.label: 'Format'
+        language_code.label: 'Language'
+        formatting_code.label: 'Formatting'
         child_localizations.label: 'Child localizations'
         parent_localization.label: 'Parent localization'
 
