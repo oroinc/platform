@@ -117,16 +117,21 @@ class LayoutExtension extends \Twig_Extension
     public function mergeAttributes(array $attr, array $defaultAttr)
     {
         foreach ($defaultAttr as $key => $value) {
-            if ($key[0] === '~') {
+            if (strpos($key, '~') === 0) {
                 $key = substr($key, 1);
                 if (array_key_exists($key, $attr)) {
-                    $attr[$key] .= $value;
+                    if (is_array($value)) {
+                        $attr = array_merge_recursive($attr, $value);
+                    } else {
+                        $attr[$key] .= $value;
+                    }
                 }
             }
             if (!array_key_exists($key, $attr)) {
                 $attr[$key] = $value;
             }
         }
+
         return $attr;
     }
 

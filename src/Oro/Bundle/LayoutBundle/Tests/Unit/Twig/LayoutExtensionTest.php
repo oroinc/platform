@@ -157,6 +157,23 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
                     'name' => 'test',
                 ],
             ],
+            'attributes with array' => [
+                'attr'  => [
+                    'id' => 'someId',
+                    'name' => 'test',
+                    'class' => 'test'
+                ],
+                'defaultAttr'   => [
+                    'autofocus' => true,
+                    '~class' => ['class' =>' input input_block']
+                ],
+                'expected'  => [
+                    'autofocus' => true,
+                    'class' => ['test', ' input input_block'],
+                    'id' => 'someId',
+                    'name' => 'test',
+                ],
+            ],
             'attributes without tilde' => [
                 'attr'  => [
                     'id' => 'someId',
