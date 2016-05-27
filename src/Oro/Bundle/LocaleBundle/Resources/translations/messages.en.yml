@@ -1,4 +1,10 @@
 oro.locale:
+    menu:
+        localization:
+            label: Localization
+        locales:
+            label: Locales
+
     localeset:
         entity_label: 'Locale Set'
         entity_plural_label: 'Locale Sets'
@@ -38,15 +44,6 @@ oro.locale:
             department: "department"
             district: "district"
             province: "province"
-
-    menu:
-        localization:
-            label: Localization
-        locales:
-            label: Locales
-
-    navigation:
-        view: 'Locale #%id%'
 
     system_configuration:
         groups:
