@@ -1,5 +1,5 @@
 oro.locale:
-    locale_set:
+    localeset:
             entity_label: 'Locale Set'
             entity_plural_label: 'Locale Sets'
             entity_description: 'Represents container that holds i18n_code, l10n_code & parent set'
