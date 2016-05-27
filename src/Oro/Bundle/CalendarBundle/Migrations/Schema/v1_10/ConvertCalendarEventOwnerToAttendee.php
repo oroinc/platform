@@ -39,22 +39,34 @@ class ConvertCalendarEventOwnerToAttendee extends ParametrizedMigrationQuery
      */
     protected function createAttendees(LoggerInterface $logger)
     {
+        $data = [
+            'user_id' => 'c.user_owner_id',
+            'calendar_event_id' => 'ce.id',
+            'status_id' => 'NULL',
+            'origin_id' => 'NULL',
+            'type_id' => 'NULL',
+            'email' => 'u.email',
+            'display_name' => 'CONCAT(u.first_name, \' \', u.last_name)',
+            'created_at' => 'NOW()',
+            'updated_at' => 'NOW()',
+        ];
+
+        if (in_array(
+            'serialized_data',
+            array_keys($this->connection->getSchemaManager()->listTableColumns('oro_calendar_event_attendee'))
+        )
+        ) {
+            $data['serialized_data'] = '\'Tjs=\'';
+        }
+
+        $columns = implode(',', array_keys($data));
+        $values = implode(',', $data);
+
         $sql = <<<EOD
 INSERT INTO oro_calendar_event_attendee
-(user_id, calendar_event_id, status_id, origin_id, type_id, email, display_name, created_at, updated_at,
-    serialized_data)
-
+    ($columns)
 SELECT
-    c.user_owner_id,
-    ce.id,
-    NULL,
-    NULL,
-    NULL,
-    u.email,
-    CONCAT(u.first_name, ' ', u.last_name),
-    NOW(),
-    NOW(),
-    'Tjs='
+    $values
 FROM oro_calendar_event AS ce
     LEFT JOIN oro_calendar c ON ce.calendar_id = c.id
     LEFT JOIN oro_user u ON c.user_owner_id = u.id;
