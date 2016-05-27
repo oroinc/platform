@@ -42,7 +42,7 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function setEntity($entity)
     {
-        if ($entity instanceof CalendarEvent && $entity instanceof Attendee) {
+        if (!$entity instanceof CalendarEvent && !$entity instanceof Attendee) {
             throw new \InvalidArgumentException(sprintf(
                 '$entity needs to be one of: %s, %s but %s given',
                 'Oro\Bundle\CalendarBundle\Entity\Attendee',
