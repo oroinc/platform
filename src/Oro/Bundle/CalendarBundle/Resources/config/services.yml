@@ -19,6 +19,7 @@ parameters:
     oro_calendar.calendar_event_manager.class:                   Oro\Bundle\CalendarBundle\Manager\CalendarEventManager
     oro_calendar.calendar_manager.class:                         Oro\Bundle\CalendarBundle\Manager\CalendarManager
     oro_calendar.attendee_manager.class:                         Oro\Bundle\CalendarBundle\Manager\AttendeeManager
+    oro_calendar.attendee_relation_manager.class:                Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager
     oro_calendar.calendar_property_provider.class:               Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider
     oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
     oro_calendar.calendar_provider.system.class:                 Oro\Bundle\CalendarBundle\Provider\SystemCalendarProvider
@@ -163,6 +164,13 @@ services:
         class: %oro_calendar.attendee_manager.class%
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_calendar.attendee_relation_manager'
+
+    oro_calendar.attendee_relation_manager:
+        class: %oro_calendar.attendee_relation_manager.class%
+        arguments:
+            - '@doctrine'
+            - '@oro_locale.formatter.name'
 
     oro_calendar.calendar_property_provider:
         class: %oro_calendar.calendar_property_provider.class%
@@ -307,8 +315,18 @@ services:
             - { name: oro_workflow.action, alias: create_calendar_event }
 
     oro_calendar.autocomplete.attendee_search_handler:
-        parent: oro_activity.form.handler.autocomplete
         class: Oro\Bundle\CalendarBundle\Autocomplete\AttendeeSearchHandler
+        arguments:
+            - @security.token_storage
+            - @translator
+            - @oro_search.index
+            - @oro_activity.manager
+            - @oro_entity_config.config_manager
+            - @oro_entity.entity_class_name_helper
+            - @doctrine.orm.entity_manager
+            - @oro_search.mapper
+            - @event_dispatcher
+            - @oro_calendar.attendee_relation_manager
 
     # Recurrence Strategies
     oro_calendar.recurrence.strategy.abstract:

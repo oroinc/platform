@@ -2,46 +2,124 @@
 
 namespace Oro\Bundle\CalendarBundle\Autocomplete;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class AttendeeSearchHandler extends ContextSearchHandler
 {
+    /** @var AttendeeRelationManager */
+    protected $attendeeRelationManager;
+
+    /**
+     * @param TokenStorageInterface $token
+     * @param TranslatorInterface $translator
+     * @param Indexer $indexer
+     * @param ActivityManager $activityManager
+     * @param ConfigManager $configManager
+     * @param EntityClassNameHelper $entityClassNameHelper
+     * @param ObjectManager $objectManager
+     * @param ObjectMapper $mapper
+     * @param EventDispatcherInterface $dispatcher
+     * @param AttendeeRelationManager $attendeeRelationManager
+     * @param type $class
+     */
+    public function __construct(
+        TokenStorageInterface $token,
+        TranslatorInterface $translator,
+        Indexer $indexer,
+        ActivityManager $activityManager,
+        ConfigManager $configManager,
+        EntityClassNameHelper $entityClassNameHelper,
+        ObjectManager $objectManager,
+        ObjectMapper $mapper,
+        EventDispatcherInterface $dispatcher,
+        AttendeeRelationManager $attendeeRelationManager,
+        $class = null
+    ) {
+        parent::__construct(
+            $token,
+            $translator,
+            $indexer,
+            $activityManager,
+            $configManager,
+            $entityClassNameHelper,
+            $objectManager,
+            $mapper,
+            $dispatcher,
+            $class
+        );
+        $this->attendeeRelationManager = $attendeeRelationManager;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function convertItems(array $items)
     {
-        $recordIds = array_map(
-            function (Item $item) {
-                return $item->getRecordId();
-            },
-            $items
-        );
+        $groupped = $this->groupIdsByEntityName($items);
 
-        /** @var User[] $users */
-        $users = !$recordIds
-            ? []
-            : $this->objectManager
-                ->getRepository('Oro\Bundle\UserBundle\Entity\User')
-                ->findById($recordIds);
+        $objects = [];
+        foreach ($groupped as $entityName => $ids) {
+            $objects = array_merge(
+                $objects,
+                $this->objectManager
+                    ->getRepository($entityName)
+                    ->findById($ids)
+            );
+        }
 
         $result = [];
-        foreach ($users as $user) {
+        foreach ($objects as $object) {
+            $attendee = $this->attendeeRelationManager->createAttendee($object);
+            if (!$attendee) {
+                throw new \LogicException(
+                    'Attendee cound\'t be created for "%s" entity',
+                    ClassUtils::getClass($object)
+                );
+            }
+
             $result[] = [
                 'id'   => json_encode(
                     [
-                        'entityClass' => 'Oro\Bundle\UserBundle\Entity\User',
-                        'entityId'    => $user->getId(),
+                        'entityClass' => ClassUtils::getClass($object),
+                        'entityId'    => $object->getId(),
                     ]
                 ),
-                'text' => $user->getFullName(),
-                'displayName' => $user->getFullName(),
-                'email' => $user->getEmail(),
+                'text' => $attendee->getDisplayName(),
+                'displayName' => $attendee->getDisplayName(),
+                'email' => $attendee->getEmail(),
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * @param Item[] $items
+     *
+     * @return array
+     */
+    protected function groupIdsByEntityName(array $items)
+    {
+        $groupped = [];
+        foreach ($items as $item) {
+            $groupped[$item->getEntityName()][] = $item->getRecordId();
+        }
+
+        return $groupped;
     }
 
     /**
