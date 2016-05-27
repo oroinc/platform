@@ -35,7 +35,6 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
 
         $this->addEnums($schema);
         $this->addForeignKeys($schema);
-        $this->updateCalendarEventsTable($schema);
         $this->updateCalendarEvent($schema);
 
         $queries->addQuery(new ConvertCalendarEventOwnerToAttendee());

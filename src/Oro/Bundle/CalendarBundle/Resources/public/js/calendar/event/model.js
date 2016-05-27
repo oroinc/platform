@@ -93,7 +93,7 @@ define([
                 ),
                 attrs || {}
             );
-            
+
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);
 
