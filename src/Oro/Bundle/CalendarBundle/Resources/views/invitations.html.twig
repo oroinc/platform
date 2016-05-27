@@ -19,10 +19,8 @@
         <li class="list-group-item">
             <i {% if invitationClass %}class="{{ invitationClass }}" title="{{ attendee.status.name }}"{% endif %}></i>
             <span class="list-group-item-text">
-                {% if attendee.user %}
-                    {% set avatar = attendee.user.avatar %}
-                    <img src="{{ avatar ? filtered_image_url(avatar, 'avatar_xsmall') : asset('bundles/oroui/img/avatar-xsmall.png') }}" />
-                {% endif %}
+                {% set avatar = attendee.user ? attendee.user.avatar %}
+                <img src="{{ avatar ? filtered_image_url(avatar, 'avatar_xsmall') : asset('bundles/oroui/img/avatar-xsmall.png') }}" />
                 {% if (resource_granted('oro_user_user_view') and attendee.user) %}
                     {{ UI.link({
                         'label' : attendee.displayName,
