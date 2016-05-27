@@ -15,6 +15,7 @@ use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 class LoadCalendarEventData extends AbstractFixture implements DependentFixtureInterface
 {
     const CALENDAR_EVENT_TITLE = 'Regular event not in start:end range';
+    const CALENDAR_EVENT_WITH_ATTENDEE = 'Event with attendee';
 
     /**
      * {@inheritdoc}
@@ -41,15 +42,8 @@ class LoadCalendarEventData extends AbstractFixture implements DependentFixtureI
         $data = Yaml::parse(file_get_contents($fileName));
 
         foreach ($data as $item) {
-            $start    = new \DateTime(gmdate(DATE_RFC3339, strtotime($item['start'])));
-            $event    = new CalendarEvent();
-            $attendee = new Attendee();
-            $userName = 'user'.mt_rand(0, 100);
-            $attendee->setEmail($userName.'@example.com');
-            $attendee->setDisplayName($userName);
-            $attendee->setUser($this->getReference('simple_user'));
-            $event->setRelatedAttendee($attendee);
-
+            $start = new \DateTime(gmdate(DATE_RFC3339, strtotime($item['start'])));
+            $event = new CalendarEvent();
             $event->setCalendar($calendar)
                 ->setTitle($item['title'])
                 ->setStart($start)
@@ -90,6 +84,22 @@ class LoadCalendarEventData extends AbstractFixture implements DependentFixtureI
                 $this->setReference($item['reference'], $event);
             }
         }
+
+        $event    = new CalendarEvent();
+        $attendee = new Attendee();
+        $userName = 'user'.mt_rand(0, 100);
+        $attendee->setEmail($userName.'@example.com');
+        $attendee->setDisplayName($userName);
+        $attendee->setUser($this->getReference('simple_user'));
+        $event->setCalendar($calendar)
+            ->setTitle(self::CALENDAR_EVENT_WITH_ATTENDEE)
+            ->setStart(new \DateTime(gmdate(DATE_RFC3339, strtotime('+1 year'))))
+            ->setEnd(
+                new \DateTime(gmdate(DATE_RFC3339, strtotime('+1 year')))
+            )
+            ->setAllDay($item['allDay']);
+        $event->setRelatedAttendee($attendee);
+        $manager->persist($event);
 
         $manager->flush();
     }

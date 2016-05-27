@@ -18,7 +18,7 @@ class AjaxCalendarEventControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures\LoadCalendarEventData']);
-        $this->calendarEvent = $this->getCalendarEventByTitle(LoadCalendarEventData::CALENDAR_EVENT_TITLE);
+        $this->calendarEvent = $this->getCalendarEventByTitle(LoadCalendarEventData::CALENDAR_EVENT_WITH_ATTENDEE);
     }
 
     public function testChangeInvitationStatus()
@@ -41,7 +41,7 @@ class AjaxCalendarEventControllerTest extends WebTestCase
             $response = $this->client->getResponse();
             $data = json_decode($response->getContent(), true);
             $this->assertTrue($data['successful']);
-            $calendarEvent = $this->getCalendarEventByTitle(LoadCalendarEventData::CALENDAR_EVENT_TITLE);
+            $calendarEvent = $this->getCalendarEventByTitle(LoadCalendarEventData::CALENDAR_EVENT_WITH_ATTENDEE);
             $this->assertNotNull($calendarEvent->getRelatedAttendee());
             $this->assertNotNull($calendarEvent->getRelatedAttendee()->getStatus());
             $this->assertEquals($status, $calendarEvent->getRelatedAttendee()->getStatus()->getId());
