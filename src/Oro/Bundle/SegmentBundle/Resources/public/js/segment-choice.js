@@ -113,7 +113,7 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
         },
 
         setSelectedData: function(data) {
-            this.element.inputWidget('valData', data);
+            this.element.inputWidget('data', data);
         }
     });
 

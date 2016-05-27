@@ -50,7 +50,7 @@ function($, _, SegmentFilter) {
             var segmentId = fieldId.split('_')[1];
             var filterId = this._getSegmentFilterId();
 
-            var data = this.element.find('input.select').inputWidget('valData');
+            var data = this.element.find('input.select').inputWidget('data');
             if (_.has(data, 'id')) {
                 data.value = segmentId;
                 // pre-set data

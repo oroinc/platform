@@ -80,11 +80,11 @@ define(function(require) {
         reset: function() {
             DictionaryFilter.__super__.reset.apply(this, arguments);
             var select2element = this.$el.find(this.elementSelector);
-            var data = select2element.inputWidget('valData');
+            var data = select2element.inputWidget('data');
             if (data.length) {
                 this.previousData = data;
             }
-            select2element.inputWidget('valData',  null);
+            select2element.inputWidget('data',  null);
         },
 
         /**
@@ -174,7 +174,7 @@ define(function(require) {
                     self.applyValue();
                 });
             }
-            select2element.inputWidget('valData',  values);
+            select2element.inputWidget('data',  values);
 
             this._criteriaRenderd = true;
         },
@@ -341,7 +341,7 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var data = this.$(this.elementSelector).inputWidget('valData');
+            var data = this.$(this.elementSelector).inputWidget('data');
             if (!data.length) {
                 data = this.previousData.length ? this.previousData : this.initialData;
             }

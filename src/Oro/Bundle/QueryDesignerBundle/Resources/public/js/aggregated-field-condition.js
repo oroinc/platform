@@ -63,7 +63,7 @@ define([
             fieldChoice._select2Data = _.bind(this._getAggregatedSelectData, this);
 
             fieldChoice.setData = function(data) {
-                this.element.inputWidget('valData', data, true);
+                this.element.inputWidget('data', data, true);
             };
 
             var self = this;
@@ -135,7 +135,7 @@ define([
         },
 
         _getColumnLabel: function() {
-            var obj = this.element.find('input.select').inputWidget('valData');
+            var obj = this.element.find('input.select').inputWidget('data');
 
             return obj ? obj.text : undefined;
         },

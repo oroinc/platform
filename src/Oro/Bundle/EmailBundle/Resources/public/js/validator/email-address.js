@@ -29,7 +29,7 @@ define(function(require) {
 
             var values = null;
             if ($el.data('select2')) {
-                var data = $el.inputWidget('valData');
+                var data = $el.inputWidget('data');
                 var arrayData = _.isArray(data) ? data : [data];
                 values = _.map(arrayData, _.partial(_.result, _, 'text'));
             } else {
