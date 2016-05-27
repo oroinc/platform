@@ -133,6 +133,193 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $producer->sendTo('topic', new \stdClass());
     }
 
+    public function testSendShouldThrowExceptionIfTopicNamePropertyIsNotSet()
+    {
+        $this->setExpectedException(
+            \LogicException::class,
+            'Parameter "oro.message_queue.zero_config.topic_name" is required.'
+        );
+
+        $queue = new NullQueue('');
+        
+        $message = new NullMessage();
+
+        $producer = new MessageProducer($this->createTransportMessageProducer(), $this->createSessionStub());
+        $producer->send($queue, $message);
+    }
+
+    public function testSendShouldThrowExceptionIfProcessorNamePropertyIsNotSet()
+    {
+        $this->setExpectedException(
+            \LogicException::class,
+            'Parameter "oro.message_queue.zero_config.processor_name" is required.'
+        );
+
+        $queue = new NullQueue('');
+
+        $message = new NullMessage();
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => 'topic'
+        ]);
+
+        $producer = new MessageProducer($this->createTransportMessageProducer(), $this->createSessionStub());
+        $producer->send($queue, $message);
+    }
+
+    public function testSendShouldForceScalarsToStringAndSetTextContentType()
+    {
+        $queue = new NullQueue('');
+
+        $message = new NullMessage();
+        $message->setBody(12345);
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => 'topic',
+            Config::PARAMETER_PROCESSOR_NAME => 'processor',
+        ]);
+
+        $messageProcessor = $this->createTransportMessageProducer();
+        $messageProcessor
+            ->expects($this->once())
+            ->method('send')
+            ->with($this->identicalTo($queue, $this->identicalTo($message)))
+        ;
+
+        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer->send($queue, $message);
+
+        $this->assertEquals(['content_type' => 'text/plain'], $message->getHeaders());
+        $this->assertInternalType('string', $message->getBody());
+        $this->assertEquals('12345', $message->getBody());
+    }
+
+    public function testSendShouldForceNullToStringAndSetTextContentType()
+    {
+        $queue = new NullQueue('');
+
+        $message = new NullMessage();
+        $message->setBody(null);
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => 'topic',
+            Config::PARAMETER_PROCESSOR_NAME => 'processor',
+        ]);
+
+        $messageProcessor = $this->createTransportMessageProducer();
+        $messageProcessor
+            ->expects($this->once())
+            ->method('send')
+            ->with($this->identicalTo($queue, $this->identicalTo($message)))
+        ;
+
+        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer->send($queue, $message);
+
+        $this->assertEquals(['content_type' => 'text/plain'], $message->getHeaders());
+        $this->assertInternalType('string', $message->getBody());
+        $this->assertEquals('', $message->getBody());
+    }
+
+    public function testSendShouldAllowAnyContentTypeIfBodyIsScalar()
+    {
+        $queue = new NullQueue('');
+
+        $message = new NullMessage();
+        $message->setBody('string');
+        $message->setHeaders([
+            'content_type' => 'my/content/type',
+        ]);
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => 'topic',
+            Config::PARAMETER_PROCESSOR_NAME => 'processor',
+        ]);
+
+        $messageProcessor = $this->createTransportMessageProducer();
+        $messageProcessor
+            ->expects($this->once())
+            ->method('send')
+            ->with($this->identicalTo($queue, $this->identicalTo($message)))
+        ;
+
+        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer->send($queue, $message);
+
+        $this->assertEquals(['content_type' => 'my/content/type'], $message->getHeaders());
+        $this->assertInternalType('string', $message->getBody());
+        $this->assertEquals('string', $message->getBody());
+    }
+
+    public function testSendShouldThrowExceptionIfBodyIsArrayButContentTypeIsNotJson()
+    {
+        $this->setExpectedException(
+            \LogicException::class,
+            'Content type "application/json" only allowed when body is array'
+        );
+
+        $queue = new NullQueue('');
+
+        $message = new NullMessage();
+        $message->setBody([]);
+        $message->setHeaders([
+            'content_type' => 'invalid/content/type',
+        ]);
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => 'topic',
+            Config::PARAMETER_PROCESSOR_NAME => 'processor',
+        ]);
+
+        $messageProcessor = $this->createTransportMessageProducer();
+
+        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer->send($queue, $message);
+    }
+
+    public function testSendShouldJsonEncodeBodyIfBodyIsArrayAndSetContentTypeJson()
+    {
+        $queue = new NullQueue('');
+
+        $message = new NullMessage();
+        $message->setBody(['key' => 'value']);
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => 'topic',
+            Config::PARAMETER_PROCESSOR_NAME => 'processor',
+        ]);
+
+        $messageProcessor = $this->createTransportMessageProducer();
+        $messageProcessor
+            ->expects($this->once())
+            ->method('send')
+            ->with($this->identicalTo($queue, $this->identicalTo($message)))
+        ;
+
+        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer->send($queue, $message);
+
+        $this->assertEquals(['content_type' => 'application/json'], $message->getHeaders());
+        $this->assertInternalType('string', $message->getBody());
+        $this->assertEquals('{"key":"value"}', $message->getBody());
+    }
+
+    public function testSendShouldThrowExceptionIfBodyIsObject()
+    {
+        $this->setExpectedException(
+            \LogicException::class,
+            'The message\'s body must be either null, scalar or array. Got: stdClass'
+        );
+
+        $queue = new NullQueue('');
+
+        $message = new NullMessage();
+        $message->setBody(new \stdClass());
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => 'topic',
+            Config::PARAMETER_PROCESSOR_NAME => 'processor',
+        ]);
+
+        $messageProcessor = $this->createTransportMessageProducer();
+
+        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer->send($queue, $message);
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Session
      */

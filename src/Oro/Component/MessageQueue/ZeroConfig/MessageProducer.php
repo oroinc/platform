@@ -69,6 +69,10 @@ class MessageProducer implements TransportMessageProducer
             $headers['content_type'] = empty($headers['content_type']) ? 'text/plain' : $headers['content_type'];
             $body = (string) $body;
         } elseif (is_array($body)) {
+            if (isset($headers['content_type']) && $headers['content_type'] !== 'application/json') {
+                throw new \LogicException(sprintf('Content type "application/json" only allowed when body is array'));
+            }
+
             $headers['content_type'] = 'application/json';
             $body = json_encode($body);
         } else {
