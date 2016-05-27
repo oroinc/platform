@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -10,6 +13,28 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class EnumSelectType extends AbstractEnumType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        parent::buildView($view, $form, $options);
+
+        $disabledChoices = $options['disabled_choices'];
+
+        if (!empty($disabledChoices)) {
+            $choices         = $view->vars['choices'];
+            array_walk(
+                $choices,
+                function (ChoiceView $choiceView) use ($disabledChoices) {
+                    if (in_array($choiceView->value, $disabledChoices)) {
+                        $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
+                    }
+                }
+            );
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -26,7 +51,8 @@ class EnumSelectType extends AbstractEnumType
             [
                 'empty_value' => null,
                 'empty_data'  => null,
-                'configs'     => $defaultConfigs
+                'configs'     => $defaultConfigs,
+                'disabled_choices' => []
             ]
         );
 
