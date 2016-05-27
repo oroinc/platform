@@ -212,7 +212,6 @@ class Localization implements DatesAwareInterface
         }
 
         return $this;
-
     }
 
     /**
