@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\AbstractExclusionProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -13,7 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  * The implementation of ExclusionProviderInterface that can be used to ignore
  * "snapshot" field of multi-enum type.
  */
-class EnumExclusionProvider implements ExclusionProviderInterface
+class EnumExclusionProvider extends AbstractExclusionProvider
 {
     /** @var ConfigManager */
     protected $configManager;
@@ -33,14 +33,6 @@ class EnumExclusionProvider implements ExclusionProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function isIgnoredEntity($className)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         // check for "snapshot" field of multi-enum type
@@ -51,14 +43,6 @@ class EnumExclusionProvider implements ExclusionProviderInterface
             }
         }
 
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
-    {
         return false;
     }
 

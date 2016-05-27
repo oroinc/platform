@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
-use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -27,7 +27,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class Context extends ApiContext
+class Context extends ApiContext implements ContextInterface
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
@@ -87,199 +87,28 @@ class Context extends ApiContext
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
         parent::__construct();
-        $this->configProvider   = $configProvider;
+        $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }
 
     /**
-     * Checks whether a configuration of filters for an entity exists.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function hasConfigOfFilters()
+    public function getClassName()
     {
-        return $this->hasConfigOf(FiltersConfigExtra::NAME);
+        return $this->get(self::CLASS_NAME);
     }
 
     /**
-     * Gets a configuration of filters for an entity.
-     *
-     * @return FiltersConfig|null
+     * {@inheritdoc}
      */
-    public function getConfigOfFilters()
+    public function setClassName($className)
     {
-        return $this->getConfigOf(FiltersConfigExtra::NAME);
+        $this->set(self::CLASS_NAME, $className);
     }
 
     /**
-     * Sets a configuration of filters for an entity.
-     *
-     * @param FiltersConfig|null $config
-     */
-    public function setConfigOfFilters(FiltersConfig $config = null)
-    {
-        $this->setConfigOf(FiltersConfigExtra::NAME, $config);
-    }
-
-    /**
-     * Checks whether a configuration of sorters for an entity exists.
-     *
-     * @return bool
-     */
-    public function hasConfigOfSorters()
-    {
-        return $this->hasConfigOf(SortersConfigExtra::NAME);
-    }
-
-    /**
-     * Gets a configuration of sorters for an entity.
-     *
-     * @return SortersConfig|null
-     */
-    public function getConfigOfSorters()
-    {
-        return $this->getConfigOf(SortersConfigExtra::NAME);
-    }
-
-    /**
-     * Sets a configuration of sorters for an entity.
-     *
-     * @param SortersConfig|null $config
-     */
-    public function setConfigOfSorters(SortersConfig $config = null)
-    {
-        $this->setConfigOf(SortersConfigExtra::NAME, $config);
-    }
-
-    /**
-     * Gets a list of filters is used to add additional restrictions to a query is used to get result data.
-     *
-     * @return FilterCollection
-     */
-    public function getFilters()
-    {
-        if (!$this->has(self::FILTERS)) {
-            $this->set(self::FILTERS, new FilterCollection());
-        }
-
-        return $this->get(self::FILTERS);
-    }
-
-    /**
-     * Gets a collection of the FilterValue objects that contains all incoming filters.
-     *
-     * @return FilterValueAccessorInterface
-     */
-    public function getFilterValues()
-    {
-        if (null === $this->filterValues) {
-            $this->filterValues = new NullFilterValueAccessor();
-        }
-
-        return $this->filterValues;
-    }
-
-    /**
-     * Sets an object that will be used to accessing incoming filters.
-     *
-     * @param FilterValueAccessorInterface $accessor
-     */
-    public function setFilterValues(FilterValueAccessorInterface $accessor)
-    {
-        $this->filterValues = $accessor;
-    }
-
-    /**
-     * Gets a key of a main section of an entity configuration.
-     *
-     * @return string
-     */
-    protected function getConfigKey()
-    {
-        return self::CONFIG_PREFIX . ConfigUtil::DEFINITION;
-    }
-
-    /**
-     * Loads an entity configuration.
-     */
-    protected function loadConfig()
-    {
-        $entityClass = $this->getClassName();
-        if (empty($entityClass)) {
-            throw new \RuntimeException(
-                'A class name must be set in the context before a configuration is loaded.'
-            );
-        }
-
-        // load config by a config provider
-        $config = $this->configProvider->getConfig(
-            $entityClass,
-            $this->getVersion(),
-            $this->getRequestType(),
-            $this->getConfigExtras()
-        );
-
-        // add loaded config sections to the context
-        if (!$config->isEmpty()) {
-            foreach ($config as $key => $value) {
-                $this->set(self::CONFIG_PREFIX . $key, $value);
-            }
-        }
-
-        // make sure that all config sections, including a main section, are added to the context
-        // even if a section was not returned by the config provider
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
-            $this->set($key, null);
-        }
-        $this->ensureAllConfigSectionsSet();
-    }
-
-    /**
-     * Makes sure that all config sections are added to the context.
-     */
-    protected function ensureAllConfigSectionsSet()
-    {
-        $configExtras = $this->getConfigExtras();
-        foreach ($configExtras as $configExtra) {
-            if ($configExtra instanceof ConfigExtraSectionInterface) {
-                $key = self::CONFIG_PREFIX . $configExtra->getName();
-                if (!$this->has($key)) {
-                    $this->set($key, null);
-                }
-            }
-        }
-    }
-
-    /**
-     * Loads an entity metadata.
-     */
-    protected function loadMetadata()
-    {
-        $entityClass = $this->getClassName();
-        if (empty($entityClass)) {
-            throw new \RuntimeException(
-                'A class name must be set in the context before metadata are loaded.'
-            );
-        }
-
-        // load metadata by a metadata provider
-        $metadata = $this->metadataProvider->getMetadata(
-            $entityClass,
-            $this->getVersion(),
-            $this->getRequestType(),
-            $this->getMetadataExtras(),
-            $this->getConfig()
-        );
-
-        // add loaded metadata to the context
-        $this->set(self::METADATA, $metadata);
-    }
-
-    /**
-     * Gets request headers.
-     *
-     * @return ParameterBagInterface
+     * {@inheritdoc}
      */
     public function getRequestHeaders()
     {
@@ -291,9 +120,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets an object that will be used to accessing request headers.
-     *
-     * @param ParameterBagInterface $parameterBag
+     * {@inheritdoc}
      */
     public function setRequestHeaders(ParameterBagInterface $parameterBag)
     {
@@ -301,9 +128,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets response headers.
-     *
-     * @return ParameterBagInterface
+     * {@inheritdoc}
      */
     public function getResponseHeaders()
     {
@@ -315,9 +140,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets an object that will be used to accessing response headers.
-     *
-     * @param ParameterBagInterface $parameterBag
+     * {@inheritdoc}
      */
     public function setResponseHeaders(ParameterBagInterface $parameterBag)
     {
@@ -325,9 +148,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets the response status code.
-     *
-     * @return int|null
+     * {@inheritdoc}
      */
     public function getResponseStatusCode()
     {
@@ -335,9 +156,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets the response status code.
-     *
-     * @param $statusCode
+     * {@inheritdoc}
      */
     public function setResponseStatusCode($statusCode)
     {
@@ -345,130 +164,120 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets FQCN of an entity.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getClassName()
+    public function getFilters()
     {
-        return $this->get(self::CLASS_NAME);
-    }
-
-    /**
-     * Sets FQCN of an entity.
-     *
-     * @param string $className
-     */
-    public function setClassName($className)
-    {
-        $this->set(self::CLASS_NAME, $className);
-    }
-
-    /**
-     * Checks whether a configuration of an entity exists.
-     *
-     * @return bool
-     */
-    public function hasConfig()
-    {
-        return $this->has($this->getConfigKey());
-    }
-
-    /**
-     * Gets a configuration of an entity.
-     *
-     * @return EntityDefinitionConfig|null
-     */
-    public function getConfig()
-    {
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
-            $this->loadConfig();
+        if (!$this->has(self::FILTERS)) {
+            $this->set(self::FILTERS, new FilterCollection());
         }
 
-        return $this->get($key);
+        return $this->get(self::FILTERS);
     }
 
     /**
-     * Sets a configuration of an entity.
-     *
-     * @param EntityDefinitionConfig|null $definition
+     * {@inheritdoc}
      */
-    public function setConfig(EntityDefinitionConfig $definition = null)
+    public function getFilterValues()
     {
-        $this->set($this->getConfigKey(), $definition);
-
-        // make sure that all config sections are added to the context
-        $this->ensureAllConfigSectionsSet();
-    }
-
-    /**
-     * Checks whether a configuration of the given section exists.
-     *
-     * @param string $configSection
-     *
-     * @return bool
-     *
-     * @throws \InvalidArgumentException if undefined configuration section is specified
-     */
-    public function hasConfigOf($configSection)
-    {
-        $this->assertConfigSection($configSection);
-
-        return $this->has(self::CONFIG_PREFIX . $configSection);
-    }
-
-    /**
-     * Gets a configuration from the given section.
-     *
-     * @param string $configSection
-     *
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException if undefined configuration section is specified
-     */
-    public function getConfigOf($configSection)
-    {
-        $this->assertConfigSection($configSection);
-
-        $key = self::CONFIG_PREFIX . $configSection;
-        if (!$this->has($key)) {
-            if (!$this->has($this->getConfigKey())) {
-                $this->loadConfig();
-            } else {
-                $this->setConfigOf($configSection, null);
-            }
+        if (null === $this->filterValues) {
+            $this->filterValues = new NullFilterValueAccessor();
         }
 
-        return $this->get($key);
+        return $this->filterValues;
     }
 
     /**
-     * Sets a configuration for the given section.
-     *
-     * @param string $configSection
-     * @param mixed  $config
-     *
-     * @throws \InvalidArgumentException if undefined configuration section is specified
+     * {@inheritdoc}
      */
-    public function setConfigOf($configSection, $config)
+    public function setFilterValues(FilterValueAccessorInterface $accessor)
     {
-        $this->assertConfigSection($configSection);
-
-        $this->set(self::CONFIG_PREFIX . $configSection, $config);
-
-        // make sure that all config sections, including a main section, are added to the context
-        $key = $this->getConfigKey();
-        if (!$this->has($key)) {
-            $this->set($key, null);
-        }
-        $this->ensureAllConfigSectionsSet();
+        $this->filterValues = $accessor;
     }
 
     /**
-     * Gets a list of requests for configuration data.
-     *
-     * @return ConfigExtraInterface[]
+     * {@inheritdoc}
+     */
+    public function hasQuery()
+    {
+        return $this->has(self::QUERY);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQuery()
+    {
+        return $this->get(self::QUERY);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setQuery($query)
+    {
+        if ($query) {
+            $this->set(self::QUERY, $query);
+        } else {
+            $this->remove(self::QUERY);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCriteria()
+    {
+        return $this->get(self::CRITERIA);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCriteria($criteria)
+    {
+        $this->set(self::CRITERIA, $criteria);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasErrors()
+    {
+        return !empty($this->errors);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getErrors()
+    {
+        return null !== $this->errors
+            ? $this->errors
+            : [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addError(Error $error)
+    {
+        if (null === $this->errors) {
+            $this->errors = [];
+        }
+        $this->errors[] = $error;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resetErrors()
+    {
+        $this->errors = null;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getConfigExtras()
     {
@@ -480,11 +289,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a list of requests for configuration data.
-     *
-     * @param ConfigExtraInterface[] $extras
-     *
-     * @throws \InvalidArgumentException if $extras has invalid elements
+     * {@inheritdoc}
      */
     public function setConfigExtras(array $extras)
     {
@@ -504,11 +309,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether some configuration data is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasConfigExtra($extraName)
     {
@@ -523,11 +324,22 @@ class Context extends ApiContext
     }
 
     /**
-     * Adds a request for some configuration data.
-     *
-     * @param ConfigExtraInterface $extra
-     *
-     * @throws \InvalidArgumentException if a config extra with the same name already exists
+     * {@inheritdoc}
+     */
+    public function getConfigExtra($extraName)
+    {
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra->getName() === $extraName) {
+                return $configExtra;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function addConfigExtra(ConfigExtraInterface $extra)
     {
@@ -536,20 +348,18 @@ class Context extends ApiContext
                 sprintf('The "%s" config extra already exists.', $extra->getName())
             );
         }
-        $extras   = $this->getConfigExtras();
+        $extras = $this->getConfigExtras();
         $extras[] = $extra;
         $this->setConfigExtras($extras);
     }
 
     /**
-     * Removes a request for some configuration data.
-     *
-     * @param string $extraName
+     * {@inheritdoc}
      */
     public function removeConfigExtra($extraName)
     {
         $configExtras = $this->getConfigExtras();
-        $keys         = array_keys($configExtras);
+        $keys = array_keys($configExtras);
         foreach ($keys as $key) {
             if ($configExtras[$key]->getName() === $extraName) {
                 unset($configExtras[$key]);
@@ -559,43 +369,258 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether metadata of an entity exists.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function hasMetadata()
+    public function getConfigSections()
     {
-        return $this->has(self::METADATA);
-    }
-
-    /**
-     * Gets metadata of an entity.
-     *
-     * @return EntityMetadata|null
-     */
-    public function getMetadata()
-    {
-        if (!$this->has(self::METADATA)) {
-            $this->loadMetadata();
+        $sections = [];
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface) {
+                $sections[] = $configExtra->getName();
+            }
         }
 
-        return $this->get(self::METADATA);
+        return $sections;
     }
 
     /**
-     * Sets metadata of an entity.
-     *
-     * @param EntityMetadata|null $metadata
+     * {@inheritdoc}
      */
-    public function setMetadata(EntityMetadata $metadata = null)
+    public function hasConfig()
     {
-        $this->set(self::METADATA, $metadata);
+        return $this->has($this->getConfigKey());
     }
 
     /**
-     * Gets a list of requests for additional metadata info.
+     * {@inheritdoc}
+     */
+    public function getConfig()
+    {
+        $key = $this->getConfigKey();
+        if (!$this->has($key)) {
+            $this->loadConfig();
+        }
+
+        return $this->get($key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfig(EntityDefinitionConfig $definition = null)
+    {
+        if ($definition) {
+            $this->set($this->getConfigKey(), $definition);
+            // make sure that all config sections are added to the context
+            $this->ensureAllConfigSectionsSet();
+        } else {
+            $this->remove($this->getConfigKey());
+            // make sure that all config sections are removed from the context
+            $this->ensureAllConfigSectionsSet(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasConfigOfFilters()
+    {
+        return $this->hasConfigOf(FiltersConfigExtra::NAME);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigOfFilters()
+    {
+        return $this->getConfigOf(FiltersConfigExtra::NAME);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfigOfFilters(FiltersConfig $config = null)
+    {
+        $this->setConfigOf(FiltersConfigExtra::NAME, $config);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasConfigOfSorters()
+    {
+        return $this->hasConfigOf(SortersConfigExtra::NAME);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigOfSorters()
+    {
+        return $this->getConfigOf(SortersConfigExtra::NAME);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfigOfSorters(SortersConfig $config = null)
+    {
+        $this->setConfigOf(SortersConfigExtra::NAME, $config);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasConfigOf($configSection)
+    {
+        $this->assertConfigSection($configSection);
+
+        return $this->has(self::CONFIG_PREFIX . $configSection);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigOf($configSection)
+    {
+        $this->assertConfigSection($configSection);
+
+        $key = self::CONFIG_PREFIX . $configSection;
+        if (!$this->has($key)) {
+            if (!$this->has($this->getConfigKey())) {
+                $this->loadConfig();
+            } else {
+                $this->setConfigOf($configSection, null);
+            }
+        }
+
+        return $this->get($key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfigOf($configSection, $config)
+    {
+        $this->assertConfigSection($configSection);
+
+        $this->set(self::CONFIG_PREFIX . $configSection, $config);
+
+        // make sure that all config sections, including a main section, are added to the context
+        $key = $this->getConfigKey();
+        if (!$this->has($key)) {
+            $this->set($key, null);
+        }
+        $this->ensureAllConfigSectionsSet();
+    }
+
+    /**
+     * Gets a key of a main section of an entity configuration.
      *
-     * @return MetadataExtraInterface[]
+     * @return string
+     */
+    protected function getConfigKey()
+    {
+        return self::CONFIG_PREFIX . ConfigUtil::DEFINITION;
+    }
+
+    /**
+     * Loads an entity configuration.
+     */
+    protected function loadConfig()
+    {
+        $entityClass = $this->getClassName();
+        if (empty($entityClass)) {
+            $this->processLoadedConfig(null);
+
+            throw new \RuntimeException(
+                'A class name must be set in the context before a configuration is loaded.'
+            );
+        }
+
+        try {
+            $config = $this->configProvider->getConfig(
+                $entityClass,
+                $this->getVersion(),
+                $this->getRequestType(),
+                $this->getConfigExtras()
+            );
+            $this->processLoadedConfig($config);
+        } catch (\Exception $e) {
+            $this->processLoadedConfig(null);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param Config|null $config
+     */
+    protected function processLoadedConfig(Config $config = null)
+    {
+        // add loaded config sections to the context
+        if ($config && !$config->isEmpty()) {
+            foreach ($config as $key => $value) {
+                $this->set(self::CONFIG_PREFIX . $key, $value);
+            }
+        }
+
+        // make sure that all config sections, including a main section, are added to the context
+        // even if a section was not returned by the config provider
+        $key = $this->getConfigKey();
+        if (!$this->has($key)) {
+            $this->set($key, null);
+        }
+        $this->ensureAllConfigSectionsSet();
+    }
+
+    /**
+     * Makes sure that all config sections are added to (or removed from) the context.
+     *
+     * @param bool $remove
+     */
+    protected function ensureAllConfigSectionsSet($remove = false)
+    {
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface) {
+                $key = self::CONFIG_PREFIX . $configExtra->getName();
+                if ($remove) {
+                    if ($this->has($key)) {
+                        $this->remove($key);
+                    }
+                } else {
+                    if (!$this->has($key)) {
+                        $this->set($key, null);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $configSection
+     *
+     * @throws \InvalidArgumentException if undefined configuration section is specified
+     */
+    protected function assertConfigSection($configSection)
+    {
+        $valid = false;
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface && $configSection === $configExtra->getName()) {
+                $valid = true;
+                break;
+            }
+        }
+        if (!$valid) {
+            throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getMetadataExtras()
     {
@@ -607,11 +632,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a list of requests for additional metadata info.
-     *
-     * @param MetadataExtraInterface[] $extras
-     *
-     * @throws \InvalidArgumentException if $extras has invalid elements
+     * {@inheritdoc}
      */
     public function setMetadataExtras(array $extras)
     {
@@ -631,11 +652,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether some additional metadata info is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasMetadataExtra($extraName)
     {
@@ -650,11 +667,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Adds a request for some additional metadata info.
-     *
-     * @param MetadataExtraInterface $extra
-     *
-     * @throws \InvalidArgumentException if a metadata extra with the same name already exists
+     * {@inheritdoc}
      */
     public function addMetadataExtra(MetadataExtraInterface $extra)
     {
@@ -663,20 +676,18 @@ class Context extends ApiContext
                 sprintf('The "%s" metadata extra already exists.', $extra->getName())
             );
         }
-        $extras   = $this->getMetadataExtras();
+        $extras = $this->getMetadataExtras();
         $extras[] = $extra;
         $this->setMetadataExtras($extras);
     }
 
     /**
-     * Removes a request for some additional metadata info.
-     *
-     * @param string $extraName
+     * {@inheritdoc}
      */
     public function removeMetadataExtra($extraName)
     {
         $metadataExtras = $this->getMetadataExtras();
-        $keys           = array_keys($metadataExtras);
+        $keys = array_keys($metadataExtras);
         foreach ($keys as $key) {
             if ($metadataExtras[$key]->getName() === $extraName) {
                 unset($metadataExtras[$key]);
@@ -686,115 +697,71 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether a query is used to get result data exists.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function hasQuery()
+    public function hasMetadata()
     {
-        return $this->has(self::QUERY);
+        return $this->has(self::METADATA);
     }
 
     /**
-     * Gets a query is used to get result data.
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function getQuery()
+    public function getMetadata()
     {
-        return $this->get(self::QUERY);
-    }
-
-    /**
-     * Sets a query is used to get result data.
-     *
-     * @param mixed $query
-     */
-    public function setQuery($query)
-    {
-        $this->set(self::QUERY, $query);
-    }
-
-    /**
-     * Gets the Criteria object is used to add additional restrictions to a query is used to get result data.
-     *
-     * @return Criteria
-     */
-    public function getCriteria()
-    {
-        return $this->get(self::CRITERIA);
-    }
-
-    /**
-     * Sets the Criteria object is used to add additional restrictions to a query is used to get result data.
-     *
-     * @param Criteria $criteria
-     */
-    public function setCriteria($criteria)
-    {
-        $this->set(self::CRITERIA, $criteria);
-    }
-
-    /**
-     * Whether any error happened during the processing of an action.
-     *
-     * @return bool
-     */
-    public function hasErrors()
-    {
-        return !empty($this->errors);
-    }
-
-    /**
-     * Gets all errors happened during the processing of an action.
-     *
-     * @return Error[]
-     */
-    public function getErrors()
-    {
-        return null !== $this->errors
-            ? $this->errors
-            : [];
-    }
-
-    /**
-     * Registers an error.
-     *
-     * @param Error $error
-     */
-    public function addError(Error $error)
-    {
-        if (null === $this->errors) {
-            $this->errors = [];
+        if (!$this->has(self::METADATA)) {
+            $this->loadMetadata();
         }
-        $this->errors[] = $error;
+
+        return $this->get(self::METADATA);
     }
 
     /**
-     * Removes all errors.
+     * {@inheritdoc}
      */
-    public function resetErrors()
+    public function setMetadata(EntityMetadata $metadata = null)
     {
-        $this->errors = null;
+        if ($metadata) {
+            $this->set(self::METADATA, $metadata);
+        } else {
+            $this->remove(self::METADATA);
+        }
     }
 
     /**
-     * @param string $configSection
-     *
-     * @throws \InvalidArgumentException if undefined configuration section is specified
+     * Loads an entity metadata.
      */
-    protected function assertConfigSection($configSection)
+    protected function loadMetadata()
     {
-        $valid        = false;
-        $configExtras = $this->getConfigExtras();
-        foreach ($configExtras as $configExtra) {
-            if ($configExtra instanceof ConfigExtraSectionInterface && $configSection === $configExtra->getName()) {
-                $valid = true;
-                break;
-            }
+        $entityClass = $this->getClassName();
+        if (empty($entityClass)) {
+            $this->processLoadedMetadata(null);
+
+            return;
         }
-        if (!$valid) {
-            throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
+
+        try {
+            $metadata = $this->metadataProvider->getMetadata(
+                $entityClass,
+                $this->getVersion(),
+                $this->getRequestType(),
+                $this->getMetadataExtras(),
+                $this->getConfig()
+            );
+            $this->processLoadedMetadata($metadata);
+        } catch (\Exception $e) {
+            $this->processLoadedMetadata(null);
+
+            throw $e;
         }
+    }
+
+    /**
+     * @param EntityMetadata|null $metadata
+     */
+    protected function processLoadedMetadata(EntityMetadata $metadata = null)
+    {
+        // add loaded metadata to the context
+        $this->set(self::METADATA, $metadata);
     }
 }
