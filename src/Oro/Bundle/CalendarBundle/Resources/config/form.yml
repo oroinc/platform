@@ -205,6 +205,7 @@ services:
             - '@oro_search.mapper'
             - '@security.token_storage'
             - '@event_dispatcher'
+            - '@oro_calendar.attendee_relation_manager'
 
     oro_calendar.users_to_attendees.transformer:
         class: %oro_calendar.users_to_attendees.transformer.class%
