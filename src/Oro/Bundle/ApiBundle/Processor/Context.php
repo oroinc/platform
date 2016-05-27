@@ -486,7 +486,7 @@ class Context extends ApiContext implements ContextInterface
     {
         $this->assertConfigSection($configSection);
 
-        $key = self::CONFIG_PREFIX . $configSection;
+        $key = self::CONFIG_PREFIX . $configSection . $className;
         if (!$this->has($key)) {
             if (!$this->has($this->getConfigKey($className))) {
                 $this->loadConfig($className);
@@ -505,7 +505,7 @@ class Context extends ApiContext implements ContextInterface
     {
         $this->assertConfigSection($configSection);
 
-        $this->set(self::CONFIG_PREFIX . $configSection, $config);
+        $this->set(self::CONFIG_PREFIX . $configSection . $className, $config);
 
         // make sure that all config sections, including a main section, are added to the context
         $key = $this->getConfigKey($className);
