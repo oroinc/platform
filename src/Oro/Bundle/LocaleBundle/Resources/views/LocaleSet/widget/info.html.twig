@@ -1,0 +1,10 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+<div class="widget-content">
+    <div class="row-fluid form-horizontal">
+        <div class="responsive-block">
+            {{ UI.renderProperty('oro.locale.localeset.id.label'|trans, entity.id) }}
+            {{ UI.renderProperty('oro.locale.localeset.name.label'|trans, entity.name) }}
+        </div>
+    </div>
+</div>

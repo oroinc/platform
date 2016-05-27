@@ -1,0 +1,6 @@
+oro_entity:
+    entity_aliases:
+        # Must be removed after move Locale entity to platform
+        Oro\Bundle\LocaleBundle\Entity\Locale:
+            alias:        oro_locale_locale
+            plural_alias: oro_locale_locales
