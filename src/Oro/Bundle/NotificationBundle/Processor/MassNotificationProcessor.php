@@ -6,128 +6,54 @@ use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
-
-class MassNotificationProcessor extends AbstractNotificationProcessor
+class MassNotificationProcessor extends EmailNotificationProcessor
 {
-
-    const SEND_COMMAND = 'swiftmailer:spool:send';
-
-    /** @var EmailRenderer */
-    protected $renderer;
-
-    /** @var \Swift_Mailer */
-    protected $mailer;
-
-    /** @var string */
-    protected $messageLimit = 100;
-
-    /** @var ConfigManager */
-    protected $cm;
-
-    /** @var string */
-    protected $env = 'prod';
-
-    /** @var Processor */
-    protected $processor;
-
     /**
-     * Constructor
-     *
-     * @param LoggerInterface   $logger
-     * @param EntityManager     $em
-     * @param EntityPool        $entityPool
-     * @param \Swift_Mailer     $mailer
-     * @param ConfigManager     $cm
-     * @param Processor         $processor
-     */
-    public function __construct(
-        LoggerInterface $logger,
-        EntityManager $em,
-        EntityPool $entityPool,
-        \Swift_Mailer $mailer,
-        ConfigManager $cm,
-        Processor $processor
-    ) {
-        parent::__construct($logger, $em, $entityPool);
-        $this->mailer            = $mailer;
-        $this->cm                = $cm;
-        $this->processor         = $processor;
-    }
-
-    /**
-     * @param string            $subject
      * @param string            $body
-     * @param string            $sender
-     * @param LoggerInterface   $logger
+     * @param string            $subject
+     * @param string            $senderName
+     * @param string            $senderEmail
      */
-    public function send($subject, $body, $sender = null, LoggerInterface $logger = null)
-    {
-        if (!$logger) {
-            $logger = $this->logger;
+    public function send(
+        $body,
+        $subject = null,
+        $senderEmail = null,
+        $senderName = null
+    ) {
+
+        $senderEmail = $senderEmail ?: $this->cm->get('oro_notification.email_notification_sender_email');
+        $senderName  = $senderName ?: $this->cm->get('oro_notification.email_notification_sender_name');
+
+        $recipients = $this->getRecipientEmails();
+
+        $template = $this->cm->get('oro_notification.mass_notification_template');
+        $template = $this->em->getRepository('OroEmailBundle:EmailTemplate')->findByName($template);
+
+        $massNotification = new MassNotification($senderName, $senderEmail, $recipients, $template);
+
+        $tranport = $this->mailer->getTransport();
+        if ($tranport instanceof \Swift_Transport_SpoolTransport) {
+            $spool = $tranport->getSpool();
+            if ($spool instanceof DbSpool) {
+                $spool->setLogEntity('Oro\Bundle\NotificationBundle\Entity\MassNotification');
+            }
         }
+        
+        $this->process(null, [$massNotification], null, ['maintenance_message' => $body]);
+    }
 
-        $senderEmail = $sender ? $sender : $this->cm->get('oro_notification.email_notification_sender_email');
-        $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
-
-        foreach ($this->getRecipientEmails() as $email) {
-            $message = \Swift_Message::newInstance()
-                            ->setSubject($subject)
-                            ->setFrom($senderEmail, $senderName)
-                            ->setTo($email)
-                            ->setBody($body);
-
-            $this->mailer->send($message);
+    /**
+     * @inheritdoc
+     */
+    protected function addJob($command, $commandArgs = [])
+    {
+        if (!$this->hasNotFinishedJob($command)) {
+            $job = $this->createJob($command, $commandArgs);
+            $this->em->persist($job);
+            $this->em->flush($job);
         }
-
-        $this->addJob(self::SEND_COMMAND);
-    }
-
-    /**
-     * Set message limit
-     *
-     * @param int $messageLimit
-     */
-    public function setMessageLimit($messageLimit)
-    {
-        $this->messageLimit = $messageLimit;
-    }
-
-    /**
-     * Set environment
-     *
-     * @param string $env
-     */
-    public function setEnv($env)
-    {
-        $this->env = $env;
-    }
-
-    /**
-     * Add swift mailer spool send task to job queue if it has not been added earlier
-     *
-     * @param string $command
-     * @param array  $commandArgs
-     *
-     * @return Job
-     */
-    protected function createJob($command, $commandArgs = [])
-    {
-        $commandArgs = array_merge(
-            [
-                '--message-limit=' . $this->messageLimit,
-                '--env=' . $this->env,
-                '--mailer=db_spool_mailer',
-            ],
-            $commandArgs
-        );
-
-        return parent::createJob($command, $commandArgs);
     }
 
     /**
@@ -136,12 +62,13 @@ class MassNotificationProcessor extends AbstractNotificationProcessor
     protected function getRecipientEmails()
     {
         $recipients = $this->cm->get('oro_notification.mass_notification_recipients');
-
-        if (!$recipients) {
-           return $this->getRecipientsFromDB();
+        if ($recipients) {
+            $recipients = explode(';', $recipients);
+        } else {
+            $recipients = $this->getRecipientsFromDB();
         }
 
-        return explode(';', $recipients);
+        return $recipients;
     }
 
     /**
@@ -151,5 +78,4 @@ class MassNotificationProcessor extends AbstractNotificationProcessor
     {
         return $this->em->getRepository('OroUserBundle:User')->getActiveUserEmails();
     }
-
 }

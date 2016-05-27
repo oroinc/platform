@@ -4,6 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Provider\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\NotificationBundle\Entity\LogNotificationInterface;
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
@@ -28,6 +29,11 @@ class DbSpool extends \Swift_ConfigurableSpool
      * @var string
      */
     protected $entityClass;
+
+    /**
+     * @var string
+     */
+    protected $logEntityClass;
 
     /**
      * @param EntityManager $em
@@ -74,6 +80,7 @@ class DbSpool extends \Swift_ConfigurableSpool
         $mailObject = new $this->entityClass;
         $mailObject->setMessage($message);
         $mailObject->setStatus(self::STATUS_READY);
+        $mailObject->setLogEntityName($this->logEntityClass);
 
         $this->entityPool->addPersistEntity($mailObject);
 
@@ -97,7 +104,7 @@ class DbSpool extends \Swift_ConfigurableSpool
             return 0;
         }
 
-        $failedRecipients = (array) $failedRecipients;
+        $failedRecipients = (array)$failedRecipients;
         $count = 0;
         $time = time();
         /** @var SpoolItem $email */
@@ -105,8 +112,9 @@ class DbSpool extends \Swift_ConfigurableSpool
             $email->setStatus(self::STATUS_PROCESSING);
             $this->em->persist($email);
             $this->em->flush($email);
-
-            $count += $transport->send($email->getMessage(), $failedRecipients);
+            $sentCount = $transport->send($email->getMessage(), $failedRecipients);
+            $this->logEmailSend($email, $sentCount);
+            $count += $sentCount;
             $this->em->remove($email);
             $this->em->flush($email);
 
@@ -116,5 +124,32 @@ class DbSpool extends \Swift_ConfigurableSpool
         }
 
         return $count;
+    }
+
+    /**
+     * @param string $logEntityClass
+     */
+    public function setLogEntity($logEntityClass)
+    {
+        $this->logEntityClass = $logEntityClass;
+    }
+
+    /**
+     * @param SpoolItem $email
+     * @param int $sentCount
+     */
+    protected function logEmailSend($email, $sentCount)
+    {
+        $logEntityName = $email->getLogEntityName();
+        if (!$logEntityName) {
+            return;
+        }
+
+        $logEntity = new $logEntityName;
+        if ($logEntity instanceof LogNotificationInterface) {
+            $logEntity->updateFromSwiftMessage($email->getMessage(), $sentCount);
+            $this->em->persist($logEntity);
+            $this->em->flush($logEntity);
+        }
     }
 }

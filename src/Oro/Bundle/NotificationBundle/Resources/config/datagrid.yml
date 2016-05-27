@@ -7,7 +7,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - e.title
+                    - e.subject
                     - e.email
                     - e.sender
                     - e.body
@@ -18,8 +18,8 @@ datagrid:
                     - { table: OroNotificationBundle:MassNotification, alias: e }
 
         columns:
-            title:
-                label: oro.notification.massnotification.title.label
+            subject:
+                label: oro.notification.massnotification.subject.label
                 frontend_type: string
             sender:
                 label: oro.notification.massnotification.sender.label
@@ -48,8 +48,8 @@ datagrid:
 
         sorters:
             columns:
-                title:
-                    data_name: e.title
+                subject:
+                    data_name: e.subject
                 processedAt:
                     data_name: e.processedAt
                 scheduledAt:
@@ -57,9 +57,9 @@ datagrid:
 
         filters:
             columns:
-                title:
+                subject:
                     type: string
-                    data_name: e.title
+                    data_name: e.subject
                 email:
                     type: string
                     data_name: e.email

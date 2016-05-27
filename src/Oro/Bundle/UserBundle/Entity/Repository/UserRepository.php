@@ -152,7 +152,8 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
         $queryBuilder = $this->createQueryBuilder('u')
             ->select('u.email');
         $queryBuilder->where('u.enabled = 1');
+        $result = array_map('current', $queryBuilder->getQuery()->getArrayResult());
 
-        return $queryBuilder->getQuery()->getArrayResult();
+        return $result;
     }
 }

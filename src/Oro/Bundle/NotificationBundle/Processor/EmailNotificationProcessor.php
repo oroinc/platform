@@ -90,8 +90,9 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      * @param LoggerInterface              $logger Override for default logger. If this parameter is specified
      *                                             this logger will be used instead of a logger specified
      *                                             in the constructor
+     * @param array                        $params Additional params for template renderer
      */
-    public function process($object, $notifications, LoggerInterface $logger = null)
+    public function process($object, $notifications, LoggerInterface $logger = null, $params = [])
     {
         if (!$logger) {
             $logger = $this->logger;
@@ -103,7 +104,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
                     $emailTemplate,
-                    ['entity' => $object]
+                    ['entity' => $object] + $params
                 );
             } catch (\Twig_Error $e) {
                 $identity = method_exists($emailTemplate, '__toString')

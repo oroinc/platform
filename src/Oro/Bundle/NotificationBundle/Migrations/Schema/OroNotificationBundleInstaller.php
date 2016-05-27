@@ -70,6 +70,7 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('status', 'integer', []);
         $table->addColumn('message', 'object', ['comment' => '(DC2Type:object)']);
+        $table->addColumn('log_entity_name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['status'], 'notification_spool_status_idx', []);
     }
@@ -100,12 +101,11 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('email', 'string', ['length' => 255]);
         $table->addColumn('sender', 'string', ['length' => 255]);
-        $table->addColumn('title', 'string', ['length' => 255]);
+        $table->addColumn('subject', 'string', ['length' => 255]);
         $table->addColumn('body', 'text', ['notnull' => false]);
         $table->addColumn('scheduledAt', 'datetime', []);
         $table->addColumn('processedAt', 'datetime', []);
         $table->addColumn('status', 'integer', []);
-        $table->addColumn('message', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
         $table->setPrimaryKey(['id']);
     }
 

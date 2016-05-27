@@ -22,7 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-class MassNotification
+class MassNotification implements LogNotificationInterface
 {
     const STATUS_FAILED  = 1;
     const STATUS_SUCCESS = 2;
@@ -42,7 +42,7 @@ class MassNotification
      * @ORM\Column(name="email", type="string", length=255)
      */
     protected $email;
-    
+
     /**
      * @var string
      *
@@ -53,9 +53,9 @@ class MassNotification
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", length=255)
+     * @ORM\Column(name="subject", type="string", length=255)
      */
-    protected $title;
+    protected $subject;
 
     /**
      * @var string
@@ -84,13 +84,6 @@ class MassNotification
      * @ORM\Column(name="status", type="integer")
      */
     protected $status;
-
-    /**
-     * @var \Swift_Mime_Message
-     *
-     * @ORM\Column(name="message", type="object")
-     */
-    protected $message;
 
     /**
      * @return int
@@ -129,26 +122,32 @@ class MassNotification
 
     /**
      * @param string $sender
+     * @return MassNotification
      */
     public function setSender($sender)
     {
         $this->sender = $sender;
+
+        return $this;
     }
 
     /**
      * @return string
      */
-    public function getTitle()
+    public function getSubject()
     {
-        return $this->title;
+        return $this->subject;
     }
 
     /**
-     * @param string $title
+     * @param string $subject
+     * @return MassNotification
      */
-    public function setTitle($title)
+    public function setSubject($subject)
     {
-        $this->title = $title;
+        $this->subject = $subject;
+
+        return $this;
     }
 
     /**
@@ -161,10 +160,13 @@ class MassNotification
 
     /**
      * @param string $body
+     * @return MassNotification
      */
     public function setBody($body)
     {
         $this->body = $body;
+
+        return $this;
     }
 
     /**
@@ -177,10 +179,13 @@ class MassNotification
 
     /**
      * @param \DateTime $scheduledAt
+     * @return MassNotification
      */
     public function setScheduledAt($scheduledAt)
     {
         $this->scheduledAt = $scheduledAt;
+
+        return $this;
     }
 
     /**
@@ -193,10 +198,13 @@ class MassNotification
 
     /**
      * @param \DateTime $processedAt
+     * @return MassNotification
      */
     public function setProcessedAt($processedAt)
     {
         $this->processedAt = $processedAt;
+
+        return $this;
     }
 
     /**
@@ -209,25 +217,32 @@ class MassNotification
 
     /**
      * @param string $status
+     * @return MassNotification
      */
     public function setStatus($status)
     {
         $this->status = $status;
+
+        return $this;
     }
 
     /**
-     * @return \Swift_Mime_Message
+     * @inheritdoc
      */
-    public function getMessage()
+    public function updateFromSwiftMessage($message, $sentCount)
     {
-        return $this->message;
-    }
+        $dateSent = new \DateTime();
+        $dateSent->setTimestamp($message->getDate());
 
-    /**
-     * @param \Swift_Mime_Message $message
-     */
-    public function setMessage($message)
-    {
-        $this->message = $message;
+        $recipient = key($message->getTo());
+        $sender = key($message->getFrom());
+
+        $this->setEmail($recipient);
+        $this->setSender($sender);
+        $this->setSubject($message->getSubject());
+        $this->setStatus($sentCount > 0 ? self::STATUS_SUCCESS : self::STATUS_FAILED);
+        $this->setScheduledAt($dateSent);
+        $this->setProcessedAt(new \DateTime());
+        $this->setBody($message->getBody());
     }
 }

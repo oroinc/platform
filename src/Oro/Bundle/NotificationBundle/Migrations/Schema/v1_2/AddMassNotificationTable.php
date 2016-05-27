@@ -29,12 +29,11 @@ class AddMassNotificationTable implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('email', 'string', ['length' => 255]);
         $table->addColumn('sender', 'string', ['length' => 255]);
-        $table->addColumn('title', 'string', ['length' => 255]);
+        $table->addColumn('subject', 'string', ['length' => 255]);
         $table->addColumn('body', 'text', ['notnull' => false]);
         $table->addColumn('scheduledAt', 'datetime', []);
         $table->addColumn('processedAt', 'datetime', []);
         $table->addColumn('status', 'integer', []);
-        $table->addColumn('message', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
         $table->setPrimaryKey(['id']);
     }
 }

@@ -39,7 +39,7 @@ class MassNotificationCommand extends ContainerAwareCommand
                 InputArgument::OPTIONAL,
                 'Who send message'
             );
-        $this->setDescription('Send mass notification for user');
+        $this->setDescription('Send mass notification for users');
     }
 
     /**
@@ -58,7 +58,6 @@ class MassNotificationCommand extends ContainerAwareCommand
         $subject = $input->getArgument('subject');
         $message = $input->getArgument('message');
 
-
         if (!$subject || empty($subject)) {
             $subject = $helper->ask($input, $output, $this->getHelperQuestions('Please enter a subject: '));
         }
@@ -69,9 +68,9 @@ class MassNotificationCommand extends ContainerAwareCommand
 
         $service = $this->getContainer()->get('oro_notification.mass_notification_processor');
 
-        $service->send($subject, $message);
+        $service->send($message, $subject);
 
-        $output->writeln('Completed');
+        $output->writeln('Notifications have been added to the queue');
     }
 
     /**
@@ -84,7 +83,7 @@ class MassNotificationCommand extends ContainerAwareCommand
         $question = new Question($question, $default);
 
         $question->setValidator(function ($answer) {
-            if(!$answer || empty(trim($answer))) {
+            if (!$answer || empty(trim($answer))) {
                 throw new \RuntimeException(
                     'This value should not be blank'
                 );
