@@ -61,25 +61,6 @@ class AttachmentProvider
     /**
      * @param $entity
      *
-     * @return array
-     */
-    public function getAttachmentInfo($entity)
-    {
-        $result     = [];
-        $attachment = $this->getAttachmentByEntity($entity);
-        if ($attachment) {
-            $result = [
-                'attachmentURL'      => $this->attachmentManager->getAttachmentURL($entity, $attachment),
-                'attachmentSize'     => $this->attachmentManager->getFileSize($attachment->getFileSize()),
-                'attachmentFileName' => $attachment->getOriginalFilename(),
-            ];
-        }
-        return $result;
-    }
-
-    /**
-     * @param $entity
-     *
      * @return File
      */
     protected function getAttachmentByEntity($entity)
@@ -88,5 +69,35 @@ class AttachmentProvider
         $attachment = $accessor->getValue($entity, 'attachment');
 
         return $attachment;
+    }
+
+    /**
+     * @param $entity
+     *
+     * @return array
+     */
+    public function getAttachmentInfo($entity)
+    {
+        $result     = [];
+        $attachment = $this->getAttachmentByEntity($entity);
+        if ($attachment) {
+            $thumbnail = '';
+            if ($this->attachmentManager->isImageType($attachment->getMimeType())) {
+                $thumbnail = $this->attachmentManager->getResizedImageUrl(
+                    $attachment,
+                    AttachmentManager::THUMBNAIL_WIDTH,
+                    AttachmentManager::THUMBNAIL_HEIGHT
+                );
+            }
+            $result = [
+                'attachmentURL'       => $this->attachmentManager->getAttachmentURL($entity, $attachment),
+                'attachmentSize'      => $this->attachmentManager->getFileSize($attachment->getFileSize()),
+                'attachmentFileName'  => $attachment->getOriginalFilename(),
+                'attachmentIcon'      => $this->attachmentManager->getAttachmentIconClass($attachment),
+                'attachmentThumbnail' => $thumbnail
+            ];
+        }
+
+        return $result;
     }
 }
