@@ -8,8 +8,8 @@ oro.locale:
         name.label: 'Name'
         i18n_code.label: 'Language'
         l10n_code.label: 'Format'
-        child_localizations.label: 'Child child_localeizations'
-        parent_localization.label: 'Parent child_localeization'
+        child_localizations.label: 'Child localizations'
+        parent_localization.label: 'Parent localization'
 
     date_format:
         day: "MMM d"
