@@ -16,6 +16,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField; // required b
  * @ORM\Table(name="oro_locale_set")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
+ *      routeName="oro_locale_localeset_index",
+ *      routeView="oro_locale_localeset_view",
+ *      routeUpdate="oro_locale_localeset_update",
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-list"
@@ -79,6 +82,14 @@ class LocaleSet implements DatesAwareInterface
     public function __construct()
     {
         $this->childLocaleSets = new ArrayCollection();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
     }
 
     /**

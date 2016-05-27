@@ -5,10 +5,10 @@
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity': entity,
-        'indexPath': path('oro_locale_locale_index'),
-        'indexLabel': 'oro.locale.locale.entity_plural_label'|trans,
-        'entityTitle': 'oro.locale.locale.navigation.view'|trans({
-            '%id%': entity.id|default('N/A'|trans)
+        'indexPath': path('oro_locale_localeset_index'),
+        'indexLabel': 'oro.locale.localeset.entity_plural_label'|trans,
+        'entityTitle': 'oro.locale.localeset.navigation.view'|trans({
+            '%name%': entity.name|default('N/A'|trans)
         })
     } %}
     {{ parent() }}
@@ -18,20 +18,20 @@
     {% set localeWidget %}
         {{ oro_widget_render({
             'widgetType': 'block',
-            'title': 'oro.locale.locale.widgets.locale_information'|trans,
-            'url': path('oro_locale_locale_info', {'id': entity.id})
+            'title': 'oro.locale.localeset.widgets.localeset_information'|trans,
+            'url': path('oro_locale_localeset_info', {'id': entity.id})
         }) }}
     {% endset %}
 
     {% set dataBlocks = [
         {
-            'title': 'oro.locale.locale.sections.general'|trans,
+            'title': 'oro.locale.localeset.sections.general'|trans,
             'class': 'active',
             'subblocks': [{data: [localeWidget]}]
         }
     ] %}
 
-    {% set id = 'locale-view' %}
+    {% set id = 'localeset-view' %}
     {% set data = {'dataBlocks': dataBlocks} %}
 
     {{ parent() }}

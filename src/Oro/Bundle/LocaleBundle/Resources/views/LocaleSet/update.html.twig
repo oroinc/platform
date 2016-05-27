@@ -2,25 +2,25 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% oro_title_set({params : {
-    '%id%': entity.id|default('N/A'|trans),
-    '%entityName%': 'oro.locale.locale.entity_label'|trans
+    '%name%': entity.name|default('N/A'|trans),
+    '%entityName%': 'oro.locale.localeset.entity_label'|trans
 } }) %}
 
-{% set formAction = entity.id ? path('oro_locale_locale_update', { 'id': entity.id }) : path('oro_locale_locale_create')  %}
+{% set formAction = entity.id ? path('oro_locale_localeset_update', { 'id': entity.id }) : path('oro_locale_localeset_create')  %}
 
 {% block pageHeader %}
     {% if entity.id %}
         {% set breadcrumbs = {
             'entity':      entity,
-            'indexPath':   path('oro_locale_locale_index'),
-            'indexLabel': 'oro.locale.locale.entity_plural_label'|trans,
-            'entityTitle': 'oro.locale.locale.navigation.view'|trans({
-                '%id%': entity.id|default('N/A'|trans)
+            'indexPath':   path('oro_locale_localeset_index'),
+            'indexLabel': 'oro.locale.localeset.entity_plural_label'|trans,
+            'entityTitle': 'oro.locale.localeset.navigation.view'|trans({
+                '%name%': entity.name|default('N/A'|trans)
             })
         } %}
         {{ parent() }}
     {% else %}
-        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.locale.locale.entity_label'|trans}) %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.locale.localeset.entity_label'|trans}) %}
         {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
@@ -28,24 +28,24 @@
 {% block navButtons %}
     {{ parent() }}
 
-    {{ UI.cancelButton(path('oro_locale_locale_index')) }}
-    {#{% if entity.id and resource_granted('oro_locale_locale_update') or resource_granted('oro_locale_locale_create') %}#}
+    {{ UI.cancelButton(path('oro_locale_localeset_index')) }}
+    {% if entity.id and resource_granted('oro_locale_localeset_update') or resource_granted('oro_locale_localeset_create') %}
         {% set html = UI.saveAndStayButton() %}
-        {#{% if resource_granted('oro_locale_locale_view') %}#}
+        {% if resource_granted('oro_locale_localeset_view') %}
             {% set html = html ~ UI.saveAndCloseButton() %}
-        {#{% endif %}#}
+        {% endif %}
 
         {{ UI.dropdownSaveButton({'html': html}) }}
-    {#{% endif %}#}
+    {% endif %}
 
 {% endblock navButtons %}
 
 {% block content_data %}
-    {% set id = 'locale-edit' %}
+    {% set id = 'localeset-edit' %}
 
     {% set dataBlocks = [
         {
-            'title': 'oro.locale.locale.sections.general'|trans,
+            'title': 'oro.locale.localeset.sections.general'|trans,
             'class': 'active',
             'subblocks': [{
                 'data': [

@@ -1,4 +1,4 @@
-oro_locale_locale:
-    resource:     '@OroLocaleBundle/Controller/LocaleController.php'
+oro_locale_locale_set:
+    resource:     '@OroLocaleBundle/Controller/LocaleSetController.php'
     type:         annotation
-    prefix:       /locale/locale
+    prefix:       /locale/locale-set
