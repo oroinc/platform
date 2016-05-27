@@ -37,14 +37,14 @@ class LocaleSet
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=64, nullable=false)
+     * @ORM\Column(name="i18n_code", type="string", length=64, nullable=false)
      */
     protected $i18nCode;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=64, nullable=false)
+     * @ORM\Column(name="l10n_code", type="string", length=64, nullable=false)
      */
     protected $l10nCode;
 
