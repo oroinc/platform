@@ -8,22 +8,24 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\ProcessImport;
 
+use Oro\Component\DependencyInjection\ServiceLink;
+
 class WorkflowDefinitionListener
 {
     /** @var ProcessConfigurationGenerator */
     protected $generator;
 
-    /** @var ProcessImport */
-    protected $import;
+    /** @var ServiceLink */
+    protected $importLink;
 
     /**
      * @param ProcessConfigurationGenerator $generator
-     * @param ProcessImport $import
+     * @param ServiceLink $importLink
      */
-    public function __construct(ProcessConfigurationGenerator $generator, ProcessImport $import)
+    public function __construct(ProcessConfigurationGenerator $generator, ServiceLink $importLink)
     {
         $this->generator = $generator;
-        $this->import = $import; //todo wrap import to sync
+        $this->importLink = $importLink;
     }
 
     /**
@@ -73,6 +75,20 @@ class WorkflowDefinitionListener
 
         $configuration = $this->generator->generateForScheduledTransition($entity);
 
-        $this->import->import($configuration);
+        $this->getProcessImport()->import($configuration);
+    }
+
+    /**
+     * @return ProcessImport
+     */
+    protected function getProcessImport()
+    {
+        $service = $this->importLink->getService();
+
+        if (!$service instanceof ProcessImport) {
+            throw new \RuntimeException('Instance of Oro\Bundle\WorkflowBundle\Model\ProcessImport expected.');
+        }
+
+        return $service;
     }
 }
