@@ -2,26 +2,27 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\LocaleBundle\Entity\LocaleSet;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class LocaleSetTest extends \PHPUnit_Framework_TestCase
+class LocalizationTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
 
     public function testAccessors()
     {
-        $this->assertPropertyAccessors(new LocaleSet(), [
+        $this->assertPropertyAccessors(new Localization(), [
             ['id', 1],
             ['name', 'test_name'],
             ['i18nCode', 'i18n_test_code'],
             ['l10nCode', 'l10n_test_code'],
-            ['parentLocaleSet', new LocaleSet()],
+            ['parentLocalization', new Localization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
         ]);
-        $this->assertPropertyCollections(new LocaleSet(), [
-            ['childLocaleSets', new LocaleSet()],
+        $this->assertPropertyCollections(new Localization(), [
+            ['childLocalizations', new Localization()],
         ]);
     }
 
@@ -33,8 +34,9 @@ class LocaleSetTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsUpdatedAtSet($expected, \DateTime $date = null)
     {
-        $entity = new LocaleSet();
+        $entity = new Localization();
         $entity->setUpdatedAt($date);
+
         $this->assertEquals($expected, $entity->isUpdatedAtSet());
     }
 

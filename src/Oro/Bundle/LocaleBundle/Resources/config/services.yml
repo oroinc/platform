@@ -1,5 +1,5 @@
 parameters:
-    oro_locale.entity.locale_set.class: Oro\Bundle\LocaleBundle\Entity\LocaleSet
+    oro_locale.entity.localization.class: Oro\Bundle\LocaleBundle\Entity\Localization
 
     oro_locale.settings.class: Oro\Bundle\LocaleBundle\Model\LocaleSettings
     oro_locale.calendar.class: Oro\Bundle\LocaleBundle\Model\Calendar

@@ -9,11 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField; // required by DatesAwareTrait
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="oro_locale_set")
+ * @ORM\Table(name="oro_localization")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
@@ -27,7 +27,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField; // required b
  *      }
  * )
  */
-class LocaleSet implements DatesAwareInterface
+class Localization implements DatesAwareInterface
 {
     use DatesAwareTrait;
 
@@ -62,23 +62,23 @@ class LocaleSet implements DatesAwareInterface
     protected $l10nCode;
 
     /**
-     * @var LocaleSet
+     * @var Localization
      *
-     * @ORM\ManyToOne(targetEntity="LocaleSet", inversedBy="childLocaleSets")
+     * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childLocalizations")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
-    protected $parentLocaleSet;
+    protected $parentLocalization;
 
     /**
-     * @var Collection|LocaleSet[]
+     * @var Collection|Localization[]
      *
-     * @ORM\OneToMany(targetEntity="LocaleSet", mappedBy="parentLocaleSet")
+     * @ORM\OneToMany(targetEntity="Localization", mappedBy="parentLocalization")
      */
-    protected $childLocaleSets;
+    protected $childLocalizations;
 
     public function __construct()
     {
-        $this->childLocaleSets = new ArrayCollection();
+        $this->childLocalizations = new ArrayCollection();
     }
 
     /**
@@ -162,53 +162,53 @@ class LocaleSet implements DatesAwareInterface
     }
 
     /**
-     * @param LocaleSet $parentLocaleSet
+     * @param Localization $parentLocalization
      *
      * @return $this
      */
-    public function setParentLocaleSet(LocaleSet $parentLocaleSet = null)
+    public function setParentLocalization(Localization $parentLocalization = null)
     {
-        $this->parentLocaleSet = $parentLocaleSet;
+        $this->parentLocalization = $parentLocalization;
 
         return $this;
     }
 
     /**
-     * @return LocaleSet
+     * @return Localization
      */
-    public function getParentLocaleSet()
+    public function getParentLocalization()
     {
-        return $this->parentLocaleSet;
+        return $this->parentLocalization;
     }
 
     /**
-     * @param Collection|LocaleSet[] $childLocaleSets
+     * @param Collection|Localization[] $childLocalizations
      *
      * @return $this
      */
-    public function setChildLocaleSets($childLocaleSets)
+    public function setChildLocalizations($childLocalizations)
     {
-        $this->childLocaleSets = $childLocaleSets;
+        $this->childLocalizations = $childLocalizations;
 
         return $this;
     }
 
     /**
-     * @return Collection|LocaleSet[]
+     * @return Collection|Localization[]
      */
-    public function getChildLocaleSets()
+    public function getChildLocalizations()
     {
-        return $this->childLocaleSets;
+        return $this->childLocalizations;
     }
 
     /**
-     * @param LocaleSet $localeSet
+     * @param Localization $localization
      * @return $this
      */
-    public function addChildLocaleSet(LocaleSet $localeSet)
+    public function addChildLocalization(Localization $localization)
     {
-        if (!$this->hasChildLocaleSet($localeSet)) {
-            $this->childLocaleSets->add($localeSet);
+        if (!$this->hasChildLocalization($localization)) {
+            $this->childLocalizations->add($localization);
         }
 
         return $this;
@@ -216,25 +216,25 @@ class LocaleSet implements DatesAwareInterface
     }
 
     /**
-     * @param LocaleSet $localeSet
+     * @param Localization $localization
      * @return $this
      */
-    public function removeChildLocaleSet(LocaleSet $localeSet)
+    public function removeChildLocalization(Localization $localization)
     {
-        if ($this->hasChildLocaleSet($localeSet)) {
-            $this->childLocaleSets->removeElement($localeSet);
-            $localeSet->setParentLocaleSet(null);
+        if ($this->hasChildLocalization($localization)) {
+            $this->childLocalizations->removeElement($localization);
+            $localization->setParentLocalization(null);
         }
 
         return $this;
     }
 
     /**
-     * @param LocaleSet $localeSet
+     * @param Localization $localization
      * @return boolean
      */
-    public function hasChildLocaleSet(LocaleSet $localeSet)
+    public function hasChildLocalization(Localization $localization)
     {
-        return $this->childLocaleSets->contains($localeSet);
+        return $this->childLocalizations->contains($localization);
     }
 }

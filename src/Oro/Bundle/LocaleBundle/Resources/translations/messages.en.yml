@@ -1,15 +1,15 @@
 oro.locale:
     localeset:
-        entity_label: 'Locale Set'
-        entity_plural_label: 'Locale Sets'
-        entity_description: 'Represents container that holds i18n_code, l10n_code & parent set'
+        entity_label: 'Localization'
+        entity_plural_label: 'Localizations'
+        entity_description: 'Holds i18n_code, l10n_code and parent localization'
 
         id.label: 'Id'
         name.label: 'Name'
         i18n_code.label: 'Language'
         l10n_code.label: 'Format'
-        child_locale_sets.label: 'Child locale sets'
-        parent_locale_set.label: 'Parent locale set'
+        child_localizations.label: 'Child child_localeizations'
+        parent_localization.label: 'Parent child_localeization'
 
     date_format:
         day: "MMM d"
