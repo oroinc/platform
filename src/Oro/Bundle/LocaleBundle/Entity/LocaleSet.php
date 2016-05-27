@@ -6,15 +6,28 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField; // required by DatesAwareTrait
 
 /**
  * @ORM\Entity()
  * @ORM\Table(name="oro_locale_set")
  * @ORM\HasLifecycleCallbacks()
+ * @Config(
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-list"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *      }
+ * )
  */
-class LocaleSet
+class LocaleSet implements DatesAwareInterface
 {
     use DatesAwareTrait;
 
