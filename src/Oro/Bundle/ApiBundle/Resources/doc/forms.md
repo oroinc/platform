@@ -15,20 +15,20 @@ The Symfony [Validation Component](http://symfony.com/doc/current/book/validatio
 Validation
 ----------
 
-The validation rules are loaded from _Resources/config/validation.yml_ and annotations as it is commonly done in Symfony applications. So, all validation rules are already defined for an entity are applicable in Data API as well.
-Also, by default, Data API is used two validation groups: *Default* and *api*. If you need to add validation constrains that should be applicable in Data API only you can add them in *api* validation group.
+The validation rules are loaded from *Resources/config/validation.yml* and annotations as it is commonly done in Symfony applications. So, all validation rules defined for an entity are applicable in Data API as well.
+Also, by default, Data API uses two validation groups: **Default** and **api**. If you need to add validation constrains that should be applicable in Data API only you should add them in **api** validation group.
 
 
 Forms
 -----
 
-The forms are used in Data API are isolated from forms are used on UI. It is done to avoid collisions between them and to prevent unnecessary performance overhead in Data API.
-As result of this isolation all form types, extensions and guessers are required in Data API should be registered separately. There are two ways how it can be done:
+The Data API forms are isolated from UI forms. It is done to avoid collisions between them and to prevent unnecessary performance overhead in Data API.
+And as result all Data API form types, extensions and guessers should be registered separately. There are two ways how it can be done:
 
 - using application configuration file
-- tagging form types, extensions and guessers by appropriate tag
+- tagging form elements by appropriate tag in the dependency injection container
 
-To register new form elements using application configuration file you can add _Resources/config/oro/app.yml_ in any bundle or use _app/config/config.yml_ of your application. The following example shows how it can be done:
+To register new form elements using application configuration file you can add *Resources/config/oro/app.yml* in any bundle or use *app/config/config.yml* of your application. The following example shows how it can be done:
 
 ```yaml
 oro_api:
@@ -49,7 +49,7 @@ oro_api:
                 format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
 ```
 
-Already registered in Data API form elements you can find in [Resources/config/oro/app.yml](../config/oro/app.yml).
+Already registered Data API form elements you can find in [Resources/config/oro/app.yml](../config/oro/app.yml).
 
 Also new form elements can be added using appropriate dependency injection tags. The following table shows all available tags.
 
@@ -83,4 +83,4 @@ An example:
 
 To switch between general and Data API forms [Processor\Shared\InitializeApiFormExtension](../../Processor/Shared/InitializeApiFormExtension.php) and [Processor\Shared\RestoreDefaultFormExtension](../../Processor/Shared/RestoreDefaultFormExtension.php) processors can be used.
 
-A form for a particular entity is built on the fly based on [Data API configuration](./configuration.md) and an entity metadata. It is performed by [Processor\Shared\BuildFormBuilder](../../Processor/Shared/BuildFormBuilder.php) processor
+A form for a particular entity is built on the fly based on [Data API configuration](./configuration.md) and an entity metadata. It is performed by [Processor\Shared\BuildFormBuilder](../../Processor/Shared/BuildFormBuilder.php) processor.
