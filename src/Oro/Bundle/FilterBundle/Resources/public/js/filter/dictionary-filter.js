@@ -167,7 +167,7 @@ define(function(require) {
 
             select2element.removeClass('hide');
             select2element.attr('multiple', 'multiple');
-            select2element.select2(select2Config);
+            select2element.inputWidget('create', 'select2', {initializeOptions: select2Config});
             self.isInitSelect2 = true;
             if (this.templateTheme) {
                 select2element.on('change', function() {

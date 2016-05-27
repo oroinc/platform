@@ -67,9 +67,11 @@ define([
             var $filterContainer = this.$('.controls');
             $filterContainer.prepend(select);
             this.itemSelect = $filterContainer.find('select');
-            this.itemSelect.select2({
-                allowClear: true,
-                placeholder: options.placeholder || null
+            this.itemSelect.inputWidget('create', 'select2', {
+                initializeOptions: {
+                    allowClear: true,
+                    placeholder: options.placeholder || null
+                }
             });
 
             items.on('change:show', function(model) {

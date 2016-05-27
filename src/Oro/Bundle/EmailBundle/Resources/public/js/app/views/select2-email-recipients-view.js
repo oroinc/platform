@@ -11,7 +11,7 @@ define([
 
         initialize: function() {
             this.$contextEl = $('[data-ftid=oro_email_email_contexts]');
-            this.$el.on('select2-init', _.bind(this._onSelect2Init, this));
+            this.$el.on('input-widget:init', _.bind(this._onSelect2Init, this));
             this.$el.on('recipient:add', _.bind(this._onRecipientAdd, this));
             this.$el.on('change', _.bind(this._onchange, this));
             this._initEditation();

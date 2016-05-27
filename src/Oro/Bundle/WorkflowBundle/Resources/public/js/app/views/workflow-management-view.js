@@ -97,7 +97,7 @@ define(function(require) {
                 }, this)
             };
 
-            this.$startStepEl.select2(select2Options);
+            this.$startStepEl.inputWidget('create', 'select2', {initializeOptions: select2Options});
         },
 
         initEntityFieldsLoader: function() {

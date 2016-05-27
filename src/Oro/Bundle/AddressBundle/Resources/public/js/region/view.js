@@ -36,7 +36,7 @@ define([
             this.template = _.template($('#region-chooser-template').html());
 
             this.displaySelect2(this.showSelect);
-            this.target.on('select2-init', _.bind(function() {
+            this.target.on('input-widget:init', _.bind(function() {
                 this.displaySelect2(this.showSelect);
             }, this));
 

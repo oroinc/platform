@@ -103,12 +103,14 @@ define(function(require) {
         render: function() {
             RecentEmailsContentView.__super__.render.apply(this, arguments);
             var loadingView = this.subview('loading');
-            this.$el.find('[name=defaultActionId]').select2();
+            this.$el.find('[name=defaultActionId]').inputWidget('create');
             if (this.foldersData !== null) {
                 if (loadingView) {
                     loadingView.hide();
                 }
-                this.$el.find('[name=folderId]').select2({data: this.foldersData});
+                this.$el.find('[name=folderId]').inputWidget('create', {
+                    initializeOptions: {data: this.foldersData}
+                });
             } else {
                 if (!loadingView) {
                     this.subview('loading', new LoadingMaskView({

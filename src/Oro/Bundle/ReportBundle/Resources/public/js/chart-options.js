@@ -109,19 +109,21 @@ define(function(require) {
             var childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
             $element.find(childSelector).each(function() {
                 var exclude = $(this).data('type-filter');
-                $(this).select2({
-                    collapsibleResults: true,
-                    placeholder: __('oro.entity.form.choose_entity_field'),
-                    data: function() {
-                        return self.data(exclude);
-                    },
-                    initSelection: function(element, callback) {
-                        var value = element.val().split('(');
-                        var node = _.last(self.util.pathToEntityChain(value[0]));
-                        callback({
-                            id: value.join('('),
-                            text: node.field.label
-                        });
+                $(this).inputWidget('create', 'select2', {
+                    initializeOptions: {
+                        collapsibleResults: true,
+                        placeholder: __('oro.entity.form.choose_entity_field'),
+                        data: function() {
+                            return self.data(exclude);
+                        },
+                        initSelection: function(element, callback) {
+                            var value = element.val().split('(');
+                            var node = _.last(self.util.pathToEntityChain(value[0]));
+                            callback({
+                                id: value.join('('),
+                                text: node.field.label
+                            });
+                        }
                     }
                 });
             });

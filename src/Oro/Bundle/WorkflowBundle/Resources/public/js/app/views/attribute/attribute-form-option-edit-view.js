@@ -74,7 +74,7 @@ define(function(require) {
 
         editRow: function(data) {
             this.editViewId = data.view_id;
-            this.fieldSelectorEl.select2(
+            this.fieldSelectorEl.inputWidget(
                 'val',
                 this.options.workflow.getFieldIdByPropertyPath(data.property_path)
             );

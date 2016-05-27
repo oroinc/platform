@@ -107,10 +107,17 @@ define(function(require) {
          * Walk by each input and create widget for applicable inputs without widget
          *
          * @param {jQuery} $inputs
+         * @param {String|null} widgetKey
+         * @param {Object|null} options
          */
-        create: function($inputs) {
+        create: function($inputs, widgetKey, options) {
             var self = this;
             self.collectWidgets();
+
+            if (options || widgetKey) {
+                //create new widget with options
+                $inputs.inputWidget('dispose');
+            }
 
             _.each($inputs, function(input) {
                 var $input = $(input);
@@ -119,8 +126,10 @@ define(function(require) {
                 }
 
                 _.each(self.widgetsByPriority, function(widget) {
-                    if (!self.hasWidget($input) && self.isApplicable($input, widget)) {
-                        self.createWidget($input, widget.Widget, {});
+                    if (!self.hasWidget($input) &&
+                        self.isApplicable($input, widget) &&
+                        (!widgetKey || widget.key === widgetKey)) {
+                        self.createWidget($input, widget.Widget, options || {});
                     }
                 });
             });
@@ -144,7 +153,6 @@ define(function(require) {
          * @param {jQuery} $input
          * @param {AbstractInputWidget|Function} Widget
          * @param {Object} options
-         * @returns {AbstractInputWidget|Object}
          */
         createWidget: function($input, Widget, options) {
             if (!options) {
@@ -198,12 +206,13 @@ define(function(require) {
          * @returns {mixed}
          */
         inputWidget: function(command) {
+            var args = _.rest(arguments);
             if (command === 'create') {
-                return InputWidgetManager.create(this);
+                args.unshift(this);
+                return InputWidgetManager.create.apply(InputWidgetManager, args);
             }
 
             var response = null;
-            var args = Array.prototype.slice.call(arguments, 1);
             var overrideJqueryMethods = AbstractInputWidget.prototype.overrideJqueryMethods;
             this.each(function(i) {
                 var result = null;

@@ -52,6 +52,8 @@ define(function(require) {
             if (this.isInitialized()) {
                 this.container().addClass(this.containerClass);
             }
+
+            this.$el.trigger('input-widget:init');
         },
 
         initializeWidget: function() {

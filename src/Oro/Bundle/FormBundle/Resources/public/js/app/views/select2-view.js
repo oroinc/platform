@@ -27,7 +27,9 @@ define(function(require) {
         render: function() {
             this.undelegateEvents();
             this.$el.prop('readonly', this.$el.is('[readonly]'));
-            this.$el.select2(this.select2Config).trigger('select2-init');
+            this.$el.inputWidget('create', 'select2', {
+                initializeOptions: this.select2Config
+            });
             this.delegateEvents();
         },
 

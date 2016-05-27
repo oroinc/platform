@@ -120,7 +120,7 @@ define(function(require) {
             var _this = this;
             SelectEditorView.__super__.render.call(this);
             select2options = this.getSelect2Options();
-            this.$('input[name=value]').select2(select2options);
+            this.$('input[name=value]').inputWidget('create', 'select2', {initializeOptions: select2options});
             // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
             this.$('.select2-focusser').on('keydown' + this.eventNamespace(), function(e) {
