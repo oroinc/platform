@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures;
 
+use Symfony\Component\Yaml\Yaml;
+
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
