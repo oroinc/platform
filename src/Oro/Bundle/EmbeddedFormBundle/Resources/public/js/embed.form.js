@@ -65,9 +65,10 @@ var ORO = (function(ORO) {
 
         renderForm: function(data) {
             this.container.innerHTML = data;
-            this.container
-                .querySelector('form')
-                .addEventListener('submit', this.onSubmit.bind(this));
+            var form = this.container.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', this.onSubmit.bind(this));
+            }
         },
 
         onSubmit: function(e) {
@@ -85,15 +86,16 @@ var ORO = (function(ORO) {
     };
 
     ORO.EmbedForm = function(options) {
+        var embeddedForm;
         if (options.hasOwnProperty('iframe')) {
-            var embeddedForm = new IframeEmbeddedForm(options.container, options.iframe);
+            embeddedForm = new IframeEmbeddedForm(options.container, options.iframe);
             embeddedForm.show();
 
             return;
         }
 
         if (options.hasOwnProperty('xhr')) {
-            var embeddedForm = new XHREmbeddedForm(options.container, options.xhr);
+            embeddedForm = new XHREmbeddedForm(options.container, options.xhr);
             embeddedForm.show();
 
             return;
