@@ -87,6 +87,7 @@ class AttendeesToViewTransformer extends ContextsToViewTransformer
         $result['hidden'] = !$this->attendeeRelationManager->getRelatedEntity($object);
         $result['displayName'] = $object->getDisplayName();
         $result['email'] = $object->getEmail();
+        $result['origin'] = $object->getOrigin() ? $object->getOrigin()->getId() : Attendee::ORIGIN_SERVER;
 
         return $result;
     }
