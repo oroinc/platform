@@ -13,16 +13,39 @@ class LocaleSetTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertPropertyAccessors(new LocaleSet(), [
             ['id', 1],
-            ['name','test_name'],
+            ['name', 'test_name'],
             ['i18nCode', 'i18n_test_code'],
             ['l10nCode', 'l10n_test_code'],
             ['parentLocaleSet', new LocaleSet()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
-            ['updatedAtSet', 1]
         ]);
         $this->assertPropertyCollections(new LocaleSet(), [
             ['childLocaleSets', new LocaleSet()],
         ]);
+    }
+
+    /**
+     * @param bool $expected
+     * @param \DateTime $date
+     *
+     * @dataProvider isUpdatedAtSetDataProvider
+     */
+    public function testIsUpdatedAtSet($expected, \DateTime $date = null)
+    {
+        $entity = new LocaleSet();
+        $entity->setUpdatedAt($date);
+        $this->assertEquals($expected, $entity->isUpdatedAtSet());
+    }
+
+    /**
+     * @return array
+     */
+    public function isUpdatedAtSetDataProvider()
+    {
+        return [
+            ['expected' => true, 'date' => new \DateTime()],
+            ['expected' => false, 'date' => null],
+        ];
     }
 }
