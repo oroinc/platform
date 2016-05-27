@@ -95,7 +95,6 @@ class TriggerScheduleOptionsVerifier
                 $workflowDefinition->getRelatedEntity(),
                 $options['filter']
             );
-            
         }
 
         return $options;

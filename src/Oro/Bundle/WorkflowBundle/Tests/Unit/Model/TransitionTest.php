@@ -76,6 +76,17 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($transition->isHidden());
     }
 
+    public function testToString()
+    {
+        $transition = new Transition();
+
+        $transition->setName('test_transition');
+
+        $casted = (string) $transition;
+
+        $this->assertEquals('test_transition', $casted);
+    }
+
     /**
      * @dataProvider isAllowedDataProvider
      * @param bool $isAllowed

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class ItemsFetcher
@@ -32,10 +33,18 @@ class ItemsFetcher
     {
         $workflow = $this->workflowManager->getWorkflow($workflowName);
 
+        $transition = $workflow->getTransitionManager()->getTransition($transitionName);
+
+        if (!$transition instanceof Transition) {
+            throw new \RuntimeException(
+                sprintf('Cant get transition by given identifier "%s"', (string)$transitionName)
+            );
+        }
+
         $query = $this->queryFactory->create(
             $this->getRelatedSteps($workflow->getStepManager(), $transitionName),
             $workflow->getDefinition()->getRelatedEntity(),
-            $workflow->getTransitionManager()->getTransition($transitionName)->getScheduleFilter()
+            $transition->getScheduleFilter()
         );
 
         $result = $query->getArrayResult();
@@ -56,7 +65,8 @@ class ItemsFetcher
     private function getRelatedSteps(StepManager $stepManager, $transitionName)
     {
         $relatedSteps = [];
-        foreach ($stepManager->getRelatedTransitionSteps($transitionName) as $step) {
+        $steps = $stepManager->getRelatedTransitionSteps($transitionName);
+        foreach ($steps as $step) {
             $relatedSteps[] = $step->getName();
         }
 

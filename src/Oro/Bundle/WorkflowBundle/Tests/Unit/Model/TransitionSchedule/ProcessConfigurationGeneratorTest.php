@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Generator;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
@@ -16,7 +16,7 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $workflowItemEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem';
 
-    /** @var \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator */
+    /** @var ProcessConfigurationGenerator */
     protected $generator;
 
     /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */
@@ -24,15 +24,15 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->verifier = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->verifier = $this->getMockBuilder(
+            'Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier'
+        )->disableOriginalConstructor()->getMock();
 
         $this->workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->generator = new \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator($this->verifier, $this->workflowItemEntityClass);
+        $this->generator = new ProcessConfigurationGenerator($this->verifier, $this->workflowItemEntityClass);
     }
 
     /**
@@ -93,7 +93,7 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
                         'workflow_name_transition_one_schedule_process' => [
                             'label' => 'Scheduled transition "workflow_name_transition_one_schedule_process"',
                             'entity' => $this->workflowItemEntityClass,
-                            'order'=> 0,
+                            'order' => 0,
                             'exclude_definitions' => ['workflow_name_transition_one_schedule_process'],
                             'actions_configuration' => [
                                 '@run_action_group' => [

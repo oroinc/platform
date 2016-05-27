@@ -555,4 +555,12 @@ class Transition
     {
         return $this->scheduleFilter;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->name;
+    }
 }

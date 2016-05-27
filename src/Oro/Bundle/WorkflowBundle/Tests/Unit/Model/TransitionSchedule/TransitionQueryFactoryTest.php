@@ -1,37 +1,24 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory;
 
-use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
-class TransitionScheduleHelperTest extends \PHPUnit_Framework_TestCase
+class TransitionQueryFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ItemsFetcher */
-    protected $helper;
-
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowManager;
-
     /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
+    /** @var TransitionQueryFactory */
+    protected $queryFactory;
+
     protected function setUp()
     {
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->registry = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->helper = new ItemsFetcher($this->registry, $this->workflowManager);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->helper, $this->registry, $this->workflowManager);
+        $this->queryFactory = new TransitionQueryFactory($this->registry);
     }
 
     /**
@@ -82,7 +69,16 @@ class TransitionScheduleHelperTest extends \PHPUnit_Framework_TestCase
             ->with('EntityClass')
             ->willReturn($em);
 
-        $this->assertEquals($dqlString, $this->helper->createQuery($steps, 'EntityClass', $dqlFilter));
+        $this->assertEquals($dqlString, $this->queryFactory->create($steps, 'EntityClass', $dqlFilter));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage At least one step, in which transition can be performed from, must be provided.
+     */
+    public function testNoStepsException()
+    {
+        $this->queryFactory->create([], 'EntityClass');
     }
 
     /**
@@ -100,12 +96,5 @@ class TransitionScheduleHelperTest extends \PHPUnit_Framework_TestCase
                 'custom filter dql expression'
             ]
         ];
-    }
-
-    public function testCreateQueryWithoutSteps()
-    {
-        $this->registry->expects($this->never())->method($this->anything());
-
-        $this->assertEmpty($this->helper->createQuery([], 'EntityClass'));
     }
 }

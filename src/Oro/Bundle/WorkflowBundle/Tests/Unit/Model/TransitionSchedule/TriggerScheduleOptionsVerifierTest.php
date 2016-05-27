@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Generator;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier;
 use Oro\Bundle\WorkflowBundle\Model\Step;
-use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
 
@@ -14,14 +14,14 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowAssembler;
 
-    /** @var \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher|\PHPUnit_Framework_MockObject_MockObject */
-    protected $transitionScheduleHelper;
-
     /** @var \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier */
     protected $verifier;
 
     /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowDefinition;
+
+    /** @var  TransitionQueryFactory|\PHPUnit_Framework_MockObject_MockObject */
+    protected $queryFactory;
 
     protected function setUp()
     {
@@ -29,16 +29,15 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->transitionScheduleHelper = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionScheduleHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->queryFactory = $this->getMockBuilder(
+            'Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory'
+        )->disableOriginalConstructor()->getMock();
 
         $this->workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->verifier = new TriggerScheduleOptionsVerifier($this->workflowAssembler, $this->transitionScheduleHelper);
+        $this->verifier = new TriggerScheduleOptionsVerifier($this->workflowAssembler, $this->queryFactory);
     }
 
     public function testVerify()
@@ -92,7 +91,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $this->transitionScheduleHelper->expects($this->once())
+        $this->queryFactory->expects($this->once())
             ->method('create')
             ->with(['step1'], 'EntityClass', 'filterDQL')
             ->willReturn($query);
