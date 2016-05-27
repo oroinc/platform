@@ -27,7 +27,7 @@ class SegmentType extends AbstractQueryDesignerType
                     'empty_value' => 'oro.segment.form.choose_segment_type'
                 ]
             )
-            ->add('description', 'oro_resizeable_rich_text', ['required' => false]);
+            ->add('description', 'textarea', ['required' => false]);
 
         parent::buildForm($builder, $options);
     }
