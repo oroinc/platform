@@ -97,7 +97,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_calendar.send_processor.email'
             - '@oro_activity.manager'
-            - '@oro_calendar.users_to_attendees.transformer'
+            - '@oro_calendar.attendee_relation_manager'
 
     oro_calendar.oro_calendar_event_attendees_select.form.type:
         class: %oro_calendar.oro_calendar_event_attendees_select.form.type.class%

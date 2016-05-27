@@ -11,7 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -33,16 +33,16 @@ class CalendarEventApiHandler
     /** @var ActivityManager */
     protected $activityManager;
 
-    /** @var UsersToAttendeesTransformer */
-    protected $usersToAttendeesTransformer;
+    /** @var AttendeeRelationManager */
+    protected $attendeeRelationManager;
 
     /**
-     * @param FormInterface      $form
-     * @param Request            $request
-     * @param ObjectManager      $manager
-     * @param EmailSendProcessor $emailSendProcessor
-     * @param ActivityManager    $activityManager
-     * @param UsersToAttendeesTransformer $usersToAttendeesTransformer
+     * @param FormInterface           $form
+     * @param Request                 $request
+     * @param ObjectManager           $manager
+     * @param EmailSendProcessor      $emailSendProcessor
+     * @param ActivityManager         $activityManager
+     * @param AttendeeRelationManager $attendeeRelationManager
      */
     public function __construct(
         FormInterface $form,
@@ -50,14 +50,14 @@ class CalendarEventApiHandler
         ObjectManager $manager,
         EmailSendProcessor $emailSendProcessor,
         ActivityManager $activityManager,
-        UsersToAttendeesTransformer $usersToAttendeesTransformer
+        AttendeeRelationManager $attendeeRelationManager
     ) {
         $this->form                        = $form;
         $this->request                     = $request;
         $this->manager                     = $manager;
         $this->emailSendProcessor          = $emailSendProcessor;
         $this->activityManager             = $activityManager;
-        $this->usersToAttendeesTransformer = $usersToAttendeesTransformer;
+        $this->attendeeRelationManager = $attendeeRelationManager;
     }
 
     /**
@@ -110,7 +110,7 @@ class CalendarEventApiHandler
     protected function convertInvitedUsersToAttendee(CalendarEvent $event, array $users)
     {
         foreach ($users as $user) {
-            $attendee = $this->usersToAttendeesTransformer->userToAttendee($user);
+            $attendee = $this->attendeeRelationManager->createAttendee($user);
 
             if ($attendee) {
                 $status = $this->manager
