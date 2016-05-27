@@ -166,56 +166,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getCalendarEvents($calendarId, AbstractQuery $query)
-    {
-        $result = [];
-
-        $rawData = $query->getArrayResult();
-        foreach ($rawData as $rawDataItem) {
-            $item = $this->transformEntity($rawDataItem);
-            $this->transformRecurrenceData($item);
-            $result[] = $item;
-        }
-        $this->applyAdditionalData($result, $calendarId);
-        foreach ($result as &$resultItem) {
-            $this->applyPermissions($resultItem, $calendarId);
-        }
-
-        $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
-
-        return $result;
-    }
-
-    /**
-     * Transforms recurrence data into separate field.
-     *
-     * @param $entity
-     *
-     * @return self
-     */
-    protected function transformRecurrenceData(&$entity)
-    {
-        $result = [];
-        $key = Recurrence::STRING_KEY;
-        $isEmpty = true;
-        foreach ($entity as $field => $value) {
-            if (substr($field, 0, strlen($key)) === $key) {
-                unset($entity[$field]);
-                $result[lcfirst(substr($field, strlen($key)))] = $value;
-                $isEmpty = empty($value) ? $isEmpty : false;
-            }
-        }
-
-        if (!$isEmpty) {
-            $entity[$key] = $result;
-        }
-
-        return $this;
-    }
-
-    /**
      * @param mixed $object
      * @param string $propertyPath
      *
@@ -263,5 +213,55 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         return $extraValues;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCalendarEvents($calendarId, AbstractQuery $query)
+    {
+        $result = [];
+
+        $rawData = $query->getArrayResult();
+        foreach ($rawData as $rawDataItem) {
+            $item = $this->transformEntity($rawDataItem);
+            $this->transformRecurrenceData($item);
+            $result[] = $item;
+        }
+        $this->applyAdditionalData($result, $calendarId);
+        foreach ($result as &$resultItem) {
+            $this->applyPermissions($resultItem, $calendarId);
+        }
+
+        $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+
+        return $result;
+    }
+
+    /**
+     * Transforms recurrence data into separate field.
+     *
+     * @param $entity
+     *
+     * @return self
+     */
+    protected function transformRecurrenceData(&$entity)
+    {
+        $result = [];
+        $key = Recurrence::STRING_KEY;
+        $isEmpty = true;
+        foreach ($entity as $field => $value) {
+            if (substr($field, 0, strlen($key)) === $key) {
+                unset($entity[$field]);
+                $result[lcfirst(substr($field, strlen($key)))] = $value;
+                $isEmpty = empty($value) ? $isEmpty : false;
+            }
+        }
+
+        if (!$isEmpty) {
+            $entity[$key] = $result;
+        }
+
+        return $this;
     }
 }

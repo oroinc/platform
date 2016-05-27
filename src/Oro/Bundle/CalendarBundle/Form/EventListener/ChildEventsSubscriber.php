@@ -5,7 +5,6 @@ namespace Oro\Bundle\CalendarBundle\Form\EventListener;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -52,114 +51,8 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::PRE_SUBMIT   => 'preSubmit', // extract master event
             FormEvents::POST_SUBMIT  => 'postSubmit', // synchronize child events
         ];
-    }
-
-    /**
-     * PRE_SET_DATA event handler
-     *
-     * @param FormEvent $event
-     */
-    public function preSetData(FormEvent $event)
-    {
-        $form   = $event->getForm();
-        $config = $form->getConfig();
-
-        if (!$config->getOption('allow_change_calendar')) {
-            return;
-        }
-
-        if ($config->getOption('layout_template')) {
-            $form->add(
-                'calendarUid',
-                'oro_calendar_choice_template',
-                [
-                    'required' => false,
-                    'mapped'   => false,
-                    'label'    => 'oro.calendar.calendarevent.calendar.label'
-                ]
-            );
-        } else {
-            /** @var CalendarEvent $data */
-            $data = $event->getData();
-            $form->add(
-                $form->getConfig()->getFormFactory()->createNamed(
-                    'calendarUid',
-                    'oro_calendar_choice',
-                    $data ? $data->getCalendarUid() : null,
-                    [
-                        'required'        => false,
-                        'mapped'          => false,
-                        'auto_initialize' => false,
-                        'is_new'          => !$data || !$data->getId(),
-                        'label'           => 'oro.calendar.calendarevent.calendar.label'
-                    ]
-                )
-            );
-        }
-    }
-
-    /**
-     * Stores original parentEvent for later use
-     *
-     * @param FormEvent $event
-     */
-    public function preSubmit(FormEvent $event)
-    {
-        $form = $event->getForm();
-        $data = $form->getData();
-
-        if ($data) {
-            $this->parentEvent = $data;
-        }
-
-        if ($form->getNormData() && $form->getNormData()->getRecurrence()) {
-            foreach ($form->all() as $child) {
-                if (in_array($child->getName(), $this->editableFieldsForRecurrence)) {
-                    continue;
-                }
-                if ($form->has($child->getName())) {
-                    $form->remove($child->getName());
-                }
-            }
-        }
-    }
-
-    /**
-     * Replaces newly created attendees by transformer with existing attendees
-     * to preserve all attributes of attendees (origin, invitation status).
-     *
-     * @param FormEvent $event
-     */
-    public function postSubmitChildEvents(FormEvent $event)
-    {
-        /** @var Attendee[] $attendees */
-        $attendees = $event->getForm()->getData();
-        if ($attendees && $this->parentEvent) {
-            $existingAttendees = $this->parentEvent->getAttendees();
-            foreach ($attendees as $key => $attendee) {
-                $existingAttendee = ArrayUtil::find(
-                    function (Attendee $existingAttendee) use ($attendee) {
-                        if ($attendee->getUser()) {
-                            return $existingAttendee->getUser() &&
-                                $existingAttendee->getUser()->getId() === $attendee->getUser()->getId();
-                        }
-
-                        return !$existingAttendee->getUser() && $existingAttendee->getEmail() === $attendee->getEmail();
-                    },
-                    $existingAttendees->toArray()
-                );
-
-                if (!$existingAttendee) {
-                    continue;
-                }
-
-                $attendees[$key] = $existingAttendee;
-            }
-        }
     }
 
     /**
@@ -265,11 +158,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             if ($attendee->getDisplayName()) {
                 continue;
             }
-
-            $displayName = $attendee->getUser()
-                ? $attendee->getUser()->getFullName()
-                : $attendee->getEmail();
-            $attendee->setDisplayName($displayName);
+            $attendee->setDisplayName($attendee->getEmail());
         }
     }
 

@@ -134,11 +134,15 @@ class CalendarEventHandler
                         $entity->setCalendar($defaultCalendar);
                     }
                 }
+
+                $notifyInvitedUsers = $this->form->has('notifyInvitedUsers')
+                    ? $this->form->get('notifyInvitedUsers')->getData()
+                    : new ArrayCollection();
                 
                 $this->onSuccess(
                     $entity,
                     $originalAttendees,
-                    $this->form->get('notifyInvitedUsers')->getData()
+                    $notifyInvitedUsers
                 );
 
                 return true;

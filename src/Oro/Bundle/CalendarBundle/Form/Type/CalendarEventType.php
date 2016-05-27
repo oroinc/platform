@@ -37,6 +37,13 @@ class CalendarEventType extends AbstractType
         $this->securityFacade = $securityFacade;
     }
 
+    /** @var array */
+    protected $editableFieldsForRecurrence = [
+        'title',
+        'description',
+        'contexts',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -124,6 +131,19 @@ class CalendarEventType extends AbstractType
 
         $builder->addEventSubscriber(new CalendarUidSubscriber());
         $builder->addEventSubscriber(new ChildEventsSubscriber($this->registry, $this->securityFacade));
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            if ($form->getNormData() && $form->getNormData()->getRecurrence()) {
+                foreach ($form->all() as $child) {
+                    if (in_array($child->getName(), $this->editableFieldsForRecurrence)) {
+                        continue;
+                    }
+                    if ($form->has($child->getName())) {
+                        $form->remove($child->getName());
+                    }
+                }
+            }
+        }, 10);
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $calendarEvent = $event->getData();
             if (!$calendarEvent) {

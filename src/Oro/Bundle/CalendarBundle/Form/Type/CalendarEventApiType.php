@@ -125,6 +125,7 @@ class CalendarEventApiType extends CalendarEventType
                     'model_timezone' => 'UTC',
                 ]
             )
+            ->add('origin')
             ->add(
                 'recurrence',
                 'oro_calendar_event_recurrence',
@@ -166,13 +167,14 @@ class CalendarEventApiType extends CalendarEventType
         );
 
         $builder->addEventSubscriber(new PatchSubscriber());
-        $builder->addEventSubscriber(
-            new CalendarEventApiTypeSubscriber(
-                $this->calendarEventManager,
-                $this->requestStack
-            )
-        );
-        $builder->addEventSubscriber(new ChildEventsSubscriber($this->registry, $this->securityFacade));
+        $builder->addEventSubscriber(new CalendarEventApiTypeSubscriber(
+            $this->calendarEventManager,
+            $this->requestStack
+        ));
+        $builder->addEventSubscriber(new ChildEventsSubscriber(
+            $this->registry,
+            $this->securityFacade
+        ));
     }
 
     /**
