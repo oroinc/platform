@@ -56,7 +56,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'description',
                 'oro_resizeable_rich_text',
-                array('required' => false, 'label' => 'oro.calendar.calendarevent.description.label')
+                ['required' => false, 'label' => 'oro.calendar.calendarevent.description.label']
             )
             ->will($this->returnSelf());
         $builder->expects($this->at(2))
@@ -134,11 +134,6 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 'hidden',
                 ['mapped' => false]
             )
-            ->will($this->returnSelf());
-
-        $builder->expects($this->at(10))
-            ->method('get')
-            ->with('attendees')
             ->will($this->returnSelf());
 
         $this->type->buildForm($builder, ['layout_template' => false]);

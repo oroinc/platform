@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 
 class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
@@ -30,8 +31,8 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var ActivityManager */
     protected $activityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $usersToAttendeesTransformer;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AttendeeRelationManager */
+    private $attendeeRelationManager;
 
     protected function setUp()
     {
@@ -50,8 +51,8 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->usersToAttendeesTransformer = $this
-            ->getMockBuilder('Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer')
+        $this->attendeeRelationManager = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -90,7 +91,7 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             $this->om,
             $this->emailSendProcessor,
             $this->activityManager,
-            $this->usersToAttendeesTransformer
+            $this->attendeeRelationManager
         );
         $handler->process($this->obj);
     }
@@ -108,7 +109,7 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             $this->om,
             $this->emailSendProcessor,
             $this->activityManager,
-            $this->usersToAttendeesTransformer
+            $this->attendeeRelationManager
         );
         $handler->process($this->obj);
     }
