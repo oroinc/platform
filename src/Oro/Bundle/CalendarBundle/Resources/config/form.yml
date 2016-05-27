@@ -37,6 +37,7 @@ services:
             - '@doctrine'
             - '@oro_security.security_facade'
             - '@request_stack'
+            - '@oro_calendar.attendee_relation_manager'
         tags:
             - { name: form.type, alias: oro_calendar_event_api }
 

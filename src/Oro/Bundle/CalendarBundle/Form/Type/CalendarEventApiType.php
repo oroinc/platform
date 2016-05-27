@@ -15,6 +15,7 @@ use Oro\Bundle\CalendarBundle\Manager\CalendarEventManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Oro\Bundle\CalendarBundle\Form\EventListener\CalendarEventApiTypeSubscriber;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
 
 class CalendarEventApiType extends CalendarEventType
 {
@@ -24,21 +25,27 @@ class CalendarEventApiType extends CalendarEventType
     /** @var RequestStack */
     protected $requestStack;
 
+    /** @var AttendeeRelationManager */
+    protected $attendeeRelationManager;
+
     /**
      * @param CalendarEventManager $calendarEventManager
      * @param ManagerRegistry      $registry
      * @param SecurityFacade       $securityFacade
      * @param RequestStack         $requestStack
+     * @param AttendeeRelationManager $attendeeRelationManager
      */
     public function __construct(
         CalendarEventManager $calendarEventManager,
         ManagerRegistry $registry,
         SecurityFacade $securityFacade,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AttendeeRelationManager $attendeeRelationManager
     ) {
         parent::__construct($registry, $securityFacade);
         $this->calendarEventManager = $calendarEventManager;
         $this->requestStack         = $requestStack;
+        $this->attendeeRelationManager = $attendeeRelationManager;
     }
 
     /**
@@ -97,14 +104,14 @@ class CalendarEventApiType extends CalendarEventType
                     'oro_collection',
                     [
                         'property_path' => 'attendees',
-                        'type'          => 'oro_calendar_event_attendees_api',
-                        'options'       => [
+                        'type' => 'oro_calendar_event_attendees_api',
+                        'options' => [
                             'required' => false,
                             'label'    => 'oro.calendar.calendarevent.attendees.label',
                         ],
                     ]
                 )
-                ->addEventSubscriber(new AttendeesSubscriber($this->registry))
+                ->addEventSubscriber(new AttendeesSubscriber($this->attendeeRelationManager))
             )
             ->add('notifyInvitedUsers', 'hidden', ['mapped' => false])
             ->add(
