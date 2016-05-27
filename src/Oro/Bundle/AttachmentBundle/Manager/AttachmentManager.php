@@ -520,6 +520,6 @@ class AttachmentManager
      */
     public function getAttachmentURL($entity, $attachment)
     {
-        return $this->getFileUrl($entity, 'attachment', $attachment, 'download', true);
+        return $this->getFileUrl($entity, 'attachment', $attachment, 'download');
     }
 }
