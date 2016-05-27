@@ -22,6 +22,7 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
 {
     const OWNER_CLASS_ARGUMENT = 'class';
     const OWNER_ID_ARGUMENT = 'id';
+    const COMMAND_NAME = 'oro:email:update-email-owner-associations';
 
     /**
      * {@inheritdoc}
@@ -29,7 +30,7 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:email:update-email-owner-associations')
+            ->setName(self::COMMAND_NAME)
             ->setDescription('Updates emails for email owner')
             ->addArgument(static::OWNER_CLASS_ARGUMENT, InputArgument::REQUIRED, 'Email owner class')
             ->addArgument(
