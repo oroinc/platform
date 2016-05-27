@@ -101,7 +101,6 @@ class Localization implements DatesAwareInterface
         return $this->id;
     }
 
-
     /**
      * @param string $languageCode
      *
