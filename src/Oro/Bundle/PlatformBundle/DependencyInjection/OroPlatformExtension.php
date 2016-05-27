@@ -29,23 +29,35 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
 
         // original security config
         $securityConfig = null;
-        $securityModified = false;
         if ($container->hasExtension('security')) {
             $securityConfig = $container->getExtensionConfig('security');
         }
 
-        $resources    = $configLoader->load();
-        $extensions   = $container->getExtensions();
+        $securityModified = false;
+        $securityConfigs = [];
+
+        $extensions = $container->getExtensions();
+
+        //bundles that are loaded later should be able to override configuration of bundles loaded before
+        $resources = array_reverse($configLoader->load());
         foreach ($resources as $resource) {
             foreach ($resource->data as $name => $config) {
-                if (!empty($extensions[$name])) {
-                    if ($name === 'security') {
-                        $this->mergeConfigIntoOne($container, $name, $config);
-                        $securityModified = true;
-                    } else {
-                        $container->prependExtensionConfig($name, $config);
-                    }
+                if (empty($extensions[$name])) {
+                    continue;
                 }
+                if ($name === 'security') {
+                    $securityConfigs[] = $config;
+                    $securityModified = true;
+                } else {
+                    $container->prependExtensionConfig($name, $config);
+                }
+            }
+        }
+
+        if ($securityModified) {
+            $securityConfigs = array_reverse($securityConfigs);
+            foreach ($securityConfigs as $config) {
+                $this->mergeConfigIntoOne($container, 'security', $config);
             }
         }
 
@@ -77,7 +89,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
                         ];
                         // Add support of "oid" and "name" Db types for EnterpriseDB
                         $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [
-                            'oid' => 'integer',
+                            'oid'  => 'integer',
                             'name' => 'string'
                         ];
                     }
@@ -91,8 +103,8 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
      * Merge configuration into one config
      *
      * @param ContainerBuilder $container
-     * @param string $name
-     * @param array $config
+     * @param string           $name
+     * @param array            $config
      *
      * @throws \RuntimeException
      */
@@ -109,7 +121,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
 
         $originalConfig = $container->getExtensionConfig($name);
         if (!count($originalConfig)) {
-            $originalConfig[] = array();
+            $originalConfig[] = [];
         }
 
         $mergedConfig = ArrayUtil::arrayMergeRecursiveDistinct($originalConfig[0], $config);

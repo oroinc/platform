@@ -51,7 +51,7 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
         $this->context = new Context($configProvider, $metadataProvider);
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
         $this->context->setClassName($className);
@@ -62,6 +62,13 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
             ->method('applyAclToCriteria');
 
         $this->processor->process($this->context);
+    }
+
+    public function testProcessWhenCriteriaObjectDoesNotExist()
+    {
+        $this->processor->process($this->context);
+
+        $this->assertNull($this->context->getCriteria());
     }
 
     public function testProcessWithoutConfig()

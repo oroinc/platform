@@ -298,7 +298,8 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          * @param {string} styles
          */
         addCSSRule: function(selector, styles) {
-            document.styleSheets[0].insertRule(selector + '{' + styles + '}', 0);
+            var styleSheet = document.styleSheets[0];
+            styleSheet.insertRule(selector + '{' + styles + '}', styleSheet.cssRules.length);
         },
 
         /**

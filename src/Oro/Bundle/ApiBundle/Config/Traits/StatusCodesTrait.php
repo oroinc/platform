@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @property array $items
@@ -17,8 +17,8 @@ trait StatusCodesTrait
      */
     public function getStatusCodes()
     {
-        return array_key_exists(ConfigUtil::STATUS_CODES, $this->items)
-            ? $this->items[ConfigUtil::STATUS_CODES]
+        return array_key_exists(EntityDefinitionConfig::STATUS_CODES, $this->items)
+            ? $this->items[EntityDefinitionConfig::STATUS_CODES]
             : null;
     }
 
@@ -30,9 +30,9 @@ trait StatusCodesTrait
     public function setStatusCodes(StatusCodesConfig $statusCodes = null)
     {
         if (null !== $statusCodes) {
-            $this->items[ConfigUtil::STATUS_CODES] = $statusCodes;
+            $this->items[EntityDefinitionConfig::STATUS_CODES] = $statusCodes;
         } else {
-            unset($this->items[ConfigUtil::STATUS_CODES]);
+            unset($this->items[EntityDefinitionConfig::STATUS_CODES]);
         }
     }
 }

@@ -1,2 +1,2 @@
 bundles:
-    - Oro\Bundle\DataGridBundle\OroDataGridBundle
+    - {name: Oro\Bundle\DataGridBundle\OroDataGridBundle, priority: -75 }
