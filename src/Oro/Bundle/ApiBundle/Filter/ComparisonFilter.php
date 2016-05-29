@@ -12,7 +12,7 @@ use Doctrine\Common\Collections\Expr\Expression;
  */
 class ComparisonFilter extends StandaloneFilter
 {
-    const NEQ = '<>';
+    const NEQ = '!=';
     const LT  = '<';
     const LTE = '<=';
     const GT  = '>';
@@ -67,28 +67,17 @@ class ComparisonFilter extends StandaloneFilter
      */
     public function createExpression(FilterValue $value = null)
     {
-        if (null !== $value) {
-            $operator = $value->getOperator();
-            $val      = $value->getValue();
-        } else {
-            $operator = null;
-            $val      = $this->getDefaultValue();
-            if (null !== $val) {
-                $operator = self::EQ;
-            }
-        }
-
-        return null !== $operator
-            ? $this->buildExpression($this->field, $operator, $val)
+        return null !== $value
+            ? $this->buildExpression($this->field, $value->getOperator(), $value->getValue())
             : null;
     }
 
     /**
      * Creates the Expression object that can be used to filter data using the Criteria object.
      *
-     * @param string $field
-     * @param string $operator
-     * @param mixed  $value
+     * @param string      $field
+     * @param string|null $operator
+     * @param mixed       $value
      *
      * @return Expression
      *
@@ -105,6 +94,9 @@ class ComparisonFilter extends StandaloneFilter
             );
         }
 
+        if (null === $operator) {
+            $operator = self::EQ;
+        }
         if (in_array($operator, $this->operators, true)) {
             $expr = $this->doBuildExpression($field, $operator, $value);
             if (null !== $expr) {

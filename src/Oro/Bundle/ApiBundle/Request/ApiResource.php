@@ -19,16 +19,6 @@ class ApiResource
     }
 
     /**
-     * Returns a string representation of this resource.
-     *
-     * @return string A string representation of the Resource
-     */
-    public function __toString()
-    {
-        return $this->entityClass;
-    }
-
-    /**
      * Gets the class name of the entity.
      *
      * @return string

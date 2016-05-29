@@ -749,6 +749,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@kernel'
             - '@oro_security.security_facade.link'
+            - '@router'
             - '@oro_attachment.validator.file_config_validator'
             - '@oro_attachment.association_helper'
 
@@ -783,6 +784,8 @@ services:
         arguments:
             - '@knp_gaufrette.filesystem_map'
             - '@oro_email.form.factory'
+            - '@oro_attachment.manager'
+            - '@oro_email.manager.email_attachment_manager'
 
     oro_email.email_importance_transformer:
         class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailImportanceApiTransformer

@@ -9,6 +9,9 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Replaces LEFT JOIN with INNER JOIN in the Criteria object where it is possible.
+ */
 class OptimizeCriteria implements ProcessorInterface
 {
     /**
@@ -19,6 +22,11 @@ class OptimizeCriteria implements ProcessorInterface
         /** @var Context $context */
 
         $criteria = $context->getCriteria();
+        if (null === $criteria) {
+            // the criteria object does not exist
+            return;
+        }
+
         $filters  = $context->getFilters();
         foreach ($filters as $filter) {
             if ($filter instanceof ComparisonFilter) {

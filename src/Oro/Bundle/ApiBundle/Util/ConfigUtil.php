@@ -23,7 +23,4 @@ class ConfigUtil extends BaseConfigUtil
 
     /** a flag indicates whether an entity configuration should be merged with a configuration of a parent entity */
     const INHERIT = 'inherit';
-
-    /** the name of ACL resource */
-    const ACL_RESOURCE = 'acl_resource';
 }

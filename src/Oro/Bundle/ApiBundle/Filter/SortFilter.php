@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Criteria;
 /**
  * A filter that can be used to specify how a result collection should be sorted.
  */
-class SortFilter extends StandaloneFilter
+class SortFilter extends StandaloneFilterWithDefaultValue
 {
     /**
      * {@inheritdoc}
