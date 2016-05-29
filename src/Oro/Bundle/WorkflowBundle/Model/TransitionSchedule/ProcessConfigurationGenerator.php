@@ -59,7 +59,7 @@ class ProcessConfigurationGenerator
      */
     private function createProcessConfiguration($workflowName, $transitionName, $cronExpression)
     {
-        $processName = $this->generateScheduledTransitionProcessName($workflowName, $transitionName);
+        $processName = $this->createProcessName($workflowName, $transitionName);
 
         $definitionConfiguration = [
             $processName => [
@@ -107,8 +107,8 @@ class ProcessConfigurationGenerator
      * @param string $transitionName
      * @return string
      */
-    protected function generateScheduledTransitionProcessName($workflowName, $transitionName)
+    protected function createProcessName($workflowName, $transitionName)
     {
-        return sprintf('%s_%s_schedule_process', $workflowName, $transitionName);
+        return (string)(new ScheduledTransitionProcessName($workflowName, $transitionName));
     }
 }
