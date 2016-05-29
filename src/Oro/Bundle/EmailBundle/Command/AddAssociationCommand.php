@@ -7,9 +7,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
-
 class AddAssociationCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'oro:email:add-associations';
@@ -49,34 +46,20 @@ class AddAssociationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $target = $this->getDoctrineHelper()
-            ->getEntityRepository($input->getOption('targetClass'))
-            ->find($input->getOption('targetId'));
+        $countNewAssociations = $this->getCommandAssociationManager()->processAddAssociation(
+            $input->getOption('id'),
+            $input->getOption('targetClass'),
+            $input->getOption('targetId')
+        );
 
-        $ids = $input->getOption('id');
-        foreach ($ids as $id) {
-            $email = $this->getDoctrineHelper()->getEntityRepository('Oro\Bundle\EmailBundle\Entity\Email')->find($id);
-            $this->getEmailActivityManager()->addAssociation($email, $target);
-        }
-
-        $this->getDoctrineHelper()->getEntityManager('Oro\Bundle\EmailBundle\Entity\Email')->flush();
-        $output->writeln(sprintf('<info>Update %d emails.</info>', count($ids)));
-    }
-
-
-    /**
-     * @return EmailActivityManager
-     */
-    protected function getEmailActivityManager()
-    {
-        return $this->getContainer()->get('oro_email.email.activity.manager');
+        $output->writeln(sprintf('<info>Added %d association.</info>', $countNewAssociations));
     }
 
     /**
-     * @return DoctrineHelper
+     * @return Manager\AssociationManager
      */
-    protected function getDoctrineHelper()
+    protected function getCommandAssociationManager()
     {
-        return $this->getContainer()->get('oro_entity.doctrine_helper');
+        return $this->getContainer()->get('oro_email.command.association_manager');
     }
 }
