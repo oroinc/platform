@@ -57,7 +57,7 @@ class EmailOwnersProvider
 
     /**
      * Get QB email entities from owner entity
-     * 
+     *
      * @param object $entity
      *
      * @return array
