@@ -114,8 +114,8 @@ class LocalizationController extends Controller
     {
         $form = $this->createFormBuilder($localization)
             ->add('name')
-            ->add('i18nCode')
-            ->add('l10nCode')
+            ->add('languageCode')
+            ->add('formattingCode')
             ->add('parentLocalization', 'entity', [
                 'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
                 'required' => false,
