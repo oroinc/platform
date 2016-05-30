@@ -34,7 +34,7 @@ class DurationTypeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $value
-     * @param string $expected
+     * @param mixed $expected
      *
      * @dataProvider convertToDatabaseValueDataProvider
      */
@@ -46,9 +46,7 @@ class DurationTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @return array
-     */
+    /** @return array */
     public function convertToDatabaseValueDataProvider()
     {
         return [

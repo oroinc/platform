@@ -24,9 +24,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DurationToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public function transform($value)
     {
         if (null === $value) {
@@ -64,9 +62,7 @@ class DurationToStringTransformer implements DataTransformerInterface
         return empty($encoded) ? '0s' : join(' ', $encoded);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public function reverseTransform($value)
     {
         if (null === $value || (is_string($value) && '' === trim($value))) {
