@@ -8,6 +8,8 @@ use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriber;
 
 class RouterMessageProcessor implements MessageProcessor, TopicSubscriber
 {
+    const TOPIC = 'message_queue.router';
+
     /**
      * @var Router
      */
@@ -39,8 +41,6 @@ class RouterMessageProcessor implements MessageProcessor, TopicSubscriber
      */
     public static function getSubscribedTopics()
     {
-        return [
-            '__router__',
-        ];
+        return [self::TOPIC];
     }
 }
