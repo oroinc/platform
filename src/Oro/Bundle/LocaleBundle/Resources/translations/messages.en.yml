@@ -2,8 +2,8 @@ oro.locale:
     menu:
         localization:
             label: Localization
-        locales:
-            label: Locales
+        localizations:
+            label: Localizations
 
     localization:
         entity_label: 'Localization'
