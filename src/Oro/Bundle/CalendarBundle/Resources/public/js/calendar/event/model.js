@@ -88,7 +88,7 @@ define([
             ];
 
             if (this.get('recurrence')) {
-                fields.push("start", "end");
+                fields.push('start', 'end');
             }
 
             modelData = _.extend(
