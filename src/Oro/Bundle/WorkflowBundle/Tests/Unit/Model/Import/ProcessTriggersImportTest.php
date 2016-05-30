@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
-use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
+use Oro\Bundle\WorkflowBundle\Model\ProcessCronScheduler;
 
 class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +31,7 @@ class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
     protected $triggerEntityClass;
 
     /**
-     * @var ProcessTriggerScheduler|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProcessCronScheduler|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $processCronScheduler;
 

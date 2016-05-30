@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
-use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
+use Oro\Bundle\WorkflowBundle\Model\ProcessCronScheduler;
 
 class ProcessTriggersImport
 {
@@ -31,7 +31,7 @@ class ProcessTriggersImport
     private $triggerEntityClass;
 
     /**
-     * @var ProcessTriggerScheduler
+     * @var ProcessCronScheduler
      */
     private $processCronScheduler;
 
@@ -44,13 +44,13 @@ class ProcessTriggersImport
      * @param ProcessConfigurationBuilder $configurationBuilder
      * @param ManagerRegistry $registry
      * @param string $triggerEntityClass
-     * @param ProcessTriggerScheduler $processCronScheduler
+     * @param ProcessCronScheduler $processCronScheduler
      */
     public function __construct(
         ProcessConfigurationBuilder $configurationBuilder,
         ManagerRegistry $registry,
         $triggerEntityClass,
-        ProcessTriggerScheduler $processCronScheduler
+        ProcessCronScheduler $processCronScheduler
     ) {
         $this->configurationBuilder = $configurationBuilder;
         $this->registry = $registry;

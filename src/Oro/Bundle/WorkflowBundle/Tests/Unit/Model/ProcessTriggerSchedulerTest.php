@@ -9,7 +9,7 @@ use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
+use Oro\Bundle\WorkflowBundle\Model\ProcessCronScheduler;
 
 class ProcessTriggerSchedulerTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +29,7 @@ class ProcessTriggerSchedulerTest extends \PHPUnit_Framework_TestCase
     protected $scheduleClass;
 
     /**
-     * @var ProcessTriggerScheduler
+     * @var ProcessCronScheduler
      */
     protected $processCronScheduler;
 
@@ -50,7 +50,7 @@ class ProcessTriggerSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
 
-        $this->processCronScheduler = new ProcessTriggerScheduler(
+        $this->processCronScheduler = new ProcessCronScheduler(
             $this->scheduleManager,
             $this->registry,
             $this->scheduleClass

@@ -9,7 +9,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessTriggerScheduler
+class ProcessCronScheduler
 {
     /** @var ManagerRegistry */
     private $registry;
