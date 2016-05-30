@@ -233,6 +233,22 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testAddLogEntity()
+    {
+        $spool = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool')
+                    ->disableOriginalConstructor()->getMock();
+        $spool->expects($this->once())->method('setLogEntity')->with('Test Class');
+        $tranport = $this->getMockBuilder('Swift_Transport_SpoolTransport')
+                    ->disableOriginalConstructor()->getMock();
+        $tranport->expects($this->once())->method('getSpool')->will(
+            $this->returnValue($spool)
+        );
+        $this->mailer->expects($this->once())->method('getTransport')->will(
+            $this->returnValue($tranport)
+        );
+        $this->processor->addLogEntity('Test Class');
+    }
+
     /**
      * Test processor with exception and empty recipients
      */

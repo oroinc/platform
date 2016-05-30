@@ -50,6 +50,8 @@ oro:
             body.label:           Body
             email.label:          Email
             status.label:         Status
+            status.success:       Success
+            status.failed:        Failed
             scheduled_at.label:   Scheduled At
             processed_at.label:   Processed At
             action:               View Mass Notifications

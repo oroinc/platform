@@ -1,6 +1,9 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Processor;
+namespace Oro\Bundle\NotificationBundle\Model;
+
+use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface;
 
 class MassNotification implements SenderAwareEmailNotificationInterface
 {

@@ -1,17 +1,56 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Processor;
+namespace Oro\Bundle\NotificationBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
+use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 
-class MassNotificationProcessor extends EmailNotificationProcessor
+class MassNotificationSender
 {
     const MAINTENANCE_VARIABLE = 'maintenance_message';
+
+    /**
+     * @var EmailNotificationProcessor
+     */
+    protected $processor;
+
+    /** @var ConfigManager */
+    protected $cm;
+
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var EntityPool
+     */
+    protected $entityPool;
+
+    /**
+     * @param EmailNotificationProcessor $emailNotificationProcessor
+     * @param ConfigManager $cm
+     * @param EntityManager $em
+     * @param EntityPool $entityPool
+     */
+    public function __construct(
+        EmailNotificationProcessor $emailNotificationProcessor,
+        ConfigManager $cm,
+        EntityManager $em,
+        EntityPool $entityPool
+    ) {
+        $this->processor = $emailNotificationProcessor;
+        $this->cm = $cm;
+        $this->em = $em;
+        $this->entityPool = $entityPool;
+    }
 
     /**
      * @param string $body
@@ -26,7 +65,6 @@ class MassNotificationProcessor extends EmailNotificationProcessor
         $senderEmail = null,
         $senderName = null
     ) {
-
         $senderEmail = $senderEmail ?: $this->cm->get('oro_notification.email_notification_sender_email');
         $senderName  = $senderName ?: $this->cm->get('oro_notification.email_notification_sender_name');
 
@@ -40,41 +78,17 @@ class MassNotificationProcessor extends EmailNotificationProcessor
         if ($subject) {
             $template->setSubject($subject);
         }
-
-        $this->addLogEntity();
         $massNotification = new MassNotification($senderName, $senderEmail, $recipients, $template);
 
-        $this->process(null, [$massNotification], null, [self::MAINTENANCE_VARIABLE => $body]);
+        $this->processor->addLogEntity('Oro\Bundle\NotificationBundle\Entity\MassNotification');
+        $this->processor->setMessageLimit(0);
+        $this->processor->process(null, [$massNotification], null, [self::MAINTENANCE_VARIABLE => $body]);
+        //persist and flush sending job entity
+        $this->entityPool->persistAndFlush($this->em);
 
         $recipientsCount = count($recipients);
 
         return $recipientsCount;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function addJob($command, $commandArgs = [])
-    {
-        if (!$this->hasNotFinishedJob($command)) {
-            $job = $this->createJob($command, $commandArgs);
-            $this->em->persist($job);
-            $this->em->flush($job);
-        }
-    }
-
-    /**
-     * Add entity class to log email sending
-     */
-    protected function addLogEntity()
-    {
-        $tranport = $this->mailer->getTransport();
-        if ($tranport instanceof \Swift_Transport_SpoolTransport) {
-            $spool = $tranport->getSpool();
-            if ($spool instanceof DbSpool) {
-                $spool->setLogEntity('Oro\Bundle\NotificationBundle\Entity\MassNotification');
-            }
-        }
     }
 
     /**

@@ -12,6 +12,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
+use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {
@@ -142,6 +143,22 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             }
 
             $this->addJob(self::SEND_COMMAND);
+        }
+    }
+
+    /**
+     * Add entity class to log email sending
+     *
+     * @param string $className
+     */
+    public function addLogEntity($className)
+    {
+        $tranport = $this->mailer->getTransport();
+        if ($tranport instanceof \Swift_Transport_SpoolTransport) {
+            $spool = $tranport->getSpool();
+            if ($spool instanceof DbSpool) {
+                $spool->setLogEntity($className);
+            }
         }
     }
 

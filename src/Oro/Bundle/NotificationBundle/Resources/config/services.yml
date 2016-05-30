@@ -9,7 +9,6 @@ parameters:
 
     # Notification processors
     oro_notification.email_processor.class: Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor
-    oro_notification.mass_notification_processor.class: Oro\Bundle\NotificationBundle\Processor\MassNotificationProcessor
 
     # Event manager and event handler classes
     oro_notification.manager.class: Oro\Bundle\NotificationBundle\Provider\NotificationManager
@@ -40,6 +39,8 @@ parameters:
     oro_notification.email_notification_entity_provider.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
 
     oro_notification.mass_notification_status_formatter.class: Oro\Bundle\NotificationBundle\Formatter\StatusFormatter
+
+    oro_notification.mass_notification_sender.class: Oro\Bundle\NotificationBundle\Model\MassNotificationSender
 
 services:
     # Entity spool
@@ -148,19 +149,13 @@ services:
             - [ setEnv, [%kernel.environment%] ]
             - [ setMessageLimit, [100] ]
 
-    oro_notification.mass_notification_processor:
-        class: %oro_notification.mass_notification_processor.class%
+    oro_notification.mass_notification_sender:
+        class: %oro_notification.mass_notification_sender.class%
         arguments:
-            - '@logger'
+            - '@oro_notification.email_processor'
+            - '@oro_config.user'
             - '@doctrine.orm.entity_manager'
             - '@oro_notification.entity_spool'
-            - '@oro_email.email_renderer'
-            - '@swiftmailer.mailer.db_spool_mailer'
-            - '@oro_config.user'
-            - '@oro_email.mailer.processor'
-        calls:
-            - [ setEnv, [%kernel.environment%] ]
-            - [ setMessageLimit, [0] ]
 
     oro_notification.email_handler:
         class: %oro_notification.email_handler.class%
@@ -212,3 +207,5 @@ services:
 
     oro_notification.mass_notification_status_formatter:
         class: %oro_notification.mass_notification_status_formatter.class%
+        arguments:
+            - '@translator'

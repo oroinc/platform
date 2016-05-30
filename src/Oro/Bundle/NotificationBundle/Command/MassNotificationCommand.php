@@ -2,11 +2,9 @@
 
 namespace  Oro\Bundle\NotificationBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 /**
@@ -62,36 +60,21 @@ class MassNotificationCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getDescription());
-
-        $subject = $input->getOption('subject');
-        $message = $input->getOption('message');
-        $senderName = $input->getOption('sender_name');
+        $subject     = $input->getOption('subject');
+        $message     = $input->getOption('message');
+        $senderName  = $input->getOption('sender_name');
         $senderEmail = $input->getOption('sender_email');
 
-        $service = $this->getContainer()->get('oro_notification.mass_notification_processor');
+        if (!$message) {
+            throw new \RuntimeException(
+                'Message should not be blank'
+            );
+        }
+
+        $service = $this->getContainer()->get('oro_notification.mass_notification_sender');
 
         $count = $service->send($message, $subject, $senderEmail, $senderEmail);
 
         $output->writeln(sprintf('%s notifications have been added to the queue', $count));
-    }
-
-    /**
-     * @param string        $question
-     * @param null|string   $default
-     * @return Question
-     */
-    protected function getHelperQuestions($question, $default = null)
-    {
-        $question = new Question($question, $default);
-
-        $question->setValidator(function ($answer) {
-            if (!$answer || empty(trim($answer))) {
-                throw new \RuntimeException(
-                    'This value should not be blank'
-                );
-            }
-        });
-
-        return $question;
     }
 }
