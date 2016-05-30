@@ -33,7 +33,9 @@ class LocalizationValidator extends ConstraintValidator
         if ($localization->getId() === $parentLocalization->getId() ||
             $localization->getChildLocalizations()->contains($parentLocalization)
         ) {
-            $this->context->addViolationAt('parentLocalization', $constraint->messageCircularReference);
+            $this->context->buildViolation($constraint->messageCircularReference)
+                ->atPath('parentLocalization')
+                ->addViolation();
         }
     }
 }

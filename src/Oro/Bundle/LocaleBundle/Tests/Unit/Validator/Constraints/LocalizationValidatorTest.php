@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ExecutionContextInterface;
 
 use Oro\Bundle\LocaleBundle\Entity;
 use Oro\Bundle\LocaleBundle\Validator\Constraints;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\LocalizationValidator;
-
 
 class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +23,9 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->constraint = new Constraints\Localization();
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContextInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->validator = new LocalizationValidator();
         $this->validator->initialize($this->context);
@@ -53,9 +52,9 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateWithoutCircularReference()
     {
-        $this->context->expects($this->never())->method('addViolationAt');
-        $localization1 = $this->createLocalization('loca1');
-        $localization2 = $this->createLocalization('loca2');
+        $this->context->expects($this->never())->method('buildViolation');
+        $localization1 = $this->createLocalization('loca1', 1);
+        $localization2 = $this->createLocalization('loca2', 2);
         $localization1->setParentLocalization($localization2);
 
         $this->validator->validate($localization1, $this->constraint);
@@ -63,14 +62,22 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateWithCircularReference()
     {
-        $this->context
-            ->expects($this->once())->method('addViolationAt')
-            ->with('parentLocalization', $this->constraint->messageCircularReference);
+        $this->expectViolation();
 
-        $localization1 = $this->createLocalization('loca1');
-        $localization2 = $this->createLocalization('loca2');
+        $localization1 = $this->createLocalization('loca1', 1);
+        $localization2 = $this->createLocalization('loca2', 2);
         $localization1->setParentLocalization($localization2);
-        $localization2->setParentLocalization($localization2);
+        $localization1->addChildLocalization($localization2);
+
+        $this->validator->validate($localization1, $this->constraint);
+    }
+
+    public function testValidateSelfPatrent()
+    {
+        $this->expectViolation();
+
+        $localization1 = $this->createLocalization('loca1', 1);
+        $localization1->setParentLocalization($localization1);
 
         $this->validator->validate($localization1, $this->constraint);
     }
@@ -84,24 +91,42 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate('test', $this->constraint);
     }
 
-    public function testUnexpectedItem()
+    public function testUnexpectedClass()
     {
         $this->setExpectedException(
             '\Symfony\Component\Validator\Exception\UnexpectedTypeException',
-            'Expected argument of type "Oro\Bundle\LocaleBundle\Model\Localization", "stdClass" given'
+            'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "stdClass" given'
         );
-        $data = new ArrayCollection([ new \stdClass()]);
+        $data = new \stdClass();
         $this->validator->validate($data, $this->constraint);
+    }
+
+    private function expectViolation()
+    {
+        $violationBuilder = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
+        $violationBuilder->expects($this->once())
+            ->method('atPath')
+            ->with('parentLocalization')
+            ->willReturnSelf();
+        $this->context->expects($this->once())
+            ->method('buildViolation')
+            ->with($this->constraint->messageCircularReference)
+            ->willReturn($violationBuilder);
     }
 
     /**
      * @param string $name
+     * @param int $id
      * @return Entity\Localization|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createLocalization($name)
+    private function createLocalization($name, $id)
     {
         $localization = new Entity\Localization();
         $localization->setName($name);
+        $reflection = new \ReflectionClass('Oro\Bundle\LocaleBundle\Entity\Localization');
+        $reflectionProperty = $reflection->getProperty('id');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($localization, $id);
 
         return $localization;
     }
