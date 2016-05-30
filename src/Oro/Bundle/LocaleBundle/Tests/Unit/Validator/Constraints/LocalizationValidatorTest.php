@@ -117,7 +117,7 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param int $id
-     * @return Entity\Localization|\PHPUnit_Framework_MockObject_MockObject
+     * @return Entity\Localization
      */
     private function createLocalization($name, $id)
     {
