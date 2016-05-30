@@ -562,7 +562,10 @@ class FieldAclExtension extends AbstractAclExtension
         $identity = $this->permissionToMaskBuilderIdentity[$permission];
         if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $permission))) {
             $maskAccessLevels = [];
-            foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
+            foreach ($this->getAccessLevelNames($object, $permission) as $accessLevel) {
+                if ($accessLevel === AccessLevel::NONE_LEVEL_NAME) {
+                    continue;
+                }
                 if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_' . $accessLevel))) {
                     $maskAccessLevels[] = $accessLevel;
                 }
