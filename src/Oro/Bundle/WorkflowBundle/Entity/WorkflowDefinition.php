@@ -300,7 +300,6 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function getConfiguration()
     {
-        unset($this->configuration['attributes']);
         return $this->configuration;
     }
 

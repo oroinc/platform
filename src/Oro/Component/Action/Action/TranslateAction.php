@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Action\Action;
 
+use Doctrine\Common\Util\ClassUtils;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -54,6 +56,18 @@ class TranslateAction extends AbstractAction
             $locale = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_LOCALE]);
         }
 
+        if (!is_array($parameters)) {
+            throw new InvalidParameterException(
+                sprintf(
+                    'Action "%s" expects array in parameter "configuration", %s is given.',
+                    self::OPTION_KEY_PARAMETERS,
+                    $this->getType($parameters)
+                )
+            );
+        }
+
+        $parameters = $this->parseArrayValues($context, $parameters);
+
         $result = $this->translator->trans($id, $parameters, $domain, $locale);
 
         $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_ATTRIBUTE], $result);
@@ -75,5 +89,34 @@ class TranslateAction extends AbstractAction
         }
 
         $this->options = $options;
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    protected function getType($value)
+    {
+        if (is_object($value)) {
+            return ClassUtils::getClass($value);
+        }
+
+        return gettype($value);
+    }
+
+    /**
+     * @param mixed $context
+     * @param array $data
+     * @return array
+     */
+    protected function parseArrayValues($context, array $data)
+    {
+        foreach ($data as $key => $value) {
+            if ($value instanceof PropertyPath) {
+                $data[$key] = $this->contextAccessor->getValue($context, $value);
+            }
+        }
+
+        return $data;
     }
 }

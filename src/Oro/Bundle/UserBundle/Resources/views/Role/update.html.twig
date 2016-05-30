@@ -20,15 +20,6 @@
         }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {% if entityId and resource_granted('CREATE', form.vars.value)%}
-        {{ UI.button({
-            'iCss': 'icon-copy',
-            'label': 'oro.user.role.clone'|trans,
-            'title': 'oro.user.role.clone'|trans,
-            'path': path('oro_user_role_clone', {'id': entityId}),
-        }) }}
-    {% endif %}
-    {{ UI.buttonSeparator() }}
     {{ UI.cancelButton(path('oro_user_role_index')) }}
     {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success role-submit', 'label': 'Save and Close'|trans}) %}
     {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
@@ -61,6 +52,7 @@
     <div data-page-component-module="orouser/js/views/role-view"
          data-page-component-options="{{ options|json_encode }}">
     </div>
+    {{ parent() }}
 {% endblock navButtons %}
 
 {% block pageHeader %}

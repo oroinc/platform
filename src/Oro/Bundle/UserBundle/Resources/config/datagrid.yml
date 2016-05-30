@@ -231,10 +231,6 @@ datagrid:
                 route: oro_api_delete_role
                 params:
                     - id
-            clone_link:
-                type:       url
-                route:      oro_user_role_clone
-                params:     [ id ]
 
         actions:
             update:
@@ -250,11 +246,6 @@ datagrid:
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_role_delete
-            clone:
-                type:          navigate
-                label:         oro.grid.action.clone
-                link:          clone_link
-                icon:          copy
 
         action_configuration: "@oro_user.role.datagrid_helper->getActionConfigurationClosure"
 

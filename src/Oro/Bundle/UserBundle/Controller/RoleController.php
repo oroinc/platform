@@ -49,30 +49,6 @@ class RoleController extends Controller
 
     /**
      * @Route(
-     *      "/clone/{id}",
-     *      name="oro_user_role_clone",
-     *      requirements={"id"="\d+"}
-     * )
-     * @AclAncestor("oro_user_role_create")
-     * @Template("OroUserBundle:Role:update.html.twig")
-     *
-     * @param Role $entity
-     * @return array
-     */
-    public function cloneAction(Role $entity)
-    {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-        $clonedLabel = $translator->trans('oro.user.role.clone.label', array('%name%' => $entity->getLabel()));
-
-        $clonedRole = clone $entity;
-        $clonedRole->setLabel($clonedLabel);
-
-        return $this->update($clonedRole);
-    }
-
-    /**
-     * @Route(
      *      "/{_format}",
      *      name="oro_user_role_index",
      *      requirements={"_format"="html|json"},

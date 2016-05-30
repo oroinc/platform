@@ -85,7 +85,10 @@ class Role extends ExtendRole
      */
     public function __clone()
     {
-        $this->id = null;
+        if ($this->id) {
+            $this->id = null;
+            $this->setRole($this->role);
+        }
     }
 
     /**
