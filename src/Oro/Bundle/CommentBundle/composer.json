@@ -5,7 +5,7 @@
     "keywords": ["BAP", "UI", "Comment"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.*",
+        "php": ">=5.5.9",
         "symfony/symfony": "2.7.*",
         "oro/ui-bundle": "dev-master"
     },

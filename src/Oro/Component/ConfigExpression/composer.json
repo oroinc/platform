@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "Config", "Expression"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "oro/property-access": "dev-master"
     },
     "require-dev": {

@@ -17,8 +17,10 @@ class RemoveDeletedCountHeader implements ProcessorInterface
     {
         /** @var DeleteListContext $context */
 
-        if ($context->hasErrors() && $context->getResponseHeaders()->has(SetDeletedCountHeader::HEADER_NAME)) {
-            $context->getResponseHeaders()->remove(SetDeletedCountHeader::HEADER_NAME);
+        if ($context->hasErrors()
+            && $context->getResponseHeaders()->has(SetDeletedCountHeader::RESPONSE_HEADER_NAME)
+        ) {
+            $context->getResponseHeaders()->remove(SetDeletedCountHeader::RESPONSE_HEADER_NAME);
         }
     }
 }

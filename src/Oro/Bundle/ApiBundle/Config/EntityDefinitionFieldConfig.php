@@ -14,12 +14,23 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     use Traits\ExcludeTrait;
     use Traits\LabelTrait;
     use Traits\DescriptionTrait;
+    use Traits\DataTypeTrait;
+    use Traits\FormTrait;
 
     /** a human-readable representation of the field */
-    const LABEL = 'label';
+    const LABEL = EntityDefinitionConfig::LABEL;
 
     /** a human-readable description of the field */
-    const DESCRIPTION = 'description';
+    const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
+
+    /** the data type of the field value */
+    const DATA_TYPE = 'data_type';
+
+    /** the form type that should be used for the field */
+    const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;
+
+    /** the form options that should be used for the field */
+    const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
 
     /**
      * {@inheritdoc}
@@ -99,6 +110,16 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function hasPropertyPath()
     {
         return array_key_exists(self::PROPERTY_PATH, $this->items);
+    }
+
+    /**
+     * Whether at least one data transformer exists.
+     *
+     * @return bool
+     */
+    public function hasDataTransformers()
+    {
+        return !empty($this->items[self::DATA_TRANSFORMER]);
     }
 
     /**
