@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Form\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -57,16 +58,12 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ($request->request->has('attendees')) {
+        if ($this->hasAttendeeInRequest()) {
             $form->remove('invitedUsers');
         }
     }
 
     /**
-     * @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees'
-     *
      * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
@@ -74,7 +71,10 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-        if (!empty($data['attendees'])) {
+        /**
+         * @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees'
+         */
+        if ($this->hasAttendeeInRequest()) {
             $form->remove('invitedUsers');
         }
 
@@ -112,5 +112,18 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
         }
 
         $this->calendarEventManager->setCalendar($data, $calendarAlias, (int)$calendarId);
+    }
+
+    /**
+     * @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees'
+     *
+     * @return bool
+     */
+    protected function hasAttendeeInRequest()
+    {
+        /** @var Request $request */
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request->request->has('attendees');
     }
 }
