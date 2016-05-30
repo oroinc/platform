@@ -6,7 +6,7 @@ oro_menu_config:
 
         locales:
             label: 'oro.locale.menu.locales.label'
-            route: 'oro_locale_localeset_index'
+            route: 'oro_locale_localization_index'
             extras:
                 routes: ['/^oro_locale/']
 
@@ -20,7 +20,7 @@ oro_menu_config:
                                 locales: ~
 
 oro_titles:
-    oro_locale_localeset_index: ~
-    oro_locale_localeset_view:   'oro.locale.localeset.navigation.view'
-    oro_locale_localeset_update: 'oro.locale.localeset.navigation.view - oro.ui.edit'
-    oro_locale_localeset_create: 'oro.ui.create_entity'
+    oro_locale_localization_index: ~
+    oro_locale_localization_view:   'oro.locale.localization.navigation.view'
+    oro_locale_localization_update: 'oro.locale.localization.navigation.view - oro.ui.edit'
+    oro_locale_localization_create: 'oro.ui.create_entity'

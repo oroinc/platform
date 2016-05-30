@@ -203,4 +203,12 @@ class Localization implements DatesAwareInterface
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->name;
+    }
 }
