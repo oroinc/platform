@@ -78,10 +78,10 @@ datagrid:
                                 terminated: oro.cron.job.status.terminated
                                 incomplete: oro.cron.job.status.incomplete
                 runtime:
-                    type: number
+                    type: number-range
                     data_name: j.runtime
                 priority:
-                    type: number
+                    type: number-range
                     data_name: j.priority * -1
                 createdAt:
                     type:      datetime

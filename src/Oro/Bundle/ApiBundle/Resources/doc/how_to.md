@@ -5,6 +5,7 @@ How to
 Table of Contents
 -----------------
  - [Turn on API for entity](#overview)
+ - [Turn on API for entity disabled in "Resources/config/oro/entity.yml"](#turn-on-api-for-entity-disabled-in-resourcesconfigoroentityyml)
  - [Change ACL resource for action](#change-acl-resource-for-action)
  - [Disable access checks for action](#disable-access-checks-for-action)
  - [Disable entity action](#disable-entity-action)
@@ -22,6 +23,33 @@ By default, API for entities is disabled. To turn on API for some entity, you sh
 oro_api:
     entities:
         Acme\Bundle\ProductBundle\Product: ~
+```
+
+Turn on API for entity disabled in Resources/config/oro/entity.yml
+------------------------------------------------------------------
+
+The `exclusions` section of `Resources/config/oro/entity.yml` configuration file is used to make an entity or a field not accessible for a user. Also such entities and fields are not accessible via Data API as well. But it is possible that by some reasons you want to override such rules for Data API. It can be done using `exclude` option in `Resources/config/oro/api.yml`.
+
+Let's imagine that you have the following `Resources/config/oro/entity.yml`:
+
+```yaml
+oro_entity:
+    exclusions:
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1 }
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
+```
+
+To override these rules in Data API you can use the following `Resources/config/oro/api.yml`:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            exclude: false # override exclude rule from entity.yml
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity2:
+            fields:
+                field1:
+                    exclude: false # override exclude rule from entity.yml
 ```
 
 Change ACL resource for action

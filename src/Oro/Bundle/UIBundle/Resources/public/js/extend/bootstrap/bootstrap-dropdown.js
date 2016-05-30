@@ -26,6 +26,7 @@ define(function(require) {
             if ($parent.hasClass('open')) {
                 $parent.trigger('hide.bs.dropdown');
             }
+            $(this).dropdown('detach', false);
         });
     }
 
@@ -47,6 +48,7 @@ define(function(require) {
                 if ($dropdown.is('.open')) {
                     $dropdown.trigger('hide.bs.dropdown').removeClass('open');
                 }
+                $el.dropdown('detach', false);
             }
         };
         $el.data('globalHandlers', globalHandlers);

@@ -17,12 +17,13 @@ class AddressCollectionType extends AbstractType
     {
         $resolver->setNormalizers(
             array(
-                'options' => function (Options $options, $options) {
-                    if (!$options) {
-                        $options = array();
+                'options' => function (Options $options, $values) {
+                    if (!$values) {
+                        $values = array();
                     }
-                    $options['single_form'] = false;
-                    return $options;
+                    $values['single_form'] = false;
+
+                    return $values;
                 }
             )
         );

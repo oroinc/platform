@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -82,9 +83,8 @@ class EmailOriginHelper
      */
     protected function isEmptyOrigin($origin)
     {
-        return (null === $origin || ($origin instanceof Collection && $origin->isEmpty()))
-        && null !== $this->emailModel
-        ;
+        return (null === $origin || ($origin instanceof Collection && $origin->isEmpty())) &&
+        null !== $this->emailModel;
     }
 
     /**
@@ -140,8 +140,8 @@ class EmailOriginHelper
     protected function getInternalFilter(OrganizationInterface $organization = null)
     {
         return function ($item) use ($organization) {
-            return $item instanceof InternalEmailOrigin
-            && (!$organization || $item->getOrganization() === $organization);
+            return ($item->getOrganization() === $organization || !$organization) &&
+            $item instanceof InternalEmailOrigin;
         };
     }
 

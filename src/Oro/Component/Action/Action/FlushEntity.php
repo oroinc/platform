@@ -92,10 +92,8 @@ class FlushEntity extends AbstractAction
      */
     protected function getEntity($context)
     {
-        if ($this->entity) {
-            return $this->contextAccessor->getValue($context, $this->entity);
-        } else {
-            return $context->getEntity();
-        }
+        return $this->entity
+            ? $this->contextAccessor->getValue($context, $this->entity)
+            : $context->getEntity();
     }
 }

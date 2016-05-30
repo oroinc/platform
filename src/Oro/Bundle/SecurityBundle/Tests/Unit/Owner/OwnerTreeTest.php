@@ -272,6 +272,18 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bu2', 'bu3'), $tree->getBusinessUnitsIdByUserOrganizations('user'));
     }
 
+    public function testAddBusinessUsersAndGetAllBusinessUnitIds()
+    {
+        $tree = new OwnerTree();
+
+        $tree->addBusinessUnit('bu1', 1);
+        $tree->addBusinessUnit('bu2', 2);
+        $tree->addBusinessUnit('bu3', 2);
+        $tree->addBusinessUnit('bu4', 3);
+
+        $this->assertEquals(['bu1', 'bu2', 'bu3', 'bu4'], $tree->getAllBusinessUnitIds());
+    }
+
     public static function addBusinessUnitRelationProvider()
     {
         return array(
@@ -315,7 +327,7 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
                     array('12', '1'),
                 ),
                 array(
-                    '1' => array('11', '111', '12'),
+                    '1' => array('11', '12', '111'),
                     '11' => array('111'),
                     '111' => array(),
                     '12' => array(),
@@ -334,7 +346,7 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
                     array('1221', '122'),
                 ),
                 array(
-                    '1' => array('11', '111', '1111', '1112', '12', '121', '122', '1221'),
+                    '1' => array('11', '12', '111', '121', '122', '1111', '1112', '1221'),
                     '11' => array('111', '1111', '1112'),
                     '111' => array('1111', '1112'),
                     '1111' => array(),
