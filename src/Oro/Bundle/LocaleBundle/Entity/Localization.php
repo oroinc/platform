@@ -16,6 +16,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\Table(name="oro_localization")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
+ *      routeName="oro_locale_localization_index",
+ *      routeView="oro_locale_localization_view",
+ *      routeUpdate="oro_locale_localization_update",
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-list"
@@ -24,7 +27,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "type"="ACL",
  *              "group_name"=""
  *          },
- *      }
+ *      },
+
  * )
  */
 class Localization implements DatesAwareInterface
