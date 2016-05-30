@@ -8,15 +8,18 @@ datagrid:
             type: orm
             query:
                 select:
-                    - localization.id
                     - localization.name
+                    - localization.languageCode
+                    - localization.formattingCode
                 from:
                     - { table: %oro_locale.entity.localization.class%, alias: localization }
         columns:
-            id:
-                label: oro.locale.localization.id.label
             name:
                 label: oro.locale.localization.name.label
+            languageCode:
+                label: oro.locale.localization.language_code.label
+            formattingCode:
+                label: oro.locale.localization.formatting_code.label
         properties:
             id: ~
             view_link:
