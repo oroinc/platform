@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
-use Oro\Bundle\WorkflowBundle\Model\ProcessImport;
+use Oro\Bundle\WorkflowBundle\Model\ProcessStorage;
 
 class ProcessImportTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,7 +33,7 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
     protected $triggersImport;
 
     /**
-     * @var ProcessImport
+     * @var ProcessStorage
      */
     protected $processImport;
 
@@ -50,7 +50,7 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processImport = new ProcessImport(
+        $this->processImport = new ProcessStorage(
             $this->managerRegistry,
             $this->definitionImport,
             $this->triggersImport,

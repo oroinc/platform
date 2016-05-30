@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 class ScheduledTransitionProcessName
 {
-    const IDENTITY_SUFFIX = 'stpn';
-    const DELIMITER       = '__';
+    const IDENTITY_PREFIX = 'stpn';
+    const DELIMITER = '__';
 
     /** @var string */
     private $workflow;
@@ -31,15 +31,17 @@ class ScheduledTransitionProcessName
     {
         $chunks = explode(self::DELIMITER, (string)$name);
 
-        if (!array_key_exists(2, $chunks) || $chunks[2] !== self::IDENTITY_SUFFIX) {
+        if (!array_key_exists(0, $chunks) || $chunks[0] !== self::IDENTITY_PREFIX) {
             throw new \InvalidArgumentException(
-                sprintf('Can not restore. Provided name `%s` is not valid `%s` representation.', $name, __CLASS__)
+                sprintf(
+                    'Can not restore name object. Provided name `%s` is not valid `%s` representation.',
+                    $name,
+                    __CLASS__
+                )
             );
         }
 
-        list($workflow, $transition) = $chunks;
-
-        return new self($workflow, $transition);
+        return new self($chunks[1], $chunks[2]);
     }
 
     /**
@@ -64,10 +66,12 @@ class ScheduledTransitionProcessName
     public function getName()
     {
         if (empty($this->transition) || empty($this->workflow)) {
-            throw new \UnderflowException('Cannot build valid string representation without all parts.');
+            throw new \UnderflowException(
+                'Cannot build valid string representation of scheduled transition process name without all parts.'
+            );
         }
 
-        return implode(self::DELIMITER, [$this->workflow, $this->transition, self::IDENTITY_SUFFIX]);
+        return implode(self::DELIMITER, [self::IDENTITY_PREFIX, $this->workflow, $this->transition]);
     }
 
     /**

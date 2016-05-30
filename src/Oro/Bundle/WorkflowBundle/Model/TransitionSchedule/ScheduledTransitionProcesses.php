@@ -3,11 +3,15 @@
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NoResultException;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Component\DoctrineUtils\ORM\LikeQueryHelperTrait;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class ScheduledTransitionProcesses
 {
+    use LikeQueryHelperTrait;
+
     /**
      * @var ManagerRegistry
      */
@@ -29,37 +33,40 @@ class ScheduledTransitionProcesses
     }
 
     /**
-     * @param $workflow
-     * @param $transition
+     * @param ScheduledTransitionProcessName $scheduledTransitionProcessName
      * @return ProcessDefinition|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function exact($workflow, $transition)
+    public function get(ScheduledTransitionProcessName $scheduledTransitionProcessName)
     {
         $qb = $this->getEntityRepository()->createQueryBuilder('e')->where('e.name = :name');
         $qb->setParameter(
             'name',
-            (string)(new ScheduledTransitionProcessName($workflow, $transition))
+            $scheduledTransitionProcessName->getName()
         );
 
-        return $qb->getQuery()->getSingleResult();
+        try {
+            return $qb->getQuery()->getSingleResult();
+        } catch (NoResultException $e) {
+            return null;
+        }
     }
 
     /**
      * @param string $workflow
-     * @return array|ProcessDefinition
+     * @return array|ProcessDefinition[]
      */
     public function workflowRelated($workflow)
     {
         $qb = $this->getEntityRepository()->createQueryBuilder('p');
-        $qb = $qb->where($qb->expr()->like('p.name', ':suffix'));
+        $qb = $qb->where($qb->expr()->like('p.name', ":match ESCAPE '!'"));
 
-        $qb->setParameter(
-            'suffix',
-            implode(
-                ScheduledTransitionProcessName::DELIMITER,
-                [$workflow, '%', ScheduledTransitionProcessName::IDENTITY_SUFFIX]
-            )
+        $matchWorkflowRelated = implode(
+            ScheduledTransitionProcessName::DELIMITER,
+            [ScheduledTransitionProcessName::IDENTITY_PREFIX, $workflow]
         );
+
+        $qb->setParameter('match', $this->makeLikeParam($matchWorkflowRelated, '%s%%'));
 
         return $qb->getQuery()->getResult();
     }
@@ -69,16 +76,12 @@ class ScheduledTransitionProcesses
      */
     public function all()
     {
+        $allMatch = ScheduledTransitionProcessName::IDENTITY_PREFIX . ScheduledTransitionProcessName::DELIMITER;
+
         $qb = $this->getEntityRepository()->createQueryBuilder('p');
-        $qb = $qb->where($qb->expr()->like('p.name', ':suffix'));
+        $qb = $qb->where($qb->expr()->like('p.name', ":match ESCAPE '!'"));
 
-        //todo escape underlines
-        $qb->setParameter(
-            'suffix',
-            '%' . ScheduledTransitionProcessName::DELIMITER . ScheduledTransitionProcessName::IDENTITY_SUFFIX
-        );
-
-
+        $qb->setParameter('match', $this->makeLikeParam($allMatch, '%s%%'));
 
         return $qb->getQuery()->getResult();
     }

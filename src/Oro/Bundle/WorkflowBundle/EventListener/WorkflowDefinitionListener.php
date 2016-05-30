@@ -4,28 +4,41 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\ProcessStorage;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
-use Oro\Bundle\WorkflowBundle\Model\ProcessImport;
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Provide logic for workflow scheduled transitions processes synchronization
+ */
 class WorkflowDefinitionListener
 {
     /** @var ProcessConfigurationGenerator */
     protected $generator;
 
     /** @var ServiceLink */
-    protected $importLink;
+    protected $processStorageLink;
+
+    /** @var ScheduledTransitionProcesses */
+    private $scheduledTransitionProcessesLink;
 
     /**
      * @param ProcessConfigurationGenerator $generator
-     * @param ServiceLink $importLink
+     * @param ServiceLink $processStorageServiceLink
+     * @param serviceLink $scheduledTransitionProcessesLink
      */
-    public function __construct(ProcessConfigurationGenerator $generator, ServiceLink $importLink)
-    {
+    public function __construct(
+        ProcessConfigurationGenerator $generator,
+        ServiceLink $processStorageServiceLink,
+        ServiceLink $scheduledTransitionProcessesLink
+    ) {
         $this->generator = $generator;
-        $this->importLink = $importLink;
+        $this->processStorageLink = $processStorageServiceLink;
+        $this->scheduledTransitionProcessesLink = $scheduledTransitionProcessesLink;
     }
 
     /**
@@ -33,7 +46,15 @@ class WorkflowDefinitionListener
      */
     public function postPersist(LifecycleEventArgs $args)
     {
-        $this->onWorkflowDefinitionChange($args->getEntity());
+        $entity = $args->getEntity();
+
+        if (!$entity instanceof WorkflowDefinition) {
+            return;
+        }
+
+        $configuration = $this->generator->generateForScheduledTransition($entity);
+
+        $this->getProcessStorage()->import($configuration);
     }
 
     /**
@@ -41,7 +62,28 @@ class WorkflowDefinitionListener
      */
     public function postUpdate(LifecycleEventArgs $args)
     {
-        $this->onWorkflowDefinitionChange($args->getEntity());
+        $entity = $args->getEntity();
+
+        if (!$entity instanceof WorkflowDefinition) {
+            return;
+        }
+
+        $generatedConfigurations = $this->generator->generateForScheduledTransition($entity);
+
+        $processStorage = $this->getProcessStorage();
+        $processStorage->import($generatedConfigurations);
+
+        $persistedProcessDefinitions = $this->getScheduledTransitionProcesses()->workflowRelated($entity->getName());
+
+        $toDelete = [];
+        foreach ($persistedProcessDefinitions as $definition) {
+            $name = $definition->getName();
+            if (!array_key_exists($name, $generatedConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS])) {
+                $toDelete[] = $definition->getName();
+            }
+        }
+
+        $processStorage->remove($toDelete);
     }
 
     /**
@@ -53,6 +95,15 @@ class WorkflowDefinitionListener
         if (!$this->isSupportedEntity($entity)) {
             return;
         }
+
+        $workflowScheduledProcesses = $this->getScheduledTransitionProcesses()->workflowRelated($entity->getName());
+
+        $toDelete = [];
+        foreach ($workflowScheduledProcesses as $definition) {
+            $toDelete[] = $definition->getName();
+        }
+
+        $this->getProcessStorage()->remove($toDelete);
     }
 
     /**
@@ -65,28 +116,30 @@ class WorkflowDefinitionListener
     }
 
     /**
-     * @param object|WorkflowDefinition $entity
+     * @return ProcessStorage
      */
-    protected function onWorkflowDefinitionChange($entity)
+    protected function getProcessStorage()
     {
-        if (!$this->isSupportedEntity($entity)) {
-            return;
+        $service = $this->processStorageLink->getService();
+
+        if (!$service instanceof ProcessStorage) {
+            throw new \RuntimeException('Instance of Oro\Bundle\WorkflowBundle\Model\ProcessStorage expected.');
         }
 
-        $configuration = $this->generator->generateForScheduledTransition($entity);
-
-        $this->getProcessImport()->import($configuration);
+        return $service;
     }
 
     /**
-     * @return ProcessImport
+     * @return ScheduledTransitionProcesses
      */
-    protected function getProcessImport()
+    protected function getScheduledTransitionProcesses()
     {
-        $service = $this->importLink->getService();
+        $service = $this->scheduledTransitionProcessesLink->getService();
 
-        if (!$service instanceof ProcessImport) {
-            throw new \RuntimeException('Instance of Oro\Bundle\WorkflowBundle\Model\ProcessImport expected.');
+        if (!$service instanceof ScheduledTransitionProcesses) {
+            throw new \RuntimeException(
+                'Instance of Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses expected.'
+            );
         }
 
         return $service;

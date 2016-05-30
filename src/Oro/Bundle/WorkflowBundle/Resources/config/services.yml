@@ -167,8 +167,8 @@ services:
             - '%oro_workflow.process_trigger.entity.class%'
             - '@oro_workflow.process.cron_scheduler'
 
-    oro_workflow.process.import:
-        class: Oro\Bundle\WorkflowBundle\Model\ProcessImport
+    oro_workflow.process.storage:
+        class: Oro\Bundle\WorkflowBundle\Model\ProcessStorage
         public: true
         arguments:
             - '@doctrine'

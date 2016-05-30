@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessImportResult;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
 
-class ProcessImport
+class ProcessStorage
 {
     /**
      * @var ManagerRegistry
@@ -76,10 +76,39 @@ class ProcessImport
     }
 
     /**
+     * Removes all process definitions from database by their names
+     * @param array|string $names
+     */
+    public function remove($names)
+    {
+        $objectManager = $this->getObjectManager();
+        $repository = $this->getRepository();
+        $dirty = false;
+        foreach ((array)$names as $processDefinitionName) {
+            $definition = $repository->find($processDefinitionName);
+            if ($definition) {
+                $objectManager->remove($definition);
+                $dirty = true;
+            }
+        }
+        if ($dirty) {
+            $objectManager->flush();
+        }
+    }
+
+    /**
      * @return ObjectRepository
      */
     protected function getRepository()
     {
-        return $this->registry->getManagerForClass($this->definitionClass)->getRepository($this->definitionClass);
+        return $this->getObjectManager()->getRepository($this->definitionClass);
+    }
+
+    /**
+     * @return \Doctrine\Common\Persistence\ObjectManager|null
+     */
+    protected function getObjectManager()
+    {
+        return $this->registry->getManagerForClass($this->definitionClass);
     }
 }

@@ -55,7 +55,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
             $usedDefinitions
         );
 
-        $processImport = $this->getContainer()->get('oro_workflow.process.import');
+        $processImport = $this->getContainer()->get('oro_workflow.process.storage');
 
         $result = $processImport->import($processConfiguration);
 
