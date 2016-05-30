@@ -2,24 +2,46 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
-use Oro\Bundle\ApiBundle\Config\FiltersConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterInterface;
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Applies all requested filters to the Criteria object.
  */
 class BuildCriteria implements ProcessorInterface
 {
+    /** @var ConfigProvider */
+    protected $configProvider;
+
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /**
+     * @param ConfigProvider $configProvider
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(
+        ConfigProvider $configProvider,
+        DoctrineHelper $doctrineHelper
+    ) {
+        $this->configProvider = $configProvider;
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -50,15 +72,21 @@ class BuildCriteria implements ProcessorInterface
         }
 
         // Process unknown filters
-        foreach ($filterValues->getAll() as $filterKey => $filterValue) {
+        $filterValues = $filterValues->getGroup('filter');
+        foreach ($filterValues as $filterKey => $filterValue) {
             /** @var FilterValue $filterValue */
             if ($filters->has($filterKey)) {
                 continue;
             }
 
-            $filterValueDataType = $this->getFilterValueDataType($context, $filterKey, $filterValue);
+            $filterValueDataType = $this->getFilterValueDataType($context, $filterValue);
             if (!$filterValueDataType) {
-                $this->addContextDataTypeNotFoundError($context, $filterKey);
+                $context->addError(
+                    Error::createValidationError(
+                        Constraint::FILTER,
+                        sprintf('Filter "%s" is not supported.', $filterKey)
+                    )->setSource(ErrorSource::createByParameter($filterKey))
+                );
                 continue;
             }
 
@@ -73,125 +101,58 @@ class BuildCriteria implements ProcessorInterface
 
     /**
      * @param Context     $context
-     * @param string      $filterKey
      * @param FilterValue $filterValue
      *
      * @return string|null
      */
-    protected function getFilterValueDataType($context, $filterKey, $filterValue)
+    protected function getFilterValueDataType($context, $filterValue)
     {
-        $metadata = $context->getMetadata();
-
-        $filterParts = explode('.', $filterValue->getPath());
-        $filterPartsCount = count($filterParts);
-
-        foreach ($filterParts as $index => $fieldName) {
-            //the last part reached
-            if ($index === $filterPartsCount - 1) {
-                break;
-            }
-
-            //all parts, except last one should be associations
-            if (!$metadata->hasAssociation($fieldName)) {
-                $this->addContextAssociationError($context, $fieldName, $filterKey);
-                break;
-            }
-
-            $metadata = $context->getMetadata($metadata->getAssociation($fieldName)->getTargetClassName());
-        }
-
-        $fieldName = end($filterParts);
-        if (!$metadata->hasAssociation($fieldName) && !$metadata->hasField($fieldName)) {
-            $this->addContextResourceError($context, $fieldName, $filterKey);
-
+        /** @var ClassMetadata $metadata */
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
+        if (!$metadata) {
             return null;
         }
 
-        if ($metadata->hasAssociation($fieldName)) {
-            /** @var FiltersConfig $config */
-            $config = $context->getConfigOfFilters($metadata->getAssociation($fieldName)->getTargetClassName());
+        $filterParts = explode('.', $filterValue->getPath());
+        $filterFieldName = array_pop($filterParts);
 
-            /** @var EntityMetadata $meta */
-            $meta = $metadata->getAssociation($fieldName)->getTargetMetadata();
-            foreach ($meta->getIdentifierFieldNames() as $identifier) {
-                if ($config->hasField($identifier)) {
-                    return $config->getField($identifier)->getDataType();
-                }
-            }
-        } else {
-            /** @var FiltersConfig $config */
-            $config = $context->getConfigOfFilters($metadata->getClassName());
-            if (!$config->hasField($fieldName)) {
-                $this->addContextFilterNotAllowedError($context, $fieldName, $filterKey);
+        //all parts of filter path, except last one should be an associations
+        foreach ($filterParts as $filterPart) {
+            if (!$metadata->hasAssociation($filterPart)) {
                 return null;
             }
 
-            return $config->getField($fieldName)->getDataType();
+            $metadata = $this->doctrineHelper->getEntityMetadataForClass(
+                $metadata->getAssociationTargetClass($filterPart)
+            );
+        }
+
+        //the last part of filter path should exist in metadata.
+        if (!$metadata->hasAssociation($filterFieldName) && !$metadata->hasField($filterFieldName)) {
+            return null;
+        }
+
+        $className = $metadata->getName();
+        if ($metadata->hasAssociation($filterFieldName)) {
+            $className = $metadata->getAssociationTargetClass($filterFieldName);
+        }
+
+        $config = $this->configProvider->getConfig(
+            $className,
+            $context->getVersion(),
+            $context->getRequestType(),
+            [
+                new EntityDefinitionConfigExtra(),
+                new FiltersConfigExtra()
+            ]
+        );
+
+        if ($config->hasFilters() && $config->getFilters()->hasField($filterFieldName)) {
+            $filterFieldConfig = $config->getFilters()->getField($filterFieldName);
+
+            return $filterFieldConfig->getDataType();
         }
 
         return null;
-    }
-
-    /**
-     * @param Context $context
-     * @param string  $filterKey
-     */
-    protected function addContextDataTypeNotFoundError($context, $filterKey)
-    {
-        /** @var Context $context */
-        $context->addError(
-            Error::createValidationError(
-                Constraint::FILTER,
-                'Filter data type not specified and could not be detected automatically.'
-            )->setSource(ErrorSource::createByParameter($filterKey))
-        );
-    }
-
-    /**
-     * @param Context $context
-     * @param string  $fieldName
-     * @param string  $filterKey
-     */
-    protected function addContextAssociationError($context, $fieldName, $filterKey)
-    {
-        /** @var Context $context */
-        $context->addError(
-            Error::createValidationError(
-                Constraint::FILTER,
-                sprintf('All resource parts (except last), should be an association, see the "%s".', $fieldName)
-            )->setSource(ErrorSource::createByParameter($filterKey))
-        );
-    }
-
-    /**
-     * @param Context $context
-     * @param string  $fieldName
-     * @param string  $filterKey
-     */
-    protected function addContextResourceError($context, $fieldName, $filterKey)
-    {
-        /** @var Context $context */
-        $context->addError(
-            Error::createValidationError(
-                Constraint::FILTER,
-                sprintf('Unknown resource "%s".', $fieldName)
-            )->setSource(ErrorSource::createByParameter($filterKey))
-        );
-    }
-
-    /**
-     * @param Context $context
-     * @param string  $fieldName
-     * @param string  $filterKey
-     */
-    protected function addContextFilterNotAllowedError($context, $fieldName, $filterKey)
-    {
-        /** @var Context $context */
-        $context->addError(
-            Error::createValidationError(
-                Constraint::FILTER,
-                sprintf('Filtering by "%s" field is not supported.', $fieldName)
-            )->setSource(ErrorSource::createByParameter($filterKey))
-        );
     }
 }

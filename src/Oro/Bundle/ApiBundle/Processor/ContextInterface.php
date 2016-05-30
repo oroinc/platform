@@ -238,118 +238,97 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Checks whether a configuration of an entity exists.
      *
-     * @param string|null $className
-     *
      * @return bool
      */
-    public function hasConfig($className = null);
+    public function hasConfig();
 
     /**
      * Gets a configuration of an entity.
      *
-     * @param string|null $className
-     *
      * @return EntityDefinitionConfig|null
      */
-    public function getConfig($className = null);
+    public function getConfig();
 
     /**
      * Sets a configuration of an entity.
      *
-     * @param string|null $className
-     *
      * @param EntityDefinitionConfig|null $definition
      */
-    public function setConfig(EntityDefinitionConfig $definition = null, $className = null);
+    public function setConfig(EntityDefinitionConfig $definition = null);
 
     /**
      * Checks whether a configuration of filters for an entity exists.
      *
-     * @param string|null $className
-     *
      * @return bool
      */
-    public function hasConfigOfFilters($className = null);
+    public function hasConfigOfFilters();
 
     /**
      * Gets a configuration of filters for an entity.
      *
-     * @param string|null $className
-     *
      * @return FiltersConfig|null
      */
-    public function getConfigOfFilters($className = null);
+    public function getConfigOfFilters();
 
     /**
      * Sets a configuration of filters for an entity.
      *
-     * @param string|null $className
-     *
      * @param FiltersConfig|null $config
      */
-    public function setConfigOfFilters(FiltersConfig $config = null, $className = null);
+    public function setConfigOfFilters(FiltersConfig $config = null);
 
     /**
      * Checks whether a configuration of sorters for an entity exists.
      *
-     * @param string|null $className
-     *
      * @return bool
      */
-    public function hasConfigOfSorters($className = null);
+    public function hasConfigOfSorters();
 
     /**
      * Gets a configuration of sorters for an entity.
      *
-     * @param string|null $className
-     *
      * @return SortersConfig|null
      */
-    public function getConfigOfSorters($className = null);
+    public function getConfigOfSorters();
 
     /**
      * Sets a configuration of sorters for an entity.
      *
-     * @param string|null $className
-     *
      * @param SortersConfig|null $config
      */
-    public function setConfigOfSorters(SortersConfig $config = null, $className = null);
+    public function setConfigOfSorters(SortersConfig $config = null);
 
     /**
      * Checks whether a configuration of the given section exists.
      *
      * @param string $configSection
-     * @param string|null $className
      *
      * @return bool
      *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function hasConfigOf($configSection, $className = null);
+    public function hasConfigOf($configSection);
 
     /**
      * Gets a configuration from the given section.
      *
      * @param string $configSection
-     * @param string|null $className
      *
      * @return mixed
      *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function getConfigOf($configSection, $className = null);
+    public function getConfigOf($configSection);
 
     /**
      * Sets a configuration for the given section.
      *
      * @param string $configSection
-     * @param string|null $className
      * @param mixed  $config
      *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function setConfigOf($configSection, $config, $className = null);
+    public function setConfigOf($configSection, $config);
 
     /**
      * Gets a list of requests for additional metadata info.
@@ -395,27 +374,21 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Checks whether metadata of an entity exists.
      *
-     * @param string|null $className
-     *
      * @return bool
      */
-    public function hasMetadata($className = null);
+    public function hasMetadata();
 
     /**
      * Gets metadata of an entity.
      *
-     * @param string|null $className
-     *
      * @return EntityMetadata|null
      */
-    public function getMetadata($className = null);
+    public function getMetadata();
 
     /**
      * Sets metadata of an entity.
      *
-     * @param string|null         $className
-     *
      * @param EntityMetadata|null $metadata
      */
-    public function setMetadata(EntityMetadata $metadata = null, $className = null);
+    public function setMetadata(EntityMetadata $metadata = null);
 }

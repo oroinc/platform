@@ -387,19 +387,19 @@ class Context extends ApiContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function hasConfig($className = null)
+    public function hasConfig()
     {
-        return $this->has($this->getConfigKey($className));
+        return $this->has($this->getConfigKey());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfig($className = null)
+    public function getConfig()
     {
-        $key = $this->getConfigKey($className);
+        $key = $this->getConfigKey();
         if (!$this->has($key)) {
-            $this->loadConfig($className);
+            $this->loadConfig();
         }
 
         return $this->get($key);
@@ -408,14 +408,14 @@ class Context extends ApiContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setConfig(EntityDefinitionConfig $definition = null, $className = null)
+    public function setConfig(EntityDefinitionConfig $definition = null)
     {
         if ($definition) {
-            $this->set($this->getConfigKey($className), $definition);
+            $this->set($this->getConfigKey(), $definition);
             // make sure that all config sections are added to the context
             $this->ensureAllConfigSectionsSet();
         } else {
-            $this->remove($this->getConfigKey($className));
+            $this->remove($this->getConfigKey());
             // make sure that all config sections are removed from the context
             $this->ensureAllConfigSectionsSet(true);
         }
@@ -424,74 +424,74 @@ class Context extends ApiContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function hasConfigOfFilters($className = null)
+    public function hasConfigOfFilters()
     {
-        return $this->hasConfigOf(FiltersConfigExtra::NAME, $className);
+        return $this->hasConfigOf(FiltersConfigExtra::NAME);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigOfFilters($className = null)
+    public function getConfigOfFilters()
     {
-        return $this->getConfigOf(FiltersConfigExtra::NAME, $className);
+        return $this->getConfigOf(FiltersConfigExtra::NAME);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setConfigOfFilters(FiltersConfig $config = null, $className = null)
+    public function setConfigOfFilters(FiltersConfig $config = null)
     {
-        $this->setConfigOf(FiltersConfigExtra::NAME, $config, $className);
+        $this->setConfigOf(FiltersConfigExtra::NAME, $config);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasConfigOfSorters($className = null)
+    public function hasConfigOfSorters()
     {
-        return $this->hasConfigOf(SortersConfigExtra::NAME, $className);
+        return $this->hasConfigOf(SortersConfigExtra::NAME);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigOfSorters($className = null)
+    public function getConfigOfSorters()
     {
-        return $this->getConfigOf(SortersConfigExtra::NAME, $className);
+        return $this->getConfigOf(SortersConfigExtra::NAME);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setConfigOfSorters(SortersConfig $config = null, $className = null)
+    public function setConfigOfSorters(SortersConfig $config = null)
     {
-        $this->setConfigOf(SortersConfigExtra::NAME, $config, $className);
+        $this->setConfigOf(SortersConfigExtra::NAME, $config);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasConfigOf($configSection, $className = null)
+    public function hasConfigOf($configSection)
     {
         $this->assertConfigSection($configSection);
 
-        return $this->has(self::CONFIG_PREFIX . $configSection . $className);
+        return $this->has(self::CONFIG_PREFIX . $configSection);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigOf($configSection, $className = null)
+    public function getConfigOf($configSection)
     {
         $this->assertConfigSection($configSection);
 
-        $key = self::CONFIG_PREFIX . $configSection . $className;
+        $key = self::CONFIG_PREFIX . $configSection;
         if (!$this->has($key)) {
-            if (!$this->has($this->getConfigKey($className))) {
-                $this->loadConfig($className);
+            if (!$this->has($this->getConfigKey())) {
+                $this->loadConfig();
             } else {
-                $this->setConfigOf($configSection, null, $className);
+                $this->setConfigOf($configSection, null);
             }
         }
 
@@ -501,14 +501,14 @@ class Context extends ApiContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setConfigOf($configSection, $config, $className = null)
+    public function setConfigOf($configSection, $config)
     {
         $this->assertConfigSection($configSection);
 
-        $this->set(self::CONFIG_PREFIX . $configSection . $className, $config);
+        $this->set(self::CONFIG_PREFIX . $configSection, $config);
 
         // make sure that all config sections, including a main section, are added to the context
-        $key = $this->getConfigKey($className);
+        $key = $this->getConfigKey();
         if (!$this->has($key)) {
             $this->set($key, null);
         }
@@ -518,27 +518,23 @@ class Context extends ApiContext implements ContextInterface
     /**
      * Gets a key of a main section of an entity configuration.
      *
-     * @param string|null $className
-     *
      * @return string
      */
-    protected function getConfigKey($className = null)
+    protected function getConfigKey()
     {
-        return self::CONFIG_PREFIX . ConfigUtil::DEFINITION . $className;
+        return self::CONFIG_PREFIX . ConfigUtil::DEFINITION;
     }
 
     /**
      * Loads an entity configuration.
      *
-     * @param string|null $className
-     *
      * @throws \Exception
      */
-    protected function loadConfig($className = null)
+    protected function loadConfig()
     {
-        $entityClass = null === $className ? $this->getClassName() : $className;
+        $entityClass = $this->getClassName();
         if (empty($entityClass)) {
-            $this->processLoadedConfig(null, $className);
+            $this->processLoadedConfig(null);
 
             throw new \RuntimeException(
                 'A class name must be set in the context before a configuration is loaded.'
@@ -552,9 +548,9 @@ class Context extends ApiContext implements ContextInterface
                 $this->getRequestType(),
                 $this->getConfigExtras()
             );
-            $this->processLoadedConfig($config, $className);
+            $this->processLoadedConfig($config);
         } catch (\Exception $e) {
-            $this->processLoadedConfig(null, $className);
+            $this->processLoadedConfig(null);
 
             throw $e;
         }
@@ -563,18 +559,18 @@ class Context extends ApiContext implements ContextInterface
     /**
      * @param Config|null $config
      */
-    protected function processLoadedConfig(Config $config = null, $className = null)
+    protected function processLoadedConfig(Config $config = null)
     {
         // add loaded config sections to the context
         if ($config && !$config->isEmpty()) {
             foreach ($config as $key => $value) {
-                $this->set(self::CONFIG_PREFIX . $key . $className, $value);
+                $this->set(self::CONFIG_PREFIX . $key, $value);
             }
         }
 
         // make sure that all config sections, including a main section, are added to the context
         // even if a section was not returned by the config provider
-        $key = $this->getConfigKey($className);
+        $key = $this->getConfigKey();
         if (!$this->has($key)) {
             $this->set($key, null);
         }
@@ -705,44 +701,43 @@ class Context extends ApiContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function hasMetadata($className = null)
+    public function hasMetadata()
     {
-        return $this->has(self::METADATA . $className);
+        return $this->has(self::METADATA);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($className = null)
+    public function getMetadata()
     {
-        if (!$this->has(self::METADATA . $className)) {
-            $this->loadMetadata($className);
+        if (!$this->has(self::METADATA)) {
+            $this->loadMetadata();
         }
 
-        return $this->get(self::METADATA . $className);
+        return $this->get(self::METADATA);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setMetadata(EntityMetadata $metadata = null, $className = null)
+    public function setMetadata(EntityMetadata $metadata = null)
     {
         if ($metadata) {
-            $this->set(self::METADATA . $className, $metadata);
+            $this->set(self::METADATA, $metadata);
         } else {
-            $this->remove(self::METADATA . $className);
+            $this->remove(self::METADATA);
         }
     }
 
     /**
      * Loads an entity metadata.
      *
-     * @param string|null $className
      * @throws \Exception
      */
-    protected function loadMetadata($className = null)
+    protected function loadMetadata()
     {
-        $entityClass = null === $className ? $this->getClassName() : $className;
+        $entityClass = $this->getClassName();
         if (empty($entityClass)) {
             $this->processLoadedMetadata(null);
 
@@ -755,11 +750,11 @@ class Context extends ApiContext implements ContextInterface
                 $this->getVersion(),
                 $this->getRequestType(),
                 $this->getMetadataExtras(),
-                $this->getConfig($className)
+                $this->getConfig()
             );
-            $this->processLoadedMetadata($metadata, $className);
+            $this->processLoadedMetadata($metadata);
         } catch (\Exception $e) {
-            $this->processLoadedMetadata(null, $className);
+            $this->processLoadedMetadata(null);
 
             throw $e;
         }
@@ -767,11 +762,10 @@ class Context extends ApiContext implements ContextInterface
 
     /**
      * @param EntityMetadata|null $metadata
-     * @param string|null $className
      */
-    protected function processLoadedMetadata(EntityMetadata $metadata = null, $className = null)
+    protected function processLoadedMetadata(EntityMetadata $metadata = null)
     {
         // add loaded metadata to the context
-        $this->set(self::METADATA . $className, $metadata);
+        $this->set(self::METADATA, $metadata);
     }
 }
