@@ -100,7 +100,7 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $expectedValue = [
-            'topic-subscriber-name' => 'processor-id',
+            'processor-id' => 'processor-id',
         ];
 
         $this->assertEquals($expectedValue, $processorRegistry->getArgument(0));
@@ -122,7 +122,7 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $expectedValue = [
-            'topic-subscriber-name' => 'subscriber-processor-name',
+            'subscriber-processor-name' => 'processor-id',
         ];
 
         $this->assertEquals($expectedValue, $processorRegistry->getArgument(0));

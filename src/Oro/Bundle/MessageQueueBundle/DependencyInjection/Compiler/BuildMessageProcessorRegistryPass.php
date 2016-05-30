@@ -42,11 +42,11 @@ class BuildMessageProcessorRegistryPass implements CompilerPassInterface
     {
         foreach ($class::getSubscribedTopics() as $topicName => $params) {
             if (is_string($params)) {
-                $processorIds[$params] = $serviceId;
+                $processorIds[$serviceId] = $serviceId;
             } elseif (is_array($params)) {
                 $processorName = empty($params['processorName']) ? $serviceId : $params['processorName'];
 
-                $processorIds[$topicName] = $processorName;
+                $processorIds[$processorName] = $serviceId;
             } else {
                 throw new \LogicException(sprintf(
                     'Topic subscriber configuration is invalid. "%s"',
