@@ -1,0 +1,6 @@
+{% extends 'OroWorkflowBundle:WorkflowDefinition:update.html.twig' %}
+{% set entity = context.clone %}
+{% set workflowConfiguration = context.workflowConfiguration %}
+{% set system_entities = context.systemEntities %}
+{% set delete_allowed = context.deleteAllowed %}
+{% set form = context.formView %}

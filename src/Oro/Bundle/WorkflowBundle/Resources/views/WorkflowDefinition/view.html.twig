@@ -95,13 +95,6 @@
             </script>
         {% endif %}
     {% endif %}
-
-    {{ UI.button({
-        'iCss': 'icon-copy',
-        'label': 'oro.workflow.workflowdefinition.datagrid.clone'|trans,
-        'title': 'oro.workflow.workflowdefinition.datagrid.clone'|trans,
-        'path': path('oro_workflow_definition_clone', {'name': entity.name}),
-    }) }}
     {% if not entity.system %}
         {% if resource_granted('EDIT', entity) %}
             {{ UI.editButton({
@@ -120,6 +113,7 @@
             }) }}
         {% endif %}
     {% endif %}
+    {{ parent() }}
 {% endblock navButtons %}
 
 {% block stats %}

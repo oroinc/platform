@@ -172,7 +172,7 @@ oro:
             steps_display_ordered.label:  Display steps ordered
             steps_display_ordered.description: "When this box is selected, all workflow steps will be shown on the Related entity view page so the entire progression path can be seen. Otherwise, only the current step and the past steps of the workflow will be shown.<br/><strong>Note:</strong> We recommend not to check this box for non-linear workflows where two or more steps have the same priority to avoid confusion."
             active.label:                 Active
-            clone_label_prefix:           'Copy of '
+            clone.label:                  'Copy of {label}'
 
             attribute:
                 property_path.tooltip:    "This is the field of the workflow entity or its related entities that will be appear on the view form of the transition. Use these if you want user to add or edit some entity data in the transition."
@@ -197,7 +197,6 @@ oro:
             datagrid:
                 view: View
                 update: Edit
-                clone:  Clone
                 delete: Delete
                 activate: Activate
                 deactivate: Deactivate

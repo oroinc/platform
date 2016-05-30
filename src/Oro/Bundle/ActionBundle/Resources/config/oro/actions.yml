@@ -131,6 +131,49 @@ operations:
                         - '@not_empty': $.gridName
                 parameters: [$.gridName]
 
+    CLONE:
+        extends: CRUD_ACTION
+        acl_resource: [CREATE, $.data]
+        order: 30
+        groups:
+            - view_navButtons
+            - update_navButtons
+            - datagridRowAction
+        preactions:
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@not_blank': $.data
+                        - '@eq': [$.hasConfig, true]
+                actions:
+                    - '@call_service_method':
+                        service: oro_entity_config.helper.entity_config
+                        method: getRoutes
+                        method_parameters: [$.data, ['name']]
+                        attribute: $.routes
+                    - '@clone_object':
+                        target: $.data
+                        attribute: $.clone
+        preconditions:
+            '@and':
+                - '@or':
+                    - '@not_blank': $.routes[name]
+                    - '@not_blank': $.gridName
+        label: oro.action.clone
+        frontend_options:
+            title: oro.action.clone_entity
+        button_options:
+            icon: icon-copy
+        attributes:
+            entity:
+                label: ' '
+                type: entity
+                options:
+                  class: '\stdClass'
+        form_options:
+            attribute_fields:
+                entity:
+                    form_type: form
 action_groups:
     DELETE:
         parameters:

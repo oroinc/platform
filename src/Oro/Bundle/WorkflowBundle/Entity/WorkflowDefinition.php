@@ -161,6 +161,23 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     *
+     */
+    public function __clone()
+    {
+        $this->setName($this->getName() . uniqid('_clone_'));
+        $this->setSystem(false);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getLabel();
+    }
+
+    /**
      * Set name
      *
      * @param string $name
@@ -283,6 +300,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function getConfiguration()
     {
+        unset($this->configuration['attributes']);
         return $this->configuration;
     }
 
