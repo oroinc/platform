@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-use Oro\Component\EntitySerializer\FieldConfig;
-
 /**
  * Represents a sorter configuration for a field.
  */
@@ -13,10 +11,10 @@ class SorterFieldConfig implements FieldConfigInterface
     use Traits\FieldConfigTrait;
 
     /** a flag indicates whether the field should be excluded */
-    const EXCLUDE = FieldConfig::EXCLUDE;
+    const EXCLUDE = EntityDefinitionFieldConfig::EXCLUDE;
 
     /** the path of the field value */
-    const PROPERTY_PATH = FieldConfig::PROPERTY_PATH;
+    const PROPERTY_PATH = EntityDefinitionFieldConfig::PROPERTY_PATH;
 
     /** @var array */
     protected $items = [];

@@ -162,7 +162,7 @@ define(function(require) {
          * @param {jQuery=} $container
          */
         styleForm: function($container) {
-            $container.find('input:file,input:checkbox,input:radio,select').inputWidget('create');
+            $container.inputWidget('seekAndCreate');
             $container.one('content:changed', _.bind(this.styleForm, this, $container));
         },
 
@@ -172,7 +172,7 @@ define(function(require) {
          * @param {jQuery=} $container
          */
         unstyleForm: function($container) {
-            $container.find('input:file,input:checkbox,input:radio,select').inputWidget('dispose');
+            $container.inputWidget('seekAndDestroy');
         },
 
         onPageRendered: function(cb) {

@@ -9,7 +9,7 @@ interface FilterFactoryInterface
      *
      * @param string $dataType
      *
-     * @return FilterInterface|null
+     * @return StandaloneFilter|null
      */
     public function createFilter($dataType);
 }

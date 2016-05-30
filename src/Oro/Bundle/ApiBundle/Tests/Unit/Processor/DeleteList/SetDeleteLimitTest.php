@@ -27,6 +27,13 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->assertEquals($context, $this->context);
     }
 
+    public function testProcessWhenCriteriaObjectDoesNotExist()
+    {
+        $context = clone $this->context;
+        $this->processor->process($this->context);
+        $this->assertEquals($context, $this->context);
+    }
+
     public function testProcessWhenLimitIsAlreadySet()
     {
         $maxResults = 2;
@@ -72,7 +79,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        $this->assertEquals(SetDeleteLimit::DEFAULT_MAX_ENTITIES_TO_DELETE, $criteria->getMaxResults());
+        $this->assertEquals(100, $criteria->getMaxResults());
     }
 
     public function testProcessWhenLimitExistsInConfig()

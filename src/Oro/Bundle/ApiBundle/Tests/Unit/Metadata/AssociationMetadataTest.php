@@ -17,6 +17,24 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->entityMetadata->setInheritedType(true);
     }
 
+    public function testGetName()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        $this->assertNull($associationMetadata->getName());
+        $associationMetadata->setName('associationName');
+        $this->assertEquals('associationName', $associationMetadata->getName());
+    }
+
+    public function testGetDataType()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        $this->assertNull($associationMetadata->getDataType());
+        $associationMetadata->setDataType('associationType');
+        $this->assertEquals('associationType', $associationMetadata->getDataType());
+    }
+
     public function testTargetClassName()
     {
         $associationMetadata = new AssociationMetadata();
@@ -51,6 +69,15 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($associationMetadata->isCollection());
         $associationMetadata->setIsCollection(true);
         $this->assertTrue($associationMetadata->isCollection());
+    }
+
+    public function testIsNullable()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        $this->assertFalse($associationMetadata->isNullable());
+        $associationMetadata->setIsNullable(true);
+        $this->assertTrue($associationMetadata->isNullable());
     }
 
     public function testTargetMetadata()

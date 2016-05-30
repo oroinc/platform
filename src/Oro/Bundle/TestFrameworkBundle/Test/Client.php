@@ -224,72 +224,12 @@ class Client extends BaseClient
             $this->hasPerformedRequest = true;
         }
 
-        $this->refreshDoctrineConnection();
-
         $response = $this->kernel->handle($request);
 
         if ($this->kernel instanceof TerminableInterface) {
             $this->kernel->terminate($request, $response);
         }
         return $response;
-    }
-
-    /**
-     * Refresh doctrine connection services
-     */
-    protected function refreshDoctrineConnection()
-    {
-        if (!$this->pdoConnection) {
-            return;
-        }
-
-        /** @var \Doctrine\DBAL\Connection $oldConnection */
-        $oldConnection = $this->getContainer()->get('doctrine.dbal.default_connection');
-
-        $newConnection =  $this->getContainer()->get('doctrine.dbal.connection_factory')
-            ->createConnection(
-                array_merge($oldConnection->getParams(), array('pdo' => $this->pdoConnection)),
-                $oldConnection->getConfiguration(),
-                $oldConnection->getEventManager()
-            );
-
-        $this->getContainer()->set('doctrine.dbal.default_connection', $newConnection);
-
-        //increment transaction level
-        $reflection = new \ReflectionProperty('Doctrine\DBAL\Connection', '_transactionNestingLevel');
-        $reflection->setAccessible(true);
-        $reflection->setValue($newConnection, $oldConnection->getTransactionNestingLevel() + 1);
-
-        //update connection of entity manager
-        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        if ($entityManager->getConnection() !== $newConnection) {
-            $reflection = new \ReflectionProperty('Doctrine\ORM\EntityManager', 'conn');
-            $reflection->setAccessible(true);
-            $reflection->setValue($entityManager, $newConnection);
-        }
-    }
-
-    /**
-     * Start transaction
-     */
-    public function startTransaction()
-    {
-        /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.dbal.default_connection');
-        $this->pdoConnection = $connection->getWrappedConnection();
-        $this->pdoConnection->beginTransaction();
-
-        $this->refreshDoctrineConnection();
-    }
-
-    /**
-     * Rollback transaction
-     */
-    public function rollbackTransaction()
-    {
-        if ($this->pdoConnection) {
-            $this->pdoConnection->rollBack();
-        }
     }
 
     /**
@@ -384,5 +324,13 @@ class Client extends BaseClient
             </html>';
 
         return sprintf($html, $title, $title, $flashMessages, $content['beforeContentAddition'], $content['content']);
+    }
+
+    /**
+     * @param array $server
+     */
+    public function mergeServerParameters(array $server)
+    {
+        $this->server = array_replace($this->server, $server);
     }
 }

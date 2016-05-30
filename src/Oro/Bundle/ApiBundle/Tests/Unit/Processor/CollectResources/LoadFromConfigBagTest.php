@@ -43,8 +43,8 @@ class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                new ApiResource('Test\Entity1'),
-                new ApiResource('Test\Entity2'),
+                'Test\Entity1' => new ApiResource('Test\Entity1'),
+                'Test\Entity2' => new ApiResource('Test\Entity2'),
             ],
             $context->getResult()->toArray()
         );
