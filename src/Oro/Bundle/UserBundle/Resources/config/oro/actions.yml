@@ -10,6 +10,7 @@ operations:
             - roles-grid
         routes:
             - oro_user_role_view
+        acl_resource: [CREATE, entity:Oro\Bundle\UserBundle\Entity\Role]
         preactions:
             - '@trans':
                 id: oro.user.role.clone.label

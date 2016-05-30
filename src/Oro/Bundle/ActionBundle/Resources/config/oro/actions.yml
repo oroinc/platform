@@ -133,7 +133,6 @@ operations:
 
     CLONE:
         extends: CRUD_ACTION
-        acl_resource: [CREATE, $.data]
         order: 30
         groups:
             - view_navButtons

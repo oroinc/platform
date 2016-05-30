@@ -8,6 +8,7 @@ operations:
             - Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
         datagrids:
             - workflow-definitions-grid
+        acl_resource: [CREATE, entity:Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition]
         preactions:
             - '@call_method':
                 conditions:
