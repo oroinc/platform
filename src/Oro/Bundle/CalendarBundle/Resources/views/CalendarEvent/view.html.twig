@@ -7,7 +7,7 @@
 {% oro_title_set({params : {"%entity.title%": entity.title|default('N/A') }}) %}
 
 {% block navButtons %}
-    {% if app.user and app.user.id == entity.calendar.owner.id %}
+    {% if app.user and entity.relatedAttendee and entity.relatedAttendee.user and app.user.id == entity.relatedAttendee.user.id  %}
         {% include 'OroCalendarBundle:CalendarEvent:invitationButtons.html.twig' with {'entity': entity} %}
     {% endif %}
 
