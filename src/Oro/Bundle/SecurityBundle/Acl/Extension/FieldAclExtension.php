@@ -132,7 +132,7 @@ class FieldAclExtension extends AbstractAclExtension
      */
     public function supports($type, $id)
     {
-        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE && $id === $this->getExtensionKey()) {
+        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             return $id === $this->getExtensionKey();
         }
 
