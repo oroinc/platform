@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "ext-intl": "*",
         "ext-mbstring": "*",
         "ext-gd": "*",
@@ -62,7 +62,7 @@
         "akeneo/batch-bundle": "0.4.2",
         "nesbot/Carbon": "1.8.*",
         "monolog/monolog": "1.8.*",
-        "ocramius/proxy-manager": "0.4.*",
+        "ocramius/proxy-manager": "~0.4",
         "knplabs/knp-gaufrette-bundle": "0.1.*",
         "oro/doctrine-extensions": "1.0.*",
         "tinymce/tinymce": "4.1.*",
@@ -79,7 +79,12 @@
         "symfony/polyfill-php70":"1.*"
     },
     "require-dev": {
-        "sensio/generator-bundle": "2.5.3"
+        "sensio/generator-bundle": "2.5.3",
+        "behat/behat": "v3.1.0",
+        "behat/mink-extension": "^2.0",
+        "behat/mink-selenium2-driver":"1.*",
+        "bossa/phpspec2-expect": "~1.0",
+        "behat/symfony2-extension": "2.1.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

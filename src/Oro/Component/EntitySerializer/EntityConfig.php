@@ -38,7 +38,7 @@ class EntityConfig
     protected $items = [];
 
     /** @var FieldConfig[] */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * Gets a native PHP array representation of the entity configuration.

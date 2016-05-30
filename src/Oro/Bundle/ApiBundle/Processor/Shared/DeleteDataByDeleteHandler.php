@@ -13,8 +13,6 @@ use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 
 abstract class DeleteDataByDeleteHandler implements ProcessorInterface
 {
-    const DEFAULT_DELETE_HANDLER = 'oro_soap.handler.delete';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -50,7 +48,7 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
 
         $deleteHandlerServiceId = $context->getConfig()->getDeleteHandler();
         if (!$deleteHandlerServiceId) {
-            $deleteHandlerServiceId = self::DEFAULT_DELETE_HANDLER;
+            $deleteHandlerServiceId = $this->getDefaultDeleteHandler();
         }
 
         $deleteHandler = $this->container->get($deleteHandlerServiceId);
@@ -58,6 +56,14 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
             $this->processDelete($context, $deleteHandler);
             $context->removeResult();
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultDeleteHandler()
+    {
+        return 'oro_soap.handler.delete';
     }
 
     /**
