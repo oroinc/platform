@@ -14,7 +14,7 @@ class WorkflowDefinitionHandler
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
-    /** @var ManagerRegistry  */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
     /** @var string */
@@ -38,6 +38,7 @@ class WorkflowDefinitionHandler
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @param WorkflowDefinition|null $newDefinition
+     * @throws \Exception
      */
     public function updateWorkflowDefinition(
         WorkflowDefinition $workflowDefinition,
@@ -62,6 +63,7 @@ class WorkflowDefinitionHandler
             $em->commit();
         } catch (\Exception $exception) {
             $em->rollback();
+            throw $exception;
         }
     }
 

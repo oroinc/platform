@@ -30,7 +30,10 @@ class ProcessConfigurationGenerator
      */
     public function generateForScheduledTransition(WorkflowDefinition $workflowDefinition)
     {
-        $processConfigurations = [];
+        $processConfigurations = [
+            ProcessConfigurationProvider::NODE_DEFINITIONS => [],
+            ProcessConfigurationProvider::NODE_TRIGGERS => []
+        ];
         $workflowName = $workflowDefinition->getName();
         foreach ($this->getTransitionsConfigurations($workflowDefinition) as $name => $transitionConfiguration) {
             if (array_key_exists('schedule', $transitionConfiguration)) {

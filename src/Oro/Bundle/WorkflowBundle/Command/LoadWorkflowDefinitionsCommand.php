@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
+use Symfony\Component\Yaml\Yaml;
 
 class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
 {
@@ -70,6 +71,10 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                 $workflowDefinition->setSystem(true);
 
                 $definitionHandler->updateWorkflowDefinition($workflowDefinition);
+
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $output->writeln(Yaml::dump($workflowDefinition->getConfiguration(), 10));
+                }
             }
         } else {
             $output->writeln('No workflow definitions found.');
