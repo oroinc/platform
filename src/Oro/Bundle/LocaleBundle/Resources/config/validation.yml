@@ -1,0 +1,3 @@
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    constraints:
+        - Oro\Bundle\LocaleBundle\Validator\Constraints\Localization: ~
