@@ -121,7 +121,7 @@ class LayoutExtension extends \Twig_Extension
                 $key = substr($key, 1);
                 if (array_key_exists($key, $attr)) {
                     if (is_array($value)) {
-                        $attr = array_merge_recursive($attr, $value);
+                        $attr[$key] = array_merge_recursive($value, (array)$attr[$key]);
                     } else {
                         $attr[$key] .= $value;
                     }

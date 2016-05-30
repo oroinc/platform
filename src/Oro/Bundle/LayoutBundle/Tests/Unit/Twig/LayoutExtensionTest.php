@@ -2,16 +2,19 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
+use Symfony\Bridge\Twig\Form\TwigRendererInterface;
+
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Templating\TextHelper;
 
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 
 class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var TwigRendererInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var TextHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $textHelper;
 
     /** @var LayoutExtension */
@@ -34,6 +37,7 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testInitRuntime()
     {
+        /** @var \Twig_Environment $environment */
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->getMock();
 
@@ -165,11 +169,28 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 'defaultAttr'   => [
                     'autofocus' => true,
-                    '~class' => ['class' =>' input input_block']
+                    '~class' => ['class' => ' input input_block']
                 ],
                 'expected'  => [
                     'autofocus' => true,
-                    'class' => ['test', ' input input_block'],
+                    'class' => ['test', 'class' => ' input input_block'],
+                    'id' => 'someId',
+                    'name' => 'test',
+                ],
+            ],
+            'attributes with array of arrays' => [
+                'attr'  => [
+                    'id' => 'someId',
+                    'name' => 'test',
+                    'class' => ['class_prefixes' => ['mobile']]
+                ],
+                'defaultAttr'   => [
+                    'autofocus' => true,
+                    '~class' => ['class' => ' input input_block', 'class_prefixes' => ['web']]
+                ],
+                'expected'  => [
+                    'autofocus' => true,
+                    'class' => ['class' => ' input input_block', 'class_prefixes' => ['web', 'mobile']],
                     'id' => 'someId',
                     'name' => 'test',
                 ],
