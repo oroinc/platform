@@ -1,5 +1,5 @@
 datagrid:
-    localesets-grid:
+    localizations-grid:
         acl_resource: oro_locale_localization_view
         options:
             entityHint:         localization

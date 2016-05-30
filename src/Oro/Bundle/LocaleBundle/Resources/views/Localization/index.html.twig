@@ -2,14 +2,14 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set gridName = 'localizations-grid' %}
-{% set pageTitle = 'oro.locale.localeset.entity_plural_label'|trans %}
+{% set pageTitle = 'oro.locale.localization.entity_plural_label'|trans %}
 
 {% block navButtons %}
-    {% if resource_granted('oro_locale_localeset_create') %}
+    {% if resource_granted('oro_locale_localization_create') %}
         <div class="btn-group">
             {{ UI.addButton({
                 'path': path('oro_locale_localization_create'),
-                'entity_label': 'oro.locale.localeset.entity_label'|trans
+                'entity_label': 'oro.locale.localization.entity_label'|trans
             }) }}
         </div>
     {% endif %}

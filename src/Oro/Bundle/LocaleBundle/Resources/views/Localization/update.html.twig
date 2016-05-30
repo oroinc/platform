@@ -3,17 +3,17 @@
 
 {% oro_title_set({params : {
     '%name%': entity.name|default('N/A'|trans),
-    '%entityName%': 'oro.locale.localeset.entity_label'|trans
+    '%entityName%': 'oro.locale.localization.entity_label'|trans
 } }) %}
 
-{% set formAction = entity.id ? path('oro_locale_localeset_update', { 'id': entity.id }) : path('oro_locale_localeset_create')  %}
+{% set formAction = entity.id ? path('oro_locale_localization_update', { 'id': entity.id }) : path('oro_locale_localization_create')  %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity':      entity,
-        'indexPath':   path('oro_locale_localeset_index'),
-        'indexLabel': 'oro.locale.localeset.entity_plural_label'|trans,
-        'entityTitle': entity.id ? 'oro.locale.localeset.navigation.view'|trans({'%name%': entity.name}) : 'oro.ui.create_entity'|trans({'%entityName%': 'oro.locale.localeset.entity_label'|trans})
+        'indexPath':   path('oro_locale_localization_index'),
+        'indexLabel': 'oro.locale.localization.entity_plural_label'|trans,
+        'entityTitle': entity.id ? 'oro.locale.localization.navigation.view'|trans({'%name%': entity.name}) : 'oro.ui.create_entity'|trans({'%entityName%': 'oro.locale.localization.entity_label'|trans})
     } %}
 
     {{ parent() }}
@@ -22,10 +22,10 @@
 {% block navButtons %}
     {{ parent() }}
 
-    {{ UI.cancelButton(path('oro_locale_localeset_index')) }}
-    {% if entity.id and resource_granted('oro_locale_localeset_update') or resource_granted('oro_locale_localeset_create') %}
+    {{ UI.cancelButton(path('oro_locale_localization_index')) }}
+    {% if entity.id and resource_granted('oro_locale_localization_update') or resource_granted('oro_locale_localization_create') %}
         {% set html = UI.saveAndStayButton() %}
-        {% if resource_granted('oro_locale_localeset_view') %}
+        {% if resource_granted('oro_locale_localization_view') %}
             {% set html = html ~ UI.saveAndCloseButton() %}
         {% endif %}
 
@@ -35,11 +35,11 @@
 {% endblock navButtons %}
 
 {% block content_data %}
-    {% set id = 'localeset-edit' %}
+    {% set id = 'localization-edit' %}
 
     {% set dataBlocks = [
         {
-            'title': 'oro.locale.localeset.sections.general'|trans,
+            'title': 'oro.locale.localization.sections.general'|trans,
             'class': 'active',
             'subblocks': [{
                 'data': [

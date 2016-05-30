@@ -64,7 +64,7 @@ class LocalizationController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_locale.entity.locale_set.class')
+            'entity_class' => $this->container->getParameter('oro_locale.entity.localization.class')
         ];
     }
 

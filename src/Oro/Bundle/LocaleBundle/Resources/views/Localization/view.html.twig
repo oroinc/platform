@@ -5,9 +5,9 @@
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity': entity,
-        'indexPath': path('oro_locale_localeset_index'),
-        'indexLabel': 'oro.locale.localeset.entity_plural_label'|trans,
-        'entityTitle': 'oro.locale.localeset.navigation.view'|trans({
+        'indexPath': path('oro_locale_localization_index'),
+        'indexLabel': 'oro.locale.localization.entity_plural_label'|trans,
+        'entityTitle': 'oro.locale.localization.navigation.view'|trans({
             '%name%': entity.name|default('N/A'|trans)
         })
     } %}
@@ -18,20 +18,20 @@
     {% set localeWidget %}
         {{ oro_widget_render({
             'widgetType': 'block',
-            'title': 'oro.locale.localeset.widgets.localization_information'|trans,
-            'url': path('oro_locale_localeset_info', {'id': entity.id})
+            'title': 'oro.locale.localization.widgets.localization_information'|trans,
+            'url': path('oro_locale_localization_info', {'id': entity.id})
         }) }}
     {% endset %}
 
     {% set dataBlocks = [
         {
-            'title': 'oro.locale.localeset.sections.general'|trans,
+            'title': 'oro.locale.localization.sections.general'|trans,
             'class': 'active',
             'subblocks': [{data: [localeWidget]}]
         }
     ] %}
 
-    {% set id = 'localeset-view' %}
+    {% set id = 'localization-view' %}
     {% set data = {'dataBlocks': dataBlocks} %}
 
     {{ parent() }}
