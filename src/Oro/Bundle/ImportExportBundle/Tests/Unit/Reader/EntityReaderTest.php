@@ -222,7 +222,31 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->with($entityName)
             ->will($this->returnValue($classMetadata));
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
+        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configuration->expects($this->once())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->once())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->exactly(2))
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
+        $query = new Query($em);
+        $queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->setMethods(['getQuery'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
 
         $queryBuilder->expects($this->once())->method('getEntityManager')
             ->will($this->returnValue($entityManager));
@@ -251,7 +275,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertAttributeEquals(
-            $queryBuilder,
+            $query,
             'source',
             self::readAttribute($this->reader, 'sourceIterator')
         );
@@ -276,12 +300,39 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
     public function testSetSourceEntityName()
     {
         $name = '\stdClass';
-
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
             ->disableOriginalConstructor()
             ->getMock();
+        $configuration->expects($this->once())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->once())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->exactly(2))
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
+        $query = new Query($em);
+        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->setMethods(
+                ['getQuery', 'getRootAliases', 'setParameter', 'addSelect', 'leftJoin', 'orderBy', 'andWhere']
+            )
+            ->getMock();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+        $queryBuilder->expects($this->any())
+            ->method('getRootAliases')
+            ->will($this->returnValue(['root']));
 
         $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->setMethods(
+                ['getAssociationMappings', 'isAssociationWithSingleJoinColumn', 'getIdentifierFieldNames']
+            )
             ->disableOriginalConstructor()
             ->getMock();
         $classMetadata->expects($this->once())
