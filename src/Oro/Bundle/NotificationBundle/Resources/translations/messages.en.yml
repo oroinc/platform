@@ -6,8 +6,6 @@ oro:
         controller:
             emailnotification:
                 saved.message: Email notification rule saved
-            massnotification:
-                saved.message: Mass notifications are saved and start
 
         event:
             entity_post_update:  Entity update
