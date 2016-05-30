@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Block\OptionsResolver;
 
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionsResolver;
 
 /**
@@ -10,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionsResolver;
  * @see Symfony\Component\OptionsResolver\OptionsResolver
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class OptionsResolver
+class OptionsResolver implements Options
 {
     /**
      * @var BaseOptionsResolver $optionsResolver

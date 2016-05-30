@@ -38,7 +38,6 @@ class DatagridType extends AbstractType
                 'grid_parameters' => [],
                 'grid_render_parameters' => []
             ]);
-        ;
     }
 
     /**
