@@ -27,11 +27,11 @@
                         'path'  : path('oro_user_view', {'id': attendee.user.id })
                     }) }}
                 {% else %}
-                    {% if attendee.displayName is not empty and attendee.displayName != attendee.email %}
-                        {{ attendee.displayName }} ({{ attendee.email }})
-                    {% else %}
-                        {{ attendee.email }}
+                    {% set attendeeName = attendee.displayName %}
+                    {% if attendee.email %}
+                        {% set attendeeName = attendeeName ? attendeeName ~ ' (' ~ attendee.email ~ ')' : attendee.email %}
                     {% endif %}
+                    {{ attendeeName }}
                 {% endif %}
             </span>
         </li>
