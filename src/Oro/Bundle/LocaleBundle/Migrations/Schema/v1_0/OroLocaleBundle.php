@@ -15,25 +15,25 @@ class OroLocaleBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
-        $this->createOroLocaleSetTable($schema);
+        $this->createOroLocalizationTable($schema);
 
         /** Foreign keys generation **/
-        $this->addOroLocaleSetForeignKeys($schema);
+        $this->addOroLocalizationForeignKeys($schema);
     }
 
     /**
-     * Create oro_locale_set table
+     * Create oro_localization table
      *
      * @param Schema $schema
      */
-    protected function createOroLocaleSetTable(Schema $schema)
+    protected function createOroLocalizationTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_locale_set');
+        $table = $schema->createTable('oro_localization');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('parent_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 64]);
-        $table->addColumn('i18n_code', 'string', ['length' => 64]);
-        $table->addColumn('l10n_code', 'string', ['length' => 64]);
+        $table->addColumn('language_code', 'string', ['length' => 64]);
+        $table->addColumn('formatting_code', 'string', ['length' => 64]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
@@ -41,15 +41,15 @@ class OroLocaleBundle implements Migration
     }
 
     /**
-     * Add oro_locale_set foreign keys.
+     * Add oro_localization foreign keys.
      *
      * @param Schema $schema
      */
-    protected function addOroLocaleSetForeignKeys(Schema $schema)
+    protected function addOroLocalizationForeignKeys(Schema $schema)
     {
-        $table = $schema->getTable('oro_locale_set');
+        $table = $schema->getTable('oro_localization');
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_locale_set'),
+            $schema->getTable('oro_localization'),
             ['parent_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]

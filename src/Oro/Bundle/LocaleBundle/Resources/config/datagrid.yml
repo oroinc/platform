@@ -1,27 +1,27 @@
 datagrid:
-    localesets-grid:
-        acl_resource: oro_locale_localeset_view
+    localizations-grid:
+        acl_resource: oro_locale_localization_view
         options:
-            entityHint:         locale_set
+            entityHint:         localization
             entity_pagination:  true
         source:
             type: orm
             query:
                 select:
-                    - localeSet.id
-                    - localeSet.name
+                    - localization.id
+                    - localization.name
                 from:
-                    - { table: %oro_locale.entity.locale_set.class%, alias: localeSet }
+                    - { table: %oro_locale.entity.localization.class%, alias: localization }
         columns:
             id:
-                label: oro.locale.localeset.id.label
+                label: oro.locale.localization.id.label
             name:
-                label: oro.locale.localeset.name.label
+                label: oro.locale.localization.name.label
         properties:
             id: ~
             view_link:
                 type:  url
-                route: oro_locale_localeset_view
+                route: oro_locale_localization_view
                 params: [ id ]
         actions:
             view:
@@ -29,4 +29,4 @@ datagrid:
                 label:          oro.grid.action.view
                 link:           view_link
                 icon:           eye-open
-                acl_resource:   oro_locale_localeset_view
+                acl_resource:   oro_locale_localization_view
