@@ -63,13 +63,12 @@ class AclPrivilegeRepository
     public function getPermissionNames($extensionKeyOrKeys)
     {
         if (is_string($extensionKeyOrKeys)) {
-            return $this->manager->getExtensionSelector()->select($this->manager->getRootOid($extensionKeyOrKeys))
-                ->getPermissions();
+            return $this->manager->getExtensionSelector()->selectByExtensionKey($extensionKeyOrKeys)->getPermissions();
         }
 
         $result = array();
         foreach ($extensionKeyOrKeys as $extensionKey) {
-            $extension = $this->manager->getExtensionSelector()->select($this->manager->getRootOid($extensionKey));
+            $extension = $this->manager->getExtensionSelector()->select($extensionKey);
             foreach ($extension->getPermissions() as $permission) {
                 if (!in_array($permission, $result)) {
                     $result[] = $permission;
