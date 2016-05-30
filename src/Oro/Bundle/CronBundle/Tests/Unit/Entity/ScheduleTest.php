@@ -84,6 +84,14 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributes(['data', 'value']);
     }
 
+    public function testGetHash()
+    {
+        $args = ['test' => 'value', 'some' => 'data'];
+        $this->object->setArguments($args);
+
+        $this->assertSame(md5(json_encode($args)), $this->object->getArgumentsHash());
+    }
+
     /**
      * @param array $attributes
      */

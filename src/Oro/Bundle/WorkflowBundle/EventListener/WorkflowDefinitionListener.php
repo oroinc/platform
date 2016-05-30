@@ -72,7 +72,7 @@ class WorkflowDefinitionListener
 
         $processStorage = $this->getProcessStorage();
         $processStorage->import($generatedConfigurations);
-
+        
         $persistedProcessDefinitions = $this->getScheduledTransitionProcesses()->workflowRelated($entity->getName());
 
         $toDelete = [];

@@ -170,4 +170,12 @@ class Schedule
     {
         return (string)$this->getId();
     }
+
+    /**
+     * @return string
+     */
+    public function getArgumentsHash()
+    {
+        return $this->argumentsHash;
+    }
 }
