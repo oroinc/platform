@@ -68,7 +68,7 @@ class AclPrivilegeRepository
 
         $result = array();
         foreach ($extensionKeyOrKeys as $extensionKey) {
-            $extension = $this->manager->getExtensionSelector()->select($extensionKey);
+            $extension = $this->manager->getExtensionSelector()->selectByExtensionKey($extensionKey);
             foreach ($extension->getPermissions() as $permission) {
                 if (!in_array($permission, $result)) {
                     $result[] = $permission;
