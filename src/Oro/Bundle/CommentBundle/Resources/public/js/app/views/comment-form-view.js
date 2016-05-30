@@ -13,12 +13,7 @@ define(function(require) {
     require('jquery.validate');
 
     function setValue($elem, value) {
-        if ($elem.data('select2')) {
-            $elem.inputWidget('val', value);
-        } else {
-            $elem.val(value);
-        }
-        $elem.trigger('change');
+        $elem.inputWidget('val', value).trigger('change');
     }
 
     CommentFormView = BaseView.extend({

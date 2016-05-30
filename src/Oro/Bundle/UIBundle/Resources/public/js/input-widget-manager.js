@@ -49,6 +49,7 @@ define(function(require) {
                 key: key,
                 priority: 10,
                 selector: '',
+                disableAutoCreate: false,
                 Widget: null
             });
 
@@ -126,9 +127,7 @@ define(function(require) {
                 }
 
                 _.each(self.widgetsByPriority, function(widget) {
-                    if (!self.hasWidget($input) &&
-                        self.isApplicable($input, widget) &&
-                        (!widgetKey || widget.key === widgetKey)) {
+                    if (!self.hasWidget($input) && self.isApplicable($input, widget, widgetKey)) {
                         self.createWidget($input, widget.Widget, options || {});
                     }
                 });
@@ -138,10 +137,15 @@ define(function(require) {
         /**
          * @param {jQuery} $input
          * @param {Object} widget
+         * @param {String|null} widgetKey
          * @returns {boolean}
          */
-        isApplicable: function($input, widget) {
-            if (this.noWidgetSelector && $input.is(this.noWidgetSelector)) {
+        isApplicable: function($input, widget, widgetKey) {
+            if (widgetKey && widget.key !== widgetKey) {
+                return false;
+            } else if (!widgetKey && widget.disableAutoCreate) {
+                return false;
+            } else if (this.noWidgetSelector && $input.is(this.noWidgetSelector)) {
                 return false;
             } else if (widget.selector && !$input.is(widget.selector)) {
                 return false;

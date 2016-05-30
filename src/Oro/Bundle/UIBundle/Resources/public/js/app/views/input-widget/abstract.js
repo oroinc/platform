@@ -136,6 +136,11 @@ define(function(require) {
             return this.$container || (this.$container = this.findContainer());
         },
 
+        applyWidgetFunction: function(command, args) {
+            Array.prototype.unshift.call(args, command);
+            return this.widgetFunction.apply(this, args);
+        },
+
         /**
          * Resize widget
          *

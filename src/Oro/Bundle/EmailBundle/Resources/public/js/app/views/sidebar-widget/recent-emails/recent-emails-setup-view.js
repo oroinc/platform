@@ -108,7 +108,7 @@ define(function(require) {
                 if (loadingView) {
                     loadingView.hide();
                 }
-                this.$el.find('[name=folderId]').inputWidget('create', {
+                this.$el.find('[name=folderId]').inputWidget('create', 'select2', {
                     initializeOptions: {data: this.foldersData}
                 });
             } else {
