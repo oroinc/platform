@@ -36,9 +36,9 @@ class UpdateEmailOwnerAssociationsCommandTest extends WebTestCase
 
         $user = self::getReference('simple_user');
         $commandTester->execute(array(
-            'command'      => $command->getName(),
+            'command' => $command->getName(),
             'class' => 'Oro\Bundle\UserBundle\Entity\User',
-            'id'=>[$user->getId()]
+            'id' => [$user->getId()]
         ));
 
         $doctrine = self::getContainer()->get('doctrine');
