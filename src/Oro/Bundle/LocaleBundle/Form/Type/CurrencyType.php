@@ -13,12 +13,10 @@ class CurrencyType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'choices' => Intl::getCurrencyBundle()->getCurrencyNames('en'),
-                'restrict' => false
-            )
-        );
+        $resolver->setDefaults([
+            'choices' => Intl::getCurrencyBundle()->getCurrencyNames('en'),
+            'restrict' => false
+        ]);
 
         $resolver->setDefined('restrict');
         $resolver->setAllowedTypes('restrict', 'bool');
