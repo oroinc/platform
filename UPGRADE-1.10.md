@@ -1,6 +1,13 @@
 UPGRADE FROM 1.9 to 1.10
 ========================
 
+####TestFrameworkBundle
+- All tests run with debug true, hence in case of exception you will see a detailed information about it. Previously it was like on prod.
+- All connections, tests internally share one pdo connection to database.
+- Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::cleanUpConnections method was removed.
+- Oro\Bundle\TestFrameworkBundle\Test\Client::startTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
+- Oro\Bundle\TestFrameworkBundle\Test\Client::rollbackTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
+
 ####EntityBundle:
 - The implementation of `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` was changed. Now the loaded entity aliases is saved into a cache that gives significant performance gain. Also, from now, you can implement `Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface` to create aliases for any entities not only for ORM entities.
 
@@ -123,3 +130,6 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 ####EmailBundle
 - Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
 - Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
+
+####PlatformBundle
+- The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.

@@ -74,8 +74,6 @@ class GetRestJsonApiTest extends ApiTestCase
 
             }
         }
-
-        self::cleanUpConnections();
     }
 
     /**
@@ -144,8 +142,6 @@ class GetRestJsonApiTest extends ApiTestCase
                 }
             }
         }
-
-        self::cleanUpConnections();
     }
 
     /**

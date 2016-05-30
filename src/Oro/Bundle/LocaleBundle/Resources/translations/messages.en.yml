@@ -1,28 +1,28 @@
 oro.locale:
-    localeset:
-        entity_label: 'Locale Set'
-        entity_plural_label: 'Locale Sets'
-        entity_description: 'Represents container that holds i18n_code, l10n_code & parent set'
+    localization:
+        entity_label: 'Localization'
+        entity_plural_label: 'Localizations'
+        entity_description: 'Holds language code, formatting code and parent localization'
 
         id.label: 'Id'
         name.label: 'Name'
-        i18n_code.label: 'Language'
-        l10n_code.label: 'Format'
-        child_locale_sets.label: 'Child locale sets'
-        parent_locale_set.label: 'Parent locale set'
+        language_code.label: 'Language'
+        formatting_code.label: 'Formatting'
+        child_localizations.label: 'Child localizations'
+        parent_localization.label: 'Parent localization'
 
         widgets:
-            localeset_information: Locale Set Information
+            localization_information: Localization Information
 
         sections:
             general: General
 
         navigation:
-            view: 'LocaleSet "%name%"'
+            view: 'Localization "%name%"'
 
     controller:
-        localeset:
-            saved.message: 'Locale Set has been saved'
+        localization:
+            saved.message: 'Localization has been saved'
 
     date_format:
         day: "MMM d"
