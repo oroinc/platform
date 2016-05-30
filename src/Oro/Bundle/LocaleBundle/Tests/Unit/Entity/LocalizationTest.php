@@ -50,4 +50,12 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
             ['expected' => false, 'date' => null],
         ];
     }
+
+    public function testToString()
+    {
+        $entity = new Localization();
+        $expectedString = 'Expected String';
+        $entity->setName($expectedString);
+        $this->assertEquals($expectedString, $entity->__toString());
+    }
 }

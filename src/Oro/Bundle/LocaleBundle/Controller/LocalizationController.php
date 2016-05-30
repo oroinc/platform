@@ -78,12 +78,11 @@ class LocalizationController extends Controller
      *     class="OroLocaleBundle:Localization"
      * )
      *
-     * @param Request $request
      * @return array|RedirectResponse
      */
-    public function createAction(Request $request)
+    public function createAction()
     {
-        return $this->update(new Localization(), $request);
+        return $this->update(new Localization());
     }
 
     /**
@@ -97,13 +96,12 @@ class LocalizationController extends Controller
      * )
      *
      * @param Localization $localization
-     * @param Request $request
      *
      * @return array|RedirectResponse
      */
-    public function updateAction(Localization $localization, Request $request)
+    public function updateAction(Localization $localization)
     {
-        return $this->update($localization, $request);
+        return $this->update($localization);
     }
 
     /**
@@ -118,7 +116,6 @@ class LocalizationController extends Controller
             ->add('formattingCode')
             ->add('parentLocalization', 'entity', [
                 'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
-                'property_path' => 'name',
                 'required' => false,
             ])
             ->getForm();
