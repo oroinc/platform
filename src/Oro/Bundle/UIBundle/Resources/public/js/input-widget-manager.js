@@ -13,6 +13,7 @@ define(function(require) {
      *
      * Example of usage:
      *     InputWidgetManager.create($(':input'));//create widgets for inputs
+     *     InputWidgetManager.create($(':input'), 'uniform-select');//create only 'uniform-select' widgets for inputs
      *
      *     //add widget to InputWidgetManager
      *     InputWidgetManager.addWidget('uniform-select', {
@@ -25,6 +26,7 @@ define(function(require) {
      *     `selector` - required. Widget will be used only for inputs applicable to this selector
      *     `Widget` - required. InputWidget constructor
      *     `priority` - you can control the order of the widgets. For each input will be used first applicable widget.
+     *     `disableAutoCreate` - if true, widget will be created only when create method called with widgetKey specified
      *
      *     //or you can remove widget from InputWidgetManager
      *     InputWidgetManager.removeWidget('uniform-select')
