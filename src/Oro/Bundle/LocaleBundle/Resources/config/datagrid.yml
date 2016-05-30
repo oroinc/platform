@@ -8,6 +8,7 @@ datagrid:
             type: orm
             query:
                 select:
+                    - localization.id
                     - localization.name
                     - localization.languageCode
                     - localization.formattingCode
