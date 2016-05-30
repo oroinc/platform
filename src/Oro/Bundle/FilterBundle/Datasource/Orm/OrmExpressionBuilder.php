@@ -9,6 +9,8 @@ use Oro\Bundle\FilterBundle\Expr\Coalesce;
 
 class OrmExpressionBuilder implements ExpressionBuilderInterface
 {
+    const NULL_PLACEHOLDER = "':null:'";
+
     /** @var Expr */
     protected $expr;
 
@@ -152,7 +154,15 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function isNull($x)
     {
-        return $this->expr->isNull($x);
+        /*
+         * TODO: Revert this back when https://github.com/doctrine/doctrine2/pull/5680 will be merged
+         * This is workaround to be able use IS NULL in sub-queries (Doctrine has bug with it)
+         */
+        return new Expr\Comparison(
+            new Expr\Func('COALESCE', [$x, self::NULL_PLACEHOLDER]),
+            Expr\Comparison::EQ,
+            self::NULL_PLACEHOLDER
+        );
     }
 
     /**
@@ -160,7 +170,15 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function isNotNull($x)
     {
-        return $this->expr->isNotNull($x);
+        /*
+         * TODO: Revert this back when https://github.com/doctrine/doctrine2/pull/5680 will be merged
+         * This is workaround to be able use IS NOT NULL in sub-queries (Doctrine has bug with it)
+         */
+        return new Expr\Comparison(
+            new Expr\Func('COALESCE', [$x, self::NULL_PLACEHOLDER]),
+            Expr\Comparison::NEQ,
+            self::NULL_PLACEHOLDER
+        );
     }
 
     /**

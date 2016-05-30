@@ -108,14 +108,14 @@ class OrmManyRelationBuilderTest extends OrmTestCase
         $qb->where($expr);
         $result = $qb->getDQL();
 
-        $operator = $inverse ? 'IS NOT' : 'IS';
+        $operator = $inverse ? '<>' : '=';
         $this->assertEquals(
             'SELECT o.id FROM Stub:TestOrder o'
             . ' WHERE o IN('
             . 'SELECT null_filter_test'
             . ' FROM Stub:TestOrder null_filter_test'
             . ' LEFT JOIN null_filter_test.products null_filter_test_rel'
-            . ' WHERE null_filter_test_rel ' . $operator . ' NULL)',
+            . " WHERE COALESCE(null_filter_test_rel, ':null:') " . $operator . " ':null:')",
             $result
         );
     }
