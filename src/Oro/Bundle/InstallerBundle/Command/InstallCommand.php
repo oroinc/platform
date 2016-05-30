@@ -8,6 +8,7 @@ use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\ProcessBuilder;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
@@ -16,6 +17,7 @@ use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -104,13 +106,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         if ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
-            $commandExecutor->runCommand(
-                'cache:clear',
-                array(
-                    '--no-optional-warmers' => true,
-                    '--process-isolation'   => true
-                )
-            );
+            $this->doCacheClear($commandExecutor);
         }
 
         $output->writeln('<info>Installing Oro Application.</info>');
@@ -235,7 +231,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             }
             $commandExecutor
                 ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
-                ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
+                ->runCommand('oro:entity-extend:cache:clear', ['--process-isolation' => true]);
         }
 
         return $this;
@@ -568,11 +564,11 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $this->updateInstalledFlag(date('c'));
 
         // clear the cache and set installed flag in DI container
-        $cacheClearOptions = ['--process-isolation' => true];
+        $cacheClearOptions = [];
         if ($commandExecutor->getDefaultOption('no-debug')) {
             $cacheClearOptions['--no-debug'] = true;
         }
-        $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
+        $this->doCacheClear($commandExecutor, $cacheClearOptions);
 
         $output->writeln('');
 
@@ -642,5 +638,90 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
 
         $table->render($output);
+    }
+
+    /**
+     * This function help to prevent calling commands
+     * (`oro:entity-extend:cache:check`, `oro:entity-extend:cache:warmup`)
+     * with default (300 second) timeout in class `OroEntityExtendBundle`
+     *
+     * @param CommandExecutor $commandExecutor
+     * @param array $cacheClearOptions
+     */
+    protected function doCacheClear($commandExecutor, $cacheClearOptions = [])
+    {
+        $commandExecutor->runCommand(
+            'cache:clear',
+            array_merge(
+                array(
+                    '--process-isolation' => true,
+                    '--no-warmup' => true
+                ),
+                $cacheClearOptions
+            )
+        );
+
+        $cacheDir = $this->getContainer()->get('kernel')->getCacheDir();
+        $commandNames = ['oro:entity-extend:cache:check', 'oro:entity-extend:cache:warmup'];
+        if ($this->isNeedToReinitializeExtendEntityCache($cacheDir)) {
+            foreach ($commandNames as $commandName) {
+                $this->runExtendCacheCommand(
+                    $commandName,
+                    $commandExecutor->getDefaultOption('process-timeout'),
+                    $commandExecutor->getPhpExecutable(),
+                    $cacheDir
+                );
+            }
+        }
+
+        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:update-config')) {
+            ExtendClassLoadingUtils::setAliases($cacheDir);
+        }
+
+        $commandExecutor->runCommand(
+            'cache:warmup',
+            array(
+                '--process-isolation' => true,
+            )
+        );
+    }
+
+    /**
+     * @param string $commandName
+     * @param int $timeout
+     * @param string $phpExecutable
+     * @param string $cacheDir
+     */
+    protected function runExtendCacheCommand($commandName, $timeout, $phpExecutable, $cacheDir)
+    {
+        $pb = ProcessBuilder::create()
+            ->setTimeout($timeout)
+            ->add($phpExecutable)
+            ->add($this->getContainer()->get('kernel')->getRootDir() . '/console')
+            ->add($commandName)
+            ->add('--env')
+            ->add($this->getContainer()->get('kernel')->getEnvironment())
+            ->add('--cache-dir')
+            ->add($cacheDir);
+
+        if (!CommandExecutor::isCommandRunning($commandName)) {
+            $pb->getProcess()->run();
+        }
+    }
+
+    /**
+     * @param string $cacheDir
+     *
+     * @return bool
+     */
+    protected function isNeedToReinitializeExtendEntityCache($cacheDir)
+    {
+        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)) {
+            ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($cacheDir));
+            if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($cacheDir))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
