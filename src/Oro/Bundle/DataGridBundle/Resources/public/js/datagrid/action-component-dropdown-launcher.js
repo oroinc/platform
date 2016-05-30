@@ -57,12 +57,10 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        render: function() {
-            ActionComponentDropdownLauncher.__super__.render.call(this);
+        initComponent: function() {
             this.componentOptions._sourceElement = this.$('.dropdown-menu');
             var Component = this.componentConstructor;
             this.component = new Component(this.componentOptions);
-            return this;
         },
 
         /**
@@ -72,7 +70,9 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.component.dispose();
+            if (this.component) {
+                this.component.dispose();
+            }
             delete this.component;
             delete this.componentOptions;
             ActionComponentDropdownLauncher.__super__.dispose.call(this);
@@ -84,6 +84,9 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onDropdownToggleClick: function(e) {
+            if (!this.component) {
+                this.initComponent();
+            }
             // inverse condition because this handler is bound first, before Bootstrap
             var that = this;
             if (!this.$el.is('.open')) {

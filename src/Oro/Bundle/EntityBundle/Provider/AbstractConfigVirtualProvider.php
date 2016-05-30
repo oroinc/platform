@@ -19,15 +19,15 @@ class AbstractConfigVirtualProvider
     protected $configuration = [];
 
     /**
-     * @var EntityHierarchyProvider
+     * @var EntityHierarchyProviderInterface
      */
     protected $entityHierarchyProvider;
 
     /**
-     * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param array $configuration
+     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
+     * @param array                            $configuration
      */
-    public function __construct(EntityHierarchyProvider $entityHierarchyProvider, array $configuration)
+    public function __construct(EntityHierarchyProviderInterface $entityHierarchyProvider, array $configuration)
     {
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->configuration = $configuration;

@@ -146,6 +146,44 @@ class BusinessUnitManager
     }
 
     /**
+     * Checks if Business Unit can be set as owner by given user
+     *
+     * @param User              $currentUser
+     * @param BusinessUnit      $entityOwner
+     * @param string            $accessLevel
+     * @param OwnerTreeProvider $treeProvider
+     * @param Organization      $organization
+     *
+     * @return bool
+     */
+    public function canBusinessUnitBeSetAsOwner(
+        User $currentUser,
+        BusinessUnit $entityOwner,
+        $accessLevel,
+        OwnerTreeProvider $treeProvider,
+        Organization $organization
+    ) {
+        $businessUnits = [];
+        if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
+            return true;
+        } elseif (AccessLevel::LOCAL_LEVEL === $accessLevel) {
+            $businessUnits =  $treeProvider->getTree()->getUserBusinessUnitIds(
+                $this->$currentUser->getId(),
+                $organization
+            );
+        } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
+            $businessUnits = $treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
+                $currentUser->getId(),
+                $organization->getId()
+            );
+        } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
+            $businessUnits = $this->getBusinessUnitIds($this->getOrganizationContextId());
+        }
+
+        return in_array($entityOwner->getId(), $businessUnits, true);
+    }
+
+    /**
      * @param User $user
      * @param Organization $organization
      *

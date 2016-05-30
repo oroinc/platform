@@ -18,6 +18,7 @@ Our guide is divided into the following sections:
 * [Working with forms](#working-with-forms)
 * [Creating new block types](#creating-new-block-types)
 * [Wrapping up](#wrapping-up)
+* [Simplify block attribute configuration](#simplify-block-attribute-configuration)
 
 Getting started
 -----------------------
@@ -1945,3 +1946,15 @@ And the footer like this:
     </div>
 </div>
 ```
+
+Simplify block attribute configuration
+-------------
+For simplify block attribute configuration use twig function `layout_attr_merge(attr, default_attr)`:
+```twig
+{% set attr = layout_attr_merge(attr, {
+    required: 'required',
+    autofocus: true,
+    '~class': " input input_block input_md {{ class_prefix }}__form__input"
+}) %}
+```
+If you use prefix `~` value `attr` concatenate `default_attr` value with this prefix.

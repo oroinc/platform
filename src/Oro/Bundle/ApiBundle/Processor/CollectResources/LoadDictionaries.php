@@ -31,9 +31,11 @@ class LoadDictionaries implements ProcessorInterface
         /** @var CollectResourcesContext $context */
 
         $resources = $context->getResult();
-        $entities  = $this->dictionaryProvider->getSupportedEntityClasses();
+        $entities = $this->dictionaryProvider->getSupportedEntityClasses();
         foreach ($entities as $entityClass) {
-            $resources->add(new ApiResource($entityClass));
+            if (!$resources->has($entityClass)) {
+                $resources->add(new ApiResource($entityClass));
+            }
         }
     }
 }

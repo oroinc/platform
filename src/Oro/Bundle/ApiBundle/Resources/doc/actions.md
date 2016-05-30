@@ -10,6 +10,8 @@ Table of Contents
     - [**get_list** Action](#get_list-action)
     - [**delete** Action](#delete-action)
     - [**delete_list** Action](#delete_list-action)
+    - [**create** Action](#create-action)
+    - [**update** Action](#update-action)
     - [**customize_loaded_data** Action](#customize_loaded_data-action)
     - [**get_config** Action](#get_config-action)
     - [**get_relation_config** Action](#get_relation_config-action)
@@ -34,7 +36,7 @@ The following table shows all actions provided out of the box:
 
 | Action Name           | Description |
 | ---                   | --- |
-| [collect_resources](#collect_resources-action) | Returns a list of all resources available through Data API |
+| [collect_resources](#collect_resources-action) | Returns a list of all resources accessible through Data API |
 | [get](#get-action) | Returns an entity by its identifier |
 | [get_list](#get_list-action) | Returns a list of entities |
 | [delete](#delete-action) | Deletes an entity by its identifier |
@@ -52,7 +54,7 @@ Also you can use the [oro:api:debug](./debug_commands.md#oroapidebug) command to
 collect_resources Action
 ------------------------
 
-This action is intended to get a list of all resources available through Data API.
+This action is intended to get a list of all resources accessible through Data API.
 
 The context class: [CollectResourcesContext](../../Processor/CollectResources/CollectResourcesContext.php).
 
@@ -75,7 +77,7 @@ get Action
 
 This action is intended to get an entity by its identifier.
 
-The context class: [GetContext](../../Processor/Get/GetContext.php). Also see  [Context class](#context-class) for more details.
+The context class: [GetContext](../../Processor/Get/GetContext.php). Also see [Context](#context-class) class for more details.
 
 The main processor class: [GetProcessor](../../Processor/GetProcessor.php).
 
@@ -83,16 +85,16 @@ Existing worker processors: [processors.get.yml](../../Resources/config/processo
 
 This action has the following processor groups:
 
-| Group Name | Responsibility of Processors | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
+| security_check | Checking whether an access to the requested resource is granted. | If you add a new processor in this group, it should be added in the **security_check** group of actions that execute this action, e.g. look at **security_check** group of [create](#create-action) or [update](#update-action) actions. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadDataByEntitySerializer](../../Processor/Get/LoadDataByEntitySerializer.php). |
-| finalize | Final validation of loaded data | |
-| normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| finalize | Final validation of loaded data and adding required response headers | |
+| normalize_result | Building the action result | The processors from this group are executed even if an exception has been thrown by any processor from previous groups. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `getAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -101,7 +103,7 @@ get_list Action
 
 This action is intended to get a list of entities.
 
-The context class: [GetListContext](../../Processor/GetList/GetListContext.php). Also see  [Context class](#context-class) for more details.
+The context class: [GetListContext](../../Processor/GetList/GetListContext.php). Also see [Context](#context-class) class for more details.
 
 The main processor class: [GetListProcessor](../../Processor/GetListProcessor.php).
 
@@ -109,7 +111,7 @@ Existing worker processors: [processors.get_list.yml](../../Resources/config/pro
 
 This action has the following processor groups:
 
-| Group Name | Responsibility of Processors | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | |
@@ -117,17 +119,17 @@ This action has the following processor groups:
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadDataByEntitySerializer](../../Processor/Get/LoadDataByEntitySerializer.php). |
-| finalize | Final validation of loaded data | |
-| normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| finalize | Final validation of loaded data and adding required response headers | |
+| normalize_result | Building the action result | The processors from this group are executed even if an exception has been thrown by any processor from previous groups. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `cgetAction` method of [RestApiController](../../Controller/RestApiController.php).
 
 delete Action
-----------
+-------------
 
 This action is intended to delete an entity by its identifier.
 
-The context class: [DeleteContext](../../Processor/Delete/DeleteContext.php). Also see  [Context class](#context-class) for more details.
+The context class: [DeleteContext](../../Processor/Delete/DeleteContext.php). Also see [Context](#context-class) class for more details.
 
 The main processor class: [DeleteProcessor](../../Processor/DeleteProcessor.php).
 
@@ -135,7 +137,7 @@ Existing worker processors: [processors.delete.yml](../../Resources/config/proce
 
 This action has the following processor groups:
 
-| Group Name | Responsibility of Processors | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | |
@@ -143,22 +145,23 @@ This action has the following processor groups:
 | build_query | Building a query that will be used to load an entity to be deleted | |
 | load_data | Loading an entity that should be deleted and save it in the `result` property of the context | |
 | delete_data | Deleting the entity stored in the `result` property of the context | |
-| normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| finalize | Adding required response headers | |
+| normalize_result | Building the action result | The processors from this group are executed even if an exception has been thrown by any processor from previous groups. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `deleteAction` method of [RestApiController](../../Controller/RestApiController.php).
 
 delete_list Action
-----------
+------------------
 
 This action is intended to delete a list of entities.
 
 The entities list is builded based on input filters. Please take into account that at least one filter must be specified, otherwise an error raises.
 
 By default the maximum number of entities that can be deleted by one request is 100. This limit was introduced to minimize impact on the server.
-You can change this limit for an entity in `Resources/config/acl.yml`, but please test your limit carefully because a big limit may make a big impact to the server. 
+You can change this limit for an entity in `Resources/config/acl.yml`, but please test your limit carefully because a big limit may make a big impact to the server.
 An example how to change default limit you can read at [how-to](how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request).
 
-The context class: [DeleteListContext](../../Processor/DeleteList/DeleteListContext.php). Also see [Context class](#context-class) for more details.
+The context class: [DeleteListContext](../../Processor/DeleteList/DeleteListContext.php). Also see [Context](#context-class) class for more details.
 
 The main processor class: [DeleteListProcessor](../../Processor/DeleteListProcessor.php).
 
@@ -166,7 +169,7 @@ Existing worker processors: [processors.delete_list.yml](../../Resources/config/
 
 This action has the following processor groups:
 
-| Group Name | Responsibility of Processors | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | |
@@ -174,9 +177,64 @@ This action has the following processor groups:
 | build_query | Building a query that will be used to load an entities list to be deleted | |
 | load_data | Loading an entities list that should be deleted and save it in the `result` property of the context | |
 | delete_data | Deleting the entities list stored in the `result` property of the context | |
-| normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+| finalize | Adding required response headers | |
+| normalize_result | Building the action result | The processors from this group are executed even if an exception has been thrown by any processor from previous groups. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `deleteListAction` method of [RestApiController](../../Controller/RestApiController.php).
+
+create Action
+-------------
+
+This action is intended to create a new entity.
+
+The context class: [CreateContext](../../Processor/Create/CreateContext.php). Also see [Context](#context-class) class for more details.
+
+The main processor class: [CreateProcessor](../../Processor/CreateProcessor.php).
+
+Existing worker processors: [processors.create.yml](../../Resources/config/processors.create.yml) or run `php app/console oro:api:debug create`.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
+| --- | --- | --- |
+| initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to a newly created entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.create.load_normalized_entity** processor. |
+| normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| load_data | Creating an new entity object | |
+| transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
+| save_data | Validating and persisting an entity | |
+| normalize_data | Converting created entity into array | |
+| finalize | Adding required response headers | |
+| normalize_result | Building the action result | The processors from this group are executed even if an exception has been thrown by any processor from previous groups. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+
+Example of usage you can find in the `postAction` method of [RestApiController](../../Controller/RestApiController.php).
+
+update Action
+-------------
+
+This action is intended to update an entity.
+
+The context class: [UpdateContext](../../Processor/Update/UpdateContext.php). Also see [Context](#context-class) class for more details.
+
+The main processor class: [UpdateProcessor](../../Processor/UpdateProcessor.php).
+
+Existing worker processors: [processors.update.yml](../../Resources/config/processors.update.yml) or run `php app/console oro:api:debug update`.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
+| --- | --- | --- |
+| initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to updated entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.update.load_normalized_entity** processor. |
+| normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| load_data | Loading an entity object to be updated | |
+| transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
+| save_data | Validating and persisting an entity | |
+| normalize_data | Converting updated entity into array | |
+| finalize | Adding required response headers | |
+| normalize_result | Building the action result | The processors from this group are executed even if an exception has been thrown by any processor from previous groups. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+
+Example of usage you can find in the `patchAction` method of [RestApiController](../../Controller/RestApiController.php).
 
 customize_loaded_data Action
 ----------------------------
@@ -346,8 +404,10 @@ Entity configuration related methods:
 - **getConfigExtras()** - Gets a list of [requests for configuration data](../../Config/ConfigExtraInterface.php).
 - **setConfigExtras(extras)** - Sets a list of requests for configuration data.
 - **hasConfigExtra(extraName)** - Checks whether some configuration data is requested.
+- **getConfigExtra(extraName)** - Gets a request for configuration data by its name.
 - **addConfigExtra(extra)** - Adds a request for some configuration data.
 - **removeConfigExtra(extraName)** - Removes a request for some configuration data.
+- **getConfigSections()** - Gets names of all requested [configuration sections](../../Config/ConfigExtraSectionInterface.php).
 - **hasConfig()** - Checks whether a configuration of an entity exists.
 - **getConfig()** - Gets a [configuration of an entity](../../Config/EntityDefinitionConfig.php).
 - **setConfig(config)** - Sets a custom configuration of an entity. This method can be used to completely override the default configuration of an entity.

@@ -111,14 +111,11 @@ class PackageManager
      */
     public function getInstalled()
     {
-        $notificationUrl = new \ReflectionProperty('Composer\Package\Package', 'notificationUrl');
-        $notificationUrl->setAccessible(true);
-
         $packages = array_values(
             array_filter(
                 $this->getLocalRepository()->getCanonicalPackages(),
-                function (PackageInterface $package) use ($notificationUrl) {
-                    return 'https://packagist.org/downloads/' != $notificationUrl->getValue($package);
+                function (PackageInterface $package) {
+                    return 'https://packagist.org/downloads/' != $package->getNotificationUrl();
                 }
             )
         );

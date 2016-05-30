@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Command\Util;
 use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionResolver;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
 class DebugOptionsResolverDecorator
 {
@@ -61,21 +62,13 @@ class DebugOptionsResolverDecorator
      */
     private function getPrivatePropertyValue($object, $propertyName)
     {
-        $reflClass = new \ReflectionClass($object);
-        $prop      = null;
-        while ($reflClass) {
-            if ($reflClass->hasProperty($propertyName)) {
-                $prop = $reflClass->getProperty($propertyName);
-                break;
-            }
-            $reflClass = $reflClass->getParentClass();
-        }
-        if (!$prop) {
+        $property = ReflectionUtil::getProperty(new \ReflectionClass($object), $propertyName);
+        if (!$property) {
             throw new \RuntimeException(sprintf('Property "%s" does not exist.', $propertyName));
         }
 
-        $prop->setAccessible(true);
+        $property->setAccessible(true);
 
-        return $prop->getValue($object);
+        return $property->getValue($object);
     }
 }

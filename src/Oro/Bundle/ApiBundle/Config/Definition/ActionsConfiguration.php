@@ -6,20 +6,16 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
+use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class ActionsConfiguration extends AbstractConfigurationSection implements ConfigurationSectionInterface
+class ActionsConfiguration extends AbstractConfigurationSection
 {
     /**
      * {@inheritdoc}
      */
-    public function configure(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    public function configure(NodeBuilder $node)
+    {
         /** @var NodeBuilder $actionNode */
         $actionNode = $node->end()
             ->useAttributeAsKey('name')
@@ -29,8 +25,8 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
                 ->treatNullLike([ActionConfig::EXCLUDE => false])
                 ->children();
         $actionNode
-            ->booleanNode(ActionConfig::EXCLUDE)->cannotBeEmpty()->end();
-        $this->configureActionNode($actionNode, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
+            ->booleanNode(ActionConfig::EXCLUDE)->end();
+        $this->configureActionNode($actionNode);
     }
 
     /**
@@ -43,65 +39,67 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
 
     /**
      * @param NodeBuilder $node
-     * @param array       $configureCallbacks
-     * @param array       $preProcessCallbacks
-     * @param array       $postProcessCallbacks
      */
-    protected function configureActionNode(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
-        $sectionName = ConfigUtil::ACTIONS . '.action';
+    protected function configureActionNode(NodeBuilder $node)
+    {
+        $sectionName = 'actions.action';
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        $parentNode
-            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
-            ->beforeNormalization()
-                ->always(
-                    function ($value) use ($preProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
-                    }
-                );
-        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
+        $this->callConfigureCallbacks($node, $sectionName);
+        $this->addPreProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks(
+            $parentNode,
+            $sectionName,
+            function ($value) {
+                if (empty($value[ActionConfig::STATUS_CODES])) {
+                    unset($value[ActionConfig::STATUS_CODES]);
+                }
+                if (empty($value[ActionConfig::FORM_TYPE])) {
+                    unset($value[ActionConfig::FORM_TYPE]);
+                }
+                if (empty($value[ActionConfig::FORM_OPTIONS])) {
+                    unset($value[ActionConfig::FORM_OPTIONS]);
+                }
+                if (empty($value[ActionConfig::FIELDS])) {
+                    unset($value[ActionConfig::FIELDS]);
+                }
+
+                return $value;
+            }
+        );
+
         $node
             ->scalarNode(ActionConfig::ACL_RESOURCE)->end()
             ->scalarNode(ActionConfig::DESCRIPTION)->end()
             ->integerNode(ActionConfig::MAX_RESULTS)
                 ->min(-1)
+            ->end()
+            ->scalarNode(ActionConfig::FORM_TYPE)->end()
+            ->arrayNode(ActionConfig::FORM_OPTIONS)
+                ->useAttributeAsKey('name')
+                ->performNoDeepMerging()
+                ->prototype('variable')
+                ->end()
             ->end();
-        $this->addStatusCodesNode(
-            $node,
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-        );
-        $parentNode
-            ->validate()
-                ->always(
-                    function ($value) use ($postProcessCallbacks, $sectionName) {
-                        if (empty($value[ActionConfig::STATUS_CODES])) {
-                            unset($value[ActionConfig::STATUS_CODES]);
-                        }
-                        return $this->callProcessConfigCallbacks($value, $postProcessCallbacks, $sectionName);
-                    }
-                );
+        $this->addStatusCodesNode($node);
+        $fieldNode = $node
+            ->arrayNode(ActionConfig::FIELDS)
+                ->useAttributeAsKey('name')
+                ->prototype('array')
+                    ->children();
+        $this->configureFieldNode($fieldNode);
     }
 
     /**
-     * {@inheritdoc}
+     * @param NodeBuilder $node
      */
-    public function addStatusCodesNode(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    public function addStatusCodesNode(NodeBuilder $node)
+    {
         /** @var ArrayNodeDefinition $parentNode */
         $codeNode = $node
-            ->arrayNode(ConfigUtil::STATUS_CODES)
+            ->arrayNode(ActionConfig::STATUS_CODES)
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->beforeNormalization()
@@ -115,42 +113,61 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
                     ->treatNullLike([])
                     ->children();
         $codeNode
-            ->booleanNode(StatusCodeConfig::EXCLUDE)->cannotBeEmpty()->end()
+            ->booleanNode(StatusCodeConfig::EXCLUDE)->end()
             ->scalarNode(StatusCodeConfig::DESCRIPTION)->cannotBeEmpty()->end();
-        $this->configureStatusCodeNode($codeNode, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
+        $this->configureStatusCodeNode($codeNode);
     }
 
     /**
      * @param NodeBuilder $node
-     * @param array       $configureCallbacks
-     * @param array       $preProcessCallbacks
-     * @param array       $postProcessCallbacks
      */
-    protected function configureStatusCodeNode(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    protected function configureStatusCodeNode(NodeBuilder $node)
+    {
         $sectionName = 'actions.action.status_code';
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        $parentNode
-            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
-            ->beforeNormalization()
-                ->always(
-                    function ($value) use ($preProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
-                    }
-                );
-        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
-        $parentNode
-            ->validate()
-                ->always(
-                    function ($value) use ($postProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $postProcessCallbacks, $sectionName);
-                    }
-                );
+        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
+        $this->callConfigureCallbacks($node, $sectionName);
+        $this->addPreProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks($parentNode, $sectionName);
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    protected function configureFieldNode(NodeBuilder $node)
+    {
+        $sectionName = 'actions.action.field';
+
+        /** @var ArrayNodeDefinition $parentNode */
+        $parentNode = $node->end();
+        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
+        $this->callConfigureCallbacks($node, $sectionName);
+        $this->addPreProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks(
+            $parentNode,
+            $sectionName,
+            function ($value) {
+                if (empty($value[ActionFieldConfig::FORM_TYPE])) {
+                    unset($value[ActionFieldConfig::FORM_TYPE]);
+                }
+                if (empty($value[ActionFieldConfig::FORM_OPTIONS])) {
+                    unset($value[ActionFieldConfig::FORM_OPTIONS]);
+                }
+
+                return $value;
+            }
+        );
+
+        $node
+            ->booleanNode(ActionFieldConfig::EXCLUDE)->end()
+            ->scalarNode(ActionFieldConfig::FORM_TYPE)->end()
+            ->arrayNode(ActionFieldConfig::FORM_OPTIONS)
+                ->useAttributeAsKey('name')
+                ->performNoDeepMerging()
+                ->prototype('variable')
+                ->end()
+            ->end();
     }
 }
