@@ -22,7 +22,12 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
     {
         $file = ArrayUtil::find(
             function (array $file) use ($path) {
-                return $file['tmp_name']['file'] === $path;
+                if (!isset($file['tmp_name']['file'])) {
+                    $tmpName = array_pop($file['tmp_name']);
+                    return $tmpName['file'] === $path;
+                } else {
+                    return $file['tmp_name']['file'] === $path;
+                }
             },
             $_FILES
         );
@@ -31,7 +36,7 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
             return null;
         }
 
-        $extension = pathinfo($file['name']['file'], PATHINFO_EXTENSION);
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
 
         $handle = fopen($path, 'r');
         $bytes = bin2hex(fread($handle, 8));

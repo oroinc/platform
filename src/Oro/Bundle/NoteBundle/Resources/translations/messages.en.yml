@@ -8,6 +8,7 @@ oro:
 
         id.label:             Id
         add.label:            Add
+        save.label:           Save
         message.label:        Message
         attachment.label:     Attachment
         owner.label:          Created By

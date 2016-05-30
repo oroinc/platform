@@ -126,8 +126,13 @@ class NoteController extends Controller
             $responseData['saved'] = true;
             $responseData['model'] = $this->getNoteManager()->getEntityViewModel($entity);
         }
-        $responseData['form']       = $this->getForm()->createView();
-        $responseData['formAction'] = $formAction;
+        $responseData['form']        = $this->getForm()->createView();
+        $responseData['formAction']  = $formAction;
+        if ($entity->getId()) {
+            $responseData['submitLabel'] = $this->get('translator')->trans('oro.note.save.label');
+        } else {
+            $responseData['submitLabel'] = $this->get('translator')->trans('oro.note.add.label');
+        }
 
         return $responseData;
     }

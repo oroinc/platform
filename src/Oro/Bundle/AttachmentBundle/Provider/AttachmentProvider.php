@@ -80,7 +80,7 @@ class AttachmentProvider
     {
         $result     = [];
         $attachment = $this->getAttachmentByEntity($entity);
-        if ($attachment) {
+        if ($attachment && $attachment->getId()) {
             $thumbnail = '';
             if ($this->attachmentManager->isImageType($attachment->getMimeType())) {
                 $thumbnail = $this->attachmentManager->getResizedImageUrl(
