@@ -45,7 +45,7 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
      */
     public function isPropagable()
     {
-        return false;
+        return true;
     }
 
     /**

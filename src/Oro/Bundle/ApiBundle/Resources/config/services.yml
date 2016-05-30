@@ -1,10 +1,6 @@
 parameters:
     # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
     oro_api.config.max_nesting_level: 3
-    # a list of supported formats of REST API requests delimited by |
-    oro_api.rest.formats: json
-    # default format of REST API requests
-    oro_api.rest.default_format: json
 
 services:
     oro_api.action_processor_bag:
@@ -40,6 +36,18 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_api.validation_helper:
+        class: Oro\Bundle\ApiBundle\Util\ValidationHelper
+        public: false
+        arguments:
+            - '@validator.mapping.class_metadata_factory'
+
+    oro_api.entity_instantiator:
+        class: Oro\Bundle\ApiBundle\Util\EntityInstantiator
+        public: false
+        arguments:
+            - '@oro_api.doctrine_helper'
+
     oro_api.entity_accessor:
         class: Oro\Component\EntitySerializer\EntityDataAccessor
         public: false
@@ -60,8 +68,14 @@ services:
         class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer
         public: false
         arguments:
+            - '@oro_api.object_normalizer_registry'
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_accessor'
+            - '@oro_api.entity_serializer.data_transformer'
+
+    oro_api.object_normalizer_registry:
+        class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry
+        public: false
         calls:
             - [addNormalizer,  ['@oro_api.search_item_normalizer', 50]]
             - [addNormalizer,  ['@oro_api.datetime_normalizer']]
@@ -85,6 +99,26 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesLoader
         arguments:
             - '@oro_api.collect_resources.processor'
+            - '@oro_api.resources_cache'
+
+    oro_api.resources_cache:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesCache
+        public: false
+        arguments:
+            - '@oro_api.resources_cache.impl'
+
+    oro_api.resources_cache.impl:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_api_resources' ] ]
+
+    oro_api.listener.console_command:
+        class: Oro\Bundle\ApiBundle\EventListener\ConsoleCommandListener
+        arguments:
+            - '@oro_api.resources_cache'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
@@ -137,15 +171,18 @@ services:
             - '@oro_api.get_relation_config.processor'
 
     oro_api.entity_exclusion_provider:
-        class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
+        class: Oro\Bundle\ApiBundle\Provider\ChainExclusionProvider
         public: false
+        arguments:
+            - '@oro_entity.entity_hierarchy_provider.all'
+            - [] # include rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.entity_exclusion_provider.config:
         class: Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
         public: false
         arguments:
-            - '@oro_entity.entity_hierarchy_provider'
-            - [] # exclusion rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_entity.entity_hierarchy_provider.all'
+            - [] # exclude rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
         tags:
             - { name: oro_entity.exclusion_provider.api, priority: 60 }
 
@@ -205,12 +242,43 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
 
-    oro_api.json_api.document_builder_factory:
-        class: Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory
+    oro_api.exception_text_extractor:
+        class: Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor
+        public: false
+
+    oro_api.exception_text_extractor.default:
+        class: Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor
+        public: false
+        arguments:
+            - %kernel.debug%
+            - []
+        tags:
+            - { name: oro.api.exception_text_extractor, priority: -10 }
+
+    oro_api.rest.document_builder:
+        class: Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder
+        public: false
+
+    oro_api.rest.error_completer:
+        class: Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter
+        public: false
+        arguments:
+            - '@oro_api.exception_text_extractor'
+        lazy: true
+
+    oro_api.json_api.document_builder:
+        class: Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder
         public: false
         arguments:
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.entity_id_transformer'
+
+    oro_api.json_api.error_completer:
+        class: Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter
+        public: false
+        arguments:
+            - '@oro_api.exception_text_extractor'
+        lazy: true
 
     oro_api.rest.routing_options_resolver:
         class: Oro\Bundle\ApiBundle\Routing\RestRouteOptionsResolver
@@ -220,10 +288,12 @@ services:
             - '@oro_api.resources_loader'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
-            - %oro_api.rest.formats%
-            - %oro_api.rest.default_format%
         tags:
-            - { name: routing.options_resolver, priority: -255 }
+            - { name: routing.options_resolver.api_doc, priority: -255 }
+
+    oro_api.routing_options_resolver.api_doc:
+        class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
+        public: false
 
     oro_api.rest.doc_handler:
         class: Oro\Bundle\ApiBundle\Routing\RestDocHandler

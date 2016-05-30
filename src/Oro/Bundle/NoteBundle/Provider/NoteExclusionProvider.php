@@ -4,31 +4,15 @@ namespace Oro\Bundle\NoteBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\AbstractExclusionProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * The implementation of ExclusionProviderInterface that can be used to ignore
  * relations which are a note associations.
  */
-class NoteExclusionProvider implements ExclusionProviderInterface
+class NoteExclusionProvider extends AbstractExclusionProvider
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isIgnoredEntity($className)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
-    {
-        return false;
-    }
-
     /**
      * {@inheritdoc}
      */

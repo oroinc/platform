@@ -52,6 +52,10 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
             $container->getDefinition('oro_api.entity_exclusion_provider.config'),
             'Expected oro_api.entity_exclusion_provider.config service'
         );
+        $this->assertNotNull(
+            $container->getDefinition('oro_api.entity_exclusion_provider'),
+            'Expected oro_api.entity_exclusion_provider service'
+        );
 
         $this->assertEquals(
             [
@@ -121,6 +125,13 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                     'Test\Entity10' => [],
                     'Test\Entity11' => [],
+                    'Test\Entity12' => [
+                        'fields' => [
+                            'field1' => [
+                                'exclude' => false
+                            ]
+                        ]
+                    ],
                 ],
                 'relations' => [],
             ],
@@ -134,6 +145,13 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
                 ['entity' => 'Test\Entity3'],
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider.config')->getArgument(1)
+        );
+        $this->assertEquals(
+            [
+                ['entity' => 'Test\Entity12'],
+                ['entity' => 'Test\Entity12', 'field' => 'field1'],
+            ],
+            $container->getDefinition('oro_api.entity_exclusion_provider')->getArgument(1)
         );
     }
 }

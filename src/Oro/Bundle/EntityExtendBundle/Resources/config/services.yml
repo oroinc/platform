@@ -46,7 +46,7 @@ parameters:
 
 services:
     oro_entity_extend.entity.cache.warmer:
-        public: false
+        public: true
         class: Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
         arguments:
             - "@oro_entity_extend.tools.dumper"
