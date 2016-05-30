@@ -118,6 +118,7 @@ class LocalizationController extends Controller
             ->add('formattingCode')
             ->add('parentLocalization', 'entity', [
                 'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
+                'property_path' => 'name',
                 'required' => false,
             ])
             ->getForm();
