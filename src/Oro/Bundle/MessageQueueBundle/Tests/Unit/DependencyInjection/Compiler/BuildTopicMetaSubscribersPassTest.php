@@ -20,7 +20,7 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'topic',
             'processorName' => 'processor-name',
         ]);
@@ -28,7 +28,7 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
 
         $topicMetaRegistry = new Definition();
         $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -45,7 +45,7 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'topic',
             'processorName' => 'barProcessorName',
         ]);
@@ -55,7 +55,7 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $topicMetaRegistry->setArguments([[
             'topic' => ['description' => 'aDescription', 'subscribers' => ['fooProcessorName']],
         ]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -75,7 +75,7 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'fooTopic',
             'processorName' => 'barProcessorName',
         ]);
@@ -86,7 +86,7 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
             'fooTopic' => ['description' => 'aDescription', 'subscribers' => ['fooProcessorName']],
             'barTopic' => ['description' => 'aBarDescription'],
         ]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -107,14 +107,14 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'fooTopic',
             'processorName' => 'fooProcessorName',
         ]);
         $container->setDefinition('processor-id', $processor);
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'fooTopic',
             'processorName' => 'barProcessorName',
         ]);
@@ -122,7 +122,7 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
 
         $topicMetaRegistry = new Definition();
         $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -141,14 +141,14 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'fooTopic',
             'processorName' => 'fooProcessorName',
         ]);
         $container->setDefinition('processor-id', $processor);
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'fooTopic',
             'processorName' => 'barProcessorName',
         ]);
@@ -158,7 +158,7 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $topicMetaRegistry->setArguments([[
             'fooTopic' => ['description' => 'aDescription', 'subscribers' => ['bazProcessorName']],
         ]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -178,12 +178,12 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $processor->addTag('oro_message_queue.client.message_processor');
         $container->setDefinition('processor', $processor);
 
         $topicMetaRegistry = new Definition();
         $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -194,14 +194,14 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'topic',
         ]);
         $container->setDefinition('processor-id', $processor);
 
         $topicMetaRegistry = new Definition();
         $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -218,12 +218,12 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition(OnlyTopicNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $processor->addTag('oro_message_queue.client.message_processor');
         $container->setDefinition('processor-id', $processor);
 
         $topicMetaRegistry = new Definition();
         $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -240,12 +240,12 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition(ProcessorNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $processor->addTag('oro_message_queue.client.message_processor');
         $container->setDefinition('processor-id', $processor);
 
         $topicMetaRegistry = new Definition();
         $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);
@@ -264,12 +264,12 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition(InvalidTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $processor->addTag('oro_message_queue.client.message_processor');
         $container->setDefinition('processor-id', $processor);
 
         $topicMetaRegistry = new Definition();
         $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $topicMetaRegistry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
 
         $pass = new BuildTopicMetaSubscribersPass();
         $pass->process($container);

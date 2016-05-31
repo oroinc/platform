@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Router;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface as TransportSession;
-use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriberInterface;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 
 class RouterMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {

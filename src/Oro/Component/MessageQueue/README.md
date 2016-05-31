@@ -8,7 +8,7 @@ The lowest layer is called Transport and provides an abstraction of transport pr
 The Consumption layer provides tools to consume messages, such as cli command, sigal handling, logging, extensions.
 It works on top of transport layer.
 
-The ZeroConfig layer provides ability to start producing\consuming messages with as less as possible configuration.
+The Client layer provides ability to start producing\consuming messages with as less as possible configuration.
 
 Usage
 -----

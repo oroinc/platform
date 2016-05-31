@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
-use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriberInterface;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -14,8 +14,8 @@ class BuildRouteRegistryPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $processorTagName = 'oro_message_queue.zero_config.message_processor';
-        $routerId = 'oro_message_queue.zero_config.router';
+        $processorTagName = 'oro_message_queue.client.message_processor';
+        $routerId = 'oro_message_queue.client.router';
 
         if (false == $container->hasDefinition($routerId)) {
             return;

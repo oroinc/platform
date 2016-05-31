@@ -54,7 +54,7 @@ class AddTopicMetaPassTest extends \PHPUnit_Framework_TestCase
         $registry = new Definition(null, [[
             'bazTopic' => []
         ]]);
-        $container->setDefinition('oro_message_queue.zero_config.meta.topic_meta_registry', $registry);
+        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $registry);
 
         $pass = AddTopicMetaPass::create()
             ->add('fooTopic')

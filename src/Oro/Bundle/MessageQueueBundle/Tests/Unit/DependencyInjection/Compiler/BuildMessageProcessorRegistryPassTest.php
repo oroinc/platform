@@ -20,7 +20,7 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'topic',
             'processorName' => 'processor-name',
         ]);
@@ -28,7 +28,7 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
 
         $processorRegistry = new Definition();
         $processorRegistry->setArguments([]);
-        $container->setDefinition('oro_message_queue.zero_config.message_processor_registry', $processorRegistry);
+        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
 
         $pass = new BuildMessageProcessorRegistryPass();
         $pass->process($container);
@@ -45,18 +45,18 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(
             \LogicException::class,
             'Topic name is not set but it is required. service: "processor",'.
-            ' tag: "oro_message_queue.zero_config.message'
+            ' tag: "oro_message_queue.client.message'
         );
 
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $processor->addTag('oro_message_queue.client.message_processor');
         $container->setDefinition('processor', $processor);
 
         $processorRegistry = new Definition();
         $processorRegistry->setArguments([]);
-        $container->setDefinition('oro_message_queue.zero_config.message_processor_registry', $processorRegistry);
+        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
 
         $pass = new BuildMessageProcessorRegistryPass();
         $pass->process($container);
@@ -67,14 +67,14 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition();
-        $processor->addTag('oro_message_queue.zero_config.message_processor', [
+        $processor->addTag('oro_message_queue.client.message_processor', [
             'topicName' => 'topic',
         ]);
         $container->setDefinition('processor-id', $processor);
 
         $processorRegistry = new Definition();
         $processorRegistry->setArguments([]);
-        $container->setDefinition('oro_message_queue.zero_config.message_processor_registry', $processorRegistry);
+        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
 
         $pass = new BuildMessageProcessorRegistryPass();
         $pass->process($container);
@@ -91,12 +91,12 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition(OnlyTopicNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $processor->addTag('oro_message_queue.client.message_processor');
         $container->setDefinition('processor-id', $processor);
 
         $processorRegistry = new Definition();
         $processorRegistry->setArguments([]);
-        $container->setDefinition('oro_message_queue.zero_config.message_processor_registry', $processorRegistry);
+        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
 
         $pass = new BuildMessageProcessorRegistryPass();
         $pass->process($container);
@@ -113,12 +113,12 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition(ProcessorNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $processor->addTag('oro_message_queue.client.message_processor');
         $container->setDefinition('processor-id', $processor);
 
         $processorRegistry = new Definition();
         $processorRegistry->setArguments([]);
-        $container->setDefinition('oro_message_queue.zero_config.message_processor_registry', $processorRegistry);
+        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
 
         $pass = new BuildMessageProcessorRegistryPass();
         $pass->process($container);
@@ -137,12 +137,12 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $processor = new Definition(InvalidTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.zero_config.message_processor');
+        $processor->addTag('oro_message_queue.client.message_processor');
         $container->setDefinition('processor-id', $processor);
 
         $processorRegistry = new Definition();
         $processorRegistry->setArguments([]);
-        $container->setDefinition('oro_message_queue.zero_config.message_processor_registry', $processorRegistry);
+        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
 
         $pass = new BuildMessageProcessorRegistryPass();
         $pass->process($container);

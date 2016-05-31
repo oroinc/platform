@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
-use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriberInterface;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -12,7 +12,7 @@ class BuildTopicMetaSubscribersPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $processorTagName = 'oro_message_queue.zero_config.message_processor';
+        $processorTagName = 'oro_message_queue.client.message_processor';
 
         $topicsSubscribers = [];
         foreach ($container->findTaggedServiceIds($processorTagName) as $serviceId => $tagAttributes) {

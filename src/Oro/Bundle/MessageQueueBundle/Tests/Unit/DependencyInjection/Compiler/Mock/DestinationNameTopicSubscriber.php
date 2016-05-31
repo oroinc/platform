@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock;
 
-use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriberInterface;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 
 class DestinationNameTopicSubscriber implements TopicSubscriberInterface
 {

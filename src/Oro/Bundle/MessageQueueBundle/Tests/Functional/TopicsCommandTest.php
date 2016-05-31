@@ -2,9 +2,9 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
 
-class MessageProducerTest extends WebTestCase
+class TopicsCommandTest extends WebTestCase
 {
     public function setUp()
     {
@@ -13,8 +13,8 @@ class MessageProducerTest extends WebTestCase
 
     public function testCouldBeGetFromContainerAsService()
     {
-        $messageProducer = $this->getContainer()->get('oro_message_queue.client.message_producer');
+        $command = $this->getContainer()->get('oro_message_queue.client.meta.topics_command');
 
-        $this->assertInstanceOf(MessageProducer::class, $messageProducer);
+        $this->assertInstanceOf(TopicsCommand::class, $command);
     }
 }

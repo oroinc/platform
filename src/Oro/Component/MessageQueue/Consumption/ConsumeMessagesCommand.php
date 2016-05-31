@@ -25,7 +25,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     public function __construct(QueueConsumer $consumer)
     {
-        parent::__construct($name = 'oro:message-queue:consume');
+        parent::__construct($name = 'oro:message-queue:transport:consume');
         
         $this->consumer = $consumer;
     }
@@ -36,7 +36,9 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
     protected function configure()
     {
         $this
-            ->setDescription('A worker that consumes message from a broker')
+            ->setDescription('A worker that consumes message from a broker. '.
+                'To use this broker you have to explicitly set a queue to consume from '.
+                'and a message processor service')
             ->addArgument('queue', InputArgument::REQUIRED, 'Queues to consume from')
             ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service')
         ;

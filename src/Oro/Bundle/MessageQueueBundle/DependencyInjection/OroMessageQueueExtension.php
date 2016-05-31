@@ -40,17 +40,17 @@ class OroMessageQueueExtension extends Extension
             "oro_message_queue.transport.$defaultTransport.connection"
         );
 
-        if (isset($config['zero_config'])) {
-            $loader->load('zero_config.yml');
+        if (isset($config['client'])) {
+            $loader->load('client.yml');
 
-            $routerProcessorName = 'oro_message_queue.zero_config.route_message_processor';
+            $routerProcessorName = 'oro_message_queue.client.route_message_processor';
 
-            $configDef = $container->getDefinition('oro_message_queue.zero_config.config');
+            $configDef = $container->getDefinition('oro_message_queue.client.config');
             $configDef->setArguments([
-                $config['zero_config']['prefix'],
-                $config['zero_config']['router_processor'] ?: $routerProcessorName,
-                $config['zero_config']['router_destination'],
-                $config['zero_config']['default_destination'],
+                $config['client']['prefix'],
+                $config['client']['router_processor'] ?: $routerProcessorName,
+                $config['client']['router_destination'],
+                $config['client']['default_destination'],
             ]);
         }
     }

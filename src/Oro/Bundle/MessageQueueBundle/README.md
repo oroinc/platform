@@ -16,7 +16,7 @@ oro_message_queue:
     transport:
         default: amqp
         amqp: { host: 'localhost', port: 5672, user: 'guest', password: 'guest', vhost: '/' }
-    zero_config: ~
+    client: ~
 ```
 
 Once you configured everything you can start producing messages:
@@ -24,8 +24,8 @@ Once you configured everything you can start producing messages:
 ```php
 <?php
 
-/** @var Oro\Component\MessageQueue\ZeroConfig\MessageProducer $messageProducer **/
-$messageProducer = $container->get('oro_message_queue.zero_config.message_producer');
+/** @var Oro\Component\MessageQueue\Client\MessageProducer $messageProducer **/
+$messageProducer = $container->get('oro_message_queue.client.message_producer');
 
 $messageProducer->sendTo('aFooTopic', 'Something has happened');
 ```
@@ -53,11 +53,11 @@ Register it as a container service and subscribe to the topic:
 orocrm_channel.async.change_integration_status_processor:
     class: 'FooMessageProcessor'
     tags:
-        - { name: 'oro_message_queue.zero_config.message_processor', topicName: 'aFooTopic' }
+        - { name: 'oro_message_queue.client.message_processor', topicName: 'aFooTopic' }
 ```
 
 Now you can start consuming messages:
 
 ```bash
-./app/console oro:message-queue:zeroconfig:consume  -vvv
+./app/console oro:message-queue:consume  -vvv
 ```

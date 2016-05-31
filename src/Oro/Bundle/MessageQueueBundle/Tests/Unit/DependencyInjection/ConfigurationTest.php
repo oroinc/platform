@@ -104,7 +104,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ], $config);
     }
 
-    public function testShouldSetDefaultConfigurationForZeroConfig()
+    public function testShouldSetDefaultConfigurationForClient()
     {
         $configuration = new Configuration();
 
@@ -114,7 +114,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'default' => 'null',
                 'null' => true,
             ],
-            'zero_config' => null,
+            'client' => null,
         ]]);
 
         $this->assertEquals([
@@ -122,8 +122,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'default' => 'null',
                 'null' => true,
             ],
-            'zero_config' => [
-                'prefix' => 'oro.message_queue.zero_config',
+            'client' => [
+                'prefix' => 'oro.message_queue.client',
                 'router_processor' => null,
                 'router_destination' => 'default',
                 'default_destination' => 'default',
@@ -135,7 +135,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(
             InvalidConfigurationException::class,
-            'The path "oro_message_queue.zero_config.router_destination" cannot contain an empty value, but got "".'
+            'The path "oro_message_queue.client.router_destination" cannot contain an empty value, but got "".'
         );
 
         $configuration = new Configuration();
@@ -146,7 +146,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'default' => 'null',
                 'null' => true,
             ],
-            'zero_config' => [
+            'client' => [
                 'router_destination' => '',
             ],
         ]]);
@@ -156,7 +156,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(
             InvalidConfigurationException::class,
-            'The path "oro_message_queue.zero_config.default_destination" cannot contain an empty value, but got "".'
+            'The path "oro_message_queue.client.default_destination" cannot contain an empty value, but got "".'
         );
 
         $configuration = new Configuration();
@@ -167,7 +167,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'default' => 'null',
                 'null' => true,
             ],
-            'zero_config' => [
+            'client' => [
                 'default_destination' => '',
             ],
         ]]);
