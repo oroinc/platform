@@ -51,6 +51,7 @@ oro:
             status.label:         Status
             status.success:       Success
             status.failed:        Failed
+            scheduled_at.label:   Scheduled At
             processed_at.label:   Sent At
             action:               View Mass Notifications
             block.info:           Notification Details
