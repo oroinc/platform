@@ -249,9 +249,9 @@ services:
 
     oro_user.form.handler.acl_role:
         parent: oro_user.form.handler.abstract.acl_role
-        scope: prototype
+        shared: false
         calls:
-            - [setRequest, ["@request"]]
+            - [setRequest, ["@=service('request_stack').getCurrentRequest()"]]
             - [addExtensionFilter, ['action', '']]    # only default group actions are allowed
 
     oro_user.form.handler.set_password:
