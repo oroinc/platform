@@ -16,9 +16,11 @@ class OroLocaleBundle implements Migration
     {
         /** Tables generation **/
         $this->createOroLocalizationTable($schema);
+        $this->createOroFallbackLocalizedValueTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroLocalizationForeignKeys($schema);
+        $this->addOroFallbackLocalizedValueForeignKeys($schema);
     }
 
     /**
@@ -41,6 +43,24 @@ class OroLocaleBundle implements Migration
     }
 
     /**
+     * Create oro_fallback_locale_value table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroFallbackLocalizedValueTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_fallback_locale_value');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('locale_id', 'integer', ['notnull' => false]);
+        $table->addColumn('fallback', 'string', ['notnull' => false, 'length' => 64]);
+        $table->addColumn('string', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('text', 'text', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['fallback']);
+        $table->addIndex(['string']);
+    }
+
+    /**
      * Add oro_localization foreign keys.
      *
      * @param Schema $schema
@@ -53,6 +73,22 @@ class OroLocaleBundle implements Migration
             ['parent_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add oro_fallback_locale_value foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroFallbackLocalizedValueForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_fallback_locale_value');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_localization'),
+            ['locale_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 }

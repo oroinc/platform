@@ -1,0 +1,38 @@
+services:
+    oro_locale.form.type.fallback_property:
+        class: 'Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType'
+        public: true
+        arguments:
+            - "@translator"
+        tags:
+            - { name: form.type, alias: oro_locale_fallback_property }
+
+    oro_locale.form.type.fallback_value:
+        class: 'Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType'
+        public: true
+        tags:
+            - { name: form.type, alias: oro_locale_fallback_value }
+
+    oro_locale.form.type.locale_collection:
+        class: 'Oro\Bundle\LocaleBundle\Form\Type\LocaleCollectionType'
+        public: true
+        arguments:
+            - "@doctrine"
+        calls:
+            - [setLocaleClass, ['%orob2b_website.entity.locale.class%']]
+        tags:
+            - { name: form.type, alias: oro_locale_locale_collection }
+
+    oro_locale.form.type.localized_property:
+        class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType'
+        public: true
+        tags:
+            - { name: form.type, alias: oro_locale_localized_property }
+
+    oro_locale.form.type.localzed_fallback_value_colection:
+        class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType'
+        public: true
+        arguments:
+            - "@doctrine"
+        tags:
+            - { name: form.type, alias: oro_locale_localized_fallback_value_collection }

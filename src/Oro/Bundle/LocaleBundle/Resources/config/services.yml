@@ -1,5 +1,6 @@
 parameters:
     oro_locale.entity.localization.class: Oro\Bundle\LocaleBundle\Entity\Localization
+    oro_locale.entity.localized_fallback_value.class: Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue
 
     oro_locale.settings.class: Oro\Bundle\LocaleBundle\Model\LocaleSettings
     oro_locale.calendar.class: Oro\Bundle\LocaleBundle\Model\Calendar
