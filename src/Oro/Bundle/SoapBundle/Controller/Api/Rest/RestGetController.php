@@ -47,7 +47,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
             if ($manager->isSerializerConfigured()) {
                 $result = $manager->serialize($qb);
             } elseif ($qb instanceof QueryBuilder) {
-                $result = $this->getPreparedItems($qb->getQuery()->getResult());
+                $result = $this->getPreparedItems($this->get('oro_security.acl_helper')->apply($qb)->getResult());
             } elseif ($qb instanceof SqlQueryBuilder) {
                 $result = $this->getPreparedItems($qb->getQuery()->getResult());
             } elseif ($qb instanceof SearchQuery) {

@@ -47,37 +47,6 @@ class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener = new ApiEventListener($this->securityFacade, $this->aclHelper);
     }
 
-    public function testOnGetListBefore()
-    {
-        $this->listener->setRequest($this->request);
-        $acl = new Acl(['id' => 5, 'class' => 'OroTestBundle:Test', 'type' => 'entity', 'permission' => 'TEST_PERM']);
-        $criteria = new Criteria();
-        $newCriteria = new Criteria();
-        $event = new GetListBefore($criteria, 'OroTestBundle:Test');
-
-        $this->securityFacade->expects($this->once())
-            ->method('getRequestAcl')
-            ->with($this->request, true)
-            ->will($this->returnValue($acl));
-
-        $this->aclHelper->expects($this->once())
-            ->method('applyAclToCriteria')
-            ->with('OroTestBundle:Test', $criteria, 'TEST_PERM')
-            ->will($this->returnValue($newCriteria));
-
-        $this->listener->onGetListBefore($event);
-        $this->assertSame($newCriteria, $event->getCriteria());
-    }
-
-    public function testOnGetListBeforeNoRequest()
-    {
-        $this->securityFacade->expects($this->never())
-            ->method($this->anything());
-
-        $event = new GetListBefore(new Criteria(), 'OroTestBundle:Test');
-        $this->listener->onGetListBefore($event);
-    }
-
     /**
      * @dataProvider onFindAfterProvider
      */

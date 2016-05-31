@@ -64,16 +64,6 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function checkEntity($entity)
-    {
-        return $this->authChecker->isGranted('VIEW', $entity) ?
-            static::FILTER_NOTHING :
-            static::FILTER_ALL;
-    }
-
-    /**
      * @param string $entityClass
      *
      * @return bool

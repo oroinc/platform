@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
@@ -183,8 +184,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             foreach ($aces as $ace) {
                 if ($sid->equals($ace->getSecurityIdentity())) {
                     foreach ($masks as $requiredMask) {
-                        if ($this->compareMasks($requiredMask, $ace, $acl)) {
-                            if ($this->isAceApplicable($requiredMask, $ace)) {
+                        if ($this->compareMasks($requiredMask, $ace, $acl, $aclExt)) {
+                            if ($this->isAceApplicable($requiredMask, $ace, $aclExt)) {
                                 $isGranting = $ace->isGranting();
                                 if ($sid instanceof RoleSecurityIdentity) {
                                     // give an additional chance for the appropriate ACL extension to decide
@@ -215,9 +216,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                                     $triggeredMask = $requiredMask;
                                 }
                             } elseif (0 !== count(array_diff(
-                                $aclExt->getPermissions($requiredMask, true),
-                                $aclExt->getPermissions($ace->getMask(), true)
-                            ))) {
+                                    $aclExt->getPermissions($requiredMask, true),
+                                    $aclExt->getPermissions($ace->getMask(), true)
+                                ))
+                            ) {
                                 $triggeredAce = $ace;
                                 $triggeredMask = $requiredMask;
                             }
@@ -243,10 +245,20 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * Compare required and mask from the ace. Return true if ace's mask matches
+     *
+     * @param integer               $requiredMask
+     * @param EntryInterface        $ace
+     * @param AclInterface          $acl
+     * @param AclExtensionInterface $extension
+     *
+     * @return bool
      */
-    protected function compareMasks($requiredMask, EntryInterface $ace, AclInterface $acl)
-    {
-        $extension = $this->getContext()->getAclExtension();
+    protected function compareMasks(
+        $requiredMask,
+        EntryInterface $ace,
+        AclInterface $acl,
+        AclExtensionInterface $extension
+    ) {
         $aceMask = $ace->getMask();
 
         if ($acl->getObjectIdentity()->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
@@ -279,13 +291,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @return bool
      * @throws \RuntimeException if the ACE strategy is not supported
      */
-    protected function isAceApplicable($requiredMask, EntryInterface $ace)
+    protected function isAceApplicable($requiredMask, EntryInterface $ace, AclExtensionInterface $extension)
     {
-        $extension = $this->getContext()->getAclExtension();
-        $aceMask = $ace->getMask();
-
         $requiredMask = $extension->removeServiceBits($requiredMask);
-        $aceMask = $extension->removeServiceBits($aceMask);
+        $aceMask = $extension->removeServiceBits($ace->getMask());
         $strategy = $ace->getStrategy();
         switch ($strategy) {
             case self::ALL:
