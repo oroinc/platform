@@ -1,6 +1,6 @@
 <?php
 
-namespace OOro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectionTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;

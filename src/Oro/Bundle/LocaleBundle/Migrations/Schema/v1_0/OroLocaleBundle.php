@@ -56,8 +56,8 @@ class OroLocaleBundle implements Migration
         $table->addColumn('string', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('text', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['fallback']);
-        $table->addIndex(['string']);
+        $table->addIndex(['fallback'], 'idx_fallback', []);
+        $table->addIndex(['string'], 'idx_string', []);
     }
 
     /**
