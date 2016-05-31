@@ -20,7 +20,11 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class OroEntityExtendBundle extends Bundle
 {
-    const CACHE_GENERATION_TIMEOUT = 300;
+    /**
+     * We should to disable timeout on commands because
+     * they can be called in 'oro:install' execution context
+     */
+    const CACHE_GENERATION_TIMEOUT = null;
     const CACHE_CHECKOUT_INTERVAL = 1;
     const CACHE_CHECKOUT_ATTEMPTS = 120;
 
