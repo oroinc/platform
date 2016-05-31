@@ -83,13 +83,16 @@ class AttendeeRelationManagerTest extends \PHPUnit_Framework_TestCase
         return [
             (new Attendee(1))
                 ->setEmail('u1@example.com')
-                 ->setUser($this->users['u1@example.com']),
+                 ->setUser($this->users['u1@example.com'])
+                 ->setDisplayName($this->users['u1@example.com']->getFullName()),
             (new Attendee())
                 ->setEmail('u2@example.com')
-                ->setUser($this->users['u2@example.com']),
+                ->setUser($this->users['u2@example.com'])
+                ->setDisplayName($this->users['u2@example.com']->getFullName()),
             (new Attendee())
                 ->setEmail('u3@example.com')
-                ->setUser($this->users['u3@example.com']),
+                ->setUser($this->users['u3@example.com'])
+                ->setDisplayName($this->users['u3@example.com']->getFullName()),
             (new Attendee())
                 ->setEmail('nonExisting@example.com'),
             (new Attendee())

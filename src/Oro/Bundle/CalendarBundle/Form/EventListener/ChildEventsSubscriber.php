@@ -13,7 +13,6 @@ use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Component\PhpUtils\ArrayUtil;
 
 class ChildEventsSubscriber implements EventSubscriberInterface
 {
@@ -22,9 +21,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
     /** @var SecurityFacade */
     protected $securityFacade;
-
-    /** @var CalendarEvent */
-    protected $parentEvent;
 
     /** @var array */
     protected $editableFieldsForRecurrence = [
@@ -51,7 +47,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::POST_SUBMIT  => 'postSubmit', // synchronize child events
+            FormEvents::POST_SUBMIT => 'postSubmit', // synchronize child events
         ];
     }
 
@@ -158,6 +154,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             if ($attendee->getDisplayName()) {
                 continue;
             }
+
             $attendee->setDisplayName($attendee->getEmail());
         }
     }
