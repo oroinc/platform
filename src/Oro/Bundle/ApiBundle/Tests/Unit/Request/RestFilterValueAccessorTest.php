@@ -13,12 +13,14 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $queryStringValues = [
             'prm1=val1'                          => ['prm1', '=', 'val1'],
+            'PRM1=val1'                          => ['PRM1', '=', 'val1'],
             'prm2<>val2'                         => ['prm2', '!=', 'val2'],
             'prm3<val3'                          => ['prm3', '<', 'val3'],
             'prm4<=val4'                         => ['prm4', '<=', 'val4'],
             'prm5>val5'                          => ['prm5', '>', 'val5'],
             'prm6>=val6'                         => ['prm6', '>=', 'val6'],
             'prm7%3C%3Eval7'                     => ['prm7', '!=', 'val7'],
+            'PRM7%3C%3Eval7'                     => ['PRM7', '!=', 'val7'],
             'prm8%3Cval8'                        => ['prm8', '<', 'val8'],
             'prm9%3C=val9'                       => ['prm9', '<=', 'val9'],
             'prm10%3Eval10'                      => ['prm10', '>', 'val10'],
@@ -30,6 +32,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             'page[number]=123'                   => ['page[number]', '=', '123', 'number'],
             'page%5Bsize%5D=456'                 => ['page[size]', '=', '456', 'size'],
             'filter[address.country]=US'         => ['filter[address.country]', '=', 'US', 'address.country'],
+            'filter[address.defaultRegion]=LA' => ['filter[address.defaultRegion]', '=', 'LA', 'address.defaultRegion'],
             'filter%5Baddress.region%5D=NY'      => ['filter[address.region]', '=', 'NY', 'address.region'],
             'filter[address][type]=billing'      => ['filter[address.type]', '=', 'billing', 'address.type'],
             'filter%5Baddress%5D%5Bcode%5D=Z123' => ['filter[address.code]', '=', 'Z123', 'address.code'],
@@ -70,10 +73,11 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             [
-                'filter[address.country]' => new FilterValue('address.country', 'US', '='),
-                'filter[address.region]'  => new FilterValue('address.region', 'NY', '='),
-                'filter[address.type]'    => new FilterValue('address.type', 'billing', '='),
-                'filter[address.code]'    => new FilterValue('address.code', 'Z123', '='),
+                'filter[address.country]'       => new FilterValue('address.country', 'US', '='),
+                'filter[address.defaultRegion]' => new FilterValue('address.defaultRegion', 'LA', '='),
+                'filter[address.region]'        => new FilterValue('address.region', 'NY', '='),
+                'filter[address.type]'          => new FilterValue('address.type', 'billing', '='),
+                'filter[address.code]'          => new FilterValue('address.code', 'Z123', '='),
             ],
             $accessor->getGroup('filter')
         );
@@ -90,6 +94,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             'filter' => [
                 'address.country' => 'US',
                 'address.region'  => ['<>' => 'NY'],
+                'address.defaultRegion'  => ['<>' => 'LA'],
                 'path1'           => ['val1'],
                 'path2'           => ['=' => ['key' => 'val2']],
             ]
@@ -138,6 +143,11 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             'filter[address.region]'
         );
         $this->assertEquals(
+            new FilterValue('address.defaultRegion', 'LA', '!='),
+            $accessor->get('filter[address.defaultRegion]'),
+            'filter[address.defaultRegion]'
+        );
+        $this->assertEquals(
             new FilterValue('path1', ['val1'], '='),
             $accessor->get('filter[path1]'),
             'filter[path1]'
@@ -148,7 +158,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             'filter[path2]'
         );
 
-        $this->assertCount(9, $accessor->getAll(), 'getAll');
+        $this->assertCount(10, $accessor->getAll(), 'getAll');
         $this->assertEquals(
             [
                 'prm1' => new FilterValue('prm1', 'val1', '='),
@@ -157,10 +167,11 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             [
-                'filter[address.country]' => new FilterValue('address.country', 'US', '='),
-                'filter[address.region]'  => new FilterValue('address.region', 'NY', '!='),
-                'filter[path1]'           => new FilterValue('path1', ['val1'], '='),
-                'filter[path2]'           => new FilterValue('path2', ['key' => 'val2'], '='),
+                'filter[address.country]'       => new FilterValue('address.country', 'US', '='),
+                'filter[address.region]'        => new FilterValue('address.region', 'NY', '!='),
+                'filter[address.defaultRegion]' => new FilterValue('address.defaultRegion', 'LA', '!='),
+                'filter[path1]'                 => new FilterValue('path1', ['val1'], '='),
+                'filter[path2]'                 => new FilterValue('path2', ['key' => 'val2'], '='),
             ],
             $accessor->getGroup('filter')
         );
