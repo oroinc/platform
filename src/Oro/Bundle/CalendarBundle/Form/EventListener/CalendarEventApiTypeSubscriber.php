@@ -84,6 +84,8 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
                 $this->calendarEventManager->removeRecurrence($recurrence);
                 $form->get('recurrence')->setData(null);
             }
+            unset($data['recurrence']);
+            $event->setData($data);
         }
     }
 
