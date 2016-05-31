@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\LocaleBundle\Entity\Localization;
-
-use OroB2B\Bundle\SaleBundle\Tests\Unit\Form\Type\Stub\EntityType;
-use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\PreloadedExtension;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
+
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationParentSelectTypeTest extends FormIntegrationTestCase
 {
@@ -72,7 +69,7 @@ class LocalizationParentSelectTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()->getMock();
         $optionsResolver->expects($this->atLeastOnce())->method('setNormalizer');
         $optionsResolver->expects($this->atLeastOnce())->method('setDefaults')->willReturn($optionsResolver);
-        
+
         $this->formType->configureOptions($optionsResolver);
     }
 
