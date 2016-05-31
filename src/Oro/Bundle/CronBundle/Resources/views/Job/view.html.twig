@@ -37,15 +37,15 @@
                 </tr>
                 <tr>
                     <th>{{ 'oro.ui.created_at'|trans }}</th>
-                    <td>{{ entity.createdAt|oro_format_datetime }}</td>
+                    <td>{{ entity.createdAt|oro_format_datetime({'timeType': 0}) }}</td>
                 </tr>
                 <tr>
                     <th>{{ 'oro.cron.header.started_at'|trans }}</th>
-                    <td>{{ entity.startedAt|oro_format_datetime }}</td>
+                    <td>{{ entity.startedAt|oro_format_datetime({'timeType': 0}) }}</td>
                 </tr>
                 <tr>
                     <th>{{ 'oro.cron.header.closed_at'|trans }}</th>
-                    <td>{{ entity.closedAt|oro_format_datetime }}</td>
+                    <td>{{ entity.closedAt|oro_format_datetime({'timeType': 0}) }}</td>
                 </tr>
 
                 {% if entity.isRetryJob() %}
