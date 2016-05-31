@@ -44,7 +44,7 @@ class LocalizationExtension extends \Twig_Extension
             ),
             new \Twig_SimpleFilter(
                 'oro_formatting_code_title',
-                [$this, 'getLanguageTitleByCode'],
+                [$this, 'getFormattingTitleByCode'],
                 ['is_safe' => ['html']]
             ),
         ];
