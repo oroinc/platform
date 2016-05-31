@@ -2,11 +2,11 @@
 
 namespace OroB2B\Bundle\SaleBundle\Tests\Unit\Formatter;
 
-use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 
 class FormattingCodeFormatterTest extends \PHPUnit_Framework_TestCase
