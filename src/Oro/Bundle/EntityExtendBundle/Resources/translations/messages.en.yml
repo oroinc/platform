@@ -35,6 +35,7 @@ oro:
                 float:              Float
                 money:              Currency
                 percent:            Percent
+                duration:           Duration
                 oneToOne:           One to one
                 oneToMany:          One to many
                 manyToOne:          Many to one
