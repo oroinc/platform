@@ -71,3 +71,11 @@ services:
         factory_method: createNamed
         factory_service: form.factory
         arguments: ["oro_workflow_definition_form", "oro_workflow_definition", null]
+
+    oro_workflow.form.extension.restriction:
+        class: Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: form.type_extension, alias: form }

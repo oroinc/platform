@@ -17,6 +17,10 @@ services:
         class: %oro_workflow.prototype.transition_manager.class%
         scope: prototype
 
+    oro_workflow.prototype.restriction_manager:
+        class: Oro\Bundle\WorkflowBundle\Model\RestrictionManager
+        scope: prototype
+
     oro_workflow.prototype.workflow:
         class: %oro_workflow.prototype.workflow.class%
         scope: prototype
@@ -26,3 +30,4 @@ services:
             - '@oro_workflow.prototype.step_manager'
             - '@oro_workflow.prototype.attribute_manager'
             - '@oro_workflow.prototype.transition_manager'
+            - '@oro_workflow.prototype.restriction_manager'

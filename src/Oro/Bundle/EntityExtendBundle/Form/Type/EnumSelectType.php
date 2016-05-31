@@ -20,15 +20,21 @@ class EnumSelectType extends AbstractEnumType
     {
         parent::buildView($view, $form, $options);
 
-        $disabledChoices = $options['disabled_choices'];
+        $disabledChoices = $options['disabled_values'];
 
         if (!empty($disabledChoices)) {
             $choices         = $view->vars['choices'];
             array_walk(
                 $choices,
                 function (ChoiceView $choiceView) use ($disabledChoices) {
-                    if (in_array($choiceView->value, $disabledChoices)) {
-                        $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
+                    if (is_array($disabledChoices)) {
+                        if (in_array($choiceView->value, $disabledChoices)) {
+                            $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
+                        }
+                    } elseif (is_callable($disabledChoices)) {
+                        if (!$disabledChoices($choiceView->value)) {
+                            $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
+                        }
                     }
                 }
             );
@@ -52,7 +58,7 @@ class EnumSelectType extends AbstractEnumType
                 'empty_value' => null,
                 'empty_data'  => null,
                 'configs'     => $defaultConfigs,
-                'disabled_choices' => []
+                'disabled_values' => []
             ]
         );
 
