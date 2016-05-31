@@ -18,7 +18,7 @@ class LocalizationParentSelectType extends AbstractType
     /**
      * @var string
      */
-    protected $entityClass = 'Oro\Bundle\LocaleBundle\Entity\Localization';
+    protected $entityClass;
 
     /**
      * @var DoctrineHelper
