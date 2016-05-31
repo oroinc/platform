@@ -2,13 +2,13 @@
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession;
 
-class DelayRedeliveredMessageAmqpExtension implements Extension
+class DelayRedeliveredMessageAmqpExtension implements ExtensionInterface
 {
     use ExtensionTrait;
 
@@ -57,7 +57,7 @@ class DelayRedeliveredMessageAmqpExtension implements Extension
         $session->createProducer()->send($deadQueue, $deadMessage);
         $context->getLogger()->debug('[DelayDeadAmqpExtension] Send message to dead queue');
 
-        $context->setStatus(MessageProcessor::REJECT);
+        $context->setStatus(MessageProcessorInterface::REJECT);
         $context->getLogger()->debug('[DelayDeadAmqpExtension] Reject original message');
     }
 }

@@ -5,10 +5,10 @@ use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessageProducer;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpTopic;
-use Oro\Component\MessageQueue\Transport\Destination;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
-use Oro\Component\MessageQueue\Transport\MessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
@@ -19,7 +19,7 @@ class AmqpMessageProducerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementMessageProducerInterface()
     {
-        $this->assertClassImplements(MessageProducer::class, AmqpMessageProducer::class);
+        $this->assertClassImplements(MessageProducerInterface::class, AmqpMessageProducer::class);
     }
 
     public function testCouldBeConstructedWithChannelAsArgument()
@@ -202,10 +202,10 @@ class AmqpMessageProducerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Destination
+     * @return \PHPUnit_Framework_MockObject_MockObject|DestinationInterface
      */
     protected function createDestination()
     {
-        return $this->getMock(Destination::class);
+        return $this->getMock(DestinationInterface::class);
     }
 }

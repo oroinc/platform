@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
-interface TopicSubscriber
+interface TopicSubscriberInterface
 {
     /**
      * * ['topicName']

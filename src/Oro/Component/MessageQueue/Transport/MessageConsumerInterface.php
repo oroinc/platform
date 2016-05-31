@@ -1,32 +1,32 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport;
 
-interface MessageConsumer
+interface MessageConsumerInterface
 {
     /**
-     * @return Queue
+     * @return QueueInterface
      */
     public function getQueue();
 
     /**
      * @param int $timeout
      *
-     * @return Message
+     * @return MessageInterface
      */
     public function receive($timeout = 0);
 
     /**
-     * @param Message $message
+     * @param MessageInterface $message
      *
      * @return void
      */
-    public function acknowledge(Message $message);
+    public function acknowledge(MessageInterface $message);
 
     /**
-     * @param Message $message
+     * @param MessageInterface $message
      * @param bool $requeue
      *
      * @return void
      */
-    public function reject(Message $message, $requeue = false);
+    public function reject(MessageInterface $message, $requeue = false);
 }

@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\Null\NullSession as TransportNullSession;
-use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\MessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\NullSession;
 use Oro\Component\MessageQueue\ZeroConfig\Config;

@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Null;
 
 use Oro\Component\MessageQueue\Transport\Null\NullTopic;
-use Oro\Component\MessageQueue\Transport\Topic;
+use Oro\Component\MessageQueue\Transport\TopicInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class NullTopicTest extends \PHPUnit_Framework_TestCase
@@ -11,7 +11,7 @@ class NullTopicTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementTopicInterface()
     {
-        $this->assertClassImplements(Topic::class, NullTopic::class);
+        $this->assertClassImplements(TopicInterface::class, NullTopic::class);
     }
 
     public function testCouldBeConstructedWithNameAsArgument()

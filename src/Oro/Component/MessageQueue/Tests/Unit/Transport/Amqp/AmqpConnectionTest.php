@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Amqp;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession;
-use Oro\Component\MessageQueue\Transport\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
@@ -14,7 +14,7 @@ class AmqpConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementConnectionInterface()
     {
-        $this->assertClassImplements(Connection::class, AmqpConnection::class);
+        $this->assertClassImplements(ConnectionInterface::class, AmqpConnection::class);
     }
 
     public function testCouldBeConstructedWithLibAmqpConnection()

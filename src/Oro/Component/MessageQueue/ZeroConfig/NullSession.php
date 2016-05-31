@@ -2,9 +2,9 @@
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
 use Oro\Component\MessageQueue\Transport\Null\NullSession as TransportNullSession;
-use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 
-class NullSession implements Session
+class NullSession implements SessionInterface
 {
     /**
      * @var TransportNullSession
@@ -45,7 +45,7 @@ class NullSession implements Session
     /**
      * @param string $queueName
      *
-     * @return Queue
+     * @return QueueInterface
      */
     public function createQueue($queueName)
     {

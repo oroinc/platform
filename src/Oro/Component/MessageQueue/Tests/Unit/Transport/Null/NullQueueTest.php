@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Null;
 
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
-use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class NullQueueTest extends \PHPUnit_Framework_TestCase
@@ -11,7 +11,7 @@ class NullQueueTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementQueueInterface()
     {
-        $this->assertClassImplements(Queue::class, NullQueue::class);
+        $this->assertClassImplements(QueueInterface::class, NullQueue::class);
     }
 
     public function testCouldBeConstructedWithNameAsArgument()

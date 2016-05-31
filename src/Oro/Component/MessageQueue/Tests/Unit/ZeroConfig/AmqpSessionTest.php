@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession as TransportAmqpSession;
-use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\MessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\AmqpSession;
 use Oro\Component\MessageQueue\ZeroConfig\Config;

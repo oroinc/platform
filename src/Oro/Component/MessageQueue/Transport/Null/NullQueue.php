@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Null;
 
-use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 
-class NullQueue implements Queue
+class NullQueue implements QueueInterface
 {
     /**
      * @var string

@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
-use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriber;
+use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriberInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -24,7 +24,7 @@ class BuildRouteRegistryPass implements CompilerPassInterface
         $configs = [];
         foreach ($container->findTaggedServiceIds($processorTagName) as $serviceId => $tagAttributes) {
             $class = $container->getDefinition($serviceId)->getClass();
-            if (is_subclass_of($class, TopicSubscriber::class)) {
+            if (is_subclass_of($class, TopicSubscriberInterface::class)) {
                 $this->addConfigsFromTopicSubscriber($configs, $class, $serviceId);
             } else {
                 $this->addConfigsFromTags($configs, $tagAttributes, $serviceId, $processorTagName);

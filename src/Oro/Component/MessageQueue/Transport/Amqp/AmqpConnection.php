@@ -1,11 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Amqp;
 
-use Oro\Component\MessageQueue\Transport\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
-class AmqpConnection implements Connection
+class AmqpConnection implements ConnectionInterface
 {
     /**
      * @var AbstractConnection

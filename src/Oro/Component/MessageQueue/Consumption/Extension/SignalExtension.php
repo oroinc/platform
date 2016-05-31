@@ -5,11 +5,11 @@ declare(ticks = 1);
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Psr\Log\LoggerInterface;
 
-class SignalExtension implements Extension
+class SignalExtension implements ExtensionInterface
 {
     use ExtensionTrait;
 

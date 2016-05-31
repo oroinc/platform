@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 
-use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\ZeroConfig\MessageProducer;
 use Oro\Component\MessageQueue\ZeroConfig\Config;
-use Oro\Component\MessageQueue\ZeroConfig\Session;
+use Oro\Component\MessageQueue\ZeroConfig\SessionInterface;
 
 class MessageProducerTest extends \PHPUnit_Framework_TestCase
 {
@@ -321,11 +321,11 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Session
+     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
     protected function createSessionStub($message = null, $config = null, $queue = null)
     {
-        $sessionMock = $this->getMock(Session::class, [], [], '', false);
+        $sessionMock = $this->getMock(SessionInterface::class, [], [], '', false);
         $sessionMock
             ->expects($this->any())
             ->method('createMessage')

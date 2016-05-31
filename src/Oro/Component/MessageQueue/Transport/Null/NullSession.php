@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Null;
 
-use Oro\Component\MessageQueue\Transport\Destination;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 
-class NullSession implements Session
+class NullSession implements SessionInterface
 {
     /**
      * {@inheritdoc}
@@ -46,7 +46,7 @@ class NullSession implements Session
      *
      * @return NullMessageConsumer
      */
-    public function createConsumer(Destination $destination)
+    public function createConsumer(DestinationInterface $destination)
     {
         return new NullMessageConsumer($destination);
     }
@@ -62,21 +62,21 @@ class NullSession implements Session
     /**
      * {@inheritdoc}
      */
-    public function declareTopic(Destination $destination)
+    public function declareTopic(DestinationInterface $destination)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function declareQueue(Destination $destination)
+    public function declareQueue(DestinationInterface $destination)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function declareBind(Destination $source, Destination $target)
+    public function declareBind(DestinationInterface $source, DestinationInterface $target)
     {
     }
 

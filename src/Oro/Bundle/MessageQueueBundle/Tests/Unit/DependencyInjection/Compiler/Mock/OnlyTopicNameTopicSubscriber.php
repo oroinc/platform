@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock;
 
-use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriber;
+use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriberInterface;
 
-class OnlyTopicNameTopicSubscriber implements TopicSubscriber
+class OnlyTopicNameTopicSubscriber implements TopicSubscriberInterface
 {
     public static function getSubscribedTopics()
     {

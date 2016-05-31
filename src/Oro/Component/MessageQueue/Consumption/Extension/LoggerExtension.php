@@ -2,11 +2,11 @@
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Psr\Log\LoggerInterface;
 
-class LoggerExtension implements Extension
+class LoggerExtension implements ExtensionInterface
 {
     use ExtensionTrait;
 

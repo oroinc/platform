@@ -1,14 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
-use Oro\Component\MessageQueue\Router\Router as RuterInterface;
+use Oro\Component\MessageQueue\Router\RecipientListRouterInterface as RuterInterface;
 use Oro\Component\MessageQueue\Router\Recipient;
-use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class Router implements RuterInterface
 {
     /**
-     * @var Session
+     * @var SessionInterface
      */
     protected $session;
 
@@ -18,10 +18,10 @@ class Router implements RuterInterface
     protected $routes;
 
     /**
-     * @param Session $session
+     * @param SessionInterface $session
      * @param array   $routes
      */
-    public function __construct(Session $session, array $routes = [])
+    public function __construct(SessionInterface $session, array $routes = [])
     {
         $this->session = $session;
         $this->routes = $routes;
@@ -64,7 +64,7 @@ class Router implements RuterInterface
     /**
      * {@inheritdoc}
      */
-    public function route(Message $message)
+    public function route(MessageInterface $message)
     {
         $topicName = $message->getProperty(Config::PARAMETER_TOPIC_NAME);
         if (false == $topicName) {
@@ -89,13 +89,13 @@ class Router implements RuterInterface
     }
 
     /**
-     * @param Message $message
+     * @param MessageInterface $message
      * @param string $processorName
      * @param string $queueName
      *
      * @return Recipient
      */
-    protected function createRecipient(Message $message, $processorName, $queueName)
+    protected function createRecipient(MessageInterface $message, $processorName, $queueName)
     {
         $properties = $message->getProperties();
         $properties[Config::PARAMETER_PROCESSOR_NAME] = $processorName;

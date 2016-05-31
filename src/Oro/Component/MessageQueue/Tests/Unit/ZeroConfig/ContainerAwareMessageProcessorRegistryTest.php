@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\ZeroConfig\ContainerAwareMessageProcessorRegistry;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -61,10 +61,10 @@ class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessor
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
      */
     protected function createMessageProcessorMock()
     {
-        return $this->getMock(MessageProcessor::class);
+        return $this->getMock(MessageProcessorInterface::class);
     }
 }

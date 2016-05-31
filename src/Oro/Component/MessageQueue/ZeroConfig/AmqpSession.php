@@ -3,9 +3,9 @@ namespace Oro\Component\MessageQueue\ZeroConfig;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession as TransportAmqpSession;
-use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 
-class AmqpSession implements Session
+class AmqpSession implements SessionInterface
 {
     /**
      * @var TransportAmqpSession
@@ -48,7 +48,7 @@ class AmqpSession implements Session
     /**
      * @param string $queueName
      *
-     * @return Queue
+     * @return QueueInterface
      */
     public function createQueue($queueName)
     {

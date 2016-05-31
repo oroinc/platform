@@ -3,12 +3,12 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\IllegalContextModificationException;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\Extensions;
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\NullLogger;
 
@@ -96,8 +96,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAllowGetPreviouslySetMessage()
     {
-        /** @var Message $message */
-        $message = $this->getMock(Message::class);
+        /** @var MessageInterface $message */
+        $message = $this->getMock(MessageInterface::class);
 
         $context = new Context(
             $this->createSession(),
@@ -113,8 +113,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowOnTryToChangeMessageIfAlreadySet()
     {
-        /** @var Message $message */
-        $message = $this->getMock(Message::class);
+        /** @var MessageInterface $message */
+        $message = $this->getMock(MessageInterface::class);
 
         $context = new Context(
             $this->createSession(),
@@ -249,26 +249,26 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Session
+     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
     protected function createSession()
     {
-        return $this->getMock(Session::class);
+        return $this->getMock(SessionInterface::class);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumer
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumerInterface
      */
     protected function createMessageConsumer()
     {
-        return $this->getMock(MessageConsumer::class);
+        return $this->getMock(MessageConsumerInterface::class);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessor
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
      */
     protected function createMessageProcessor()
     {
-        return $this->getMock(MessageProcessor::class);
+        return $this->getMock(MessageProcessorInterface::class);
     }
 }

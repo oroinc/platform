@@ -1,11 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Exception;
 
-use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class InvalidMessageException extends Exception
 {
-    public static function assertMessageInstanceOf(Message $message, $class)
+    public static function assertMessageInstanceOf(MessageInterface $message, $class)
     {
         if (false == $message instanceof $class) {
             throw new static(sprintf(

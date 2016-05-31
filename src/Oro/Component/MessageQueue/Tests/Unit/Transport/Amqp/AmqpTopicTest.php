@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Amqp;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpTopic;
-use Oro\Component\MessageQueue\Transport\Topic;
+use Oro\Component\MessageQueue\Transport\TopicInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class AmqpTopicTest extends \PHPUnit_Framework_TestCase
@@ -11,7 +11,7 @@ class AmqpTopicTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementTopicInterface()
     {
-        $this->assertClassImplements(Topic::class, AmqpTopic::class);
+        $this->assertClassImplements(TopicInterface::class, AmqpTopic::class);
     }
 
     public function testCouldBeConstructedWithNameAsArgument()

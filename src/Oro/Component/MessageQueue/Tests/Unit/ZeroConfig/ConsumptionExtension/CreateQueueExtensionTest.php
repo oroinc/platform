@@ -2,11 +2,11 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig\ConsumptionExtension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\ZeroConfig\ConsumptionExtension\CreateQueueExtension;
-use Oro\Component\MessageQueue\ZeroConfig\Session;
+use Oro\Component\MessageQueue\ZeroConfig\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
@@ -15,7 +15,7 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementExtensionInterface()
     {
-        $this->assertClassImplements(Extension::class, CreateQueueExtension::class);
+        $this->assertClassImplements(ExtensionInterface::class, CreateQueueExtension::class);
     }
 
     public function testCouldBeConstructedWithRequiredArguments()
@@ -42,11 +42,11 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Session
+     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
     protected function createSessionMock()
     {
-        return $this->getMock(Session::class);
+        return $this->getMock(SessionInterface::class);
     }
 
     /**
@@ -54,7 +54,7 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContextStub($queue = null)
     {
-        $messageConsumerStub = $this->getMock(MessageConsumer::class);
+        $messageConsumerStub = $this->getMock(MessageConsumerInterface::class);
         $messageConsumerStub
             ->expects($this->any())
             ->method('getQueue')

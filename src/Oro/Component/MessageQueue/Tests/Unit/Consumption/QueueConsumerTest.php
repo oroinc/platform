@@ -2,16 +2,16 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\Extensions;
 use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
-use Oro\Component\MessageQueue\Transport\Connection;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
-use Oro\Component\MessageQueue\Transport\Queue;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\NullLogger;
 
 // @codingStandardsIgnoreStart
@@ -35,16 +35,16 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     public function testShouldSubscribeToGivenQueueAndQuitAfterFifthIdleCycle()
     {
         $expectedQueueName = 'theQueueName';
-        $expectedQueue = $this->getMock(Queue::class);
+        $expectedQueue = $this->getMock(QueueInterface::class);
 
-        $messageConsumerMock = $this->getMock(MessageConsumer::class);
+        $messageConsumerMock = $this->getMock(MessageConsumerInterface::class);
         $messageConsumerMock
             ->expects($this->exactly(5))
             ->method('receive')
             ->willReturn(null)
         ;
 
-        $sessionMock = $this->getMock(Session::class);
+        $sessionMock = $this->getMock(SessionInterface::class);
         $sessionMock
             ->expects($this->once())
             ->method('createConsumer')
@@ -108,7 +108,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('process')
             ->with($this->identicalTo($messageMock))
-            ->willReturn(MessageProcessor::ACK)
+            ->willReturn(MessageProcessorInterface::ACK)
         ;
 
         $connectionStub = $this->createConnectionStub($sessionStub);
@@ -162,7 +162,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('process')
             ->with($this->identicalTo($messageMock))
-            ->willReturn(MessageProcessor::REJECT)
+            ->willReturn(MessageProcessorInterface::REJECT)
         ;
 
         $connectionStub = $this->createConnectionStub($sessionStub);
@@ -189,7 +189,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('process')
             ->with($this->identicalTo($messageMock))
-            ->willReturn(MessageProcessor::REQUEUE)
+            ->willReturn(MessageProcessorInterface::REQUEUE)
         ;
 
         $connectionStub = $this->createConnectionStub($sessionStub);
@@ -231,7 +231,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('onPreReceived')
             ->with($this->isInstanceOf(Context::class))
             ->willReturnCallback(function (Context $context) {
-                $context->setStatus(MessageProcessor::ACK);
+                $context->setStatus(MessageProcessorInterface::ACK);
             })
         ;
 
@@ -386,7 +386,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame($expectedMessage, $context->getMessage());
                 $this->assertInstanceOf(NullLogger::class, $context->getLogger());
                 $this->assertNull($context->getException());
-                $this->assertSame(MessageProcessor::ACK, $context->getStatus());
+                $this->assertSame(MessageProcessorInterface::ACK, $context->getStatus());
                 $this->assertFalse($context->isExecutionInterrupted());
             })
         ;
@@ -525,7 +525,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame($expectedMessage, $context->getMessage());
                 $this->assertInstanceOf(NullLogger::class, $context->getLogger());
                 $this->assertNull($context->getException());
-                $this->assertSame(MessageProcessor::ACK, $context->getStatus());
+                $this->assertSame(MessageProcessorInterface::ACK, $context->getStatus());
                 $this->assertTrue($context->isExecutionInterrupted());
             })
         ;
@@ -570,7 +570,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame($expectedMessage, $context->getMessage());
                 $this->assertInstanceOf(NullLogger::class, $context->getLogger());
                 $this->assertNull($context->getException());
-                $this->assertSame(MessageProcessor::ACK, $context->getStatus());
+                $this->assertSame(MessageProcessorInterface::ACK, $context->getStatus());
                 $this->assertTrue($context->isExecutionInterrupted());
             })
         ;
@@ -714,11 +714,11 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumer
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumerInterface
      */
     protected function createMessageConsumerStub($message = null)
     {
-        $messageConsumerMock = $this->getMock(MessageConsumer::class);
+        $messageConsumerMock = $this->getMock(MessageConsumerInterface::class);
         $messageConsumerMock
             ->expects($this->any())
             ->method('receive')
@@ -729,11 +729,11 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createConnectionStub($session = null)
     {
-        $connectionMock = $this->getMock(Connection::class);
+        $connectionMock = $this->getMock(ConnectionInterface::class);
         $connectionMock
             ->expects($this->any())
             ->method('createSession')
@@ -744,11 +744,11 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Session|\PHPUnit_Framework_MockObject_MockObject
+     * @return SessionInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createSessionStub($messageConsumer = null)
     {
-        $sessionMock = $this->getMock(Session::class);
+        $sessionMock = $this->getMock(SessionInterface::class);
         $sessionMock
             ->expects($this->any())
             ->method('createConsumer')
@@ -757,7 +757,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $sessionMock
             ->expects($this->any())
             ->method('createQueue')
-            ->willReturn($this->getMock(Queue::class))
+            ->willReturn($this->getMock(QueueInterface::class))
         ;
         $sessionMock
             ->expects($this->any())
@@ -768,31 +768,31 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessor
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
      */
     protected function createMessageProcessorMock()
     {
-        return $this->getMock(MessageProcessor::class);
+        return $this->getMock(MessageProcessorInterface::class);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Message
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
      */
     protected function createMessageMock()
     {
-        return $this->getMock(Message::class);
+        return $this->getMock(MessageInterface::class);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Extension
+     * @return \PHPUnit_Framework_MockObject_MockObject|ExtensionInterface
      */
     protected function createExtension()
     {
-        return $this->getMock(Extension::class);
+        return $this->getMock(ExtensionInterface::class);
     }
 }
 
-class BreakCycleExtension implements Extension
+class BreakCycleExtension implements ExtensionInterface
 {
     use ExtensionTrait;
 

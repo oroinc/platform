@@ -7,9 +7,9 @@ use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessageProducer;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpTopic;
-use Oro\Component\MessageQueue\Transport\Destination;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Wire\AMQPTable;
@@ -20,7 +20,7 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementSessionInterface()
     {
-        $this->assertClassImplements(Session::class, AmqpSession::class);
+        $this->assertClassImplements(SessionInterface::class, AmqpSession::class);
     }
 
     public function testCouldBeConstructedWithChannelAsArgument()
@@ -273,10 +273,10 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Destination
+     * @return \PHPUnit_Framework_MockObject_MockObject|DestinationInterface
      */
     protected function createDestination()
     {
-        return $this->getMock(Destination::class);
+        return $this->getMock(DestinationInterface::class);
     }
 }

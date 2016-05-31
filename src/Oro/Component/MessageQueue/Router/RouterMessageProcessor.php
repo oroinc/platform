@@ -1,24 +1,24 @@
 <?php
 namespace Oro\Component\MessageQueue\Router;
 
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\Session as TransportSession;
-use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriber;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface as TransportSession;
+use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriberInterface;
 
-class RouterMessageProcessor implements MessageProcessor, TopicSubscriber
+class RouterMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const TOPIC = 'message_queue.router';
 
     /**
-     * @var Router
+     * @var object
      */
     private $router;
 
     /**
-     * @param Router $router
+     * @param object $router
      */
-    public function __construct(Router $router)
+    public function __construct($router)
     {
         $this->router = $router;
     }
@@ -26,14 +26,28 @@ class RouterMessageProcessor implements MessageProcessor, TopicSubscriber
     /**
      * {@inheritdoc}
      */
-    public function process(Message $message, TransportSession $session)
+    public function process(MessageInterface $message, TransportSession $session)
     {
-        $producer = $session->createProducer();
-        foreach ($this->router->route($message) as $recipient) {
-            $producer->send($recipient->getDestination(), $recipient->getMessage());
+        if ($this->router instanceof  RecipientListRouterInterface) {
+            $this->routeOneToMany($this->router, $message, $session);
+        } else {
+            throw new \LogicException(sprintf('Unsupported router given %s', get_class($this->router)));
         }
 
         return self::ACK;
+    }
+
+    /**
+     * @param RecipientListRouterInterface $router
+     * @param MessageInterface $message
+     * @param TransportSession $session
+     */
+    protected function routeOneToMany(RecipientListRouterInterface $router, MessageInterface $message, TransportSession $session)
+    {
+        $producer = $session->createProducer();
+        foreach ($router->route($message) as $recipient) {
+            $producer->send($recipient->getDestination(), $recipient->getMessage());
+        }
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Null;
 
-use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\Testing\ClassExtensionTrait;
 
@@ -11,7 +11,7 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementMessageInterface()
     {
-        $this->assertClassImplements(Message::class, NullMessage::class);
+        $this->assertClassImplements(MessageInterface::class, NullMessage::class);
     }
 
     public function testCouldBeConstructedWithoutAnyArguments()

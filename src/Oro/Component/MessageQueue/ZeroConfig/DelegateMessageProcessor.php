@@ -1,11 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\Session as TransportSession;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface as TransportSession;
 
-class DelegateMessageProcessor implements MessageProcessor
+class DelegateMessageProcessor implements MessageProcessorInterface
 {
     /**
      * @var MessageProcessorRegistryInterface
@@ -23,7 +23,7 @@ class DelegateMessageProcessor implements MessageProcessor
     /**
      * {@inheritdoc}
      */
-    public function process(Message $message, TransportSession $session)
+    public function process(MessageInterface $message, TransportSession $session)
     {
         $processorName = $message->getProperty(Config::PARAMETER_PROCESSOR_NAME);
         if (false == $processorName) {

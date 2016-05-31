@@ -2,11 +2,11 @@
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 
-class JsonDecodeExtension implements Extension
+class JsonDecodeExtension implements ExtensionInterface
 {
     use ExtensionTrait;
 

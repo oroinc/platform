@@ -1,33 +1,33 @@
 <?php
 namespace Oro\Component\MessageQueue\Router;
 
-use Oro\Component\MessageQueue\Transport\Destination;
-use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class Recipient
 {
     /**
-     * @var Destination
+     * @var DestinationInterface
      */
     private $destination;
     
     /**
-     * @var Message
+     * @var MessageInterface
      */
     private $message;
 
     /**
-     * @param Destination $destination
-     * @param Message $message
+     * @param DestinationInterface $destination
+     * @param MessageInterface $message
      */
-    public function __construct(Destination $destination, Message $message)
+    public function __construct(DestinationInterface $destination, MessageInterface $message)
     {
         $this->destination = $destination;
         $this->message = $message;
     }
 
     /**
-     * @return Destination
+     * @return DestinationInterface
      */
     public function getDestination()
     {
@@ -35,7 +35,7 @@ class Recipient
     }
 
     /**
-     * @return Message
+     * @return MessageInterface
      */
     public function getMessage()
     {

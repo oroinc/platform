@@ -51,12 +51,12 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
 
         $queueName = $input->getArgument('queue');
 
-        /** @var MessageProcessor $messageProcessor */
+        /** @var MessageProcessorInterface $messageProcessor */
         $messageProcessor = $this->container->get($input->getArgument('processor-service'));
-        if (false == $messageProcessor instanceof  MessageProcessor) {
+        if (false == $messageProcessor instanceof  MessageProcessorInterface) {
             throw new \LogicException(sprintf(
                 'Invalid message processor service given. It must be an instance of %s but %s',
-                MessageProcessor::class,
+                MessageProcessorInterface::class,
                 get_class($messageProcessor)
             ));
         }

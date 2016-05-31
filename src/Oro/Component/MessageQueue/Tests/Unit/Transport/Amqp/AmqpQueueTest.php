@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Amqp;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
-use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class AmqpQueueTest extends \PHPUnit_Framework_TestCase
@@ -11,7 +11,7 @@ class AmqpQueueTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementQueueInterface()
     {
-        $this->assertClassImplements(Queue::class, AmqpQueue::class);
+        $this->assertClassImplements(QueueInterface::class, AmqpQueue::class);
     }
 
     public function testCouldBeConstructedWithNameAsArgument()

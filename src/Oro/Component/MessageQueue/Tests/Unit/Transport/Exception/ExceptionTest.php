@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Exception;
 
-use Oro\Component\MessageQueue\Transport\Exception as ExceptionInterface;
+use Oro\Component\MessageQueue\Transport\ExceptionInterface as ExceptionInterface;
 use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Oro\Component\Testing\ClassExtensionTrait;
 

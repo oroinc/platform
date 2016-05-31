@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\Testing\ClassExtensionTrait;
@@ -14,7 +14,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementExtensionInterface()
     {
-        $this->assertClassImplements(Extension::class, LoggerExtension::class);
+        $this->assertClassImplements(ExtensionInterface::class, LoggerExtension::class);
     }
 
     public function testCouldBeConstructedWithLoggerAsFirstArgument()

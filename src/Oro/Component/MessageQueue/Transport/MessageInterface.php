@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport;
 
-interface Message
+interface MessageInterface
 {
     /**
      * @return string

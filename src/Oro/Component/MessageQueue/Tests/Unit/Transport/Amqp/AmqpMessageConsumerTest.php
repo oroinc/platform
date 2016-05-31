@@ -6,8 +6,8 @@ use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
@@ -22,7 +22,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementMessageConsumerInterface()
     {
-        $this->assertClassImplements(MessageConsumer::class, AmqpMessageConsumer::class);
+        $this->assertClassImplements(MessageConsumerInterface::class, AmqpMessageConsumer::class);
     }
 
     public function testCouldBeConstructedWithSessionAndQueueAsArguments()
@@ -346,11 +346,11 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Message
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
      */
     protected function createMessage()
     {
-        return $this->getMock(Message::class);
+        return $this->getMock(MessageInterface::class);
     }
 
     /**

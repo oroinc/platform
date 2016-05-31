@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption;
 
-interface Extension
+interface ExtensionInterface
 {
     /**
      * @param Context $context

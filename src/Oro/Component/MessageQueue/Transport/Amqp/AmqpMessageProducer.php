@@ -1,16 +1,16 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Amqp;
 
-use Oro\Component\MessageQueue\Transport\Destination;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
-class AmqpMessageProducer implements MessageProducer
+class AmqpMessageProducer implements MessageProducerInterface
 {
     /**
      * @var AMQPChannel
@@ -28,7 +28,7 @@ class AmqpMessageProducer implements MessageProducer
     /**
      * {@inheritdoc}
      */
-    public function send(Destination $destination, Message $message)
+    public function send(DestinationInterface $destination, MessageInterface $message)
     {
         $body = $message->getBody();
         if (is_scalar($body) || is_null($body)) {

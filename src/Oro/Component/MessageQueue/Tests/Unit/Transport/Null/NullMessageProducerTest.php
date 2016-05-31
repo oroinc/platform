@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Null;
 
-use Oro\Component\MessageQueue\Transport\MessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullTopic;
@@ -13,7 +13,7 @@ class NullMessageProducerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementMessageProducerInterface()
     {
-        $this->assertClassImplements(MessageProducer::class, NullMessageProducer::class);
+        $this->assertClassImplements(MessageProducerInterface::class, NullMessageProducer::class);
     }
 
     public function testCouldBeConstructedWithoutAnyArguments()

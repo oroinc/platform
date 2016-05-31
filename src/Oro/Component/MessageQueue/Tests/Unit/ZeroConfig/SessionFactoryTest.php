@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession as TransportAmqpSession;
-use Oro\Component\MessageQueue\Transport\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullSession as TransportNullSession;
 use Oro\Component\MessageQueue\ZeroConfig\AmqpSession;
@@ -47,9 +47,9 @@ class SessionFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfUnexpectedConnectionInstance()
     {
-        $this->setExpectedException(\LogicException::class, 'Unexpected connection instance: "Mock_Connection_');
+        $this->setExpectedException(\LogicException::class, 'Unexpected connection instance: "Mock_Connection');
 
-        SessionFactory::create($this->getMock(Connection::class), new Config('', '', '', ''));
+        SessionFactory::create($this->getMock(ConnectionInterface::class), new Config('', '', '', ''));
     }
 
     /**

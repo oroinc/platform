@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport;
 
-interface Queue extends Destination
+interface TopicInterface extends DestinationInterface
 {
     /**
      * @return string
      */
-    public function getQueueName();
+    public function getTopicName();
 }

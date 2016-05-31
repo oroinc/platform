@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\Extensions;
 use Oro\Component\Testing\ClassExtensionTrait;
 
@@ -12,7 +12,7 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementExtensionInterface()
     {
-        $this->assertClassImplements(Extension::class, Extensions::class);
+        $this->assertClassImplements(ExtensionInterface::class, Extensions::class);
     }
 
     public function testCouldBeConstructedWithExtensionsArray()
@@ -161,10 +161,10 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Extension
+     * @return \PHPUnit_Framework_MockObject_MockObject|ExtensionInterface
      */
     protected function createExtension()
     {
-        return $this->getMock(Extension::class);
+        return $this->getMock(ExtensionInterface::class);
     }
 }

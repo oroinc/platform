@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport;
 
-interface Connection
+interface ConnectionInterface
 {
     /**
-     * @return Session
+     * @return SessionInterface
      */
     public function createSession();
 

@@ -2,18 +2,18 @@
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
-use Oro\Component\MessageQueue\Transport\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 
 class SessionFactory
 {
     /**
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      * @param Config     $config
      *
-     * @return Session
+     * @return SessionInterface
      */
-    public static function create(Connection $connection, Config $config)
+    public static function create(ConnectionInterface $connection, Config $config)
     {
         if ($connection instanceof  AmqpConnection) {
             return new AmqpSession($connection->createSession(), $config);

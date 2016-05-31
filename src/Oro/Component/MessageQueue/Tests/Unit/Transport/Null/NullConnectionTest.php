@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Null;
 
-use Oro\Component\MessageQueue\Transport\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\Testing\ClassExtensionTrait;
@@ -12,7 +12,7 @@ class NullConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementConnectionInterface()
     {
-        $this->assertClassImplements(Connection::class, NullConnection::class);
+        $this->assertClassImplements(ConnectionInterface::class, NullConnection::class);
     }
     
     public function testCouldBeConstructedWithoutAnyArguments()

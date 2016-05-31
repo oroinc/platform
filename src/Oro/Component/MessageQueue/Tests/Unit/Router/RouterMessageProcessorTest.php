@@ -1,14 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Router;
 
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Router\Recipient;
-use Oro\Component\MessageQueue\Router\Router;
+use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Router\RouterMessageProcessor;
-use Oro\Component\MessageQueue\Transport\MessageProducer;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
@@ -17,7 +17,7 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementMessageProcessorInterface()
     {
-        $this->assertClassImplements(MessageProcessor::class, RouterMessageProcessor::class);
+        $this->assertClassImplements(MessageProcessorInterface::class, RouterMessageProcessor::class);
     }
 
     public function testCouldBeConstructedWithRouterAsFirstArgument()
@@ -63,30 +63,30 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $status = $processor->process($originalMessage, $sessionMock);
 
-        $this->assertEquals(MessageProcessor::ACK, $status);
+        $this->assertEquals(MessageProcessorInterface::ACK, $status);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducer
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
      */
     protected function createProducerMock()
     {
-        return $this->getMock(MessageProducer::class);
+        return $this->getMock(MessageProducerInterface::class);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Session
+     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
     protected function createSessionMock()
     {
-        return $this->getMock(Session::class);
+        return $this->getMock(SessionInterface::class);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Router
+     * @return \PHPUnit_Framework_MockObject_MockObject|RecipientListRouterInterface
      */
     protected function createRouterMock()
     {
-        return $this->getMock(Router::class);
+        return $this->getMock(RecipientListRouterInterface::class);
     }
 }

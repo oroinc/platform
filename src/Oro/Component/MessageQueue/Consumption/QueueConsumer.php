@@ -1,13 +1,13 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption;
 
-use Oro\Component\MessageQueue\Transport\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Psr\Log\NullLogger;
 
 class QueueConsumer
 {
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     private $connection;
 
@@ -17,17 +17,17 @@ class QueueConsumer
     private $extensions;
 
     /**
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      * @param Extensions $extensions
      */
-    public function __construct(Connection $connection, Extensions $extensions)
+    public function __construct(ConnectionInterface $connection, Extensions $extensions)
     {
         $this->connection = $connection;
         $this->extensions = $extensions;
     }
 
     /**
-     * @return Connection
+     * @return ConnectionInterface
      */
     public function getConnection()
     {
@@ -36,12 +36,12 @@ class QueueConsumer
 
     /**
      * @param string $queueName
-     * @param MessageProcessor $messageProcessor
+     * @param MessageProcessorInterface $messageProcessor
      * @param Extensions $extensions
      *
      * @throws \Exception
      */
-    public function consume($queueName, MessageProcessor $messageProcessor, Extensions $extensions = null)
+    public function consume($queueName, MessageProcessorInterface $messageProcessor, Extensions $extensions = null)
     {
         $session = $this->connection->createSession();
         $queue = $session->createQueue($queueName);
@@ -69,15 +69,15 @@ class QueueConsumer
                     $extensions->onPreReceived($context);
                     if (false == $context->getStatus()) {
                         $status = $messageProcessor->process($message, $session);
-                        $status = $status ?: MessageProcessor::ACK;
+                        $status = $status ?: MessageProcessorInterface::ACK;
                         $context->setStatus($status);
                     }
 
-                    if (MessageProcessor::ACK === $context->getStatus()) {
+                    if (MessageProcessorInterface::ACK === $context->getStatus()) {
                         $messageConsumer->acknowledge($message);
-                    } elseif (MessageProcessor::REJECT === $context->getStatus()) {
+                    } elseif (MessageProcessorInterface::REJECT === $context->getStatus()) {
                         $messageConsumer->reject($message, false);
-                    } elseif (MessageProcessor::REQUEUE === $context->getStatus()) {
+                    } elseif (MessageProcessorInterface::REQUEUE === $context->getStatus()) {
                         $messageConsumer->reject($message, true);
                     } else {
                         throw new \LogicException(sprintf('Status is not supported: %s', $context->getStatus()));

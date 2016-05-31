@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Null;
 
-use Oro\Component\MessageQueue\Transport\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
-class NullConnection implements Connection
+class NullConnection implements ConnectionInterface
 {
     /**
      * {@inheritdoc}

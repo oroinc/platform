@@ -1,14 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 
 interface MessageProcessorRegistryInterface
 {
     /**
      * @param string $processorName
      *
-     * @return MessageProcessor
+     * @return MessageProcessorInterface
      */
     public function get($processorName);
 }

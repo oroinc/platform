@@ -1,13 +1,13 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Amqp;
 
-use Oro\Component\MessageQueue\Transport\Destination;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Wire\AMQPTable;
 
-class AmqpSession implements Session
+class AmqpSession implements SessionInterface
 {
     /**
      * @var AMQPChannel
@@ -74,7 +74,7 @@ class AmqpSession implements Session
      *
      * @return AmqpMessageConsumer
      */
-    public function createConsumer(Destination $destination)
+    public function createConsumer(DestinationInterface $destination)
     {
         InvalidDestinationException::assertDestinationInstanceOf($destination, AmqpQueue::class);
         
@@ -96,7 +96,7 @@ class AmqpSession implements Session
      *
      * @param AmqpTopic $destination
      */
-    public function declareTopic(Destination $destination)
+    public function declareTopic(DestinationInterface $destination)
     {
         InvalidDestinationException::assertDestinationInstanceOf($destination, AmqpTopic::class);
 
@@ -117,7 +117,7 @@ class AmqpSession implements Session
      *
      * @param AmqpQueue $destination
      */
-    public function declareQueue(Destination $destination)
+    public function declareQueue(DestinationInterface $destination)
     {
         InvalidDestinationException::assertDestinationInstanceOf($destination, AmqpQueue::class);
 
@@ -138,7 +138,7 @@ class AmqpSession implements Session
      * @param AmqpTopic $source
      * @param AmqpQueue $target
      */
-    public function declareBind(Destination $source, Destination $target)
+    public function declareBind(DestinationInterface $source, DestinationInterface $target)
     {
         InvalidDestinationException::assertDestinationInstanceOf($source, AmqpTopic::class);
         InvalidDestinationException::assertDestinationInstanceOf($target, AmqpQueue::class);

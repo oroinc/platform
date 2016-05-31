@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\ZeroConfig\Config;
 use Oro\Component\MessageQueue\ZeroConfig\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\ZeroConfig\DelegateMessageProcessor;
@@ -65,18 +65,18 @@ class DelegateMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Session
+     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
     protected function createTransportSessionMock()
     {
-        return $this->getMock(Session::class);
+        return $this->getMock(SessionInterface::class);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessor
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
      */
     protected function createMessageProcessorMock()
     {
-        return $this->getMock(MessageProcessor::class);
+        return $this->getMock(MessageProcessorInterface::class);
     }
 }

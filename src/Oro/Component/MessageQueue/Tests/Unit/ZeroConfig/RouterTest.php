@@ -4,19 +4,19 @@ namespace Oro\Component\MessageQueue\Tests\Unit\ZeroConfig;
 use Oro\Component\MessageQueue\Router\Recipient;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
-use Oro\Component\MessageQueue\Router\Router as RouterInterface;
+use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\ZeroConfig\Config;
 use Oro\Component\MessageQueue\ZeroConfig\Router;
-use Oro\Component\MessageQueue\ZeroConfig\Session;
+use Oro\Component\MessageQueue\ZeroConfig\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
     use ClassExtensionTrait;
 
-    public function testShouldImplementRouterInterface()
+    public function testShouldImplementRecipientListRouterInterface()
     {
-        $this->assertClassImplements(RouterInterface::class, Router::class);
+        $this->assertClassImplements(RecipientListRouterInterface::class, Router::class);
     }
 
     public function testCouldBeConstructedWithSessionAsFirstArgument()
@@ -181,7 +181,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     
     protected function createSessionStub($config = null)
     {
-        $sessionMock = $this->getMock(Session::class);
+        $sessionMock = $this->getMock(SessionInterface::class);
         $sessionMock
             ->expects($this->any())
             ->method('createMessage')

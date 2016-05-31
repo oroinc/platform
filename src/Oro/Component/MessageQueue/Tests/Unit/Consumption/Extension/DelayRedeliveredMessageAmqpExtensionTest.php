@@ -2,15 +2,15 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\Extension\DelayRedeliveredMessageAmqpExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessageProducer;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\NullLogger;
 
@@ -20,7 +20,7 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
     
     public function testShouldImplementExtensionInterface()
     {
-        $this->assertClassImplements(Extension::class, DelayRedeliveredMessageAmqpExtension::class);
+        $this->assertClassImplements(ExtensionInterface::class, DelayRedeliveredMessageAmqpExtension::class);
     }
     
     public function testCouldBeConstructedWithoutAnyArguments()
@@ -30,8 +30,8 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
     
     public function testShouldDoNothingIfNotAmqpSession()
     {
-        /** @var Session $session */
-        $session = $this->getMock(Session::class);
+        /** @var SessionInterface $session */
+        $session = $this->getMock(SessionInterface::class);
         
         $context = new Context(
             $session,
@@ -89,7 +89,7 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
 
         $extension->onPreReceived($context);
 
-        $this->assertEquals(MessageProcessor::REJECT, $context->getStatus());
+        $this->assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
     }
 
     public function testShouldDeclareDelayedQueueBeforeUsingIt()
@@ -226,13 +226,13 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumer
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumerInterface
      */
     protected function createMessageConsumerStub($queueName = null)
     {
         $queue = new AmqpQueue($queueName);
 
-        $messageConsumerMock = $this->getMock(MessageConsumer::class);
+        $messageConsumerMock = $this->getMock(MessageConsumerInterface::class);
         $messageConsumerMock
             ->expects($this->any())
             ->method('getQueue')
@@ -251,10 +251,10 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessor
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
      */
     protected function createMessageProcessorMock()
     {
-        return $this->getMock(MessageProcessor::class);
+        return $this->getMock(MessageProcessorInterface::class);
     }
 }

@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Exception;
 
 use Oro\Component\MessageQueue\Transport\Exception\Exception as ExceptionInterface;
-use Oro\Component\MessageQueue\Transport\Destination;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
 use Oro\Component\Testing\ClassExtensionTrait;
 
@@ -35,11 +35,11 @@ class InvalidDestinationExceptionTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class DestinationFoo implements Destination
+class DestinationFoo implements DestinationInterface
 {
 }
 
-class DestinationBar implements Destination
+class DestinationBar implements DestinationInterface
 {
 }
 

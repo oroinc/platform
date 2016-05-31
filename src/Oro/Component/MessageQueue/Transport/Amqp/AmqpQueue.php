@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Amqp;
 
-use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 
-class AmqpQueue implements Queue
+class AmqpQueue implements QueueInterface
 {
     /**
      * @var string

@@ -2,16 +2,16 @@
 namespace Oro\Component\MessageQueue\Transport\Amqp;
 
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\Queue;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
 use PhpAmqpLib\Wire\AMQPAbstractCollection;
 use PhpAmqpLib\Wire\AMQPArray;
 use PhpAmqpLib\Wire\AMQPTable;
 
-class AmqpMessageConsumer implements MessageConsumer
+class AmqpMessageConsumer implements MessageConsumerInterface
 {
     /**
      * @var AmqpSession
@@ -19,7 +19,7 @@ class AmqpMessageConsumer implements MessageConsumer
     private $session;
 
     /**
-     * @var Queue
+     * @var QueueInterface
      */
     private $queue;
 
@@ -79,7 +79,7 @@ class AmqpMessageConsumer implements MessageConsumer
      *
      * @param AmqpMessage $message
      */
-    public function acknowledge(Message $message)
+    public function acknowledge(MessageInterface $message)
     {
         if (false == $message instanceof AmqpMessage) {
             throw new InvalidMessageException(sprintf(
@@ -97,7 +97,7 @@ class AmqpMessageConsumer implements MessageConsumer
      *
      * @param AmqpMessage $message
      */
-    public function reject(Message $message, $requeue = false)
+    public function reject(MessageInterface $message, $requeue = false)
     {
         if (false == $message instanceof AmqpMessage) {
             throw new InvalidMessageException(sprintf(

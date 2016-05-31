@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Amqp;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
-use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
 
@@ -12,7 +12,7 @@ class AmqpMessageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementMessageInterface()
     {
-        $this->assertClassImplements(Message::class, AmqpMessage::class);
+        $this->assertClassImplements(MessageInterface::class, AmqpMessage::class);
     }
 
     public function testCouldBeConstructedWithoutAnyArguments()

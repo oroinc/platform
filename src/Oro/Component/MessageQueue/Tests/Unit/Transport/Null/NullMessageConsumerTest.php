@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Null;
 
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
@@ -13,7 +13,7 @@ class NullMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementMessageConsumerInterface()
     {
-        $this->assertClassImplements(MessageConsumer::class, NullMessageConsumer::class);
+        $this->assertClassImplements(MessageConsumerInterface::class, NullMessageConsumer::class);
     }
 
     public function testCouldBeConstructedWithQueueAsArgument()

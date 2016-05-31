@@ -2,23 +2,23 @@
 namespace Oro\Component\MessageQueue\ZeroConfig\ConsumptionExtension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
-use Oro\Component\MessageQueue\ZeroConfig\Session;
+use Oro\Component\MessageQueue\ZeroConfig\SessionInterface;
 
-class CreateQueueExtension implements Extension
+class CreateQueueExtension implements ExtensionInterface
 {
     use ExtensionTrait;
     
     /**
-     * @var Session
+     * @var SessionInterface
      */
     private $session;
 
     /**
-     * @param Session $session
+     * @param SessionInterface $session
      */
-    public function __construct(Session $session)
+    public function __construct(SessionInterface $session)
     {
         $this->session = $session;
     }

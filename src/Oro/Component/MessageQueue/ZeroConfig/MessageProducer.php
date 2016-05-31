@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
-use Oro\Component\MessageQueue\Transport\Destination;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageProducer as TransportMessageProducer;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 
 class MessageProducer implements TransportMessageProducer
 {
@@ -13,15 +13,15 @@ class MessageProducer implements TransportMessageProducer
     protected $transportProducer;
 
     /**
-     * @var Session
+     * @var SessionInterface
      */
     protected $session;
 
     /**
      * @param TransportMessageProducer $transportProducer
-     * @param Session                  $session
+     * @param SessionInterface                  $session
      */
-    public function __construct(TransportMessageProducer $transportProducer, Session $session)
+    public function __construct(TransportMessageProducer $transportProducer, SessionInterface $session)
     {
         $this->transportProducer = $transportProducer;
         $this->session = $session;
@@ -52,7 +52,7 @@ class MessageProducer implements TransportMessageProducer
     /**
      * {@inheritdoc}
      */
-    public function send(Destination $destination, Message $message)
+    public function send(DestinationInterface $destination, MessageInterface $message)
     {
         if (false == $message->getProperty(Config::PARAMETER_TOPIC_NAME)) {
             throw new \LogicException(sprintf('Parameter "%s" is required.', Config::PARAMETER_TOPIC_NAME));

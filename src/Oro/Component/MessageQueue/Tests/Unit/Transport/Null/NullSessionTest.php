@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Transport\Null\NullTopic;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class NullSessionTest extends \PHPUnit_Framework_TestCase
@@ -16,7 +16,7 @@ class NullSessionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementSessionInterface()
     {
-        $this->assertClassImplements(Session::class, NullSession::class);
+        $this->assertClassImplements(SessionInterface::class, NullSession::class);
     }
 
     public function testCouldBeConstructedWithoutAnyArguments()

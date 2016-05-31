@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\ZeroConfig;
 
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -11,7 +11,7 @@ class ContainerAwareMessageProcessorRegistry implements MessageProcessorRegistry
     use ContainerAwareTrait;
 
     /**
-     * @var MessageProcessor[]
+     * @var MessageProcessorInterface[]
      */
     protected $processors;
 
@@ -47,9 +47,9 @@ class ContainerAwareMessageProcessorRegistry implements MessageProcessorRegistry
 
         $processor = $this->container->get($this->processors[$processorName]);
 
-        if (false == $processor instanceof MessageProcessor) {
+        if (false == $processor instanceof MessageProcessorInterface) {
             throw new \LogicException(
-                sprintf('Invalid instance of message processor. expected: "%s", got: "%s"', MessageProcessor::class, is_object($processor) ? get_class($processor) : gettype($processor))
+                sprintf('Invalid instance of message processor. expected: "%s", got: "%s"', MessageProcessorInterface::class, is_object($processor) ? get_class($processor) : gettype($processor))
             );
         }
 

@@ -1,21 +1,21 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Null;
 
-use Oro\Component\MessageQueue\Transport\Destination;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
+use Oro\Component\MessageQueue\Transport\DestinationInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 
-class NullMessageConsumer implements MessageConsumer
+class NullMessageConsumer implements MessageConsumerInterface
 {
     /**
-     * @var Destination
+     * @var DestinationInterface
      */
     private $queue;
 
     /**
-     * @param Destination $queue
+     * @param DestinationInterface $queue
      */
-    public function __construct(Destination $queue)
+    public function __construct(DestinationInterface $queue)
     {
         $this->queue = $queue;
     }
@@ -41,14 +41,14 @@ class NullMessageConsumer implements MessageConsumer
     /**
      * {@inheritdoc}
      */
-    public function acknowledge(Message $message)
+    public function acknowledge(MessageInterface $message)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function reject(Message $message, $requeue = false)
+    public function reject(MessageInterface $message, $requeue = false)
     {
     }
 }

@@ -2,7 +2,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Transport\Connection;
+use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
 class ConnectionTest extends WebTestCase
 {
@@ -15,6 +15,6 @@ class ConnectionTest extends WebTestCase
     {
         $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
         
-        $this->assertInstanceOf(Connection::class, $connection);
+        $this->assertInstanceOf(ConnectionInterface::class, $connection);
     }
 }

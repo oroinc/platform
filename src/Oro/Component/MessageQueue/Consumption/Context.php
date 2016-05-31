@@ -2,26 +2,26 @@
 namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Exception\IllegalContextModificationException;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Tests\Logger;
 
 class Context
 {
     /**
-     * @var Session
+     * @var SessionInterface
      */
     private $session;
 
     /**
-     * @var MessageConsumer
+     * @var MessageConsumerInterface
      */
     private $messageConsumer;
 
     /**
-     * @var MessageProcessor
+     * @var MessageProcessorInterface
      */
     private $messageProcessor;
 
@@ -31,7 +31,7 @@ class Context
     private $logger;
 
     /**
-     * @var Message
+     * @var MessageInterface
      */
     private $message;
 
@@ -51,15 +51,15 @@ class Context
     private $executionInterrupted;
 
     /**
-     * @param Session $session
-     * @param MessageConsumer $messageConsumer
-     * @param MessageProcessor $messageProcessor
+     * @param SessionInterface $session
+     * @param MessageConsumerInterface $messageConsumer
+     * @param MessageProcessorInterface $messageProcessor
      * @param LoggerInterface $logger
      */
     public function __construct(
-        Session $session,
-        MessageConsumer $messageConsumer,
-        MessageProcessor $messageProcessor,
+        SessionInterface $session,
+        MessageConsumerInterface $messageConsumer,
+        MessageProcessorInterface $messageProcessor,
         LoggerInterface $logger
     ) {
         $this->session = $session;
@@ -71,7 +71,7 @@ class Context
     }
 
     /**
-     * @return Message
+     * @return MessageInterface
      */
     public function getMessage()
     {
@@ -79,9 +79,9 @@ class Context
     }
 
     /**
-     * @param Message $message
+     * @param MessageInterface $message
      */
-    public function setMessage(Message $message)
+    public function setMessage(MessageInterface $message)
     {
         if ($this->message) {
             throw new IllegalContextModificationException('The message modification is not allowed');
@@ -91,7 +91,7 @@ class Context
     }
 
     /**
-     * @return Session
+     * @return SessionInterface
      */
     public function getSession()
     {
@@ -99,7 +99,7 @@ class Context
     }
 
     /**
-     * @return MessageConsumer
+     * @return MessageConsumerInterface
      */
     public function getMessageConsumer()
     {
@@ -107,7 +107,7 @@ class Context
     }
 
     /**
-     * @return MessageProcessor
+     * @return MessageProcessorInterface
      */
     public function getMessageProcessor()
     {

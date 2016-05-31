@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
-use Oro\Component\MessageQueue\Consumption\Exception\Exception;
+use Oro\Component\MessageQueue\Consumption\Exception\ExceptionInterface;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
 use Oro\Component\Testing\ClassExtensionTrait;
 
@@ -11,7 +11,7 @@ class LogicExceptionTest extends \PHPUnit_Framework_TestCase
     
     public function testShouldImplementExceptionInterface()
     {
-        $this->assertClassImplements(Exception::class, LogicException::class);
+        $this->assertClassImplements(ExceptionInterface::class, LogicException::class);
     }
 
     public function testShouldExtendLogicException()

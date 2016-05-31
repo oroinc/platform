@@ -1,15 +1,15 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption;
 
-class Extensions implements Extension
+class Extensions implements ExtensionInterface
 {
     /**
-     * @var array|Extension[]
+     * @var array|ExtensionInterface[]
      */
     private $extensions;
 
     /**
-     * @param Extension[] $extensions
+     * @param ExtensionInterface[] $extensions
      */
     public function __construct(array $extensions)
     {
