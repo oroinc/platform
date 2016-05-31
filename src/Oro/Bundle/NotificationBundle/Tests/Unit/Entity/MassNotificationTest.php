@@ -65,8 +65,8 @@ class MassNotificationTest extends \PHPUnit_Framework_TestCase
         
         $this->massNotification->updateFromSwiftMessage($message, 1);
         
-        $this->assertEquals($this->massNotification->getEmail(), 'to@test.com');
-        $this->assertEquals($this->massNotification->getSender(), 'from@test.com');
+        $this->assertEquals($this->massNotification->getEmail(), 'test <to@test.com>');
+        $this->assertEquals($this->massNotification->getSender(), 'test <from@test.com>');
         $this->assertEquals($this->massNotification->getSubject(), 'test subject');
         $this->assertEquals($this->massNotification->getBody(), 'test body');
         $this->assertEquals($this->massNotification->getScheduledAt(), $date);

@@ -29,6 +29,7 @@ oro_system_configuration:
             type: textarea
             priority: 10
             options:
+                required: false
                 label: oro.notification.system_configuration.mass_notification.recipients
                 tooltip: oro.notification.system_configuration.mass_notification.recipients.tooltip
     tree:

@@ -32,6 +32,9 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EmailNotificationProcessor */
     protected $processor;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $dqlNameFormatter;
+
     /** @var MassNotificationSender */
     protected $sender;
 
@@ -41,7 +44,9 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->setMethods(['getRepository'])->getMock();
+            ->disableOriginalConstructor()->setMethods(['getRepository', 'detach'])->getMock();
+
+        $this->entityManager->expects($this->once())->method('detach');
 
         $this->userRepository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
                     ->disableOriginalConstructor()->getMock();
@@ -54,6 +59,9 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->dqlNameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
             ->disableOriginalConstructor()->getMock();
 
         $this->processor = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor')
@@ -71,7 +79,8 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
             $this->processor,
             $this->cm,
             $this->entityManager,
-            $this->entityPool
+            $this->entityPool,
+            $this->dqlNameFormatter
         );
     }
 
@@ -84,13 +93,17 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
         unset($this->sender);
         unset($this->templateRepository);
         unset($this->userRepository);
+        unset($this->dqlNameFormatter);
     }
 
     public function testSendToActiveUsersWithEmptySender()
     {
         $body = "Test Body";
         $subject = "Test Subject";
-        $userRecipients = ['test1@test.com', 'test2@test.com'];
+        $userRecipients = [
+            ['email' => 'test1@test.com', 'name' => 'test1'],
+            ['email' => 'test2@test.com', 'name' => 'test2']
+        ];
         $this->cm->expects($this->any())->method('get')->will(
             $this->returnValueMap(
                 [
@@ -103,7 +116,7 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->entityManager->expects($this->at(1))->method('getRepository')->with('OroEmailBundle:EmailTemplate')
-                            ->will($this->returnValue($this->templateRepository));
+            ->will($this->returnValue($this->templateRepository));
 
         $this->entityManager->expects($this->at(0))->method('getRepository')->with('OroUserBundle:User')->will(
             $this->returnValue($this->userRepository)
@@ -114,15 +127,36 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $this->templateRepository->expects($this->once())->method('findByName')->with(self::TEMPLATE_NAME)->will(
             $this->returnValue($template)
         );
+        $this->dqlNameFormatter->expects($this->once())->method('getFormattedNameDQL')->will(
+            $this->returnValue("ConcatExpression")
+        );
 
-        $this->userRepository->expects($this->once())->method('getActiveUserEmails')->will(
-            $this->returnValue($userRecipients)
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+        $query->expects($this->any())
+            ->method('getResult')
+            ->will($this->returnValue($userRecipients));
+
+        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->setMethods(['getQuery', 'where'])
+            ->getMock();
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('u.enabled = 1');
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+        $this->userRepository->expects($this->once())->method('getPrimaryEmailsQb')->with("ConcatExpression")->will(
+            $this->returnValue($queryBuilder)
         );
 
         $this->massNotificationParams = [
             'sender_name'   => self::TEST_SENDER_NAME,
             'sender_email'  => self::TEST_SENDER_EMAIL,
-            'recipients'    => $userRecipients,
+            'recipients'    => [['test1@test.com' => 'test1'], ['test2@test.com' => 'test2']],
             'template_type' => null
         ];
         $this->processor->expects($this->once())->method('process')->with(

@@ -46,13 +46,12 @@ oro:
             id.label:             Id
             subject.label:        Subject
             sender.label:         From
-            body.label:           Body
-            email.label:          Email
+            body.label:           Message
+            email.label:          To
             status.label:         Status
             status.success:       Success
             status.failed:        Failed
-            scheduled_at.label:   Scheduled At
-            processed_at.label:   Processed At
+            processed_at.label:   Sent At
             action:               View Mass Notifications
             block.info:           Notification Details
 
@@ -63,7 +62,7 @@ oro:
             mass_notification:
               title: Mass Notification Configuration
               template: Email Template
-              template.tooltip: The default template to use for system notifications.
+              template.tooltip: The template to be used by default for system notifications.
               recipients: Recipients
-              recipients.tooltip: By default, if this field is empty, all active users recieve system mass notification emails. If you want mass notifications to be sent to certain email addresses only, please specify the email addresses list here, separated by semicolon (;)
+              recipients.tooltip: Leave this field empty to send mass notification emails to all active users. To send notifications only to specific users, write in their email addresses separated by semicolon (;).
 

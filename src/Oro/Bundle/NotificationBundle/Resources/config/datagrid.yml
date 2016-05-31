@@ -12,32 +12,28 @@ datagrid:
                     - e.email
                     - e.sender
                     - e.status
-                    - e.scheduledAt
                     - e.processedAt
                 from:
                     - { table: OroNotificationBundle:MassNotification, alias: e }
 
         columns:
-            subject:
-                label: oro.notification.massnotification.subject.label
-                frontend_type: string
             sender:
                 label: oro.notification.massnotification.sender.label
                 frontend_type: string
             email:
                 label: oro.notification.massnotification.email.label
                 frontend_type: string
+            processedAt:
+                label: oro.notification.massnotification.processed_at.label
+                frontend_type: datetime
+            subject:
+                label: oro.notification.massnotification.subject.label
+                frontend_type: string
             status:
                 label: oro.notification.massnotification.status.label
                 frontend_type: string
                 type: callback
                 callable: "@oro_notification.mass_notification_status_formatter->format"
-            scheduledAt:
-                label: oro.notification.massnotification.scheduled_at.label
-                frontend_type: datetime
-            processedAt:
-                label: oro.notification.massnotification.processed_at.label
-                frontend_type: datetime
 
         properties:
             id: ~
@@ -60,34 +56,29 @@ datagrid:
                     data_name: e.subject
                 processedAt:
                     data_name: e.processedAt
-                scheduledAt:
-                    data_name: e.scheduledAt
             default:
                 processedAt: DESC
 
         filters:
             columns:
-                subject:
-                    type: string
-                    data_name: e.subject
-                email:
-                    type: string
-                    data_name: e.email
                 sender:
                     type: string
                     data_name: e.sender
+                email:
+                    type: string
+                    data_name: e.email
+                processedAt:
+                    type: datetime
+                    data_name: e.processedAt
+                subject:
+                    type: string
+                    data_name: e.subject
                 status:
                     type: choice
                     data_name: e.status
                     options:
                         field_options:
                             choices: "@oro_notification.mass_notification_status_formatter->getStatusLabels"
-                scheduledAt:
-                    type: datetime
-                    data_name: e.scheduledAt
-                processedAt:
-                    type: datetime
-                    data_name: e.processedAt
 
     email-notification-grid:
         options:

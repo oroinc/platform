@@ -4,11 +4,11 @@
 <div class="widget-content">
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
-            {{ ui.renderHtmlProperty('oro.notification.massnotification.email.label'|trans, email.renderEmailWithActions(entity.email, entity)) }}
-            {{ ui.renderProperty('oro.notification.massnotification.subject.label'|trans, entity.subject) }}
             {{ ui.renderProperty('oro.notification.massnotification.sender.label'|trans, entity.sender) }}
-            {{ ui.renderProperty('oro.notification.massnotification.scheduled_at.label'|trans, entity.scheduledAt|oro_format_datetime) }}
+            {{ ui.renderProperty('oro.notification.massnotification.email.label'|trans, entity.email) }}
             {{ ui.renderProperty('oro.notification.massnotification.processed_at.label'|trans, entity.processedAt|oro_format_datetime) }}
+            {{ ui.renderProperty('oro.notification.massnotification.subject.label'|trans, entity.subject) }}
+            {{ ui.renderHtmlProperty('oro.notification.massnotification.status.label'|trans, statusLabel) }}
             {{ ui.renderHtmlProperty('oro.notification.massnotification.body.label'|trans, entity.body) }}
         </div>
     </div>

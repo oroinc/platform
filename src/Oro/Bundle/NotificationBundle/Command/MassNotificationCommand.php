@@ -28,12 +28,12 @@ class MassNotificationCommand extends ContainerAwareCommand
                 'subject',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Subject of notification email. If emtpy, subject from configured template is used'
+                'Subject of notification email. If emtpy, subject from the configured template is used'
             )
             ->addOption(
                 'message',
                 null,
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_OPTIONAL,
                 'Notification message to send'
             )
             ->addOption(
@@ -65,15 +65,9 @@ class MassNotificationCommand extends ContainerAwareCommand
         $senderName  = $input->getOption('sender_name');
         $senderEmail = $input->getOption('sender_email');
 
-        if (!$message) {
-            throw new \RuntimeException(
-                'Message should not be blank'
-            );
-        }
-
         $service = $this->getContainer()->get('oro_notification.mass_notification_sender');
 
-        $count = $service->send($message, $subject, $senderEmail, $senderEmail);
+        $count = $service->send($message, $subject, $senderEmail, $senderName);
 
         $output->writeln(sprintf('%s notifications have been added to the queue', $count));
     }

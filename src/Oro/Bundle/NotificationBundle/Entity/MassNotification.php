@@ -231,18 +231,24 @@ class MassNotification implements LogNotificationInterface
      */
     public function updateFromSwiftMessage($message, $sentCount)
     {
-        $dateSent = new \DateTime();
-        $dateSent->setTimestamp($message->getDate());
+        $dateScheduled = new \DateTime();
+        $dateScheduled->setTimestamp($message->getDate());
 
-        $recipient = key($message->getTo());
-        $sender = key($message->getFrom());
-
-        $this->setEmail($recipient);
-        $this->setSender($sender);
+        $this->setEmail($this->formatEmail($message->getTo()));
+        $this->setSender($this->formatEmail($message->getFrom()));
         $this->setSubject($message->getSubject());
         $this->setStatus($sentCount > 0 ? self::STATUS_SUCCESS : self::STATUS_FAILED);
-        $this->setScheduledAt($dateSent);
+        $this->setScheduledAt($dateScheduled);
         $this->setProcessedAt(new \DateTime());
         $this->setBody($message->getBody());
+    }
+
+    /**
+     * @param array $email
+     * @return string
+     */
+    protected function formatEmail($email)
+    {
+        return current($email) . ' <' . key($email) . '>';
     }
 }

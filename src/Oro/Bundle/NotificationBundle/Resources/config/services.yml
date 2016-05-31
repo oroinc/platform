@@ -156,6 +156,7 @@ services:
             - '@oro_config.user'
             - '@doctrine.orm.entity_manager'
             - '@oro_notification.entity_spool'
+            - '@oro_locale.dql.formatter.name'
 
     oro_notification.email_handler:
         class: %oro_notification.email_handler.class%

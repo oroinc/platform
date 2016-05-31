@@ -14,7 +14,9 @@ Command to send mass notification emails to all active users.
 
 Params are:
 
-- `message` - message to insert into email body.
+- `message` - message to insert into email body. Optional.
 - `subject` - email subject. Optional. If not provided, email subject from configuration is used.
 - `sender_name` - sender name. Optional. If not provided, sender name from configuration is used.
 - `sender_email` - sender email. Optional. If not provided, sender email from configuration is used.
+
+To send notifications on production servers --env=prod option should be added to use production email settings.

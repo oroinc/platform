@@ -8,6 +8,7 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
@@ -34,22 +35,28 @@ class MassNotificationSender
      */
     protected $entityPool;
 
+    /** @var DQLNameFormatter */
+    protected $dqlNameFormatter;
+
     /**
      * @param EmailNotificationProcessor $emailNotificationProcessor
      * @param ConfigManager $cm
      * @param EntityManager $em
      * @param EntityPool $entityPool
+     * @param DQLNameFormatter $dqlNameFormatter
      */
     public function __construct(
         EmailNotificationProcessor $emailNotificationProcessor,
         ConfigManager $cm,
         EntityManager $em,
-        EntityPool $entityPool
+        EntityPool $entityPool,
+        DQLNameFormatter $dqlNameFormatter
     ) {
         $this->processor = $emailNotificationProcessor;
         $this->cm = $cm;
         $this->em = $em;
         $this->entityPool = $entityPool;
+        $this->dqlNameFormatter = $dqlNameFormatter;
     }
 
     /**
@@ -65,8 +72,8 @@ class MassNotificationSender
         $senderEmail = null,
         $senderName = null
     ) {
+        $senderName  = $senderName ?: $senderEmail ?: $this->cm->get('oro_notification.email_notification_sender_name');
         $senderEmail = $senderEmail ?: $this->cm->get('oro_notification.email_notification_sender_email');
-        $senderName  = $senderName ?: $this->cm->get('oro_notification.email_notification_sender_name');
 
         $recipients = $this->getRecipientEmails();
         /** @var EmailTemplate $template */
@@ -78,6 +85,7 @@ class MassNotificationSender
         if ($subject) {
             $template->setSubject($subject);
         }
+        $this->em->detach($template);
         $massNotification = new MassNotification($senderName, $senderEmail, $recipients, $template);
 
         $this->processor->addLogEntity('Oro\Bundle\NotificationBundle\Entity\MassNotification');
@@ -121,10 +129,21 @@ class MassNotificationSender
     }
 
     /**
+     * Get all active users emails
+     *
      * @return array
      */
     protected function getRecipientsFromDB()
     {
-        return $this->em->getRepository('OroUserBundle:User')->getActiveUserEmails();
+        $qb = $this->em->getRepository('OroUserBundle:User')->getPrimaryEmailsQb(
+            $this->dqlNameFormatter->getFormattedNameDQL('u', 'Oro\Bundle\UserBundle\Entity\User')
+        );
+        $qb->where('u.enabled = 1');
+        $users = $qb->getQuery()->getResult();
+        $users = array_map(function ($user) {
+            return [$user['email'] => $user['name']];
+        }, $users);
+
+        return $users;
     }
 }

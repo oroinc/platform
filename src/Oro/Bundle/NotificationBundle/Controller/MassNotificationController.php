@@ -56,8 +56,12 @@ class MassNotificationController extends Controller
      */
     public function infoAction(MassNotification $massNotification)
     {
+        $statusFormatter = $this->get('oro_notification.mass_notification_status_formatter');
+        $statusLabels = $statusFormatter->getStatusLabels();
+        $statusLabel = $statusLabels[$massNotification->getStatus()];
         return [
-            'entity' => $massNotification
+            'entity'      => $massNotification,
+            'statusLabel' => $statusLabel
         ];
     }
 }
