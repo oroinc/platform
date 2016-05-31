@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Manager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class AttendeeRelationManager
@@ -12,12 +13,17 @@ class AttendeeRelationManager
     /** @var ManagerRegistry */
     protected $registry;
 
+    /** @var NameFormatter */
+    protected $nameFormatter;
+
     /**
      * @param ManagerRegistry $registry
+     * @param NameFormatter   $nameFormatter
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, NameFormatter $nameFormatter)
     {
         $this->registry = $registry;
+        $this->nameFormatter = $nameFormatter;
     }
 
     /**
@@ -32,7 +38,7 @@ class AttendeeRelationManager
         }
 
         return (new Attendee())
-            ->setDisplayName($relatedEntity->getFullName())
+            ->setDisplayName($this->nameFormatter->format($relatedEntity))
             ->setEmail($relatedEntity->getEmail())
             ->setUser($relatedEntity);
     }
@@ -94,7 +100,7 @@ class AttendeeRelationManager
     {
         $attendee->setUser($user);
         if (!$attendee->getDisplayName()) {
-            $attendee->setDisplayName($user->getFullName());
+            $attendee->setDisplayName($this->nameFormatter->format($user));
         }
     }
 
