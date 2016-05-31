@@ -31,6 +31,14 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.docrine_clear_identity_map_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
+        public: false
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         arguments:
