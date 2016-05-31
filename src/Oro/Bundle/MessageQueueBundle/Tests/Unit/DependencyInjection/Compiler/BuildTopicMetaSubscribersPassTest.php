@@ -2,7 +2,9 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
-use Oro\Component\MessageQueue\ZeroConfig\TopicSubscriber;
+use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\InvalidTopicSubscriber;
+use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\OnlyTopicNameTopicSubscriber;
+use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\ProcessorNameTopicSubscriber;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -274,34 +276,3 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-// @codingStandardsIgnoreStart
-
-class OnlyTopicNameTopicSubscriber implements TopicSubscriber
-{
-    public static function getSubscribedTopics()
-    {
-        return ['topic-subscriber-name'];
-    }
-}
-
-class ProcessorNameTopicSubscriber implements TopicSubscriber
-{
-    public static function getSubscribedTopics()
-    {
-        return [
-            'topic-subscriber-name' => [
-                'processorName' => 'subscriber-processor-name'
-            ],
-        ];
-    }
-}
-
-class InvalidTopicSubscriber implements TopicSubscriber
-{
-    public static function getSubscribedTopics()
-    {
-        return [12345];
-    }
-}
-
-// @codingStandardsIgnoreEnd

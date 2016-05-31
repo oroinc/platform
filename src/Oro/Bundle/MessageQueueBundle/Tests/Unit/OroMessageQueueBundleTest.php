@@ -4,6 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
 use Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,10 +28,6 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getMock(ContainerBuilder::class);
         $container
-            ->expects($this->exactly(3))
-            ->method('addCompilerPass')
-        ;
-        $container
             ->expects($this->at(0))
             ->method('addCompilerPass')
             ->with($this->isInstanceOf(BuildExtensionsPass::class))
@@ -44,6 +41,11 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(2))
             ->method('addCompilerPass')
             ->with($this->isInstanceOf(BuildMessageProcessorRegistryPass::class))
+        ;
+        $container
+            ->expects($this->at(3))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(BuildTopicMetaSubscribersPass::class))
         ;
 
         $bundle = new OroMessageQueueBundle();
