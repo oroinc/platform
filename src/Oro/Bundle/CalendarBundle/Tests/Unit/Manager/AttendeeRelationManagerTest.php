@@ -40,17 +40,7 @@ class AttendeeRelationManagerTest extends \PHPUnit_Framework_TestCase
             ->with('OroUserBundle:User')
             ->will($this->returnValue($userRepository));
 
-        $nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $nameFormatter->expects($this->any())
-            ->method('format')
-            ->will($this->returnCallback(function ($person) {
-                return $person->getFullName();
-            }));
-
-        $this->attendeeRelationManager = new AttendeeRelationManager($registry, $nameFormatter);
+        $this->attendeeRelationManager = new AttendeeRelationManager($registry);
     }
 
     public function testBindAttendees()
@@ -83,16 +73,13 @@ class AttendeeRelationManagerTest extends \PHPUnit_Framework_TestCase
         return [
             (new Attendee(1))
                 ->setEmail('u1@example.com')
-                ->setUser($this->users['u1@example.com'])
-                ->setDisplayName($this->users['u1@example.com']->getFullName()),
+                 ->setUser($this->users['u1@example.com']),
             (new Attendee())
                 ->setEmail('u2@example.com')
-                ->setUser($this->users['u2@example.com'])
-                ->setDisplayName($this->users['u2@example.com']->getFullName()),
+                ->setUser($this->users['u2@example.com']),
             (new Attendee())
                 ->setEmail('u3@example.com')
-                ->setUser($this->users['u3@example.com'])
-                ->setDisplayName($this->users['u3@example.com']->getFullName()),
+                ->setUser($this->users['u3@example.com']),
             (new Attendee())
                 ->setEmail('nonExisting@example.com'),
             (new Attendee())

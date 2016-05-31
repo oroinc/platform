@@ -5,7 +5,6 @@ parameters:
     oro_calendar.calendar_event.form.handler.api.class:            Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler
     oro_calendar.oro_calendar_event_attendees_select.form.type.class: Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesSelectType
     oro_calendar.oro_calendar_event_attendees_api.form.type.class: Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesApiType
-    oro_calendar.calendar_event.transformer.events_to_users.class: Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer
     oro_calendar.calendar_property.form.type.api.class:            Oro\Bundle\CalendarBundle\Form\Type\CalendarPropertyApiType
     oro_calendar.calendar_property.form.handler.api.class:         Oro\Bundle\CalendarBundle\Form\Handler\CalendarPropertyApiHandler
     oro_calendar.calendar_choice.form.type.class:                  Oro\Bundle\CalendarBundle\Form\Type\CalendarChoiceType
@@ -14,7 +13,6 @@ parameters:
     oro_calendar.system_calendar.form.type.class:                  Oro\Bundle\CalendarBundle\Form\Type\SystemCalendarType
     oro_calendar.system_calendar_event.form.handler.class:         Oro\Bundle\CalendarBundle\Form\Handler\SystemCalendarEventHandler
     oro_calendar.extension.acl_label.class:                        Oro\Bundle\CalendarBundle\Form\Extension\AclObjectLabelTypeExtension
-    oro_calendar.users_to_attendees.transformer.class:             Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer
     oro_calendar.attendees_to_view_transformer.class:              Oro\Bundle\CalendarBundle\Form\DataTransformer\AttendeesToViewTransformer
     oro_calendar.user_ids_to_users.tranformer.class:               Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer
     oro_calendar.recurrence.form.type.class:                       Oro\Bundle\CalendarBundle\Form\Type\RecurrenceFormType
@@ -112,12 +110,6 @@ services:
         tags:
             - { name: form.type, alias: oro_calendar_event_attendees_api }
 
-    oro_calendar.calendar_event.transformer.events_to_users:
-        class: %oro_calendar.calendar_event.transformer.events_to_users.class%
-        arguments:
-            - '@doctrine'
-            - '@oro_security.security_facade'
-
     oro_calendar.calendar_property.form.type.api:
         class: %oro_calendar.calendar_property.form.type.api.class%
         tags:
@@ -207,12 +199,6 @@ services:
             - '@security.token_storage'
             - '@event_dispatcher'
             - '@oro_calendar.attendee_relation_manager'
-
-    oro_calendar.users_to_attendees.transformer:
-        class: %oro_calendar.users_to_attendees.transformer.class%
-        arguments:
-            - '@oro_calendar.user_ids_to_users.tranformer'
-        public: false
 
     oro_calendar.user_ids_to_users.tranformer:
         class: %oro_calendar.user_ids_to_users.tranformer.class%
