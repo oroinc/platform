@@ -328,7 +328,15 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl = $this->getAcl();
         $acl->insertObjectAce($this->sid, $aceMask, 0, true, $maskStrategy);
 
-        $this->assertEquals($result, $this->strategy->isGranted($acl, array($requiredMask), array($this->sid)));
+        if (false === $result) {
+            try {
+                $this->strategy->isGranted($acl, array($requiredMask), array($this->sid));
+                $this->fail('The ACE is not supposed to match.');
+            } catch (NoAceFoundException $noAce) {
+            }
+        } else {
+            $this->assertTrue($this->strategy->isGranted($acl, array($requiredMask), array($this->sid)));
+        }
     }
 
     public function getAllStrategyTests()
