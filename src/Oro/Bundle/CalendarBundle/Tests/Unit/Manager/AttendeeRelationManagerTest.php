@@ -40,7 +40,17 @@ class AttendeeRelationManagerTest extends \PHPUnit_Framework_TestCase
             ->with('OroUserBundle:User')
             ->will($this->returnValue($userRepository));
 
-        $this->attendeeRelationManager = new AttendeeRelationManager($registry);
+        $nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $nameFormatter->expects($this->any())
+            ->method('format')
+            ->will($this->returnCallback(function ($person) {
+                return $person->getFullName();
+            }));
+
+        $this->attendeeRelationManager = new AttendeeRelationManager($registry, $nameFormatter);
     }
 
     public function testBindAttendees()

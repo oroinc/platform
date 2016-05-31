@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Manager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class AttendeeRelationManager
@@ -12,12 +13,17 @@ class AttendeeRelationManager
     /** @var ManagerRegistry */
     protected $registry;
 
+    /** @var NameFormatter */
+    protected $nameFormatter;
+
     /**
      * @param ManagerRegistry $registry
+     * @param NameFormatter   $nameFormatter
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, NameFormatter $nameFormatter)
     {
         $this->registry = $registry;
+        $this->nameFormatter = $nameFormatter;
     }
 
     /**
@@ -32,7 +38,7 @@ class AttendeeRelationManager
         }
 
         return (new Attendee())
-            ->setDisplayName($relatedEntity->getFullName())
+            ->setDisplayName($this->nameFormatter->format($relatedEntity))
             ->setEmail($relatedEntity->getEmail())
             ->setUser($relatedEntity);
     }
@@ -72,17 +78,29 @@ class AttendeeRelationManager
     {
         foreach ($users as $user) {
             if (isset($unboundAttendeesByEmail[$user->getEmail()])) {
-                $unboundAttendeesByEmail[$user->getEmail()]->setUser($user);
+                $this->bindUser($user, $unboundAttendeesByEmail[$user->getEmail()]);
                 unset($unboundAttendeesByEmail[$user->getEmail()]);
             }
 
             foreach ($user->getEmails() as $emailEntity) {
                 $email = $emailEntity->getEmail();
                 if (isset($unboundAttendeesByEmail[$email])) {
-                    $unboundAttendeesByEmail[$email]->setUser($user);
+                    $this->bindUser($user, $unboundAttendeesByEmail[$email]);
                     unset($unboundAttendeesByEmail[$email]);
                 }
             }
+        }
+    }
+
+    /**
+     * @param User $user
+     * @param Attendee $attendee
+     */
+    protected function bindUser(User $user, Attendee $attendee)
+    {
+        $attendee->setUser($user);
+        if (!$attendee->getDisplayName()) {
+            $attendee->setDisplayName($this->nameFormatter->format($user));
         }
     }
 
