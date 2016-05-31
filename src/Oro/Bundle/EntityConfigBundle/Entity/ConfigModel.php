@@ -171,7 +171,7 @@ abstract class ConfigModel
         }
         // remove obsolete values
         foreach ($this->data[$scope] as $code => $value) {
-            if (!isset($values[$code])) {
+            if (!array_key_exists($code, $values)) {
                 unset($this->data[$scope][$code]);
                 $this->removeFromIndex($scope, $code);
             }
