@@ -1,4 +1,4 @@
-{% if entity.parent or entity.childEvents is not empty %}
+{% if entity.parent or entity.childAttendees is not empty %}
 {% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
 <div class="btn-group" role="group">
     {% for status in entity.availableInvitationStatuses %}
