@@ -44,8 +44,8 @@ class LanguageSelectType extends AbstractType
                         return $value;
                     }
 
-                    return Intl::getLocaleBundle()
-                        ->getLocaleNames($this->configManager->get(static::CONFIG_KEY_DEFAULT_LANGUAGE));
+                    return Intl::getLanguageBundle()
+                        ->getLanguageNames($this->configManager->get(static::CONFIG_KEY_DEFAULT_LANGUAGE));
                 }
             );
     }

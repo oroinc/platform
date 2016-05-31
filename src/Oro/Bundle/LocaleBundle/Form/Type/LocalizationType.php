@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LocalisationType extends AbstractType
+class LocalizationType extends AbstractType
 {
     const NAME = 'oro_localization';
 

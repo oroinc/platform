@@ -110,7 +110,7 @@ services:
 
     #Localization Form Types
     oro_locale.form.type.localization:
-        class: Oro\Bundle\LocaleBundle\Form\Type\LocalisationType
+        class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationType
         tags:
             - { name: form.type, alias: "oro_localization" }
         calls:
