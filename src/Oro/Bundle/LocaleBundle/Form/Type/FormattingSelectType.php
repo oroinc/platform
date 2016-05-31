@@ -35,19 +35,9 @@ class FormattingSelectType extends AbstractType
     {
         $resolver->setDefaults([
             'empty_value' => false,
-            'choices' => null,
-        ])
-            ->setNormalizer(
-                'choices',
-                function (Options $options, $value) {
-                    if (null !== $value) {
-                        return $value;
-                    }
-
-                    return Intl::getLocaleBundle()
-                        ->getLocaleNames($this->configManager->get(static::CONFIG_KEY_DEFAULT_LANGUAGE));
-                }
-            );
+            'choices' => Intl::getLocaleBundle()
+                ->getLocaleNames($this->configManager->get(static::CONFIG_KEY_DEFAULT_LANGUAGE)),
+        ]);
     }
 
     /**
