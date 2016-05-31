@@ -110,16 +110,6 @@ class LocalizationController extends Controller
      */
     protected function update(Localization $localization)
     {
-//        $form = $this->createFormBuilder($localization)
-//            ->add('name')
-//            ->add('languageCode')
-//            ->add('formattingCode')
-//            ->add('parentLocalization', 'entity', [
-//                'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
-//                'required' => false,
-//            ])
-//            ->getForm();
-
         $form = $this->createForm('oro_localization', $localization);
 
         /* @var $handler UpdateHandler */

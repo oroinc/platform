@@ -16,7 +16,7 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager
      */
-    protected $cmMock;
+    protected $configManager;
 
     /**
      * @var AbstractType
@@ -26,27 +26,27 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver
      */
-    protected $optionsResolverMock;
+    protected $optionsResolver;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->cmMock = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->optionsResolverMock = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
+        $this->optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formType = new FormattingSelectType($this->cmMock);
+        $this->formType = new FormattingSelectType($this->configManager);
 
     }
 
     public function tearDown()
     {
-        unset($this->cmMock, $this->formType, $this->optionsResolver);
+        unset($this->configManager, $this->formType, $this->optionsResolver);
 
         parent::tearDown();
     }
@@ -71,7 +71,7 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
     {
         IntlTestHelper::requireIntl($this);
 
-        $this->cmMock->expects($this->at(0))->method('get')
+        $this->configManager->expects($this->at(0))->method('get')
             ->with($this->equalTo(FormattingSelectType::CONFIG_KEY_DEFAULT_LANGUAGE))
             ->will($this->returnValue($defaultLang));
 
