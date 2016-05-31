@@ -3,8 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\NodeInterface;
-use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\ActionsConfigExtra;
@@ -14,6 +12,7 @@ use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
@@ -28,9 +27,6 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
 {
     /** @var ConfigBag */
     protected $configBag;
-
-    /** @var NodeInterface */
-    private $configurationTree;
 
     /**
      * @param ConfigExtensionRegistry          $configExtensionRegistry
@@ -90,10 +86,41 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
      */
     protected function mergeActionConfig(array $config, array $actionConfig)
     {
-        return array_merge(
-            $config,
-            array_diff_key($actionConfig, [ActionConfig::EXCLUDE => true])
-        );
+        unset($actionConfig[ActionConfig::EXCLUDE]);
+        $actionFields = null;
+        if (array_key_exists(ActionConfig::FIELDS, $actionConfig)) {
+            $actionFields = $actionConfig[ActionConfig::FIELDS];
+            unset($actionConfig[ActionConfig::FIELDS]);
+        }
+        $config = array_merge($config, $actionConfig);
+        if (!empty($actionFields)) {
+            $config[EntityDefinitionConfig::FIELDS] = !empty($config[EntityDefinitionConfig::FIELDS])
+                ? $this->mergeActionFields($config[EntityDefinitionConfig::FIELDS], $actionFields)
+                : $actionFields;
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param array $fields
+     * @param array $actionFields
+     *
+     * @return array
+     */
+    protected function mergeActionFields(array $fields, array $actionFields)
+    {
+        foreach ($actionFields as $key => $value) {
+            if (!empty($fields[$key])) {
+                if (!empty($value)) {
+                    $fields[$key] = array_merge($fields[$key], $value);
+                }
+            } else {
+                $fields[$key] = $value;
+            }
+        }
+
+        return $fields;
     }
 
     /**
@@ -107,50 +134,16 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     /**
      * {@inheritdoc}
      */
-    protected function mergeConfigs(array $config, array $parentConfig)
-    {
-        $processor = new Processor();
-
-        return $processor->process($this->getConfigurationTree(), [$parentConfig, $config]);
-    }
-
-    /**
-     * @return NodeInterface
-     */
-    protected function getConfigurationTree()
-    {
-        if (null === $this->configurationTree) {
-            $this->configurationTree = $this->createConfigurationTree();
-        }
-
-        return $this->configurationTree;
-    }
-
-    /**
-     * @return NodeInterface
-     */
     protected function createConfigurationTree()
     {
-        list(
-            $extraSections,
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-            ) = $this->configExtensionRegistry->getConfigurationSettings();
-
         $configTreeBuilder = new TreeBuilder();
         $configuration     = new EntityConfiguration(
             ApiConfiguration::ENTITIES_SECTION,
             new EntityDefinitionConfiguration(),
-            $extraSections,
+            $this->configExtensionRegistry->getConfigurationSettings(),
             $this->configExtensionRegistry->getMaxNestingLevel()
         );
-        $configuration->configure(
-            $configTreeBuilder->root('entity')->children(),
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-        );
+        $configuration->configure($configTreeBuilder->root('entity')->children());
 
         return $configTreeBuilder->buildTree();
     }
