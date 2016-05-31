@@ -31,11 +31,33 @@ class LocalizationValidator extends ConstraintValidator
             return;
         }
         if ($localization->getId() === $parentLocalization->getId() ||
-            $localization->getChildLocalizations()->contains($parentLocalization)
+            $this->localizationExists($parentLocalization, $localization)
         ) {
             $this->context->buildViolation($constraint->messageCircularReference)
                 ->atPath('parentLocalization')
                 ->addViolation();
         }
+    }
+
+    /**
+     * @param Entity\Localization $localizationNeedle
+     * @param Entity\Localization $localization
+     *
+     * @return bool
+     */
+    private function localizationExists(Entity\Localization $localizationNeedle, Entity\Localization $localization)
+    {
+        $childLocalizations = $localization->getChildLocalizations();
+        if ($childLocalizations->contains($localizationNeedle)) {
+            return true;
+        }
+
+        foreach ($childLocalizations as $childLocalization) {
+            if ($this->checkLocalizationExists($localizationNeedle, $childLocalization)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

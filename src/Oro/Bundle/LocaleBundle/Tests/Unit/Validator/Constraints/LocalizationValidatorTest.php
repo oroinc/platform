@@ -66,13 +66,21 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
 
         $localization1 = $this->createLocalization('loca1', 1);
         $localization2 = $this->createLocalization('loca2', 2);
-        $localization1->setParentLocalization($localization2);
-        $localization1->addChildLocalization($localization2);
+        $localization3 = $this->createLocalization('loca3', 3);
 
-        $this->validator->validate($localization1, $this->constraint);
+        $localization1->setParentLocalization($localization2);
+        $localization1->addChildLocalization($localization3);
+
+        $localization2->setParentLocalization($localization3);
+        $localization2->addChildLocalization($localization1);
+
+        $localization3->setParentLocalization($localization3);
+        $localization3->addChildLocalization($localization2);
+
+        $this->validator->validate($localization3, $this->constraint);
     }
 
-    public function testValidateSelfPatrent()
+    public function testValidateSelfParent()
     {
         $this->expectViolation();
 
@@ -97,8 +105,7 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
             '\Symfony\Component\Validator\Exception\UnexpectedTypeException',
             'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "stdClass" given'
         );
-        $data = new \stdClass();
-        $this->validator->validate($data, $this->constraint);
+        $this->validator->validate(new \stdClass(), $this->constraint);
     }
 
     private function expectViolation()
