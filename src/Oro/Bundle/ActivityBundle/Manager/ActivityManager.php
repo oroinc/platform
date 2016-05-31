@@ -187,7 +187,8 @@ class ActivityManager
         $oldTargetEntities = $activityEntity->getActivityTargetEntities();
 
         foreach ($oldTargetEntities as $oldTargetEntity) {
-            if (!in_array($oldTargetEntity, $targetEntities)) {
+            if (!in_array($oldTargetEntity, $targetEntities)
+                && $oldTargetEntity->getId() != $activityEntity->getOwner()->getId()) {
                 $this->removeActivityTarget($activityEntity, $oldTargetEntity);
                 $hasChanges = true;
             }
