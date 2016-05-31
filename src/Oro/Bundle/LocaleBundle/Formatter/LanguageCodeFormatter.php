@@ -7,7 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
-class LocaleCodeFormatter
+class LanguageCodeFormatter
 {
     const CONFIG_KEY_DEFAULT_LANGUAGE = 'oro_locale.language';
 
@@ -19,6 +19,7 @@ class LocaleCodeFormatter
 
     /**
      * @param TranslatorInterface $translator
+     * @param ConfigManager $configManager
      */
     public function __construct(TranslatorInterface $translator, ConfigManager $configManager)
     {
@@ -30,13 +31,13 @@ class LocaleCodeFormatter
      * @param string $code
      * @return string
      */
-    public function formatLocaleCode($code)
+    public function format($code)
     {
         if (!$code) {
             return $this->translator->trans('N/A');
         }
 
-        $name = Intl::getLocaleBundle()->getLocaleName(
+        $name = Intl::getLanguageBundle()->getLanguageName(
             $code,
             $this->configManager->get(self::CONFIG_KEY_DEFAULT_LANGUAGE)
         );

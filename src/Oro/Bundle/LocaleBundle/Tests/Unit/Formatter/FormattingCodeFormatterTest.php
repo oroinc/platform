@@ -2,15 +2,16 @@
 
 namespace OroB2B\Bundle\SaleBundle\Tests\Unit\Formatter;
 
-use Symfony\Component\Intl\Intl;
+use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LocaleBundle\Formatter\LocaleCodeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 
-class LocaleCodeFormatterTest extends \PHPUnit_Framework_TestCase
+class FormattingCodeFormatterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var LocaleCodeFormatter */
+    /** @var LanguageCodeFormatter */
     protected $formatter;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
@@ -24,20 +25,22 @@ class LocaleCodeFormatterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        IntlTestHelper::requireIntl($this);
+
         $this->translator   = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->formatter = new LocaleCodeFormatter($this->translator, $this->configManager);
+        $this->formatter = new FormattingCodeFormatter($this->translator, $this->configManager);
     }
 
     /**
      * @param string $value
      * @param string $expected
      *
-     * @dataProvider formatLocaleCodeProvider
+     * @dataProvider formatLanguageCodeProvider
      */
-    public function testFormatLocaleCode($value, $expected)
+    public function testFormatLanguageCode($value, $expected)
     {
         $this->translator->expects($value ? $this->never() : $this->once())
             ->method('trans')
@@ -46,16 +49,16 @@ class LocaleCodeFormatterTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($value ? $this->once() : $this->never())
             ->method('get')
-            ->with(LocaleCodeFormatter::CONFIG_KEY_DEFAULT_LANGUAGE)
+            ->with(LanguageCodeFormatter::CONFIG_KEY_DEFAULT_LANGUAGE)
             ->willReturn('en');
 
-        $this->assertSame($expected, $this->formatter->formatLocaleCode($value));
+        $this->assertSame($expected, $this->formatter->format($value));
     }
 
     /**
      * @return array
      */
-    public function formatLocaleCodeProvider()
+    public function formatLanguageCodeProvider()
     {
         return [
             [

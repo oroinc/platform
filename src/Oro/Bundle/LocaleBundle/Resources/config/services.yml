@@ -181,8 +181,14 @@ services:
         tags:
             - { name: oro_service_link, service: oro_locale.dql.formatter.name }
 
-    oro_locale.formatter.locale_code:
-        class: 'Oro\Bundle\LocaleBundle\Formatter\LocaleCodeFormatter'
+    oro_locale.formatter.language_code:
+        class: 'Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter'
+        arguments:
+            - '@translator'
+            - '@oro_config.global'
+
+    oro_locale.formatter.formatting_code:
+        class: 'Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter'
         arguments:
             - '@translator'
             - '@oro_config.global'
@@ -235,10 +241,11 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_locale.twig.locale_code:
-        class: 'Oro\Bundle\LocaleBundle\Twig\LocaleCodeExtension'
+    oro_locale.twig.localization:
+        class: 'Oro\Bundle\LocaleBundle\Twig\LocalizationExtension'
         arguments:
-            - '@oro_locale.formatter.locale_code'
+            - '@oro_locale.formatter.language_code'
+            - '@oro_locale.formatter.formatting_code'
         tags:
             - { name: twig.extension }
 
