@@ -108,6 +108,28 @@ services:
         tags:
             - { name: form.type, alias: "oro_quarter" }
 
+    #Localization Form Types
+    oro_locale.form.type.localization:
+        class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationType
+        tags:
+            - { name: form.type, alias: "oro_localization" }
+        calls:
+            - [setDataClass, ['%oro_locale.entity.localization.class%']]
+
+    oro_locale.form.type.language_select:
+        class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: form.type, alias: "oro_language_select" }
+
+    oro_locale.form.type.formatting_select:
+        class: Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: form.type, alias: "oro_formatting_select" }
+
     # Converters
     oro_locale.format_converter.date_time.registry:
         class: %oro_locale.format_converter.date_time.registry.class%
