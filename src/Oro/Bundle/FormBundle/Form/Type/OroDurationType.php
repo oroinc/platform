@@ -75,13 +75,13 @@ class OroDurationType extends AbstractType
         );
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritdoc} */
     public function getName()
     {
         return self::NAME;
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritdoc} */
     public function getParent()
     {
         return 'text';

@@ -22,14 +22,12 @@ class DurationTypeTest extends \PHPUnit_Framework_TestCase
             )
             ->setMethods(null)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         $this->platform = $this
             ->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass()
-        ;
+            ->getMockForAbstractClass();
     }
 
     /**

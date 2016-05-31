@@ -8,9 +8,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class OroTimeIntervalType
- *
- * @deprecated Use OroDurationType instead
+ * @deprecated since 1.10. Use {@see Oro\Bundle\FormBundle\Form\Type\OroDurationType} instead
  */
 class OroTimeIntervalType extends AbstractType
 {
