@@ -1,9 +1,10 @@
 define([
     'underscore',
+    'backbone',
     'backgrid',
     './row',
     '../pageable-collection'
-], function(_, Backgrid, Row, PageableCollection) {
+], function(_, Backbone, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -158,8 +159,7 @@ define([
 
             if (index >= $children.length) {
                 $el.append($rowEl);
-            }
-            else {
+            } else {
                 $children.eq(index).before($rowEl);
                 this.attachListenerToSingleRow(this.rows[index]);
             }
