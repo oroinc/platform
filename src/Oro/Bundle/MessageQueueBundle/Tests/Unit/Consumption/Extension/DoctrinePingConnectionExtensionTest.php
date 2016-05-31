@@ -1,37 +1,20 @@
 <?php
-namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Extension;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension\DoctrineHeartbeatExtension;
 use Oro\Component\MessageQueue\Consumption\MessageProcessor;
 use Oro\Component\MessageQueue\Transport\MessageConsumer;
 use Oro\Component\MessageQueue\Transport\Session;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class DoctrineHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
+class DoctrinePingConnectionExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredAttributes()
     {
-        new DoctrineHeartbeatExtension([]);
-    }
-
-    public function testShouldThrowExceptionIfGotUnsupportedConnectionType()
-    {
-        $this->setExpectedException(\LogicException::class, 'Got unsupported Connection instance. "stdClass"');
-
-        $registry = $this->createManagerRegistryMock();
-        $registry
-            ->expects($this->once())
-            ->method('getConnections')
-            ->will($this->returnValue([new \stdClass()]))
-        ;
-
-        $context = $this->createContext();
-
-        $extension = new DoctrineHeartbeatExtension([$registry]);
-        $extension->onPreReceived($context);
+        new DoctrinePingConnectionExtension($this->createRegistryMock());
     }
 
     public function testShouldNotReconnectIfConnectionIsOK()
@@ -51,16 +34,20 @@ class DoctrineHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('connect')
         ;
 
-        $registry = $this->createManagerRegistryMock();
+        $context = $this->createContext();
+        $context->getLogger()
+            ->expects($this->never())
+            ->method('debug')
+        ;
+
+        $registry = $this->createRegistryMock();
         $registry
             ->expects($this->once())
             ->method('getConnections')
             ->will($this->returnValue([$connection]))
         ;
 
-        $context = $this->createContext();
-
-        $extension = new DoctrineHeartbeatExtension([$registry]);
+        $extension = new DoctrinePingConnectionExtension($registry);
         $extension->onPreReceived($context);
     }
 
@@ -81,16 +68,26 @@ class DoctrineHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('connect')
         ;
 
-        $registry = $this->createManagerRegistryMock();
+        $context = $this->createContext();
+        $context->getLogger()
+            ->expects($this->at(0))
+            ->method('debug')
+            ->with('[DoctrinePingConnectionExtension] Connection is not active trying to reconnect.')
+        ;
+        $context->getLogger()
+            ->expects($this->at(1))
+            ->method('debug')
+            ->with('[DoctrinePingConnectionExtension] Connection is active now.')
+        ;
+
+        $registry = $this->createRegistryMock();
         $registry
             ->expects($this->once())
             ->method('getConnections')
             ->will($this->returnValue([$connection]))
         ;
 
-        $context = $this->createContext();
-
-        $extension = new DoctrineHeartbeatExtension([$registry]);
+        $extension = new DoctrinePingConnectionExtension($registry);
         $extension->onPreReceived($context);
     }
 
@@ -108,11 +105,11 @@ class DoctrineHeartbeatExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @return \PHPUnit_Framework_MockObject_MockObject|RegistryInterface
      */
-    protected function createManagerRegistryMock()
+    protected function createRegistryMock()
     {
-        return $this->getMock(ManagerRegistry::class);
+        return $this->getMock(RegistryInterface::class);
     }
 
     /**

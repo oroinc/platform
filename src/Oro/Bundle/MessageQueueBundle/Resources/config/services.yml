@@ -23,6 +23,14 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.docrine_ping_connection_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
+        public: false
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         arguments:
