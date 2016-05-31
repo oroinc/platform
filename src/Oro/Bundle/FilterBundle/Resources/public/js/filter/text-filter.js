@@ -95,8 +95,7 @@ define([
          */
         ensurePopupCriteriaClosed: function() {
             if (this.popupCriteriaShowed) {
-                this._hideCriteria();
-                this.applyValue();
+                this._applyValueAndHideCriteria();
             }
         },
 
@@ -108,8 +107,7 @@ define([
          */
         _onReadCriteriaInputKey: function(e) {
             if (e.which === 13) {
-                this._hideCriteria();
-                this.applyValue();
+                this._applyValueAndHideCriteria();
             }
         },
 
@@ -121,8 +119,7 @@ define([
          */
         _onClickUpdateCriteria: function(e) {
             this.trigger('updateCriteriaClick', this);
-            this._hideCriteria();
-            this.applyValue();
+            this._applyValueAndHideCriteria();
         },
 
         /**
@@ -155,9 +152,16 @@ define([
             var elem = this.$(this.criteriaSelector);
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
-                this._hideCriteria();
-                this.applyValue();
+                this._applyValueAndHideCriteria();
             }
+        },
+
+        /**
+         * @protected
+         */
+        _applyValueAndHideCriteria: function() {
+            this._hideCriteria();
+            this.applyValue();
         },
 
         /**
@@ -197,7 +201,7 @@ define([
          * @protected
          */
         _showCriteria: function() {
-            this.$(this.criteriaSelector).show();
+            this.$(this.criteriaSelector).css('visibility', 'visible');
             this._alignCriteria();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
@@ -235,7 +239,7 @@ define([
          * @protected
          */
         _hideCriteria: function() {
-            this.$(this.criteriaSelector).hide();
+            this.$(this.criteriaSelector).css('visibility', 'hidden');
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {

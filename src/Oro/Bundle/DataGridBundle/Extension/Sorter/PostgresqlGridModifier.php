@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Sorter;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Select;
@@ -17,21 +15,21 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class PostgresqlGridModifier extends AbstractExtension
 {
-    const PRIORITY = -251;
+    const PRIORITY = -261;
 
-    /** @var ContainerInterface */
-    protected $container;
+    /** @var string */
+    protected $databaseDriver;
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
     /**
-     * @param ContainerInterface $container
+     * @param string $databaseDriver
      * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(ContainerInterface $container, EntityClassResolver $entityClassResolver)
+    public function __construct($databaseDriver, EntityClassResolver $entityClassResolver)
     {
-        $this->container = $container;
+        $this->databaseDriver = $databaseDriver;
         $this->entityClassResolver = $entityClassResolver;
     }
 
@@ -40,8 +38,7 @@ class PostgresqlGridModifier extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $dbDriver = $this->container->getParameter('database_driver');
-        return $dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL;
+        return $this->databaseDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL;
     }
 
     /**
@@ -190,7 +187,7 @@ class PostgresqlGridModifier extends AbstractExtension
         }
 
         if (!$isSelected) {
-            $queryBuilder->select($field);
+            $queryBuilder->addSelect($field);
         }
     }
 }

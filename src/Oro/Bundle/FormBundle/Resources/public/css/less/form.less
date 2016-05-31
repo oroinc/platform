@@ -3,6 +3,11 @@
     border:1px solid #ccc;
     border-radius: 3px;
   }
+  &.mce-fullscreen {
+    width: auto !important;
+    max-width: none !important;
+    bottom: 0;
+  }
   .mce-toolbar-grp {
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
@@ -12,6 +17,18 @@
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
   }
+}
+.mce-fullscreen-overlay {
+  display: block;
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9;
+  background-color: black;
+  opacity: 0.2;
 }
 
 .entities.list-group {
@@ -36,4 +53,8 @@
   .entities.list-group {
     width: 297px;
   }
+}
+
+.expanded-text-field textarea, .expanded-text-field .mce-tinymce {
+  width: 100%
 }

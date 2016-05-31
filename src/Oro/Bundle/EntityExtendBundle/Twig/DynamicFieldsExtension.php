@@ -55,9 +55,9 @@ class DynamicFieldsExtension extends \Twig_Extension
     ) {
         $this->fieldTypeHelper  = $fieldTypeHelper;
         $this->eventDispatcher  = $dispatcher;
+        $this->viewProvider     = $configManager->getProvider('view');
         $this->extendProvider   = $configManager->getProvider('extend');
         $this->entityProvider   = $configManager->getProvider('entity');
-        $this->viewProvider     = $configManager->getProvider('view');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -102,10 +102,10 @@ class DynamicFieldsExtension extends \Twig_Extension
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
             $dynamicRow[$fieldName] = [
-                'type'     => $fieldType,
+                'type'     => $this->viewProvider->getConfigById($fieldConfigId)->get('type') ?: $fieldType,
                 'label'    => $fieldConfig->get('label') ?: $fieldName,
                 'value'    => $event->getFieldViewValue(),
-                'priority' => $this->viewProvider->getConfigById($fieldConfigId)->get('priority', false, 0)
+                'priority' => $this->viewProvider->getConfigById($fieldConfigId)->get('priority') ?: 0
             ];
         }
 

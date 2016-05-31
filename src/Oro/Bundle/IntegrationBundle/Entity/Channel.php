@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
+use Oro\Bundle\DataGridBundle\Common\DataObject as ConfigObject;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -47,8 +47,13 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Channel
 {
+    /** This mode allow to do any changes(including removing) with channel */
     const EDIT_MODE_ALLOW = 3;
+
+    /** This mode allow only to activate/deactivate channel(switch enable field) */
     const EDIT_MODE_RESTRICTED = 2;
+
+    /** This mode do not allow to edit, remove and activate/deactivate channel */
     const EDIT_MODE_DISALLOW = 1;
 
     /**
@@ -113,6 +118,17 @@ class Channel
     * @Oro\Versioned()
     */
     protected $enabled;
+
+    /**
+     * If the status is changed by a user the previous status has to be set.
+     * If the status is changed from the code, it has to be set to null.
+     * For example in the listener when a channel status is changed
+     *
+     * @var boolean
+     *
+     * @ORM\Column(name="previously_enabled", type="boolean", nullable=true)
+     */
+    protected $previouslyEnabled;
 
     /**
      * @var User
@@ -477,5 +493,21 @@ class Channel
     public function __toString()
     {
         return (string)$this->getName();
+    }
+
+    /**
+     * @return boolean|null
+     */
+    public function getPreviouslyEnabled()
+    {
+        return $this->previouslyEnabled;
+    }
+
+    /**
+     * @param boolean|null $previouslyEnabled
+     */
+    public function setPreviouslyEnabled($previouslyEnabled)
+    {
+        $this->previouslyEnabled = $previouslyEnabled;
     }
 }

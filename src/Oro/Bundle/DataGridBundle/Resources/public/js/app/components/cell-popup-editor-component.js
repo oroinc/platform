@@ -249,8 +249,9 @@ define(function(require) {
         exitEditMode: function(withDispose) {
             if (this.view) {
                 this.errorHolderView.adoptErrorMessage();
-                this.options.cell.$el.removeClass('edit-mode');
-                this.options.cell.$el.addClass('view-mode');
+                if (!this.options.cell.disposed) {
+                    this.options.cell.$el.removeClass('edit-mode').addClass('view-mode');
+                }
                 this.view.dispose();
                 this.stopListening(this.view);
                 delete this.view;
@@ -501,17 +502,28 @@ define(function(require) {
         },
 
         onValidationError: function(jqXHR) {
-            if (!this.options.cell.disposed) {
-                var fieldName = this.options.cell.column.get('name');
-            }
-            if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
-                var backendErrors = {};
-                _.each(jqXHR.responseJSON.errors.children, function(item, name) {
-                    if (fieldName === name && _.isArray(item.errors)) {
-                        backendErrors.value = item.errors[0];
+            var fieldErrors;
+            var backendErrors;
+            var responseErrors = _.result(jqXHR.responseJSON, 'errors');
+            if (responseErrors) {
+                if (this.disposed || this.options.cell.disposed) {
+                    _.each(responseErrors.children, function(item) {
+                        if (_.isArray(item.errors)) {
+                            mediator.execute('showMessage', 'error', item.errors[0]);
+                        }
+                    });
+                    if (_.isArray(responseErrors.errors)) {
+                        mediator.execute('showMessage', 'error', responseErrors.errors[0]);
                     }
-                }, this);
-                this.errorHolderView.setErrorMessages(backendErrors);
+                } else {
+                    fieldErrors = _.result(responseErrors.children, this.options.cell.column.get('name'));
+                    if (fieldErrors && _.isArray(fieldErrors.errors)) {
+                        backendErrors = {value: fieldErrors.errors[0]};
+                    } else if (_.isArray(responseErrors.errors)) {
+                        backendErrors = {value: responseErrors.errors[0]};
+                    }
+                    this.errorHolderView.setErrorMessages(backendErrors);
+                }
             }
         }
     });

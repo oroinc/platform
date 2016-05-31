@@ -28,9 +28,9 @@ services:
         class: %oro_tracking.form.handler.tracking_website.class%
         scope: request
         arguments:
-            - @oro_tracking.form.tracking_website
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@oro_tracking.form.tracking_website'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
 
     oro_tracking.form.tracking_website:
         class: Symfony\Component\Form\Form
@@ -45,22 +45,22 @@ services:
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_tracking.tracking_website.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_tracking.importexport.reader.log:
         class: %oro_tracking.importexport.reader.log.class%
         arguments:
-            - @oro_importexport.context_registry
+            - '@oro_importexport.context_registry'
 
     oro_tracking.importexport.reader.context:
         class: %oro_tracking.importexport.reader.context.class%
         arguments:
-            - @oro_importexport.context_registry
+            - '@oro_importexport.context_registry'
 
     oro_tracking.importexport.data_converter.data:
         class: %oro_tracking.importexport.data_converter.data.class%
         arguments:
-            - @oro_importexport.field.field_helper
+            - '@oro_importexport.field.field_helper'
 
     oro_tracking.importexport.strategy.data:
         parent: oro_importexport.strategy.configurable_add_or_replace
@@ -76,16 +76,16 @@ services:
     oro_tracking.importexport.processor.import.data:
         parent: oro_importexport.processor.import_abstract
         calls:
-            - [setDataConverter, [@oro_tracking.importexport.data_converter.data]]
-            - [setStrategy, [@oro_tracking.importexport.strategy.data]]
+            - [setDataConverter,  ['@oro_tracking.importexport.data_converter.data']]
+            - [setStrategy,  ['@oro_tracking.importexport.strategy.data']]
         tags:
             - { name: oro_importexport.processor, type: import, entity: %oro_tracking.tracking_data.class%, alias: oro_tracking.processor.data }
 
     oro_tracking.config.listener:
         class: %oro_tracking.config.listener%
         arguments:
-            - @oro_config.global
-            - @router
+            - '@oro_config.global'
+            - '@router'
             - %kernel.logs_dir%
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
@@ -103,18 +103,18 @@ services:
     oro_tracking.entity_config_dumper.visit_identifier.extension:
         class: %oro_tracking.entity_config_dumper.visit_identifier.extension.class%
         arguments:
-            - @oro_tracking.provider.identifier_provider
-            - @oro_entity_config.config_manager
-            - @oro_entity_extend.association_builder
+            - '@oro_tracking.provider.identifier_provider'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.association_builder'
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_tracking.entity_config_dumper.visit_event_association.extension:
         class: Oro\Bundle\TrackingBundle\Tools\VisitEventAssociationDumperExtension
         arguments:
-            - @oro_tracking.provider.identifier_provider
-            - @oro_entity_config.config_manager
-            - @oro_entity_extend.association_builder
+            - '@oro_tracking.provider.identifier_provider'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.association_builder'
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
@@ -131,8 +131,8 @@ services:
     oro_tracking.processor.tracking_processor:
         class: %oro_tracking.processor.tracking_processor.class%
         arguments:
-            - @doctrine
-            - @oro_tracking.provider.identifier_provider
+            - '@doctrine'
+            - '@oro_tracking.provider.identifier_provider'
 
     oro_tracking.exclusion_provider.identifier_event:
         class: Oro\Bundle\TrackingBundle\Provider\IdentifierEventExclusionProvider

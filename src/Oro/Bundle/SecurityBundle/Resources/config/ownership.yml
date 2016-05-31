@@ -15,7 +15,7 @@ services:
     oro_security.owner.entity_owner_accessor:
         class: %oro_security.owner.entity_owner_accessor.class%
         arguments:
-            - @oro_security.owner.metadata_provider.chain
+            - '@oro_security.owner.metadata_provider.chain'
 
     oro_security.owner.entity_owner_accessor.link:
         tags:
@@ -24,17 +24,17 @@ services:
     oro_security.owner.metadata_provider.chain:
         class: %oro_security.owner.metadata_provider.chain.class%
         calls:
-            - [setDefaultProvider, [@oro_security.owner.ownership_metadata_provider]]
+            - [setDefaultProvider, ['@oro_security.owner.ownership_metadata_provider']]
 
     oro_security.owner.ownership_metadata_provider:
         class: %oro_security.owner.ownership_metadata_provider.class%
         arguments:
             - %oro_security.entity.owners%
-            - @oro_entity_config.provider.ownership
-            - @oro_entity.orm.entity_class_resolver
-            - @oro_security.owner.ownership_metadata_provider.cache
+            - '@oro_entity_config.provider.ownership'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_security.owner.ownership_metadata_provider.cache'
         calls:
-            - [ setContainer, [ @service_container ] ]
+            - [ setContainer, [ '@service_container' ] ]
         tags:
             - { name: oro_security.owner.metadata_provider, alias: default }
 
@@ -51,7 +51,7 @@ services:
     oro_security.owner.ownership_config_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigListener
         arguments:
-            - @oro_security.owner.metadata_provider.chain
+            - '@oro_security.owner.metadata_provider.chain'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
@@ -59,7 +59,7 @@ services:
         public: false
         class: %oro_security.owner.ownership_metadata_provider.cache.warmer.class%
         arguments:
-            - @oro_security.owner.metadata_provider.chain
+            - '@oro_security.owner.metadata_provider.chain'
         tags:
             - { name: kernel.cache_warmer }
 
@@ -67,7 +67,7 @@ services:
         public: false
         class: %oro_security.owner.ownership_metadata_provider.cache.clearer.class%
         arguments:
-            - @oro_security.owner.metadata_provider.chain
+            - '@oro_security.owner.metadata_provider.chain'
         tags:
             - { name: kernel.cache_clearer }
 

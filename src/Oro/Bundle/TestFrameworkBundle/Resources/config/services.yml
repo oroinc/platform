@@ -1,6 +1,8 @@
 parameters:
     test.client.class:         Oro\Bundle\TestFrameworkBundle\Test\Client
     search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
+    oro_test.entity.item.class: Oro\Bundle\TestFrameworkBundle\Entity\Item
+    oro_test.entity.item_value.class: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue
     oro_test.provider.exclusion_provider.class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
     oro_test.test_activity_activity_list.provider.class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
 
@@ -11,24 +13,24 @@ services:
     oro_test.entity_field_list_provider:
         class: %oro_entity.entity_field_list_provider.class%
         arguments:
-            - @oro_test.entity_field_provider
-            - @oro_test.entity_provider
+            - '@oro_test.entity_field_provider'
+            - '@oro_test.entity_provider'
 
     oro_test.entity_field_provider:
         parent: oro_entity.entity_field_provider
         calls:
-            - [setExclusionProvider, [@oro_test.provider.exclusion_provider]]
+            - [setExclusionProvider, ['@oro_test.provider.exclusion_provider']]
 
     oro_test.entity_provider:
         parent: oro_entity.entity_provider
         calls:
-            - [setExclusionProvider, [@oro_test.provider.exclusion_provider]]
+            - [setExclusionProvider, ['@oro_test.provider.exclusion_provider']]
 
     oro_test.test_activity_activity_list.provider:
         class: %oro_test.test_activity_activity_list.provider.class%
         arguments:
-           - @oro_entity.doctrine_helper
-           - @oro_activity.association_helper
+           - '@oro_entity.doctrine_helper'
+           - '@oro_activity.association_helper'
         tags:
            - {name: oro_activity_list.provider}
 

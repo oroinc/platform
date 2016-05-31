@@ -185,6 +185,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
     protected function getMockStepExecution($context)
     {
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+            ->setMethods(['addReaderWarning', 'getByStepExecution'])
             ->disableOriginalConstructor()
             ->getMock();
 

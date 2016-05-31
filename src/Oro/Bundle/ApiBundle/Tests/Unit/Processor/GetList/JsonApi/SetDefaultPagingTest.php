@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 
-use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultPaging;
@@ -33,44 +32,21 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         $this->assertSame($qb, $this->context->getQuery());
     }
 
-    public function testProcessForJSONAPIRequest()
+    public function testProcess()
     {
-        $this->context->getRequestType()->clear();
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
         $this->assertEquals(2, $filters->count());
-        $this->assertEquals(10, $filters->get('page[size]')->getDefaultValue());
-        $this->assertEquals(1, $filters->get('page[number]')->getDefaultValue());
-        $expectedFiltersOrder = ['page[size]', 'page[number]'];
-        $currentIndex = 0;
-        foreach ($filters as $filterKey => $filterDefinition) {
-            $this->assertEquals($expectedFiltersOrder[$currentIndex], $filterKey);
-            $currentIndex++;
-        }
-    }
+        /** @var PageSizeFilter $pageSizeFilter */
+        $pageSizeFilter = $filters->get('page[size]');
+        $this->assertEquals(10, $pageSizeFilter->getDefaultValue());
+        /** @var PageNumberFilter $pageNumberFilter */
+        $pageNumberFilter = $filters->get('page[number]');
+        $this->assertEquals(1, $pageNumberFilter->getDefaultValue());
 
-    public function testProcessForMixedRequest()
-    {
-        $pageSizeFilter = new PageSizeFilter('integer');
-        $pageNumberFilter = new PageNumberFilter('integer');
-        $filters = new FilterCollection();
-        $filters->add('limit', $pageSizeFilter);
-        $filters->add('page', $pageNumberFilter);
-        $this->context->set('filters', $filters);
-
-        $this->context->getRequestType()->clear();
-        $this->context->getRequestType()->add(RequestType::REST);
-        $this->context->getRequestType()->add(RequestType::JSON_API);
-        $this->processor->process($this->context);
-
-        $this->assertEquals(2, $filters->count());
-        $expectedFiltersOrder = ['page[size]', 'page[number]'];
-        $currentIndex = 0;
-        foreach ($filters as $filterKey => $filterDefinition) {
-            $this->assertEquals($expectedFiltersOrder[$currentIndex], $filterKey);
-            $currentIndex++;
-        }
+        // check that filters are added in correct order
+        $this->assertEquals(['page[size]', 'page[number]'], array_keys($filters->all()));
     }
 }

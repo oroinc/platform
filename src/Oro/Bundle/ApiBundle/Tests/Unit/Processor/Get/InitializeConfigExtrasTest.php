@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
 
+use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
+use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Get\InitializeConfigExtras;
@@ -27,9 +29,11 @@ class InitializeConfigExtrasTest extends GetProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertCount(3, $this->context->getConfigExtras());
+        $this->assertCount(5, $this->context->getConfigExtras());
         $this->assertTrue($this->context->hasConfigExtra($existingExtra->getName()));
         $this->assertTrue($this->context->hasConfigExtra(EntityDefinitionConfigExtra::NAME));
+        $this->assertTrue($this->context->hasConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
+        $this->assertTrue($this->context->hasConfigExtra(DataTransformersConfigExtra::NAME));
         $this->assertTrue($this->context->hasConfigExtra(FiltersConfigExtra::NAME));
     }
 }

@@ -84,7 +84,7 @@ class OwnerDeletionManager
      */
     public function isOwner($entity)
     {
-        return ($this->getOwnerType($entity) !== OwnershipType::OWNER_TYPE_NONE);
+        return $this->getOwnerType($entity) !== OwnershipType::OWNER_TYPE_NONE;
     }
 
     /**
@@ -96,7 +96,6 @@ class OwnerDeletionManager
      */
     public function hasAssignments($owner)
     {
-        $result = false;
         $ownerType = $this->getOwnerType($owner);
         if ($ownerType !== OwnershipType::OWNER_TYPE_NONE) {
             foreach ($this->ownershipProvider->getConfigs(null, true) as $config) {
@@ -109,13 +108,13 @@ class OwnerDeletionManager
                         $this->em
                     );
                     if ($result) {
-                        break;
+                        return true;
                     }
                 }
             }
         }
 
-        return $result;
+        return false;
     }
 
     /**
@@ -127,7 +126,6 @@ class OwnerDeletionManager
      */
     public function hasOrganizationAssignments(Organization $organization)
     {
-        $result = false;
         foreach ($this->ownershipProvider->getConfigs(null, true) as $config) {
             if (in_array(
                 $config->get('owner_type'),
@@ -148,15 +146,13 @@ class OwnerDeletionManager
                     ->getQuery()
                     ->getArrayResult();
 
-                $result = !empty($findResult);
-
-                if ($result) {
-                    break;
+                if ($findResult) {
+                    return true;
                 }
             }
         }
 
-        return $result;
+        return false;
     }
 
     /**
@@ -185,12 +181,16 @@ class OwnerDeletionManager
     {
         if (is_a($owner, $this->ownershipMetadata->getUserClass())) {
             return OwnershipType::OWNER_TYPE_USER;
-        } elseif (is_a($owner, $this->ownershipMetadata->getBusinessUnitClass())) {
-            return OwnershipType::OWNER_TYPE_BUSINESS_UNIT;
-        } elseif (is_a($owner, $this->ownershipMetadata->getOrganizationClass())) {
-            return OwnershipType::OWNER_TYPE_ORGANIZATION;
-        } else {
-            return OwnershipType::OWNER_TYPE_NONE;
         }
+
+        if (is_a($owner, $this->ownershipMetadata->getBusinessUnitClass())) {
+            return OwnershipType::OWNER_TYPE_BUSINESS_UNIT;
+        }
+
+        if (is_a($owner, $this->ownershipMetadata->getOrganizationClass())) {
+            return OwnershipType::OWNER_TYPE_ORGANIZATION;
+        }
+
+        return OwnershipType::OWNER_TYPE_NONE;
     }
 }

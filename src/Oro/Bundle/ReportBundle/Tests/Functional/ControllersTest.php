@@ -18,6 +18,7 @@ class ControllersTest extends WebTestCase
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
+        $this->client->useHashNavigation(true);
     }
 
     public function testIndex()
@@ -25,7 +26,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_report_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertEquals('Manage Custom Reports - Reports &amp; Segments', $crawler->filter('#page-title')->html());
+        $this->assertEquals('Manage Custom Reports - Reports & Segments', $crawler->filter('#page-title')->html());
     }
 
     /**
@@ -156,7 +157,10 @@ class ControllersTest extends WebTestCase
             $this->getUrl(
                 'oro_datagrid_export_action',
                 array('gridName' => Report::GRID_PREFIX . $id, 'format' => 'csv')
-            )
+            ),
+            [],
+            [],
+            $this->generateNoHashNavigationHeader()
         );
         $content = ob_get_contents();
         // Clean the output buffer and end it

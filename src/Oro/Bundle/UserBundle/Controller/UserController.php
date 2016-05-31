@@ -64,6 +64,11 @@ class UserController extends Controller
      */
     public function apigenAction(User $user)
     {
+        $securityFacade = $this->get('oro_security.security_facade');
+        if ($securityFacade->getLoggedUserId() !== $user->getId() && !$securityFacade->isGranted('EDIT', $user)) {
+            throw $this->createAccessDeniedException();
+        }
+
         $em      = $this->getDoctrine()->getManager();
         $userApi = $this->getUserApi($user);
         $userApi->setApiKey($userApi->generateKey())

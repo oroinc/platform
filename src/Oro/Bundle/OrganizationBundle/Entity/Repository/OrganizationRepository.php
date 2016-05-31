@@ -2,7 +2,6 @@
 namespace Oro\Bundle\OrganizationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -54,6 +53,33 @@ class OrganizationRepository extends EntityRepository
             ->setParameter('name', $name)
             ->getQuery()
             ->getSingleResult();
+    }
+
+    /**
+     * Returns partial organizations data
+     *
+     * @param array $fields    array with fields should be returned
+     * @param array $sortOrder order condition
+     * @param array $ids array with organizations ids data should be limited
+     *
+     * @return array
+     */
+    public function getOrganizationsPartialData(array $fields, array $sortOrder = [], array $ids = [])
+    {
+        $organizationsQueryQB = $this->createQueryBuilder('org')
+            ->select(sprintf('partial org.{%s}', implode(', ', $fields)));
+        if (count($sortOrder) !== 0) {
+            foreach ($sortOrder as $fieldName => $direction) {
+                $organizationsQueryQB->addOrderBy('org.' . $fieldName, $direction);
+            }
+        }
+
+        if (count($ids) !== 0) {
+            $organizationsQueryQB->where('org.id in (:ids)')
+                ->setParameter('ids', $ids);
+        }
+
+        return $organizationsQueryQB->getQuery()->getArrayResult();
     }
 
     /**

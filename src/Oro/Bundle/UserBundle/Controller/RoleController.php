@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/role")
@@ -104,6 +105,30 @@ class RoleController extends Controller
             'form'             => $aclRoleHandler->createView(),
             'privilegesConfig' => $privilegesConfig,
         ];
+    }
+
+    /**
+     * @Route(
+     *      "/clone/{id}",
+     *      name="oro_user_role_clone",
+     *      requirements={"id"="\d+"}
+     * )
+     * @AclAncestor("oro_user_role_create")
+     * @Template("OroUserBundle:Role:update.html.twig")
+     *
+     * @param Role $entity
+     * @return array
+     */
+    public function cloneAction(Role $entity)
+    {
+        /** @var TranslatorInterface $translator */
+        $translator = $this->get('translator');
+        $clonedLabel = $translator->trans('oro.user.role.clone.label', array('%name%' => $entity->getLabel()));
+
+        $clonedRole = clone $entity;
+        $clonedRole->setLabel($clonedLabel);
+
+        return $this->update($clonedRole);
     }
 
     /**

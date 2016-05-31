@@ -40,45 +40,45 @@ services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
         arguments:
-            - @oro_security.security_facade
-            - @oro_entity.entity_name_resolver
-            - @oro_datagrid.extension.pager.orm.pager
-            - @oro_config.user
-            - @oro_activity_list.provider.chain
-            - @oro_activity_list.filter.helper
-            - @oro_comment.comment.api_manager
-            - @oro_entity.doctrine_helper
-            - @oro_activity_list.helper.acl_criteria
-            - @oro_activity_list.helper.activity_inheritance_targets
-            - @event_dispatcher
+            - "@oro_security.security_facade"
+            - "@oro_entity.entity_name_resolver"
+            - "@oro_datagrid.extension.pager.orm.pager"
+            - "@oro_config.user"
+            - "@oro_activity_list.provider.chain"
+            - "@oro_activity_list.filter.helper"
+            - "@oro_comment.comment.api_manager"
+            - "@oro_entity.doctrine_helper"
+            - "@oro_activity_list.helper.acl_criteria"
+            - "@oro_activity_list.helper.activity_inheritance_targets"
+            - "@event_dispatcher"
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
         arguments:
-            - @oro_activity_list.provider.chain
+            - "@oro_activity_list.provider.chain"
 
     oro_activity_list.manager.api:
         class: %oro_activity_list.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_activity_list.entity.class%
-            - @doctrine.orm.entity_manager
+            - "@doctrine.orm.entity_manager"
 
     oro_activity_list.placeholder.filter:
         class: %oro_activity_list.placeholder.filter.class%
         arguments:
-            - @oro_activity_list.provider.chain
-            - @doctrine
-            - @oro_entity.doctrine_helper
-            - @oro_entity_config.config_manager
+            - "@oro_activity_list.provider.chain"
+            - "@doctrine"
+            - "@oro_entity.doctrine_helper"
+            - "@oro_entity_config.config_manager"
         tags:
             - { name: kernel.event_listener, event: oro.ui.grouping_chain_widget.before, method: isAllowedButton }
 
     oro_activity_list.event_listener.actitity_list_listener:
         class:  %oro_activity_list.event_listener.actitity_list_listener.class%
         arguments:
-            - @oro_activity_list.collect_manager
-            - @oro_entity.doctrine_helper
+            - "@oro_activity_list.collect_manager"
+            - "@oro_entity.doctrine_helper"
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -86,20 +86,20 @@ services:
     oro_activity_list.provider.chain:
         class: %oro_activity_list.provider.chain.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity_config.config_manager
-            - @translator
-            - @oro_entity.routing_helper
-            - @oro_ui.html_tag_helper
+            - "@oro_entity.doctrine_helper"
+            - "@oro_entity_config.config_manager"
+            - "@translator"
+            - "@oro_entity.routing_helper"
+            - "@oro_ui.html_tag_helper"
 
     oro_activity_list.provider.email_recipients:
         class: %oro_activity_list.provider.email_recipients.class%
         arguments:
-            - @doctrine
-            - @oro_activity.manager
-            - @oro_email.related_emails.provider
-            - @oro_activity_list.helper.acl_criteria
-            - @oro_activity_list.provider.chain
+            - "@doctrine"
+            - "@oro_activity.manager"
+            - "@oro_email.related_emails.provider"
+            - "@oro_activity_list.helper.acl_criteria"
+            - "@oro_activity_list.provider.chain"
         tags:
             - { name: oro_email.recipients_provider, priority: 10 }
 
@@ -116,16 +116,16 @@ services:
     oro_activity_list.entity_config_dumper.extension:
         class: %oro_activity_list.entity_config_dumper.extension.class%
         arguments:
-            - @oro_activity_list.provider.chain
-            - @oro_entity_config.config_manager
-            - @oro_entity_extend.association_builder
+            - "@oro_activity_list.provider.chain"
+            - "@oro_entity_config.config_manager"
+            - "@oro_entity_extend.association_builder"
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_activity_list.entity_generator.extension:
         class: %oro_activity_list.entity_generator.extension.class%
         arguments:
-            - @oro_activity_list.provider.chain
+            - "@oro_activity_list.provider.chain"
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
@@ -137,21 +137,21 @@ services:
     oro_activity_list.migration.activity_list.post_up.listener:
         class: %oro_activity_list.migration.activity_list.post_up.listener.class%
         arguments:
-            - @oro_activity_list.provider.chain
-            - @oro_activity_list.migration.extension.activity_list
-            - @oro_entity_extend.migration.entity_metadata_helper
-            - @oro_migration.db_id_name_generator
-            - @oro_entity_config.config_manager
+            - "@oro_activity_list.provider.chain"
+            - "@oro_activity_list.migration.extension.activity_list"
+            - "@oro_entity_extend.migration.entity_metadata_helper"
+            - "@oro_migration.db_id_name_generator"
+            - "@oro_entity_config.config_manager"
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -110 }
 
     oro_activity_list.filter.helper:
         class: %oro_activity_list.filter.helper.class%
         arguments:
-            - @oro_filter.datetime_range_filter
-            - @oro_filter.choice_filter
-            - @oro_entity.routing_helper
-            - @oro_activity_list.provider.chain
+            - "@oro_filter.datetime_range_filter"
+            - "@oro_filter.choice_filter"
+            - "@oro_entity.routing_helper"
+            - "@oro_activity_list.provider.chain"
 
     oro_activity_list.datagrid.builder.link:
         tags:
@@ -160,51 +160,51 @@ services:
     oro_activity_list.filter.activity_list:
         class: %oro_activity_list.filter.activity_list.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
-            - @oro_activity.association_helper
-            - @oro_activity_list.provider.chain
-            - @oro_activity_list.filter.helper
-            - @oro_entity.routing_helper
-            - @oro_query_designer.query_designer.manager
-            - @oro_activity_list.filter.datagrid_helper
+            - "@form.factory"
+            - "@oro_filter.filter_utility"
+            - "@oro_activity.association_helper"
+            - "@oro_activity_list.provider.chain"
+            - "@oro_activity_list.filter.helper"
+            - "@oro_entity.routing_helper"
+            - "@oro_query_designer.query_designer.manager"
+            - "@oro_activity_list.filter.datagrid_helper"
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: activityList }
 
     oro_activity_list.filter.datagrid_helper:
         class: %oro_activity_list.filter.datagrid_helper.class%
         arguments:
-            - @oro_query_designer.grid.datagrid_configuration_builder
-            - @oro_activity_list.datagrid.builder.link
-            - @event_dispatcher
+            - "@oro_query_designer.grid.datagrid_configuration_builder"
+            - "@oro_activity_list.datagrid.builder.link"
+            - "@event_dispatcher"
 
     oro_activity_list.helper.acl_criteria:
         class: %oro_activity_list.helper.acl_criteria.class%
         arguments:
-            - @oro_security.acl_helper
-            - @oro_entity_config.link.security_context
+            - "@oro_security.acl_helper"
+            - "@oro_entity_config.link.security_context"
 
     oro_activity_list.helper.activity_inheritance_targets:
         class: %oro_activity_list.helper.activity_inheritance_targets.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @doctrine
+            - "@oro_entity_config.config_manager"
+            - "@doctrine"
    
     # Strategies
     oro_activity_list.strategy.replace:
         class: %oro_activity_list.strategy.replace.class%
         arguments:
-            - @oro_activity_list.manager
-            - @oro_entity.doctrine_helper
-            - @oro_activity.manager
+            - "@oro_activity_list.manager"
+            - "@oro_entity.doctrine_helper"
+            - "@oro_activity.manager"
         tags:
             - { name: oro_entity_merge.strategy }
 
     oro_activity_list.strategy.unite:
         class: %oro_activity_list.strategy.unite.class%
         arguments:
-            - @oro_activity_list.manager
-            - @oro_entity.doctrine_helper
+            - "@oro_activity_list.manager"
+            - "@oro_entity.doctrine_helper"
         tags:
             - { name: oro_entity_merge.strategy }
 
@@ -212,7 +212,7 @@ services:
     oro_activity_list.accessor.activity:
         class: %oro_activity_list.accessor.activity.class%
         arguments:
-          - @doctrine
+          - "@doctrine"
         tags:
             - { name: oro_entity_merge.accessor }
 
@@ -220,8 +220,8 @@ services:
     oro_activity_list.listener.merge_listener:
         class: %oro_activity_list.listener.merge_listener.class%
         arguments:
-          - @translator
-          - @oro_entity_config.provider.entity
-          - @oro_activity.manager
+          - "@translator"
+          - "@oro_entity_config.provider.entity"
+          - "@oro_activity.manager"
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata, priority: -10 }

@@ -6,11 +6,30 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 
 class DoctrineHelper extends BaseHelper
 {
+    /** @var array */
+    private $manageableEntityClasses = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isManageableEntityClass($entityClass)
+    {
+        if (isset($this->manageableEntityClasses[$entityClass])) {
+            return $this->manageableEntityClasses[$entityClass];
+        }
+
+        $isManageable = null !== $this->getEntityManagerForClass($entityClass, false);
+        $this->manageableEntityClasses[$entityClass] = $isManageable;
+
+        return $isManageable;
+    }
+
     /**
      * Adds criteria to the query.
      *
@@ -158,5 +177,54 @@ class DoctrineHelper extends BaseHelper
         }
 
         return $relations;
+    }
+
+    /**
+     * Sets the identifier values for a given entity.
+     *
+     * @param object             $entity
+     * @param mixed              $entityId
+     * @param ClassMetadata|null $metadata
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setEntityIdentifier($entity, $entityId, ClassMetadata $metadata = null)
+    {
+        if (null === $metadata) {
+            $metadata = $this->getEntityMetadata($entity);
+        }
+
+        if (!is_array($entityId)) {
+            $idFieldNames = $metadata->getIdentifierFieldNames();
+            if (count($idFieldNames) > 1) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Unexpected identifier value "%s" for composite primary key of the entity "%s".',
+                        $entityId,
+                        $metadata->getName()
+                    )
+                );
+            }
+            $entityId = [reset($idFieldNames) => $entityId];
+        }
+
+        $reflClass = new \ReflectionClass($entity);
+        foreach ($entityId as $fieldName => $value) {
+            $property = ReflectionUtil::getProperty($reflClass, $fieldName);
+            if (null === $property) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'The entity "%s" does not have the "%s" property.',
+                        get_class($entity),
+                        $fieldName
+                    )
+                );
+            }
+
+            if (!$property->isPublic()) {
+                $property->setAccessible(true);
+            }
+            $property->setValue($entity, $value);
+        }
     }
 }

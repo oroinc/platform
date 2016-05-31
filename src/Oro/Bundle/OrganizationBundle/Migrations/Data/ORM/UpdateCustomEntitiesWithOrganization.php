@@ -54,9 +54,12 @@ class UpdateCustomEntitiesWithOrganization extends UpdateWithOrganization implem
         /** @var EntityConfigId[] $entityConfigIds */
         $entityConfigIds = $configManager->getIds('extend');
         $ownerProvider = $configManager->getProvider('ownership');
+        $extendProvider = $configManager->getProvider('extend');
         foreach ($entityConfigIds as $entityConfigId) {
             if ($configManager->getConfig($entityConfigId)->get('owner') == ExtendScope::OWNER_CUSTOM
                 && $ownerProvider->hasConfigById($entityConfigId)
+                && !$extendProvider->getConfig($entityConfigId->getClassName())
+                    ->is('state', ExtendScope::STATE_NEW)
             ) {
                 $className   = $entityConfigId->getClassName();
                 $ownerConfig = $ownerProvider->getConfig($className);

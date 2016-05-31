@@ -13,13 +13,15 @@ class SyncSchedulerTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->client->startTransaction();
+        $this->startTransaction();
     }
 
     protected function tearDown()
     {
-        $this->client->rollbackTransaction();
         parent::tearDown();
+
+        self::$loadedFixtures = [];
+        $this->rollbackTransaction();
     }
 
     public function testScheduleWithoutFlush()
@@ -37,7 +39,8 @@ class SyncSchedulerTest extends WebTestCase
         $integration = new Integration();
         $integration->setType($integrationType);
 
-        $this->getContainer()->get('oro_integration.sync_scheduler')->schedule($integration, $connectorType, [], false);
+        $scheduler = $this->getContainer()->get('oro_integration.sync_scheduler');
+        $scheduler->schedule($integration, $connectorType, [], false);
         $this->assertEmpty($this->getScheduledJobs(), 'Should be empty before flush');
 
         $this->getContainer()->get('doctrine')->getManager()->flush();

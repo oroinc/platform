@@ -1,1 +1,5 @@
-<%= _.escape(fullName) %>
+<%= _.escape(fullName) %><% if (id === null) { %>
+    <span class="select2__result-entry-info">
+        (<%= _.__('oro.form.new') %>)
+    </span>
+<% } %>

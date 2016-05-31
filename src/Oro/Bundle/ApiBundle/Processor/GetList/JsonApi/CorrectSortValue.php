@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -44,13 +47,40 @@ class CorrectSortValue implements ProcessorInterface
             return;
         }
 
+        $filterValue = null;
         $filterValues = $context->getFilterValues();
         if ($filterValues->has(self::SORT_FILTER_KEY)) {
             $filterValue = $filterValues->get(self::SORT_FILTER_KEY);
+        } else {
+            $defaultValue = $this->getSortFilterDefaultValue($context->getFilters());
+            if (!empty($defaultValue)) {
+                $filterValue = new FilterValue(self::SORT_FILTER_KEY, $defaultValue);
+                $filterValues->set(self::SORT_FILTER_KEY, $filterValue);
+            }
+        }
+        if (null !== $filterValue) {
             $filterValue->setValue(
                 $this->normalizeValue($filterValue->getValue(), $entityClass)
             );
         }
+    }
+
+    /**
+     * @param FilterCollection $filters
+     *
+     * @return string|null
+     */
+    protected function getSortFilterDefaultValue(FilterCollection $filters)
+    {
+        $result = null;
+        if ($filters->has(self::SORT_FILTER_KEY)) {
+            $sortFilter = $filters->get(self::SORT_FILTER_KEY);
+            if ($sortFilter instanceof StandaloneFilterWithDefaultValue) {
+                $result = $sortFilter->getDefaultValueString();
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -66,7 +96,7 @@ class CorrectSortValue implements ProcessorInterface
         }
 
         $result = [];
-        $items  = explode(self::ARRAY_DELIMITER, $value);
+        $items = explode(self::ARRAY_DELIMITER, $value);
         foreach ($items as $item) {
             switch (trim($item)) {
                 case 'id':

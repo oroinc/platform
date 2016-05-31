@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 class StatusCodesConfig
 {
     /** @var StatusCodeConfig[] */
-    private $codes = [];
+    protected $codes = [];
 
     /**
      * Gets a native PHP array representation of the configuration.

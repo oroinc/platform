@@ -104,10 +104,6 @@ class ExtendConfigDumper
      */
     public function addExtension(AbstractEntityConfigDumperExtension $extension, $priority = 0)
     {
-        if (!isset($this->extensions[$priority])) {
-            $this->extensions[$priority] = [];
-        }
-
         $this->extensions[$priority][] = $extension;
     }
 
@@ -115,11 +111,16 @@ class ExtendConfigDumper
      * Update config.
      *
      * @param callable|null $filter function (ConfigInterface $config) : bool
+     * @param bool $updateCustom
      */
-    public function updateConfig($filter = null)
+    public function updateConfig($filter = null, $updateCustom = false)
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
+
+        if ($updateCustom) {
+            $this->updatePendingConfigs();
+        }
 
         $extensions = $this->getExtensions();
 
@@ -471,6 +472,9 @@ class ExtendConfigDumper
             $fieldConfig->set('is_deleted', true);
             $this->configManager->persist($fieldConfig);
         } elseif (!$fieldConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+            if ($fieldConfig->is('state', ExtendScope::STATE_RESTORE)) {
+                $fieldConfig->set('is_deleted', false);
+            }
             $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
             $this->configManager->persist($fieldConfig);
         }
@@ -512,6 +516,37 @@ class ExtendConfigDumper
             if (!$hasNotActiveFields) {
                 $entityConfig->set('state', ExtendScope::STATE_ACTIVE);
                 $this->configManager->persist($entityConfig);
+            }
+        }
+    }
+
+    /**
+     * Updates pending configs
+     */
+    protected function updatePendingConfigs()
+    {
+        $pendingChanges = [];
+
+        $configs = $this->configManager->getProvider('extend')->getConfigs();
+        foreach ($configs as $config) {
+            $configPendingChanges = $config->get('pending_changes');
+            if (!$configPendingChanges) {
+                continue;
+            }
+
+            $pendingChanges[$config->getId()->getClassName()] = $configPendingChanges;
+            $config->remove('pending_changes');
+            $this->configManager->persist($config);
+        }
+
+        foreach ($pendingChanges as $className => $changes) {
+            foreach ($changes as $scope => $values) {
+                $provider = $this->configManager->getProvider($scope);
+                $config = $provider->getConfig($className);
+                foreach ($values as $code => $value) {
+                    $config->set($code, ExtendHelper::updatedPendingValue($config->get($code), $value));
+                }
+                $this->configManager->persist($config);
             }
         }
     }

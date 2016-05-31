@@ -12,13 +12,13 @@ services:
     oro_theme.event_listener.load_css:
         class: %oro_theme.event_listener.load_css.class%
         arguments:
-            - @oro_theme.registry
+            - '@oro_theme.registry'
         tags:
             - { name: kernel.event_listener, event: oro_assetic.load_css, method: onLoadCss  }
 
     oro_theme.twig.extension:
         class: %oro_theme.twig.extension.class%
         arguments:
-            - @oro_theme.registry
+            - '@oro_theme.registry'
         tags:
             - { name: twig.extension }

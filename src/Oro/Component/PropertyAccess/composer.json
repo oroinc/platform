@@ -5,17 +5,16 @@
     "keywords": ["ORO", "BAP", "property", "index", "access", "object", "array", "extraction", "injection", "reflection", "property path"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "symfony/property-access": "~2.3"
     },
     "autoload": {
-        "psr-0": { "Oro\\Component\\PropertyAccess": "" }
+        "psr-4": { "Oro\\Component\\PropertyAccess\\": "" }
     },
-    "target-dir": "Oro/Component/PropertyAccess",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "1.x-dev"
         }
     }
 }

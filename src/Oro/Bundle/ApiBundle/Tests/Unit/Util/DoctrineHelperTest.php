@@ -7,11 +7,43 @@ use Doctrine\ORM\Query\Expr\Join;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 class DoctrineHelperTest extends OrmRelatedTestCase
 {
     const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
+
+    public function testIsManageableEntityClassShouldBeCached()
+    {
+        $entityClass = 'Test\Entity';
+        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn($this->em);
+
+        $doctrineHelper = new DoctrineHelper($doctrine);
+        $this->assertTrue($doctrineHelper->isManageableEntityClass($entityClass));
+        // test local cache
+        $this->assertTrue($doctrineHelper->isManageableEntityClass($entityClass));
+    }
+
+    public function testIsManageableEntityClassShouldBeCachedEvenForNotManageableEntity()
+    {
+        $entityClass = 'Test\Entity';
+        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn(null);
+
+        $doctrineHelper = new DoctrineHelper($doctrine);
+        $this->assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
+        // test local cache
+        $this->assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
+    }
 
     public function testApplyCriteriaWithoutJoins()
     {
@@ -199,6 +231,58 @@ class DoctrineHelperTest extends OrmRelatedTestCase
             ],
             $this->doctrineHelper->getIndexedAssociations($this->getClassMetadata('User'))
         );
+    }
+
+    public function testSetIdentifierForEntityWithSingleId()
+    {
+        $entityId = 123;
+        $entity = new Entity\Group();
+
+        $this->doctrineHelper->setEntityIdentifier($entity, $entityId);
+        $this->assertEquals($entityId, $entity->getId());
+    }
+
+    public function testSetIdentifierForEntityWithCompositeId()
+    {
+        $entityId = ['id' => 123, 'title' => 'test'];
+        $entity = new Entity\CompositeKeyEntity();
+
+        $this->doctrineHelper->setEntityIdentifier($entity, $entityId);
+        $this->assertEquals($entityId['id'], $entity->getId());
+        $this->assertEquals($entityId['title'], $entity->getTitle());
+    }
+
+    public function testSetInvalidIdentifierForEntityWithCompositeId()
+    {
+        $entityId = 123;
+        $entity = new Entity\CompositeKeyEntity();
+
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            sprintf(
+                'Unexpected identifier value "%s" for composite primary key of the entity "%s".',
+                $entityId,
+                get_class($entity)
+            )
+        );
+
+        $this->doctrineHelper->setEntityIdentifier($entity, $entityId);
+    }
+
+    public function testSetIdentifierWithUndefinedFieldForEntityWithCompositeId()
+    {
+        $entityId = ['id' => 123, 'title1' => 'test'];
+        $entity = new Entity\CompositeKeyEntity();
+
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            sprintf(
+                'The entity "%s" does not have the "title1" property.',
+                get_class($entity)
+            )
+        );
+
+        $this->doctrineHelper->setEntityIdentifier($entity, $entityId);
     }
 
     /**

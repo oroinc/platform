@@ -19,8 +19,8 @@ services:
         class: %oro_action.cache.clearer.class%
         public: false
         calls:
-            - [addProvider, [@oro_action.configuration.provider.operations]]
-            - [addProvider, [@oro_action.configuration.provider.action_groups]]
+            - [addProvider, ['@oro_action.configuration.provider.operations']]
+            - [addProvider, ['@oro_action.configuration.provider.action_groups']]
         tags:
             - { name: kernel.cache_clearer }
 
@@ -28,7 +28,7 @@ services:
         class: %oro_action.cache.warmer.class%
         public: false
         calls:
-            - [addProvider, [@oro_action.configuration.provider.operations]]
-            - [addProvider, [@oro_action.configuration.provider.action_groups]]
+            - [addProvider, ['@oro_action.configuration.provider.operations']]
+            - [addProvider, ['@oro_action.configuration.provider.action_groups']]
         tags:
             - { name: kernel.cache_warmer }

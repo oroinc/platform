@@ -28,7 +28,7 @@ class LoadEntityMetadata implements ProcessorInterface
      */
     public function __construct(DoctrineHelper $doctrineHelper, EntityMetadataFactory $entityMetadataFactory)
     {
-        $this->doctrineHelper        = $doctrineHelper;
+        $this->doctrineHelper = $doctrineHelper;
         $this->entityMetadataFactory = $entityMetadataFactory;
     }
 
@@ -52,60 +52,68 @@ class LoadEntityMetadata implements ProcessorInterface
 
         // filter excluded fields on this stage though there is another processor doing the same
         // it is done due to performance reasons
-        $config        = $context->getConfig();
+        $config = $context->getConfig();
         $allowedFields = null !== $config
             ? $this->getAllowedFields($config)
             : [];
 
-        $classMetadata  = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+        $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $entityMetadata = $this->entityMetadataFactory->createEntityMetadata($classMetadata);
 
-        $this->loadFields($entityMetadata, $classMetadata, $allowedFields, null !== $config);
-        $this->loadAssociations($entityMetadata, $classMetadata, $allowedFields, null !== $config);
+        $this->loadFields($entityMetadata, $classMetadata, $allowedFields, $config);
+        $this->loadAssociations($entityMetadata, $classMetadata, $allowedFields, $config);
 
         $context->setResult($entityMetadata);
     }
 
     /**
-     * @param EntityMetadata $entityMetadata
-     * @param ClassMetadata  $classMetadata
-     * @param array          $allowedFields
-     * @param bool           $hasConfig
+     * @param EntityMetadata              $entityMetadata
+     * @param ClassMetadata               $classMetadata
+     * @param array                       $allowedFields
+     * @param EntityDefinitionConfig|null $config
      */
     protected function loadFields(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         array $allowedFields,
-        $hasConfig
+        EntityDefinitionConfig $config = null
     ) {
+        $hasConfig = null !== $config;
         $fields = $classMetadata->getFieldNames();
         foreach ($fields as $fieldName) {
             if ($hasConfig && !isset($allowedFields[$fieldName])) {
                 continue;
             }
-            $field = $this->entityMetadataFactory->createFieldMetadata($classMetadata, $fieldName);
             if ($hasConfig) {
                 $configFieldName = $allowedFields[$fieldName];
+                $field = $this->entityMetadataFactory->createFieldMetadata(
+                    $classMetadata,
+                    $fieldName,
+                    $config->getField($configFieldName)->getDataType()
+                );
                 if ($fieldName !== $configFieldName) {
                     $field->setName($configFieldName);
                 }
+            } else {
+                $field = $this->entityMetadataFactory->createFieldMetadata($classMetadata, $fieldName);
             }
             $entityMetadata->addField($field);
         }
     }
 
     /**
-     * @param EntityMetadata $entityMetadata
-     * @param ClassMetadata  $classMetadata
-     * @param array          $allowedFields
-     * @param bool           $hasConfig
+     * @param EntityMetadata              $entityMetadata
+     * @param ClassMetadata               $classMetadata
+     * @param array                       $allowedFields
+     * @param EntityDefinitionConfig|null $config
      */
     protected function loadAssociations(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         array $allowedFields,
-        $hasConfig
+        EntityDefinitionConfig $config = null
     ) {
+        $hasConfig = null !== $config;
         $associations = $classMetadata->getAssociationNames();
         foreach ($associations as $associationName) {
             if ($hasConfig && !isset($allowedFields[$associationName])) {
@@ -128,7 +136,7 @@ class LoadEntityMetadata implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      *
-     * @return array
+     * @return array [property path => field name, ...]
      */
     protected function getAllowedFields(EntityDefinitionConfig $definition)
     {
@@ -136,7 +144,7 @@ class LoadEntityMetadata implements ProcessorInterface
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->isExcluded()) {
-                $propertyPath          = $field->getPropertyPath() ?: $fieldName;
+                $propertyPath = $field->getPropertyPath() ?: $fieldName;
                 $result[$propertyPath] = $fieldName;
             }
         }

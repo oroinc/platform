@@ -32,7 +32,7 @@ class EnumValueRepository extends EntityRepository
         if (strlen($name) === 0) {
             throw new \InvalidArgumentException('$name must not be empty.');
         }
-        if (empty($id)) {
+        if (!isset($id) || $id === '') {
             $id = ExtendHelper::buildEnumValueId($name);
         } elseif (strlen($id) > ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH) {
             throw new \InvalidArgumentException(

@@ -43,7 +43,7 @@ define([
             }
 
             this.listenTo(this.model, 'backgrid:select', function(model, checked) {
-                this.$checkbox.prop('checked', checked).change();
+                this.$(':checkbox').prop('checked', checked).change();
             });
         },
 
@@ -86,13 +86,11 @@ define([
         render: function() {
             // work around with trigger event to get current state of model (selected or not)
             var state = {selected: false};
-            this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
-            this.$checkbox = this.$(':checkbox');
             this.model.trigger('backgrid:isSelected', this.model, state);
-            if (state.selected) {
-                this.$checkbox.prop('checked', 'checked');
-            }
-            this.model.trigger('backgrid:selected', this.model, state.selected);
+            this.$checkbox = $('<input tabindex="-1" type="checkbox" ' +
+                (state.selected ? 'checked="checked"' : '') +
+                '/>');
+            this.$el.empty().append(this.$checkbox);
             return this;
         }
     });

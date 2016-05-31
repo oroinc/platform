@@ -3,8 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\NodeInterface;
-use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
@@ -22,9 +20,6 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
 {
     /** @var ConfigBag */
     protected $configBag;
-
-    /** @var NodeInterface */
-    private $configurationTree;
 
     /**
      * @param ConfigExtensionRegistry          $configExtensionRegistry
@@ -53,50 +48,16 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     /**
      * {@inheritdoc}
      */
-    protected function mergeConfigs(array $config, array $parentConfig)
-    {
-        $processor = new Processor();
-
-        return $processor->process($this->getConfigurationTree(), [$parentConfig, $config]);
-    }
-
-    /**
-     * @return NodeInterface
-     */
-    protected function getConfigurationTree()
-    {
-        if (null === $this->configurationTree) {
-            $this->configurationTree = $this->createConfigurationTree();
-        }
-
-        return $this->configurationTree;
-    }
-
-    /**
-     * @return NodeInterface
-     */
     protected function createConfigurationTree()
     {
-        list(
-            $extraSections,
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-            ) = $this->configExtensionRegistry->getConfigurationSettings();
-
         $configTreeBuilder = new TreeBuilder();
         $configuration     = new EntityConfiguration(
             ApiConfiguration::RELATIONS_SECTION,
             new RelationDefinitionConfiguration(),
-            $extraSections,
+            $this->configExtensionRegistry->getConfigurationSettings(),
             $this->configExtensionRegistry->getMaxNestingLevel()
         );
-        $configuration->configure(
-            $configTreeBuilder->root('related_entity')->children(),
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-        );
+        $configuration->configure($configTreeBuilder->root('related_entity')->children());
 
         return $configTreeBuilder->buildTree();
     }

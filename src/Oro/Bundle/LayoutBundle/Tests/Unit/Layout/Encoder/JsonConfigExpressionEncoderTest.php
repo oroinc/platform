@@ -12,7 +12,7 @@ class JsonConfigExpressionEncoderTest extends \PHPUnit_Framework_TestCase
     public function testEncodeExpr()
     {
         $encoder = new JsonConfigExpressionEncoder();
-        $result  = $encoder->encodeExpr(new Condition\True());
+        $result  = $encoder->encodeExpr(new Condition\TrueCondition());
         $this->assertEquals('{"@true":null}', $result);
     }
 

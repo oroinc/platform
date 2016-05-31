@@ -211,9 +211,15 @@ class AclRoleHandler
      */
     public function process(AbstractRole $role, $className = null)
     {
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->form->submit($this->request);
-
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+            $data = $this->request->request->get($this->form->getName(), []);
+            if (isset($data['privileges'])) {
+                $privileges = json_decode($data['privileges'], true);
+                if (is_array($privileges)) {
+                    $data = array_merge($data, $privileges);
+                }
+            }
+            $this->form->submit($data);
             if ($this->form->isValid()) {
                 $appendUsers = $this->form->get('appendUsers')->getData();
                 $removeUsers = $this->form->get('removeUsers')->getData();

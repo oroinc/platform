@@ -30,6 +30,7 @@ class EntityMetadataFactory
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setClassName($classMetadata->name);
         $entityMetadata->setIdentifierFieldNames($classMetadata->getIdentifierFieldNames());
+        $entityMetadata->setHasIdentifierGenerator($classMetadata->usesIdGenerator());
         $entityMetadata->setInheritedType($classMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE);
 
         return $entityMetadata;
@@ -38,14 +39,23 @@ class EntityMetadataFactory
     /**
      * @param ClassMetadata $classMetadata
      * @param string        $fieldName
+     * @param string|null   $fieldType
      *
      * @return FieldMetadata
      */
-    public function createFieldMetadata(ClassMetadata $classMetadata, $fieldName)
+    public function createFieldMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
     {
+        if (!$fieldType) {
+            $fieldType = (string)$classMetadata->getTypeOfField($fieldName);
+        }
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
-        $fieldMetadata->setDataType($classMetadata->getTypeOfField($fieldName));
+        $fieldMetadata->setDataType($fieldType);
+        $fieldMetadata->setIsNullable($classMetadata->isNullable($fieldName));
+        $mapping = $classMetadata->getFieldMapping($fieldName);
+        if (isset($mapping['length'])) {
+            $fieldMetadata->setMaxLength($mapping['length']);
+        }
 
         return $fieldMetadata;
     }
@@ -78,6 +88,15 @@ class EntityMetadataFactory
         } else {
             $associationMetadata->addAcceptableTargetClassName($targetClass);
         }
+
+        $isNullable = true;
+        if ($classMetadata->isAssociationWithSingleJoinColumn($associationName)) {
+            $mapping = $classMetadata->getAssociationMapping($associationName);
+            if (!isset($mapping['joinColumns'][0]['nullable']) || !$mapping['joinColumns'][0]['nullable']) {
+                $isNullable = false;
+            }
+        }
+        $associationMetadata->setIsNullable($isNullable);
 
         return $associationMetadata;
     }

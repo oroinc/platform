@@ -49,7 +49,7 @@ datagrid:
             objectClass:
                 label: oro.dataaudit.datagrid.entity_type
                 frontend_type: select
-                choices: @oro_dataaudit.dataaudit_grid_service->getObjectClassOptions
+                choices: "@oro_dataaudit.dataaudit_grid_service->getObjectClassOptions"
             objectName:
                 label: oro.dataaudit.datagrid.entity_name
             objectId:
@@ -98,7 +98,7 @@ datagrid:
                                 update: oro.dataaudit.action.update
                                 remove: oro.dataaudit.action.remove
                 version:
-                    type: number
+                    type: number-range
                     data_name: a.version
                     enabled: false
                 objectClass:
@@ -106,12 +106,12 @@ datagrid:
                     data_name: a.objectClass
                     options:
                           field_options:
-                              choices: @oro_dataaudit.dataaudit_grid_service->getObjectClassOptions
+                              choices: "@oro_dataaudit.dataaudit_grid_service->getObjectClassOptions"
                 objectName:
                     type: string
                     data_name: a.objectName
                 objectId:
-                    type: number
+                    type: number-range
                     data_name: a.objectId
                 author:
                     type: string
