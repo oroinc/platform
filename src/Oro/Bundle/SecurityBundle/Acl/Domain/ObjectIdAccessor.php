@@ -36,12 +36,15 @@ class ObjectIdAccessor
             return $domainObject->getObjectIdentifier();
         } elseif (method_exists($domainObject, 'getId')) {
             return $domainObject->getId();
-        } elseif ($id = $this->doctrineHelper->getSingleEntityIdentifier($domainObject, false)) {
+        } elseif ($this->doctrineHelper->isManageableEntity($domainObject)
+            && $id = $this->doctrineHelper->getSingleEntityIdentifier($domainObject, false)
+        ) {
             return $id;
         }
 
         throw new InvalidDomainObjectException(
-            '$domainObject must either implement the DomainObjectInterface, or have a method named "getId".'
+            '$domainObject must either implement the DomainObjectInterface, object that have a method named "getId" '
+            . 'or single identifier entity.'
         );
     }
 }
