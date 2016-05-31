@@ -116,7 +116,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
         $iteration = 0;
         $emailUserIds = [];
 
-        if (array_key_exists('values', $data)) {
+        if (array_key_exists('values', $data) && !empty($data['values'])) {
             $emailUserIds = explode(',', $data['values']);
         }
 
