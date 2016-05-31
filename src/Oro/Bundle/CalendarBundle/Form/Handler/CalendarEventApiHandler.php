@@ -52,11 +52,11 @@ class CalendarEventApiHandler
         ActivityManager $activityManager,
         AttendeeRelationManager $attendeeRelationManager
     ) {
-        $this->form                        = $form;
-        $this->request                     = $request;
-        $this->manager                     = $manager;
-        $this->emailSendProcessor          = $emailSendProcessor;
-        $this->activityManager             = $activityManager;
+        $this->form                    = $form;
+        $this->request                 = $request;
+        $this->manager                 = $manager;
+        $this->emailSendProcessor      = $emailSendProcessor;
+        $this->activityManager         = $activityManager;
         $this->attendeeRelationManager = $attendeeRelationManager;
     }
 
@@ -74,7 +74,7 @@ class CalendarEventApiHandler
             // clone attendees to have have original attendees at disposal later
             $originalAttendees = new ArrayCollection($entity->getAttendees()->toArray());
 
-            $this->form->submit($this->request->request->all());
+            $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
                 /** @deprecated since version 1.10. Please use field attendees instead of invitedUsers */

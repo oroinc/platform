@@ -172,6 +172,12 @@ services:
             - '@doctrine'
             - '@oro_locale.formatter.name'
 
+    oro_calendar.attendee_relation_manager:
+        class: %oro_calendar.attendee_relation_manager.class%
+        arguments:
+            - @doctrine
+            - @oro_locale.formatter.name
+
     oro_calendar.calendar_property_provider:
         class: %oro_calendar.calendar_property_provider.class%
         arguments:
