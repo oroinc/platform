@@ -663,19 +663,16 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 
         $cacheDir = $this->getContainer()->get('kernel')->getCacheDir();
         $commandNames = ['oro:entity-extend:cache:check', 'oro:entity-extend:cache:warmup'];
-        if ($this->isNeedToReinitializeExtendEntityCache($cacheDir)) {
+        if ($this->isExtendEntityCacheNotInitialized($cacheDir)) {
+            ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($cacheDir));
             foreach ($commandNames as $commandName) {
-                $this->runExtendCacheCommand(
+                $this->runExtendEntityCacheCommand(
                     $commandName,
                     $commandExecutor->getDefaultOption('process-timeout'),
                     $commandExecutor->getPhpExecutable(),
                     $cacheDir
                 );
             }
-        }
-
-        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:update-config')) {
-            ExtendClassLoadingUtils::setAliases($cacheDir);
         }
 
         $commandExecutor->runCommand(
@@ -692,9 +689,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      * @param string $phpExecutable
      * @param string $cacheDir
      */
-    protected function runExtendCacheCommand($commandName, $timeout, $phpExecutable, $cacheDir)
+    protected function runExtendEntityCacheCommand($commandName, $timeout, $phpExecutable, $cacheDir)
     {
-        $pb = ProcessBuilder::create()
+        ProcessBuilder::create()
             ->setTimeout($timeout)
             ->add($phpExecutable)
             ->add($this->getContainer()->get('kernel')->getRootDir() . '/console')
@@ -702,11 +699,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->add('--env')
             ->add($this->getContainer()->get('kernel')->getEnvironment())
             ->add('--cache-dir')
-            ->add($cacheDir);
-
-        if (!CommandExecutor::isCommandRunning($commandName)) {
-            $pb->getProcess()->run();
-        }
+            ->add($cacheDir)
+            ->getProcess()
+            ->run();
     }
 
     /**
@@ -714,13 +709,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      *
      * @return bool
      */
-    protected function isNeedToReinitializeExtendEntityCache($cacheDir)
+    protected function isExtendEntityCacheNotInitialized($cacheDir)
     {
-        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)) {
-            ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($cacheDir));
-            if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($cacheDir))) {
-                return true;
-            }
+        if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($cacheDir))) {
+            return true;
         }
         return false;
     }
