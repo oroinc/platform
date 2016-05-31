@@ -46,29 +46,6 @@ class ApiEventListener
         $this->request = $request;
     }
 
-//    /**
-//     * Add ACL check to API get list query criteria
-//     *
-//     * @param GetListBefore $event
-//     */
-//    public function onGetListBefore(GetListBefore $event)
-//    {
-//        if (!$this->request) {
-//            return;
-//        }
-//
-//        $acl = $this->securityFacade->getRequestAcl($this->request, true);
-//        if ($acl && $event->getClassName() === $acl->getClass()) {
-//            $event->setCriteria(
-//                $this->aclHelper->applyAclToCriteria(
-//                    $event->getClassName(),
-//                    $event->getCriteria(),
-//                    $acl->getPermission()
-//                )
-//            );
-//        }
-//    }
-
     /**
      * Check access to current object after entity was selected
      *

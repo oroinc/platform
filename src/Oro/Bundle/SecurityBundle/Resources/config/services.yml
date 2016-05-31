@@ -577,7 +577,6 @@ services:
           calls:
               - [setRequest, ["@?request="]]
           tags:
-           #   - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
 
     oro_security.listener.refresh_context_listener:
