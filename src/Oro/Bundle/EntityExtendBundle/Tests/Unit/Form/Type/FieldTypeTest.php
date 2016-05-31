@@ -60,7 +60,6 @@ class FieldTypeTest extends TypeTestCase
             'smallint'  => 'oro.entity_extend.form.data_type.smallint',
             'string'    => 'oro.entity_extend.form.data_type.string',
             'text'      => 'oro.entity_extend.form.data_type.text',
-            'duration'  => 'oro.entity_extend.form.data_type.duration',
         ],
         self::RELATIONS_GROUP => [
             'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
