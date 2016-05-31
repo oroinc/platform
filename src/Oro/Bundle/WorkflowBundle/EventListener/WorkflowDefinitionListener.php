@@ -6,7 +6,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\ProcessStorage;
+use Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 
@@ -21,23 +21,23 @@ class WorkflowDefinitionListener
     protected $generator;
 
     /** @var ServiceLink */
-    protected $processStorageLink;
+    protected $processConfiguratorLink;
 
     /** @var ScheduledTransitionProcesses */
     private $scheduledTransitionProcessesLink;
 
     /**
      * @param ProcessConfigurationGenerator $generator
-     * @param ServiceLink $processStorageServiceLink
+     * @param ServiceLink $processConfiguratorServiceLink
      * @param serviceLink $scheduledTransitionProcessesLink
      */
     public function __construct(
         ProcessConfigurationGenerator $generator,
-        ServiceLink $processStorageServiceLink,
+        ServiceLink $processConfiguratorServiceLink,
         ServiceLink $scheduledTransitionProcessesLink
     ) {
         $this->generator = $generator;
-        $this->processStorageLink = $processStorageServiceLink;
+        $this->processConfiguratorLink = $processConfiguratorServiceLink;
         $this->scheduledTransitionProcessesLink = $scheduledTransitionProcessesLink;
     }
 
@@ -54,7 +54,7 @@ class WorkflowDefinitionListener
 
         $configuration = $this->generator->generateForScheduledTransition($entity);
 
-        $this->getProcessStorage()->import($configuration);
+        $this->getProcessConfigurator()->import($configuration);
     }
 
     /**
@@ -70,8 +70,8 @@ class WorkflowDefinitionListener
 
         $generatedConfigurations = $this->generator->generateForScheduledTransition($entity);
 
-        $processStorage = $this->getProcessStorage();
-        $processStorage->import($generatedConfigurations);
+        $processConfigurator = $this->getProcessConfigurator();
+        $processConfigurator->import($generatedConfigurations);
         
         $persistedProcessDefinitions = $this->getScheduledTransitionProcesses()->workflowRelated($entity->getName());
 
@@ -83,7 +83,7 @@ class WorkflowDefinitionListener
             }
         }
 
-        $processStorage->remove($toDelete);
+        $processConfigurator->remove($toDelete);
     }
 
     /**
@@ -103,7 +103,7 @@ class WorkflowDefinitionListener
             $toDelete[] = $definition->getName();
         }
 
-        $this->getProcessStorage()->remove($toDelete);
+        $this->getProcessConfigurator()->remove($toDelete);
     }
 
     /**
@@ -116,14 +116,14 @@ class WorkflowDefinitionListener
     }
 
     /**
-     * @return ProcessStorage
+     * @return ProcessConfigurator
      */
-    protected function getProcessStorage()
+    protected function getProcessConfigurator()
     {
-        $service = $this->processStorageLink->getService();
+        $service = $this->processConfiguratorLink->getService();
 
-        if (!$service instanceof ProcessStorage) {
-            throw new \RuntimeException('Instance of Oro\Bundle\WorkflowBundle\Model\ProcessStorage expected.');
+        if (!$service instanceof ProcessConfigurator) {
+            throw new \RuntimeException('Instance of Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator expected.');
         }
 
         return $service;

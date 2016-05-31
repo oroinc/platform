@@ -5,32 +5,23 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Import;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport;
+use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator;
 
-class ProcessDefinitionsImportTest extends \PHPUnit_Framework_TestCase
+class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ProcessConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ProcessConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationBuilder;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $managerRegistry;
 
-    /**
-     * @var string|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var string|\PHPUnit_Framework_MockObject_MockObject */
     protected $definitionClass;
 
-    /**
-     * @var ProcessDefinitionsImport
-     */
-    protected $processDefinitionsImport;
+    /** @var ProcessDefinitionsConfigurator */
+    protected $processDefinitionsConfigurator;
 
     /**
      * @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject
@@ -53,7 +44,7 @@ class ProcessDefinitionsImportTest extends \PHPUnit_Framework_TestCase
 
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->definitionClass = 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition';
-        $this->processDefinitionsImport = new ProcessDefinitionsImport(
+        $this->processDefinitionsConfigurator = new ProcessDefinitionsConfigurator(
             $this->configurationBuilder,
             $this->managerRegistry,
             $this->definitionClass
@@ -92,7 +83,7 @@ class ProcessDefinitionsImportTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             ['existent' => $definitionStoredExistent, 'nonExistent' => $newDefinitionNonExistent],
-            $this->processDefinitionsImport->import($definitionsConfiguration)
+            $this->processDefinitionsConfigurator->import($definitionsConfiguration)
         );
     }
 

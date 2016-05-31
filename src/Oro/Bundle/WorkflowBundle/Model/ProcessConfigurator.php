@@ -6,11 +6,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessImportResult;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
+use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator;
+use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersConfigurator;
 
-class ProcessStorage
+class ProcessConfigurator
 {
     /**
      * @var ManagerRegistry
@@ -18,61 +17,52 @@ class ProcessStorage
     private $registry;
 
     /**
-     * @var ProcessDefinitionsImport
+     * @var ProcessDefinitionsConfigurator
      */
     private $definitionImport;
 
     /**
-     * @var ProcessTriggersImport
+     * @var ProcessTriggersConfigurator
      */
-    private $triggersImport;
+    private $triggersConfigurator;
 
     /**
      * @param ManagerRegistry $registry
-     * @param ProcessDefinitionsImport $definitionImport
-     * @param ProcessTriggersImport $triggersImport
+     * @param ProcessDefinitionsConfigurator $definitionImport
+     * @param ProcessTriggersConfigurator $triggersImport
      * @param string $definitionClass
      */
     public function __construct(
         ManagerRegistry $registry,
-        ProcessDefinitionsImport $definitionImport,
-        ProcessTriggersImport $triggersImport,
+        ProcessDefinitionsConfigurator $definitionImport,
+        ProcessTriggersConfigurator $triggersImport,
         $definitionClass
     ) {
         $this->registry = $registry;
         $this->definitionImport = $definitionImport;
-        $this->triggersImport = $triggersImport;
+        $this->triggersConfigurator = $triggersImport;
         $this->definitionClass = $definitionClass;
     }
 
     /**
      * @param array $processConfigurations
-     * @return ProcessImportResult
      */
     public function import(array $processConfigurations = [])
     {
-        $importResult = new ProcessImportResult();
 
         if (array_key_exists(ProcessConfigurationProvider::NODE_DEFINITIONS, $processConfigurations)) {
-            $importResult->setDefinitions(
-                $this->definitionImport->import(
-                    $processConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS]
-                )
+            $this->definitionImport->import(
+                $processConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS]
             );
         }
 
         if (array_key_exists(ProcessConfigurationProvider::NODE_TRIGGERS, $processConfigurations)) {
-            $importResult->setTriggers(
-                $this->triggersImport->import(
-                    $processConfigurations[ProcessConfigurationProvider::NODE_TRIGGERS],
-                    $this->getRepository()->findAll()
-                )
+            $this->triggersConfigurator->updateTriggers(
+                $processConfigurations[ProcessConfigurationProvider::NODE_TRIGGERS],
+                $this->getRepository()->findAll()
             );
         }
 
-        $importResult->setSchedules($this->triggersImport->getCreatedSchedules());
-
-        return $importResult;
     }
 
     /**

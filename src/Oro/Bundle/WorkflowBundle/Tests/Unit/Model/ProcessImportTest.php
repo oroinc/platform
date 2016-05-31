@@ -9,9 +9,9 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
-use Oro\Bundle\WorkflowBundle\Model\ProcessStorage;
+use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator;
+use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersConfigurator;
+use Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator;
 
 class ProcessImportTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,17 +23,17 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
     protected $managerRegistry;
 
     /**
-     * @var ProcessDefinitionsImport|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProcessDefinitionsConfigurator|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $definitionImport;
 
     /**
-     * @var ProcessTriggersImport|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProcessTriggersConfigurator|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $triggersImport;
 
     /**
-     * @var ProcessStorage
+     * @var ProcessConfigurator
      */
     protected $processImport;
 
@@ -42,7 +42,7 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $this->definitionImport = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport')
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -50,7 +50,7 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processImport = new ProcessStorage(
+        $this->processImport = new ProcessConfigurator(
             $this->managerRegistry,
             $this->definitionImport,
             $this->triggersImport,

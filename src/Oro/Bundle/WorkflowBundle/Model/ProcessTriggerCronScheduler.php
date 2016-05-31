@@ -9,7 +9,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessCronScheduler
+class ProcessTriggerCronScheduler
 {
     /** @var ManagerRegistry */
     private $registry;
@@ -80,7 +80,9 @@ class ProcessCronScheduler
         if ($this->scheduleManager->hasSchedule(self::$command, $arguments, $trigger->getCron())) {
             $schedule = $this->scheduleManager->createSchedule(self::$command, $arguments, $trigger->getCron());
 
-            $storedSchedule = $repository->findOneBy(['args_hash' => $schedule->getArgumentsHash()]);
+            $storedSchedule = $repository->findOneBy(
+                ['command' => self::$command, 'args_hash' => $schedule->getArgumentsHash()]
+            );
 
             if ($storedSchedule) {
                 $this->getObjectManager()->remove($storedSchedule);

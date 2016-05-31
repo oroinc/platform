@@ -7,7 +7,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionListener;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
-use Oro\Bundle\WorkflowBundle\Model\ProcessStorage;
+use Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
@@ -79,7 +79,7 @@ class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Instance of Oro\Bundle\WorkflowBundle\Model\ProcessStorage expected.
+     * @expectedExceptionMessage Instance of Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator expected.
      */
     public function testProcessImportException()
     {
@@ -121,7 +121,7 @@ class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
             ->with($workflowDefinition)
             ->willReturn($configuration);
 
-        /** @var ProcessStorage|\PHPUnit_Framework_MockObject_MockObject $import */
+        /** @var ProcessConfigurator|\PHPUnit_Framework_MockObject_MockObject $import */
         $import = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessImport')
             ->disableOriginalConstructor()
             ->getMock();

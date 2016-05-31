@@ -9,7 +9,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
-class ProcessDefinitionsImport
+class ProcessDefinitionsConfigurator
 {
     /**
      * @var ProcessConfigurationBuilder
