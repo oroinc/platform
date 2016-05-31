@@ -130,6 +130,13 @@ services:
         tags:
             - { name: form.type, alias: "oro_formatting_select" }
 
+    oro_locale.form.type.localization_parent_select:
+        class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: form.type, alias: "oro_localization_parent_select" }
+
     # Converters
     oro_locale.format_converter.date_time.registry:
         class: %oro_locale.format_converter.date_time.registry.class%
