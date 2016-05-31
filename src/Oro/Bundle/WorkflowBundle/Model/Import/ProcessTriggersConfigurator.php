@@ -93,12 +93,13 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
 
                     $existingTrigger = $this->pickExistentTrigger($storedTriggers, $builtTrigger);
                     if ($existingTrigger) {
-                        $this->removeScheduled($existingTrigger);
+                        $this->removeScheduled($existingTrigger); //old config schedule to remove
                         $existingTrigger->import($builtTrigger);
+                        $this->addScheduled($builtTrigger);
                         //$updated[] = $existingTrigger;
                     } else {
-                        $this->addScheduled($builtTrigger);
                         $entityManager->persist($builtTrigger);
+                        $this->addScheduled($builtTrigger);
                         //$created[] = $builtTrigger;
                     }
                 }
