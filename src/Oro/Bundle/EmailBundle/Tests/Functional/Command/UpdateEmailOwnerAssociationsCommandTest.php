@@ -45,7 +45,7 @@ class UpdateEmailOwnerAssociationsCommandTest extends WebTestCase
 
         $jobs = $doctrine->getRepository('JMS\JobQueueBundle\Entity\Job')->findBy([
             'command' => AddAssociationCommand::COMMAND_NAME
-        ]);
+        ], ['id' => 'ASC']);
         $dependences = $jobs[1]->getDependencies();
 
         self::assertEquals(2, count($jobs));
