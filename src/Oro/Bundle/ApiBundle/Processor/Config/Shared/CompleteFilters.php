@@ -37,7 +37,7 @@ class CompleteFilters extends CompleteSection
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         /** @var FiltersConfig $section */
-        $this->completePredefinedFieldFilters($section, $metadata);
+        $this->completePreConfiguredFieldFilters($section, $metadata);
         $this->completeIndexedFieldFilters($section, $metadata, $definition);
         $this->completeAssociationFilters($section, $metadata, $definition);
     }
@@ -46,7 +46,7 @@ class CompleteFilters extends CompleteSection
      * @param FiltersConfig          $filters
      * @param ClassMetadata          $metadata
      */
-    protected function completePredefinedFieldFilters(
+    protected function completePreConfiguredFieldFilters(
         FiltersConfig $filters,
         ClassMetadata $metadata
     ) {

@@ -61,20 +61,24 @@ class BuildCriteria implements ProcessorInterface
         }
 
         $filterValues = $context->getFilterValues();
+        $processedFilterKeys = [];
 
         $filters = $context->getFilters();
         /** @var FilterInterface $filter */
         foreach ($filters as $filterKey => $filter) {
             if ($filterValues->has($filterKey)) {
                 $filter->apply($criteria, $filterValues->get($filterKey));
-                $filterValues->remove($filterKey);
+
+                $processedFilterKeys[$filterKey] = true;
             }
         }
 
         // Process unknown filters
         $filterValues = $filterValues->getGroup('filter');
         foreach ($filterValues as $filterKey => $filterValue) {
-            /** @var FilterValue $filterValue */
+            if (isset($processedFilterKeys[$filterKey])) {
+                continue;
+            }
             if ($filters->has($filterKey)) {
                 continue;
             }
@@ -142,7 +146,7 @@ class BuildCriteria implements ProcessorInterface
             $context->getVersion(),
             $context->getRequestType(),
             [
-                new EntityDefinitionConfigExtra(),
+                new EntityDefinitionConfigExtra($context->getAction()),
                 new FiltersConfigExtra()
             ]
         );

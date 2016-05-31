@@ -52,7 +52,7 @@ interface FilterValueAccessorInterface
     /**
      * Removes a filter.
      *
-     * @param string           $key   The key of a filter value
+     * @param string $key The key of a filter value
      */
     public function remove($key);
 }

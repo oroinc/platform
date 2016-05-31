@@ -527,8 +527,6 @@ class Context extends ApiContext implements ContextInterface
 
     /**
      * Loads an entity configuration.
-     *
-     * @throws \Exception
      */
     protected function loadConfig()
     {
@@ -732,8 +730,6 @@ class Context extends ApiContext implements ContextInterface
 
     /**
      * Loads an entity metadata.
-     *
-     * @throws \Exception
      */
     protected function loadMetadata()
     {

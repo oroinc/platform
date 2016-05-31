@@ -242,7 +242,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testRemoveExistingFilterValue()
+    public function testRemoveExistingFilterValueViaSetMethod()
     {
         $accessor = new RestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
 
@@ -255,7 +255,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $accessor->getGroup('prm1'), 'getGroup');
     }
 
-    public function testRemoveExistingGroupedFilterValue()
+    public function testRemoveExistingGroupedFilterValueViaSetMethod()
     {
         $accessor = new RestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
 
@@ -263,6 +263,32 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
         // test override existing filter value
         $accessor->set('group[path]');
+        $this->assertNull($accessor->get('group[path]'));
+        $this->assertCount(0, $accessor->getAll(), 'getAll');
+        $this->assertCount(0, $accessor->getGroup('group'), 'getGroup');
+    }
+
+    public function testRemoveExistingFilterValueViaRemoveMethod()
+    {
+        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
+
+        $this->assertEquals(new FilterValue('prm1', 'val1', '='), $accessor->get('prm1'));
+
+        // test remove existing filter value by key
+        $accessor->remove('prm1');
+        $this->assertNull($accessor->get('prm1'));
+        $this->assertCount(0, $accessor->getAll(), 'getAll');
+        $this->assertCount(0, $accessor->getGroup('prm1'), 'getGroup');
+    }
+
+    public function testRemoveExistingGroupedFilterValueViaRemoveMethod()
+    {
+        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
+
+        $this->assertEquals(new FilterValue('path', 'val1', '='), $accessor->get('group[path]'));
+
+        // test remove existing filter value by key
+        $accessor->remove('group[path]');
         $this->assertNull($accessor->get('group[path]'));
         $this->assertCount(0, $accessor->getAll(), 'getAll');
         $this->assertCount(0, $accessor->getGroup('group'), 'getGroup');
