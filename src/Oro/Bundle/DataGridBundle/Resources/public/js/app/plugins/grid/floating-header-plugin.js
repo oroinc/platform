@@ -79,7 +79,7 @@ define(function(require) {
             this.domCache = {
                 body: $(document.body),
                 gridContainer: this.$grid.parent(),
-                headerCells: this.$grid.find('th:first').parent().find('th'),
+                headerCells: this.$grid.find('th:first').parent().find('th.renderable'),
                 firstRowCells: this.$grid.find('tbody tr:not(.thead-sizing-row):first').children('td'),
                 otherScrollContainer: this.$grid.parents('.other-scroll-container:first'),
                 gridScrollableContainer: this.$grid.parents('.grid-scrollable-container:first'),

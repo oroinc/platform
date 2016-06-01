@@ -72,13 +72,10 @@ class RegisterFilters implements ProcessorInterface
     {
         $filter = $this->filterFactory->createFilter($field->getDataType());
         if (null !== $filter) {
+            $filter->setArrayAllowed($field->isArrayAllowed());
+            $filter->setDescription($field->getDescription());
             if ($filter instanceof ComparisonFilter) {
                 $filter->setField($field->getPropertyPath() ?: $fieldName);
-            }
-            if ($filter instanceof StandaloneFilter) {
-                $filter->setArrayAllowed($field->isArrayAllowed());
-                $filter->setDescription($field->getDescription());
-                $filter->setDefaultValue($field->getDefaultValue());
             }
         }
 

@@ -59,7 +59,7 @@ The following table describes existing sections for which new options can be add
 | sorters.field  | Add a sorter options |
 | actions.action | Add an action options |
 | actions.action.status_code | Add a response status code options |
-|||
+| actions.action.field | Add a field options specific for a particular action. These options override options defined in `entities.entity.field` |
 
 An example:
 
@@ -123,16 +123,13 @@ An example of simple configuration section:
 <?php
 namespace Acme\Bundle\AcmeBundle\Api;
 
-use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSectionInterface;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Oro\Bundle\ApiBundle\Config\Definition\AbstractConfigurationSection;
 
-class MyConfiguration implements ConfigurationSectionInterface
+class MyConfiguration extends AbstractConfigurationSection
 {
-    public function configure(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    public function configure(NodeBuilder $node)
+    {
         $node->scalarNode('some_option');
     }
 }
@@ -144,38 +141,24 @@ An example of a configuration section that can be extended by other bundles:
 <?php
 namespace Acme\Bundle\AcmeBundle\Api;
 
-use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSectionInterface;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Oro\Bundle\ApiBundle\Config\Definition\AbstractConfigurationSection;
 
-class MyConfiguration extends AbstractConfigurationSection implements ConfigurationSectionInterface
+class MyConfiguration extends AbstractConfigurationSection
 {
-    public function configure(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    public function configure(NodeBuilder $node)
+    {
         $sectionName = 'my_section';
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        $parentNode
-            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
-            ->beforeNormalization()
-                ->always(
-                    function ($value) use ($preProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
-                    }
-                );
-        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
+        $this->callConfigureCallbacks($node, $sectionName);
+        $this->addPreProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks($parentNode, $sectionName);
+
         $node->scalarNode('some_option');
-        $parentNode
-            ->validate()
-                ->always(
-                    function ($value) use ($postProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $postProcessCallbacks, $sectionName);
-                    }
-                );
     }
 }
 ```
