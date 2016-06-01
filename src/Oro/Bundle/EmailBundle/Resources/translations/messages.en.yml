@@ -30,6 +30,7 @@ oro:
                 attachment_sync:
                     enable: Enable load attachments on email sync.
                     max_size: Maximum sync attacment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
+                    preview_limit: Limit to show preview for attachments (thumbnail for images and big file icon for other files). Set to 0 to see a list with file names only.
 
         variable.not.found:                     N/A
 
@@ -77,6 +78,8 @@ oro:
                     label: Enable attachment sync
                 max_size:
                     label: Maximum sync attachment size, Mb
+                preview_limit:
+                    label: Attachments preview limit
 
         emailtemplate:
             entity_label:        Template
@@ -124,8 +127,10 @@ oro:
 
         attachment:
             copy_to_record: Copy to Record
-            save: Save
+            save: Download
             select_file: Select file
+            download_all: Download
+            view: View
 
         menu:
             emailtemplate_list.description: List of email templates
@@ -173,7 +178,7 @@ oro:
             mark:
                 success_message: "{0} No entities were marked|{1} One entity was marked|]1,Inf[ %count% entities were marked"
             mailbox:
-                view: Mailbox: %mailbox%
+                view: 'Mailbox: %mailbox%'
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -236,7 +241,7 @@ oro:
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden
         empty_body:               Empty body
-        unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
+        unable_to_load_body:      'Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.'
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
         body_synced.label:        Email body synced

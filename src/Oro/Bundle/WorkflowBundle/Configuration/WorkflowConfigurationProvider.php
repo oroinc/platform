@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class WorkflowConfigurationProvider extends AbstractConfigurationProvider

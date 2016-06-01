@@ -121,6 +121,9 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessSyntaxExceptions()
     {
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update5.yml';
+        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
@@ -138,11 +141,11 @@ add:
     parentId: myParentId
 
 
-Filename: path/to/my/file.yml
+Filename: $path
 MESSAGE;
         $this->setExpectedException('\RuntimeException', $message);
 
-        $update = $loader->load('path/to/my/file.yml');
+        $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
     }
 

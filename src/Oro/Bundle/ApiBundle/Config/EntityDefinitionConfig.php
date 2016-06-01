@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @method EntityDefinitionFieldConfig[] getFields()
@@ -13,9 +12,11 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterface
 {
     use Traits\ConfigTrait;
+    use Traits\FindFieldTrait;
     use Traits\LabelTrait;
     use Traits\PluralLabelTrait;
     use Traits\DescriptionTrait;
+    use Traits\FormTrait;
     use Traits\AclResourceTrait;
     use Traits\MaxResultsTrait;
     use Traits\StatusCodesTrait;
@@ -36,7 +37,13 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     const DELETE_HANDLER = 'delete_handler';
 
     /** response status codes */
-    const STATUS_CODES = ConfigUtil::STATUS_CODES;
+    const STATUS_CODES = 'status_codes';
+
+    /** the form type that should be used for the entity */
+    const FORM_TYPE = 'form_type';
+
+    /** the form options that should be used for the entity */
+    const FORM_OPTIONS = 'form_options';
 
     /**
      * {@inheritdoc}
@@ -75,9 +82,33 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function hasFields()
     {
-        $fields = $this->getFields();
+        return !empty($this->fields);
+    }
 
-        return !empty($fields);
+    /**
+     * Finds the configuration of the field by its name or property path.
+     * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
+     *
+     * @param string $fieldName
+     * @param bool   $findByPropertyPath
+     *
+     * @return EntityDefinitionFieldConfig|null
+     */
+    public function findField($fieldName, $findByPropertyPath = false)
+    {
+        return $this->doFindField($fieldName, $findByPropertyPath);
+    }
+
+    /**
+     * Finds the name of the field by its property path.
+     *
+     * @param string $propertyPath
+     *
+     * @return string|null
+     */
+    public function findFieldNameByPropertyPath($propertyPath)
+    {
+        return $this->doFindFieldNameByPropertyPath($propertyPath);
     }
 
     /**

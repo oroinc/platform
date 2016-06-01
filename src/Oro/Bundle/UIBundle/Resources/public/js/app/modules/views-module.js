@@ -1,9 +1,10 @@
 define([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page-view',
+    'oroui/js/tools',
     'underscore',
     'module'
-], function(BaseController, PageView, _, module) {
+], function(BaseController, PageView, tools, _, module) {
     'use strict';
 
     var config = module.config();
@@ -110,25 +111,34 @@ define([
         });
     });
 
-    /**
-     * Init DebugToolbarView
-     */
-    BaseController.loadBeforeAction([
-        'oroui/js/mediator',
-        'oroui/js/app/views/page/debug-toolbar-view'
-    ], function(mediator, DebugToolbarView) {
-        BaseController.addToReuse('debugToolbar', {
-            compose: function() {
-                var view;
-                if (!mediator.execute('retrieveOption', 'debug')) {
-                    return;
+    if (tools.debug) {
+        /**
+         * Init DebugToolbarView
+         */
+        BaseController.loadBeforeAction([
+            'oroui/js/mediator',
+            'oroui/js/app/views/page/debug-toolbar-view'
+        ], function(mediator, DebugToolbarView) {
+            BaseController.addToReuse('debugToolbar', {
+                compose: function() {
+                    var view;
+                    if (!mediator.execute('retrieveOption', 'debug')) {
+                        return;
+                    }
+                    view = new DebugToolbarView({
+                        el: 'body .sf-toolbar'
+                    });
+                    mediator.setHandler('updateDebugToolbar', view.updateToolbar, view);
+                    this.view = view;
                 }
-                view = new DebugToolbarView({
-                    el: 'body .sf-toolbar'
-                });
-                mediator.setHandler('updateDebugToolbar', view.updateToolbar, view);
-                this.view = view;
-            }
+            });
         });
-    });
+    } else {
+        // initialize updateDebugToolbar mediator handler
+        BaseController.loadBeforeAction([
+            'oroui/js/mediator'
+        ], function(mediator) {
+            mediator.setHandler('updateDebugToolbar', _.noop);
+        });
+    }
 });

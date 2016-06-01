@@ -129,12 +129,13 @@ class Notes extends AbstractPageEntity
      */
     public function noteAction($note, $action)
     {
-        $actionMenu = "//*[@class='container-fluid accordion']".
-            "//*[@class='message-item message'][contains(., '{$note}')]".
-            "/parent::*/*[@class='actions']//a[contains(., '...')]";
-        $selectedAction = "//*[@class='container-fluid accordion']".
-            "//*[@class='message-item message'][contains(., '{$note}')]".
-            "/parent::*/*[@class='actions']//a[contains(., '{$action}')]";
+        $actionMenu = "//*[@class='container-fluid accordion']" .
+            "[//*[@class='message-item message'][contains(., '{$note}')]]" .
+            "//div[@class='actions']//a[contains(., '...')]";
+        $selectedAction =
+            "//*[@class='container-fluid accordion']" .
+            "[//*[@class='message-item message'][contains(., '{$note}')]]" .
+            "//div[@class='actions']//a[contains(., '{$action}')]";
 
         $this->test->moveto($this->test->byXPath($actionMenu));
         $this->test->byXPath($selectedAction)->click();

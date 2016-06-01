@@ -61,7 +61,6 @@ full:
                     property_path: path1
                     data_type: string
                     allow_array: true
-                    default_value: val1
                     description: description1
                 field4:
                     exclude: false
@@ -78,7 +77,6 @@ full:
                     property_path: path1
                     data_type: string
                     allow_array: true
-                    default_value: val1
                     description: description1
                 field4:
                     exclude: false
@@ -120,15 +118,6 @@ invalid_field_allow_array:
                     allow_array: 123
     expected: []
     error: 'Invalid type for path "entity.filters.fields.field1.allow_array". Expected boolean, but got integer.'
-
-null_field_default_value:
-    config:
-        filters:
-            fields:
-                field1:
-                    default_value: null
-    expected: []
-    error: 'The path "entity.filters.fields.field1.default_value" cannot contain an empty value, but got null.'
 
 null_field_description:
     config:

@@ -5,6 +5,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var _ = require('underscore');
     var $ = require('tinymce/jquery.tinymce.min');
+    var tools = require('oroui/js/tools');
     var txtHtmlTransformer = require('./txt-html-transformer');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
@@ -38,6 +39,12 @@ define(function(require) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
             this.options = _.omit(options, ['enabled']);
+            if (tools.isIOS()) {
+                this.options.plugins = _.without(this.options.plugins, 'fullscreen');
+                this.options.toolbar = this.options.toolbar.map(function(toolbar) {
+                    return toolbar.replace(/\s*\|\s?fullscreen/, '');
+                });
+            }
             WysiwygEditorView.__super__.initialize.apply(this, arguments);
         },
 
@@ -95,6 +102,26 @@ define(function(require) {
                 'init_instance_callback': function(editor) {
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
+                    if (!tools.isMobile()) {
+                        self.tinymceInstance.on('FullscreenStateChanged', function(e) {
+                            if (e.state) {
+                                var rect = $('#container').get(0).getBoundingClientRect();
+                                var css = {
+                                    top: rect.top + 'px',
+                                    left: rect.left + 'px',
+                                    right: Math.max(window.innerWidth - rect.right, 0) + 'px'
+                                };
+
+                                var rules = _.map(_.pairs(css), function(item) {
+                                    return item.join(': ');
+                                }).join('; ');
+                                tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
+                                self.$el.after($('<div />', {class: 'mce-fullscreen-overlay'}));
+                            } else {
+                                self.$el.siblings('.mce-fullscreen-overlay').remove();
+                            }
+                        });
+                    }
                     _.defer(function() {
                         /**
                          * fixes jumping dialog on refresh page

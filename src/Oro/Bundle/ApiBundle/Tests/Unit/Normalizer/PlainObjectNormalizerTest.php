@@ -3,9 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Object;
+use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
@@ -22,19 +24,22 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->willReturn(null);
 
+        $normalizers = new ObjectNormalizerRegistry();
         $this->objectNormalizer = new ObjectNormalizer(
+            $normalizers,
             new DoctrineHelper($doctrine),
-            new EntityDataAccessor()
+            new EntityDataAccessor(),
+            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'))
         );
 
-        $this->objectNormalizer->addNormalizer(
+        $normalizers->addNormalizer(
             new DateTimeNormalizer()
         );
     }
 
     public function testNormalizeSimpleObject()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -51,7 +56,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeObjectWithNullToOneRelations()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
 
@@ -89,7 +94,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeObjectWithNullToManyRelations()
     {
-        $user = new Object\User();
+        $user = new Entity\User();
         $user->setId(123);
         $user->setName('user_name');
 
@@ -126,32 +131,30 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Object\Product
+     * @return Entity\Product
      */
     protected function createProductObject()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
         $product->setUpdatedAt(new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')));
 
-        $category = new Object\Category();
-        $category->setName('category_name');
+        $category = new Entity\Category('category_name');
         $category->setLabel('category_label');
         $product->setCategory($category);
 
-        $owner = new Object\User();
+        $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
-        $ownerCategory = new Object\Category();
-        $ownerCategory->setName('owner_category_name');
+        $ownerCategory = new Entity\Category('owner_category_name');
         $ownerCategory->setLabel('owner_category_label');
         $owner->setCategory($ownerCategory);
-        $ownerGroup1 = new Object\Group();
+        $ownerGroup1 = new Entity\Group();
         $ownerGroup1->setId(11);
         $ownerGroup1->setName('owner_group1');
         $owner->addGroup($ownerGroup1);
-        $ownerGroup2 = new Object\Group();
+        $ownerGroup2 = new Entity\Group();
         $ownerGroup2->setId(22);
         $ownerGroup2->setName('owner_group2');
         $owner->addGroup($ownerGroup2);

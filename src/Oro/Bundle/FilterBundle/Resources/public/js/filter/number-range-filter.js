@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
+    'oroui/js/tools',
     'oro/filter/number-filter'
-], function($, _, __, NumberFilter) {
+], function($, _, __, tools, NumberFilter) {
     'use strict';
 
     var NumberRangeFilter;
@@ -37,6 +38,23 @@ define([
         },
 
         /**
+         * Type values to use if only one value is selected
+         *
+         * @property {Object}
+         */
+        fallbackTypeValues: {
+            moreThan: 2,
+            lessThan: 6
+        },
+
+        /**
+         * Flag to allow filter type change if start or end value is missing
+         *
+         * @property
+         */
+        autoUpdateRangeFilterType: true,
+
+        /**
          * Initialize.
          */
         initialize: function(options) {
@@ -65,6 +83,14 @@ define([
             } else {
                 return false;
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _applyValueAndHideCriteria: function() {
+            this._beforeApply();
+            NumberRangeFilter.__super__._applyValueAndHideCriteria.apply(this);
         },
 
         /**
@@ -145,12 +171,91 @@ define([
         },
 
         /**
+         * Called before filter value is applied by user action
+         *
+         * @protected
+         */
+        _beforeApply: function() {
+            if (this.autoUpdateRangeFilterType) {
+                this._updateRangeFilter(this._readDOMValue());
+            }
+        },
+
+        /**
+         * Apply additional logic for "between" filters
+         * - Swap start/end values if end value is lower than start
+         * - Change filter type to more than/less than, when only one value is filled
+         *
+         * @param {*} value
+         * @protected
+         */
+        _updateRangeFilter: function(value) {
+            value = this._formatRawValue(value);
+            var oldValue = tools.deepClone(value);
+            if (this.isApplicable(value.type)) {
+                if (value.value && value.value_end) {
+                    //if both values are filled
+                    //start/end values if end value is lower than start
+                    if (value.value_end < value.value) {
+                        var endValue = value.value_end;
+                        value.value_end = value.value;
+                        value.value = endValue;
+                    }
+                } else {
+                    if (value.value || value.value_end) {
+                        var type = parseInt(value.type);
+                        //if only one value is filled, replace filter type to less than or more than
+                        if (value.value_end) {
+                            value.type = type === this.typeValues.between ?
+                                this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
+                            value.value = value.value_end;
+                            value.value_end = '';
+                        } else {
+                            value.type = type === this.typeValues.between ?
+                                this.fallbackTypeValues.moreThan : this.fallbackTypeValues.lessThan;
+                        }
+                    }
+                }
+                if (!tools.isEqualsLoosely(value, oldValue)) {
+                    //apply new values and filter type
+                    this._writeDOMValue(value);
+                }
+            }
+        },
+
+        /**
          * @inheritDoc
          */
         _writeDOMValue: function(data) {
             this._setInputValue(this.criteriaValueSelectors.value_end, data.value_end);
+            var $typeInput = this.$(this.criteriaValueSelectors.type);
+            if ($typeInput.length && data.type !== $typeInput.val()) {
+                this._setInputValue(this.criteriaValueSelectors.type, data.type);
+                this._updateTypeDropdown(data.type);
+            }
 
             return NumberRangeFilter.__super__._writeDOMValue.apply(this, arguments);
+        },
+
+        /**
+         * Update type dropdown with new type value
+         *
+         * @param {string} value
+         * @protected
+         */
+        _updateTypeDropdown: function(value) {
+            var a = this.$('.dropdown-menu:eq(0) a').filter(function() {
+                return $(this).data('value') === value;
+            });
+            a.parent().parent().find('li').each(function() {
+                $(this).removeClass('active');
+            });
+            a.parent().addClass('active');
+
+            var parentDiv = a.parent().parent().parent();
+            var choiceName = a.html();
+            choiceName += this.caret;
+            parentDiv.find('.dropdown-toggle').html(choiceName);
         },
 
         /**

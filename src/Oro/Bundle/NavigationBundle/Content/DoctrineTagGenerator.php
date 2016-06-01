@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Content;
 
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\UnitOfWork;
@@ -125,9 +126,13 @@ class DoctrineTagGenerator implements TagGeneratorInterface
             $value = $metadata->reflFields[$fieldName]->getValue($data);
             if (null !== $value) {
                 // skip DoctrineTagGenerator#supports() call due to doctrine association mapping always contain entities
-                $unwrappedValue = ($mapping['type'] & ClassMetadata::TO_ONE)
-                    ? [$value]
-                    : $value->unwrap();
+                if ($mapping['type'] & ClassMetadata::TO_ONE) {
+                    $unwrappedValue = [$value];
+                } elseif ($value instanceof PersistentCollection) {
+                    $unwrappedValue = $value->unwrap();
+                } else {
+                    $unwrappedValue = $value;
+                }
                 foreach ($unwrappedValue as $entity) {
                     // allowed one nested level
                     $tags = array_merge($tags, $this->generate($entity));

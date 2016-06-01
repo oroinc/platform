@@ -153,9 +153,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composerRepositoryWithoutProvidersMock->expects($this->atLeastOnce())
             ->method('getPackages')
             ->will($this->returnValue([$availablePackage1, $availablePackage2]));
-        $composerRepositoryWithoutProvidersMock->expects($this->any())
-            ->method('getMinimalPackages')
-            ->will($this->returnValue([]));
 
         // Ready Steady Go!
         $manager = $this->createPackageManager($composer);
@@ -1110,6 +1107,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $logger->expects($this->never())
             ->method('error');
 
+        $pathToComposerJson = $this->getPathToComposerJson(uniqid());
+
         $manager = $this->createPackageManager(
             $composer,
             $composerInstaller,
@@ -1117,7 +1116,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $runner,
             $maintenance,
             $logger,
-            tempnam(sys_get_temp_dir(), uniqid())
+            $pathToComposerJson
         );
         $manager->update($packageName);
     }
@@ -1164,6 +1163,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('error')
             ->with($bufferOutput);
 
+        $pathToComposerJson = $this->getPathToComposerJson(uniqid());
+
         $manager = $this->createPackageManager(
             $composer,
             $composerInstaller,
@@ -1171,7 +1172,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $this->createScriptRunnerMock(),
             null,
             $logger,
-            tempnam(sys_get_temp_dir(), uniqid())
+            $pathToComposerJson
         );
         $manager->update($packageName);
     }
@@ -1379,7 +1380,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $logger = $this->createLoggerMock();
         }
         if (!$pathToComposerJson) {
-            $pathToComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+            $pathToComposerJson = $this->getPathToComposerJson();
         }
         return new PackageManager(
             $composer,
@@ -1502,5 +1503,17 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $maintenance->expects($this->once())->method('activate');
 
         return $maintenance;
+    }
+
+    /**
+     * @param   string $filename
+     * @return  string
+     */
+    protected function getPathToComposerJson($filename = 'composer.json')
+    {
+        $pathToComposerJson = tempnam(sys_get_temp_dir(), $filename);
+        file_put_contents($pathToComposerJson, '{}');
+
+        return $pathToComposerJson;
     }
 }

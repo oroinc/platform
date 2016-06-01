@@ -26,7 +26,7 @@ class DumpCommand extends AbstractDebugCommand
     {
         $this
             ->setName('oro:api:dump')
-            ->setDescription('Dumps all resources available through Data API.')
+            ->setDescription('Dumps all resources accessible through Data API.')
             ->addArgument(
                 'entity',
                 InputArgument::OPTIONAL,

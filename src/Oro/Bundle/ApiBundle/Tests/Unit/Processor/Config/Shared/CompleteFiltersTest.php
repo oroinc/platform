@@ -102,6 +102,9 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessForNotCompletedFilters()
     {
         $config = [
@@ -114,8 +117,20 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'field3'       => null,
                 'field4'       => null,
                 'field5'       => null,
+                'field7'       => [
+                    'property_path' => 'realField7'
+                ],
+                'field8'       => [
+                    'property_path' => 'realField8'
+                ],
                 'association1' => null,
                 'association3' => null,
+                'association4'       => [
+                    'property_path' => 'realAssociation4'
+                ],
+                'association5'       => [
+                    'property_path' => 'realAssociation5'
+                ],
             ]
         ];
 
@@ -128,10 +143,16 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'field3'       => [
                     'exclude' => true
                 ],
+                'field8'       => [
+                    'exclude' => true
+                ],
                 'association3' => [
                     'data_type'   => 'string',
                     'allow_array' => false
-                ]
+                ],
+                'association5' => [
+                    'exclude' => true
+                ],
             ]
         ];
 
@@ -150,9 +171,11 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->with($this->identicalTo($rootEntityMetadata))
             ->willReturn(
                 [
-                    'field1' => 'integer',
-                    'field5' => 'integer',
-                    'field6' => 'integer',
+                    'field1'     => 'integer',
+                    'field5'     => 'integer',
+                    'field6'     => 'integer',
+                    'realField7' => 'integer',
+                    'realField8' => 'integer',
                 ]
             );
         $this->doctrineHelper->expects($this->once())
@@ -160,9 +183,11 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             ->with($this->identicalTo($rootEntityMetadata))
             ->willReturn(
                 [
-                    'association1' => 'integer',
-                    'association2' => 'integer',
-                    'association3' => 'integer',
+                    'association1'     => 'integer',
+                    'association2'     => 'integer',
+                    'association3'     => 'integer',
+                    'realAssociation4' => 'integer',
+                    'realAssociation5' => 'integer',
                 ]
             );
 
@@ -185,7 +210,16 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         'exclude' => true
                     ],
                     'field5'       => [
-                        'data_type' => 'integer',
+                        'data_type'   => 'integer',
+                        'allow_array' => true
+                    ],
+                    'field7'       => [
+                        'data_type'   => 'integer',
+                        'allow_array' => true
+                    ],
+                    'field8'       => [
+                        'exclude'     => true,
+                        'data_type'   => 'integer',
                         'allow_array' => true
                     ],
                     'association1' => [
@@ -194,6 +228,15 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                     ],
                     'association3' => [
                         'data_type' => 'string'
+                    ],
+                    'association4' => [
+                        'data_type'   => 'integer',
+                        'allow_array' => true
+                    ],
+                    'association5' => [
+                        'exclude'     => true,
+                        'data_type'   => 'integer',
+                        'allow_array' => true
                     ],
                 ]
             ],

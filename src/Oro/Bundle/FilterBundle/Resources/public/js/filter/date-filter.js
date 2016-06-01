@@ -7,6 +7,7 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var __ = require('orotranslation/js/translator');
     var ChoiceFilter = require('./choice-filter');
+    var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
     var DateValueHelper = require('orofilter/js/date-value-helper');
@@ -48,7 +49,7 @@ define(function(require) {
          */
         criteriaValueSelectors: {
             type: 'select',// to handle both type and part changes
-            date_type: 'select[name!=date_part]',
+            date_type: 'select[name][name!=date_part]',
             date_part: 'select[name=date_part]',
             value: {
                 start: 'input[name="start"]',
@@ -83,7 +84,7 @@ define(function(require) {
          *
          * @property
          */
-        picker: VariableDatePickerView,
+        picker: tools.isMobile() ? DatePickerView : VariableDatePickerView,
 
         /**
          * Additional date widget options that might be passed to filter
@@ -136,6 +137,13 @@ define(function(require) {
         events: {
             'change select': 'onChangeFilterType'
         },
+
+        /**
+         * Flag to allow filter type change if start or end date is missing
+         *
+         * @property
+         */
+        autoUpdateRangeFilterType: true,
 
         /**
          * @param {Object} options
@@ -210,6 +218,14 @@ define(function(require) {
             this.changeFilterType(value);
         },
 
+        /**
+         * @inheritDoc
+         */
+        _applyValueAndHideCriteria: function() {
+            this._beforeApply();
+            DateFilter.__super__._applyValueAndHideCriteria.apply(this);
+        },
+
         changeFilterType: function(value) {
             var type = parseInt(value, 10);
             if (!isNaN(type)) {
@@ -228,6 +244,11 @@ define(function(require) {
                     this.$('.filter-separator, .filter-start-date').hide();
                     this.subview('start').setValue('');
                 }
+
+                this.$(this.criteriaValueSelectors.date_type)
+                 .closest('.dropdown')
+                 .find('.dropdown-toggle')
+                 .html(this.$(this.criteriaValueSelectors.date_type + ' :selected').text());
             } else {
                 // it's part
                 this.subview('start').setPart(value);
@@ -268,6 +289,8 @@ define(function(require) {
                     })
                 );
             }
+
+            this._updateRangeFilter(value, false);
 
             parts.push(
                 datePartTemplate({
@@ -434,6 +457,74 @@ define(function(require) {
         },
 
         /**
+         * Called before filter value is applied by user action
+         *
+         * @protected
+         */
+        _beforeApply: function() {
+            if (this.autoUpdateRangeFilterType) {
+                this._updateRangeFilter(this._readDOMValue(), true);
+            }
+        },
+
+        /**
+         * Apply additional logic for "between" filters
+         * - Swap start and end dates if end date is behind start date
+         * - Change filter type to more than/less than, when only one date is filled
+         *
+         * @param {*} value
+         * @param {boolean} updateDom
+         * @protected
+         */
+        _updateRangeFilter: function(value, updateDom) {
+            var oldValue = tools.deepClone(value);
+            var type = parseInt(value.type);
+            if (value.value &&
+                (type === this.typeValues.between || type === this.typeValues.notBetween)) {
+                if (value.value.start && value.value.end) {
+                    //if both dates are filled
+                    if (!this.dateVariableHelper.isDateVariable(value.value.end) &&
+                        !this.dateVariableHelper.isDateVariable(value.value.start)) {
+                        //swap end/start date if no variables are used and end date is behind start date
+                        var end = datetimeFormatter.getMomentForBackendDateTime(value.value.end);
+                        var start = datetimeFormatter.getMomentForBackendDateTime(value.value.start);
+                        if (end < start) {
+                            var endValue = value.value.end;
+                            value.value.end = value.value.start;
+                            value.value.start = endValue;
+                        }
+                    }
+                } else {
+                    if (value.value.start || value.value.end) {
+                        //if only one date is filled replace filter type to less than or more than
+                        if (type === this.typeValues.between) {
+                            value.type = value.value.end ? this.typeValues.lessThan : this.typeValues.moreThan;
+                        } else if (type === this.typeValues.notBetween) {
+                            if (!value.value.end) {
+                                //less than type expects end date
+                                value.type = this.typeValues.lessThan;
+                                value.value.end = value.value.start;
+                                value.value.start = '';
+                            } else {
+                                //more than type expects start date
+                                value.type = this.typeValues.moreThan;
+                                value.value.start = value.value.end;
+                                value.value.end = '';
+                            }
+                        }
+                    }
+                }
+                if (!tools.isEqualsLoosely(value, oldValue)) {
+                    //apply new values and filter type
+                    this.value = tools.deepClone(value);
+                    if (updateDom) {
+                        this._writeDOMValue(value);
+                    }
+                }
+            }
+        },
+
+        /**
          * Converts the date value from Raw to Display
          *
          * @param {string} value
@@ -473,6 +564,23 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        _triggerUpdate: function(newValue, oldValue) {
+            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+                var start = this.subview('start');
+                var end = this.subview('end');
+                if (start && start.updateFront) {
+                    start.updateFront();
+                }
+                if (end && end.updateFront) {
+                    end.updateFront();
+                }
+                this.trigger('update');
+            }
+        },
+
+        /**
+         * @inheritDoc
+         */
         _writeDOMValue: function(value) {
             var $typeInput;
             this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
@@ -491,8 +599,8 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
-            this.subview('start').checkConsistency();
-            this.subview('end').checkConsistency();
+            _.result(this.subview('start'), 'checkConsistency');
+            _.result(this.subview('end'), 'checkConsistency');
 
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.date_type),

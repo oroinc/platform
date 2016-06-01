@@ -9,8 +9,10 @@ use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment as AttachmentOro;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as AttachmentEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
+use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
 
@@ -32,13 +34,31 @@ class EmailAttachmentTransformer
     protected $factory;
 
     /**
-     * @param FilesystemMap $filesystemMap
-     * @param Factory       $factory
+     * @var AttachmentManager
      */
-    public function __construct(FilesystemMap $filesystemMap, Factory $factory)
-    {
-        $this->filesystem = $filesystemMap->get('attachments');
-        $this->factory    = $factory;
+    protected $manager;
+
+    /**
+     * @var EmailAttachmentManager
+     */
+    protected $emailAttachmentManager;
+
+    /**
+     * @param FilesystemMap          $filesystemMap
+     * @param Factory                $factory
+     * @param AttachmentManager      $manager
+     * @param EmailAttachmentManager $emailAttachmentManager
+     */
+    public function __construct(
+        FilesystemMap $filesystemMap,
+        Factory $factory,
+        AttachmentManager $manager,
+        EmailAttachmentManager $emailAttachmentManager
+    ) {
+        $this->filesystem             = $filesystemMap->get('attachments');
+        $this->factory                = $factory;
+        $this->manager                = $manager;
+        $this->emailAttachmentManager = $emailAttachmentManager;
     }
 
     /**
@@ -53,8 +73,18 @@ class EmailAttachmentTransformer
         $attachmentModel->setEmailAttachment($attachmentEntity);
         $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
         $attachmentModel->setId($attachmentEntity->getId());
-        $attachmentModel->setFileSize(strlen($attachmentEntity->getContent()->getContent()));
+        $attachmentModel->setFileSize($attachmentEntity->getSize());
         $attachmentModel->setModified($attachmentEntity->getEmailBody()->getCreated());
+        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachmentEntity));
+        if ($this->manager->isImageType($attachmentEntity->getContentType())) {
+            $attachmentModel->setPreview(
+                $this->emailAttachmentManager->getResizedImageUrl(
+                    $attachmentEntity,
+                    AttachmentManager::THUMBNAIL_WIDTH,
+                    AttachmentManager::THUMBNAIL_HEIGHT
+                )
+            );
+        }
 
         return $attachmentModel;
     }
@@ -73,7 +103,17 @@ class EmailAttachmentTransformer
         $attachmentModel->setFileName($attachmentOro->getFile()->getOriginalFilename());
         $attachmentModel->setFileSize($attachmentOro->getFile()->getFileSize());
         $attachmentModel->setModified($attachmentOro->getCreatedAt());
-
+        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachmentOro->getFile()));
+        if ($this->manager->isImageType($attachmentOro->getFile()->getMimeType())) {
+            $attachmentModel->setPreview(
+                $this->manager->getResizedImageUrl(
+                    $attachmentOro->getFile(),
+                    AttachmentManager::THUMBNAIL_WIDTH,
+                    AttachmentManager::THUMBNAIL_HEIGHT
+                )
+            );
+        }
+        
         return $attachmentModel;
     }
 

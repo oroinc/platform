@@ -89,9 +89,10 @@ class OriginFolderFilterProvider
             $mailbox = $origin->getMailboxName();
             $folders = $this->filterFolders($folders->toArray());
             if (count($folders) > 0) {
-                $results[$mailbox] = [];
-                $results[$mailbox]['id'] = $origin->getId();
-                $results[$mailbox]['active'] = $origin->isActive();
+                $results[$mailbox] = [
+                    'id' => $origin->getId(),
+                    'active' => $origin->isActive(),
+                ];
                 $i=1;
                 foreach ($folders as $folder) {
                     if ($extended) {
@@ -124,10 +125,10 @@ class OriginFolderFilterProvider
             $mailbox = $mailbox->getLabel();
             $folders = $this->filterFolders($folders->toArray());
             if (count($folders) > 0) {
-                $results[$mailbox] = [];
-                $results[$mailbox]['id'] = $origin->getId();
-                $results[$mailbox]['active'] = $origin->isActive();
-                /** @var EmailFolder $folder */
+                $results[$mailbox] = [
+                    'id' => $origin->getId(),
+                    'active' => $origin->isActive(),
+                ];
                 $i=1;
                 foreach ($folders as $folder) {
                     if ($extended) {
@@ -147,14 +148,13 @@ class OriginFolderFilterProvider
 
     /**
      * @param $folders array
-     * @return array
+     * @return EmailFolder[]
      */
-    private function filterFolders($folders)
+    private function filterFolders(array $folders)
     {
         $folders = array_filter(
             $folders,
-            function ($item) {
-                /** @var EmailFolder $item */
+            function (EmailFolder $item) {
                 return $item->isSyncEnabled();
             }
         );

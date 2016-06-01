@@ -98,7 +98,7 @@ datagrid:
                                 update: oro.dataaudit.action.update
                                 remove: oro.dataaudit.action.remove
                 version:
-                    type: number
+                    type: number-range
                     data_name: a.version
                     enabled: false
                 objectClass:
@@ -111,7 +111,7 @@ datagrid:
                     type: string
                     data_name: a.objectName
                 objectId:
-                    type: number
+                    type: number-range
                     data_name: a.objectId
                 author:
                     type: string
