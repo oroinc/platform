@@ -44,13 +44,12 @@ class BackLinkExtension extends \Twig_Extension
         ];
     }
 
-
     /**
      * @param string $string
      * @param string $id
      * @return string
      */
-    public function backLinkFilter($string, $id)
+    public function backLinkFilter($string, $id = null)
     {
         $backLinkRegexp = '/{back_link(?:\|([^}]+))?}/';
         preg_match($backLinkRegexp, $string, $matches);
@@ -58,10 +57,23 @@ class BackLinkExtension extends \Twig_Extension
         if (!$linkText) {
             $linkText = 'oro.embeddedform.back_link_default_text';
         }
-        $translatedLinkText = $this->translator->trans($linkText);
-        $url = $this->router->generate('oro_embedded_form_submit', ['id' => $id]);
-        $link = sprintf('<a href="%s">%s</a>', $url, $translatedLinkText);
+
+        $link = $this->getLink($id, $this->translator->trans($linkText));
 
         return str_replace($placeholder, $link, $string);
+    }
+
+    private function getLink($id, $linkText)
+    {
+        if (empty($id)) {
+            return sprintf(
+                '<a href="#" onclick="window.location.reload(true); return false;">%s</a>',
+                $linkText
+            );
+        }
+
+        $url = $this->router->generate('oro_embedded_form_submit', ['id' => $id]);
+
+        return sprintf('<a href="%s">%s</a>', $url, $linkText);
     }
 }

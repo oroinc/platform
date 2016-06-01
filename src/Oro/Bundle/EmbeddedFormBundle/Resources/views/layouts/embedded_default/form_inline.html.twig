@@ -12,9 +12,5 @@
 {% endblock %}
 
 {% block embed_form_success_widget %}
-    {{ message|default('oro.embeddedform.success_message.default'|trans)|
-    replace({
-        '{back_link}' : '<a href="#" onclick="window.location.reload(true); return false;">' ~
-        'oro.embeddedform.back_link_default_text'|trans ~ '</a>'
-    })|raw }}
+    {{ message|default('oro.embeddedform.success_message.default'|trans)|back_link()|raw }}
 {% endblock %}
