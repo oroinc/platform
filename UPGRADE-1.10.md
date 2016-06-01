@@ -112,7 +112,7 @@ UPGRADE FROM 1.9 to 1.10
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
 
 ####DataGridBundle
-- The class Oro\Bundle\DataGridBundle\Common\Object was renamed to DataObject
+- Moved and renamed class `Oro\Bundle\DataGridBundle\Common\Object` to `Oro\Component\Config\Common\ConfigObject`
 - Changed priority in next extensions:
     * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260
     * Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier from -251 to -261

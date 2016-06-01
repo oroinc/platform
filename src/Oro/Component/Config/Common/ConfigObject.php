@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Common;
+namespace Oro\Component\Config\Common;
 
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -10,9 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
-use Oro\Bundle\DataGridBundle\Exception\LogicException;
-
-class DataObject implements \ArrayAccess, \IteratorAggregate
+class ConfigObject implements \ArrayAccess, \IteratorAggregate
 {
     const NAME_KEY = 'name';
 
@@ -66,7 +64,7 @@ class DataObject implements \ArrayAccess, \IteratorAggregate
     public function getName()
     {
         if (!isset($this[self::NAME_KEY])) {
-            throw new LogicException("Trying to get name of unnamed object");
+            throw new \LogicException("Trying to get name of unnamed object");
         }
 
         return $this[self::NAME_KEY];

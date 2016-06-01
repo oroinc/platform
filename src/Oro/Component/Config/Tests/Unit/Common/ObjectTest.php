@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\Common;
 
-use Oro\Bundle\DataGridBundle\Common\DataObject;
+use Oro\Component\Config\Common\ConfigObject;
 
 class ObjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +14,7 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testOffsetGetByPath(array $params, $path, $expected)
     {
-        $object = DataObject::create($params);
+        $object = ConfigObject::create($params);
         $this->assertEquals($expected, $object->offsetExistByPath($path));
     }
 
