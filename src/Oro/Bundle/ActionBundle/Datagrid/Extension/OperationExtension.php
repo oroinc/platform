@@ -84,6 +84,7 @@ class OperationExtension extends AbstractExtension
             return false;
         }
 
+        $this->processDatagridConfig($config);
         $this->processActionsConfig($config);
         $this->processMassActionsConfig($config);
 
@@ -192,6 +193,18 @@ class OperationExtension extends AbstractExtension
         $frontendOptions = $this->optionsHelper->getFrontendOptions($operation, $context);
 
         return $frontendOptions['options'];
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     */
+    protected function processDatagridConfig(DatagridConfiguration $config)
+    {
+        $context = $this->contextHelper->getContext();
+
+        if (!empty($context['route'])) {
+            $config->offsetSetByPath('[options][urlParams][originalRoute]', $context['route']);
+        }
     }
 
     /**

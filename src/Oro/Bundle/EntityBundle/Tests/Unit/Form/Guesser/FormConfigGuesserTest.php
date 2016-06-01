@@ -254,7 +254,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($associationEntityConfig));
 
         $guess = $this->guesser->guessType($class, $property);
-        $this->assertTypeGuess($guess, $associationFormType, $associationFormOptions, TypeGuess::LOW_CONFIDENCE);
+        $this->assertTypeGuess($guess, $associationFormType, $associationFormOptions, TypeGuess::HIGH_CONFIDENCE);
     }
 
     /**

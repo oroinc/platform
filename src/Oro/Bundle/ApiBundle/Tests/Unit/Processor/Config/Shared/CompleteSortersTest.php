@@ -114,6 +114,12 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 'field3'       => null,
                 'field4'       => null,
                 'field5'       => null,
+                'field7'       => [
+                    'property_path' => 'realField7'
+                ],
+                'field8'       => [
+                    'property_path' => 'realField8'
+                ],
                 'association1' => null,
             ]
         ];
@@ -123,6 +129,9 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 'field1' => null,
                 'field2' => null,
                 'field3' => [
+                    'exclude' => true
+                ],
+                'field8' => [
                     'exclude' => true
                 ],
             ]
@@ -143,8 +152,10 @@ class CompleteSortersTest extends ConfigProcessorTestCase
             ->with($this->identicalTo($rootEntityMetadata))
             ->willReturn(
                 [
-                    'field5' => 'integer',
-                    'field6' => 'integer',
+                    'field5'     => 'integer',
+                    'field6'     => 'integer',
+                    'realField7' => 'integer',
+                    'realField8' => 'integer',
                 ]
             );
         $this->doctrineHelper->expects($this->once())
@@ -173,6 +184,10 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                         'exclude' => true
                     ],
                     'field5'       => null,
+                    'field7'       => null,
+                    'field8'       => [
+                        'exclude' => true
+                    ],
                     'association1' => null,
                 ]
             ],

@@ -22,6 +22,8 @@ oro:
             tooltip: Attached file {{ filename }}
             delete_message: The comment attachment is successfully removed
             delete_confirmation: Are you sure you want to delete this attachment?
+            download: Download
+            view: View
         item:
             added: '{{ user }} added on {{ time }}'
             update: 'updated by {{ user }} on {{ time }}'

@@ -1,9 +1,10 @@
 define([
     'underscore',
+    'backbone',
     'backgrid',
     './row',
     '../pageable-collection'
-], function(_, Backgrid, Row, PageableCollection) {
+], function(_, Backbone, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -44,6 +45,9 @@ define([
                 this.rowClassName = opts.rowClassName;
             }
 
+            this.columns = options.columns;
+            this.filteredColumns = options.filteredColumns;
+
             this.backgridInitialize(opts);
         },
 
@@ -53,8 +57,6 @@ define([
          * @param {Object} options
          */
         backgridInitialize: function(options) {
-            this.columns = options.columns;
-
             this.row = options.row || Row;
             this.createRows();
 
@@ -82,12 +84,15 @@ define([
             });
             delete this.rows;
             delete this.columns;
+            delete this.filteredColumns;
+
             Body.__super__.dispose.call(this);
         },
 
         createRows: function() {
             this.rows = this.collection.map(function(model) {
                 var rowOptions = {
+                    collection: this.filteredColumns,
                     columns: this.columns,
                     model: model
                 };
@@ -129,11 +134,37 @@ define([
          * @inheritDoc
          */
         insertRow: function(model, collection, options) {
-            Body.__super__.insertRow.apply(this, arguments);
+            if (this.rows[0] instanceof Backgrid.EmptyRow) {
+                this.rows.pop().remove();
+            }
+
+            // insertRow() is called directly
+            if (!(collection instanceof Backbone.Collection) && !options) {
+                this.collection.add(model, (options = collection));
+                return;
+            }
+
+            var row = new this.row({
+                collection: this.filteredColumns,
+                columns: this.columns,
+                model: model
+            });
+
             var index = collection.indexOf(model);
-            if (index < this.rows.length) {
+            this.rows.splice(index, 0, row);
+
+            var $el = this.$el;
+            var $children = $el.children();
+            var $rowEl = row.render().$el;
+
+            if (index >= $children.length) {
+                $el.append($rowEl);
+            } else {
+                $children.eq(index).before($rowEl);
                 this.attachListenerToSingleRow(this.rows[index]);
             }
+
+            return this;
         },
 
         /**

@@ -3,7 +3,7 @@ data:
     type: "testdepartments"
     id: auto
     attributes:
-      name: "TestDepartment"
+      title: "TestDepartment"
     relationships:
       staff:
         data:

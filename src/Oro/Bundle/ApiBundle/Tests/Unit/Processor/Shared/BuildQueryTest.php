@@ -21,7 +21,7 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
         $this->processor = new BuildQuery($this->doctrineHelper);
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $qb = $this->getQueryBuilderMock();
 
@@ -31,12 +31,24 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
         $this->assertSame($qb, $this->context->getQuery());
     }
 
+    public function testProcessWhenCriteriaObjectDoesNotExist()
+    {
+        $this->processor->process($this->context);
+
+        $this->assertFalse($this->context->hasQuery());
+    }
+
     public function testProcessForNotManageableEntity()
     {
         $className = 'Test\Class';
 
         $this->notManageableClassNames = [$className];
 
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context->setCriteria(new Criteria($resolver));
         $this->context->setClassName($className);
         $this->processor->process($this->context);
 
