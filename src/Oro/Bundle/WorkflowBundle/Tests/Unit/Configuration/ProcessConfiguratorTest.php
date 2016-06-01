@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -9,11 +9,11 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersConfigurator;
-use Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 
-class ProcessImportTest extends \PHPUnit_Framework_TestCase
+class ProcessConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition';
 
@@ -25,40 +25,41 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
     /**
      * @var ProcessDefinitionsConfigurator|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $definitionImport;
+    protected $definitionsConfigurator;
 
     /**
      * @var ProcessTriggersConfigurator|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $triggersImport;
+    protected $triggersConfigurator;
 
     /**
-     * @var ProcessConfigurator
+     * @var \Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator
      */
-    protected $processImport;
+    protected $processConfigurator;
 
     protected function setUp()
     {
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
 
-        $this->definitionImport = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator')
+        $this->definitionsConfigurator = $this
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->triggersImport = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport')
+        $this->triggersConfigurator = $this
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processImport = new ProcessConfigurator(
+        $this->processConfigurator = new ProcessConfigurator(
             $this->managerRegistry,
-            $this->definitionImport,
-            $this->triggersImport,
+            $this->definitionsConfigurator,
+            $this->triggersConfigurator,
             self::CLASS_NAME
         );
     }
 
-    public function testImport()
+    public function testCofigureProcesses()
     {
         $processConfigurations = [
             ProcessConfigurationProvider::NODE_DEFINITIONS => ['...definitions config'],
@@ -69,7 +70,7 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
         $triggersImported = [new ProcessTrigger()];
         $createdSchedules = [new Schedule()];
 
-        $this->definitionImport->expects($this->once())
+        $this->definitionsConfigurator->expects($this->once())
             ->method('import')
             ->with(['...definitions config'])
             ->willReturn($definitionsImported);
@@ -78,20 +79,16 @@ class ProcessImportTest extends \PHPUnit_Framework_TestCase
         $definitionsRepositoryMock = $this->assertObjectManagerCalledForRepository(self::CLASS_NAME);
         $definitionsRepositoryMock->expects($this->once())->method('findAll')->willReturn(['...definitions here']);
 
-        $this->triggersImport->expects($this->once())->method('import')->with(
+        $this->triggersConfigurator->expects($this->once())->method('import')->with(
             ['...triggers config'],
             ['...definitions here']
         )->willReturn($triggersImported);
 
-        $this->triggersImport->expects($this->once())->method('getCreatedSchedules')->willReturn($createdSchedules);
+        $this->triggersConfigurator->expects($this->once())
+            ->method('getCreatedSchedules')->willReturn($createdSchedules);
 
-        $result = $this->processImport->import($processConfigurations);
+        $this->processConfigurator->configureProcesses($processConfigurations);
 
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\Import\ProcessImportResult', $result);
-
-        $this->assertEquals($definitionsImported, $result->getDefinitions());
-        $this->assertEquals($triggersImported, $result->getTriggers());
-        $this->assertEquals($createdSchedules, $result->getSchedules());
     }
 
     /**

@@ -1,89 +1,99 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Model;
+namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
-use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersConfigurator;
-
-class ProcessConfigurator
+class ProcessConfigurator implements LoggerAwareInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @var ProcessDefinitionsConfigurator
-     */
-    private $definitionImport;
+    /** @var ProcessDefinitionsConfigurator */
+    private $definitionsConfigurator;
 
-    /**
-     * @var ProcessTriggersConfigurator
-     */
+    /** @var ProcessTriggersConfigurator */
     private $triggersConfigurator;
+
+    /** @var string */
+    protected $definitionClass;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * @param ManagerRegistry $registry
-     * @param ProcessDefinitionsConfigurator $definitionImport
+     * @param ProcessDefinitionsConfigurator $definitionsConfigurator
      * @param ProcessTriggersConfigurator $triggersImport
      * @param string $definitionClass
      */
     public function __construct(
         ManagerRegistry $registry,
-        ProcessDefinitionsConfigurator $definitionImport,
+        ProcessDefinitionsConfigurator $definitionsConfigurator,
         ProcessTriggersConfigurator $triggersImport,
         $definitionClass
     ) {
         $this->registry = $registry;
-        $this->definitionImport = $definitionImport;
+        $this->definitionsConfigurator = $definitionsConfigurator;
         $this->triggersConfigurator = $triggersImport;
         $this->definitionClass = $definitionClass;
+        $this->setLogger(new NullLogger());
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        $this->definitionsConfigurator->setLogger($logger);
+        $this->triggersConfigurator->setLogger($logger);
     }
 
     /**
      * @param array $processConfigurations
      */
-    public function import(array $processConfigurations = [])
+    public function configureProcesses(array $processConfigurations = [])
     {
 
         if (array_key_exists(ProcessConfigurationProvider::NODE_DEFINITIONS, $processConfigurations)) {
-            $this->definitionImport->import(
+            $this->definitionsConfigurator->configureDefinitions(
                 $processConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS]
             );
+            $this->definitionsConfigurator->flush();
         }
 
         if (array_key_exists(ProcessConfigurationProvider::NODE_TRIGGERS, $processConfigurations)) {
-            $this->triggersConfigurator->updateTriggers(
+            $this->triggersConfigurator->configureTriggers(
                 $processConfigurations[ProcessConfigurationProvider::NODE_TRIGGERS],
                 $this->getRepository()->findAll()
             );
+            $this->triggersConfigurator->flush();
         }
-
     }
 
     /**
      * Removes all process definitions from database by their names
+     *
      * @param array|string $names
      */
-    public function remove($names)
+    public function removeProcesses($names)
     {
-        $objectManager = $this->getObjectManager();
         $repository = $this->getRepository();
-        $dirty = false;
+
         foreach ((array)$names as $processDefinitionName) {
+            /** @var ProcessDefinition $definition */
             $definition = $repository->find($processDefinitionName);
             if ($definition) {
-                $objectManager->remove($definition);
-                $dirty = true;
+                $this->triggersConfigurator->removeDefinitionTriggers($definition);
+                $this->definitionsConfigurator->removeDefinition($processDefinitionName);
             }
         }
-        if ($dirty) {
-            $objectManager->flush();
-        }
+        
+        $this->triggersConfigurator->flush();
+        $this->definitionsConfigurator->flush();
     }
 
     /**

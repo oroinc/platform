@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Import;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -10,24 +10,18 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersConfigurator;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
 
-class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
+class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ProcessConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ProcessConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationBuilder;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $managerRegistry;
 
-    /**
-     * @var string|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var string|\PHPUnit_Framework_MockObject_MockObject */
     protected $triggerEntityClass;
 
     /**
@@ -120,7 +114,7 @@ class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
         $this->processCronScheduler->expects($this->once())->method('flush')->willReturn($schedulesCreated);
 
         //run import
-        $this->processTriggersImport->updateTriggers($triggersConfiguration, $definitions);
+        $this->processTriggersImport->configureTriggers($triggersConfiguration, $definitions);
         $this->assertEquals($schedulesCreated, $this->processTriggersImport->getCreatedSchedules());
     }
 

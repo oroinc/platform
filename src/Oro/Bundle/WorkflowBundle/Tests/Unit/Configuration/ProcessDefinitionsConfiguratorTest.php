@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Import;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 
 class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,14 +23,10 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
     /** @var ProcessDefinitionsConfigurator */
     protected $processDefinitionsConfigurator;
 
-    /**
-     * @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
     private $repository;
 
-    /**
-     * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
     private $objectManager;
 
     protected function setUp()
@@ -83,7 +79,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             ['existent' => $definitionStoredExistent, 'nonExistent' => $newDefinitionNonExistent],
-            $this->processDefinitionsConfigurator->import($definitionsConfiguration)
+            $this->processDefinitionsConfigurator->configureDefinitions($definitionsConfiguration)
         );
     }
 

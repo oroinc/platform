@@ -6,7 +6,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 
@@ -54,7 +54,7 @@ class WorkflowDefinitionListener
 
         $configuration = $this->generator->generateForScheduledTransition($entity);
 
-        $this->getProcessConfigurator()->import($configuration);
+        $this->getProcessConfigurator()->configureProcesses($configuration);
     }
 
     /**
@@ -71,7 +71,7 @@ class WorkflowDefinitionListener
         $generatedConfigurations = $this->generator->generateForScheduledTransition($entity);
 
         $processConfigurator = $this->getProcessConfigurator();
-        $processConfigurator->import($generatedConfigurations);
+        $processConfigurator->configureProcesses($generatedConfigurations);
         
         $persistedProcessDefinitions = $this->getScheduledTransitionProcesses()->workflowRelated($entity->getName());
 
@@ -83,7 +83,7 @@ class WorkflowDefinitionListener
             }
         }
 
-        $processConfigurator->remove($toDelete);
+        $processConfigurator->removeProcesses($toDelete);
     }
 
     /**
@@ -103,7 +103,7 @@ class WorkflowDefinitionListener
             $toDelete[] = $definition->getName();
         }
 
-        $this->getProcessConfigurator()->remove($toDelete);
+        $this->getProcessConfigurator()->removeProcesses($toDelete);
     }
 
     /**
@@ -123,7 +123,9 @@ class WorkflowDefinitionListener
         $service = $this->processConfiguratorLink->getService();
 
         if (!$service instanceof ProcessConfigurator) {
-            throw new \RuntimeException('Instance of Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator expected.');
+            throw new \RuntimeException(
+                'Instance of Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator expected.'
+            );
         }
 
         return $service;

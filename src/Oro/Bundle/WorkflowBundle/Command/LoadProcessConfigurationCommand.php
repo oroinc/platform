@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
+use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\CronBundle\Entity\Schedule;
-use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class LoadProcessConfigurationCommand extends ContainerAwareCommand
 {
@@ -55,76 +53,32 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
             $usedDefinitions
         );
 
-        $processImport = $this->getContainer()->get('oro_workflow.process.storage');
+        $processConfigurator = $this->getContainer()->get('oro_workflow.process.configurator');
 
-        $result = $processImport->import($processConfiguration);
+        $processConfigurator->setLogger($this->createConsoleLogger($output));
 
-        $this->printDefinitions($output, $result->getDefinitions());
-        $this->printTriggers($output, $result->getTriggers());
-        $this->printSchedules($output, $result->getSchedules());
-
+        $processConfigurator->configureProcesses($processConfiguration);
+        
         // update triggers cache
         $this->getContainer()->get('oro_workflow.cache.process_trigger')->build();
     }
 
     /**
      * @param OutputInterface $output
-     * @param ProcessDefinition[] $definitions
+     *
+     * @return ConsoleLogger
      */
-    protected function printDefinitions(OutputInterface $output, array $definitions)
+    protected function createConsoleLogger(OutputInterface $output)
     {
-        if (count($definitions) !== 0) {
-            $output->writeln('Loaded process definitions:');
-            foreach ($definitions as $definition) {
-                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $definition->getName()));
-            }
-        } else {
-            $output->writeln('No process definitions found.');
-        }
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param array|ProcessTrigger[] $triggers
-     */
-    protected function printTriggers(OutputInterface $output, array $triggers)
-    {
-        if (count($triggers) !== 0) {
-            $output->writeln('Loaded process triggers:');
-            foreach ($triggers as $trigger) {
-                $output->writeln(
-                    sprintf(
-                        '  <comment>></comment> <info>%s:%s</info>',
-                        $trigger->getDefinition()->getName(),
-                        $trigger->getEvent() ?: 'cron:' . $trigger->getCron()
-                    )
-                );
-            }
-        } else {
-            $output->writeln('No process triggers found.');
-        }
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param array|Schedule[] $schedules
-     */
-    protected function printSchedules(OutputInterface $output, array $schedules)
-    {
-        if (count($schedules) !== 0) {
-            $output->writeln('Loaded process schedules:');
-            foreach ($schedules as $schedule) {
-                $output->writeln(
-                    sprintf(
-                        '  <comment>></comment> <info>[%s] %s %s</info>',
-                        $schedule->getDefinition(),
-                        $schedule->getCommand(),
-                        implode(' ', $schedule->getArguments())
-                    )
-                );
-            }
-        } else {
-            $output->writeln('No enabled process triggers with cron expression found.');
-        }
+        return new ConsoleLogger($output, [
+            LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ERROR => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
+        ]);
     }
 }

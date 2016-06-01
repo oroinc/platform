@@ -51,9 +51,9 @@ services:
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: onClear }
 
-    oro_workflow.process.storage.link:
+    oro_workflow.process.configurator.link:
         tags:
-            - { name: oro_service_link, service: oro_workflow.process.storage }
+            - { name: oro_service_link, service: oro_workflow.process.configurator }
 
     oro_workflow.transition_schedule_processes.link:
         tags:
@@ -63,7 +63,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionListener'
         arguments:
             - '@oro_workflow.transition_schedule.process_configuration_generator'
-            - '@oro_workflow.process.storage.link'
+            - '@oro_workflow.process.configurator.link'
             - '@oro_workflow.transition_schedule_processes.link'
         tags:
             - { name: doctrine.event_listener, event: postPersist }

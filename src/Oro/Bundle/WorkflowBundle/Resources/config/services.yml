@@ -153,22 +153,22 @@ services:
             - '%oro_cron.entity.schedule.class%'
 
     oro_workflow.process.definitions_configurator:
-        class: Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsConfigurator
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator
         arguments:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@doctrine'
             - '%oro_workflow.process_definition.entity.class%'
 
     oro_workflow.process.triggers_configurator:
-        class: Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersConfigurator
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator
         arguments:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@doctrine'
             - '%oro_workflow.process_trigger.entity.class%'
             - '@oro_workflow.process.cron_scheduler'
 
-    oro_workflow.process.storage:
-        class: Oro\Bundle\WorkflowBundle\Model\ProcessConfigurator
+    oro_workflow.process.configurator:
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator
         public: true
         arguments:
             - '@doctrine'
