@@ -38,7 +38,7 @@
         "jms/job-queue-bundle": "1.2.*",
         "jms/serializer": "0.14.0",
         "jms/serializer-bundle": "0.13.0",
-        "kriswallsmith/assetic": "1.2.1",
+        "kriswallsmith/assetic": "1.3.1",
         "knplabs/knp-menu": "2.0.0-alpha2",
         "knplabs/knp-menu-bundle": "2.0.0-alpha2",
         "friendsofsymfony/rest-bundle": "1.7.1",
