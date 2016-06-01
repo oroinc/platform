@@ -29,8 +29,6 @@ parameters:
     oro_workflow.action.run_action_group.class: Oro\Bundle\ActionBundle\Action\RunActionGroup
     oro_workflow.action.find_entities.class: Oro\Component\Action\Action\FindEntities
     oro_workflow.action.assign_url.class: Oro\Component\Action\Action\AssignUrl
-    oro_workflow.action.clone_object.class: Oro\Component\Action\Action\CloneObject
-    oro_workflow.action.clone_entity.class: Oro\Component\Action\Action\CloneEntity
 
 services:
     oro_workflow.action_factory:
@@ -258,18 +256,3 @@ services:
             - '@router'
         tags:
             - { name: oro_workflow.action, alias: assign_url }
-
-    oro_workflow.action.clone_object:
-        class: '%oro_workflow.action.clone_object.class%'
-        arguments:
-            - '@oro_action.context_accessor'
-        tags:
-            - { name: oro_workflow.action, alias: clone_object }
-
-    oro_workflow.action.clone_entity:
-        class: '%oro_workflow.action.clone_entity.class%'
-        arguments:
-            - '@oro_action.context_accessor'
-            - '@doctrine'
-        tags:
-            - { name: oro_workflow.action, alias: clone_entity }
