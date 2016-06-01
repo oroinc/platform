@@ -52,18 +52,25 @@ class AttendeesSubscriber implements EventSubscriberInterface
 
         $attendeeKeysByEmail = [];
         foreach ($attendees as $key => $attendee) {
-            $attendeeKeysByEmail[$attendee->getEmail()] = $key;
+            $id = $attendee->getEmail() ?: $attendee->getDisplayName();
+            if (!$id) {
+                return;
+            }
+
+            $attendeeKeysByEmail[$id] = $key;
         }
 
         $nextNewKey = count($attendeeKeysByEmail);
         $fixedData = [];
         foreach ($data as $attendee) {
-            if (empty($attendee['email'])) {
+            if (empty($attendee['email']) && empty($attendee['displayName'])) {
                 return;
             }
 
-            $key = isset($attendeeKeysByEmail[$attendee['email']])
-                ? $attendeeKeysByEmail[$attendee['email']]
+            $id = empty($attendee['email']) ? $attendee['displayName'] : $attendee['email'];
+
+            $key = isset($attendeeKeysByEmail[$id])
+                ? $attendeeKeysByEmail[$id]
                 : $nextNewKey++;
 
             $fixedData[$key] = $attendee;

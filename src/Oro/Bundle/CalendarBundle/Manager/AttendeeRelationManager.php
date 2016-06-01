@@ -113,7 +113,7 @@ class AttendeeRelationManager
     {
         $unbound = [];
         foreach ($attendees as $attendee) {
-            if ($this->getRelatedEntity($attendee)) {
+            if (!$attendee->getEmail() || $this->getRelatedEntity($attendee)) {
                 continue;
             }
 

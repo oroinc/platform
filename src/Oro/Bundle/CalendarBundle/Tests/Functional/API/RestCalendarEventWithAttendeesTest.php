@@ -68,6 +68,10 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                     'origin'      => 'client',
                     'status'      => null,
                 ],
+                [
+                    'displayName' => 'attendee without email',
+                    'origin'      => 'client',
+                ],
             ]
         ];
         $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
@@ -102,7 +106,9 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             $result['attendees'][0]['createdAt'],
             $result['attendees'][0]['updatedAt'],
             $result['attendees'][1]['createdAt'],
-            $result['attendees'][1]['updatedAt']
+            $result['attendees'][1]['updatedAt'],
+            $result['attendees'][2]['createdAt'],
+            $result['attendees'][2]['updatedAt']
         );
         $this->assertEquals(
             [
@@ -137,6 +143,14 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'type'        => 'optional',
                         'user_id'     => $adminUser->getId()
                     ],
+                    [
+                        'displayName' => 'attendee without email',
+                        'origin'      => 'client',
+                        'email'       => null,
+                        'user_id'     => null,
+                        'status'      => 'none',
+                        'type'        => 'optional',
+                    ],
                 ],
             ],
             $this->extractInterestingResponseData($result)
@@ -147,14 +161,14 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             ->find($id);
 
         $attendees = $calendarEvent->getAttendees();
-        $this->assertCount(2, $attendees);
+        $this->assertCount(3, $attendees);
 
-        $admin = $attendees->get(1);
+        $admin = $attendees->get(2);
         $this->assertEquals('admin@example.com', $admin->getEmail());
         $this->assertEquals('admin', $admin->getUser()->getUsername());
         $this->assertEquals($admin, $calendarEvent->getRelatedAttendee());
 
-        $simpleUser = $attendees->first();
+        $simpleUser = $attendees->get(1);
         $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
         $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
     }
