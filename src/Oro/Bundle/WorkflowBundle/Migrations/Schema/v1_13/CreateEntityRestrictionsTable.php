@@ -30,7 +30,7 @@ class CreateEntityRestrictionsTable implements Migration
         $table->addColumn('mode_values', 'json_array', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(
-            ['workflow_name', 'workflow_step_id', 'attribute', 'entity_class', 'mode'],
+            ['workflow_name', 'workflow_step_id', 'field', 'entity_class', 'mode'],
             'oro_workflow_restriction_idx'
         );
 
