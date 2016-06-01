@@ -1,0 +1,4 @@
+oro.locale:
+    localization:
+        parent:
+            circular_reference: 'Circular Reference Found.'
