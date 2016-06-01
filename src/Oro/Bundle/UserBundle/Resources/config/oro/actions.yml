@@ -17,30 +17,28 @@ operations:
                 attribute: $.clone.label
                 params:
                     '{label}': $.clone.label
-            - '@tree':
-                - '@call_service_method':
-                    attribute: $.aclRoleHandler
-                    service: service_container
-                    method: get
-                    method_parameters: ['oro_user.form.handler.acl_role']
-                - '@call_method':
-                    object: $.aclRoleHandler
-                    method: createForm
-                    method_parameters: [$.clone]
-                - '@call_method':
-                    object: $.aclRoleHandler
-                    method: process
-                    method_parameters: [$.data]
-                - '@call_method':
-                    attribute: $.formView
-                    object: $.aclRoleHandler
-                    method: createView
-                - '@call_service_method':
-                    attribute: $.privilegesConfig
-                    service: service_container
-                    method: getParameter
-                    method_parameters: ['oro_user.privileges']
-            - '@assign_value': [$.allow_delete, false]
+            - '@call_service_method':
+                attribute: $.aclRoleHandler
+                service: service_container
+                method: get
+                method_parameters: ['oro_user.form.handler.acl_role']
+            - '@call_method':
+                object: $.aclRoleHandler
+                method: createForm
+                method_parameters: [$.clone]
+            - '@call_method':
+                object: $.aclRoleHandler
+                method: process
+                method_parameters: [$.data]
+            - '@call_method':
+                attribute: $.formView
+                object: $.aclRoleHandler
+                method: createView
+            - '@call_service_method':
+                attribute: $.privilegesConfig
+                service: service_container
+                method: getParameter
+                method_parameters: ['oro_user.privileges']
         frontend_options:
             show_dialog: false
             template: 'OroUserBundle:Role:clone.html.twig'

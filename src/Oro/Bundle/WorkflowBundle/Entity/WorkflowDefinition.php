@@ -165,8 +165,10 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function __clone()
     {
-        $this->setName($this->getName() . uniqid('_clone_'));
-        $this->setSystem(false);
+        if ($this->name) {
+            $this->setName($this->getName() . uniqid('_clone_'));
+            $this->setSystem(false);
+        }
     }
 
     /**

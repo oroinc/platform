@@ -14,9 +14,7 @@ class CloneEntity extends CloneObject
 {
     const OPTION_KEY_FLUSH = 'flush';
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /**
@@ -30,9 +28,7 @@ class CloneEntity extends CloneObject
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     protected function cloneObject($context)
     {
         $target = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_TARGET]);
@@ -46,15 +42,16 @@ class CloneEntity extends CloneObject
 
         $entity = parent::cloneObject($context);
 
-        try {
-            // avoid duplicate ids
-            $classMeta = $entityManager->getClassMetadata($entityClassName);
-            $targetId = $classMeta->getIdentifierValues($target);
-            $entityId = $classMeta->getIdentifierValues($entity);
+        // avoid duplicate ids
+        $classMeta = $entityManager->getClassMetadata($entityClassName);
+        $targetId = $classMeta->getIdentifierValues($target);
+        $entityId = $classMeta->getIdentifierValues($entity);
 
-            if ($targetId == $entityId) {
-                $classMeta->setIdentifierValues($entity, array_fill_keys(array_keys($entityId), null));
-            }
+        if ($targetId == $entityId) {
+            $classMeta->setIdentifierValues($entity, array_fill_keys(array_keys($entityId), null));
+        }
+
+        try {
             // save
             $entityManager->persist($entity);
 

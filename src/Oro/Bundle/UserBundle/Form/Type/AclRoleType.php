@@ -19,7 +19,7 @@ class AclRoleType extends AbstractType
     /**
      * @param array $privilegeTypeConfig
      */
-    public function __construct(array $privilegeTypeConfig = array())
+    public function __construct(array $privilegeTypeConfig)
     {
         $this->privilegeConfig = $privilegeTypeConfig;
     }

@@ -2,8 +2,9 @@
 
 namespace Oro\Component\Action\Action;
 
-use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
+use Oro\Component\Action\Exception\InvalidParameterException;
 
 class CloneObject extends AbstractAction
 {

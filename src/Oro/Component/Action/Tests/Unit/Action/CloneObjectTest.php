@@ -2,10 +2,11 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\Action\Action\CloneObject;
 use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CloneObjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -96,10 +97,10 @@ class CloneObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider executeDataProvider
      * @param array $options
      * @param array $expectedData
      * @param null|array $contextData
-     * @dataProvider executeDataProvider
      */
     public function testExecute(array $options, array $contextData = [], array $expectedData = null)
     {

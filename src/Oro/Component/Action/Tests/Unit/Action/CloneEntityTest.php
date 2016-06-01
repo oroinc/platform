@@ -14,14 +14,10 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CloneEntityTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CloneEntity
-     */
+    /** @var CloneEntity */
     protected $action;
 
-    /**
-     * @var ContextAccessor
-     */
+    /** @var ContextAccessor */
     protected $contextAccessor;
 
     /**
@@ -46,14 +42,9 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
         $this->action->setDispatcher($dispatcher);
     }
 
-    protected function tearDown()
-    {
-        unset($this->contextAccessor, $this->registry, $this->action);
-    }
-
     /**
-     * @param array $options
      * @dataProvider executeDataProvider
+     * @param array $options
      */
     public function testExecute(array $options)
     {
@@ -107,6 +98,11 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData, $entity->getData());
     }
 
+    protected function tearDown()
+    {
+        unset($this->contextAccessor, $this->registry, $this->action);
+    }
+
     /**
      * @return array
      */
@@ -114,29 +110,29 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
     {
         $stubTarget = new ItemStub();
 
-        return array(
-            'without data' => array(
-                'options' => array(
+        return [
+            'without data' => [
+                'options' => [
                     CloneEntity::OPTION_KEY_TARGET    => $stubTarget,
                     CloneEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
-                )
-            ),
-            'with data' => array(
-                'options' => array(
+                ]
+            ],
+            'with data' => [
+                'options' => [
                     CloneEntity::OPTION_KEY_TARGET     => $stubTarget,
                     CloneEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
                     CloneEntity::OPTION_KEY_DATA      => array('key1' => 'value1', 'key2' => 'value2'),
-                )
-            ),
-            'without flush' => array(
-                'options' => array(
+                ]
+            ],
+            'without flush' => [
+                'options' => [
                     CloneEntity::OPTION_KEY_TARGET     => $stubTarget,
                     CloneEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
                     CloneEntity::OPTION_KEY_DATA      => array('key1' => 'value1', 'key2' => 'value2'),
                     CloneEntity::OPTION_KEY_FLUSH     => false
-                )
-            )
-        );
+                ]
+            ]
+        ];
     }
 
     /**
