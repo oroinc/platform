@@ -31,6 +31,7 @@ use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\CalendarBundle\Exception\NotUserCalendarEvent;
 
 /**
  * @RouteResource("calendarevent")
@@ -363,6 +364,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
             }
         } catch (ForbiddenException $forbiddenEx) {
             $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
+        } catch (NotUserCalendarEvent $e) {
+            $view = $this->view(['error' => $e->getMessage()], Codes::HTTP_BAD_REQUEST);
         }
 
         return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
