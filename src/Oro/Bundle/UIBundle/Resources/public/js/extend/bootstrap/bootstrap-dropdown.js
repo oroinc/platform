@@ -91,12 +91,7 @@ define(function(require) {
                 width: $dropdownMenu.outerWidth()
             });
             $placeholder = $('<div class="dropdown-menu__placeholder"/>');
-            $dropdownMenu.data('related-data', {
-                $dropdownMenu: $dropdownMenu,
-                $placeholder: $placeholder,
-                $currentDropdown: $this,
-                css: css
-            });
+            $dropdownMenu.data('related-toggle', $this);
             $placeholder.data('related-menu', $dropdownMenu);
 
             /**
@@ -108,20 +103,21 @@ define(function(require) {
                 .appendTo($container)
                 .css(css);
 
-            $this.dropdown('updatePosition', $dropdownMenu.data('related-data'));
+            $this.data('related-data', {
+                $dropdownMenu: $dropdownMenu,
+                $placeholder: $placeholder
+            }).dropdown('updatePosition');
         } else if (!isActive && ($placeholder = $parent.find('.dropdown-menu__placeholder')).length) {
             $dropdownMenu = $placeholder.data('related-menu')
                 .removeAttr('style')
-                .removeClass('detach')
-                .removeData('related-data');
+                .removeClass('detach');
 
+            $this.removeData('related-data');
             $placeholder.before($dropdownMenu).remove();
         }
     };
-    /**
-     * * @param {string} obj
-     * */
-    Dropdown.prototype.updatePosition = function(obj) {
+
+    Dropdown.prototype.updatePosition = function() {
         /**
          * Sometimes, when dropdown opens in scrollable content, appears scrollbars.
          * Scrollbars decrease content height and width, change elements position.
@@ -129,20 +125,20 @@ define(function(require) {
          * Styles that was applied to dropdown are wrong, because dimensions and position are changed.
          * Following code fixes dropdown styles after that changes.
          */
+        var obj = $(this).data('related-data');
         if (typeof obj !== 'object') {
             return false;
         }
         var $parent =  obj.$placeholder.parent();
         var $dropdownMenu = obj.$dropdownMenu;
-        var css = obj.css;
-        var currentParentOffset = $parent.offset();
-        var parrentHeight = $parent.outerHeight();
-        var currentParentWidth = $parent.outerWidth();
-        var currentOffset = $parent.offset();
-        css.top = currentParentOffset.top + parrentHeight;
-        css.left = currentOffset.left;
-        css.width = currentParentWidth;
-        $dropdownMenu.css(css);
+        var parentOffset = $parent.offset();
+        var parentHeight = $parent.outerHeight();
+        var parentWidth = $parent.outerWidth();
+        $dropdownMenu.css({
+            top: parentOffset.top + parentHeight,
+            left: parentOffset.left,
+            width: parentWidth
+        });
     };
 
     $(document)
@@ -195,7 +191,7 @@ define(function(require) {
                 $toggle.data('container', 'body');
             }
             $toggle.dropdown('detach', true);
-            var $placeholder = $dropdownMenu.data('related-data').$placeholder;
+            var $placeholder = $toggle.data('related-data').$placeholder;
             $dropdownMenu
                 .addClass('dropdown-menu__floating')
                 .one('mouseleave', function(e) {
@@ -252,15 +248,9 @@ define(function(require) {
                 return false;
             }
 
-            _.each($openedDropdowns, function($dropdown) {
-                var options = $($dropdown).data('related-data');
-
-                if (typeof options === 'object') {
-                    options.$currentDropdown
-                        .data('dropdown')
-                        .updatePosition(options);
-                }
-            }, this);
+            $openedDropdowns.each(function() {
+                $(this).data('related-toggle').dropdown('updatePosition');
+            });
         };
 
         $(window).on('resize', _.debounce(_updateDropdownsPosition, 100));

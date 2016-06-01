@@ -29,8 +29,9 @@ define([
         var delay = opt.delay || (opt.flash && 5000);
         var actions = {
             close: function() {
-                $el.alert('close');
+                var result = $el.alert('close');
                 mediator.trigger('layout:adjustHeight');
+                return result;
             }
         };
         if (opt.namespace) {
