@@ -89,6 +89,7 @@ class RestrictionsExtension extends AbstractTypeExtension
                     }
                     $isNew = $this->doctrineHelper->isNewEntity($data);
                     foreach ($applicableRestrictions as $restriction) {
+                        $found = false;
                         $step = $restriction->getStep();
                         if (!$step && !$isNew) {
                             continue;
