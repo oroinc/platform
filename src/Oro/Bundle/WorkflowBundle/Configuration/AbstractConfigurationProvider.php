@@ -85,7 +85,7 @@ abstract class AbstractConfigurationProvider
     protected function loadConfigFile(\SplFileInfo $file)
     {
         $realPathName = $file->getRealPath();
-        $configData = Yaml::parse($realPathName);
+        $configData = Yaml::parse(file_get_contents($realPathName)) ? : [];
 
         if (array_key_exists('imports', $configData) && is_array($configData['imports'])) {
             $imports = $configData['imports'];

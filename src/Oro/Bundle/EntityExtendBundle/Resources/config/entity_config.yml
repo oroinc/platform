@@ -123,7 +123,20 @@ oro_entity_config:
 
                 # in case user changes something which requires schema update, this change is not applied
                 # to the configuration, but is stored into "pending_changes" as changeset
-                # format of changeset is same as format for doctrine fields ['field' => ['oldValue', 'newValue'], ...]
+                # format of changeset is ['scope' => ['field' => ['oldValue', 'newValue'], ...], ...]
+                #
+                # Example:
+                #
+                # Let's imagine that user have active activity email and changes it to task.
+                # Value of pending changes would be:
+                #
+                # 'activity' => [
+                #     'activities' => [
+                #         ['Oro\Bundle\EmailBundle\Entity\Email'],
+                #         ['OroCRM\Bundle\TaskBundle\Entity\Task'],
+                #     ],
+                # ],
+                #
                 pending_changes:
                     options:
                         auditable:          false
@@ -134,12 +147,12 @@ oro_entity_config:
                     route:                  'oro_entityextend_field_remove'
                     type:                   'ajaxdeletefield'
                     icon:                   'trash'
-                    filter:                 { extend_owner: 'Custom', mode: 'default', extend_state: ['New', 'Requires update', 'Active'] }
+                    filter:                 { extend_owner: 'Custom', mode: 'default', extend_state: ['New', 'Requires update', 'Active', 'Restored'] }
                     args:                   ['id']
                 -
                     name:                   oro.entity_extend.entity_config.extend.field.grid_action.restore
                     route:                  'oro_entityextend_field_unremove'
-                    type:                   'ajax'
+                    type:                   'ajaxrestorefield'
                     icon:                   'backward'
                     filter:                 { extend_owner: 'Custom', extend_state: ['Deleted'] }
                     args:                   ['id']
@@ -153,14 +166,14 @@ oro_entity_config:
                     name:                   oro.entity_extend.entity_config.extend.field.layout_action.create_field
                     route:                  'oro_entityextend_field_create'
                     entity_id:              true
-                    filter:                 { is_extend: true, mode: 'default', state: ['New', 'Requires update', 'Active'] }
+                    filter:                 { is_extend: true, mode: 'default', state: ['New', 'Requires update', 'Active', 'Restored'] }
                 -
                     name:                   oro.entity_extend.entity_config.extend.field.layout_action.update_schema
                     route:                  'oro_entityextend_update'
                     entity_id:              true
                     aCss:                   'btn-danger entity-extend-apply'
                     void:                   true
-                    filter:                 { upgradeable: true, state: ['New', 'Requires update', 'Deleted'] }
+                    filter:                 { upgradeable: true, state: ['New', 'Requires update', 'Deleted', 'Restored'] }
             items:
                 owner:
                     options:

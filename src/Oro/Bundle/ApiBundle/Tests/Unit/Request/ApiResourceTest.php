@@ -14,11 +14,13 @@ class ApiResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($className, $resource->getEntityClass());
     }
 
-    public function testToString()
+    public function testExcludedActions()
     {
-        $className = 'Test\Class';
+        $resource = new ApiResource('Test\Class');
+        $this->assertEquals([], $resource->getExcludedActions());
 
-        $resource = new ApiResource($className);
-        $this->assertEquals($className, (string)$resource);
+        $excludedActions = ['delete', 'delete_list'];
+        $resource->setExcludedActions($excludedActions);
+        $this->assertEquals($excludedActions, $resource->getExcludedActions());
     }
 }

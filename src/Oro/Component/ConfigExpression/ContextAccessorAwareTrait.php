@@ -39,7 +39,9 @@ trait ContextAccessorAwareTrait
             }
 
             return null;
-        } elseif ($value instanceof ExpressionInterface) {
+        }
+
+        if ($value instanceof ExpressionInterface) {
             return $value->evaluate($context, $this->errors);
         }
 

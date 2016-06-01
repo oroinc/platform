@@ -391,37 +391,59 @@
         hasGrantReattach - has grants for create attachment entity
 #}
 {% macro attachments(attachments, target, hasGrantReattach) -%}
+    {% set galleryUid = random() %}
     {%- for attachment in attachments -%}
         {% if attachment.embeddedContentId is null %}
             {% set canCopyToRecord = (hasGrantReattach and target is defined and oro_can_attache(attachment, target)) ? true : false %}
+            {% set attachmentUrl = path('oro_email_attachment', {id: attachment.id}) %}
+            {% set isImage = oro_type_is_image(attachment.contentType) %}
+            {% set isPreviewAvailable = oro_is_preview_available(attachment.contentType) %}
+            {% set icon = oro_attachment_icon(attachment) %}
             <li class="email-attachments-list-item">
-            <div class="dropdown link-to-record">
-                <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
-                    <i class="icon icon-file-alt"></i> {{ attachment.fileName|oro_format_filename }}
-                </a>
-                <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
-                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                        {{ 'oro.email.attachment.save'|trans }}
-                    </a>
-                    {% if (canCopyToRecord) %}
-                        {% set options = {
-                            'view': 'oroemail/js/app/views/email-attachment-link-view',
-                            'url': path('oro_email_attachment_link', {
-                                id: attachment.id,
-                                targetActivityClass: oro_class_name(target),
-                                targetActivityId: target.id
-                            })
-                        } %}
-                    <a tabindex="-1" data-page-component-module="oroui/js/app/components/view-component"
-                        class="attachment"
-                        data-page-component-options="{{ options|json_encode }}"
-                        href="{{ options.url }}">
-                        {{ 'oro.email.attachment.copy_to_record'|trans }}
-                    </a>
+                <div class="email-attachments-file">
+                    {% if (isImage) %}
+                        <a data-gallery="gallery-{{ galleryUid }}"
+                           data-filename="{{ attachment.fileName }}"
+                           class="no-hash"
+                           href="{{ attachmentUrl }}">
+                            <span class="thumbnail" style="background: url('{{ path('oro_resize_email_attachment', {id: attachment.id, width: 110, height: 80}) }}') 50% 50% no-repeat;"></span>
+                        </a>
+                    {% else %}
+                        <div class="thumbnail">
+                            <i class="fa {{ icon }} fa-3x"></i>
+                        </div>
                     {% endif %}
-                </ul>
-            </div>
-        </li>
+                </div>
+                <div class="dropdown link-to-record">
+                    <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
+                        <i class="fa {{ icon }}"></i> {{ oro_format_filename(attachment.fileName, 11, 4, 5) }}
+                    </a>
+                    <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
+                        {% if (isPreviewAvailable) %}
+                            <a class="view-image no-hash" tabindex="-1" data-gallery="gallery-{{ galleryUid }}" href="{{ attachmentUrl }}">{{ 'oro.email.attachment.view'|trans }}</a>
+                        {% endif %}
+                        <a class="no-hash" tabindex="-1" href="{{ attachmentUrl }}">
+                            {{ 'oro.email.attachment.save'|trans }}<span>({{ file_size(attachment.size) }})</span>
+                        </a>
+                        {% if (canCopyToRecord) %}
+                            {% set options = {
+                                'view': 'oroemail/js/app/views/email-attachment-link-view',
+                                'url': path('oro_email_attachment_link', {
+                                    id: attachment.id,
+                                    targetActivityClass: oro_class_name(target),
+                                    targetActivityId: target.id
+                                })
+                            } %}
+                        <a tabindex="-1" data-page-component-module="oroui/js/app/components/view-component"
+                            class="attachment"
+                            data-page-component-options="{{ options|json_encode }}"
+                            href="{{ options.url }}">
+                            {{ 'oro.email.attachment.copy_to_record'|trans }}
+                        </a>
+                        {% endif %}
+                    </ul>
+                </div>
+            </li>
         {% endif %}
     {%- endfor -%}
 {%- endmacro %}
@@ -450,7 +472,9 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_participant_name_or_me(emailAddress, emailAddressName, noLink, knownOnly) -%}
-    {% if emailAddress.owner is not null and emailAddress.owner.id == app.user.id -%}
+    {% if emailAddress.owner is not null and
+          oro_class_name(emailAddress.owner, true) == oro_class_name(app.user, true) and
+          emailAddress.owner.id == app.user.id -%}
         {% if noLink|default(false) -%}
             {{ 'Me'|trans|lower }}
         {%- else -%}
@@ -599,4 +623,16 @@
             {{ buttons|raw }}
         </div>
     </div>
+{% endmacro %}
+
+{#
+    Wrap text to tag
+#}
+{% macro wrapTextToTag(text, isWrap, tag) %}
+    {% set tag = tag is not null ? tag : 'strong' %}
+    {% if isWrap == true %}
+        <{{ tag }}>{{ text }}</{{ tag }}>
+    {% else %}
+        {{ text }}
+    {% endif %}
 {% endmacro %}

@@ -44,8 +44,16 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->provider   = $this
             ->getMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
-        $this->yamlDriver = $this->getMock('Oro\Component\Layout\Loader\Driver\DriverInterface');
-        $this->phpDriver  = $this->getMock('Oro\Component\Layout\Loader\Driver\DriverInterface');
+        $this->yamlDriver = $this
+            ->getMockBuilder('Oro\Component\Layout\Loader\Driver\DriverInterface')
+            ->setMethods(['supports', 'load'])
+            ->getMock()
+        ;
+        $this->phpDriver  = $this
+            ->getMockBuilder('Oro\Component\Layout\Loader\Driver\DriverInterface')
+            ->setMethods(['supports', 'load'])
+            ->getMock()
+        ;
 
         $this->dependencyInitializer = $this
             ->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer')

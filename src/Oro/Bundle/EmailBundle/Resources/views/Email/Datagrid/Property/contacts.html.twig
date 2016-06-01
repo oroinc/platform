@@ -3,61 +3,45 @@
 {% set folders = record.getValue('folders') %}
 {% set thread = record.getValue('email.thread') %}
 {% set isNew = record.getValue('is_new') %}
+{% set folderType = folders is not null and folders[0] is defined ? folders[0].type : null %}
 
-{% if thread is not null  %}
+{% if record.getValue('incoming') %}
+    {% set sender = record.getValue('email.from_name') %}
+{% elseif thread is not null %}
     {% set recipients = oro_get_email_thread_recipients(thread) %}
-{% else %}
+{% elseif record.getValue('outgoing') %}
     {% set recipients = record.getValue('email.recipients') %}
 {% endif %}
 
 <span class="nowrap">
 {% if folders is not null %}
-    {% if record.getValue('outgoing') %}
-        <span class="icon grid">
-            <i class="icon-signout"></i>
-        </span>
-    {% else %}
+    {% if record.getValue('incoming') %}
         <span class="icon grid">
             <i class="icon-signin"></i>
         </span>
+    {% else %}
+        <span class="icon grid">
+            <i class="icon-signout"></i>
+        </span>
     {% endif %}
 {% endif %}
-
-{% if (recipients|length > 0 and recipients|length < 3) %}
-    {% if isNew == 1 %}
-        <strong>
-    {% endif %}
-        {{ EA.email_participants_name(recipients, true, false) }}
-    {% if isNew == 1 %}
-        </strong>
-    {% endif %}
+{% if sender is defined %}
+    {{ EA.wrapTextToTag(sender|truncate(22, false, '...'), isNew) }}
+{% elseif (recipients is defined and recipients|length > 0 and recipients|length < 3) %}
+    {{ EA.wrapTextToTag(EA.email_participants_name(recipients, true, false), isNew) }}
 {% else %}
-        {% if isNew == 1 %}
-            <strong>
-        {% endif %}
-
-        {% if recipients|length > 0 %}
+        {% if (recipients is defined and recipients|length > 0) %}
             {% set firstEmail = recipients|first %}
             {% set lastEmail = recipients|last %}
-            {{
+            {% set firstLastRecipients =
                 EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
-            }}..{{
+                ~ '..' ~
                 EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
-            }}
+            %}
+            {{ EA.wrapTextToTag(firstLastRecipients, isNew) }}
         {% endif %}
-        {% if isNew == 1 %}
-            </strong>
-        {% endif %}
-
 {% endif %}
 {% if thread is not null and thread.emails|length > 1 %}
-    {% if isNew == 1 %}
-        <strong>
-    {% endif %}
-        ({{ thread.emails|length }})
-    {% if isNew == 1 %}
-        </strong>
-    {% endif %}
-
+    {{ EA.wrapTextToTag('(' ~ thread.emails|length ~ ')', isNew) }}
 {% endif %}
 </span>

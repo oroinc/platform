@@ -68,6 +68,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
+        $this->mockConnection($em);
         $em->expects($this->any())->method('createQueryBuilder')
             ->will($this->returnValue($qb));
         $em->expects($this->any())->method('getExpressionBuilder')
@@ -159,6 +160,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
+        $this->mockConnection($em);
         $em->expects($this->any())->method('createQueryBuilder')
             ->will($this->returnValue($qb));
         $em->expects($this->any())->method('getExpressionBuilder')
@@ -193,9 +195,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 )
             );
 
-        $entityHierarchyProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityHierarchyProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
         $entityHierarchyProvider
             ->expects($this->any())
             ->method('getHierarchy')
@@ -244,5 +244,19 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $filter->init($name, $params);
 
         return $filter;
+    }
+
+    /**
+     * @param $em
+     */
+    protected function mockConnection($em)
+    {
+        $connection = $this->getMockBuilder('\Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection->expects($this->any())->method('getDatabasePlatform')
+            ->will($this->returnValue(null));
+        $em->expects($this->any())->method('getConnection')
+            ->will($this->returnValue($connection));
     }
 }

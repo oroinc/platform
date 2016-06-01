@@ -38,9 +38,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
     {
         $this->encryptor = new Mcrypt('someKey');
 
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->setMethods(['getOrganization'])
-            ->getMock();
+        $user = $this->getUser();
 
         $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
 
@@ -53,7 +51,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         $this->securityFacade->expects($this->any())
-            ->method('getLoggerUser')
+            ->method('getLoggedUser')
             ->willReturn($user);
 
         $this->securityFacade->expects($this->any())
@@ -75,6 +73,14 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         parent::setUp();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getUser()
+    {
+        return $this->getMockBuilder('\StdClass')->setMethods(['getOrganization'])->getMock();
     }
 
     protected function getExtensions()
@@ -134,8 +140,8 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                     $userEmailOrigin = $this->readAttribute($entity, $name);
 
                     if ($userEmailOrigin) {
-                        $passowrd = $this->encryptor->decryptData($userEmailOrigin->getPassword());
-                        $userEmailOrigin->setPassword($passowrd);
+                        $password = $this->encryptor->decryptData($userEmailOrigin->getPassword());
+                        $userEmailOrigin->setPassword($password);
                     }
 
                     $this->assertAttributeEquals($userEmailOrigin, $name, $entity);
@@ -256,6 +262,8 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         }
         $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $userEmailOrigin->setOrganization($organization);
+
+        $userEmailOrigin->setOwner($this->getUser());
 
         return $userEmailOrigin;
     }

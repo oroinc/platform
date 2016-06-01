@@ -272,6 +272,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
     private function getEntityManager($repositoryMock, $eventManager = 'Oro\Bundle\EntityBundle\Event\OroEventManager')
     {
         $eventManager = $this->getMockBuilder($eventManager)
+            ->setMethods(['disableListeners', 'clearDisabledListeners'])
             ->disableOriginalConstructor()
             ->getMock();
 

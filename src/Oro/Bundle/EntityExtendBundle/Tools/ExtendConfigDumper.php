@@ -104,10 +104,6 @@ class ExtendConfigDumper
      */
     public function addExtension(AbstractEntityConfigDumperExtension $extension, $priority = 0)
     {
-        if (!isset($this->extensions[$priority])) {
-            $this->extensions[$priority] = [];
-        }
-
         $this->extensions[$priority][] = $extension;
     }
 
@@ -476,6 +472,9 @@ class ExtendConfigDumper
             $fieldConfig->set('is_deleted', true);
             $this->configManager->persist($fieldConfig);
         } elseif (!$fieldConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+            if ($fieldConfig->is('state', ExtendScope::STATE_RESTORE)) {
+                $fieldConfig->set('is_deleted', false);
+            }
             $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
             $this->configManager->persist($fieldConfig);
         }
@@ -536,7 +535,7 @@ class ExtendConfigDumper
             }
 
             $pendingChanges[$config->getId()->getClassName()] = $configPendingChanges;
-            $config->set('pending_changes', []);
+            $config->remove('pending_changes');
             $this->configManager->persist($config);
         }
 

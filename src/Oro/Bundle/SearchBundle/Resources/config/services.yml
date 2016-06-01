@@ -151,7 +151,6 @@ services:
     oro_search.event_listener.update_schema_listener:
         class: %oro_search.event_listener.update_schema_listener.class%
         arguments:
-            - '@oro_search.fulltext_index_manager'
             - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: console.terminate, name: onConsoleTerminate }
