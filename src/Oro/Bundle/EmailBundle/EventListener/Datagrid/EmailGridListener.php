@@ -58,11 +58,9 @@ class EmailGridListener
     protected function prepareQueryToFilter($parameters, $queryBuilder)
     {
         $filters = $parameters->get('_filter');
-        if ($filters && array_key_exists('cc', $filters)) {
-            $queryBuilder->leftJoin('e.recipients', 'r_cc', 'WITH', "r_cc.type = 'cc'");
-        }
-        if ($filters && array_key_exists('bcc', $filters)) {
-            $queryBuilder->leftJoin('e.recipients', 'r_bcc', 'WITH', "r_bcc.type = 'bcc'");
+        if ($filters && array_key_exists('ccBcc', $filters)) {
+            $queryBuilder
+                ->leftJoin('e.recipients', 'r_cc_bcc', 'WITH', "r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'");
         }
     }
 }
