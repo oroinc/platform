@@ -74,7 +74,7 @@ class RestCalendarEventTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(['Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures\LoadCalendarEventData']);
     }
 

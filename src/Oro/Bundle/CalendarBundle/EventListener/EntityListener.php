@@ -45,7 +45,7 @@ class EntityListener
     public function __construct(ServiceLink $securityContextLink, Recurrence $recurrenceModel)
     {
         $this->securityContextLink = $securityContextLink;
-        $this->recurrenceModel = $recurrenceModel;
+        $this->recurrenceModel     = $recurrenceModel;
     }
 
     /**
