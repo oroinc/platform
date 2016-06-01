@@ -8,17 +8,18 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\DBAL\Connection;
 
+use Oro\Component\Testing\DbIsolationExtension;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
-
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+
+use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 
 /**
  * Abstract class for functional and integration tests
@@ -27,6 +28,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
+    use DbIsolationExtension;
+    
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
     const DB_REINDEX_ANNOTATION   = 'dbReindex';
@@ -53,7 +56,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @var Client
      */
-    private static $clientInstance;
+    protected static $clientInstance;
 
     /**
      * @var Client
@@ -73,12 +76,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @var array
      */
-    private static $loadedFixtures = [];
-
-    /**
-     * @var Connection[]
-     */
-    private static $connections = [];
+    protected static $loadedFixtures = [];
 
     /**
      * @var ReferenceRepository
@@ -94,46 +92,17 @@ abstract class WebTestCase extends BaseWebTestCase
                 $prop->setValue($this, null);
             }
         }
-
-        /**
-         * We should collect and close (in tearDownAfterClass) all opened DB connection
-         *  to avoid exceeding the `max_connections` limitation.
-         * Due all test cases runs in single process.
-         */
-        /** @var Connection[] $connections */
-        $connections = self::getContainer()->get('doctrine')->getConnections();
-        foreach ($connections as $connection) {
-            if ($connection->isConnected()) {
-                self::$connections[] = $connection;
-            }
-        }
     }
 
     public static function tearDownAfterClass()
     {
-        if (self::$clientInstance) {
-            if (self::getDbIsolationSetting()) {
-                self::$clientInstance->rollbackTransaction();
-            }
-
-            self::cleanUpConnections();
-
-            self::$clientInstance = null;
-            self::$soapClientInstance = null;
-            self::$loadedFixtures = [];
+        if (self::getDbIsolationSetting()) {
+            self::rollbackTransaction();
         }
-    }
 
-    /**
-     * Closes opened DB connections to avoid exceeding the `max_connections` limitation.
-     */
-    public static function cleanUpConnections()
-    {
-        $connections = self::$connections;
-        foreach ($connections as $connection) {
-            $connection->close();
-        }
-        self::$connections = [];
+        self::$clientInstance = null;
+        self::$soapClientInstance = null;
+        self::$loadedFixtures = [];
     }
 
     /**
@@ -159,8 +128,7 @@ abstract class WebTestCase extends BaseWebTestCase
                 $options['debug'] = false;
             }
 
-            /** @var Client $client */
-            $client = self::$clientInstance = static::createClient($options, $server);
+            $this->client = self::$clientInstance = static::createClient($options, $server);
 
             if (self::getDbIsolationSetting()) {
                 //This is a workaround for MyISAM search tables that are not transactional
@@ -168,7 +136,7 @@ abstract class WebTestCase extends BaseWebTestCase
                     self::getContainer()->get('oro_search.search.engine')->reindex();
                 }
 
-                $client->startTransaction();
+                $this->startTransaction();
             }
         } else {
             self::$clientInstance->setServerParameters($server);
@@ -184,12 +152,12 @@ abstract class WebTestCase extends BaseWebTestCase
     {
         if (self::$clientInstance) {
             if (self::getDbIsolationSetting()) {
-                self::$clientInstance->rollbackTransaction();
+                self::$loadedFixtures = [];
+                $this->rollbackTransaction();
             }
 
             $this->client = null;
             self::$clientInstance = null;
-            self::$connections = [];
         }
     }
 
@@ -393,6 +361,10 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getReferenceRepository()
     {
+        if (false == self::$referenceRepository) {
+            throw new \LogicException('The reference repository is not set. Have you loaded fixtures?');
+        }
+
         return self::$referenceRepository;
     }
 
@@ -516,7 +488,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $parameters = [];
         $testFiles = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
         foreach ($testFiles as $fileName => $object) {
-            $parameters[$fileName] = Yaml::parse($fileName);
+            $parameters[$fileName] = Yaml::parse(file_get_contents($fileName)) ?: [];
             if (is_null($parameters[$fileName]['response'])) {
                 unset($parameters[$fileName]['response']);
             }
@@ -618,6 +590,14 @@ abstract class WebTestCase extends BaseWebTestCase
             'PHP_AUTH_PW'           => $userPassword,
             'PHP_AUTH_ORGANIZATION' => $userOrganization
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function generateNoHashNavigationHeader()
+    {
+        return ['HTTP_' . strtoupper(ResponseHashnavListener::HASH_NAVIGATION_HEADER) => 0];
     }
 
     /**
@@ -770,5 +750,13 @@ abstract class WebTestCase extends BaseWebTestCase
             $actualIntersect,
             $message
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getClient()
+    {
+        return $this->client;
     }
 }

@@ -58,7 +58,7 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
         /** @var $file \SplFileInfo */
         foreach ($finder as $file) {
             $realPathName = $file->getRealPath();
-            $configData = $this->loadConfigFile($file);
+            $configData = $this->loadConfigFile($file) ? : [];
 
             list($definitionsData, $triggersData) = $this->parseConfiguration($configData, $realPathName);
 

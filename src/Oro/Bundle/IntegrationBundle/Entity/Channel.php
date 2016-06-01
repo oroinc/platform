@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
+use Oro\Bundle\DataGridBundle\Common\DataObject as ConfigObject;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -47,16 +47,14 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Channel
 {
+    /** This mode allow to do any changes(including removing) with channel */
     const EDIT_MODE_ALLOW = 3;
+
+    /** This mode allow only to activate/deactivate channel(switch enable field) */
     const EDIT_MODE_RESTRICTED = 2;
+
+    /** This mode do not allow to edit, remove and activate/deactivate channel */
     const EDIT_MODE_DISALLOW = 1;
-    
-    /**
-     * This modes could be used to programmatically force the edit mode status.
-     * It must not be changed on any user actions.
-     */
-    const EDIT_MODE_FORCED_ALLOW = 4;
-    const EDIT_MODE_FORCED_DISALLOW = 5;
 
     /**
      * @var integer

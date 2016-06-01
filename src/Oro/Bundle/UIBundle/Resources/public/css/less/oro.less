@@ -113,6 +113,14 @@ label, input, button, select, textarea { font-size:13px;}
   font-size:13px;
   text-align:left;
   line-height:1.2em;
+  &.header-tooltips {
+    display: inline;
+    float: none;
+    .oro-popover-content {
+      line-height: 20px;
+      color: #777;
+    }
+  }
 }
 .control-group .controls p.control-label{
   width: auto;
@@ -2412,6 +2420,9 @@ label.validation-error {
       margin-left: -6px;
       padding-left: 5px;
     }
+  }
+  div.error {
+    min-height: 28px;
   }
   .input-append.error, .input-prepend.error {
     border-width: 0;

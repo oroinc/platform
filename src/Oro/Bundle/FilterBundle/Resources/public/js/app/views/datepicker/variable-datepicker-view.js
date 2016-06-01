@@ -102,7 +102,6 @@ define(function(require) {
                 }
             ];
 
-            _.extend(this, _.pick(options, ['backendFormat']));
             this.dateVariableHelper = new DateVariableHelper(options.datePickerOptions.dateVars);
             this.dateValueHelper = new DateValueHelper(options.dayFormats);
             VariableDatePickerView.__super__.initialize.apply(this, arguments);

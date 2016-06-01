@@ -46,7 +46,7 @@ parameters:
 
 services:
     oro_entity_extend.entity.cache.warmer:
-        public: false
+        public: true
         class: Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
         arguments:
             - "@oro_entity_extend.tools.dumper"
@@ -329,6 +329,12 @@ services:
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
+
+    oro_entity_extend.datagrid.action.type.ajaxrestorefield:
+        class: Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxRestoreFieldAction
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: ajaxrestorefield }
 
     oro_entity_extend.validation_loader:
         class: %oro_entity_extend.validation_loader.class%

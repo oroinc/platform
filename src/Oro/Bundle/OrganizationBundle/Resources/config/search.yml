@@ -10,19 +10,13 @@ Oro\Bundle\OrganizationBundle\Entity\Organization:
 
 Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
     alias:                          oro_business_unit
-    search_template:                OroOrganizationBundle:Search:organizationResult.html.twig
-    title_fields:                   [name]
-    fields:
-        -
-            name:                   name
-            target_type:            text
-            target_fields:          [name]
-
-Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
-    alias:                          business_unit
     search_template:                OroOrganizationBundle:Search:businessUnitResult.html.twig
     title_fields:                   [name]
     fields:
+        -
+            name:                   id
+            target_type:            integer
+            target_fields:          [id]
         -
             name:                   name
             target_type:            text

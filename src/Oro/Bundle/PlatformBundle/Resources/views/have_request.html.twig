@@ -4,14 +4,11 @@
             var options = {
                 dataType: 'script',
                 cache:     true,
-                url:       '//crm.orocrm.com/bundles/orocrmrequest/js/embed.form.js',
+                url:       '{{ data|default(constant('Oro\\Bundle\\PlatformBundle\\Form\\UrlGenerator::URL') ~ constant('Oro\\Bundle\\PlatformBundle\\Form\\UrlGenerator::FORM_JS')) }}',
                 timeout:   2000
             };
 
             $.ajax(options).done(function() {
-                var options = {
-                    version: {{ oro_version()|json_encode|raw }}
-                };
                 new ORO.EmbedRequestForm(options);
             }).error(function() {
                 if (typeof(console) != 'undefined' && console.hasOwnProperty('error')) {

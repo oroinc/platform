@@ -135,6 +135,15 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
                             $val = $this->translator->trans($options['choices'][$val]);
                         }
                         break;
+                    case PropertyInterface::TYPE_MULTI_SELECT:
+                        if (is_array($val) && count($val)) {
+                            $val = implode(',', array_map(function ($value) use ($options) {
+                                return array_key_exists($value, $options['choices'])
+                                    ? $options['choices'][$value]
+                                    : '';
+                            }, $val));
+                        }
+                        break;
                     case PropertyInterface::TYPE_HTML:
                         $val = $this->formatHtmlFrontendType(
                             $val,

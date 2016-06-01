@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Functional;
 
+use Oro\Component\Testing\ResponseExtension;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
@@ -12,6 +13,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
+    use ResponseExtension;
+
     const ENTITY_NAME = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
 
     protected $eventUpdate;
@@ -24,6 +27,7 @@ class ControllersTest extends WebTestCase
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
+        $this->client->useHashNavigation(true);
     }
 
     protected function prepareData()
@@ -45,8 +49,9 @@ class ControllersTest extends WebTestCase
     public function testIndex()
     {
         $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_index'));
-        $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        
+        $this->assertLastResponseStatus(200);
+        $this->assertLastResponseContentTypeHtml();
     }
 
     /**
@@ -55,6 +60,8 @@ class ControllersTest extends WebTestCase
     public function testCreate()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_create'));
+        $this->assertLastResponseStatus(200);
+        $this->assertLastResponseContentTypeHtml();
 
         // prepare data for next tests
         $this->prepareData();

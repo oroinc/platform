@@ -82,4 +82,16 @@ class TestDepartment implements TestFrameworkEntityInterface
     {
         return $this->staff;
     }
+
+    /**
+     * @param Collection $staff
+     *
+     * @return self
+     */
+    public function setStaff(Collection $staff)
+    {
+        $this->staff = $staff;
+
+        return $this;
+    }
 }

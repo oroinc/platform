@@ -11,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 
 class EmailManager
 {
@@ -26,24 +27,30 @@ class EmailManager
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var MailboxManager */
+    protected $mailboxManager;
+
     /**
      * Constructor
      *
-     * @param EntityManager       $em                  - Entity Manager
-     * @param EmailThreadManager  $emailThreadManager  - Email Thread Manager
+     * @param EntityManager $em - Entity Manager
+     * @param EmailThreadManager $emailThreadManager - Email Thread Manager
      * @param EmailThreadProvider $emailThreadProvider - Email Thread Provider
-     * @param SecurityFacade      $securityFacade      - Security Facade
+     * @param SecurityFacade $securityFacade - Security Facade
+     * @param MailboxManager $mailboxManager
      */
     public function __construct(
         EntityManager $em,
         EmailThreadManager $emailThreadManager,
         EmailThreadProvider $emailThreadProvider,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        MailboxManager $mailboxManager
     ) {
         $this->em                  = $em;
         $this->emailThreadManager  = $emailThreadManager;
         $this->emailThreadProvider = $emailThreadProvider;
         $this->securityFacade      = $securityFacade;
+        $this->mailboxManager      = $mailboxManager;
     }
 
     /**
@@ -122,23 +129,25 @@ class EmailManager
      */
     public function markAllEmailsAsSeen(User $user, Organization $organization, $ids = [])
     {
+        $mailboxIds = $this->mailboxManager->findAvailableMailboxIds($user, $organization);
+
         $emailUserQueryBuilder = $this
             ->em
             ->getRepository('OroEmailBundle:EmailUser')
-            ->findUnseenUserEmail($user, $organization, $ids);
-        $unseenUserEmails      = $emailUserQueryBuilder->getQuery()->getResult();
+            ->findUnseenUserEmail($user, $organization, $ids, $mailboxIds);
+        $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
+
+        if (empty($unseenUserEmails)) {
+            return false;
+        }
 
         foreach ($unseenUserEmails as $userEmail) {
             $this->setEmailUserSeen($userEmail);
         }
 
-        if (count($unseenUserEmails) > 0) {
-            $this->em->flush();
+        $this->em->flush();
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**

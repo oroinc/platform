@@ -6,6 +6,7 @@ define(function(require) {
     var moment = require('moment');
     var __ = require('orotranslation/js/translator');
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    var DateTimePickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
     var VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
     var DateFilter = require('./date-filter');
     var tools = require('oroui/js/tools');
@@ -26,7 +27,7 @@ define(function(require) {
          *
          * @property
          */
-        picker: VariableDateTimePickerView,
+        picker: tools.isMobile() ? DateTimePickerView : VariableDateTimePickerView,
 
         /**
          * Selectors for filter data
@@ -35,7 +36,7 @@ define(function(require) {
          */
         criteriaValueSelectors: {
             type: 'select',// to handle both type and part changes
-            date_type: 'select[name!=datetime_part]',
+            date_type: 'select[name][name!=datetime_part]',
             date_part: 'select[name=datetime_part]',
             value: {
                 start: 'input[name="start"]',
@@ -150,16 +151,8 @@ define(function(require) {
         _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
                 this._updateTimeVisibility(newValue.part);
-                var start = this.subview('start');
-                var end = this.subview('end');
-                if (start && start.updateFront) {
-                    start.updateFront();
-                }
-                if (end && end.updateFront) {
-                    end.updateFront();
-                }
-                this.trigger('update');
             }
+            DatetimeFilter.__super__._triggerUpdate.apply(this, arguments);
         },
 
         _renderSubViews: function() {

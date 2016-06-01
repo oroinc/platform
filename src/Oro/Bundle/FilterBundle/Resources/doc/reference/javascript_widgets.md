@@ -11,6 +11,7 @@ They are located in Resources/public/js directory and use javascript namespace O
 - [Oro.Filter.TextFilter](#orofiltertextfilter)
 - [Oro.Filter.ChoiceFilter](#orofilterchoicefilter)
 - [Oro.Filter.NumberFilter](#orofilternumberfilter)
+- [Oro.Filter.NumberRangeFilter](#orofilternumberrangefilter)
 - [Oro.Filter.SelectFilter](#orofilterselectfilter)
 - [Oro.Filter.MultiSelectFilter](#orofiltermultiselectfilter)
 - [Oro.Filter.MultiSelectDecorator](#orofiltermultiselectdecorator)
@@ -141,6 +142,18 @@ It contains next options:
     * decimals: Integer - number of decimals to display. Must be an integer;
     * decimalSeparator: String - the separator to use whendisplaying decimals;
     * orderSeparator: String - the separator to use to separator thousands. May be an empty string.
+
+###Oro.Filter.NumberRangeFilter
+
+Extends NumberFilter to add ability to filter by range (between, not between)
+
+**Rendered As**
+
+Same as parent widget but allow to filter by number ranges
+
+**Parent**
+
+_Oro.Filter.NumberFilter_
 
 ###Oro.Filter.SelectFilter
 

@@ -15,16 +15,10 @@ class NormalizePagingTest extends GetListProcessorTestCase
     {
         parent::setUp();
 
-        $classResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->context->setCriteria(new Criteria($classResolver));
-
         $this->processor = new NormalizePaging();
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $this->context->setQuery(new \stdClass());
         $context = clone $this->context;
@@ -32,12 +26,24 @@ class NormalizePagingTest extends GetListProcessorTestCase
         $this->assertEquals($context, $this->context);
     }
 
+    public function testProcessWhenCriteriaObjectDoesNotExist()
+    {
+        $this->processor->process($this->context);
+
+        $this->assertNull($this->context->getCriteria());
+    }
+
     public function testProcessOnDisabledPaging()
     {
-        $criteria = $this->context->getCriteria();
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $criteria = new Criteria($resolver);
         $criteria->setFirstResult(12);
         $criteria->setMaxResults(-1);
 
+        $this->context->setCriteria($criteria);
         $this->processor->process($this->context);
 
         $this->assertNull($criteria->getMaxResults());
@@ -46,10 +52,15 @@ class NormalizePagingTest extends GetListProcessorTestCase
 
     public function testProcess()
     {
-        $criteria = $this->context->getCriteria();
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $criteria = new Criteria($resolver);
         $criteria->setFirstResult(2);
         $criteria->setMaxResults(10);
 
+        $this->context->setCriteria($criteria);
         $this->processor->process($this->context);
 
         $this->assertEquals(10, $criteria->getMaxResults());

@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
+use Oro\Bundle\DataGridBundle\Common\DataObject as ConfigObject;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 

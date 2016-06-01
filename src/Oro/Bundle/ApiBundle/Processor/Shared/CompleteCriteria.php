@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Adds joins to the Criteria object for associations are used
- * in WHERE and ORDER BY clauses but are not joined yet.
+ * in WHERE and ORDER BY clauses.
  */
 class CompleteCriteria implements ProcessorInterface
 {
@@ -31,12 +31,18 @@ class CompleteCriteria implements ProcessorInterface
     {
         /** @var Context $context */
 
+        $criteria = $context->getCriteria();
+        if (null === $criteria) {
+            // the criteria object does not exist
+            return;
+        }
+
         $entityClass = $context->getClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
             return;
         }
 
-        $context->getCriteria()->completeJoins();
+        $criteria->completeJoins();
     }
 }
