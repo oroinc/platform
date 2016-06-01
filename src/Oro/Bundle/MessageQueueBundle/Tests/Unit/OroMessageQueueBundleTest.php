@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
 
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
@@ -46,6 +47,11 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(3))
             ->method('addCompilerPass')
             ->with($this->isInstanceOf(BuildTopicMetaSubscribersPass::class))
+        ;
+        $container
+            ->expects($this->at(4))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(BuildDestinationMetaRegistryPass::class))
         ;
 
         $bundle = new OroMessageQueueBundle();

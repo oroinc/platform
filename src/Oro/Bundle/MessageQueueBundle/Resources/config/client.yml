@@ -44,6 +44,11 @@ services:
         public: true
         arguments: [[]]
 
+    oro_message_queue.client.meta.destination_meta_registry:
+        class: 'Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry'
+        public: true
+        arguments: ['@oro_message_queue.client.config', []]
+
     oro_message_queue.client.delegate_message_processor:
         class: 'Oro\Component\MessageQueue\Client\DelegateMessageProcessor'
         public: false
@@ -85,5 +90,12 @@ services:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicsCommand'
         arguments:
             - '@oro_message_queue.client.meta.topic_meta_registry'
+        tags:
+            - { name: 'console.command' }
+
+    oro_message_queue.client.meta.destinations_command:
+        class: 'Oro\Component\MessageQueue\Client\Meta\DestinationsCommand'
+        arguments:
+            - '@oro_message_queue.client.meta.destination_meta_registry'
         tags:
             - { name: 'console.command' }

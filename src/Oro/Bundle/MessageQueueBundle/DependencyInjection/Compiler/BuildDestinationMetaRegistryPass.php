@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class BuildRouteRegistryPass implements CompilerPassInterface
+class BuildDestinationMetaRegistryPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
@@ -13,9 +13,9 @@ class BuildRouteRegistryPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $processorTagName = 'oro_message_queue.client.message_processor';
-        $routerId = 'oro_message_queue.client.router';
+        $destinationMetaRegistryId = 'oro_message_queue.client.meta.destination_meta_registry';
 
-        if (false == $container->hasDefinition($routerId)) {
+        if (false == $container->hasDefinition($destinationMetaRegistryId)) {
             return;
         }
 
@@ -25,12 +25,12 @@ class BuildRouteRegistryPass implements CompilerPassInterface
             if (is_subclass_of($class, TopicSubscriberInterface::class)) {
                 $this->addConfigsFromTopicSubscriber($configs, $class, $serviceId);
             } else {
-                $this->addConfigsFromTags($configs, $tagAttributes, $serviceId, $processorTagName);
+                $this->addConfigsFromTags($configs, $tagAttributes, $serviceId);
             }
         }
 
-        $routerDef = $container->getDefinition($routerId);
-        $routerDef->replaceArgument(1, $configs);
+        $destinationMetaRegistryDef = $container->getDefinition($destinationMetaRegistryId);
+        $destinationMetaRegistryDef->replaceArgument(1, $configs);
     }
 
     /**
@@ -42,12 +42,12 @@ class BuildRouteRegistryPass implements CompilerPassInterface
     {
         foreach ($class::getSubscribedTopics() as $topicName => $params) {
             if (is_string($params)) {
-                $configs[$params][] = [$serviceId, null];
+                $configs['']['subscribers'][] = $serviceId;
             } elseif (is_array($params)) {
                 $processorName = empty($params['processorName']) ? $serviceId : $params['processorName'];
-                $destinationName = empty($params['destinationName']) ? null : $params['destinationName'];
+                $destinationName = empty($params['destinationName']) ? '' : $params['destinationName'];
 
-                $configs[$topicName][] = [$processorName, $destinationName];
+                $configs[$destinationName]['subscribers'][] = $processorName;
             } else {
                 throw new \LogicException(sprintf(
                     'Topic subscriber configuration is invalid. "%s"',
@@ -61,23 +61,14 @@ class BuildRouteRegistryPass implements CompilerPassInterface
      * @param array  $configs
      * @param array  $tagAttributes
      * @param string $serviceId
-     * @param string $processorTagName
      */
-    protected function addConfigsFromTags(&$configs, $tagAttributes, $serviceId, $processorTagName)
+    protected function addConfigsFromTags(&$configs, $tagAttributes, $serviceId)
     {
         foreach ($tagAttributes as $tagAttribute) {
-            if (false == isset($tagAttribute['topicName']) || false == $tagAttribute['topicName']) {
-                throw new \LogicException(sprintf(
-                    'Topic name is not set but it is required. service: "%s", tag: "%s"',
-                    $serviceId,
-                    $processorTagName
-                ));
-            }
-
             $processorName = empty($tagAttribute['processorName']) ? $serviceId : $tagAttribute['processorName'];
-            $destinationName = empty($tagAttribute['destinationName']) ? null : $tagAttribute['destinationName'];
+            $destinationName = empty($tagAttribute['destinationName']) ? '' : $tagAttribute['destinationName'];
 
-            $configs[$tagAttribute['topicName']][] = [$processorName, $destinationName];
+            $configs[$destinationName]['subscribers'][] = $processorName;
         }
     }
 }
