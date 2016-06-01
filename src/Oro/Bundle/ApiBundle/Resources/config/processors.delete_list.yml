@@ -109,6 +109,9 @@ services:
 
     oro_api.delete_list.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria
+        arguments:
+            - '@oro_api.config_provider'
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: 50 }
 

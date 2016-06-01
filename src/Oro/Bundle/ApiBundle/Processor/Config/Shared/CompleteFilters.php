@@ -37,8 +37,34 @@ class CompleteFilters extends CompleteSection
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         /** @var FiltersConfig $section */
-        $this->completeFieldFilters($section, $metadata, $definition);
+        $this->completePreConfiguredFieldFilters($section, $metadata);
+        $this->completeIndexedFieldFilters($section, $metadata, $definition);
         $this->completeAssociationFilters($section, $metadata, $definition);
+    }
+
+    /**
+     * @param FiltersConfig          $filters
+     * @param ClassMetadata          $metadata
+     */
+    protected function completePreConfiguredFieldFilters(
+        FiltersConfig $filters,
+        ClassMetadata $metadata
+    ) {
+        $filtersFields = $filters->getFields();
+        foreach ($filtersFields as $fieldName => $filterFieldConfig) {
+            if (!$metadata->hasField($fieldName)) {
+                continue;
+            }
+
+            $fieldMapping = $metadata->getFieldMapping($fieldName);
+
+            if (!$filterFieldConfig->hasDataType()) {
+                $filterFieldConfig->setDataType($fieldMapping['type']);
+            }
+            if (!$filterFieldConfig->hasArrayAllowed()) {
+                $filterFieldConfig->setArrayAllowed();
+            }
+        }
     }
 
     /**
@@ -46,7 +72,7 @@ class CompleteFilters extends CompleteSection
      * @param ClassMetadata          $metadata
      * @param EntityDefinitionConfig $definition
      */
-    protected function completeFieldFilters(
+    protected function completeIndexedFieldFilters(
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
