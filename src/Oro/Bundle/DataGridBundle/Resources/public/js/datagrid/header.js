@@ -48,9 +48,12 @@ define([
                 this.columns = new Backgrid.Columns(this.columns);
             }
 
+            this.filteredColumns = options.filteredColumns;
+
             var rowOptions = {
                 columns: this.columns,
-                collection: this.collection,
+                collection: this.filteredColumns,
+                dataCollection: this.collection,
                 headerCell: this.headerCell
             };
             this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
@@ -66,12 +69,10 @@ define([
             if (this.disposed) {
                 return;
             }
-            _.each(this.row.cells, function(cell) {
-                cell.dispose();
-            });
-            delete this.row.cells;
+            this.row.dispose();
             delete this.row;
             delete this.columns;
+            delete this.filteredColumns;
             Header.__super__.dispose.apply(this, arguments);
         }
     });

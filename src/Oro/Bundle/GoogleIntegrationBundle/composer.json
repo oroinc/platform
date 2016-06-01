@@ -5,7 +5,7 @@
     "keywords": ["BAP"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4",
+        "php": ">=5.5.9",
         "symfony/symfony": "2.7.*",
         "oro/config-bundle": "dev-master",
         "oro/migration-bundle": "dev-master",
