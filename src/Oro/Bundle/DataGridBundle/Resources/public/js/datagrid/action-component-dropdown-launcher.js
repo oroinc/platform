@@ -28,7 +28,6 @@ define(function(require) {
 
         events: {
             'click .dropdown-menu': 'onDropdownMenuClick',
-            'click [data-toggle=dropdown]': 'onDropdownToggleClick',
             'shown.bs.dropdown': 'onOpen'
         },
 
@@ -57,12 +56,10 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        render: function() {
-            ActionComponentDropdownLauncher.__super__.render.call(this);
+        initComponent: function() {
             this.componentOptions._sourceElement = this.$('.dropdown-menu');
             var Component = this.componentConstructor;
             this.component = new Component(this.componentOptions);
-            return this;
         },
 
         /**
@@ -72,30 +69,12 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.component.dispose();
+            if (this.component) {
+                this.component.dispose();
+            }
             delete this.component;
             delete this.componentOptions;
             ActionComponentDropdownLauncher.__super__.dispose.call(this);
-        },
-
-        /**
-         * Focus first input once dropdown is opened
-         *
-         * @param {jQuery.Event} e
-         */
-        onDropdownToggleClick: function(e) {
-            // inverse condition because this handler is bound first, before Bootstrap
-            var that = this;
-            if (!this.$el.is('.open')) {
-                var $elem = this.$('.dropdown-menu');
-                _.defer(function() {
-                    // focus input after Bootstrap opened dropdown menu
-                    $elem.focusFirstInput();
-                    if (_.isFunction(that.component.updateViews)) {
-                        that.component.updateViews();
-                    }
-                });
-            }
         },
 
         /**
@@ -113,12 +92,21 @@ define(function(require) {
          * Handles dropdown menu open and sets max-width for the element
          */
         onOpen: function() {
+            if (!this.component) {
+                this.initComponent();
+            }
             var $dropdownMenu = this.$('>.dropdown-menu');
             if ($dropdownMenu.length) {
                 var rect = $dropdownMenu[0].getBoundingClientRect();
                 $dropdownMenu.css({
                     maxWidth: rect.right + 'px'
                 });
+            }
+            var $elem = this.$('.dropdown-menu');
+            // focus input after Bootstrap opened dropdown menu
+            $elem.focusFirstInput();
+            if (_.isFunction(this.component.updateViews)) {
+                this.component.updateViews();
             }
         },
 

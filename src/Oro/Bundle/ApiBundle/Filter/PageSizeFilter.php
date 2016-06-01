@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Criteria;
 /**
  * A filter that can be used to specify the maximum number of records on one page.
  */
-class PageSizeFilter extends StandaloneFilter
+class PageSizeFilter extends StandaloneFilterWithDefaultValue
 {
     /**
      * {@inheritdoc}

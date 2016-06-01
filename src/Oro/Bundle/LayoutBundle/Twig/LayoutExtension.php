@@ -73,6 +73,10 @@ class LayoutExtension extends \Twig_Extension
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
+            new \Twig_SimpleFunction(
+                'layout_attr_merge',
+                [$this, 'mergeAttributes']
+            )
         ];
     }
 
@@ -103,6 +107,32 @@ class LayoutExtension extends \Twig_Extension
         }
 
         return $view;
+    }
+
+    /**
+     * @param array $attr
+     * @param array $defaultAttr
+     * @return array
+     */
+    public function mergeAttributes(array $attr, array $defaultAttr)
+    {
+        foreach ($defaultAttr as $key => $value) {
+            if (strpos($key, '~') === 0) {
+                $key = substr($key, 1);
+                if (array_key_exists($key, $attr)) {
+                    if (is_array($value)) {
+                        $attr[$key] = array_merge_recursive($value, (array)$attr[$key]);
+                    } else {
+                        $attr[$key] .= $value;
+                    }
+                }
+            }
+            if (!array_key_exists($key, $attr)) {
+                $attr[$key] = $value;
+            }
+        }
+
+        return $attr;
     }
 
     /**
