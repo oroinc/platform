@@ -1426,7 +1426,7 @@ services:
              - { name: layout.block_type, alias: title }
 ```
 
-It's recommended to place custom block types configuration to `Resource\config\block_type.yml` file in your bundle.
+Usually the definition of layout block types are located in `Resource\config\block_types.yml`, but you can use any file.
 
 If you want to create block type with custom properties mapping extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType` or implement `Oro\Component\Layout\BlockTypeInterface`.
 

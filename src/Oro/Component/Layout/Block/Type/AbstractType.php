@@ -71,15 +71,4 @@ abstract class AbstractType implements BlockTypeInterface
     {
         return BaseType::NAME;
     }
-
-    /**
-     * @return array
-     */
-    protected function getOptionSettings()
-    {
-        return [
-            'default',
-            'required',
-        ];
-    }
 }
