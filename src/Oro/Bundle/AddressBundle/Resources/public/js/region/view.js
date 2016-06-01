@@ -54,11 +54,9 @@ define([
                 if (this.regionRequired) {
                     this.addRequiredFlag(this.$simpleEl);
                 }
-                this.target.select2('container').parent().find('label').show();
-                this.target.select2('container').show();
+                this.target.select2('container').parent().show();
             } else {
-                this.target.select2('container').parent().find('label').hide();
-                this.target.select2('container').hide();
+                this.target.select2('container').parent().hide();
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }
