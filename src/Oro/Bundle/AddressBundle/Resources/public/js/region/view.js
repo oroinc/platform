@@ -54,9 +54,9 @@ define([
                 if (this.regionRequired) {
                     this.addRequiredFlag(this.$simpleEl);
                 }
-                this.target.select2('container').parent().show();
+                this.target.parent().show();
             } else {
-                this.target.select2('container').parent().hide();
+                this.target.parent().hide();
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }
