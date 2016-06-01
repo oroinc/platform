@@ -2,13 +2,14 @@
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
-use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession as TransportAmqpSession;
+use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 
-class AmqpSession implements SessionInterface
+class AmqpDriver implements DriverInterface
 {
     /**
-     * @var TransportAmqpSession
+     * @var AmqpSession
      */
     protected $session;
 
@@ -18,10 +19,10 @@ class AmqpSession implements SessionInterface
     protected $config;
 
     /**
-     * @param TransportAmqpSession $session
+     * @param AmqpSession $session
      * @param Config               $config
      */
-    public function __construct(TransportAmqpSession $session, Config $config)
+    public function __construct(AmqpSession $session, Config $config)
     {
         $this->session = $session;
         $this->config = $config;
@@ -35,6 +36,16 @@ class AmqpSession implements SessionInterface
         return $this->session->createMessage(null, [], [
             'delivery_mode' => AmqpMessage::DELIVERY_MODE_PERSISTENT,
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessagePriority(MessageInterface $message, $priority)
+    {
+        $headers = $message->getHeaders();
+        $headers['priority'] = $priority;
+        $message->setHeaders($headers);
     }
 
     /**
@@ -55,6 +66,7 @@ class AmqpSession implements SessionInterface
         $queue = $this->session->createQueue($queueName);
         $queue->setDurable(true);
         $queue->setAutoDelete(false);
+        $queue->setTable(['x-max-priority' => 5]);
         $this->session->declareQueue($queue);
 
         return $queue;

@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Router;
-use Oro\Component\MessageQueue\Client\SessionInterface;
+use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
@@ -181,7 +181,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     
     protected function createSessionStub($config = null)
     {
-        $sessionMock = $this->getMock(SessionInterface::class);
+        $sessionMock = $this->getMock(DriverInterface::class);
         $sessionMock
             ->expects($this->any())
             ->method('createMessage')

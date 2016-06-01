@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 class Router implements RuterInterface
 {
     /**
-     * @var SessionInterface
+     * @var DriverInterface
      */
     protected $session;
 
@@ -18,10 +18,10 @@ class Router implements RuterInterface
     protected $routes;
 
     /**
-     * @param SessionInterface $session
+     * @param DriverInterface $session
      * @param array   $routes
      */
-    public function __construct(SessionInterface $session, array $routes = [])
+    public function __construct(DriverInterface $session, array $routes = [])
     {
         $this->session = $session;
         $this->routes = $routes;

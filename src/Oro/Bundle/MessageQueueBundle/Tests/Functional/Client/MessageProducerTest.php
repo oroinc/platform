@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\MessageQueueBundle\Tests\Functional;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Client;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\MessageProducer;
@@ -16,5 +16,13 @@ class MessageProducerTest extends WebTestCase
         $messageProducer = $this->getContainer()->get('oro_message_queue.client.message_producer');
 
         $this->assertInstanceOf(MessageProducer::class, $messageProducer);
+    }
+
+    public function testCouldBeGetFromContainerAsShortenAlias()
+    {
+        $messageProducer = $this->getContainer()->get('oro_message_queue.client.message_producer');
+        $aliasMessageProducer = $this->getContainer()->get('oro_message_queue.message_producer');
+
+        $this->assertSame($messageProducer, $aliasMessageProducer);
     }
 }

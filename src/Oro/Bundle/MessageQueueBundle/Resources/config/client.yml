@@ -3,17 +3,17 @@ services:
         class: 'Oro\Component\MessageQueue\Client\Config'
         public: false
 
-    oro_message_queue.client.session:
-        class: 'Oro\Component\MessageQueue\Client\Session'
+    oro_message_queue.client.driver:
+        class: 'Oro\Component\MessageQueue\Client\Driver'
         public: false
-        factory: ['Oro\Component\MessageQueue\Client\SessionFactory', 'create']
+        factory: ['Oro\Component\MessageQueue\Client\DriverFactory', 'create']
         arguments:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.client.config'
 
     oro_message_queue.client.message_producer:
         class: 'Oro\Component\MessageQueue\Client\MessageProducer'
-        factory: ['@oro_message_queue.client.session', 'createProducer']
+        factory: ['@oro_message_queue.client.driver', 'createProducer']
 
     oro_message_queue.message_producer:
         alias: 'oro_message_queue.client.message_producer'
@@ -22,7 +22,7 @@ services:
         class: 'Oro\Component\MessageQueue\Client\Router'
         public: false
         arguments:
-            - '@oro_message_queue.client.session'
+            - '@oro_message_queue.client.driver'
             - []
 
     oro_message_queue.client.route_message_processor:
@@ -59,7 +59,7 @@ services:
         class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\CreateQueueExtension'
         public: false
         arguments:
-            - '@oro_message_queue.client.session'
+            - '@oro_message_queue.client.driver'
 
     oro_message_queue.client.extensions:
         class: 'Oro\Component\MessageQueue\Consumption\Extensions'
@@ -82,7 +82,7 @@ services:
         arguments:
             - '@oro_message_queue.client.queue_consumer'
             - '@oro_message_queue.client.delegate_message_processor'
-            - '@oro_message_queue.client.session'
+            - '@oro_message_queue.client.driver'
         tags:
             - { name: 'console.command' }
 

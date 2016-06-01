@@ -4,21 +4,21 @@ namespace Oro\Component\MessageQueue\Client\ConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
-use Oro\Component\MessageQueue\Client\SessionInterface;
+use Oro\Component\MessageQueue\Client\DriverInterface;
 
 class CreateQueueExtension implements ExtensionInterface
 {
     use ExtensionTrait;
     
     /**
-     * @var SessionInterface
+     * @var DriverInterface
      */
     private $session;
 
     /**
-     * @param SessionInterface $session
+     * @param DriverInterface $session
      */
-    public function __construct(SessionInterface $session)
+    public function __construct(DriverInterface $session)
     {
         $this->session = $session;
     }

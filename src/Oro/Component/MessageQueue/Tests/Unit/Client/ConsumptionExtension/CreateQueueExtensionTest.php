@@ -6,7 +6,7 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Client\ConsumptionExtension\CreateQueueExtension;
-use Oro\Component\MessageQueue\Client\SessionInterface;
+use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
@@ -42,11 +42,11 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|DriverInterface
      */
     protected function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->getMock(DriverInterface::class);
     }
 
     /**

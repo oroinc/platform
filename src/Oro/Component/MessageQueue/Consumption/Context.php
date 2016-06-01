@@ -6,7 +6,6 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Tests\Logger;
 
 class Context
 {

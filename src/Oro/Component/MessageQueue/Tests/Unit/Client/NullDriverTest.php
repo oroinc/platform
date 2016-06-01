@@ -3,24 +3,24 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
-use Oro\Component\MessageQueue\Transport\Null\NullSession as TransportNullSession;
+use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\Client\MessageProducer;
-use Oro\Component\MessageQueue\Client\NullSession;
+use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Client\Config;
 
-class NullSessionTest extends \PHPUnit_Framework_TestCase
+class NullDriverTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new NullSession($this->createTransportSessionMock(), new Config('', '', '', '', ''));
+        new NullDriver($this->createSessionMock(), new Config('', '', '', '', ''));
     }
 
     public function testShouldCreateMessageInstance()
     {
         $message = new NullMessage();
 
-        $transportSession = $this->createTransportSessionMock();
+        $transportSession = $this->createSessionMock();
         $transportSession
             ->expects($this->once())
             ->method('createMessage')
@@ -28,23 +28,35 @@ class NullSessionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($message))
         ;
 
-        $session = new NullSession($transportSession, new Config('', '', '', '', ''));
-        $result = $session->createMessage();
+        $driver = new NullDriver($transportSession, new Config('', '', '', '', ''));
+        $result = $driver->createMessage();
 
         $this->assertSame($message, $result);
     }
 
+    public function testShouldSetMessagePriority()
+    {
+        $message = new NullMessage();
+
+        $session = $this->createSessionMock();
+
+        $driver = new NullDriver($session, new Config('', '', '', '', ''));
+        $driver->setMessagePriority($message, $priority = 3);
+
+        $this->assertSame($priority, $message->getHeader('priority'));
+    }
+
     public function testShouldCreateProducerInstance()
     {
-        $transportSession = $this->createTransportSessionMock();
+        $transportSession = $this->createSessionMock();
         $transportSession
             ->expects($this->once())
             ->method('createProducer')
             ->will($this->returnValue($this->getMock(TransportMessageProducer::class)))
         ;
 
-        $session = new NullSession($transportSession, new Config('', '', '', '', ''));
-        $result = $session->createProducer();
+        $driver = new NullDriver($transportSession, new Config('', '', '', '', ''));
+        $result = $driver->createProducer();
 
         $this->assertInstanceOf(MessageProducer::class, $result);
     }
@@ -53,8 +65,8 @@ class NullSessionTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Config('', '', '', '', '');
 
-        $session = new NullSession($this->createTransportSessionMock(), $config);
-        $result = $session->getConfig();
+        $driver = new NullDriver($this->createSessionMock(), $config);
+        $result = $driver->getConfig();
 
         $this->assertSame($config, $result);
     }
@@ -65,7 +77,7 @@ class NullSessionTest extends \PHPUnit_Framework_TestCase
 
         $config = new Config('', '', '', '', '');
 
-        $transportSession = $this->createTransportSessionMock();
+        $transportSession = $this->createSessionMock();
         $transportSession
             ->expects($this->once())
             ->method('createQueue')
@@ -73,17 +85,17 @@ class NullSessionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queue))
         ;
 
-        $session = new NullSession($transportSession, $config);
-        $result = $session->createQueue('queue-name');
+        $driver = new NullDriver($transportSession, $config);
+        $result = $driver->createQueue('queue-name');
 
         $this->assertSame($queue, $result);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TransportNullSession
+     * @return \PHPUnit_Framework_MockObject_MockObject|NullSession
      */
-    protected function createTransportSessionMock()
+    protected function createSessionMock()
     {
-        return $this->getMock(TransportNullSession::class, [], [], '', false);
+        return $this->getMock(NullSession::class, [], [], '', false);
     }
 }

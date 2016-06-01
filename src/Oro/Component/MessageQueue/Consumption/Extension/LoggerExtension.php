@@ -30,7 +30,10 @@ class LoggerExtension implements ExtensionInterface
     {
         $context->setLogger($this->logger);
         $context->getLogger()->debug(sprintf('Set context\'s logger %s', get_class($this->logger)));
-        $context->getLogger()->info('Start consuming');
+        $context->getLogger()->info(sprintf(
+            'Start consuming from queue %s',
+            $context->getMessageConsumer()->getQueue()->getQueueName()
+        ));
     }
 
     /**
@@ -77,7 +80,7 @@ class LoggerExtension implements ExtensionInterface
     public function onInterrupted(Context $context)
     {
         if ($context->getException()) {
-            $context->getLogger()->info(sprintf('Consuming interrupted by exception'));
+            $context->getLogger()->error(sprintf('Consuming interrupted by exception'));
         } else {
             $context->getLogger()->info(sprintf('Consuming interrupted'));
         }

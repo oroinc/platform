@@ -23,16 +23,16 @@ class ConsumeMessagesCommand extends Command
     protected $processor;
 
     /**
-     * @var SessionInterface
+     * @var DriverInterface
      */
     private $session;
 
     /**
      * @param QueueConsumer $consumer
      * @param DelegateMessageProcessor $processor
-     * @param SessionInterface $session
+     * @param DriverInterface $session
      */
-    public function __construct(QueueConsumer $consumer, DelegateMessageProcessor $processor, SessionInterface $session)
+    public function __construct(QueueConsumer $consumer, DelegateMessageProcessor $processor, DriverInterface $session)
     {
         parent::__construct('oro:message-queue:consume');
 

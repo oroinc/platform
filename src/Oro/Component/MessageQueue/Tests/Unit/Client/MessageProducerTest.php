@@ -1,18 +1,19 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Component\MessageQueue\Client\MessagePriorityEnum;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\SessionInterface;
+use Oro\Component\MessageQueue\Client\DriverInterface;
 
 class MessageProducerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new MessageProducer($this->createTransportMessageProducer(), $this->createSessionStub());
+        new MessageProducer($this->createTransportMessageProducer(), $this->createDriverStub());
     }
 
     public function testShouldSendMessageAndCreateSchema()
@@ -29,9 +30,9 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($queue), $this->identicalTo($message))
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue);
+        $driver = $this->createDriverStub($message, $config, $queue);
 
-        $producer = new MessageProducer($messageProducer, $session);
+        $producer = new MessageProducer($messageProducer, $driver);
         $producer->sendTo('topic', 'message');
 
         $expectedProperties = [
@@ -41,6 +42,46 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expectedProperties, $message->getProperties());
+    }
+
+    public function testShouldSendMessageWithLowPriorityByDefault()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('queue');
+
+        $message = new NullMessage();
+
+        $messageProducer = $this->createTransportMessageProducer();
+
+        $driver = $this->createDriverStub($message, $config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('setMessagePriority')
+            ->with($this->identicalTo($message), MessagePriorityEnum::LOW)
+        ;
+
+        $producer = new MessageProducer($messageProducer, $driver);
+        $producer->sendTo('topic', 'message');
+    }
+
+    public function testShouldSendMessageWithCustomPriority()
+    {
+        $config = new Config('', 'route-message-processor', 'router-queue', '', '');
+        $queue = new NullQueue('queue');
+
+        $message = new NullMessage();
+
+        $messageProducer = $this->createTransportMessageProducer();
+
+        $driver = $this->createDriverStub($message, $config, $queue);
+        $driver
+            ->expects($this->once())
+            ->method('setMessagePriority')
+            ->with($this->identicalTo($message), MessagePriorityEnum::HIGH)
+        ;
+
+        $producer = new MessageProducer($messageProducer, $driver);
+        $producer->sendTo('topic', 'message', MessagePriorityEnum::HIGH);
     }
 
     public function testShouldSendNullAsPlainText()
@@ -56,9 +97,9 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue);
+        $driver = $this->createDriverStub($message, $config, $queue);
 
-        $producer = new MessageProducer($messageProducer, $session);
+        $producer = new MessageProducer($messageProducer, $driver);
         $producer->sendTo('topic', null);
 
         $this->assertSame('', $message->getBody());
@@ -78,9 +119,9 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue);
+        $driver = $this->createDriverStub($message, $config, $queue);
 
-        $producer = new MessageProducer($messageProducer, $session);
+        $producer = new MessageProducer($messageProducer, $driver);
         $producer->sendTo('topic', 'message');
 
         $this->assertSame('message', $message->getBody());
@@ -100,9 +141,9 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue);
+        $driver = $this->createDriverStub($message, $config, $queue);
 
-        $producer = new MessageProducer($messageProducer, $session);
+        $producer = new MessageProducer($messageProducer, $driver);
         $producer->sendTo('topic', ['foo' => 'fooVal']);
 
         $this->assertSame('{"foo":"fooVal"}', $message->getBody());
@@ -122,9 +163,9 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->method('send')
         ;
 
-        $session = $this->createSessionStub($message, $config, $queue);
+        $driver = $this->createDriverStub($message, $config, $queue);
 
-        $producer = new MessageProducer($messageProducer, $session);
+        $producer = new MessageProducer($messageProducer, $driver);
 
         $this->setExpectedException(
             \InvalidArgumentException::class,
@@ -144,7 +185,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         
         $message = new NullMessage();
 
-        $producer = new MessageProducer($this->createTransportMessageProducer(), $this->createSessionStub());
+        $producer = new MessageProducer($this->createTransportMessageProducer(), $this->createDriverStub());
         $producer->send($queue, $message);
     }
 
@@ -162,7 +203,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             Config::PARAMETER_TOPIC_NAME => 'topic'
         ]);
 
-        $producer = new MessageProducer($this->createTransportMessageProducer(), $this->createSessionStub());
+        $producer = new MessageProducer($this->createTransportMessageProducer(), $this->createDriverStub());
         $producer->send($queue, $message);
     }
 
@@ -184,7 +225,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($queue, $this->identicalTo($message)))
         ;
 
-        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub());
         $producer->send($queue, $message);
 
         $this->assertEquals(['content_type' => 'text/plain'], $message->getHeaders());
@@ -210,7 +251,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($queue, $this->identicalTo($message)))
         ;
 
-        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub());
         $producer->send($queue, $message);
 
         $this->assertEquals(['content_type' => 'text/plain'], $message->getHeaders());
@@ -239,7 +280,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($queue, $this->identicalTo($message)))
         ;
 
-        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub());
         $producer->send($queue, $message);
 
         $this->assertEquals(['content_type' => 'my/content/type'], $message->getHeaders());
@@ -268,7 +309,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $messageProcessor = $this->createTransportMessageProducer();
 
-        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub());
         $producer->send($queue, $message);
     }
 
@@ -290,7 +331,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($queue, $this->identicalTo($message)))
         ;
 
-        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub());
         $producer->send($queue, $message);
 
         $this->assertEquals(['content_type' => 'application/json'], $message->getHeaders());
@@ -316,33 +357,33 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $messageProcessor = $this->createTransportMessageProducer();
 
-        $producer = new MessageProducer($messageProcessor, $this->createSessionStub());
+        $producer = new MessageProducer($messageProcessor, $this->createDriverStub());
         $producer->send($queue, $message);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|DriverInterface
      */
-    protected function createSessionStub($message = null, $config = null, $queue = null)
+    protected function createDriverStub($message = null, $config = null, $queue = null)
     {
-        $sessionMock = $this->getMock(SessionInterface::class, [], [], '', false);
-        $sessionMock
+        $driverMock = $this->getMock(DriverInterface::class, [], [], '', false);
+        $driverMock
             ->expects($this->any())
             ->method('createMessage')
             ->will($this->returnValue($message))
         ;
-        $sessionMock
+        $driverMock
             ->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($config))
         ;
-        $sessionMock
+        $driverMock
             ->expects($this->any())
             ->method('createQueue')
             ->will($this->returnValue($queue))
         ;
 
-        return $sessionMock;
+        return $driverMock;
     }
 
     /**

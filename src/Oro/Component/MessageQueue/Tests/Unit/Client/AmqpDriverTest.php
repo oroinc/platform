@@ -3,17 +3,17 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
-use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession as TransportAmqpSession;
+use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\Client\MessageProducer;
-use Oro\Component\MessageQueue\Client\AmqpSession;
+use Oro\Component\MessageQueue\Client\AmqpDriver;
 use Oro\Component\MessageQueue\Client\Config;
 
-class AmqpSessionTest extends \PHPUnit_Framework_TestCase
+class AmqpDriverTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new AmqpSession($this->createTransportSessionMock(), new Config('', '', '', '', ''));
+        new AmqpDriver($this->createSessionMock(), new Config('', '', '', '', ''));
     }
 
     public function testShouldCreateMessageInstance()
@@ -24,31 +24,43 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
             'delivery_mode' => AmqpMessage::DELIVERY_MODE_PERSISTENT,
         ];
 
-        $transportSession = $this->createTransportSessionMock();
-        $transportSession
+        $session = $this->createSessionMock();
+        $session
             ->expects($this->once())
             ->method('createMessage')
             ->with(null, [], $expectedProperties)
             ->will($this->returnValue($message))
         ;
 
-        $session = new AmqpSession($transportSession, new Config('', '', '', '', ''));
-        $result = $session->createMessage();
+        $driver = new AmqpDriver($session, new Config('', '', '', '', ''));
+        $result = $driver->createMessage();
 
         $this->assertSame($message, $result);
     }
 
+    public function testShouldSetMessagePriority()
+    {
+        $message = new AmqpMessage();
+
+        $session = $this->createSessionMock();
+
+        $driver = new AmqpDriver($session, new Config('', '', '', '', ''));
+        $driver->setMessagePriority($message, $priority = 3);
+
+        $this->assertSame($priority, $message->getHeader('priority'));
+    }
+
     public function testShouldCreateProducerInstance()
     {
-        $transportSession = $this->createTransportSessionMock();
-        $transportSession
+        $session = $this->createSessionMock();
+        $session
             ->expects($this->once())
             ->method('createProducer')
             ->will($this->returnValue($this->getMock(TransportMessageProducer::class)))
         ;
 
-        $session = new AmqpSession($transportSession, new Config('', '', '', '', ''));
-        $result = $session->createProducer();
+        $driver = new AmqpDriver($session, new Config('', '', '', '', ''));
+        $result = $driver->createProducer();
 
         $this->assertInstanceOf(MessageProducer::class, $result);
     }
@@ -57,8 +69,8 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Config('', '', '', '', '');
 
-        $session = new AmqpSession($this->createTransportSessionMock(), $config);
-        $result = $session->getConfig();
+        $driver = new AmqpDriver($this->createSessionMock(), $config);
+        $result = $driver->getConfig();
 
         $this->assertSame($config, $result);
     }
@@ -69,26 +81,25 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
 
         $config = new Config('', '', '', '', '');
 
-        $transportSession = $this->createTransportSessionMock();
-        $transportSession
+        $session = $this->createSessionMock();
+        $session
             ->expects($this->once())
             ->method('createQueue')
             ->with('queue-name')
             ->will($this->returnValue($queue))
         ;
-        $transportSession
+        $session
             ->expects($this->once())
             ->method('declareQueue')
             ->with($this->identicalTo($queue))
         ;
 
-        $session = new AmqpSession($transportSession, $config);
-        $result = $session->createQueue('queue-name');
+        $driver = new AmqpDriver($session, $config);
+        $result = $driver->createQueue('queue-name');
 
         $this->assertSame($queue, $result);
 
         $this->assertEmpty($queue->getConsumerTag());
-        $this->assertEmpty($queue->getTable());
         $this->assertFalse($queue->isExclusive());
         $this->assertFalse($queue->isAutoDelete());
         $this->assertFalse($queue->isPassive());
@@ -96,13 +107,14 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($queue->isDurable());
         $this->assertFalse($queue->isNoAck());
         $this->assertFalse($queue->isNoLocal());
+        $this->assertEquals(['x-max-priority' => 5], $queue->getTable());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TransportAmqpSession
+     * @return \PHPUnit_Framework_MockObject_MockObject|AmqpSession
      */
-    protected function createTransportSessionMock()
+    protected function createSessionMock()
     {
-        return $this->getMock(TransportAmqpSession::class, [], [], '', false);
+        return $this->getMock(AmqpSession::class, [], [], '', false);
     }
 }

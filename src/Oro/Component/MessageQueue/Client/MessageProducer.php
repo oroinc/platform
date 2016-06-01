@@ -13,38 +13,41 @@ class MessageProducer implements TransportMessageProducer
     protected $transportProducer;
 
     /**
-     * @var SessionInterface
+     * @var DriverInterface
      */
-    protected $session;
+    protected $driver;
 
     /**
      * @param TransportMessageProducer $transportProducer
-     * @param SessionInterface                  $session
+     * @param DriverInterface                  $driver
      */
-    public function __construct(TransportMessageProducer $transportProducer, SessionInterface $session)
+    public function __construct(TransportMessageProducer $transportProducer, DriverInterface $driver)
     {
         $this->transportProducer = $transportProducer;
-        $this->session = $session;
+        $this->driver = $driver;
     }
 
     /**
      * @param string $topic
      * @param string $body
+     * @param int $priority
      */
-    public function sendTo($topic, $body)
+    public function sendTo($topic, $body, $priority = MessagePriorityEnum::LOW)
     {
-        $config = $this->session->getConfig();
+        $config = $this->driver->getConfig();
 
-        $message = $this->session->createMessage();
+        $message = $this->driver->createMessage();
+        $this->driver->setMessagePriority($message, $priority);
+
         $message->setBody($body);
-        
+
         $properties = $message->getProperties();
         $properties[Config::PARAMETER_TOPIC_NAME] = $topic;
         $properties[Config::PARAMETER_PROCESSOR_NAME] = $config->getRouterMessageProcessorName();
         $properties[Config::PARAMETER_QUEUE_NAME] = $config->getRouterQueueName();
         $message->setProperties($properties);
-
-        $queue = $this->session->createQueue($config->getRouterQueueName());
+        
+        $queue = $this->driver->createQueue($config->getRouterQueueName());
         
         $this->send($queue, $message);
     }

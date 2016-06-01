@@ -1,13 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Transport\Null\NullSession as TransportNullSession;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 
-class NullSession implements SessionInterface
+class NullDriver implements DriverInterface
 {
     /**
-     * @var TransportNullSession
+     * @var NullSession
      */
     protected $session;
 
@@ -17,10 +18,10 @@ class NullSession implements SessionInterface
     protected $config;
 
     /**
-     * @param TransportNullSession $session
+     * @param NullSession $session
      * @param Config               $config
      */
-    public function __construct(TransportNullSession $session, Config $config)
+    public function __construct(NullSession $session, Config $config)
     {
         $this->session = $session;
         $this->config = $config;
@@ -32,6 +33,16 @@ class NullSession implements SessionInterface
     public function createMessage()
     {
         return $this->session->createMessage();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessagePriority(MessageInterface $message, $priority)
+    {
+        $headers = $message->getHeaders();
+        $headers['priority'] = $priority;
+        $message->setHeaders($headers);
     }
 
     /**
