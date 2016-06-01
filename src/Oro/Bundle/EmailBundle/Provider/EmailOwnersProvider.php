@@ -56,6 +56,26 @@ class EmailOwnersProvider
     }
 
     /**
+     * Get QB email entities from owner entity
+     *
+     * @param object $entity
+     *
+     * @return array
+     */
+    public function getQBEmailsByOwnerEntity($entity)
+    {
+        $ownerColumnName = $this->getOwnerColumnName($entity);
+        if ($ownerColumnName === null) {
+            return [];
+        }
+
+        return $this
+            ->registry
+            ->getRepository('OroEmailBundle:Email')
+            ->createEmailsByOwnerEntityQbs($entity, $ownerColumnName);
+    }
+
+    /**
      * @param object $entity
      * @return bool
      */
