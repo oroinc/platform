@@ -40,6 +40,7 @@ class ReminderType extends AbstractType
                 'intention'            => 'reminder',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'cascade_validation'   => true,
+                'error_bubbling'       => false,
             )
         );
     }
