@@ -2,6 +2,7 @@
 namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
+use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Symfony\Component\Console\Command\Command;
@@ -46,6 +47,8 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
             ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service')
             ->addOption('message-limit', InputOption::VALUE_REQUIRED, 'Consume n messages and exit')
             ->addOption('time-limit', InputOption::VALUE_REQUIRED, 'Consume messages during this time')
+            ->addOption('memory-limit', InputOption::VALUE_REQUIRED, 'Consume messages until process reaches'.
+                ' this memory limit in MB');
         ;
     }
 
@@ -54,7 +57,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $extensions = [];
+        $extensions = [new LoggerExtension(new ConsoleLogger($output))];
 
         if ($messageLimit = (int) $input->getOption('message-limit')) {
             $extensions[] = new LimitConsumedMessagesExtension($messageLimit);
@@ -72,7 +75,9 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
             $extensions[] = new LimitConsumptionTimeExtension($timeLimit);
         }
 
-        $extensions[] = new LoggerExtension(new ConsoleLogger($output));
+        if ($memoryLimit = (int) $input->getOption('memory-limit')) {
+            $extensions[] = new LimitConsumerMemoryExtension($memoryLimit);
+        }
 
         $queueName = $input->getArgument('queue');
 

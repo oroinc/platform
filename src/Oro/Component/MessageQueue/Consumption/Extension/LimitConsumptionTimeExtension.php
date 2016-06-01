@@ -53,7 +53,7 @@ class LimitConsumptionTimeExtension implements ExtensionInterface
     protected function checkTime(Context $context)
     {
         $now = new \DateTime();
-        if ($now <= $this->timeLimit) {
+        if ($now >= $this->timeLimit) {
             $context->getLogger()->debug(sprintf(
                 '[LimitConsumptionTimeExtension] Execution interrupted as limit time has passed.'.
                 ' now: "%s", time-limit: "%s"',
