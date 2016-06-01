@@ -16,31 +16,44 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _formatRawValue: function(value) {
-            if (value.value && value.value.start) {
-                value.value.start = this._toRawValue(value.value.start);
+        autoUpdateRangeFilterType: false,
 
-                this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
-            }
-            if (value.value && value.value.end) {
-                value.value.end = this._toRawValue(value.value.end);
-
-                this._setInputValue(this.criteriaValueSelectors.value.end, value.value.end);
-            }
-
-            return value;
+        /**
+         * Render filter view
+         * Update value after render
+         *
+         * @return {*}
+         */
+        render: function() {
+            WidgetConfigDateTimeRangeFilter.__super__.render.call(this);
+            this.setValue(this.value);
+            return this;
         },
 
         /**
          * @inheritDoc
          */
-        setValue: function(value) {
-            var oldValue = this.value;
-            this.value = tools.deepClone(value);
-            this._onValueUpdated(this.value, oldValue);
+        _triggerUpdate: function(newValue, oldValue) {
+            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+                this.trigger('update');
+            }
+        },
 
-            return this;
-        }
+        /**
+         * Update value without triggering events
+         *
+         * @param value
+         */
+        updateValue: function(value) {
+            this.value = tools.deepClone(value);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _updateDOMValue: function() {
+            return this._writeDOMValue(this._formatRawValue(this.getValue()));
+        },
     });
 
     return WidgetConfigDateTimeRangeFilter;

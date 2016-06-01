@@ -33,15 +33,16 @@ class OriginFolderFilterProvider
     }
 
     /**
-     * Get marketing list types choices.
+     * Get origins list choices.
      *
+     * @param bool $extended
      * @return array
      */
-    public function getListTypeChoices()
+    public function getListTypeChoices($extended = false)
     {
         $results = [];
-        $results = $this->preparePersonalOrigin($results);
-        $results = $this->prepareMailboxOrigins($results);
+        $results = $this->preparePersonalOrigin($results, $extended);
+        $results = $this->prepareMailboxOrigins($results, $extended);
 
         return $results;
     }
@@ -76,9 +77,11 @@ class OriginFolderFilterProvider
 
     /**
      * @param $results
+     * @param $extended
+     *
      * @return array
      */
-    protected function preparePersonalOrigin($results)
+    protected function preparePersonalOrigin($results, $extended)
     {
         $origins = $this->getOrigins();
         foreach ($origins as $origin) {
@@ -86,11 +89,20 @@ class OriginFolderFilterProvider
             $mailbox = $origin->getMailboxName();
             $folders = $this->filterFolders($folders->toArray());
             if (count($folders) > 0) {
-                $results[$mailbox] = [];
-                $results[$mailbox]['active'] = $origin->isActive();
-                /** @var EmailFolder $folder */
+                $results[$mailbox] = [
+                    'id' => $origin->getId(),
+                    'active' => $origin->isActive(),
+                ];
+                $i=1;
                 foreach ($folders as $folder) {
-                    $results[$mailbox]['folder'][$folder->getId()] = str_replace('@', '\@', $folder->getFullName());
+                    if ($extended) {
+                        $results[$mailbox]['folder'][$i]['id'] = $folder->getId();
+                        $results[$mailbox]['folder'][$i]['syncEnabled'] = $folder->isSyncEnabled();
+                        $results[$mailbox]['folder'][$i]['fullName'] = str_replace('@', '\@', $folder->getFullName());
+                        $i++;
+                    } else {
+                        $results[$mailbox]['folder'][$folder->getId()] = str_replace('@', '\@', $folder->getFullName());
+                    }
                 }
             }
         }
@@ -100,22 +112,33 @@ class OriginFolderFilterProvider
 
     /**
      * @param $results
+     * @param $extended
+     *
      * @return mixed
      */
-    protected function prepareMailboxOrigins($results)
+    protected function prepareMailboxOrigins($results, $extended)
     {
         $systemMailboxes = $this->getMailboxes();
         foreach ($systemMailboxes as $mailbox) {
             $origin = $mailbox->getOrigin();
             $folders = $origin->getFolders();
-            $mailboxLabel = $mailbox->getLabel();
+            $mailbox = $mailbox->getLabel();
             $folders = $this->filterFolders($folders->toArray());
             if (count($folders) > 0) {
-                $results[$mailboxLabel] = [];
-                $results[$mailboxLabel]['active'] = $origin->isActive();
-                /** @var EmailFolder $folder */
+                $results[$mailbox] = [
+                    'id' => $origin->getId(),
+                    'active' => $origin->isActive(),
+                ];
+                $i=1;
                 foreach ($folders as $folder) {
-                    $results[$mailboxLabel]['folder'][$folder->getId()] = $folder->getFullName();
+                    if ($extended) {
+                        $results[$mailbox]['folder'][$i]['id'] = $folder->getId();
+                        $results[$mailbox]['folder'][$i]['syncEnabled'] = $folder->isSyncEnabled();
+                        $results[$mailbox]['folder'][$i]['fullName'] = str_replace('@', '\@', $folder->getFullName());
+                        $i++;
+                    } else {
+                        $results[$mailbox]['folder'][$folder->getId()] = str_replace('@', '\@', $folder->getFullName());
+                    }
                 }
             }
         }
@@ -125,14 +148,13 @@ class OriginFolderFilterProvider
 
     /**
      * @param $folders array
-     * @return array
+     * @return EmailFolder[]
      */
-    private function filterFolders($folders)
+    private function filterFolders(array $folders)
     {
         $folders = array_filter(
             $folders,
-            function ($item) {
-                /** @var EmailFolder $item */
+            function (EmailFolder $item) {
                 return $item->isSyncEnabled();
             }
         );

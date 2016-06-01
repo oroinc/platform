@@ -30,7 +30,10 @@
             class: attr.class|replace({'{{ class_prefix }}': class_prefix})
         }) %}
     {% endif %}
-    {% for attrname, attrvalue in attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
+    {% for attrname, attrvalue in attr %}
+        {% if (attrvalue is iterable) %}{% set attrvalue = attrvalue|json_encode(constant('JSON_FORCE_OBJECT')) %}{% endif %}
+        {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}
+    {% endfor %}
 {%- endblock %}
 
 {% block block_label_attributes -%}
@@ -119,6 +122,7 @@
 {% endblock %}
 
 {% block form_start_widget %}
+    {% set attr = form.vars.attr|merge(attr) %}
     {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
     {% if method is defined and method not in ['GET', 'POST'] -%}
         {% set form_method = 'POST' %}

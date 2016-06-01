@@ -9,12 +9,20 @@
     display: inline-block;
     vertical-align: middle;
     white-space: nowrap;
+
+    .loader-frame {
+        padding-left: 36px;
+    }
 }
 .filter-item .reset-filter:hover [class^='icon-']:before {
     color: #666;
 }
 .filter-item .reset-filter {
     margin-left: 2px;
+    display: inline-block;
+    width: 12px;
+    line-height: 25px;
+    vertical-align: top;
 }
 .filter-item .filter-default-value .reset-filter {
     display: none;
@@ -56,7 +64,8 @@
     background-color: #ffffff;
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
-    display: none;
+    display: block;
+    visibility: hidden;
     z-index: @oroZindexDropdown;
     margin-top: 7px;
     top: auto;
@@ -393,6 +402,9 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 
 .filter-container {
     position: relative;
+}
+.filter-items > :empty {
+  display: none;
 }
 .filter-items-hint {
     padding-right: 80px;

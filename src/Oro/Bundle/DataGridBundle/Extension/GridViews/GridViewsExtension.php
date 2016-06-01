@@ -177,10 +177,14 @@ class GridViewsExtension extends AbstractExtension
     protected function getDefaultView($gridName)
     {
         if ($this->defaultGridView === false) {
+            if (!$currentUser = $this->securityFacade->getLoggedUser()) {
+                return null;
+            }
+
             $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
             $defaultGridView = $repository->findDefaultGridView(
                 $this->aclHelper,
-                $this->securityFacade->getLoggedUser(),
+                $currentUser,
                 $gridName
             );
 

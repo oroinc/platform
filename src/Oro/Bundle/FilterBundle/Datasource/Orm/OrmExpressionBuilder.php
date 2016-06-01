@@ -11,6 +11,9 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
 {
     /** @var Expr */
     protected $expr;
+    
+    /** @var bool */
+    protected $caseInsensitive;
 
     /**
      * @param Expr $expr
@@ -18,8 +21,17 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     public function __construct(Expr $expr)
     {
         $this->expr = $expr;
+        $this->caseInsensitive = false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function setCaseInsensitive($caseInsensitive = false)
+    {
+        $this->caseInsensitive = $caseInsensitive;
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -41,7 +53,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function comparison($x, $operator, $y, $withParam = false)
     {
-        return new Expr\Comparison($x, $operator, $withParam ? ':' . $y : $y);
+        return new Expr\Comparison($this->prepareParameter($x), $operator, $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -49,7 +61,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function eq($x, $y, $withParam = false)
     {
-        return $this->expr->eq($x, $withParam ? ':' . $y : $y);
+        return $this->expr->eq($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -88,7 +100,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
         );
         */
 
-        return $this->expr->neq($x, $withParam ? ':' . $y : $y);
+        return $this->expr->neq($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -96,7 +108,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function lt($x, $y, $withParam = false)
     {
-        return $this->expr->lt($x, $withParam ? ':' . $y : $y);
+        return $this->expr->lt($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -104,7 +116,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function lte($x, $y, $withParam = false)
     {
-        return $this->expr->lte($x, $withParam ? ':' . $y : $y);
+        return $this->expr->lte($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -112,7 +124,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function gt($x, $y, $withParam = false)
     {
-        return $this->expr->gt($x, $withParam ? ':' . $y : $y);
+        return $this->expr->gt($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -120,7 +132,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function gte($x, $y, $withParam = false)
     {
-        return $this->expr->gte($x, $withParam ? ':' . $y : $y);
+        return $this->expr->gte($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -136,7 +148,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function in($x, $y, $withParam = false)
     {
-        return $this->expr->in($x, $withParam ? ':' . $y : $y);
+        return $this->expr->in($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -144,7 +156,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function notIn($x, $y, $withParam = false)
     {
-        return $this->expr->notIn($x, $withParam ? ':' . $y : $y);
+        return $this->expr->notIn($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -168,7 +180,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function like($x, $y, $withParam = false)
     {
-        return $this->expr->like($x, $withParam ? ':' . $y : $y);
+        return $this->expr->like($this->prepareParameter($x), $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -196,7 +208,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
         );
         */
 
-        return new Expr\Comparison($x, 'NOT LIKE', $withParam ? ':' . $y : $y);
+        return new Expr\Comparison($this->prepareParameter($x), 'NOT LIKE', $this->prepareParameter($y, $withParam));
     }
 
     /**
@@ -229,5 +241,21 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     public function exists($x)
     {
         return $this->expr->exists($x);
+    }
+
+    /**
+     * @param $param
+     * @param bool $withParam
+     *
+     * @return mixed
+     */
+    protected function prepareParameter($param, $withParam = false)
+    {
+        $param = $withParam ? ':' . $param : $param;
+        if ($this->caseInsensitive) {
+            $param = $this->expr->lower($param);
+        }
+
+        return $param;
     }
 }

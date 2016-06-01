@@ -10,16 +10,8 @@ interface ConfigurationSectionInterface
      * Builds the definition of a section configuration.
      *
      * @param NodeBuilder $node
-     * @param array       $configureCallbacks
-     * @param array       $preProcessCallbacks
-     * @param array       $postProcessCallbacks
      */
-    public function configure(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    );
+    public function configure(NodeBuilder $node);
 
     /**
      * Checks if section can be added to the given configuration section
@@ -29,4 +21,11 @@ interface ConfigurationSectionInterface
      * @return bool
      */
     public function isApplicable($section);
+
+    /**
+     * Injects the configuration settings
+     *
+     * @param ConfigurationSettingsInterface $settings
+     */
+    public function setSettings(ConfigurationSettingsInterface $settings);
 }

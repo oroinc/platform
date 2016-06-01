@@ -10,6 +10,7 @@ use Oro\Component\EntitySerializer\EntityConfig;
 class SortersConfig implements EntityConfigInterface
 {
     use Traits\ConfigTrait;
+    use Traits\FindFieldTrait;
     use Traits\ExclusionPolicyTrait;
 
     /** a list of sorters */
@@ -28,7 +29,7 @@ class SortersConfig implements EntityConfigInterface
     protected $items = [];
 
     /** @var SorterFieldConfig[] */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
@@ -125,6 +126,32 @@ class SortersConfig implements EntityConfigInterface
         return isset($this->fields[$fieldName])
             ? $this->fields[$fieldName]
             : null;
+    }
+
+    /**
+     * Finds the configuration of the sorter by its name or property path.
+     * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
+     *
+     * @param string $fieldName
+     * @param bool   $findByPropertyPath
+     *
+     * @return SorterFieldConfig|null
+     */
+    public function findField($fieldName, $findByPropertyPath = false)
+    {
+        return $this->doFindField($fieldName, $findByPropertyPath);
+    }
+
+    /**
+     * Finds the name of the sorter by its property path.
+     *
+     * @param string $propertyPath
+     *
+     * @return string|null
+     */
+    public function findFieldNameByPropertyPath($propertyPath)
+    {
+        return $this->doFindFieldNameByPropertyPath($propertyPath);
     }
 
     /**

@@ -4,12 +4,14 @@ namespace Oro\Bundle\FormBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -65,64 +67,102 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
     public function postSubmit(FormEvent $event)
     {
         $form = $event->getForm();
+        $fieldName = $this->getFieldName($form);
 
-        $added   = $form->get('added')->getData();
+        $added = $form->get('added')->getData();
         $removed = $form->get('removed')->getData();
 
-        $parentData = $form->getParent()->getData();
+        $parent = $form->getParent()->getData();
+        $parentMetadata = $this->doctrineHelper->getEntityMetadata(
+            ClassUtils::getClass($parent),
+            false
+        );
 
-        /** @var ClassMetadata $parentMetadata */
-        $parentMetadata = $this->doctrineHelper->getEntityMetadata(ClassUtils::getClass($parentData));
-
-        /** @var Collection $collection */
-        $collection = $form->getData();
-
-        foreach ($added as $relation) {
-            $this->processRelation($parentMetadata, $relation, $parentData);
-            $collection->add($relation);
+        /** @var Collection $children */
+        $children = $form->getData();
+        foreach ($added as $child) {
+            if (null !== $parentMetadata
+                && $this->isOneToManyAssociation($child, $parentMetadata, $fieldName)
+            ) {
+                $this->setOneToManyTargetEntity($child, $parentMetadata, $fieldName, $parent);
+            }
+            $children->add($child);
         }
-
-        foreach ($removed as $relation) {
-            $this->processRelation($parentMetadata, $relation, null);
-            $collection->removeElement($relation);
+        foreach ($removed as $child) {
+            if (null !== $parentMetadata
+                && $this->isOneToManyAssociation($child, $parentMetadata, $fieldName)
+            ) {
+                $this->setOneToManyTargetEntity($child, $parentMetadata, $fieldName, null);
+            }
+            $children->removeElement($child);
         }
     }
 
     /**
-     * @param ClassMetadata $metadata
-     * @param object $relation
-     * @param mixed $value
+     * @param FormInterface $form
+     *
+     * @return string
      */
-    protected function processRelation($metadata, $relation, $value)
+    protected function getFieldName(FormInterface $form)
     {
-        foreach ($metadata->getAssociationMappings() as $mapping) {
-            if (!is_array($mapping) || !isset($mapping['targetEntity'], $mapping['type'], $mapping['mappedBy'])) {
-                continue;
-            }
-            if ($mapping['targetEntity'] !== ClassUtils::getClass($relation)) {
-                continue;
-            }
-            if ($mapping['type'] !== ClassMetadata::ONE_TO_MANY) {
-                continue;
-            }
-            $mappedBy = $mapping['mappedBy'];
-            $setter = $this->getSetterName($mappedBy);
-            $relation->$setter($value);
+        $form->getPropertyPath();
+        $propertyPath = $form->getConfig()->getPropertyPath();
+        if (null !== $propertyPath) {
+            return (string)$propertyPath;
         }
+
+        return $form->getName();
+    }
+
+    /**
+     * @param object        $owningEntity
+     * @param ClassMetadata $targetMetadata
+     * @param string        $targetAssociationName
+     *
+     * @return bool
+     */
+    protected function isOneToManyAssociation(
+        $owningEntity,
+        $targetMetadata,
+        $targetAssociationName
+    ) {
+        if (!$targetMetadata->hasAssociation($targetAssociationName)) {
+            return false;
+        }
+
+        $targetAssociationMapping = $targetMetadata->getAssociationMapping($targetAssociationName);
+        if (ClassMetadata::ONE_TO_MANY !== $targetAssociationMapping['type']
+            || ClassUtils::getClass($owningEntity) !== $targetAssociationMapping['targetEntity']
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     * @param object        $owningEntity
+     * @param ClassMetadata $targetMetadata
+     * @param string        $targetAssociationName
+     * @param object|null   $targetEntity
+     */
+    protected function setOneToManyTargetEntity(
+        $owningEntity,
+        $targetMetadata,
+        $targetAssociationName,
+        $targetEntity
+    ) {
+        $targetAssociationMapping = $targetMetadata->getAssociationMapping($targetAssociationName);
+        $setter = $this->getSetterName($targetAssociationMapping['mappedBy']);
+        $owningEntity->$setter($targetEntity);
     }
 
     /**
      * @param string $mappedBy
+     *
      * @return string
      */
     protected function getSetterName($mappedBy)
     {
-        $parts = explode('_', $mappedBy);
-        $setter = 'set';
-        foreach ($parts as $part) {
-            $setter .= ucfirst($part);
-        }
-
-        return $setter;
+        return 'set' . Inflector::classify($mappedBy);
     }
 }

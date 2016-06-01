@@ -25,7 +25,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            EmailEditorView.__super__.initialize.apply(this, options);
+            EmailEditorView.__super__.initialize.apply(this, arguments);
             this.templatesProvider = options.templatesProvider;
             this.setupCache();
         },

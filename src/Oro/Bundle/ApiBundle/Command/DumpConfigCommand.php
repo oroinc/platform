@@ -24,13 +24,15 @@ class DumpConfigCommand extends AbstractDebugCommand
      * @var array
      */
     protected $knownExtras = [
-        'actions'        => 'Oro\Bundle\ApiBundle\Config\ActionsConfigExtra',
-        'definition'     => 'Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra',
-        'filters'        => 'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
-        'sorters'        => 'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',
-        'virtual_fields' => 'Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra',
-        'descriptions'   => 'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra',
-        'status_codes'   => 'Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\ActionsConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra',
+        'Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra',
     ];
 
     /**
@@ -67,7 +69,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 'The kind of configuration data that should be displayed. ' .
                 sprintf(
                     'Can be %s or the full name of a class implements "%s"',
-                    '"' . implode('", "', array_keys($this->knownExtras)) . '"',
+                    '"' . implode('", "', array_keys($this->getKnownExtras())) . '"',
                     'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
                 ),
                 ['definition', 'filters', 'sorters']
@@ -77,7 +79,8 @@ class DumpConfigCommand extends AbstractDebugCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'The name of action for which the configuration should be displayed.' .
-                'Can be "get", "get_list", "delete", etc.'
+                'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.',
+                'get'
             );
         parent::configure();
     }
@@ -134,11 +137,12 @@ class DumpConfigCommand extends AbstractDebugCommand
     {
         $result = [];
 
+        $knownExtras = $this->getKnownExtras();
         $extraNames = $input->getOption('extra');
         foreach ($extraNames as $extraName) {
             $extraClassName = null;
-            if (array_key_exists($extraName, $this->knownExtras)) {
-                $extraClassName = $this->knownExtras[$extraName];
+            if (array_key_exists($extraName, $knownExtras)) {
+                $extraClassName = $knownExtras[$extraName];
             } else {
                 if (false === strpos($extraName, '\\')) {
                     throw new \InvalidArgumentException(
@@ -243,10 +247,23 @@ class DumpConfigCommand extends AbstractDebugCommand
             }
         }
         // add other sections
-        foreach ($data as $sectionName => $config) {
+        foreach ($data as $sectionName => $sectionConfig) {
             if (!array_key_exists($sectionName, $result)) {
-                $result[$sectionName] = $config;
+                $result[$sectionName] = $sectionConfig;
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return string[] [extra name => extra class name]
+     */
+    protected function getKnownExtras()
+    {
+        $result = [];
+        foreach ($this->knownExtras as $className) {
+            $result[constant($className . '::NAME')] = $className;
         }
 
         return $result;

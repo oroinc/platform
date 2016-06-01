@@ -5,19 +5,19 @@
     "keywords": ["ORO", "BAP", "Config"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "symfony/config": "~2.1",
         "symfony/dependency-injection": "~2.1",
-        "symfony/yaml": "~2.1"
+        "symfony/yaml": "~2.1",
+        "oro/property-access": "1.x-dev"
     },
     "autoload": {
-        "psr-0": { "Oro\\Component\\Config": "" }
+        "psr-4": { "Oro\\Component\\Config\\": "" }
     },
-    "target-dir": "Oro/Component/Config",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "1.x-dev"
         }
     }
 }

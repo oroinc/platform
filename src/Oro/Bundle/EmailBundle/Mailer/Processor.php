@@ -136,8 +136,12 @@ class Processor
             $message->getHeaders()->addTextHeader('References', $parentMessageId);
             $message->getHeaders()->addTextHeader('In-Reply-To', $parentMessageId);
         }
+        $addresses = $this->getAddresses($model->getFrom());
+        $address = $this->emailAddressHelper->extractPureEmailAddress($model->getFrom());
         $message->setDate($messageDate->getTimestamp());
-        $message->setFrom($this->getAddresses($model->getFrom()));
+        $message->setFrom($addresses);
+        $message->setReplyTo($addresses);
+        $message->setReturnPath($address);
         $message->setTo($this->getAddresses($model->getTo()));
         $message->setCc($this->getAddresses($model->getCc()));
         $message->setBcc($this->getAddresses($model->getBcc()));
@@ -150,7 +154,6 @@ class Processor
         $messageId = '<' . $message->generateId() . '>';
 
         if ($origin === null) {
-            $this->emailOriginHelper->setEmailModel($model);
             $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
         }
         $this->processSend($message, $origin);
@@ -267,38 +270,41 @@ class Processor
     /**
      * Process inline images. Convert it to embedded attachments and update message body.
      *
-     * @param \Swift_Message $message
-     * @param EmailModel     $model
+     * @param \Swift_Message  $message
+     * @param EmailModel|null $model
      */
-    protected function processEmbeddedImages(\Swift_Message $message, EmailModel $model)
+    public function processEmbeddedImages(\Swift_Message $message, EmailModel $model = null)
     {
-        if ($model->getType() === 'html') {
-            $guesser = ExtensionGuesser::getInstance();
-            $body    = $message->getBody();
-            $body    = preg_replace_callback(
-                '/<img(.*)src(\s*)=(\s*)["\'](.*)["\']/U',
-                function ($matches) use ($message, $guesser, $model) {
-                    if (count($matches) === 5) {
-                        // 1st match contains any data between '<img' and 'src' parts (e.g. 'width=100')
-                        $imgConfig = $matches[1];
+        if ($model ? $model->getType() !== 'html' : $message->getContentType() !== 'text/html') {
+            return;
+        }
 
-                        // 4th match contains src attribute value
-                        $srcData = $matches[4];
+        $guesser = ExtensionGuesser::getInstance();
+        $body = preg_replace_callback(
+            '/<img(.*)src(\s*)=(\s*)["\'](.*)["\']/U',
+            function ($matches) use ($message, $guesser, $model) {
+                if (count($matches) === 5) {
+                    // 1st match contains any data between '<img' and 'src' parts (e.g. 'width=100')
+                    $imgConfig = $matches[1];
 
-                        if (strpos($srcData, 'data:image') === 0) {
-                            list($mime, $content) = explode(';', $srcData);
-                            list($encoding, $file) = explode(',', $content);
-                            $mime            = str_replace('data:', '', $mime);
-                            $fileName        = sprintf('%s.%s', uniqid(), $guesser->guess($mime));
-                            $swiftAttachment = \Swift_Image::newInstance(
-                                ContentDecoder::decode($file, $encoding),
-                                $fileName,
-                                $mime
-                            );
+                    // 4th match contains src attribute value
+                    $srcData = $matches[4];
 
-                            /** @var $message \Swift_Message */
-                            $id = $message->embed($swiftAttachment);
+                    if (strpos($srcData, 'data:image') === 0) {
+                        list($mime, $content) = explode(';', $srcData);
+                        list($encoding, $file) = explode(',', $content);
+                        $mime            = str_replace('data:', '', $mime);
+                        $fileName        = sprintf('%s.%s', uniqid(), $guesser->guess($mime));
+                        $swiftAttachment = \Swift_Image::newInstance(
+                            ContentDecoder::decode($file, $encoding),
+                            $fileName,
+                            $mime
+                        );
 
+                        /** @var $message \Swift_Message */
+                        $id = $message->embed($swiftAttachment);
+
+                        if ($model) {
                             $attachmentContent = new EmailAttachmentContent();
                             $attachmentContent->setContent($file);
                             $attachmentContent->setContentTransferEncoding($encoding);
@@ -313,17 +319,17 @@ class Processor
                             $emailAttachmentModel = new EmailAttachmentModel();
                             $emailAttachmentModel->setEmailAttachment($emailAttachment);
                             $model->addAttachment($emailAttachmentModel);
-
-                            return sprintf('<img%ssrc="%s"', $imgConfig, $id);
                         }
-                    }
 
-                    return $matches[0];
-                },
-                $body
-            );
-            $message->setBody($body);
-        }
+                        return sprintf('<img%ssrc="%s"', $imgConfig, $id);
+                    }
+                }
+
+                return $matches[0];
+            },
+            $message->getBody()
+        );
+        $message->setBody($body);
     }
 
     /**

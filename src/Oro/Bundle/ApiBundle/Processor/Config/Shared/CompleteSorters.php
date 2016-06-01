@@ -37,8 +37,9 @@ class CompleteSorters extends CompleteSection
             array_keys($this->doctrineHelper->getIndexedFields($metadata)),
             array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
         );
-        foreach ($fields as $fieldName) {
-            if ($definition->hasField($fieldName)) {
+        foreach ($fields as $propertyPath) {
+            $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
+            if ($fieldName) {
                 $section->getOrAddField($fieldName);
             }
         }

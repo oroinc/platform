@@ -6,6 +6,7 @@ class Entity
 {
     protected $owner;
     protected $organization;
+    protected $id;
 
     public function setOwner($owner)
     {
@@ -31,5 +32,21 @@ class Entity
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 }

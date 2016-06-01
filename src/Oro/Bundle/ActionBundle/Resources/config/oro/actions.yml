@@ -6,6 +6,50 @@ operations:
         preconditions:
             '@and':
                 - '@not_blank': $.data
+                - '@or':
+                    - '@blank': $.gridName # that operation should be displayed on single page, not on grid
+                    - '@blank': $.requestRoute # for operation execute route
+                    - '@and':
+                        - '@not_blank': $.routes[name]
+                        - '@eq':
+                            - $.routes[name]
+                            - $.requestRoute
+        preactions:
+            - '@tree':
+                conditions:
+                    '@not_blank': $.data
+                actions:
+                    - '@call_service_method':
+                        service: oro_action.helper.default_operation_request
+                        method: getRequestRoute
+                        attribute: $.requestRoute
+                    - '@call_service_method':
+                        service: oro_entity_config.provider.entity
+                        method: getClassName
+                        method_parameters: [$.data]
+                        attribute: $.className
+                    - '@call_service_method':
+                        service: oro_entity_config.config_manager
+                        method: hasConfig
+                        method_parameters: [$.className]
+                        attribute: $.hasConfig
+                    - '@tree':
+                        conditions:
+                            '@eq': [$.hasConfig, true]
+                        actions:
+                            - '@call_service_method':
+                                service: oro_entity_config.helper.entity_config
+                                method: getRoutes
+                                method_parameters: [$.data, ['name', 'update']]
+                                attribute: $.routes
+                            - '@call_service_method':
+                                service: oro_entity_config.helper.entity_config
+                                method: getConfigValue
+                                method_parameters: [$.data, 'label']
+                                attribute: $.entityLabel
+                            - '@trans':
+                                id: $.entityLabel
+                                attribute: $.entityLabel
 
     UPDATE:
         extends: CRUD_ACTION
@@ -16,16 +60,6 @@ operations:
         groups:
             - view_navButtons
             - datagridRowAction
-        preactions:
-            - '@tree':
-                conditions:
-                    '@not_blank': $.data
-                actions:
-                    - '@call_service_method':
-                        service: oro_entity_config.helper.entity_config
-                        method: getRoutes
-                        method_parameters: [$.data, ['update']]
-                        attribute: $.routes
         preconditions:
             '@and':
                 - '@not_blank': $.routes[update]
@@ -49,28 +83,11 @@ operations:
             - view_navButtons
             - update_navButtons
             - datagridRowAction
-        preactions:
-            - '@tree':
-                conditions:
-                    '@not_blank': $.data
-                actions:
-                    - '@call_service_method':
-                        service: oro_entity_config.helper.entity_config
-                        method: getRoutes
-                        method_parameters: [$.data, ['name', 'delete']]
-                        attribute: $.routes
-                    - '@call_service_method':
-                        service: oro_entity_config.helper.entity_config
-                        method: getConfigValue
-                        method_parameters: [$.data, 'label']
-                        attribute: $.entityLabel
-                    - '@trans':
-                        id: $.entityLabel
-                        attribute: $.entityLabel
         preconditions:
             '@and':
-                - '@not_blank': $.routes[name]
-                - '@not_blank': $.routes[delete]
+                - '@or':
+                    - '@not_blank': $.routes[name]
+                    - '@not_blank': $.gridName
         label: oro.action.delete
         frontend_options:
             title: oro.action.delete_entity
@@ -88,11 +105,22 @@ operations:
                     data: $.data
             - '@flash_message':
                 message: oro.action.delete_message
-                type: 'info'
+                type: 'success'
                 message_parameters:
                     entityLabel: $.entityLabel
             - '@redirect':
-                route: $.routes[name]
+                conditions:
+                    '@and':
+                        - '@empty': $.gridName
+                        - '@not_empty': $.routes[name]
+                parameters:
+                    route: $.routes[name]
+            - '@refresh_grid':
+                conditions:
+                    '@and':
+                        - '@empty': $.routes[name]
+                        - '@not_empty': $.gridName
+                parameters: [$.gridName]
 
 action_groups:
     DELETE:

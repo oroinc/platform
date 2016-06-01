@@ -399,7 +399,7 @@ services:
             # tags
             - [ 'app', 'for', 'if', 'spaceless' ]
             # filters
-            - [ 'default', 'date', 'escape', 'format', 'length', 'lower', 'nl2br', 'number_format', 'title', 'trim', 'upper' ]
+            - [ 'default', 'date', 'escape', 'format', 'length', 'lower', 'nl2br', 'number_format', 'title', 'trim', 'upper', 'oro_html_sanitize' ]
             # methods
             - []
             # properties
@@ -637,6 +637,7 @@ services:
             - '@oro_email.email.thread.manager'
             - '@oro_email.email.thread.provider'
             - '@oro_security.security_facade'
+            - '@oro_email.mailbox.manager'
 
     oro_email.twig.extension.email:
         class: %oro_email.twig.extension.email.class%
@@ -748,6 +749,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@kernel'
             - '@oro_security.security_facade.link'
+            - '@router'
             - '@oro_attachment.validator.file_config_validator'
             - '@oro_attachment.association_helper'
 
@@ -782,6 +784,8 @@ services:
         arguments:
             - '@knp_gaufrette.filesystem_map'
             - '@oro_email.form.factory'
+            - '@oro_attachment.manager'
+            - '@oro_email.manager.email_attachment_manager'
 
     oro_email.email_importance_transformer:
         class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailImportanceApiTransformer
@@ -1039,3 +1043,11 @@ services:
         class: %oro_email.model.email_activity_updates.class%
         arguments:
             - '@oro_email.provider.emailowners.provider'
+
+    oro_email.command.association_manager:
+        class: Oro\Bundle\EmailBundle\Command\Manager\AssociationManager
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.email.activity.manager'
+            - '@oro_email.provider.emailowners.provider'
+            - '@oro_email.email.manager'

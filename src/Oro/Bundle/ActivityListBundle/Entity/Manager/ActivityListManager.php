@@ -25,6 +25,7 @@ use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 
 class ActivityListManager
 {
@@ -132,7 +133,7 @@ class ActivityListManager
     {
         $qb = $this->prepareQB($entityClass, $entityId, $filter);
 
-        $pager = $this->pager;
+        $pager = clone $this->pager;
         $pager->setQueryBuilder($qb);
         $pager->setPage($page);
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
@@ -160,21 +161,7 @@ class ActivityListManager
     public function getListCount($entityClass, $entityId, $filter)
     {
         $qb = $this->prepareQB($entityClass, $entityId, $filter);
-        $qb->resetDQLPart('orderBy');
-
-        $query             = $qb->getQuery();
-        $parserResult      = QueryUtils::parseQuery($query);
-        $parameterMappings = $parserResult->getParameterMappings();
-        list($params, $types) = QueryUtils::processParameterMappings($query, $parameterMappings);
-        $statement = $query->getEntityManager()->getConnection()->executeQuery(
-            'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
-            $params,
-            $types
-        );
-
-        $result = $statement->fetchColumn();
-
-        return (int)$result;
+        return QueryCountCalculator::calculateCount($qb->getQuery());
     }
 
     /**
@@ -187,11 +174,9 @@ class ActivityListManager
         /** @var ActivityList $activityListItem */
         $activityListItem = $this->getRepository()->find($activityListItemId);
 
-        if ($activityListItem) {
-            return $this->getEntityViewModel($activityListItem);
-        }
-
-        return null;
+        return $activityListItem
+            ? $this->getEntityViewModel($activityListItem)
+            : null;
     }
 
     /**
@@ -364,12 +349,7 @@ class ActivityListManager
      */
     protected function getHeadStatus(ActivityList $entity, $entityProvider)
     {
-        $isHead = false;
-        if ($this->isGroupingApplicable($entityProvider)) {
-            $isHead = $entity->isHead();
-        }
-
-        return $isHead;
+        return $this->isGroupingApplicable($entityProvider) && $entity->isHead();
     }
 
     /**

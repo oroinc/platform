@@ -20,7 +20,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_13';
+        return 'v1_14';
     }
 
     /**
@@ -81,6 +81,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addIndex(['organization_id'], 'IDX_55B9B9C532C8A3DE', []);
         $table->addIndex(['name'], 'oro_integration_channel_name_idx', []);
         $table->addIndex(['default_business_unit_owner_id'], 'IDX_55B9B9C5FA248E2', []);
+        $table->addColumn('previously_enabled', 'boolean', ['notnull' => false]);
     }
 
     /**
