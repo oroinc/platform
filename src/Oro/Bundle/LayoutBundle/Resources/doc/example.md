@@ -1385,6 +1385,51 @@ Creating new block types
 -----------------------------------
 
 Since the existing layout block types are covering only basic scenarios, it is often required to create new ones.
+
+You can create custom block type by providing DI configuration for it. Configuration provides possibility to set name and name of a parent, and setup options of the block. See below examples.
+
+Simple block type:
+```yaml
+services:
+    acme_demo.block_type.datetime:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptions, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
+            - [setName, ['datetime']]
+        tags:
+             - { name: layout.block_type, alias: datetime }
+```
+
+`setOptions` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
+
+Container block type:
+```yaml
+services:
+    acme_demo.block_type.sidebar:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['sidebar']]
+        tags:
+             - { name: layout.block_type, alias: sidebar }
+```
+
+Block type inherited from "text" type:
+```yaml
+services:
+    acme_demo.block_type.title:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptions, [{level: {default: 1}}]]
+            - [setName, ['title']]
+            - [setParent, ['text']]
+        tags:
+             - { name: layout.block_type, alias: title }
+```
+
+It's recommended to place custom block types configuration to `Resource\config\block_type.yml` file in your bundle.
+
+If you want to create block type with custom properties mapping extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType` or implement `Oro\Component\Layout\BlockTypeInterface`.
+
 Let's see how this is done on the example of `ImageType` that will be responsible for rendering `<img>` elements.
 
 First, let's create the block type file itself and place it in the `Acme/Bundle/LayoutBundle/Layout/Block/Type` directory:
