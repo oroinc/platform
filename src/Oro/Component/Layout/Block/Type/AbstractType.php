@@ -80,8 +80,6 @@ abstract class AbstractType implements BlockTypeInterface
         return [
             'default',
             'required',
-            'normalizers',
-            'allowed_values',
         ];
     }
 }

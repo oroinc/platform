@@ -63,7 +63,7 @@ The **OroLayoutBundle** introduces a set of block types that allow to easily bui
 | `button` | | `<button>` or `<input type="submit/reset/button">` |
 | `button_group` | | Nothing, this is just a logical grouping of buttons. You can define how to render the button group in your application |
 
-You can create custom block type by providing DI configuration for it. See below examples.
+You can create custom block type by providing DI configuration for it. Configuration provides possibility to set name and name of a parent, and setup options of the block. See below examples.
 
 Simple block type:
 ```yaml
@@ -71,11 +71,13 @@ services:
     acme_demo.block_type.datetime:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptions, [{datetime: {required: true}, format: {default: 'd-m-Y'}}]]
+            - [setOptions, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
             - [setName, ['datetime']]
         tags:
              - { name: layout.block_type, alias: datetime }
 ```
+
+`setOptions` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
 
 Container block type:
 ```yaml
