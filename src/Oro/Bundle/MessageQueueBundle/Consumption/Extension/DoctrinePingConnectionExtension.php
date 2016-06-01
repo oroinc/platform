@@ -3,11 +3,11 @@ namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
 use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\Extension;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class DoctrinePingConnectionExtension implements Extension
+class DoctrinePingConnectionExtension implements ExtensionInterface
 {
     use ExtensionTrait;
 

@@ -4,9 +4,9 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\MessageProcessor;
-use Oro\Component\MessageQueue\Transport\MessageConsumer;
-use Oro\Component\MessageQueue\Transport\Session;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -97,9 +97,9 @@ class DoctrinePingConnectionExtensionTest extends \PHPUnit_Framework_TestCase
     protected function createContext()
     {
         return new Context(
-            $this->getMock(Session::class),
-            $this->getMock(MessageConsumer::class),
-            $this->getMock(MessageProcessor::class),
+            $this->getMock(SessionInterface::class),
+            $this->getMock(MessageConsumerInterface::class),
+            $this->getMock(MessageProcessorInterface::class),
             $this->getMock(LoggerInterface::class)
         );
     }
