@@ -98,7 +98,7 @@ define(function(require) {
             var oldParentWidth = $parent.outerWidth();
             var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
                 display: 'block',
-                width: $dropdownMenu.outerWidth(),
+                width: $dropdownMenu.outerWidth() + 1,
                 height: $dropdownMenu.outerHeight()
             });
             $dropdownMenu.after($placeholder)
