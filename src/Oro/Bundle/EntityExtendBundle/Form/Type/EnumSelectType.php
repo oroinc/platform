@@ -61,7 +61,7 @@ class EnumSelectType extends AbstractEnumType
                 'disabled_values' => []
             ]
         );
-
+        $resolver->setAllowedTypes('disabled_values', ['array', 'callable']);
         $resolver->setNormalizers(
             [
                 'empty_value' => function (Options $options, $value) {
