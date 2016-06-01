@@ -68,7 +68,7 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', ['notnull' => false]);
         $table->addColumn('calendar_event_id', 'integer', ['notnull' => true]);
-        $table->addColumn('email', 'string', ['notnull' => true, 'length' => 255]);
+        $table->addColumn('email', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('display_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('created_at', 'datetime', ['notnull' => true]);
         $table->addColumn('updated_at', 'datetime', ['notnull' => true]);
