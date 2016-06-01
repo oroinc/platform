@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 /**
  * Class ChoicesGuesser
@@ -38,16 +39,19 @@ class ChoicesGuesser implements GuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column)
+    public function guessColumnOptions($columnName, $entityName, $column, DatagridConfiguration $config)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
+        $behaviour = $config->offsetGetByPath(Configuration::BEHAVIOUR_CONFIG_PATH);
         if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
-                $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
+                if ($behaviour === Configuration::BEHAVIOUR_ENABLE_ALL_VALUE) {
+                    $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
+                }
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::SELECT;
                 $result[PropertyInterface::TYPE_KEY] = 'field';
 

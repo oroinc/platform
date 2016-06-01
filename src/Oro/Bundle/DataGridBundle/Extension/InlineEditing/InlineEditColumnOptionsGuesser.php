@@ -7,6 +7,7 @@ use Symfony\Component\Validator\PropertyMetadataContainerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 /**
  * Class InlineEditColumnOptionsGuesser
@@ -44,17 +45,18 @@ class InlineEditColumnOptionsGuesser
     /**
      * @param string $columnName
      * @param string $entityName
-     * @param array  $column
+     * @param array $column
+     * @param DatagridConfiguration $config
      *
      * @return array
      */
-    public function getColumnOptions($columnName, $entityName, $column)
+    public function getColumnOptions($columnName, $entityName, $column, DatagridConfiguration $config)
     {
         /** @var ValidatorInterface $validatorMetadata */
         $validatorMetadata = $this->validator->getMetadataFor($entityName);
 
         foreach ($this->guessers as $guesser) {
-            $options = $guesser->guessColumnOptions($columnName, $entityName, $column);
+            $options = $guesser->guessColumnOptions($columnName, $entityName, $column, $config);
 
             if (!empty($options)) {
                 if ($validatorMetadata->hasPropertyMetadata($columnName)) {

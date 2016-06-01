@@ -86,7 +86,12 @@ class InlineEditingExtension extends AbstractExtension
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
-                $newColumn = $this->guesser->getColumnOptions($columnName, $configItems['entity_name'], $column);
+                $newColumn = $this->guesser->getColumnOptions(
+                    $columnName,
+                    $configItems['entity_name'],
+                    $column,
+                    $config
+                );
 
                 // frontend type key must not be replaced with default value
                 $frontendTypeKey = PropertyInterface::FRONTEND_TYPE_KEY;

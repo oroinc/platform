@@ -13,9 +13,16 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
     /** @var RelationGuesser */
     protected $guesser;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $datagridConfiguration;
+
     public function setUp()
     {
         $this->guesser = new RelationGuesser();
+        $this->datagridConfiguration = $this
+            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -26,7 +33,7 @@ class RelationGuesserTest extends \PHPUnit_Framework_TestCase
      */
     public function testRelationGuess($column, $expected)
     {
-        $guessed = $this->guesser->guessColumnOptions('test', 'test', $column);
+        $guessed = $this->guesser->guessColumnOptions('test', 'test', $column, $this->datagridConfiguration);
 
         $this->assertEquals($expected, $guessed);
     }

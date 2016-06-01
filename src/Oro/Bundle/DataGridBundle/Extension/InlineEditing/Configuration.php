@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldBlackList;
 class Configuration implements ConfigurationInterface
 {
     const ENABLED_CONFIG_PATH           = '[inline_editing][enable]';
+    const BEHAVIOUR_CONFIG_PATH         = '[inline_editing][behaviour]';
 
     const BEHAVIOUR_DEFAULT_VALUE       = 'enable_selected';
     const BEHAVIOUR_ENABLE_ALL_VALUE    = 'enable_all';
