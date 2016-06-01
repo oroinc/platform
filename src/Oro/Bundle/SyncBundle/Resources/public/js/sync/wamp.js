@@ -51,8 +51,7 @@ define([
         this.connect();
         // fixes premature connection close in FF on page reload
         $(window).on('beforeunload', _.bind(function() {
-            if(this.session)
-            {
+            if (this.session) {
                 this.session.close();
             }
         }, this));
