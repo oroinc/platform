@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
@@ -186,14 +187,20 @@ class ImportExportController extends Controller
 
     /**
      * @Route("/import_export/error/{jobCode}.log", name="oro_importexport_error_log")
-     * @AclAncestor("oro_importexport")
      *
      * @param string $jobCode
-     *
      * @return Response
+     * @throws AccessDeniedException
      */
     public function errorLogAction($jobCode)
     {
+        $securityFacade = $this->get('oro_security.security_facade');
+        if (!$securityFacade->isGranted('oro_importexport_import') &&
+            !$securityFacade->isGranted('oro_importexport_export')
+        ) {
+            throw new AccessDeniedException('Insufficient permission');
+        }
+
         $jobExecutor = $this->getJobExecutor();
         $errors      = array_merge(
             $jobExecutor->getJobFailureExceptions($jobCode),
