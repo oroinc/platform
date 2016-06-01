@@ -26,7 +26,10 @@ class CalendarEventAttendeesApiType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('data_class', 'Oro\Bundle\CalendarBundle\Entity\Attendee');
+        $resolver->setDefaults([
+            'data_class' => 'Oro\Bundle\CalendarBundle\Entity\Attendee',
+            'error_bubbling' => false,
+        ]);
     }
 
     /**

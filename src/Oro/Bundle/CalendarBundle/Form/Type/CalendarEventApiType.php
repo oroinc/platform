@@ -105,6 +105,7 @@ class CalendarEventApiType extends CalendarEventType
                     [
                         'property_path' => 'attendees',
                         'type' => 'oro_calendar_event_attendees_api',
+                        'error_bubbling' => false,
                         'options' => [
                             'required' => false,
                             'label'    => 'oro.calendar.calendarevent.attendees.label',
