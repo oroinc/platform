@@ -84,7 +84,9 @@ define([
                 'recurrencePattern',
                 'recurringEventId',
                 'originalStart',
-                'isCancelled'
+                'isCancelled',
+                'durationEditable',
+                'startEditable'
             ];
 
             if (this.get('recurrence')) {

@@ -577,7 +577,18 @@ define(function(require) {
         createViewModel: function(eventModel) {
             var fcEvent = _.pick(
                 eventModel.attributes,
-                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
+                [
+                    'id',
+                    'title',
+                    'start',
+                    'end',
+                    'allDay',
+                    'backgroundColor',
+                    'calendarUid',
+                    'editable',
+                    'startEditable',
+                    'durationEditable'
+                ]
             );
             var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
 
