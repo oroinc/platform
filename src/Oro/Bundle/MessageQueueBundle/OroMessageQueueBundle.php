@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle;
 
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
@@ -20,5 +20,6 @@ class OroMessageQueueBundle extends Bundle
         $container->addCompilerPass(new BuildRouteRegistryPass());
         $container->addCompilerPass(new BuildMessageProcessorRegistryPass());
         $container->addCompilerPass(new BuildTopicMetaSubscribersPass());
+        $container->addCompilerPass(new BuildDestinationMetaRegistryPass());
     }
 }
