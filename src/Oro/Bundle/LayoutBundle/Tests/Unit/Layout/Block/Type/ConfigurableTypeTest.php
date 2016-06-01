@@ -58,7 +58,7 @@ class ConfigurableTypeTest extends BaseBlockTypeTestCase
     {
         $this->setExpectedException(
             'InvalidArgumentException',
-            'Option setting "test" not supported. Supported settings [default, required, normalizers, allowed_values]'
+            'Option setting "test" not supported. Supported settings [default, required]'
         );
         $this->type->setOptions(['test' => ['test' => 'value']]);
     }
