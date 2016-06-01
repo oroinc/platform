@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\CalendarBundle\Exception\NotUserCalendarEvent;
 use Oro\Bundle\CalendarBundle\Model\ExtendCalendarEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -616,13 +617,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 
     /**
      * {@inheritdoc}
+     *
+     * @throws NotUserCalendarEvent
      */
     public function getReminderData()
     {
         if (!$this->getCalendar()) {
-            throw new \LogicException(
-                sprintf('Only user\'s calendar events can have reminders. Event Id: %d.', $this->id)
-            );
+            throw new NotUserCalendarEvent($this->id);
         }
 
         $result = new ReminderData();
