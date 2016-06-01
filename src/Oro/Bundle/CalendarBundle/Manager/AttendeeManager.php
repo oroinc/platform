@@ -54,19 +54,29 @@ class AttendeeManager
             $attendees = $attendees->toArray();
         }
 
-        return array_values(array_filter(array_map(
-            function (Attendee $attendee) {
+        return array_reduce(
+            $attendees,
+            function (array $result, Attendee $attendee) {
                 $relatedEntity = $this->attendeeRelationManager->getRelatedEntity($attendee);
-                if ($relatedEntity) {
-                    return json_encode([
-                        'entityClass' => ClassUtils::getClass($relatedEntity),
-                        'entityId' => $this->doctrineHelper->getSingleEntityIdentifier($relatedEntity),
-                    ]);
+                if (!$relatedEntity) {
+                    return $result;
                 }
 
-                return null;
+                $key = json_encode([
+                    'entityClass' => ClassUtils::getClass($relatedEntity),
+                    'entityId' => $this->doctrineHelper->getSingleEntityIdentifier($relatedEntity),
+                ]);
+
+                $val = json_encode([
+                    'entityClass' => 'Oro\Bundle\CalendarBundle\Entity\Attendee',
+                    'entityId' => $attendee->getId(),
+                ]);
+
+                $result[$key] = $val;
+
+                return $result;
             },
-            $attendees
-        )));
+            []
+        );
     }
 }

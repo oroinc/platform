@@ -46,7 +46,7 @@ class CalendarEventAttendeesSelectType extends AbstractType
     {
         $view->vars['attr']['data-selected-data'] = $view->vars['value'];
         if ($form->getData()) {
-            $view->vars['excluded'] = $this->attendeeManager->createAttendeeExclusions($form->getData());
+            $view->vars['configs']['selected'] = $this->attendeeManager->createAttendeeExclusions($form->getData());
         }
     }
 
@@ -67,14 +67,12 @@ class CalendarEventAttendeesSelectType extends AbstractType
                     'forceSelectedData'  => true,
                     'minimumInputLength' => 0,
                     'route_name'         => 'oro_calendarevent_autocomplete_attendees',
+                    'component'          => 'attendees',
+                    'needsInit'         => $options['layout_template'],
                     'route_parameters'   => [
                         'name' => 'name',
                     ],
                 ];
-
-                if ($options['layout_template']) {
-                    $configs['component'] = 'attendees';
-                }
 
                 return $configs;
             }
