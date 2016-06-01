@@ -242,13 +242,7 @@ define(function(require) {
         clickEvents.splice(clickEvents.indexOf(clearMenusHandler), 0, clickEvents.pop());
 
         var _updateDropdownsPosition = function() {
-            var $openedDropdowns = $('.dropdown-menu').filter('.open, .detach');
-
-            if (!$openedDropdowns.length) {
-                return false;
-            }
-
-            $openedDropdowns.each(function() {
+            $('.dropdown-menu').filter('.open, .detach').each(function() {
                 $(this).data('related-toggle').dropdown('updatePosition');
             });
         };
