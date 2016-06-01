@@ -15,11 +15,20 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
         new LimitConsumptionTimeExtension(new \DateTime('+1 day'));
     }
 
-    public function testShouldThrowExceptionIfLimitTimeIsLessThanNow()
+    public function testOnBeforeReceiveShouldInterruptExecutionIfConsumptionTimeExceeded()
     {
-        $this->setExpectedException(\LogicException::class, 'Expected time limit is more than now, but got: now');
+        $context = $this->createContext();
 
-        new LimitConsumptionTimeExtension(new \DateTime('-1 day'));
+        // guard
+        $this->assertFalse($context->isExecutionInterrupted());
+
+        // test
+        $extension = new LimitConsumptionTimeExtension(new \DateTime('+1 second'));
+
+        sleep(2);
+        $extension->onBeforeReceive($context);
+
+        $this->assertTrue($context->isExecutionInterrupted());
     }
 
     public function testOnIdleShouldInterruptExecutionIfConsumptionTimeExceeded()
@@ -52,6 +61,21 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->onPostReceived($context);
 
         $this->assertTrue($context->isExecutionInterrupted());
+    }
+
+    public function testOnBeforeReceiveShouldNotInterruptExecutionIfConsumptionTimeIsNotExceeded()
+    {
+        $context = $this->createContext();
+
+        // guard
+        $this->assertFalse($context->isExecutionInterrupted());
+
+        // test
+        $extension = new LimitConsumptionTimeExtension(new \DateTime('+1 day'));
+
+        $extension->onBeforeReceive($context);
+
+        $this->assertFalse($context->isExecutionInterrupted());
     }
 
     public function testOnIdleShouldNotInterruptExecutionIfConsumptionTimeIsNotExceeded()

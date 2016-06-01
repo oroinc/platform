@@ -29,11 +29,18 @@ class DoctrineClearIdentityMapExtensionTest extends \PHPUnit_Framework_TestCase
         $registry
             ->expects($this->once())
             ->method('getManagers')
-            ->will($this->returnValue([$manager]))
+            ->will($this->returnValue(['manager-name' => $manager]))
+        ;
+
+        $context = $this->createContext();
+        $context->getLogger()
+            ->expects($this->once())
+            ->method('debug')
+            ->with('[DoctrineClearIdentityMapExtension] Clear identity map for manager "manager-name"')
         ;
 
         $extension = new DoctrineClearIdentityMapExtension($registry);
-        $extension->onPreReceived($this->createContext());
+        $extension->onPreReceived($context);
     }
 
     /**

@@ -26,14 +26,15 @@ class LimitConsumerMemoryExtension implements ExtensionInterface
             ));
         }
 
-        if ($memoryLimit <= 0) {
-            throw new \LogicException(sprintf(
-                'Memory limit must be more than zero but got: "%s"',
-                $memoryLimit
-            ));
-        }
-
         $this->memoryLimit = $memoryLimit * 1024 * 1024;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onBeforeReceive(Context $context)
+    {
+        $this->checkMemory($context);
     }
 
     /**
@@ -57,10 +58,13 @@ class LimitConsumerMemoryExtension implements ExtensionInterface
      */
     protected function checkMemory(Context $context)
     {
-        if (memory_get_usage(true) >= $this->memoryLimit) {
-            $context->getLogger()->debug(
-                '[LimitConsumerMemoryExtension] Interrupt execution as memory limit exceeded'
-            );
+        $memoryUsage = memory_get_usage(true);
+        if ($memoryUsage >= $this->memoryLimit) {
+            $context->getLogger()->debug(sprintf(
+                '[LimitConsumerMemoryExtension] Interrupt execution as memory limit reached. limit: "%s", used: "%s"',
+                $this->memoryLimit,
+                $memoryUsage
+            ));
 
             $context->setExecutionInterrupted(true);
         }

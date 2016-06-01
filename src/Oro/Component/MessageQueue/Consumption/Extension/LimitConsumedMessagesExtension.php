@@ -15,6 +15,11 @@ class LimitConsumedMessagesExtension implements ExtensionInterface
     protected $messageLimit;
 
     /**
+     * @var int
+     */
+    protected $messageConsumed;
+
+    /**
      * @param int $messageLimit
      */
     public function __construct($messageLimit)
@@ -26,14 +31,16 @@ class LimitConsumedMessagesExtension implements ExtensionInterface
             ));
         }
 
-        if ($messageLimit <= 0) {
-            throw new \LogicException(sprintf(
-                'Message limit must be more than zero but got: "%s"',
-                $messageLimit
-            ));
-        }
-
         $this->messageLimit = $messageLimit;
+        $this->messageConsumed = 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onBeforeReceive(Context $context)
+    {
+        $this->checkMessageLimit($context);
     }
 
     /**
@@ -41,10 +48,23 @@ class LimitConsumedMessagesExtension implements ExtensionInterface
      */
     public function onPostReceived(Context $context)
     {
-        if (--$this->messageLimit <= 0) {
-            $context->getLogger()->debug(
-                '[LimitConsumedMessagesExtension] Interrupt execution as message limit exceeded'
-            );
+        $this->messageConsumed++;
+
+        $this->checkMessageLimit($context);
+    }
+
+    /**
+     * @param Context $context
+     */
+    protected function checkMessageLimit(Context $context)
+    {
+        if ($this->messageConsumed >= $this->messageLimit) {
+            $context->getLogger()->debug(sprintf(
+                '[LimitConsumedMessagesExtension] Message consumption is interrupted since the message limit reached.'.
+                ' limit: "%s", consumed: "%s"',
+                $this->messageLimit,
+                $this->messageConsumed
+            ));
 
             $context->setExecutionInterrupted(true);
         }

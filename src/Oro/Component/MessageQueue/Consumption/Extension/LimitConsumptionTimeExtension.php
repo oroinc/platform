@@ -19,16 +19,15 @@ class LimitConsumptionTimeExtension implements ExtensionInterface
      */
     public function __construct(\DateTime $timeLimit)
     {
-        $now = new \DateTime();
-        if ($timeLimit <= $now) {
-            throw new \LogicException(sprintf(
-                'Expected time limit is more than now, but got: now "%s", time-limit "%s"',
-                $now->format(DATE_ISO8601),
-                $timeLimit->format(DATE_ISO8601)
-            ));
-        }
-
         $this->timeLimit = $timeLimit;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onBeforeReceive(Context $context)
+    {
+        $this->checkTime($context);
     }
 
     /**
