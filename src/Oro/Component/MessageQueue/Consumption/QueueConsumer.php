@@ -15,15 +15,21 @@ class QueueConsumer
      * @var Extensions
      */
     private $extensions;
+    /**
+     * @var int
+     */
+    private $idleTime;
 
     /**
      * @param ConnectionInterface $connection
      * @param Extensions $extensions
+     * @param int $idleTime
      */
-    public function __construct(ConnectionInterface $connection, Extensions $extensions)
+    public function __construct(ConnectionInterface $connection, Extensions $extensions, $idleTime = 1)
     {
         $this->connection = $connection;
         $this->extensions = $extensions;
+        $this->idleTime = $idleTime;
     }
 
     /**
@@ -85,6 +91,7 @@ class QueueConsumer
 
                     $extensions->onPostReceived($context);
                 } else {
+                    sleep($this->idleTime);
                     $extensions->onIdle($context);
                 }
 

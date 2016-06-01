@@ -51,6 +51,54 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer->receive();
     }
 
+    public function testShouldNotSubscribeToQueueOnReceiveNoWaitCall()
+    {
+        $channelMock = $this->createAmqpChannel();
+        $channelMock
+            ->expects($this->never())
+            ->method('basic_consume')
+        ;
+        $channelMock
+            ->expects($this->exactly(2))
+            ->method('basic_get')
+        ;
+
+        $sessionStub = $this->createAmqpSessionStub($channelMock);
+
+        $consumer = new AmqpMessageConsumer($sessionStub, new AmqpQueue('theQueueName'));
+
+        $consumer->receiveNoWait();
+        $consumer->receiveNoWait();
+    }
+
+    public function testShouldWaitForMessageAndReturnItOnReceiveNoWait()
+    {
+        $expectedMessage = new AmqpMessage();
+        $expectedInternalMessage = new AMQPLibMessage();
+        $expectedInternalMessage->delivery_info['delivery_tag'] = 'theDeliveryTag';
+        $expectedInternalMessage->delivery_info['redelivered'] = 'theRedeliveredBool';
+        $expectedInternalMessage->delivery_info['exchange'] = 'theExchange';
+
+        $channelStub = new AMQPChannelStub();
+        $channelStub->receivedInternalMessage = $expectedInternalMessage;
+
+        $sessionStub = $this->createAmqpSessionStub($channelStub);
+        $sessionStub
+            ->expects($this->once())
+            ->method('createMessage')
+            ->with(null, [], [])
+            ->willReturn($expectedMessage)
+        ;
+
+        $consumer = new AmqpMessageConsumer($sessionStub, new AmqpQueue('aName'));
+
+        $actualMessage = $consumer->receiveNoWait();
+        $this->assertSame($expectedMessage, $actualMessage);
+        $this->assertSame('theDeliveryTag', $actualMessage->getDeliveryTag());
+        $this->assertSame('theRedeliveredBool', $actualMessage->isRedelivered());
+        $this->assertSame('theExchange', $actualMessage->getExchange());
+    }
+
     public function testShouldCorrectlyPassQueueOptionsToBasicConsumeMethod()
     {
         $queue = new AmqpQueue('aQueueName');
@@ -409,6 +457,11 @@ class AMQPChannelStub extends AMQPChannel
         $arguments = array()
     ) {
         $this->callback = $callback;
+    }
+
+    public function basic_get($queue = '', $no_ack = false, $ticket = null)
+    {
+        return $this->receivedInternalMessage;
     }
 }
 

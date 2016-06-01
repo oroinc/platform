@@ -20,14 +20,14 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithConnectionAndExtensionsAsArguments()
     {
-        new QueueConsumer($this->createConnectionStub(), new Extensions([]));
+        new QueueConsumer($this->createConnectionStub(), new Extensions([]), 0);
     }
 
     public function testShouldAllowGetConnectionSetInConstructor()
     {
         $expectedConnection = $this->createConnectionStub();
 
-        $consumer = new QueueConsumer($expectedConnection, new Extensions([]));
+        $consumer = new QueueConsumer($expectedConnection, new Extensions([]), 0);
 
         $this->assertSame($expectedConnection, $consumer->getConnection());
     }
@@ -66,7 +66,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('process')
         ;
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(5)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(5)]), 0);
 
         $queueConsumer->consume($expectedQueueName, $messageProcessorMock);
     }
@@ -86,7 +86,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(5)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(5)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -113,7 +113,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -140,7 +140,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -167,7 +167,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -194,7 +194,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -218,7 +218,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -248,7 +248,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -280,7 +280,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -312,7 +312,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -345,7 +345,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -393,7 +393,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -433,7 +433,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -462,7 +462,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionMock);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -486,7 +486,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionMock);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
 
         $this->setExpectedException(\Exception::class);
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
@@ -532,7 +532,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -577,7 +577,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -618,7 +618,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
@@ -660,7 +660,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock, new Extensions([$runtimeExtension]));
     }
@@ -708,7 +708,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
-        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]));
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
 
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }

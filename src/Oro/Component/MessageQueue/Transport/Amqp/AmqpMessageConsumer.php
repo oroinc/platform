@@ -77,6 +77,20 @@ class AmqpMessageConsumer implements MessageConsumerInterface
     /**
      * {@inheritdoc}
      *
+     * @return AmqpMessage|null
+     */
+    public function receiveNoWait()
+    {
+        if ($internalMessage = $this->session->getChannel()->basic_get($this->queue->getQueueName(), $noAck = false)) {
+            return $this->convertMessage($internalMessage);
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @param AmqpMessage $message
      */
     public function acknowledge(MessageInterface $message)
@@ -117,19 +131,7 @@ class AmqpMessageConsumer implements MessageConsumerInterface
         }
 
         $callback = function (AMQPLibMessage $internalMessage) {
-            $properties = $internalMessage->has('application_headers') ?
-                $internalMessage->get('application_headers')->getNativeData() :
-                [];
-
-            $headers = (new AMQPTable($internalMessage->get_properties()))->getNativeData();
-            unset($headers['application_headers']);
-            
-            $message = $this->session->createMessage($internalMessage->body, $properties, $headers);
-            $message->setDeliveryTag($internalMessage->delivery_info['delivery_tag']);
-            $message->setRedelivered($internalMessage->delivery_info['redelivered']);
-            $message->setExchange($internalMessage->delivery_info['exchange']);
-
-            $this->receivedMessage = $message;
+            $this->receivedMessage = $this->convertMessage($internalMessage);
         };
 
         $this->session->getChannel()->basic_consume(
@@ -143,5 +145,27 @@ class AmqpMessageConsumer implements MessageConsumerInterface
         );
 
         $this->isInit = true;
+    }
+
+    /**
+     * @param AMQPLibMessage $internalMessage
+     *
+     * @return AmqpMessage
+     */
+    protected function convertMessage(AMQPLibMessage $internalMessage)
+    {
+        $properties = $internalMessage->has('application_headers') ?
+            $internalMessage->get('application_headers')->getNativeData() :
+            [];
+
+        $headers = (new AMQPTable($internalMessage->get_properties()))->getNativeData();
+        unset($headers['application_headers']);
+
+        $message = $this->session->createMessage($internalMessage->body, $properties, $headers);
+        $message->setDeliveryTag($internalMessage->delivery_info['delivery_tag']);
+        $message->setRedelivered($internalMessage->delivery_info['redelivered']);
+        $message->setExchange($internalMessage->delivery_info['exchange']);
+
+        return $message;
     }
 }

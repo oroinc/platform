@@ -40,6 +40,16 @@ class NullMessageConsumer implements MessageConsumerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return null
+     */
+    public function receiveNoWait()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function acknowledge(MessageInterface $message)
     {

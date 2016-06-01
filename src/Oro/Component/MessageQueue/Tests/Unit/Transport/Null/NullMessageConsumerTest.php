@@ -30,6 +30,15 @@ class NullMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($consumer->receive());
     }
 
+    public function testShouldAlwaysReturnNullOnReceiveNoWait()
+    {
+        $consumer = new NullMessageConsumer(new NullQueue('theQueueName'));
+
+        $this->assertNull($consumer->receiveNoWait());
+        $this->assertNull($consumer->receiveNoWait());
+        $this->assertNull($consumer->receiveNoWait());
+    }
+
     public function testShouldDoNothingOnAcknowledge()
     {
         $consumer = new NullMessageConsumer(new NullQueue('theQueueName'));

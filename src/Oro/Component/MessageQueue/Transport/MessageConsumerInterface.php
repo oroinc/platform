@@ -11,10 +11,15 @@ interface MessageConsumerInterface
     /**
      * @param int $timeout
      *
-     * @return MessageInterface
+     * @return MessageInterface|null
      */
     public function receive($timeout = 0);
 
+    /**
+     * @return MessageInterface|null
+     */
+    public function receiveNoWait();
+    
     /**
      * @param MessageInterface $message
      *
