@@ -32,7 +32,7 @@ class LimitConsumedMessagesExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('debug')
             ->with('[LimitConsumedMessagesExtension] Message consumption is interrupted since'.
-                ' the message limit reached. limit: "0", consumed: "0"')
+                ' the message limit reached. limit: "0"')
         ;
 
         // guard
@@ -53,7 +53,7 @@ class LimitConsumedMessagesExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('debug')
             ->with('[LimitConsumedMessagesExtension] Message consumption is interrupted since'.
-                ' the message limit reached. limit: "-1", consumed: "0"')
+                ' the message limit reached. limit: "-1"')
         ;
 
         // guard
@@ -74,7 +74,7 @@ class LimitConsumedMessagesExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('debug')
             ->with('[LimitConsumedMessagesExtension] Message consumption is interrupted since'.
-                ' the message limit reached. limit: "2", consumed: "2"')
+                ' the message limit reached. limit: "2"')
         ;
 
         // guard
