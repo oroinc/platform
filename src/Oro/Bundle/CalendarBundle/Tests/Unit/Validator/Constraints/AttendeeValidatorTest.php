@@ -61,7 +61,7 @@ class AttendeeValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->context->expects($this->once())
             ->method('addViolation')
-            ->with('Email or display name have to be specified');
+            ->with('Email or display name have to be specified.');
 
         $this->validator->validate($value, new Attendee());
     }
