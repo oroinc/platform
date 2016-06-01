@@ -6,9 +6,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressRecipientsTransformer;
 
 class EmailAddressRecipientsType extends AbstractType
 {
@@ -23,6 +25,17 @@ class EmailAddressRecipientsType extends AbstractType
     public function __construct(ConfigManager $cm)
     {
         $this->cm = $cm;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->resetViewTransformers();
+        $builder->addViewTransformer(
+            new EmailAddressRecipientsTransformer()
+        );
     }
 
     /**
@@ -61,6 +74,7 @@ class EmailAddressRecipientsType extends AbstractType
             'configs' => [
                 'allowClear'         => true,
                 'multiple'           => true,
+                'separator'          => Email::EMAIL_SEPARATOR,
                 'route_name'         => 'oro_email_autocomplete_recipient',
                 'minimumInputLength' => $this->cm->get('oro_email.minimum_input_length'),
                 'per_page'           => 100,
