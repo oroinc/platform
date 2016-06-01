@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
@@ -12,15 +13,11 @@ use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 
 class LocalizationParentSelectTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var LocalizationParentSelectType
-     */
-    protected $formType;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var LocalizationParentSelectType */
+    protected $formType;
 
     public function setUp()
     {
@@ -31,7 +28,6 @@ class LocalizationParentSelectTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         $this->formType = new LocalizationParentSelectType($this->doctrineHelper);
-
     }
 
     public function tearDown()
@@ -51,22 +47,23 @@ class LocalizationParentSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals(LocalizationParentSelectType::NAME, $this->formType->getName());
     }
 
-    public function testSetEntityClass()
+    public function testSetDataClass()
     {
         $className = 'stdClass';
 
-        $this->assertAttributeEmpty('entityClass', $this->formType);
+        $this->assertAttributeEmpty('dataClass', $this->formType);
 
-        $this->formType->setEntityClass($className);
+        $this->formType->setDataClass($className);
 
-        $this->assertAttributeEquals($className, 'entityClass', $this->formType);
+        $this->assertAttributeEquals($className, 'dataClass', $this->formType);
     }
 
     public function testConfigureOptions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject $optionsResolver */
+        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionsResolver */
         $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
         $optionsResolver->expects($this->atLeastOnce())->method('setNormalizer');
         $optionsResolver->expects($this->atLeastOnce())->method('setDefaults')->willReturn($optionsResolver);
 

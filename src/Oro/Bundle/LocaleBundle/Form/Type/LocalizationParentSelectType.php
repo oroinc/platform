@@ -15,16 +15,15 @@ class LocalizationParentSelectType extends AbstractType
 {
     const NAME = 'oro_localization_parent_select';
 
-    /**
-     * @var string
-     */
-    protected $entityClass;
-
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var string */
+    protected $dataClass;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -47,11 +46,11 @@ class LocalizationParentSelectType extends AbstractType
     }
 
     /**
-     * @param string $entityClass
+     * @param string $dataClass
      */
-    public function setEntityClass($entityClass)
+    public function setDataClass($dataClass)
     {
-        $this->entityClass = $entityClass;
+        $this->dataClass = $dataClass;
     }
 
     /**
@@ -59,11 +58,13 @@ class LocalizationParentSelectType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'class' => $this->entityClass,
-            'required' => false,
-            'localization' => null,
-        ])
+        $resolver->setDefaults(
+            [
+                'class' => $this->dataClass,
+                'required' => false,
+                'localization' => null,
+            ]
+        )
             ->setNormalizer(
                 'choices',
                 function (Options $options, $value) {
@@ -85,7 +86,7 @@ class LocalizationParentSelectType extends AbstractType
      */
     protected function getAvailableParents(Localization $localization = null)
     {
-        $localizations = $this->doctrineHelper->getEntityRepositoryForClass($this->entityClass)->findAll();
+        $localizations = $this->doctrineHelper->getEntityRepositoryForClass($this->dataClass)->findAll();
 
         if (!($localization instanceof Localization) || (!$localization->getId())) {
             return $localizations;
