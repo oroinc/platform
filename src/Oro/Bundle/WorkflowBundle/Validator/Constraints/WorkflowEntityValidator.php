@@ -5,38 +5,21 @@ namespace Oro\Bundle\WorkflowBundle\Validator\Constraints;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 
 class WorkflowEntityValidator extends ConstraintValidator
 {
-    /**
-     * [
-     *      '<entityClass>' => [
-     *          'acls' => [
-     *              <WorkflowEntityAcl.id> => <WorkflowEntityAcl>,
-     *              ...
-     *          ],
-     *          'entities' => [
-     *              <entityId> => [
-     *                  'update' => true|false,
-     *                  'delete' => true|false
-     *              ],
-     *              ...
-     *          ]
-     *      ],
-     *      ...
-     * ]
-     *
-     * @var array
-     */
-    protected $entityAcls;
+    /** @var EntityManager */
+    protected $entityManager;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -44,14 +27,25 @@ class WorkflowEntityValidator extends ConstraintValidator
     /** @var ConfigProvider */
     protected $configProvider;
 
+    /** @var WorkflowPermissionRegistry */
+    protected $permissionRegistry;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigProvider $configProvider
+     * @param EntityManager              $entityManager
+     * @param DoctrineHelper             $doctrineHelper
+     * @param ConfigProvider             $configProvider
+     * @param WorkflowPermissionRegistry $permissionRegistry
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigProvider $configProvider)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->configProvider = $configProvider;
+    public function __construct(
+        EntityManager $entityManager,
+        DoctrineHelper $doctrineHelper,
+        ConfigProvider $configProvider,
+        WorkflowPermissionRegistry $permissionRegistry
+    ) {
+        $this->entityManager      = $entityManager;
+        $this->doctrineHelper     = $doctrineHelper;
+        $this->configProvider     = $configProvider;
+        $this->permissionRegistry = $permissionRegistry;
     }
 
     /**
@@ -66,13 +60,13 @@ class WorkflowEntityValidator extends ConstraintValidator
 
         // Skip changes for workflow transition form
         $root = $this->context->getRoot();
-        if ($root instanceof Form){
+        if ($root instanceof Form) {
             if (WorkflowTransitionType::NAME === $root->getName()) {
                 return;
             }
         }
 
-        if (!$this->configProvider->hasConfig($value)){
+        if (!$this->configProvider->hasConfig($value)) {
             return;
         }
 
@@ -81,95 +75,37 @@ class WorkflowEntityValidator extends ConstraintValidator
             return;
         }
 
-        $permissions = $this->getEntityPermissions($value);
-        if ($permissions['update'] === false) {
-            // @todo: checks if entity has changes
-            $this->context->addViolation($constraint->updateEntityMessage);
-        }
-
-        // @todo: Add Violation for fields atPath here
-    }
-
-    /**
-     * @param object $value
-     *
-     * @return mixed
-     */
-    protected function getEntityPermissions($value)
-    {
-        $this->loadEntityAcls();
-
-        $class      = $this->doctrineHelper->getEntityClass($value);
-        $identifier = $this->doctrineHelper->getSingleEntityIdentifier($value);
-
-        $this->loadEntityPermissions($class, $identifier);
-
-        return $this->entityAcls[$class]['entities'][$identifier];
-    }
-
-    /**
-     * @param string $class
-     * @param mixed $identifier
-     */
-    protected function loadEntityPermissions($class, $identifier)
-    {
-        if (array_key_exists($identifier, $this->entityAcls[$class]['entities'])) {
-            return;
-        }
-
-        // default permissions
-        $this->entityAcls[$class]['entities'][$identifier] = [
-            'update' => true,
-            'delete' => true,
-        ];
-
-        /** @var WorkflowEntityAclIdentityRepository $repository */
-        $repository = $this->doctrineHelper->getEntityRepository('OroWorkflowBundle:WorkflowEntityAclIdentity');
-        $identities = $repository->findByClassAndIdentifier($class, $identifier);
-
-        foreach ($identities as $identity) {
-            $aclId = $identity->getAcl()->getId();
-            if (empty($this->entityAcls[$class]['acls'][$aclId])) {
-                continue;
+        if ($this->doctrineHelper->isNewEntity($value)) {
+            // @todo: add restrictions for the new entity if needed
+        } else {
+            $permissions = $this->permissionRegistry->getEntityPermissions($value);
+            if ($permissions['UPDATE'] === false || $this->permissionRegistry->hasRestrictedEntityFields($value)) {
+                $unitOfWork = $this->entityManager->getUnitOfWork();
+                $class      = $this->entityManager->getClassMetadata($this->configProvider->getClassName($value));
+                $unitOfWork->computeChangeSet($class, $value);
+                if ($permissions['UPDATE'] === false) {
+                    if ($unitOfWork->isScheduledForUpdate($value)) {
+                        $this->context->addViolation($constraint->updateEntityMessage);
+                    }
+                } else {
+                    $changesSet       = $unitOfWork->getEntityChangeSet($value);
+                    $restrictedFields = array_flip($this->permissionRegistry->getRestrictedEntityFields($value));
+                    if ($fields = array_intersect_key($changesSet, $restrictedFields)) {
+                        foreach ($fields as $key => $value) {
+                            // @todo: Check $value for restrictions mode: disallow
+                            
+                            /** @var ExecutionContextInterface $context */
+                            $context = $this->context;
+                            $context
+                                ->buildViolation(
+                                    $constraint->updateFieldMessage
+                                )
+                                ->atPath($key)
+                                ->addViolation();
+                        }
+                    }
+                }
             }
-
-            /** @var WorkflowEntityAcl $entityAcl */
-            $entityAcl = $this->entityAcls[$class]['acls'][$aclId];
-            if ($this->entityAcls[$class]['entities'][$identifier]['update'] && !$entityAcl->isUpdatable()) {
-                $this->entityAcls[$class]['entities'][$identifier]['update'] = false;
-            }
-            if ($this->entityAcls[$class]['entities'][$identifier]['delete'] && !$entityAcl->isDeletable()) {
-                $this->entityAcls[$class]['entities'][$identifier]['delete'] = false;
-            }
-        }
-    }
-
-    /**
-     * Load ACL entities and put it to internal cache
-     */
-    protected function loadEntityAcls()
-    {
-        if (null !== $this->entityAcls) {
-            return;
-        }
-
-        /** @var WorkflowEntityAcl[] $entityAcls */
-        $entityAcls = $this->doctrineHelper
-            ->getEntityRepository('OroWorkflowBundle:WorkflowEntityAcl')
-            ->findAll();
-
-        $this->entityAcls = [];
-        foreach ($entityAcls as $entityAcl) {
-            $entityClass = $entityAcl->getEntityClass();
-
-            if (!array_key_exists($entityClass, $this->entityAcls)) {
-                $this->entityAcls[$entityClass] = [
-                    'acls' => [],
-                    'entities' => [],
-                ];
-            }
-
-            $this->entityAcls[$entityClass]['acls'][$entityAcl->getId()] = $entityAcl;
         }
     }
 }
