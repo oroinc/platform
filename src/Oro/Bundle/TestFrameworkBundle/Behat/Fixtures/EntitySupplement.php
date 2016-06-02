@@ -6,17 +6,13 @@ use Behat\Behat\Tester\Exception\PendingException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker\Factory;
+use Faker\ORM\Doctrine\ColumnTypeGuesser;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class EntitySupplement
 {
-    /**
-     * @var Factory
-     */
-    protected $faker;
-
     /**
      * @var Registry
      */
@@ -28,9 +24,19 @@ class EntitySupplement
     protected $referenceRepository;
 
     /**
+     * @var Factory
+     */
+    protected $faker;
+
+    /**
      * @var PropertyAccessor
      */
     protected $accessor;
+
+    /**
+     * @var ColumnTypeGuesser
+     */
+    protected $columnTypeGuesser;
 
     /**
      * EntitySupplement constructor.
@@ -39,10 +45,11 @@ class EntitySupplement
      */
     public function __construct(Registry $registry, ReferenceRepository $referenceRepository)
     {
-        $this->faker = Factory::create();
         $this->registry = $registry;
         $this->referenceRepository = $referenceRepository;
         $this->accessor = PropertyAccess::createPropertyAccessor();
+        $this->faker = Factory::create();
+        $this->columnTypeGuesser = new ColumnTypeGuesser($this->faker);
     }
 
     /**
@@ -85,70 +92,10 @@ class EntitySupplement
     }
 
     /**
-     * @param ClassMetadataInfo $metadata
-     * @param $fieldName
-     * @return string
-     */
-    protected function getType(ClassMetadataInfo $metadata, $fieldName)
-    {
-        $type = $metadata->getTypeOfField($fieldName);
-
-        if (is_object($type) && is_subclass_of($type, 'Doctrine\DBAL\Types\Type')) {
-            return $type->getName();
-        } elseif (is_string($type)) {
-            return $type;
-        }
-
-        throw new \InvalidArgumentException();
-    }
-
-    /**
-     * @param $type
-     * @return float|int|string
-     */
-    protected function getFakeByType($type)
-    {
-        switch ($type) {
-            case Type::TARRAY:
-                return $this->faker->words(3, false);
-            case Type::SIMPLE_ARRAY:
-                return $this->faker->words(3, false);
-            case Type::BIGINT:
-                return $this->faker->randomNumber();
-            case Type::BOOLEAN:
-                return $this->faker->boolean(50);
-            case Type::DATETIME:
-                return $this->faker->dateTime;
-            case Type::DATETIMETZ:
-                return $this->faker->dateTime;
-            case Type::DATE:
-                return $this->faker->date();
-            case Type::TIME:
-                return $this->faker->time();
-            case Type::DECIMAL:
-                return $this->faker->randomFloat(2);
-            case Type::INTEGER:
-                return $this->faker->randomNumber();
-            case Type::OBJECT:
-                return new \stdClass();
-            case Type::SMALLINT:
-                return $this->faker->randomNumber(5);
-            case Type::STRING:
-                return $this->faker->sentence(3);
-            case Type::TEXT:
-                return $this->faker->paragraph(3);
-            case Type::FLOAT:
-                return $this->faker->randomFloat(2);
-            default:
-                throw new PendingException();
-        }
-    }
-
-    /**
      * @param $object
-     * @param $metadata
+     * @param ClassMetadataInfo $metadata
      */
-    protected function completeFields($object, $metadata)
+    protected function completeFields($object, ClassMetadataInfo $metadata)
     {
         foreach ($metadata->getFieldNames() as $fieldName) {
             if (true === $metadata->isNullable($fieldName)
@@ -158,9 +105,8 @@ class EntitySupplement
                 continue;
             }
 
-            $type = $this->getType($metadata, $fieldName);
-            $fakeData = $this->getFakeByType($type);
-            $this->accessor->setValue($object, $fieldName, $fakeData);
+            $fakeData = $this->columnTypeGuesser->guessFormat($fieldName, $metadata);
+            $this->accessor->setValue($object, $fieldName, $fakeData());
         }
     }
 }
