@@ -87,6 +87,7 @@ config:
         'oro/select2-relation-component': 'bundles/oroform/js/app/components/select2-relation-component.js'
         'oro/select2-grid-component': 'bundles/oroform/js/app/components/select2-grid-component.js'
         'oroform/js/app/components/create-or-select-choice-component': 'bundles/oroform/js/app/components/create-or-select-choice-component.js'
+        'oro/select2-autocomplete-entity-parent-component': 'bundles/oroform/js/app/components/select2-autocomplete-entity-parent-component.js'
 build:
     paths:
         'tinymce/tinymce.min': 'empty:'

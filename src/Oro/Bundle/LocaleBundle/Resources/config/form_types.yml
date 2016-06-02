@@ -1,4 +1,76 @@
+parameters:
+    oro_locale.form.type.name_format.class: Oro\Bundle\LocaleBundle\Form\Type\NameFormatType
+    oro_locale.form.type.country.class:  Oro\Bundle\LocaleBundle\Form\Type\CountryType
+    oro_locale.form.type.currency.class: Oro\Bundle\LocaleBundle\Form\Type\CurrencyType
+    oro_locale.form.type.locale.class:   Oro\Bundle\LocaleBundle\Form\Type\LocaleType
+    oro_locale.form.type.language.class: Oro\Bundle\LocaleBundle\Form\Type\LanguageType
+    oro_locale.form.type.timezone.class: Oro\Bundle\LocaleBundle\Form\Type\TimezoneType
+    oro_locale.form.type.quarter.class:  Oro\Bundle\LocaleBundle\Form\Type\QuarterType
+
 services:
+   oro_locale.form.type.name_format:
+        class: %oro_locale.form.type.name_format.class%
+        arguments:
+            - '@oro_locale.formatter.name'
+        tags:
+            - { name: form.type, alias: "oro_name_format" }
+
+    oro_locale.form.type.country:
+        class: %oro_locale.form.type.country.class%
+        tags:
+            - { name: form.type, alias: "oro_locale_country" }
+
+    oro_locale.form.type.currency:
+        class: %oro_locale.form.type.currency.class%
+        tags:
+            - { name: form.type, alias: "oro_currency" }
+
+    oro_locale.form.type.locale:
+        class: %oro_locale.form.type.locale.class%
+        tags:
+            - { name: form.type, alias: "oro_locale" }
+
+    oro_locale.form.type.language:
+        class: %oro_locale.form.type.language.class%
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: form.type, alias: "oro_language" }
+
+    oro_locale.form.type.timezone:
+        class: %oro_locale.form.type.timezone.class%
+        arguments:
+            - '@oro_locale.cache'
+        tags:
+            - { name: form.type, alias: "oro_locale_timezone" }
+
+    oro_locale.form.type.quarter:
+        class: %oro_locale.form.type.quarter.class%
+        tags:
+            - { name: form.type, alias: "oro_quarter" }
+
+    #Localization Form Types
+    oro_locale.form.type.localization:
+        class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationType
+        tags:
+            - { name: form.type, alias: "oro_localization" }
+        calls:
+            - [setDataClass, ['%oro_locale.entity.localization.class%']]
+
+    oro_locale.form.type.language_select:
+        class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: form.type, alias: "oro_language_select" }
+
+    oro_locale.form.type.formatting_select:
+        class: Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: form.type, alias: "oro_formatting_select" }
+
     oro_locale.form.type.fallback_property:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType'
         public: true
@@ -36,3 +108,17 @@ services:
             - "@doctrine"
         tags:
             - { name: form.type, alias: oro_locale_localized_fallback_value_collection }
+
+    oro_locale.form.type.localization_parent_select:
+        class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType
+        tags:
+            - { name: form.type, alias: "oro_localization_parent_select" }
+
+    oro_locale.form.autocomplete.localization_parent.search_handler:
+        parent: oro_form.autocomplete.search_handler
+        class: 'Oro\Bundle\LocaleBundle\Autocomplete\ParentLocalizationSearchHandler'
+        arguments:
+            - '%oro_locale.entity.localization.class%'
+            - ["name"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: oro_localization_parent, acl_resource: oro_locale_localization_view }

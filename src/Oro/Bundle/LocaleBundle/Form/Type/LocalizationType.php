@@ -10,6 +10,7 @@ class LocalizationType extends AbstractType
 {
     const NAME = 'oro_localization';
 
+    /** @var string */
     protected $dataClass = 'Oro\Bundle\LocaleBundle\Entity\Localization';
 
     /**
@@ -20,10 +21,7 @@ class LocalizationType extends AbstractType
         $builder->add('name')
             ->add('languageCode', 'oro_language_select')
             ->add('formattingCode', 'oro_formatting_select')
-            ->add('parentLocalization', 'entity', [
-                'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
-                'required' => false,
-            ]);
+            ->add('parentLocalization', LocalizationParentSelectType::NAME);
     }
 
     /**
