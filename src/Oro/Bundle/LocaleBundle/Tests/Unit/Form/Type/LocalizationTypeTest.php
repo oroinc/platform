@@ -30,27 +30,6 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     protected $formType;
 
     /**
-     * @return array
-     */
-    protected function getExtensions()
-    {
-        return [
-            new PreloadedExtension(
-                [
-                    LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
-                    LanguageSelectType::NAME => new LanguageSelectTypeStub(),
-                    FormattingSelectType::NAME => new FormattingSelectTypeStub(),
-                    LocalizationParentSelectType::NAME => new EntityType(
-                            ['1' => $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1])],
-                            LocalizationParentSelectType::NAME
-                        ),
-                ],
-                []
-            )
-        ];
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -73,23 +52,12 @@ class LocalizationTypeTest extends FormIntegrationTestCase
 
     public function testGetName()
     {
-        $this->assertInternalType('string', $this->formType->getName());
         $this->assertEquals(LocalizationType::NAME, $this->formType->getName());
-    }
-
-    public function testBuildForm()
-    {
-        $form = $this->factory->create($this->formType);
-
-        $this->assertTrue($form->has('name'));
-        $this->assertTrue($form->has('titles'));
-        $this->assertTrue($form->has('languageCode'));
-        $this->assertTrue($form->has('formattingCode'));
-        $this->assertTrue($form->has('parentLocalization'));
     }
 
     /**
      * @dataProvider submitDataProvider
+     *
      * @param mixed $defaultData
      * @param array $submittedData
      * @param array $expectedData
@@ -102,9 +70,9 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         $this->assertEquals(static::DATA_CLASS, $formConfig->getOption('data_class'));
 
         $this->assertEquals($defaultData, $form->getData());
-        $this->assertEquals($defaultData, $form->getViewData());
 
         $form->submit($submittedData);
+
         $this->assertTrue($form->isValid());
         $this->assertEquals($expectedData, $form->getData());
     }
@@ -142,12 +110,12 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                             'parentLocalization' => 1,
                         ],
                     'expectedData' => $this->createLocalization(
-                            'new_localization_item_name',
-                            'new_localization_item_title',
-                            'en_US',
-                            'en_US',
-                            $parentLocalization
-                        ),
+                        'new_localization_item_name',
+                        'new_localization_item_title',
+                        'en_US',
+                        'en_US',
+                        $parentLocalization
+                    )
                 ],
         ];
     }
@@ -158,10 +126,17 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      * @param string $languageCode
      * @param string $formattingCode
      * @param Localization $parentLocalization
+     *
      * @return Localization
      */
-    protected function createLocalization($name, $title, $languageCode, $formattingCode, Localization $parentLocalization = null)
-    {
+    protected function createLocalization(
+        $name,
+        $title,
+        $languageCode,
+        $formattingCode,
+        Localization $parentLocalization = null
+    ) {
+        /** @var Localization $localization */
         $localization = $this->getEntity(
             'Oro\Bundle\LocaleBundle\Entity\Localization',
             [
@@ -171,8 +146,32 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                 'parentLocalization' => $parentLocalization,
             ]
         );
+
         $localization->setDefaultTitle($title);
 
         return $localization;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
+                    LanguageSelectType::NAME => new LanguageSelectTypeStub(),
+                    FormattingSelectType::NAME => new FormattingSelectTypeStub(),
+                    LocalizationParentSelectType::NAME => new EntityType(
+                        [
+                            '1' => $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1])
+                        ],
+                        LocalizationParentSelectType::NAME
+                    ),
+                ],
+                []
+            )
+        ];
     }
 }

@@ -12,7 +12,7 @@ class LocalizationType extends AbstractType
     const NAME = 'oro_localization';
 
     /** @var string */
-    protected $dataClass = 'Oro\Bundle\LocaleBundle\Entity\Localization';
+    protected $dataClass;
 
     /**
      * {@inheritdoc}
@@ -20,45 +20,32 @@ class LocalizationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(
-                'name',
-                'text',
-                [
-                    'required' => true,
-                    'label' => 'oro.locale.localization.name.label',
-                ]
-            )
+            ->add('name', 'text', ['required' => true, 'label' => 'oro.locale.localization.name.label'])
             ->add(
                 'titles',
                 LocalizedFallbackValueCollectionType::NAME,
                 [
                     'required' => true,
                     'label' => 'oro.locale.localization.titles.label',
-                    'options' => ['constraints' => [new NotBlank()]],
+                    'options' => [
+                        'constraints' => [new NotBlank(['message' => 'oro.locale.localization.titles.blank'])]
+                    ]
                 ]
             )
             ->add(
                 'languageCode',
                 'oro_language_select',
-                [
-                    'required' => true,
-                    'label' => 'oro.locale.localization.language_code.label',
-                ]
+                ['required' => true, 'label' => 'oro.locale.localization.language_code.label']
             )
             ->add(
                 'formattingCode',
                 'oro_formatting_select',
-                [
-                    'required' => true,
-                    'label' => 'oro.locale.localization.formatting_code.label',
-                ])
+                ['required' => true, 'label' => 'oro.locale.localization.formatting_code.label']
+            )
             ->add(
                 'parentLocalization',
                 LocalizationParentSelectType::NAME,
-                [
-                    'required' => false,
-                    'label' => 'oro.locale.localization.parent_localization.label',
-                ]
+                ['required' => false, 'label' => 'oro.locale.localization.parent_localization.label']
             );
     }
 

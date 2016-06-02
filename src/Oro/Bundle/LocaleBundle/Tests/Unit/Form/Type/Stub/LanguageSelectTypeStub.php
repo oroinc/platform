@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub;
 
-use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 
 class LanguageSelectTypeStub extends AbstractType
 {
