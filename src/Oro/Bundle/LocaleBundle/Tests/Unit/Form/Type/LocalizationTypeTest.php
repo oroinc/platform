@@ -8,6 +8,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\FormattingSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LanguageSelectTypeStub;
@@ -40,7 +41,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                     LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
                     LanguageSelectType::NAME => new LanguageSelectTypeStub(),
                     FormattingSelectType::NAME => new FormattingSelectTypeStub(),
-                    'entity' => new EntityType([])
+                    LocalizationParentSelectType::NAME => new EntityType([], LocalizationParentSelectType::NAME),
                 ],
                 []
             )
