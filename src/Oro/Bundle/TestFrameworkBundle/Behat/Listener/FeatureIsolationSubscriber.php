@@ -99,7 +99,9 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
      */
     public function loadFixtures(array $tags)
     {
-        $fixturesTags = array_filter($tags, function($tag) { return strpos($tag, 'fixture-') === 0; });
+        $fixturesTags = array_filter($tags, function ($tag) {
+            return strpos($tag, 'fixture-') === 0;
+        });
 
         if (0 === count($fixturesTags)) {
             return;

@@ -168,6 +168,7 @@ class FixtureLoader
         return [
             $className => [
                 $entityReference => $values
-        ]];
+            ]
+        ];
     }
 }

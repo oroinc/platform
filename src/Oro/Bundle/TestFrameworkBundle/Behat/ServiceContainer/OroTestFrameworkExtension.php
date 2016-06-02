@@ -8,7 +8,6 @@ use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
-
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
