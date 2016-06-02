@@ -405,6 +405,7 @@ services:
         arguments:
             - "@oro_entity_config.config_manager"
         tags:
+            - { name: oro_entity.exclusion_provider.default }
             - { name: oro_entity.exclusion_provider.api, priority: 10 }
 
     oro_entity_extend.exclusion_provider.enum:
