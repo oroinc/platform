@@ -59,14 +59,8 @@ class Message extends \Zend\Mail\Storage\Message
      */
     public function getHeaders()
     {
-        if (null === $this->headers) {
-            if ($this->mail) {
-                $part = $this->mail->getRawHeader($this->messageNum);
-                $this->headers = Headers::fromString($part);
-            } else {
-                $this->headers = new Headers();
-            }
-        }
+        parent::getHeaders();
+
         if (!$this->headers instanceof Headers) {
             $this->headers = new Headers();
         }
