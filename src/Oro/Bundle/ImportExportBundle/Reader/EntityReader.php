@@ -132,7 +132,6 @@ class EntityReader extends IteratorBasedReader
     public function setAclHelper(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
-
     }
 
     /**
