@@ -26,6 +26,9 @@ oro.locale:
         navigation:
             view: 'Localization "%name%"'
 
+        form:
+            choose_parent: 'Choose parent localization...'
+
     controller:
         localization:
             saved.message: 'Localization has been saved'

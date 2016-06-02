@@ -2,60 +2,37 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
+use Oro\Component\Testing\Unit\EntityTrait;
 
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-
-class LocalizationParentSelectTypeTest extends FormIntegrationTestCase
+class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    use EntityTrait;
 
     /** @var LocalizationParentSelectType */
     protected $formType;
 
     public function setUp()
     {
-        parent::setUp();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formType = new LocalizationParentSelectType($this->doctrineHelper);
+        $this->formType = new LocalizationParentSelectType();
     }
 
     public function tearDown()
     {
-        unset($this->doctrineHelper, $this->formType);
-
-        parent::tearDown();
+        unset($this->formType);
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('entity', $this->formType->getParent());
+        $this->assertEquals('oro_jqueryselect2_hidden', $this->formType->getParent());
     }
 
     public function testGetName()
     {
         $this->assertEquals(LocalizationParentSelectType::NAME, $this->formType->getName());
-    }
-
-    public function testSetDataClass()
-    {
-        $className = 'stdClass';
-
-        $this->assertAttributeEmpty('dataClass', $this->formType);
-
-        $this->formType->setDataClass($className);
-
-        $this->assertAttributeEquals($className, 'dataClass', $this->formType);
     }
 
     public function testConfigureOptions()
@@ -64,25 +41,66 @@ class LocalizationParentSelectTypeTest extends FormIntegrationTestCase
         $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();
-        $optionsResolver->expects($this->atLeastOnce())->method('setNormalizer');
-        $optionsResolver->expects($this->atLeastOnce())->method('setDefaults')->willReturn($optionsResolver);
+        $optionsResolver->expects($this->once())
+            ->method('setDefaults')
+            ->with($this->isType('array'))
+            ->willReturnCallback(
+                function (array $options) {
+                    $this->assertArrayHasKey('autocomplete_alias', $options);
+                    $this->assertEquals('oro_localization_parent', $options['autocomplete_alias']);
+
+                    $this->assertArrayHasKey('configs', $options);
+                    $this->assertEquals(
+                        [
+                            'component' => 'autocomplete-entity-parent',
+                            'placeholder' => 'oro.locale.localization.form.choose_parent'
+                        ],
+                        $options['configs']
+                    );
+                }
+            );
 
         $this->formType->configureOptions($optionsResolver);
     }
 
+
     /**
-     * {@inheritdoc}
+     * @dataProvider buildViewDataProvider
+     *
+     * @param object|null $parentData
+     * @param int|null $expectedParentId
      */
-    protected function getExtensions()
+    public function testBuildView($parentData, $expectedParentId)
+    {
+        $parentForm = $this->getMock('Symfony\Component\Form\FormInterface');
+        $parentForm->expects($this->once())->method('getData')->willReturn($parentData);
+
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form->expects($this->once())->method('getParent')->willReturn($parentForm);
+
+        $formView = new FormView();
+
+        $this->formType->buildView($formView, $form, []);
+
+        $this->assertArrayHasKey('configs', $formView->vars);
+        $this->assertArrayHasKey('entityId', $formView->vars['configs']);
+        $this->assertEquals($expectedParentId, $formView->vars['configs']['entityId']);
+    }
+
+    /**
+     * @return array
+     */
+    public function buildViewDataProvider()
     {
         return [
-            new PreloadedExtension(
-                [
-                    'entity' => new EntityType([]),
-                ],
-                []
-            ),
-            $this->getValidatorExtension(true),
+            'without entity' => [
+                'parentData' => null,
+                'expectedParentId' => null,
+            ],
+            'with entity' => [
+                'parentData' => $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 42]),
+                'expectedParentId' => 42,
+            ],
         ];
     }
 }

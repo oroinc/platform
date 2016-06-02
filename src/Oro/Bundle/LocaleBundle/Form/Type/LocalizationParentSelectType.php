@@ -2,56 +2,16 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationParentSelectType extends AbstractType
 {
     const NAME = 'oro_localization_parent_select';
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var string */
-    protected $dataClass;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'entity';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return static::NAME;
-    }
-
-    /**
-     * @param string $dataClass
-     */
-    public function setDataClass($dataClass)
-    {
-        $this->dataClass = $dataClass;
-    }
 
     /**
      * {@inheritdoc}
@@ -60,73 +20,38 @@ class LocalizationParentSelectType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'class' => $this->dataClass,
-                'required' => false,
-                'localization' => null,
+                'autocomplete_alias' => 'oro_localization_parent',
+                'configs' => [
+                    'component' => 'autocomplete-entity-parent',
+                    'placeholder' => 'oro.locale.localization.form.choose_parent'
+                ]
             ]
-        )
-            ->setNormalizer(
-                'choices',
-                function (Options $options, $value) {
-                    if (null !== $value) {
-                        return $value;
-                    }
-
-                    return $this->getAvailableParents($options['localization']);
-                }
-            );
+        );
     }
 
     /**
-     * Returns list of available parents for localization instance
-     *
-     * @param Localization $localization
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    protected function getAvailableParents(Localization $localization = null)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $localizations = $this->doctrineHelper->getEntityRepositoryForClass($this->dataClass)->findAll();
+        $parentData = $form->getParent()->getData();
 
-        if (!($localization instanceof Localization) || (!$localization->getId())) {
-            return $localizations;
-        }
-
-        $collection = new ArrayCollection();
-
-        /** @var Localization $localizationItem */
-        foreach ($localizations as $localizationItem) {
-            if (!$collection->contains($localizationItem)) {
-                if ($localizationItem->getId() !== $localization->getId()) {
-                    $collection->add($localizationItem);
-                }
-            }
-        }
-
-        $collection = $this->removeChildLocalizationsRecursive($localization, $collection);
-
-        return $collection->toArray();
+        $view->vars['configs']['entityId'] = $parentData instanceof Localization ? $parentData->getId() : null;
     }
 
     /**
-     * Removes all child localization at any level of hierarchy
-     *
-     * @param Localization $localization
-     * @param ArrayCollection $collection
-     * @return ArrayCollection
+     * {@inheritdoc}
      */
-    private function removeChildLocalizationsRecursive(Localization $localization, ArrayCollection $collection)
+    public function getParent()
     {
-        $childLocalizations = $localization->getChildLocalizations();
-        if (count($childLocalizations)) {
-            foreach ($childLocalizations as $childLocalization) {
-                if ($childLocalization->getChildLocalizations()) {
-                    $collection = $this->removeChildLocalizationsRecursive($childLocalization, $collection);
-                }
-                $collection->removeElement($childLocalization);
-            }
-        }
+        return 'oro_jqueryselect2_hidden';
+    }
 
-        return $collection;
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return self::NAME;
     }
 }
