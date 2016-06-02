@@ -25,7 +25,7 @@ class CalendarEventControllerTest extends WebTestCase
     }
 
     /**
-     * @return int
+     * @return array
      */
     public function testCreateAction()
     {
@@ -108,8 +108,6 @@ class CalendarEventControllerTest extends WebTestCase
             $this->getUrl('oro_calendar_event_update', ['id' => $param['calendarId']])
         );
         $form    = $crawler->selectButton('Save and Close')->form();
-        $user    = $this->getReference('simple_user');
-        $admin   = $this->getAdminUser();
 
         $form['oro_calendar_event_form[title]']       = 'test title';
         $form['oro_calendar_event_form[description]'] = 'test description';

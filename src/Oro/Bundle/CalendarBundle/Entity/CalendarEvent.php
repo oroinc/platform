@@ -134,7 +134,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     /**
      * @var CalendarEvent
      *
-     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="childEvents")
+     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="childEvents", fetch="EAGER")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      **/
     protected $parent;
