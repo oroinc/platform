@@ -11,6 +11,10 @@ use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 abstract class AbstractType implements BlockTypeInterface
 {
     /**
+     * Options with settings in this property allow automatically configure options and pass them to view
+     * @see configureOptions()
+     * @see buildView()
+     *
      * @var array
      */
     protected $options = [];
