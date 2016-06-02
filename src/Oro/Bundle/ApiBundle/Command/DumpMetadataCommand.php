@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,14 +30,22 @@ class DumpMetadataCommand extends AbstractDebugCommand
                 'entity',
                 InputArgument::REQUIRED,
                 'The entity class name or alias'
-            );
+            )
             // @todo: API version is not supported for now
             //->addArgument(
             //    'version',
             //    InputArgument::OPTIONAL,
             //    'API version',
             //    Version::LATEST
-            //);
+            //)
+            ->addOption(
+                'action',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The name of action for which the metadata should be displayed.' .
+                'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.'.
+                'get'
+            );
         parent::configure();
     }
 
@@ -53,12 +62,13 @@ class DumpMetadataCommand extends AbstractDebugCommand
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
+        $action = $input->getOption('action');
 
         /** @var ProcessorBag $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
         $processorBag->addApplicableChecker(new RequestTypeApplicableChecker());
 
-        $metadata = $this->getMetadata($entityClass, $version, $requestType);
+        $metadata = $this->getMetadata($entityClass, $version, $requestType, $action);
         $output->write(Yaml::dump($metadata, 100, 4, true, true));
     }
 
@@ -66,17 +76,22 @@ class DumpMetadataCommand extends AbstractDebugCommand
      * @param string      $entityClass
      * @param string      $version
      * @param RequestType $requestType
+     * @param string      $action
      *
      * @return array
      */
-    protected function getMetadata($entityClass, $version, RequestType $requestType)
+    protected function getMetadata($entityClass, $version, RequestType $requestType, $action)
     {
         /** @var MetadataProvider $configProvider */
         $metadataProvider = $this->getContainer()->get('oro_api.metadata_provider');
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
 
-        $config   = $configProvider->getConfig($entityClass, $version, $requestType);
+        $configExtras = [
+            new EntityDefinitionConfigExtra($action)
+        ];
+
+        $config   = $configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
         $metadata = $metadataProvider->getMetadata(
             $entityClass,
             $version,

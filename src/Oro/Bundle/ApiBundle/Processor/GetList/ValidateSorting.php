@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
  * Validates that requested sorting is supported.
@@ -29,13 +30,26 @@ class ValidateSorting implements ProcessorInterface
         }
 
         $filterValues = $context->getFilterValues();
-        $filters      = $context->getFilters();
+        $filters = $context->getFilters();
         foreach ($filters as $filterKey => $filter) {
             if ($filter instanceof SortFilter) {
-                $this->validateSortValue(
+                $unsupportedFields = $this->validateSortValue(
                     $this->getSortFilterValue($filterValues, $filterKey),
                     $context->getConfigOfSorters()
                 );
+                if (!empty($unsupportedFields)) {
+                    $error = Error::createValidationError(
+                        Constraint::SORT,
+                        sprintf(
+                            'Sorting by "%s" field%s not supported.',
+                            implode(', ', $unsupportedFields),
+                            count($unsupportedFields) === 1 ? ' is' : 's are'
+                        )
+                    );
+                    $error->setSource(ErrorSource::createByParameter($filterKey));
+                    $context->addError($error);
+                }
+                break;
             }
         }
     }
@@ -65,20 +79,23 @@ class ValidateSorting implements ProcessorInterface
     /**
      * @param array|null         $orderBy
      * @param SortersConfig|null $sorters
+     *
+     * @return string[] The list of fields that cannot be used for sorting
      */
     protected function validateSortValue($orderBy, SortersConfig $sorters = null)
     {
+        $unsupportedFields = [];
         if (!empty($orderBy)) {
             foreach ($orderBy as $field => $direction) {
                 if (null === $sorters
                     || !$sorters->hasField($field)
                     || $sorters->getField($field)->isExcluded()
                 ) {
-                    throw new NotAcceptableHttpException(
-                        sprintf('Sorting by "%s" is not supported.', $field)
-                    );
+                    $unsupportedFields[] = $field;
                 }
             }
         }
+
+        return $unsupportedFields;
     }
 }

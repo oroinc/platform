@@ -16,12 +16,17 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
     /** @var ChainDictionaryValueListProvider */
     protected $dictionaryProvider;
 
+    /** @var array The list of excluded actions */
+    protected $excludedActions;
+
     /**
      * @param ChainDictionaryValueListProvider $dictionaryProvider
+     * @param array                            $excludedActions
      */
-    public function __construct(ChainDictionaryValueListProvider $dictionaryProvider)
+    public function __construct(ChainDictionaryValueListProvider $dictionaryProvider, array $excludedActions)
     {
         $this->dictionaryProvider = $dictionaryProvider;
+        $this->excludedActions = $excludedActions;
     }
 
     /**
@@ -38,7 +43,7 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
         $resources = $context->getResult();
         foreach ($resources as $resource) {
             if (isset($dictionaryEntities[$resource->getEntityClass()])) {
-                $this->addExcludedActions($resource, ['delete', 'delete_list'], $actionsConfig);
+                $this->addExcludedActions($resource, $this->excludedActions, $actionsConfig);
             }
         }
     }

@@ -19,9 +19,11 @@ This means that group could be rendered as fieldset or tab or like part of accor
 oro_system_configuration:
     groups:
         platform: #unique name
-            title: 'Platform' # title is required
+            title: 'Platform'             # title is required
             icon:  icon-hdd
-            priority: 30      # sort order
+            priority: 30                  # sort order
+            description: some description # add description on the next line after group header
+            tooltip: some tooltip         # add tooltip on the same line after group header
 ```
 
 Groups definitions will be replaced recursive from configs that will parse after original definition.
