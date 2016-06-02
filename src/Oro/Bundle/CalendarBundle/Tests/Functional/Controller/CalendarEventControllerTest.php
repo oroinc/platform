@@ -14,7 +14,6 @@ class CalendarEventControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
-        $this->client->useHashNavigation(true);
     }
 
     public function testIndex()
@@ -30,6 +29,7 @@ class CalendarEventControllerTest extends WebTestCase
      */
     public function testCreateAction()
     {
+        $this->client->useHashNavigation(true);
         $crawler = $this->client->request('GET', $this->getUrl('oro_calendar_event_create'));
         $form    = $crawler->selectButton('Save and Close')->form();
         $user    = $this->getReference('simple_user');
@@ -102,6 +102,7 @@ class CalendarEventControllerTest extends WebTestCase
      */
     public function testUpdateAction(array $param)
     {
+        $this->client->useHashNavigation(true);
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_calendar_event_update', ['id' => $param['calendarId']])
