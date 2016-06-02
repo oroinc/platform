@@ -7,12 +7,14 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolation
+ * @dbReindex
  */
 class CalendarEventControllerTest extends WebTestCase
 {
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->client->useHashNavigation(true);
         $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
     }
 
@@ -29,13 +31,12 @@ class CalendarEventControllerTest extends WebTestCase
      */
     public function testCreateAction()
     {
-        $this->client->useHashNavigation(true);
         $crawler = $this->client->request('GET', $this->getUrl('oro_calendar_event_create'));
         $form    = $crawler->selectButton('Save and Close')->form();
         $user    = $this->getReference('simple_user');
         $admin   = $this->getAdminUser();
 
-        $form['oro_calendar_event_form[title]']       = 'test title';
+        $form['oro_calendar_event_form[title]']       = 'test title extra unique title';
         $form['oro_calendar_event_form[description]'] = 'test description';
         $form['oro_calendar_event_form[start]']       = '2016-05-23T14:46:02Z';
         $form['oro_calendar_event_form[end]']         = '2016-05-23T15:46:02Z';
@@ -72,7 +73,7 @@ class CalendarEventControllerTest extends WebTestCase
 
         $calendarEvent = $this->getContainer()->get('doctrine')
             ->getRepository('OroCalendarBundle:CalendarEvent')
-            ->findOneBy(['title' => 'test title']);
+            ->findOneBy(['title' => 'test title extra unique title']);
 
         return [
             'calendarId' => $calendarEvent->getId(),
@@ -102,10 +103,16 @@ class CalendarEventControllerTest extends WebTestCase
      */
     public function testUpdateAction(array $param)
     {
-        $this->client->useHashNavigation(true);
+        $response = $this->client->requestGrid(
+            'calendar-event-grid',
+            ['calendar-event-grid[_filter][title][value]' => 'test title extra unique title']
+        );
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_calendar_event_update', ['id' => $param['calendarId']])
+            $this->getUrl('oro_calendar_event_update', ['id' => $result['id']])
         );
         $form    = $crawler->selectButton('Save and Close')->form();
 
