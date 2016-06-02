@@ -12,7 +12,10 @@ define(function() {
         }
         return x > 0 ? 1 : -1;
     };
-    
+
+    // copied from https://developer.mozilla.org/
+    /* jshint ignore:start */
+    // jscs:disable
     if (!Function.prototype.bind) {
         Function.prototype.bind = function(oThis) {
             if (typeof this !== 'function') {
@@ -40,5 +43,7 @@ define(function() {
             return fBound;
         };
     }
+    // jscs:enable
+    /* jshint ignore:end */
 });
 
