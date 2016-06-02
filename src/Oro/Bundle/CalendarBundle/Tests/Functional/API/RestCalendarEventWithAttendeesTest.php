@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
+use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -160,15 +162,15 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             ->getRepository('OroCalendarBundle:CalendarEvent')
             ->find($id);
 
-        $attendees = $calendarEvent->getAttendees();
+        $attendees = $this->sortAttendees($calendarEvent->getAttendees());
         $this->assertCount(3, $attendees);
 
-        $admin = $attendees->get(2);
+        $admin = $attendees[1];
         $this->assertEquals('admin@example.com', $admin->getEmail());
         $this->assertEquals('admin', $admin->getUser()->getUsername());
         $this->assertEquals($admin, $calendarEvent->getRelatedAttendee());
 
-        $simpleUser = $attendees->get(1);
+        $simpleUser = $attendees[0];
         $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
         $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
     }
@@ -728,5 +730,26 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
         return $this->getContainer()->get('doctrine')
             ->getRepository('OroUserBundle:User')
             ->findOneByEmail('admin@example.com');
+    }
+
+    /**
+     * @param Attendee[]|Collection $attendees
+     *
+     * @return Attendee[]
+     */
+    protected function sortAttendees($attendees)
+    {
+        if ($attendees instanceof Collection) {
+            $attendees = $attendees->toArray();
+        }
+
+        usort(
+            $attendees,
+            function (Attendee $attendee1, Attendee $attendee2) {
+                return strcmp($attendee1->getDisplayName(), $attendee2->getDisplayName());
+            }
+        );
+
+        return $attendees;
     }
 }
