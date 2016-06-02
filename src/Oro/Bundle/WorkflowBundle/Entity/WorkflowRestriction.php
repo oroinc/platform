@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -54,6 +55,13 @@ class WorkflowRestriction
     /**
      * @var string
      *
+     * @ORM\Column(name="attribute", type="string", length=255, nullable=false)
+     */
+    protected $attribute;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="entity_class", type="string", length=255, nullable=false)
      */
     protected $entityClass;
@@ -71,6 +79,18 @@ class WorkflowRestriction
      * @ORM\Column(name="mode_values", type="json_array", nullable=true)
      */
     protected $values;
+
+    /**
+     * @var Collection|WorkflowRestrictionIdentity[]
+     *
+     * @ORM\OneToMany(
+     *  targetEntity="WorkflowRestrictionIdentity",
+     *  mappedBy="restriction",
+     *  cascade={"all"},
+     *  orphanRemoval=true
+     * )
+     */
+    protected $restrictionIdentities;
 
     /**
      * @return integer
@@ -138,6 +158,26 @@ class WorkflowRestriction
     public function getStep()
     {
         return $this->step;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAttribute()
+    {
+        return $this->attribute;
+    }
+
+    /**
+     * @param string $attribute
+     *
+     * @return $this
+     */
+    public function setAttribute($attribute)
+    {
+        $this->attribute = $attribute;
+        
+        return $this;
     }
 
     /**
@@ -209,11 +249,27 @@ class WorkflowRestriction
         $hashParams = [
             $stepName,
             $this->getField(),
-            $this->getEntityClass(),
+            $this->getAttribute(),
             $this->getMode()
         ];
 
         return md5(json_encode($hashParams));
+    }
+
+    /**
+     * @return Collection|WorkflowRestrictionIdentity[]
+     */
+    public function getRestrictionIdentities()
+    {
+        return $this->restrictionIdentities;
+    }
+
+    /**
+     * @param Collection|WorkflowRestrictionIdentity[] $restrictionIdentities
+     */
+    public function setRestrictionIdentities($restrictionIdentities)
+    {
+        $this->restrictionIdentities = $restrictionIdentities;
     }
 
     /**

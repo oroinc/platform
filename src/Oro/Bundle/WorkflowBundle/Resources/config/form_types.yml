@@ -78,5 +78,6 @@ services:
         arguments:
             - '@oro_workflow.manager'
             - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.restriction.manager'
         tags:
             - { name: form.type_extension, alias: form }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Extension;
 
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -9,10 +10,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Doctrine\ORM\Query\Expr\Join;
 
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
@@ -23,29 +21,30 @@ class RestrictionsExtension extends AbstractTypeExtension
      * @var WorkflowManager
      */
     protected $workflowManager;
+    
     /**
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
 
     /**
-     * @var WorkflowRestrictionRepository
+     * @var RestrictionManager
      */
-    protected $restrictionRepository;
+    protected $restrictionsManager;
 
     /**
-     * @var array [$entityClass => [$workflowName => $workflowData, ...], ...]
+     * @param WorkflowManager    $workflowManager
+     * @param DoctrineHelper     $doctrineHelper
+     * @param RestrictionManager $restrictionManager
      */
-    protected $workflows;
-
-    /**
-     * @param WorkflowManager $workflowManager
-     * @param DoctrineHelper  $doctrineHelper
-     */
-    public function __construct(WorkflowManager $workflowManager, DoctrineHelper $doctrineHelper)
-    {
-        $this->workflowManager = $workflowManager;
-        $this->doctrineHelper  = $doctrineHelper;
+    public function __construct(
+        WorkflowManager $workflowManager,
+        DoctrineHelper $doctrineHelper,
+        RestrictionManager $restrictionManager
+    ) {
+        $this->workflowManager     = $workflowManager;
+        $this->doctrineHelper      = $doctrineHelper;
+        $this->restrictionsManager = $restrictionManager;
     }
 
     /**
@@ -53,94 +52,28 @@ class RestrictionsExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['disable_workflow_restrictions'] || empty($options['data_class'])) {
+        if ($options['disable_workflow_restrictions'] ||
+            empty($options['data_class']) ||
+            !$this->restrictionsManager->hasEntityClassRestrictions($options['data_class'])
+        ) {
             return;
         }
-        $entityClass  = $options['data_class'];
-        $restrictions = $this->getRestrictionRepository()->getRestrictions($entityClass);
-        /** @var WorkflowRestriction[] $applicableRestrictions */
-        $applicableRestrictions = [];
-        foreach ($restrictions as $restriction) {
-            $workflowDefinition = $restriction->getDefinition();
-            $workflowName       = $workflowDefinition->getName();
-            if (!isset($this->workflows[$entityClass][$workflowName])) {
-                $workflow = $this->workflowManager
-                    ->getApplicableWorkflowByEntityClass(
-                        $workflowDefinition->getRelatedEntity()
-                    );
-
-                $this->workflows[$entityClass][$workflowName] = [
-                    'is_active' => null !== $workflow,
-                    'workflow'  => $workflow
-                ];
-            }
-            if ($this->workflows[$entityClass][$workflowName]['is_active']) {
-                $applicableRestrictions[] = $restriction;
-            }
-        }
-        if (!empty($applicableRestrictions)) {
-            $builder->addEventListener(
-                FormEvents::POST_SET_DATA,
-                function (FormEvent $event) use ($applicableRestrictions, $entityClass) {
-                    $data = $event->getData();
-                    $form = $event->getForm();
-                    if (!$data) {
-                        return;
-                    }
-                    $isNew = $this->doctrineHelper->isNewEntity($data);
-                    foreach ($applicableRestrictions as $restriction) {
-                        $found = false;
-                        $step = $restriction->getStep();
-                        if (!$step && !$isNew) {
-                            continue;
-                        }
-                        if (!$step) {
-                            $found = true;
-                        } elseif (!$isNew) {
-                            $workflowEntity         = $restriction->getDefinition()->getRelatedEntity();
-                            $restrictionEntityClass = $restriction->getEntityClass();
-                            if ($workflowEntity === $restrictionEntityClass) {
-                                $workflowItem = $this->workflowManager->getWorkflowItemByEntity($data);
-                                if ($workflowItem) {
-                                    $found = $workflowItem->getCurrentStep() === $step;
-                                }
-                            } else {
-                                $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($workflowEntity);
-                                $targets       = $classMetadata->getAssociationsByTargetClass($restrictionEntityClass);
-                                $target        = reset($targets);
-                                if ($target) {
-                                    $id                     = $this->doctrineHelper->getSingleEntityIdentifier($data);
-                                    $targetFieldName        = $target['fieldName'];
-                                    $workflowEntityIdField  = $this->doctrineHelper
-                                        ->getSingleEntityIdentifierFieldName($workflowEntity);
-                                    $workflowItemRepository = $this->doctrineHelper
-                                        ->getEntityRepositoryForClass('OroWorkflowBundle:WorkflowItem');
-
-                                    $found = $workflowItemRepository
-                                        ->createQueryBuilder('wi')
-                                        ->innerJoin(
-                                            $workflowEntity,
-                                            'we',
-                                            Join::WITH,
-                                            sprintf('we.%s = wi.entityId', $workflowEntityIdField)
-                                        )
-                                        ->where(sprintf('we.%s = :id', $targetFieldName))
-                                        ->andWhere('wi.currentStep = :step')
-                                        ->setParameters(['id' => $id, 'step' => $step])
-                                        ->setMaxResults(1)
-                                        ->getQuery()
-                                        ->getOneOrNullResult();
-                                }
-                            }
-                        }
-
-                        if (!empty($found)) {
-                            $this->applyRestriction($restriction, $form);
-                        }
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            function (FormEvent $event) {
+                $data = $event->getData();
+                if (!$data) {
+                    return;
+                }
+                $form         = $event->getForm();
+                $restrictions = $this->restrictionsManager->getEntitiesRestrictions($data);
+                foreach ($restrictions as $restriction) {
+                    if ($form->has($restriction['field'])) {
+                        $this->applyRestriction($restriction, $form);
                     }
                 }
-            );
-        }
+            }
+        );
     }
 
     /**
@@ -160,34 +93,22 @@ class RestrictionsExtension extends AbstractTypeExtension
     }
 
     /**
-     * @return WorkflowRestrictionRepository
+     * @param array         $restriction
+     * @param FormInterface $form
      */
-    protected function getRestrictionRepository()
+    protected function applyRestriction(array $restriction, FormInterface $form)
     {
-        if (null === $this->restrictionRepository) {
-            $this->restrictionRepository = $this->doctrineHelper
-                ->getEntityRepositoryForClass('OroWorkflowBundle:WorkflowRestriction');
-        }
-
-        return $this->restrictionRepository;
-    }
-
-    /**
-     * @param WorkflowRestriction $restriction
-     * @param FormInterface       $form
-     *
-     */
-    protected function applyRestriction(WorkflowRestriction $restriction, FormInterface $form)
-    {
-        $field = $restriction->getField();
-        if ($restriction->getMode() === 'full') {
+        $field = $restriction['field'];
+        $mode  = $restriction['mode'];
+        if ($mode === 'full') {
             FormUtils::replaceField($form, $field, ['disabled' => true]);
-        } elseif ($restriction->getValues()) {
-            if ($restriction->getMode() === 'disallow') {
-                $this->tryDisableFieldValues($form, $field, $restriction->getValues());
-            } elseif ($restriction->getMode() === 'allow') {
-                $restrictionClosure = function ($value) use ($restriction) {
-                    return in_array($value, $restriction->getValues());
+        } else {
+            $values = $restriction['values'];
+            if ($mode === 'disallow') {
+                $this->tryDisableFieldValues($form, $field, $values);
+            } elseif ($mode === 'allow') {
+                $restrictionClosure = function ($value) use ($values) {
+                    return in_array($value, $values);
                 };
                 $this->tryDisableFieldValues($form, $field, $restrictionClosure);
             }
@@ -204,6 +125,8 @@ class RestrictionsExtension extends AbstractTypeExtension
         $fieldForm = $form->get($field);
         if ($fieldForm->getConfig()->hasOption('disabled_values')) {
             FormUtils::replaceField($form, $field, ['disabled_values' => $disabledValues]);
+        } else {
+            FormUtils::replaceField($form, $field, ['disabled' => true]);
         }
     }
 }

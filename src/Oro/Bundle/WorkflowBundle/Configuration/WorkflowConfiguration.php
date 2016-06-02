@@ -324,7 +324,7 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->scalarNode('name')
                             ->cannotBeEmpty()
                         ->end()
-                        ->scalarNode('entity')
+                        ->scalarNode('attribute')
                             ->isRequired()
                             ->cannotBeEmpty()
                         ->end()

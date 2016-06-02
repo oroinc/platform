@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
-class RestrictionManager
+class ModelRestrictionManager
 {
     /**
      * @var Collection

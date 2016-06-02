@@ -43,6 +43,7 @@ class RestrictionAssembler extends AbstractAssembler
             $restriction
                 ->setStep($this->getOption($item, 'step'))
                 ->setField($this->getOption($item, 'field'))
+                ->setAttribute($this->getOption($item, 'attribute'))
                 ->setMode($this->getOption($item, 'mode'))
                 ->setValues($this->getOption($item, 'values', []))
                 ->setEntity($this->getEntityClass($item))
@@ -78,7 +79,7 @@ class RestrictionAssembler extends AbstractAssembler
      */
     protected function getEntityClass(array $item)
     {
-        $entity = $this->getOption($item, 'entity');
+        $entity = $this->getOption($item, 'attribute');
 
         foreach ($this->attributes as $attribute) {
             if ($attribute->getName() === $entity && $attribute->getType() === 'entity') {

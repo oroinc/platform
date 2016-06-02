@@ -111,7 +111,7 @@ class WorkflowAssembler extends BaseAbstractAssembler
             ->setEntityAttributeName($definition->getEntityAttributeName());
         $workflow->getTransitionManager()
             ->setTransitions($transitions);
-        $workflow->getRestrictionManager()->setRestrictions($restrictions);
+        $workflow->getModelRestrictionManager()->setRestrictions($restrictions);
         
         if ($definition->getStartStep()) {
             $startStepName = $definition->getStartStep()->getName();

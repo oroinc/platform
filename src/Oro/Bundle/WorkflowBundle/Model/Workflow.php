@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
 class Workflow
 {
@@ -33,6 +34,11 @@ class Workflow
     protected $aclManager;
 
     /**
+     * @var RestrictionManager
+     */
+    protected $restrictionManager;
+
+    /**
      * @var StepManager
      */
     protected $stepManager;
@@ -48,9 +54,9 @@ class Workflow
     protected $transitionManager;
 
     /**
-     * @var RestrictionManager
+     * @var ModelRestrictionManager
      */
-    protected $restrictionManager;
+    protected $modelRestrictionManager;
 
     /**
      * @var string
@@ -68,38 +74,45 @@ class Workflow
     protected $definition;
 
     /**
-     * @param EntityConnector           $entityConnector
-     * @param AclManager                $aclManager
-     * @param StepManager|null          $stepManager
-     * @param BaseAttributeManager|null $attributeManager
-     * @param TransitionManager|null    $transitionManager
-     * @param RestrictionManager        $restrictionManager
+     * @param EntityConnector                            $entityConnector
+     * @param AclManager                                 $aclManager
+     * @param ModelRestrictionManager|RestrictionManager $restrictionManager
+     * @param StepManager|null                           $stepManager
+     * @param BaseAttributeManager|null                  $attributeManager
+     * @param TransitionManager|null                     $transitionManager
+     * @param ModelRestrictionManager                    $modelRestrictionManager
      */
     public function __construct(
         EntityConnector $entityConnector,
         AclManager $aclManager,
+        RestrictionManager $restrictionManager,
         StepManager $stepManager = null,
         BaseAttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null,
-        RestrictionManager $restrictionManager = null
+        ModelRestrictionManager $modelRestrictionManager = null
     ) {
-        $this->entityConnector    = $entityConnector;
-        $this->aclManager         = $aclManager;
-        $this->stepManager        = $stepManager ? $stepManager : new StepManager();
-        $this->attributeManager   = $attributeManager ? $attributeManager : new BaseAttributeManager();
-        $this->transitionManager  = $transitionManager ? $transitionManager : new TransitionManager();
-        $this->restrictionManager = $restrictionManager ? $restrictionManager : new RestrictionManager();
+        $this->entityConnector         = $entityConnector;
+        $this->aclManager              = $aclManager;
+        $this->restrictionManager      = $restrictionManager;
+        $this->stepManager             = $stepManager ? $stepManager : new StepManager();
+        $this->attributeManager        = $attributeManager ? $attributeManager : new BaseAttributeManager();
+        $this->transitionManager       = $transitionManager ? $transitionManager : new TransitionManager();
+        $this->modelRestrictionManager = $modelRestrictionManager 
+            ? $modelRestrictionManager 
+            : new ModelRestrictionManager();
     }
 
     /**
      * Set name.
      *
      * @param string $name
+     *
      * @return Workflow
      */
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -117,11 +130,13 @@ class Workflow
      * Set label.
      *
      * @param string $label
+     *
      * @return Workflow
      */
     public function setLabel($label)
     {
         $this->label = $label;
+
         return $this;
     }
 
@@ -160,22 +175,23 @@ class Workflow
     }
 
     /**
-     * @return RestrictionManager
+     * @return ModelRestrictionManager
      */
-    public function getRestrictionManager()
+    public function getModelRestrictionManager()
     {
-        return $this->restrictionManager;
+        return $this->modelRestrictionManager;
     }
 
     /**
      * Start workflow.
      *
-     * @param array $data
+     * @param array  $data
      * @param object $entity
      * @param string $startTransitionName
+     *
      * @return WorkflowItem
      */
-    public function start($entity, array $data = array(), $startTransitionName = null)
+    public function start($entity, array $data = [], $startTransitionName = null)
     {
         if (null === $startTransitionName) {
             $startTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
@@ -190,10 +206,11 @@ class Workflow
     /**
      * Check if transition allowed for workflow item.
      *
-     * @param WorkflowItem $workflowItem
+     * @param WorkflowItem      $workflowItem
      * @param string|Transition $transition
-     * @param Collection $errors
-     * @param bool $fireExceptions
+     * @param Collection        $errors
+     * @param bool              $fireExceptions
+     *
      * @return bool
      * @throws InvalidTransitionException
      */
@@ -217,7 +234,7 @@ class Workflow
         $transitionIsValid = $this->checkTransitionValid($transition, $workflowItem, $fireExceptions);
 
         return $transitionIsValid
-            && $transition->isAllowed($workflowItem, $errors);
+               && $transition->isAllowed($workflowItem, $errors);
     }
 
     /**
@@ -226,9 +243,10 @@ class Workflow
      * Transition is considered invalid when workflow item is new and transition is not "start".
      * Also transition is considered invalid when current step doesn't contain such allowed transition.
      *
-     * @param Transition $transition
+     * @param Transition   $transition
      * @param WorkflowItem $workflowItem
-     * @param bool $fireExceptions
+     * @param bool         $fireExceptions
+     *
      * @return bool
      * @throws InvalidTransitionException
      */
@@ -249,6 +267,7 @@ class Workflow
                         $transition->getName()
                     );
                 }
+
                 return false;
             }
         } elseif (!$currentStep->isAllowedTransition($transition->getName())) {
@@ -260,6 +279,7 @@ class Workflow
                     $transition->getName()
                 );
             }
+
             return false;
         }
 
@@ -269,8 +289,9 @@ class Workflow
     /**
      * Transit workflow item.
      *
-     * @param WorkflowItem $workflowItem
+     * @param WorkflowItem      $workflowItem
      * @param string|Transition $transition
+     *
      * @throws ForbiddenTransitionException
      * @throws InvalidTransitionException
      */
@@ -289,6 +310,8 @@ class Workflow
         $this->entityConnector->setWorkflowStep($entity, $workflowItem->getCurrentStep());
 
         $this->aclManager->updateAclIdentities($workflowItem);
+        $this->restrictionManager->updateEntityRestrictions($workflowItem);
+
     }
 
     /**
@@ -305,10 +328,11 @@ class Workflow
      * Create workflow item.
      *
      * @param object $entity
-     * @param array $data
+     * @param array  $data
+     *
      * @return WorkflowItem
      */
-    public function createWorkflowItem($entity, array $data = array())
+    public function createWorkflowItem($entity, array $data = [])
     {
         $entityAttributeName = $this->attributeManager->getEntityAttribute()->getName();
 
@@ -337,7 +361,7 @@ class Workflow
      */
     public function getAttributesMapping()
     {
-        $mapping = array();
+        $mapping = [];
         /** @var Attribute $attribute */
         foreach ($this->attributeManager->getAttributes() as $attribute) {
             if ($attribute->getPropertyPath()) {
@@ -350,17 +374,18 @@ class Workflow
 
     /**
      * @param WorkflowItem $workflowItem
-     * @param Transition $transition
+     * @param Transition   $transition
+     *
      * @return WorkflowTransitionRecord
      * @throws WorkflowException
      */
     protected function createTransitionRecord(WorkflowItem $workflowItem, Transition $transition)
     {
         $transitionName = $transition->getName();
-        $stepFrom = $workflowItem->getCurrentStep();
+        $stepFrom       = $workflowItem->getCurrentStep();
 
         $stepName = $transition->getStepTo()->getName();
-        $stepTo = $this->getDefinition()->getStepByName($stepName);
+        $stepTo   = $this->getDefinition()->getStepByName($stepName);
         if (!$stepTo) {
             throw new WorkflowException(
                 sprintf('Workflow "%s" does not have step entity "%s"', $this->getName(), $stepName)
@@ -380,12 +405,13 @@ class Workflow
      * Check that start transition is available to show.
      *
      * @param string|Transition $transition
-     * @param object $entity
-     * @param array $data
-     * @param Collection $errors
+     * @param object            $entity
+     * @param array             $data
+     * @param Collection        $errors
+     *
      * @return bool
      */
-    public function isStartTransitionAvailable($transition, $entity, array $data = array(), Collection $errors = null)
+    public function isStartTransitionAvailable($transition, $entity, array $data = [], Collection $errors = null)
     {
         $workflowItem = $this->createWorkflowItem($entity, $data);
 
@@ -396,8 +422,9 @@ class Workflow
      * Check that transition is available to show.
      *
      * @param string|Transition $transition
-     * @param WorkflowItem $workflowItem
-     * @param Collection $errors
+     * @param WorkflowItem      $workflowItem
+     * @param Collection        $errors
+     *
      * @return bool
      */
     public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, Collection $errors = null)
@@ -411,18 +438,19 @@ class Workflow
      * Get transitions for existing workflow item.
      *
      * @param WorkflowItem $workflowItem
+     *
      * @return Collection|Transition[]
      * @throws UnknownStepException
      */
     public function getTransitionsByWorkflowItem(WorkflowItem $workflowItem)
     {
         $currentStepName = $workflowItem->getCurrentStep()->getName();
-        $currentStep = $this->stepManager->getStep($currentStepName);
+        $currentStep     = $this->stepManager->getStep($currentStepName);
         if (!$currentStep) {
             throw new UnknownStepException($currentStepName);
         }
 
-        $transitions = new ArrayCollection();
+        $transitions     = new ArrayCollection();
         $transitionNames = $currentStep->getAllowedTransitions();
         foreach ($transitionNames as $transitionName) {
             $transition = $this->transitionManager->extractTransition($transitionName);
@@ -436,16 +464,17 @@ class Workflow
      * Get passed latest steps from step with minimum order to step with maximum order.
      *
      * @param WorkflowItem $workflowItem
+     *
      * @return Collection|Step[]
      */
     public function getPassedStepsByWorkflowItem(WorkflowItem $workflowItem)
     {
         $transitionRecords = $workflowItem->getTransitionRecords();
-        $passedSteps = array();
+        $passedSteps       = [];
         if ($transitionRecords) {
             $minStepIdx = count($transitionRecords) - 1;
-            $minStep = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
-            $steps = array($minStep);
+            $minStep    = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
+            $steps      = [$minStep];
             $minStepIdx--;
             while ($minStepIdx > -1) {
                 $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
@@ -461,6 +490,7 @@ class Workflow
             }
             $passedSteps = array_reverse($steps);
         }
+
         return new ArrayCollection($passedSteps);
     }
 
@@ -474,6 +504,7 @@ class Workflow
 
     /**
      * @param WorkflowDefinition $definition
+     *
      * @return Workflow
      */
     public function setDefinition(WorkflowDefinition $definition)

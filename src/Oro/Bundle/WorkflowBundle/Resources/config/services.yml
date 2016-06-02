@@ -135,3 +135,9 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
+
+    oro_workflow.restriction.manager:
+        class: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_entity.doctrine_helper'

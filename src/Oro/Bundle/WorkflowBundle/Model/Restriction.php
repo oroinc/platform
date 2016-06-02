@@ -14,6 +14,9 @@ class Restriction
     protected $step;
 
     /** @var string */
+    protected $attribute;
+    
+    /** @var string */
     protected $field;
 
     /** @var string */
@@ -79,6 +82,26 @@ class Restriction
     {
         $this->step = $step;
 
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAttribute()
+    {
+        return $this->attribute;
+    }
+
+    /**
+     * @param string $attribute
+     *
+     * @return $this
+     */
+    public function setAttribute($attribute)
+    {
+        $this->attribute = $attribute;
+        
         return $this;
     }
 
