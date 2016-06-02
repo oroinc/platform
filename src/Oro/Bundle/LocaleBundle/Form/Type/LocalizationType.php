@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class LocalizationType extends AbstractType
 {
@@ -17,13 +18,48 @@ class LocalizationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name')
-            ->add('languageCode', 'oro_language_select')
-            ->add('formattingCode', 'oro_formatting_select')
-            ->add('parentLocalization', 'entity', [
-                'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
-                'required' => false,
-            ]);
+        $builder
+            ->add(
+                'name',
+                'text',
+                [
+                    'required' => true,
+                    'label' => 'oro.locale.localization.name.label',
+                ]
+            )
+            ->add(
+                'titles',
+                LocalizedFallbackValueCollectionType::NAME,
+                [
+                    'required' => true,
+                    'label' => 'oro.locale.localization.titles.label',
+                    'options' => ['constraints' => [new NotBlank()]],
+                ]
+            )
+            ->add(
+                'languageCode',
+                'oro_language_select',
+                [
+                    'required' => true,
+                    'label' => 'oro.locale.localization.language_code.label',
+                ]
+            )
+            ->add(
+                'formattingCode',
+                'oro_formatting_select',
+                [
+                    'required' => true,
+                    'label' => 'oro.locale.localization.formatting_code.label',
+                ])
+            ->add(
+                'parentLocalization',
+                'entity',
+                [
+                    'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
+                    'required' => false,
+                    'label' => 'oro.locale.localization.parent_localization.label',
+                ]
+            );
     }
 
     /**
@@ -33,6 +69,7 @@ class LocalizationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => $this->dataClass,
+            'intention' => 'localization',
         ]);
     }
 
