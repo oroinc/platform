@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -87,12 +88,15 @@ class EmbedFormController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect(
-                $this->generateUrl('oro_embedded_form_success', [
-                    'id' => $formEntity->getId(),
-                    'inline' => $isInline
-                ])
-            );
+            $redirectUrl = $this->generateUrl('oro_embedded_form_success', [
+                'id' => $formEntity->getId(),
+                'inline' => $isInline
+            ]);
+
+            $redirectResponse = new RedirectResponse($redirectUrl);
+            $this->setCorsHeaders($formEntity, $request, $redirectResponse);
+
+            return $redirectResponse;
         }
 
         /** @var EmbedFormLayoutManager $layoutManager */
@@ -110,12 +114,21 @@ class EmbedFormController extends Controller
      */
     public function formSuccessAction(EmbeddedForm $formEntity, Request $request)
     {
+        $response = new Response();
+        $response->setPublic();
+        $response->setEtag(
+            $formEntity->getId() . $formEntity->getUpdatedAt()->format(\DateTime::ISO8601)
+        );
+        $this->setCorsHeaders($formEntity, $request, $response);
+
         /** @var EmbedFormLayoutManager $layoutManager */
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
 
         $layoutManager->setInline($request->query->getBoolean('inline'));
 
-        return new Response($layoutManager->getLayout($formEntity)->render());
+        $response->setContent($layoutManager->getLayout($formEntity)->render());
+
+        return $response;
     }
 
     /**
@@ -148,6 +161,7 @@ class EmbedFormController extends Controller
             $regexp = '#^https?:\/\/' . str_replace('\*', '.*', preg_quote($allowedDomain, '#')) . '$#i';
             if ('*' === $allowedDomain || preg_match($regexp, $origin)) {
                 $response->headers->set('Access-Control-Allow-Origin', $origin);
+                $response->headers->set('Access-Control-Allow-Credentials', 'true');
                 break;
             }
         }

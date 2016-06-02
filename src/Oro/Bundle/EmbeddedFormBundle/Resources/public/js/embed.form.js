@@ -29,6 +29,7 @@ var ORO = (function(ORO) {
         ajax: function(url, settings) {
             var context = this;
             var xhr = new XMLHttpRequest();
+            xhr.withCredentials = true;
 
             xhr.addEventListener('error', function(e) {
                 settings.error.apply(context, [xhr, xhr.statusText]);
