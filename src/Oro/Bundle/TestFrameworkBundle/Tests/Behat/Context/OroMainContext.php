@@ -10,6 +10,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoaderAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
@@ -22,7 +24,8 @@ use SensioLabs\Behat\PageObjectExtension\PageObject\Factory as PageObjectFactory
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroElementFactoryAware,
-    KernelAwareContext
+    KernelAwareContext,
+    FixtureLoaderAware
 {
     use KernelDictionary;
 
@@ -30,6 +33,11 @@ class OroMainContext extends MinkContext implements
      * @var OroElementFactory
      */
     protected $elementFactory;
+
+    /**
+     * @var FixtureLoader
+     */
+    protected $fixtureLoader;
 
     /** @BeforeStep */
     public function beforeStep(BeforeStepScope $scope)
@@ -74,13 +82,19 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @param OroElementFactory $elementFactory
-     *
-     * @return null
+     * {@inheritdoc}
      */
     public function setElementFactory(OroElementFactory $elementFactory)
     {
         $this->elementFactory = $elementFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFixtureLoader(FixtureLoader $fixtureLoader)
+    {
+        $this->fixtureLoader = $fixtureLoader;
     }
 
     /**
@@ -174,5 +188,21 @@ JS;
     public function iOpenTheMenuAndClick($path, $linkLocator)
     {
         $this->elementFactory->createElement('MainMenu')->openAndClick($path, $linkLocator);
+    }
+
+    /**
+     * @Given /^the following ([\w ]+):?$/
+     */
+    public function theFollowing($name, TableNode $table)
+    {
+        $this->fixtureLoader->loadTable($name, $table);
+    }
+
+    /**
+     * @Given /^there (?:is|are) (\d+) ([\w ]+)$/
+     */
+    public function thereIs($nbr, $name)
+    {
+        $this->fixtureLoader->loadRandomEntities($name, $nbr);
     }
 }

@@ -1,0 +1,14 @@
+services:
+    oro_test.kernel_service_factory:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\KernelServiceFactory
+        arguments: ['@symfony2_extension.kernel']
+
+    doctrine:
+        class: Oro\Bundle\EntityBundle\ORM\Registry
+        factory: ['@oro_test.kernel_service_factory', get]
+        arguments: ['doctrine']
+
+    oro_entity.entity_alias_resolver:
+        class: Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
+        factory: ['@oro_test.kernel_service_factory', get]
+        arguments: ['oro_entity.entity_alias_resolver']

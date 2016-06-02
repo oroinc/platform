@@ -12,6 +12,8 @@ use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -67,17 +69,20 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
+        $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
     }
 
     /**
      * @param ContainerBuilder $container
+     * @throws OutOfBoundsException When
+     * @throws InvalidArgumentException
      */
     private function processDbIsolationSubscribers(ContainerBuilder $container)
     {
         $dumper = $this->getDumper($container);
-        $container->getDefinition('oro_test.listener.db_restore_subscriber')->replaceArgument(
+        $container->getDefinition('oro_test.listener.feature_isolation_subscriber')->replaceArgument(
             0,
             $dumper
         );
