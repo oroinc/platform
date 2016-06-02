@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
  * @ORM\Table(name="oro_localization")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
