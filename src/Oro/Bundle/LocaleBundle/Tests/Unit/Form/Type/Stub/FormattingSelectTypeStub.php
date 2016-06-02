@@ -35,4 +35,3 @@ class FormattingSelectTypeStub extends AbstractType
         return 'choice';
     }
 }
- 

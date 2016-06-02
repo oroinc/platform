@@ -11,6 +11,7 @@ class LocalizationType extends AbstractType
 {
     const NAME = 'oro_localization';
 
+    /** @var string */
     protected $dataClass = 'Oro\Bundle\LocaleBundle\Entity\Localization';
 
     /**

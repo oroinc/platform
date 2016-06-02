@@ -35,4 +35,3 @@ class LanguageSelectTypeStub extends AbstractType
         return 'choice';
     }
 }
- 

@@ -14,7 +14,6 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\FormattingSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LanguageSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 
-use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
@@ -41,7 +40,10 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                     LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
                     LanguageSelectType::NAME => new LanguageSelectTypeStub(),
                     FormattingSelectType::NAME => new FormattingSelectTypeStub(),
-                    LocalizationParentSelectType::NAME => new EntityType([], LocalizationParentSelectType::NAME),
+                    LocalizationParentSelectType::NAME => new EntityType(
+                            ['1' => $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1])],
+                            LocalizationParentSelectType::NAME
+                        ),
                 ],
                 []
             )
@@ -116,34 +118,37 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         $parentLocalization = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1]);
 
         return [
-            'without entity' => [
-                'defaultData' => null,
-                'submittedData' => [
-                    'name' => 'NAME',
-                    'titles' => [['string' => 'TITLE']],
-                    'languageCode' => 'ru',
-                    'formattingCode' => 'ru',
-                    'parentLocalization' => null,
+            'without entity' =>
+                [
+                    'defaultData' => null,
+                    'submittedData' =>
+                        [
+                            'name' => 'NAME',
+                            'titles' => [['string' => 'TITLE']],
+                            'languageCode' => 'ru',
+                            'formattingCode' => 'ru',
+                        ],
+                    'expectedData' => $this->createLocalization('NAME', 'TITLE', 'ru', 'ru'),
                 ],
-                'expectedData' => $this->createLocalization('NAME', 'TITLE', 'ru', 'ru'),
-            ],
-            'with entity' => [
-                'defaultData' => $localizationItem,
-                'submittedData' => [
-                    'name' => 'new_localization_item_name',
-                    'titles' => [['string' => 'new_localization_item_title']],
-                    'languageCode' => 'en_US',
-                    'formattingCode' => 'en_US',
-                    'parentLocalization' => '1',
+            'with entity' =>
+                [
+                    'defaultData' => $localizationItem,
+                    'submittedData' =>
+                        [
+                            'name' => 'new_localization_item_name',
+                            'titles' => [['string' => 'new_localization_item_title']],
+                            'languageCode' => 'en_US',
+                            'formattingCode' => 'en_US',
+                            'parentLocalization' => 1,
+                        ],
+                    'expectedData' => $this->createLocalization(
+                            'new_localization_item_name',
+                            'new_localization_item_title',
+                            'en_US',
+                            'en_US',
+                            $parentLocalization
+                        ),
                 ],
-                'expectedData' => $this->createLocalization(
-                        'new_localization_item_name',
-                        'new_localization_item_title',
-                        'en_US',
-                        'en_US',
-                        $parentLocalization
-                    ),
-            ],
         ];
     }
 
@@ -152,18 +157,21 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      * @param string $title
      * @param string $languageCode
      * @param string $formattingCode
-     * @param mixed $id
      * @param Localization $parentLocalization
      * @return Localization
      */
-    protected function createLocalization($name, $title, $languageCode, $formattingCode, $id = null, Localization $parentLocalization = null)
+    protected function createLocalization($name, $title, $languageCode, $formattingCode, Localization $parentLocalization = null)
     {
-        $localization = new Localization();
-        $localization->setName($name);
+        $localization = $this->getEntity(
+            'Oro\Bundle\LocaleBundle\Entity\Localization',
+            [
+                'name' => $name,
+                'languageCode' => $languageCode,
+                'formattingCode' => $formattingCode,
+                'parentLocalization' => $parentLocalization,
+            ]
+        );
         $localization->setDefaultTitle($title);
-        $localization->setLanguageCode($languageCode);
-        $localization->setFormattingCode($formattingCode);
-        $localization->setParentLocalization($parentLocalization);
 
         return $localization;
     }
