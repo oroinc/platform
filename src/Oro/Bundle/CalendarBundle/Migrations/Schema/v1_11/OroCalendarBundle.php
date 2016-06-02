@@ -180,7 +180,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
-            $table,
+            $schema->getTable('oro_calendar_recurrence'),
             ['recurring_event_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
