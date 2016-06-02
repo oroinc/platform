@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 
+use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 
 class EmailGridListener
 {
@@ -41,6 +44,23 @@ class EmailGridListener
                 $emailIds = explode(',', $emailIds);
             }
             $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', $emailIds));
+        }
+
+        $this->prepareQueryToFilter($parameters, $queryBuilder);
+    }
+
+    /**
+     * Add join for query just if filter used. For performance optimization - BAP-10674
+     *
+     * @param ParameterBag $parameters
+     * @param QueryBuilder $queryBuilder
+     */
+    protected function prepareQueryToFilter($parameters, $queryBuilder)
+    {
+        $filters = $parameters->get('_filter');
+        if ($filters && array_key_exists('ccBcc', $filters)) {
+            $queryBuilder
+                ->leftJoin('e.recipients', 'r_cc_bcc', 'WITH', "r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'");
         }
     }
 }
