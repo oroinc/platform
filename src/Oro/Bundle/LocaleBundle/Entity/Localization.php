@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+
 use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
 
 /**
@@ -33,8 +34,8 @@ use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
  */
 class Localization implements DatesAwareInterface
 {
-    use FallbackTrait;
     use DatesAwareTrait;
+    use FallbackTrait;
 
     /**
      * @var int

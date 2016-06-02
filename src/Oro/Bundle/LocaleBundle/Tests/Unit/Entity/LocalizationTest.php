@@ -6,6 +6,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+
 use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
 
 class LocalizationTest extends \PHPUnit_Framework_TestCase
