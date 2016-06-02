@@ -8,7 +8,7 @@ parameters:
     oro_locale.form.type.quarter.class:  Oro\Bundle\LocaleBundle\Form\Type\QuarterType
 
 services:
-   oro_locale.form.type.name_format:
+    oro_locale.form.type.name_format:
         class: %oro_locale.form.type.name_format.class%
         arguments:
             - '@oro_locale.formatter.name'
