@@ -8,27 +8,27 @@ Oro\Bundle\TestFrameworkBundle\Entity\Item:
         -
             name: stringValue
             target_type: text
-            target_fields: [stringValue, all_data]
+            target_fields: [stringvalue, all_data]
         -
             name: integerValue
             target_type: integer
-            target_fields: [integerValue, all_data]
+            target_fields: [integervalue, all_data]
         -
             name: decimalValue
             target_type: decimal
-            target_fields: [decimalValue, all_data]
+            target_fields: [decimalvalue, all_data]
         -
             name: floatValue
             target_type: decimal
-            target_fields: [floatValue, all_data]
+            target_fields: [floatvalue, all_data]
         -
             name: datetimeValue
             target_type: datetime
-            target_fields: [datetimeValue, all_data]
+            target_fields: [datetimevalue, all_data]
         -
             name: blobValue
             target_type: text
-            target_fields: [blobValue, all_data]
+            target_fields: [blobvalue, all_data]
         -
             name: phone
             target_type: text
