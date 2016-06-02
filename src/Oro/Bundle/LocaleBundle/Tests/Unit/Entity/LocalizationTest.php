@@ -60,7 +60,7 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $entity = new Localization();
         $expectedString = 'Expected String';
         $entity->setName($expectedString);
-        $this->assertEquals($expectedString, $entity->__toString());
+        $this->assertEquals($expectedString, (string)$entity);
     }
 
     public function testConstruct()
@@ -72,36 +72,32 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($entity->getTitles()->toArray());
     }
 
-    public function testTitleAccessor()
+    public function testTitleAccessors()
     {
         $entity = new Localization();
         $this->assertEmpty($entity->getTitles()->toArray());
 
-        $firstTitle = $this->createLocalizedValue();
+        $defaultTitle = $this->createLocalizedValue('default', 1);
+        $firstTitle = $this->createLocalizedValue('test1');
+        $secondTitle = $this->createLocalizedValue('test2');
 
-        $secondTitle = $this->createLocalizedValue();
+        $entity->addTitle($defaultTitle)->addTitle($firstTitle)->addTitle($secondTitle)->addTitle($secondTitle);
 
-        $entity->addTitle($firstTitle)
-            ->addTitle($secondTitle)
-            ->addTitle($secondTitle);
+        $this->assertCount(3, $entity->getTitles()->toArray());
+        $this->assertEquals([$defaultTitle, $firstTitle, $secondTitle], array_values($entity->getTitles()->toArray()));
 
-        $this->assertEquals(
-            2,
-            count($entity->getTitles()->toArray())
-        );
+        $this->assertEquals($secondTitle, $entity->getTitle($secondTitle->getLocale()));
+        $this->assertEquals($defaultTitle, $entity->getTitle());
 
-        $this->assertEquals([$firstTitle, $secondTitle], array_values($entity->getTitles()->toArray()));
-
-        $entity->removeTitle($firstTitle)
-            ->removeTitle($firstTitle);
+        $entity->removeTitle($firstTitle)->removeTitle($firstTitle)->removeTitle($defaultTitle);
 
         $this->assertEquals([$secondTitle], array_values($entity->getTitles()->toArray()));
     }
 
     public function testGetDefaultTitle()
     {
-        $defaultTitle = $this->createLocalizedValue(true);
-        $localizedTitle = $this->createLocalizedValue();
+        $defaultTitle = $this->createLocalizedValue('default', true);
+        $localizedTitle = $this->createLocalizedValue('default');
 
         $entity = new Localization();
         $entity->addTitle($defaultTitle)
@@ -116,7 +112,7 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDefaultTitleException()
     {
-        $titles = [$this->createLocalizedValue(true), $this->createLocalizedValue(true)];
+        $titles = [$this->createLocalizedValue('test1', true), $this->createLocalizedValue('test2', true)];
         $entity = new Localization();
 
         foreach ($titles as $title) {
@@ -136,18 +132,21 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $entity->setDefaultTitle('test_title_string2');
         $this->assertEquals('test_title_string2', $entity->getDefaultTitle());
     }
-    
+
     /**
+     * @param string $locale
      * @param bool|false $default
-     *
      * @return LocalizedFallbackValue
      */
-    protected function createLocalizedValue($default = false)
+    protected function createLocalizedValue($locale, $default = false)
     {
         $localized = (new LocalizedFallbackValue())->setString('some string');
 
         if (!$default) {
-            $localized->setLocale(new Locale());
+            $locale = new Locale();
+            $locale->setTitle($locale);
+
+            $localized->setLocale($locale);
         }
 
         return $localized;
