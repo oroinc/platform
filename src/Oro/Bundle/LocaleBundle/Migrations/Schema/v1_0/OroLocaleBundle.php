@@ -17,10 +17,12 @@ class OroLocaleBundle implements Migration
         /** Tables generation **/
         $this->createOroLocalizationTable($schema);
         $this->createOroFallbackLocalizedValueTable($schema);
+        $this->createOroLocalizationTitleTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroLocalizationForeignKeys($schema);
         $this->addOroFallbackLocalizedValueForeignKeys($schema);
+        $this->addOroLocalizationTitleForeignKeys($schema);
     }
 
     /**
@@ -61,6 +63,20 @@ class OroLocaleBundle implements Migration
     }
 
     /**
+     * Create oro_localization_title table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroLocalizationTitleTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_localization_title');
+        $table->addColumn('localization_id', 'integer', []);
+        $table->addColumn('localized_value_id', 'integer', []);
+        $table->setPrimaryKey(['localization_id', 'localized_value_id']);
+        $table->addUniqueIndex(['localized_value_id']);
+    }
+
+    /**
      * Add oro_localization foreign keys.
      *
      * @param Schema $schema
@@ -89,6 +105,28 @@ class OroLocaleBundle implements Migration
             ['locale_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    /**
+     * Add oro_localization_title foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroLocalizationTitleForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_localization_title');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_fallback_locale_value'),
+            ['localized_value_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_localization'),
+            ['localization_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }
