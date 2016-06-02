@@ -13,7 +13,7 @@ define(function(require) {
 
             config.ajax.results = _.wrap(config.ajax.results, function(func, data, page) {
                 var response = func.call(this, data, page);
-                _.each(response.results, function (item) {
+                _.each(response.results, function(item) {
                     if (config.selected[item.id]) {
                         item.id = config.selected[item.id];
                     }
