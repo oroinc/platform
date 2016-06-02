@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;

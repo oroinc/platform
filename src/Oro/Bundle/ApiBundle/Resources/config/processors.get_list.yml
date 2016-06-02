@@ -155,6 +155,9 @@ services:
 
     oro_api.get_list.validate_sorting:
         class: Oro\Bundle\ApiBundle\Processor\GetList\ValidateSorting
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -100 }
 
