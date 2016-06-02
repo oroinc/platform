@@ -63,13 +63,14 @@
                 {% set inputId = form.emptyFile.vars.id %}
                 {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
-                <div id="{{ divId }}" class="well well-small oro_attachment_file">
+                <div id="{{ divId }}" class="attachment_item">
+                    <i class="icon-paper-clip"></i>
                     <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
-                        <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
                         {{  value.originalFilename }}
                     </a>
+                    ({{ file_size(value.fileSize) }})
                     {{ form_row(form.emptyFile) }}
-                    <button id = "{{ buttonId }}" class="btn btn-action btn-link delete" type="button" data-related="{{ form.emptyFile.vars.name }}"></button>
+                    <i id = "{{ buttonId }}" class="btn btn-link icon-remove remove-attachment" type="button" data-related="{{ form.emptyFile.vars.name }}"></i>
                     <script type="text/javascript">
                         require(['jquery'],
                             function($){

@@ -23,6 +23,14 @@ class NoteType extends AbstractType
                     'required' => true,
                     'label'    => 'oro.note.message.label'
                 ]
+            )
+            ->add(
+                'attachment',
+                'oro_image',
+                [
+                    'label' => 'oro.note.attachment.label',
+                    'required' => false
+                ]
             );
     }
 
