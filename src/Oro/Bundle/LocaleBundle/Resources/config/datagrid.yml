@@ -8,19 +8,87 @@ datagrid:
             type: orm
             query:
                 select:
-                    - localization.id
-                    - localization.name
-                    - localization.languageCode
-                    - localization.formattingCode
+                    - l.id
+                    - l.name as name
+                    - l.languageCode
+                    - l.formattingCode
+                    - l.createdAt
+                    - l.updatedAt
+                    - t.string as title
+                    - pl.name as parentName
                 from:
-                    - { table: %oro_locale.entity.localization.class%, alias: localization }
+                    - { table: %oro_locale.entity.localization.class%, alias: l }
+                join:
+                    left:
+                        - { join: l.titles, alias: t}
+                        - { join: l.parentLocalization, alias: pl }
+                where:
+                    and:
+                        - t.locale IS NULL
         columns:
             name:
                 label: oro.locale.localization.name.label
+            title:
+                label: oro.locale.localization.default_title.label
+                type:          twig
+                frontend_type: html
+                template:      OroLocaleBundle:Localization:Datagrid/title.html.twig
             languageCode:
                 label: oro.locale.localization.language_code.label
+                type:          twig
+                frontend_type: html
+                template:      OroLocaleBundle:Localization:Datagrid/languageCode.html.twig
             formattingCode:
                 label: oro.locale.localization.formatting_code.label
+                type:          twig
+                frontend_type: html
+                template:      OroLocaleBundle:Localization:Datagrid/formattingCode.html.twig
+            parentName:
+                label: oro.locale.localization.parent_localization.label
+                type:          twig
+                frontend_type: html
+                template:      OroLocaleBundle:Localization:Datagrid/parentName.html.twig
+            createdAt:
+                label:         oro.ui.created_at
+                frontend_type: datetime
+            updatedAt:
+                label:         oro.ui.updated_at
+                frontend_type: datetime
+        sorters:
+            columns:
+                name:
+                    data_name: name
+                title:
+                    data_name: title
+                languageCode:
+                    data_name: languageCode
+                formattingCode:
+                    data_name: formattingCode
+                parentName:
+                    data_name: parentName
+                createdAt:
+                    data_name: updatedAt
+                updatedAt:
+                    data_name: updatedAt
+            default:
+                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+        filters:
+            columns:
+                name:
+                    type:      string
+                    data_name: name
+                title:
+                    type: string
+                    data_name: title
+                parentName:
+                    type: string
+                    data_name: parentName
+                createdAt:
+                    type: datetime
+                    data_name: createdAt
+                updatedAt:
+                    type: datetime
+                    data_name: updatedAt
         properties:
             id: ~
             view_link:
