@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
+use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -284,27 +285,10 @@ class OrmFilterExtension extends AbstractExtension
 
         if (!$readParameters) {
             return $defaultFilters;
+        } else {
+            $currentFilters = $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
+            return array_replace($defaultFilters, $currentFilters);
         }
-
-        $intersectKeys = array_intersect(
-            $this->getParameters()->keys(),
-            [
-                OrmSorterExtension::SORTERS_ROOT_PARAM,
-                PagerInterface::PAGER_ROOT_PARAM,
-                ParameterBag::ADDITIONAL_PARAMETERS,
-                ParameterBag::MINIFIED_PARAMETERS,
-                self::FILTER_ROOT_PARAM,
-                self::MINIFIED_FILTER_PARAM
-            ]
-        );
-
-        $gridHasInitialState = empty($intersectKeys);
-
-        if ($gridHasInitialState) {
-            return $defaultFilters;
-        }
-
-        return $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
     }
 
     /**

@@ -56,18 +56,9 @@ define([
             if (!this.itemView) {
                 this.itemView = function(options) {
                     var column = options.model;
-                    var cellOptions = {
-                        column: column,
-                        model: _this.model,
-                        themeOptions: {
-                            className: 'grid-cell grid-body-cell'
-                        }
-                    };
-                    if (column.get('name')) {
-                        cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
-                    }
+                    var cellOptions = _this.getConfiguredCellOptions(column);
+                    cellOptions.model = _this.model;
                     var Cell = column.get('cell');
-                    _this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
                     var cell = new Cell(cellOptions);
                     if (column.has('align')) {
                         cell.$el.removeClass('align-left align-center align-right');
@@ -88,6 +79,27 @@ define([
 
             Row.__super__.initialize.apply(this, arguments);
             this.cells = this.subviews;
+        },
+
+        getConfiguredCellOptions: function(column) {
+            var cellOptions = column.get('cellOptions');
+            if (!cellOptions) {
+                cellOptions = {
+                    column: column,
+                    themeOptions: {
+                        className: 'grid-cell grid-body-cell'
+                    }
+                };
+                if (column.get('name')) {
+                    cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
+                }
+                var Cell = column.get('cell');
+                this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
+                column.set({
+                    cellOptions: cellOptions
+                });
+            }
+            return cellOptions;
         },
 
         /**

@@ -4,8 +4,9 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
+use Oro\Bundle\NoteBundle\Tests\Unit\Stub\AttachmentProviderStub;
 
 class NoteManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +24,9 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $attachmentManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $attachmentAssociationHelper;
 
     /** @var NoteManager */
     protected $manager;
@@ -45,11 +49,23 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->attachmentAssociationHelper =
+            $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $attachmentProvider = new AttachmentProviderStub(
+            $this->em,
+            $this->attachmentAssociationHelper,
+            $this->attachmentManager
+        );
+
         $this->manager = new NoteManager(
             $this->em,
             $this->securityFacade,
             $this->aclHelper,
             $this->entityNameResolver,
+            $attachmentProvider,
             $this->attachmentManager
         );
     }

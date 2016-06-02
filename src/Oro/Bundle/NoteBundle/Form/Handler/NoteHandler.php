@@ -61,6 +61,7 @@ class NoteHandler
      */
     protected function onSuccess(Note $entity)
     {
+        $entity->setUpdatedAt(new \DateTime());
         $this->manager->persist($entity);
         $this->manager->flush();
     }
