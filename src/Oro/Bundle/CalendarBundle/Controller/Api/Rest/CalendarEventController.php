@@ -382,6 +382,14 @@ class CalendarEventController extends RestController implements ClassResourceInt
             $data['allDay'] = false;
         }
 
+        if (isset($data['isCancelled']) && ($data['isCancelled'] === 'false' || $data['isCancelled'] === '0')) {
+            $data['isCancelled'] = false;
+        }
+
+        if (isset($data['use_hangout']) && ($data['use_hangout'] === 'false' || $data['use_hangout'] === '0')) {
+            $data['use_hangout'] = false;
+        }
+
         // remove auxiliary attributes if any
         unset($data['updatedAt'], $data['editable'], $data['removable'], $data['notifiable']);
 
