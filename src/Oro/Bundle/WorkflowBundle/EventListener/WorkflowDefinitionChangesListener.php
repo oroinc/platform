@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 
@@ -15,7 +13,7 @@ use Oro\Component\DependencyInjection\ServiceLink;
 /**
  * Provide logic for workflow scheduled transitions processes synchronization
  */
-class WorkflowDefinitionListener
+class WorkflowDefinitionChangesListener
 {
     /** @var ProcessConfigurationGenerator */
     protected $generator;
@@ -24,7 +22,10 @@ class WorkflowDefinitionListener
     protected $processConfiguratorLink;
 
     /** @var ScheduledTransitionProcesses */
-    private $scheduledTransitionProcessesLink;
+    protected $scheduledTransitionProcessesLink;
+
+    /** @var array */
+    private $generatedConfigurations = [];
 
     /**
      * @param ProcessConfigurationGenerator $generator
@@ -41,78 +42,73 @@ class WorkflowDefinitionListener
         $this->scheduledTransitionProcessesLink = $scheduledTransitionProcessesLink;
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
-    public function postPersist(LifecycleEventArgs $args)
+    public function generateProcessConfigurations(WorkflowChangesEvent $event)
     {
-        $entity = $args->getEntity();
+        $definition = $event->getDefinition();
 
-        if (!$entity instanceof WorkflowDefinition) {
-            return;
+        $this->generatedConfigurations[$definition->getName()] = $this->generator
+            ->generateForScheduledTransition($definition);
+    }
+
+    public function workflowCreated(WorkflowChangesEvent $event)
+    {
+        $workflowName = $event->getDefinition()->getName();
+
+        if (array_key_exists($workflowName, $this->generatedConfigurations)) {
+            $this->getProcessConfigurator()->configureProcesses($this->generatedConfigurations[$workflowName]);
+            unset($this->generatedConfigurations[$workflowName]);
         }
-
-        $configuration = $this->generator->generateForScheduledTransition($entity);
-
-        $this->getProcessConfigurator()->configureProcesses($configuration);
     }
 
     /**
-     * @param LifecycleEventArgs $args
+     * @param WorkflowChangesEvent $event
      */
-    public function postUpdate(LifecycleEventArgs $args)
+    public function workflowUpdated(WorkflowChangesEvent $event)
     {
-        $entity = $args->getEntity();
-
-        if (!$entity instanceof WorkflowDefinition) {
-            return;
-        }
-
-        $generatedConfigurations = $this->generator->generateForScheduledTransition($entity);
+        $workflowDefinition = $event->getDefinition();
+        
+        $workflowName = $event->getDefinition()->getName();
 
         $processConfigurator = $this->getProcessConfigurator();
-        $processConfigurator->configureProcesses($generatedConfigurations);
         
-        $persistedProcessDefinitions = $this->getScheduledTransitionProcesses()->workflowRelated($entity->getName());
+        $scheduledTransitionProcesses = $this->getScheduledTransitionProcesses();
+        
+        if(array_key_exists($workflowName, $this->generatedConfigurations)) {
+            
+            $processConfigurator->configureProcesses($workflowDefinition);
+            $persistedProcessDefinitions = $scheduledTransitionProcesses->workflowRelated(
+                $workflowDefinition->getName()
+            );
+            
+            $generated = $this->generatedConfigurations[$workflowName];
 
-        $toDelete = [];
-        foreach ($persistedProcessDefinitions as $definition) {
-            $name = $definition->getName();
-            if (!array_key_exists($name, $generatedConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS])) {
-                $toDelete[] = $definition->getName();
+            $toDelete = [];
+            foreach ($persistedProcessDefinitions as $processDefinition) {
+                $name = $processDefinition->getName();
+                if (!array_key_exists($name, $generated[ProcessConfigurationProvider::NODE_DEFINITIONS])) {
+                    $toDelete[] = $processDefinition->getName();
+                }
             }
-        }
 
-        $processConfigurator->removeProcesses($toDelete);
+            $processConfigurator->removeProcesses($toDelete);
+        }
     }
 
     /**
-     * @param LifecycleEventArgs $args
+     * @param WorkflowChangesEvent $event
      */
-    public function postRemove(LifecycleEventArgs $args)
+    public function workflowDeleted(WorkflowChangesEvent $event)
     {
-        $entity = $args->getEntity();
-        if (!$this->isSupportedEntity($entity)) {
-            return;
-        }
+        $definition = $event->getDefinition();
 
-        $workflowScheduledProcesses = $this->getScheduledTransitionProcesses()->workflowRelated($entity->getName());
+        $workflowScheduledProcesses = $this->getScheduledTransitionProcesses()->workflowRelated($definition->getName());
 
         $toDelete = [];
-        foreach ($workflowScheduledProcesses as $definition) {
-            $toDelete[] = $definition->getName();
+        foreach ($workflowScheduledProcesses as $processDefinition) {
+            $toDelete[] = $processDefinition->getName();
         }
 
         $this->getProcessConfigurator()->removeProcesses($toDelete);
-    }
-
-    /**
-     * @param object $entity
-     * @return bool
-     */
-    protected function isSupportedEntity($entity)
-    {
-        return $entity instanceof WorkflowDefinition;
     }
 
     /**

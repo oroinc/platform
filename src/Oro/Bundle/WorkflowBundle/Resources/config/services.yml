@@ -138,10 +138,14 @@ services:
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
 
+    oro_workflow.changes.event.dispatcher:
+        class: Symfony\Component\EventDispatcher\EventDispatcher
+
     oro_workflow.handler.workflow_definition:
         class: Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler
         arguments:
             - '@oro_workflow.workflow_assembler'
+            - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
             - '%oro_workflow.workflow_definition.entity.class%'
 

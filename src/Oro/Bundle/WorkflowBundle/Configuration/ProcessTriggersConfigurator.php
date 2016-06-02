@@ -67,6 +67,8 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
      * @param array|ProcessDefinition[] $definitions array of definitions for triggers
      *
      * @return ProcessTrigger[]
+     * @throws \Oro\Component\Action\Exception\InvalidParameterException
+     * @throws \LogicException
      */
     public function configureTriggers(array $triggersConfiguration, array $definitions)
     {
@@ -234,7 +236,5 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
             $this->dirty = false;
             $this->processCronScheduler->flush();
         }
-
-
     }
 }
