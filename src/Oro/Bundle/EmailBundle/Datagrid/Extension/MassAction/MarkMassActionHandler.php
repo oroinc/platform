@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -116,7 +117,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
         $iteration = 0;
         $emailUserIds = [];
 
-        if (array_key_exists('values', $data)) {
+        if (array_key_exists('values', $data) && !empty($data['values'])) {
             $emailUserIds = explode(',', $data['values']);
         }
 
@@ -125,33 +126,19 @@ class MarkMassActionHandler implements MassActionHandlerInterface
                 $folderType = $data['filters']['folder']['value'];
             }
 
+            $organization = $this->securityFacade->getOrganization();
+
             $queryBuilder = $this
                 ->entityManager
                 ->getRepository('OroEmailBundle:EmailUser')
-                ->getEmailUserBuilderForMassAction($emailUserIds, $this->user, $folderType, $isAllSelected);
-
-            $result = $queryBuilder->getQuery()->iterate();
-            foreach ($result as $entity) {
-                /** @var EmailUser $entity */
-                $entity = $entity[0];
-
-                if ($this->securityFacade->isGranted('EDIT', $entity)) {
-                    $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
-                }
-
-                if ($entity->getEmail()->getThread()) {
-                    $this->needToProcessThreadIds[] = $entity->getEmail()->getThread()->getId();
-                }
-
-                $this->entityManager->persist($entity);
-
-                if (($iteration % self::FLUSH_BATCH_SIZE) === 0) {
-                    $this->entityManager->flush();
-                    $this->entityManager->clear();
-                }
-                $iteration++;
-            }
-            $this->entityManager->flush();
+                ->getEmailUserBuilderForMassAction(
+                    $emailUserIds,
+                    $this->user,
+                    $folderType,
+                    $isAllSelected,
+                    $organization
+                );
+            $iteration = $this->process($queryBuilder, $markType, $iteration);
         }
 
         return $iteration;
@@ -224,5 +211,39 @@ class MarkMassActionHandler implements MassActionHandlerInterface
             ),
             $options
         );
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param int $markType
+     * @param int $iteration
+     * @return mixed
+     */
+    protected function process($queryBuilder, $markType, $iteration)
+    {
+        $result = $queryBuilder->getQuery()->iterate();
+        foreach ($result as $entity) {
+            /** @var EmailUser $entity */
+            $entity = $entity[0];
+
+            if ($this->securityFacade->isGranted('EDIT', $entity)) {
+                $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
+            }
+
+            if ($entity->getEmail()->getThread()) {
+                $this->needToProcessThreadIds[] = $entity->getEmail()->getThread()->getId();
+            }
+
+            $this->entityManager->persist($entity);
+
+            if (($iteration % self::FLUSH_BATCH_SIZE) === 0) {
+                $this->entityManager->flush();
+                $this->entityManager->clear();
+            }
+            $iteration++;
+        }
+        $this->entityManager->flush();
+
+        return $iteration;
     }
 }
