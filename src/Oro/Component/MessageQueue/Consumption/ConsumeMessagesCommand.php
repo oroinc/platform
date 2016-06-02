@@ -1,14 +1,10 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption;
 
-use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -17,11 +13,12 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
+    use LimitsExtensionsCommandTrait;
 
     /**
      * @var QueueConsumer
      */
-    private $consumer;
+    protected $consumer;
 
     /**
      * ConsumeMessagesCommand constructor.
@@ -39,16 +36,15 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     protected function configure()
     {
+        $this->configureLimitsExtensions();
+
         $this
+            ->setName('oro:message-queue:transport:consume')
             ->setDescription('A worker that consumes message from a broker. '.
                 'To use this broker you have to explicitly set a queue to consume from '.
                 'and a message processor service')
             ->addArgument('queue', InputArgument::REQUIRED, 'Queues to consume from')
             ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service')
-            ->addOption('message-limit', InputOption::VALUE_REQUIRED, 'Consume n messages and exit')
-            ->addOption('time-limit', InputOption::VALUE_REQUIRED, 'Consume messages during this time')
-            ->addOption('memory-limit', InputOption::VALUE_REQUIRED, 'Consume messages until process reaches'.
-                ' this memory limit in MB');
         ;
     }
 
@@ -57,28 +53,6 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $extensions = [new LoggerExtension(new ConsoleLogger($output))];
-
-        if ($messageLimit = (int) $input->getOption('message-limit')) {
-            $extensions[] = new LimitConsumedMessagesExtension($messageLimit);
-        }
-
-        if ($timeLimit = $input->getOption('time-limit')) {
-            try {
-                $timeLimit = new \DateTime($timeLimit);
-            } catch (\Exception $e) {
-                $output->writeln('<error>Invalid time limit</error>');
-
-                return;
-            }
-
-            $extensions[] = new LimitConsumptionTimeExtension($timeLimit);
-        }
-
-        if ($memoryLimit = (int) $input->getOption('memory-limit')) {
-            $extensions[] = new LimitConsumerMemoryExtension($memoryLimit);
-        }
-
         $queueName = $input->getArgument('queue');
 
         /** @var MessageProcessorInterface $messageProcessor */
@@ -91,7 +65,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
             ));
         }
 
-        $runtimeExtensions = new Extensions([$extensions]);
+        $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
 
         try {
             $this->consumer->consume($queueName, $messageProcessor, $runtimeExtensions);
