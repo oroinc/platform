@@ -20,8 +20,8 @@ define(function(require) {
 
             this._deferredInit();
 
-            tools.loadModules(options.widgetModule, function initializeJqueryWidget() {
-                $elem[options.widgetName](widgetOptions);
+            tools.loadModules(options.widgetModule, function initializeJqueryWidget(widgetName) {
+                $elem[widgetName || options.widgetName](widgetOptions);
                 this._resolveDeferredInit();
             }, this);
         }
