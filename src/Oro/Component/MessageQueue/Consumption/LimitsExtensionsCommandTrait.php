@@ -18,9 +18,9 @@ trait LimitsExtensionsCommandTrait
     protected function configureLimitsExtensions()
     {
         $this
-            ->addOption('message-limit', InputOption::VALUE_REQUIRED, 'Consume n messages and exit')
-            ->addOption('time-limit', InputOption::VALUE_REQUIRED, 'Consume messages during this time')
-            ->addOption('memory-limit', InputOption::VALUE_REQUIRED, 'Consume messages until process reaches'.
+            ->addOption('message-limit', null, InputOption::VALUE_REQUIRED, 'Consume n messages and exit')
+            ->addOption('time-limit', null, InputOption::VALUE_REQUIRED, 'Consume messages during this time')
+            ->addOption('memory-limit', null, InputOption::VALUE_REQUIRED, 'Consume messages until process reaches'.
                 ' this memory limit in MB');
         ;
     }
