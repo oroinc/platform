@@ -28,7 +28,6 @@ define(function(require) {
 
         events: {
             'click .dropdown-menu': 'onDropdownMenuClick',
-            'click [data-toggle=dropdown]': 'onDropdownToggleClick',
             'shown.bs.dropdown': 'onOpen'
         },
 
@@ -79,29 +78,6 @@ define(function(require) {
         },
 
         /**
-         * Focus first input once dropdown is opened
-         *
-         * @param {jQuery.Event} e
-         */
-        onDropdownToggleClick: function(e) {
-            if (!this.component) {
-                this.initComponent();
-            }
-            // inverse condition because this handler is bound first, before Bootstrap
-            var that = this;
-            if (!this.$el.is('.open')) {
-                var $elem = this.$('.dropdown-menu');
-                _.defer(function() {
-                    // focus input after Bootstrap opened dropdown menu
-                    $elem.focusFirstInput();
-                    if (_.isFunction(that.component.updateViews)) {
-                        that.component.updateViews();
-                    }
-                });
-            }
-        },
-
-        /**
          * Prevents dropdown menu from closing on click
          *
          * @param {jQuery.Event} e
@@ -116,12 +92,21 @@ define(function(require) {
          * Handles dropdown menu open and sets max-width for the element
          */
         onOpen: function() {
+            if (!this.component) {
+                this.initComponent();
+            }
             var $dropdownMenu = this.$('>.dropdown-menu');
             if ($dropdownMenu.length) {
                 var rect = $dropdownMenu[0].getBoundingClientRect();
                 $dropdownMenu.css({
                     maxWidth: rect.right + 'px'
                 });
+            }
+            var $elem = this.$('.dropdown-menu');
+            // focus input after Bootstrap opened dropdown menu
+            $elem.focusFirstInput();
+            if (_.isFunction(this.component.updateViews)) {
+                this.component.updateViews();
             }
         },
 

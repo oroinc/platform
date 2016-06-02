@@ -45,7 +45,7 @@ class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
     public function testForFilterWithAdditionalParameters()
     {
         $dataType = 'string';
-        $supportedOperators = ['=', '<>'];
+        $supportedOperators = ['=', '!='];
 
         $this->filterFactory->addFilter(
             $dataType,

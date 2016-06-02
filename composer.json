@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "ext-intl": "*",
         "ext-mbstring": "*",
         "ext-gd": "*",

@@ -5,7 +5,8 @@ Feature: User
   I need to be able to open Create User dialog and create new user
 Scenario: Create new user
   Given login as "admin" user with "admin" password
-  And I go to "/user/create"
+  And I follow the menu "System -> User Management -> Users"
+  And press "Create User"
   When I fill "User" form with:
         | Username          | userName       |
         | Password          | 123123q        |
@@ -16,5 +17,4 @@ Scenario: Create new user
   And I select "Active" from "Status"
   And I check "Sales Rep"
   And I press "Save and Close"
-  And the url should match "/user/view/\d+"
-  Then I should see "User saved"
+  Then I should see "User saved" flash message

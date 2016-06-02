@@ -52,8 +52,9 @@ class CompleteFilters extends CompleteSection
         EntityDefinitionConfig $definition
     ) {
         $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
-        foreach ($indexedFields as $fieldName => $dataType) {
-            if ($definition->hasField($fieldName)) {
+        foreach ($indexedFields as $propertyPath => $dataType) {
+            $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
+            if ($fieldName) {
                 $filter = $filters->getOrAddField($fieldName);
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);
@@ -76,8 +77,9 @@ class CompleteFilters extends CompleteSection
         EntityDefinitionConfig $definition
     ) {
         $relations = $this->doctrineHelper->getIndexedAssociations($metadata);
-        foreach ($relations as $fieldName => $dataType) {
-            if ($definition->hasField($fieldName)) {
+        foreach ($relations as $propertyPath => $dataType) {
+            $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
+            if ($fieldName) {
                 $filter = $filters->getOrAddField($fieldName);
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);

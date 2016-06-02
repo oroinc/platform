@@ -167,4 +167,12 @@ JS;
     {
         $this->elementFactory->createElement($formName)->fill($table);
     }
+
+    /**
+     * @Given /^(?:|I )open the menu "(?P<path>(?:[^"]|\\")*)" and click "(?P<linkLocator>(?:[^"]|\\")*)"$/
+     */
+    public function iOpenTheMenuAndClick($path, $linkLocator)
+    {
+        $this->elementFactory->createElement('MainMenu')->openAndClick($path, $linkLocator);
+    }
 }
