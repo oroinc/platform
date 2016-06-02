@@ -29,7 +29,7 @@ class DelayRedeliveredMessageAmqpExtension implements ExtensionInterface
             return;
         }
 
-        $queueName = $context->getMessageConsumer()->getQueue()->getQueueName();
+        $queueName = $context->getQueueName();
 
         $deadQueue = $session->createQueue($queueName.'.delayed');
         $deadQueue->setDurable(true);

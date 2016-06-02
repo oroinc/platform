@@ -23,6 +23,13 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         new QueueConsumer($this->createConnectionStub(), new Extensions([]), 0);
     }
 
+    public function testShouldSetEmptyArrayToBoundMessageProcessorsPropertyInConstructor()
+    {
+        $consumer = new QueueConsumer($this->createConnectionStub(), new Extensions([]), 0);
+
+        $this->assertAttributeSame([], 'boundMessageProcessors', $consumer);
+    }
+
     public function testShouldAllowGetConnectionSetInConstructor()
     {
         $expectedConnection = $this->createConnectionStub();
@@ -30,6 +37,48 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new QueueConsumer($expectedConnection, new Extensions([]), 0);
 
         $this->assertSame($expectedConnection, $consumer->getConnection());
+    }
+
+    public function testThrowIfQueueNameEmptyOnBind()
+    {
+        $messageProcessorMock = $this->createMessageProcessorMock();
+
+        $consumer = new QueueConsumer($this->createConnectionStub(), new Extensions([]), 0);
+
+        $this->setExpectedException(\LogicException::class, 'The queue name is empty.');
+        $consumer->bind('', $messageProcessorMock);
+    }
+
+    public function testThrowIfQueueAlreadyBoundToMessageProcessorOnBind()
+    {
+        $messageProcessorMock = $this->createMessageProcessorMock();
+
+        $consumer = new QueueConsumer($this->createConnectionStub(), new Extensions([]), 0);
+
+        $consumer->bind('theQueueName', $messageProcessorMock);
+
+        $this->setExpectedException(\LogicException::class, 'The queue was already bound.');
+        $consumer->bind('theQueueName', $messageProcessorMock);
+    }
+
+    public function testShouldAllowBindMessageProcessorToQueue()
+    {
+        $messageProcessorMock = $this->createMessageProcessorMock();
+
+        $consumer = new QueueConsumer($this->createConnectionStub(), new Extensions([]), 0);
+
+        $consumer->bind('theQueueName', $messageProcessorMock);
+
+        $this->assertAttributeSame(['theQueueName' => $messageProcessorMock], 'boundMessageProcessors', $consumer);
+    }
+
+    public function testShouldReturnSelfOnBind()
+    {
+        $messageProcessorMock = $this->createMessageProcessorMock();
+
+        $consumer = new QueueConsumer($this->createConnectionStub(), new Extensions([]), 0);
+
+        $this->assertSame($consumer, $consumer->bind('aQueueName', $messageProcessorMock));
     }
 
     public function testShouldSubscribeToGivenQueueAndQuitAfterFifthIdleCycle()
@@ -67,8 +116,8 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(5)]), 0);
-
-        $queueConsumer->consume($expectedQueueName, $messageProcessorMock);
+        $queueConsumer->bind($expectedQueueName, $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldProcessFiveMessagesAndQuit()
@@ -87,8 +136,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(5)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldAckMessageIfMessageProcessorReturnSuchStatus()
@@ -114,8 +164,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldAckMessageIfMessageProcessorReturnNull()
@@ -141,8 +192,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldRejectMessageIfMessageProcessorReturnSuchStatus()
@@ -168,8 +220,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldRequeueMessageIfMessageProcessorReturnSuchStatus()
@@ -195,14 +248,15 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testThrowIfMessageProcessorReturnInvalidStatus()
     {
         $this->setExpectedException(\LogicException::class, 'Status is not supported: invalidStatus');
-        
+
         $messageMock = $this->createMessageMock();
         $messageConsumerStub = $this->createMessageConsumerStub($messageMock);
 
@@ -219,8 +273,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldNotPassMessageToMessageProcessorIfItWasProcessedByExtension()
@@ -249,8 +304,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldCallOnStartExtensionMethod()
@@ -268,12 +324,13 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(Context::class))
             ->willReturnCallback(function (Context $context) use ($sessionStub, $messageConsumerStub, $messageProcessorMock) {
                 $this->assertSame($sessionStub, $context->getSession());
-                $this->assertSame($messageConsumerStub, $context->getMessageConsumer());
-                $this->assertSame($messageProcessorMock, $context->getMessageProcessor());
-                $this->assertInstanceOf(NullLogger::class, $context->getLogger());
+                $this->assertNull($context->getMessageConsumer());
+                $this->assertNull($context->getMessageProcessor());
+                $this->assertNull($context->getLogger());
                 $this->assertNull($context->getMessage());
                 $this->assertNull($context->getException());
                 $this->assertNull($context->getStatus());
+                $this->assertNull($context->getQueueName());
                 $this->assertFalse($context->isExecutionInterrupted());
             })
         ;
@@ -281,8 +338,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldCallOnIdleExtensionMethod()
@@ -313,8 +371,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldCallOnBeforeReceiveExtensionMethod()
@@ -340,14 +399,16 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
                 $this->assertNull($context->getException());
                 $this->assertNull($context->getStatus());
                 $this->assertFalse($context->isExecutionInterrupted());
+                $this->assertEquals('theQueueName', $context->getQueueName());
             })
         ;
 
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('theQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldCallOnPreReceivedAndPostReceivedExtensionMethods()
@@ -394,8 +455,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldAllowInterruptConsumingOnIdle()
@@ -434,8 +496,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldCloseSessionWhenConsumptionInterrupted()
@@ -463,8 +526,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionMock);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldCloseSessionWhenConsumptionInterruptedByException()
@@ -487,9 +551,10 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionMock);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
         $this->setExpectedException(\Exception::class);
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldAllowInterruptConsumingOnPreReceiveButProcessCurrentMessage()
@@ -533,8 +598,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldAllowInterruptConsumingOnPostReceive()
@@ -578,8 +644,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldCallOnInterruptedIfExceptionThrow()
@@ -619,8 +686,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
     }
 
     public function testShouldCallExtensionPassedOnRuntime()
@@ -661,8 +729,9 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock, new Extensions([$runtimeExtension]));
+        $queueConsumer->consume(new Extensions([$runtimeExtension]));
     }
 
     public function testShouldChangeLoggerOnStart()
@@ -709,8 +778,50 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $connectionStub = $this->createConnectionStub($sessionStub);
 
         $queueConsumer = new QueueConsumer($connectionStub, new Extensions([$extension, new BreakCycleExtension(1)]), 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $queueConsumer->consume('aQueueName', $messageProcessorMock);
+        $queueConsumer->consume();
+    }
+
+    public function testShouldCallEachQueueOneByOne()
+    {
+        $expectedMessage = $this->createMessageMock();
+        $messageConsumerStub = $this->createMessageConsumerStub($expectedMessage);
+
+        $sessionStub = $this->createSessionStub($messageConsumerStub);
+
+        $messageProcessorMock = $this->createMessageProcessorMock();
+        $anotherMessageProcessorMock = $this->createMessageProcessorMock();
+
+        $extension = $this->createExtension();
+        $extension
+            ->expects($this->at(1))
+            ->method('onBeforeReceive')
+            ->with($this->isInstanceOf(Context::class))
+            ->willReturnCallback(function (Context $context) use ($messageProcessorMock) {
+                $this->assertSame($messageProcessorMock, $context->getMessageProcessor());
+                $this->assertEquals('theQueueName', $context->getQueueName());
+            })
+        ;
+        $extension
+            ->expects($this->at(4))
+            ->method('onBeforeReceive')
+            ->with($this->isInstanceOf(Context::class))
+            ->willReturnCallback(function (Context $context) use ($anotherMessageProcessorMock) {
+                $this->assertSame($anotherMessageProcessorMock, $context->getMessageProcessor());
+                $this->assertEquals('theAnotherQueueName', $context->getQueueName());
+            })
+        ;
+
+        $connectionStub = $this->createConnectionStub($sessionStub);
+
+        $queueConsumer = new QueueConsumer($connectionStub, new Extensions([new BreakCycleExtension(2)]), 0);
+        $queueConsumer
+            ->bind('theQueueName', $messageProcessorMock)
+            ->bind('theAnotherQueueName', $anotherMessageProcessorMock)
+        ;
+
+        $queueConsumer->consume(new Extensions([$extension]));
     }
 
     /**

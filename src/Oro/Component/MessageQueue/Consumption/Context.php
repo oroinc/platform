@@ -45,26 +45,21 @@ class Context
     private $status;
 
     /**
+     * @var string
+     */
+    private $queueName;
+
+    /**
      * @var boolean
      */
     private $executionInterrupted;
 
     /**
      * @param SessionInterface $session
-     * @param MessageConsumerInterface $messageConsumer
-     * @param MessageProcessorInterface $messageProcessor
-     * @param LoggerInterface $logger
      */
-    public function __construct(
-        SessionInterface $session,
-        MessageConsumerInterface $messageConsumer,
-        MessageProcessorInterface $messageProcessor,
-        LoggerInterface $logger
-    ) {
+    public function __construct(SessionInterface $session)
+    {
         $this->session = $session;
-        $this->messageConsumer = $messageConsumer;
-        $this->messageProcessor = $messageProcessor;
-        $this->logger = $logger;
         
         $this->executionInterrupted = false;
     }
@@ -106,11 +101,27 @@ class Context
     }
 
     /**
+     * @param MessageConsumerInterface $messageConsumer
+     */
+    public function setMessageConsumer(MessageConsumerInterface $messageConsumer = null)
+    {
+        $this->messageConsumer = $messageConsumer;
+    }
+
+    /**
      * @return MessageProcessorInterface
      */
     public function getMessageProcessor()
     {
         return $this->messageProcessor;
+    }
+
+    /**
+     * @param MessageProcessorInterface $messageProcessor
+     */
+    public function setMessageProcessor(MessageProcessorInterface $messageProcessor = null)
+    {
+        $this->messageProcessor = $messageProcessor;
     }
 
     /**
@@ -182,6 +193,30 @@ class Context
      */
     public function setLogger(LoggerInterface $logger)
     {
+        if ($this->logger) {
+            throw new IllegalContextModificationException('The logger modification is not allowed');
+        }
+        
         $this->logger = $logger;
+    }
+
+    /**
+     * @return string
+     */
+    public function getQueueName()
+    {
+        return $this->queueName;
+    }
+
+    /**
+     * @param string $queueName
+     */
+    public function setQueueName($queueName)
+    {
+        if ($this->queueName) {
+            throw new IllegalContextModificationException('The queueName modification is not allowed');
+        }
+
+        $this->queueName = $queueName;
     }
 }

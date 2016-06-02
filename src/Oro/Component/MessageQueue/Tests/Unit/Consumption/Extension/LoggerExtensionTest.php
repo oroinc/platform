@@ -5,8 +5,7 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Transport\Null\NullQueue;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\LoggerInterface;
 
@@ -30,194 +29,35 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension = new LoggerExtension($logger);
 
-        $queue = new NullQueue('aQueueName');
-
-        $messageConsumerMock = $this->createMessageConsumerMock();
-        $messageConsumerMock
-            ->expects($this->once())
-            ->method('getQueue')
-            ->willReturn($queue)
-        ;
-
-        $context = $this->createContextStub($logger);
-        $context
-            ->expects($this->once())
-            ->method('setLogger')
-            ->with($this->identicalTo($logger))
-        ;
-        $context
-            ->expects($this->any())
-            ->method('getMessageConsumer')
-            ->willReturn($messageConsumerMock)
-        ;
+        $context = new Context($this->createSessionMock());
 
         $extension->onStart($context);
+
+        $this->assertSame($logger, $context->getLogger());
     }
 
     public function testShouldAddInfoMessageOnStart()
     {
         $logger = $this->createLogger();
         $logger
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('debug')
             ->with($this->stringStartsWith('Set context\'s logger'))
-        ;
-        $logger
-            ->expects($this->at(1))
-            ->method('info')
-            ->with('Start consuming from queue aQueueName')
-        ;
-
-        $queue = new NullQueue('aQueueName');
-
-        $messageConsumerMock = $this->createMessageConsumerMock();
-        $messageConsumerMock
-            ->expects($this->once())
-            ->method('getQueue')
-            ->willReturn($queue)
         ;
 
         $extension = new LoggerExtension($logger);
 
-        $context = $this->createContextStub($logger);
-        $context
-            ->expects($this->once())
-            ->method('getMessageConsumer')
-            ->willReturn($messageConsumerMock)
-        ;
+        $context = new Context($this->createSessionMock());
 
         $extension->onStart($context);
     }
 
-    public function testShouldAddInfoMessageOnBeforeReceive()
-    {
-        $logger = $this->createLogger();
-        $logger
-            ->expects($this->once())
-            ->method('info')
-            ->with('Before receive')
-        ;
-
-        $extension = new LoggerExtension($logger);
-
-        $context = $this->createContextStub($logger);
-
-        $extension->onBeforeReceive($context);
-    }
-
-    public function testShouldAddInfoMessageOnPreReceived()
-    {
-        $logger = $this->createLogger();
-        $logger
-            ->expects($this->once())
-            ->method('info')
-            ->with('Message received')
-        ;
-
-        $extension = new LoggerExtension($logger);
-
-        $context = $this->createContextStub($logger, new NullMessage());
-
-        $extension->onPreReceived($context);
-    }
-
-    public function testShouldAddDebugInfoAboutMessageOnPreReceived()
-    {
-        $message = new NullMessage();
-        $message->setBody('theBody');
-        $message->setHeaders(['theFoo' => 'theFooVal']);
-        $message->setProperties(['theBar' => 'theBarVal']);
-
-        $logger = $this->createLogger();
-        $logger
-            ->expects($this->at(1))
-            ->method('debug')
-            ->with($this->stringStartsWith('Headers: array ('))
-        ;
-        $logger
-            ->expects($this->at(2))
-            ->method('debug')
-            ->with($this->stringStartsWith('Properties: array ('))
-        ;
-        $logger
-            ->expects($this->at(3))
-            ->method('debug')
-            ->with($this->stringStartsWith('Payload: \'theBody\''))
-        ;
-
-        $extension = new LoggerExtension($logger);
-
-        $context = $this->createContextStub($logger, $message);
-
-        $extension->onPreReceived($context);
-    }
-
-    public function testShouldAddInfoMessageOnPostReceived()
-    {
-        $logger = $this->createLogger();
-        $logger
-            ->expects($this->once())
-            ->method('info')
-            ->with('Message processed: ')
-        ;
-
-        $extension = new LoggerExtension($logger);
-
-        $context = $this->createContextStub($logger);
-
-        $extension->onPostReceived($context);
-    }
-
-    public function testShouldAddInfoMessageOnIdle()
-    {
-        $logger = $this->createLogger();
-        $logger
-            ->expects($this->once())
-            ->method('info')
-            ->with('Idle')
-        ;
-
-        $extension = new LoggerExtension($logger);
-
-        $context = $this->createContextStub($logger);
-
-        $extension->onIdle($context);
-    }
-
-    public function testShouldAddInfoMessageOnInterrupted()
-    {
-        $logger = $this->createLogger();
-        $logger
-            ->expects($this->once())
-            ->method('info')
-            ->with('Consuming interrupted')
-        ;
-
-        $extension = new LoggerExtension($logger);
-
-        $context = $this->createContextStub($logger);
-
-        $extension->onInterrupted($context);
-    }
-
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Context
+     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
-    protected function createContextStub($logger = null, $message = null)
+    protected function createSessionMock()
     {
-        $contextMock = $this->getMock(Context::class, [], [], '', false);
-        $contextMock
-            ->expects($this->any())
-            ->method('getLogger')
-            ->willReturn($logger)
-        ;
-        $contextMock
-            ->expects($this->any())
-            ->method('getMessage')
-            ->willReturn($message)
-        ;
-
-        return $contextMock;
+        return $this->getMock(SessionInterface::class);
     }
 
     /**

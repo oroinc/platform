@@ -3,8 +3,6 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\IllegalContextModificationException;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\Extensions;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
@@ -16,80 +14,53 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 {
     use ClassExtensionTrait;
 
-    public function testCouldBeConstructedWithExpectedArguments()
+    public function testCouldBeConstructedWithSessionAsFirstArgument()
     {
-        new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        new Context($this->createSession());
     }
 
     public function testShouldAllowGetSessionSetInConstructor()
     {
         $session = $this->createSession();
 
-        $context = new Context(
-            $session,
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($session);
 
         $this->assertSame($session, $context->getSession());
     }
 
-    public function testShouldAllowGetMessageConsumerSetInConstructor()
+    public function testShouldAllowGetMessageConsumerPreviouslySet()
     {
         $messageConsumer = $this->createMessageConsumer();
         
-        $context = new Context(
-            $this->createSession(),
-            $messageConsumer,
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
+        $context->setMessageConsumer($messageConsumer);
 
         $this->assertSame($messageConsumer, $context->getMessageConsumer());
     }
 
-    public function testShouldAllowGetMessageProducerSetInConstructor()
+    public function testShouldAllowGetMessageProducerPreviouslySet()
     {
         $messageProcessor = $this->createMessageProcessor();
 
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $messageProcessor,
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
+        $context->setMessageProcessor($messageProcessor);
 
         $this->assertSame($messageProcessor, $context->getMessageProcessor());
     }
 
-    public function testShouldAllowGetLoggerSetInConstructor()
+    public function testShouldAllowGetLoggerPreviouslySet()
     {
         $logger = new NullLogger();
 
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            $logger
-        );
+        $context = new Context($this->createSession());
+        $context->setLogger($logger);
 
         $this->assertSame($logger, $context->getLogger());
     }
 
     public function testShouldSetExecutionInterruptedToFalseInConstructor()
     {
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $this->assertFalse($context->isExecutionInterrupted());
     }
@@ -99,12 +70,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         /** @var MessageInterface $message */
         $message = $this->getMock(MessageInterface::class);
 
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $context->setMessage($message);
 
@@ -116,12 +82,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         /** @var MessageInterface $message */
         $message = $this->getMock(MessageInterface::class);
 
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $this->setExpectedException(
             IllegalContextModificationException::class,
@@ -136,12 +97,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $exception = new \Exception();
 
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $context->setException($exception);
 
@@ -152,12 +108,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $status = 'aStatus';
 
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $context->setStatus($status);
 
@@ -168,12 +119,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $status = 'aStatus';
 
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $this->setExpectedException(
             IllegalContextModificationException::class,
@@ -186,12 +132,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAllowGetPreviouslySetExecutionInterrupted()
     {
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         // guard
         $this->assertFalse($context->isExecutionInterrupted());
@@ -203,12 +144,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowOnTryToRollbackExecutionInterruptedIfAlreadySetToTrue()
     {
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $this->setExpectedException(
             IllegalContextModificationException::class,
@@ -221,12 +157,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testNotThrowOnSettingExecutionInterruptedToTrueIfAlreadySetToTrue()
     {
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $context->setExecutionInterrupted(true);
         $context->setExecutionInterrupted(true);
@@ -236,16 +167,46 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $expectedLogger = new NullLogger();
 
-        $context = new Context(
-            $this->createSession(),
-            $this->createMessageConsumer(),
-            $this->createMessageProcessor(),
-            new NullLogger()
-        );
+        $context = new Context($this->createSession());
 
         $context->setLogger($expectedLogger);
 
         $this->assertSame($expectedLogger, $context->getLogger());
+    }
+
+    public function testThrowOnSettingLoggerIfAlreadySet()
+    {
+        $context = new Context($this->createSession());
+
+        $context->setLogger(new NullLogger());
+
+        $this->setExpectedException(
+            IllegalContextModificationException::class,
+            'The logger modification is not allowed'
+        );
+        $context->setLogger(new NullLogger());
+    }
+
+    public function testShouldAllowGetPreviouslySetQueueName()
+    {
+        $context = new Context($this->createSession());
+
+        $context->setQueueName('theQueueName');
+
+        $this->assertSame('theQueueName', $context->getQueueName());
+    }
+
+    public function testThrowOnSettingQueueNameIfAlreadySet()
+    {
+        $context = new Context($this->createSession());
+
+        $context->setQueueName('theQueueName');
+
+        $this->setExpectedException(
+            IllegalContextModificationException::class,
+            'The queueName modification is not allowed'
+        );
+        $context->setQueueName('theAnotherQueueName');
     }
 
     /**

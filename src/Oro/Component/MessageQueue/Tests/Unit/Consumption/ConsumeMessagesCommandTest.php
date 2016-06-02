@@ -6,7 +6,6 @@ use Oro\Component\MessageQueue\Consumption\Extensions;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -78,8 +77,13 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer = $this->createQueueConsumerMock();
         $consumer
             ->expects($this->once())
+            ->method('bind')
+            ->with('queue-name', $this->identicalTo($processor))
+        ;
+        $consumer
+            ->expects($this->once())
             ->method('consume')
-            ->with('queue-name', $this->identicalTo($processor), $this->isInstanceOf(Extensions::class))
+            ->with($this->isInstanceOf(Extensions::class))
         ;
         $consumer
             ->expects($this->once())

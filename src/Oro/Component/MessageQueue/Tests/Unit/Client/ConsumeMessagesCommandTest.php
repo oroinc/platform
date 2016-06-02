@@ -4,14 +4,11 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
-use Oro\Component\MessageQueue\Client\SessionInterface;
+use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Consumption\Extensions;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +17,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         new ConsumeMessagesCommand(
             $this->createQueueConsumerMock(),
             $this->createDelegateMessageProcessorMock(),
-            $this->createSessionMock()
+            $this->createDriverMock()
         );
     }
 
@@ -29,7 +26,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $command = new ConsumeMessagesCommand(
             $this->createQueueConsumerMock(),
             $this->createDelegateMessageProcessorMock(),
-            $this->createSessionMock()
+            $this->createDriverMock()
         );
 
         $this->assertEquals('oro:message-queue:consume', $command->getName());
@@ -40,7 +37,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $command = new ConsumeMessagesCommand(
             $this->createQueueConsumerMock(),
             $this->createDelegateMessageProcessorMock(),
-            $this->createSessionMock()
+            $this->createDriverMock()
         );
 
         $options = $command->getDefinition()->getOptions();
@@ -56,7 +53,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $command = new ConsumeMessagesCommand(
             $this->createQueueConsumerMock(),
             $this->createDelegateMessageProcessorMock(),
-            $this->createSessionMock()
+            $this->createDriverMock()
         );
 
         $arguments = $command->getDefinition()->getArguments();
@@ -78,8 +75,13 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer = $this->createQueueConsumerMock();
         $consumer
             ->expects($this->once())
+            ->method('bind')
+            ->with('queue-name', $this->identicalTo($processor))
+        ;
+        $consumer
+            ->expects($this->once())
             ->method('consume')
-            ->with('queue-name', $this->identicalTo($processor), $this->isInstanceOf(Extensions::class))
+            ->with($this->isInstanceOf(Extensions::class))
         ;
         $consumer
             ->expects($this->once())
@@ -87,7 +89,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($connection))
         ;
 
-        $session = $this->createSessionMock();
+        $session = $this->createDriverMock();
         $session
             ->expects($this->once())
             ->method('getConfig')
@@ -113,8 +115,13 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer = $this->createQueueConsumerMock();
         $consumer
             ->expects($this->once())
+            ->method('bind')
+            ->with('non-default-queue', $this->identicalTo($processor))
+        ;
+        $consumer
+            ->expects($this->once())
             ->method('consume')
-            ->with('non-default-queue', $this->identicalTo($processor), $this->isInstanceOf(Extensions::class))
+            ->with($this->isInstanceOf(Extensions::class))
         ;
         $consumer
             ->expects($this->once())
@@ -122,7 +129,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($connection))
         ;
 
-        $session = $this->createSessionMock();
+        $session = $this->createDriverMock();
         $session
             ->expects($this->once())
             ->method('getConfig')
@@ -146,11 +153,11 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|DriverInterface
      */
-    protected function createSessionMock()
+    protected function createDriverMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->getMock(DriverInterface::class);
     }
 
     /**

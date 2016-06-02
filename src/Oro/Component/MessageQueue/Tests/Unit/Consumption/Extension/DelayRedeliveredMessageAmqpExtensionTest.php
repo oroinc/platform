@@ -33,12 +33,7 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
         /** @var SessionInterface $session */
         $session = $this->getMock(SessionInterface::class);
         
-        $context = new Context(
-            $session,
-            $this->createMessageConsumerStub(),
-            $this->createMessageProcessorMock(),
-            new NullLogger()
-        );
+        $context = new Context($session);
 
         $extension = new DelayRedeliveredMessageAmqpExtension();
 
@@ -50,12 +45,7 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
         $message = new AmqpMessage();
         $message->setRedelivered(false);
         
-        $context = new Context(
-            $this->createAmqpSessionStub(),
-            $this->createMessageConsumerStub(),
-            $this->createMessageProcessorMock(),
-            new NullLogger()
-        );
+        $context = new Context($this->createAmqpSessionStub());
         $context->setMessage($message);
 
         $extension = new DelayRedeliveredMessageAmqpExtension();
@@ -77,12 +67,8 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
             ->with($this->isInstanceOf(AmqpQueue::class), $this->identicalTo($deadMessage))
         ;
 
-        $context = new Context(
-            $this->createAmqpSessionStub($deadMessage, $messageProducerMock),
-            $this->createMessageConsumerStub('aQueueName'),
-            $this->createMessageProcessorMock(),
-            new NullLogger()
-        );
+        $context = new Context($this->createAmqpSessionStub($deadMessage, $messageProducerMock));
+        $context->setLogger(new NullLogger());
         $context->setMessage($message);
 
         $extension = new DelayRedeliveredMessageAmqpExtension();
@@ -125,12 +111,9 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
             })
         ;
 
-        $context = new Context(
-            $sessionMock,
-            $this->createMessageConsumerStub('theQueueName'),
-            $this->createMessageProcessorMock(),
-            new NullLogger()
-        );
+        $context = new Context($sessionMock);
+        $context->setLogger(new NullLogger());
+        $context->setQueueName('theQueueName');
         $context->setMessage($message);
 
         $extension = new DelayRedeliveredMessageAmqpExtension();
@@ -156,12 +139,8 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
             ->willReturn($deadMessage)
         ;
 
-        $context = new Context(
-            $sessionMock,
-            $this->createMessageConsumerStub('aQueueName'),
-            $this->createMessageProcessorMock(),
-            new NullLogger()
-        );
+        $context = new Context($sessionMock);
+        $context->setLogger(new NullLogger());
         $context->setMessage($message);
 
         $extension = new DelayRedeliveredMessageAmqpExtension();
@@ -185,12 +164,8 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
             ->willReturn($deadMessage)
         ;
 
-        $context = new Context(
-            $sessionMock,
-            $this->createMessageConsumerStub('aQueueName'),
-            $this->createMessageProcessorMock(),
-            new NullLogger()
-        );
+        $context = new Context($sessionMock);
+        $context->setLogger(new NullLogger());
         $context->setMessage($message);
 
         $extension = new DelayRedeliveredMessageAmqpExtension();
@@ -228,18 +203,9 @@ class DelayRedeliveredMessageAmqpExtensionTest extends \PHPUnit_Framework_TestCa
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumerInterface
      */
-    protected function createMessageConsumerStub($queueName = null)
+    protected function createMessageConsumerMock()
     {
-        $queue = new AmqpQueue($queueName);
-
-        $messageConsumerMock = $this->getMock(MessageConsumerInterface::class);
-        $messageConsumerMock
-            ->expects($this->any())
-            ->method('getQueue')
-            ->willReturn($queue)
-        ;
-
-        return $messageConsumerMock;
+        return $this->getMock(MessageConsumerInterface::class);
     }
 
     /**

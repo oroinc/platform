@@ -96,12 +96,12 @@ class DoctrinePingConnectionExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContext()
     {
-        return new Context(
-            $this->getMock(SessionInterface::class),
-            $this->getMock(MessageConsumerInterface::class),
-            $this->getMock(MessageProcessorInterface::class),
-            $this->getMock(LoggerInterface::class)
-        );
+        $context = new Context($this->getMock(SessionInterface::class));
+        $context->setLogger($this->getMock(LoggerInterface::class));
+        $context->setMessageConsumer($this->getMock(MessageConsumerInterface::class));
+        $context->setMessageProcessor($this->getMock(MessageProcessorInterface::class));
+
+        return $context;
     }
 
     /**

@@ -68,7 +68,8 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
         $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
 
         try {
-            $this->consumer->consume($queueName, $messageProcessor, $runtimeExtensions);
+            $this->consumer->bind($queueName, $messageProcessor);
+            $this->consumer->consume($runtimeExtensions);
         } finally {
             $this->consumer->getConnection()->close();
         }

@@ -74,7 +74,8 @@ class ConsumeMessagesCommand extends Command
         $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
 
         try {
-            $this->consumer->consume($queueName, $this->processor, $runtimeExtensions);
+            $this->consumer->bind($queueName, $this->processor);
+            $this->consumer->consume($runtimeExtensions);
         } finally {
             $this->consumer->getConnection()->close();
         }
