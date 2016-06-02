@@ -36,6 +36,9 @@ oro.locale:
             string.label:           'String value'
             text.label:             'Text value'
 
+        form:
+            choose_parent: 'Choose parent localization...'
+
     fallback:
         type:
             parent_locale: 'Parent Locale'

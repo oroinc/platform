@@ -53,9 +53,8 @@ class LocalizationType extends AbstractType
                 ])
             ->add(
                 'parentLocalization',
-                'entity',
+                LocalizationParentSelectType::NAME,
                 [
-                    'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
                     'required' => false,
                     'label' => 'oro.locale.localization.parent_localization.label',
                 ]
@@ -69,7 +68,6 @@ class LocalizationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => $this->dataClass,
-            'intention' => 'localization',
         ]);
     }
 
