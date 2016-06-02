@@ -20,9 +20,9 @@ define(['underscore', 'backbone'], function(_, Backbone) {
                     if (!column.get('renderable')) {
                         return;
                     }
-                    var cellCtor = column.get('cell');
-                    if (cellCtor.prototype.delegatedEventBinding && !_.isFunction(cellCtor.prototype.events)) {
-                        var events = cellCtor.prototype.events;
+                    var Cell = column.get('cell');
+                    if (Cell.prototype.delegatedEventBinding && !_.isFunction(Cell.prototype.events)) {
+                        var events = Cell.prototype.events;
                         // prevent CS error 'cause we must completely repeat Backbone behaviour
                         for (var eventName in events) { // jshint forin:false
                             if (!cellEventsList.hasOwnProperty(eventName)) {

@@ -37,7 +37,7 @@ define([
         events: function() {
             var resultEvents = {};
 
-            var events = this.simplifiedEvents.getEventsMap();
+            var events = this.cellEvents.getEventsMap();
             // prevent CS error 'cause we must completely repeat Backbone behaviour
             for (var key in events) { // jshint forin:false
                 var match = key.match(delegateEventSplitter);
@@ -105,8 +105,8 @@ define([
             }
 
             // code related to simplified event binding
-            this.simplifiedEvents = this.collection.getCellEventList();
-            this.listenTo(this.simplifiedEvents, 'change', this.delegateEvents);
+            this.cellEvents = this.collection.getCellEventList();
+            this.listenTo(this.cellEvents, 'change', this.delegateEvents);
 
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
 
@@ -118,7 +118,7 @@ define([
          * Run event handler on cell
          */
         delegateEventToCell: function(key, e) {
-            var tdEl = $(e.target).closest('td')[0];
+            var tdEl = $(e.target).closest('td, th')[0];
 
             for (var i = 0; i < this.subviews.length; i++) {
                 var view = this.subviews[i];
@@ -126,8 +126,7 @@ define([
                     // events cannot be function
                     // this kind of cell views are filtered in CellEventList.getEventsMap()
                     var events = view.events;
-                    // prevent CS error 'cause we must completely repeat Backbone behaviour
-                    if (key in events) { // jshint forin:false
+                    if (key in events) {
                         // run event
                         var method = events[key];
                         if (!_.isFunction(method)) {
@@ -136,12 +135,14 @@ define([
                         if (!method) {
                             break;
                         }
+                        var oldTarget = e.delegateTarget;
                         e.delegateTarget = tdEl;
                         method.call(view, e);
                         // must stop immediate propagation because of redelegation
                         if (e.isPropagationStopped()) {
                             e.stopImmediatePropagation();
                         }
+                        e.delegateTarget = oldTarget;
                     }
                     break;
                 }

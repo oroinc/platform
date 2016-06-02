@@ -153,20 +153,20 @@ define(function(require) {
         },
 
         patchCellConstructor: function(column) {
-            var cellCtor = column.get('cell');
+            var Cell = column.get('cell');
             var inlineEditingPlugin = this;
-            var oldClassName = cellCtor.prototype.className;
-            var splitEventsList = new SplitEventList(cellCtor, 'isEditable', {
+            var oldClassName = Cell.prototype.className;
+            var splitEventsList = new SplitEventList(Cell, 'isEditable', {
                 'dblclick': 'enterEditModeIfNeeded',
                 'mousedown [data-role=edit]': 'enterEditModeIfNeeded',
                 'click': _.noop,
                 'mouseenter': 'delayedIconRender'
             });
-            var extended = cellCtor.extend({
+            var extended = Cell.extend({
                 constructor: function(options) {
                     // column should be initialized to valid work of className generation
                     this.column = options.column;
-                    cellCtor.apply(this, arguments);
+                    Cell.apply(this, arguments);
                 },
                 className: _.isFunction(oldClassName) ?
                     function() {
@@ -208,7 +208,7 @@ define(function(require) {
 
             column.set({
                 cell: extended,
-                oldCell: cellCtor
+                oldCell: Cell
             });
         },
 
