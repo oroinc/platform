@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionListener;
+use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionChangesListener;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 
@@ -19,7 +19,7 @@ class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ServiceLink */
     protected $importLink;
 
-    /** @var WorkflowDefinitionListener */
+    /** @var WorkflowDefinitionChangesListener */
     protected $listener;
 
     protected function setUp()
@@ -32,7 +32,7 @@ class WorkflowDefinitionListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new WorkflowDefinitionListener($this->generator, $this->importLink);
+        $this->listener = new WorkflowDefinitionChangesListener($this->generator, $this->importLink);
     }
 
     protected function tearDown()

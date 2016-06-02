@@ -5,15 +5,17 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Provide logic for workflow scheduled transitions processes synchronization
  */
-class WorkflowDefinitionChangesListener
+class WorkflowDefinitionChangesListener implements EventSubscriberInterface
 {
     /** @var ProcessConfigurationGenerator */
     protected $generator;
@@ -141,5 +143,16 @@ class WorkflowDefinitionChangesListener
         }
 
         return $service;
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return [
+            WorkflowEvents::WORKFLOW_BEFORE_CREATE => 'generateProcessConfigurations',
+            WorkflowEvents::WORKFLOW_BEFORE_UPDATE => 'generateProcessConfigurations',
+            WorkflowEvents::WORKFLOW_CREATED => 'workflowCreated',
+            WorkflowEvents::WORKFLOW_UPDATED => 'workflowUpdated',
+            WorkflowEvents::WORKFLOW_DELETED => 'workflowDeleted'
+        ];
     }
 }
