@@ -2,13 +2,17 @@ define([
     'jquery',
     'underscore',
     'chaplin',
+    'backbone',
     'oroui/js/tools',
     './util'
-], function($, _, Chaplin, tools, util) {
+], function($, _, Chaplin, Backbone, tools, util) {
     'use strict';
 
     var Row;
     var document = window.document;
+
+    // Cached regex to split keys for `delegate`.
+    var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 
     /**
      * Grid row.
@@ -25,12 +29,32 @@ define([
         autoRender: false,
         animationDuration: 0,
 
-        /** @property */
-        events: {
-            'mousedown': 'onMouseDown',
-            'mouseleave': 'onMouseLeave',
-            'mouseup': 'onMouseUp',
-            'click': 'onClick'
+        /**
+         * Override Chaplin delegate events to use events as function
+         * This code supports perfomance fix.
+         */
+        delegateEvents: Backbone.View.prototype.delegateEvents,
+        events: function() {
+            var resultEvents = {};
+
+            var events = this.cellEvents.getEventsMap();
+            // prevent CS error 'cause we must completely repeat Backbone behaviour
+            for (var key in events) { // jshint forin:false
+                var match = key.match(delegateEventSplitter);
+                var eventName = match[1];
+                var selector = match[2];
+                resultEvents[eventName + ' ' + 'td' + (selector ? ' ' + selector : '')] =
+                    _.partial(this.delegateEventToCell, key);
+            }
+
+            // the order is important, please do not move up
+            _.extend(resultEvents, {
+                'mousedown': 'onMouseDown',
+                'mouseleave': 'onMouseLeave',
+                'mouseup': 'onMouseUp',
+                'click': 'onClick'
+            });
+            return resultEvents;
         },
 
         DOUBLE_CLICK_WAIT_TIMEOUT: 170,
@@ -67,13 +91,13 @@ define([
                     if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
                         cell.$el.addClass('skip-row-click');
                     }
-
-                    // use columns collection as event bus since there is no alternatives
-                    _this.columns.trigger('afterMakeCell', _this, cell);
-
                     return cell;
                 };
             }
+
+            // code related to simplified event binding
+            this.cellEvents = this.collection.getCellEventList();
+            this.listenTo(this.cellEvents, 'change', this.delegateEvents);
 
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
 
@@ -100,6 +124,41 @@ define([
                 });
             }
             return cellOptions;
+        },
+
+        /**
+         * Run event handler on cell
+         */
+        delegateEventToCell: function(key, e) {
+            var tdEl = $(e.target).closest('td, th')[0];
+
+            for (var i = 0; i < this.subviews.length; i++) {
+                var view = this.subviews[i];
+                if (view.el === tdEl) {
+                    // events cannot be function
+                    // this kind of cell views are filtered in CellEventList.getEventsMap()
+                    var events = view.events;
+                    if (key in events) {
+                        // run event
+                        var method = events[key];
+                        if (!_.isFunction(method)) {
+                            method = view[events[key]];
+                        }
+                        if (!method) {
+                            break;
+                        }
+                        var oldTarget = e.delegateTarget;
+                        e.delegateTarget = tdEl;
+                        method.call(view, e);
+                        // must stop immediate propagation because of redelegation
+                        if (e.isPropagationStopped()) {
+                            e.stopImmediatePropagation();
+                        }
+                        e.delegateTarget = oldTarget;
+                    }
+                    break;
+                }
+            }
         },
 
         /**
