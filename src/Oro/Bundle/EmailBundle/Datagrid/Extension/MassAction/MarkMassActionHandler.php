@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -137,29 +138,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
                     $isAllSelected,
                     $organization
                 );
-
-            $result = $queryBuilder->getQuery()->iterate();
-            foreach ($result as $entity) {
-                /** @var EmailUser $entity */
-                $entity = $entity[0];
-
-                if ($this->securityFacade->isGranted('EDIT', $entity)) {
-                    $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
-                }
-
-                if ($entity->getEmail()->getThread()) {
-                    $this->needToProcessThreadIds[] = $entity->getEmail()->getThread()->getId();
-                }
-
-                $this->entityManager->persist($entity);
-
-                if (($iteration % self::FLUSH_BATCH_SIZE) === 0) {
-                    $this->entityManager->flush();
-                    $this->entityManager->clear();
-                }
-                $iteration++;
-            }
-            $this->entityManager->flush();
+            $iteration = $this->process($queryBuilder, $markType, $iteration);
         }
 
         return $iteration;
@@ -232,5 +211,39 @@ class MarkMassActionHandler implements MassActionHandlerInterface
             ),
             $options
         );
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param int $markType
+     * @param int $iteration
+     * @return mixed
+     */
+    protected function process($queryBuilder, $markType, $iteration)
+    {
+        $result = $queryBuilder->getQuery()->iterate();
+        foreach ($result as $entity) {
+            /** @var EmailUser $entity */
+            $entity = $entity[0];
+
+            if ($this->securityFacade->isGranted('EDIT', $entity)) {
+                $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
+            }
+
+            if ($entity->getEmail()->getThread()) {
+                $this->needToProcessThreadIds[] = $entity->getEmail()->getThread()->getId();
+            }
+
+            $this->entityManager->persist($entity);
+
+            if (($iteration % self::FLUSH_BATCH_SIZE) === 0) {
+                $this->entityManager->flush();
+                $this->entityManager->clear();
+            }
+            $iteration++;
+        }
+        $this->entityManager->flush();
+
+        return $iteration;
     }
 }
