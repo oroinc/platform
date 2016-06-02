@@ -13,15 +13,18 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class RestDocHandler implements HandlerInterface
@@ -127,15 +130,15 @@ class RestDocHandler implements HandlerInterface
             return;
         }
 
-        $entityType = $this->getEntityType($route);
+        $entityType = $this->extractEntityTypeFromRoute($route);
         if ($entityType) {
             $entityClass = $this->getEntityClass($entityType);
-            $config = $this->getConfig($action, $entityClass);
-            $statusCodes = $config->getConfig()->getStatusCodes();
-            $config->getConfig()->setStatusCodes();
+            $context = $this->getContext($action, $entityClass);
+            $statusCodes = $context->getConfig()->getStatusCodes();
+            $context->getConfig()->setStatusCodes();
 
             $annotation->setSection($entityType);
-            $this->setDescription($annotation, $action, $config->getConfig()->toArray(), $entityClass);
+            $this->setDescription($annotation, $action, $context->getConfig()->toArray(), $entityClass);
             if ($statusCodes) {
                 $this->setStatusCodes($annotation, $statusCodes);
             }
@@ -146,8 +149,8 @@ class RestDocHandler implements HandlerInterface
                     $route->getRequirement(RestRouteOptionsResolver::ID_ATTRIBUTE)
                 );
             }
-            if ($config->hasConfigExtra(FiltersConfigExtra::NAME) && method_exists($config, 'getFilters')) {
-                $this->addFilters($annotation, $config->getFilters());
+            if ($context->hasConfigExtra(FiltersConfigExtra::NAME) && method_exists($context, 'getFilters')) {
+                $this->addFilters($annotation, $context->getFilters(), $context->getMetadata());
             }
         }
     }
@@ -157,7 +160,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return string|null
      */
-    protected function getEntityType(Route $route)
+    protected function extractEntityTypeFromRoute(Route $route)
     {
         return $route->getDefault(RestRouteOptionsResolver::ENTITY_ATTRIBUTE);
     }
@@ -177,12 +180,26 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
+     * @param $entityClass
+     *
+     * @return string
+     */
+    protected function getEntityType($entityClass)
+    {
+        return $this->valueNormalizer->normalizeValue(
+            $entityClass,
+            DataType::ENTITY_TYPE,
+            $this->getRequestType()
+        );
+    }
+
+    /**
      * @param string $action
      * @param string $entityClass
      *
      * @return Context
      */
-    protected function getConfig($action, $entityClass)
+    protected function getContext($action, $entityClass)
     {
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
@@ -287,8 +304,9 @@ class RestDocHandler implements HandlerInterface
     /**
      * @param ApiDoc           $annotation
      * @param FilterCollection $filters
+     * @param EntityMetadata   $metadata
      */
-    protected function addFilters(ApiDoc $annotation, FilterCollection $filters)
+    protected function addFilters(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata)
     {
         foreach ($filters as $key => $filter) {
             if ($filter instanceof StandaloneFilter) {
@@ -310,6 +328,24 @@ class RestDocHandler implements HandlerInterface
                         $options['default'] = $default;
                     }
                 }
+
+                if ($filter instanceof ComparisonFilter) {
+                    if ($metadata->hasAssociation($filter->getField())) {
+                        $acceptances = array_map(function ($className) {
+                            /**
+                             * Entity type may be unavailable due to 'oro_entity.entity_alias_exclusions' rule
+                             */
+                            try {
+                                $type = $this->getEntityType($className);
+                            } catch (EntityAliasNotFoundException $e) {
+                                $type = '';
+                            }
+                            return $type;
+                        }, $metadata->getAssociation($filter->getField())->getAcceptableTargetClassNames());
+                        $options['relation'] = implode(', ', array_filter($acceptances));
+                    }
+                }
+
                 $annotation->addFilter($key, $options);
             }
         }
