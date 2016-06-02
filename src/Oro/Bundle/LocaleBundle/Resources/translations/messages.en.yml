@@ -26,8 +26,28 @@ oro.locale:
         navigation:
             view: 'Localization "%name%"'
 
+        localizedfallbackvalue:
+            entity_label:           'Localized fallback value'
+            entity_plural_label:    'Localized fallback values'
+            id.label:               'ID'
+            fallback.label:         'Fallback'
+            locale.label:           'Locale'
+            string.label:           'String value'
+            text.label:             'Text value'
+
         form:
             choose_parent: 'Choose parent localization...'
+
+    fallback:
+        type:
+            parent_locale: 'Parent Locale'
+            default:       'Default Value'
+
+        value:
+            default:       'Default Value'
+
+        use_fallback:
+            label:         'Use'
 
     controller:
         localization:

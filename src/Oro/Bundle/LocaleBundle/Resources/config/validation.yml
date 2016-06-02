@@ -1,0 +1,13 @@
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    constraints:
+        - Oro\Bundle\LocaleBundle\Validator\Constraints\Localization: ~
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    properties:
+        fallback:
+            - Length:
+                max: 64
+            - Choice: { callback: getFallbacks }
+        string:
+            - Length:
+                max: 255
