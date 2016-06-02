@@ -11,6 +11,8 @@ trait FallbackTrait
     /**
      * @param Collection|LocalizedFallbackValue[] $values
      * @param Locale|null $locale
+     *
+     * @throws \LogicException
      * @return LocalizedFallbackValue
      */
     protected function getLocalizedFallbackValue(Collection $values, Locale $locale = null)
