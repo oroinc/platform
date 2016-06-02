@@ -24,7 +24,7 @@ use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
  */
 class FormFieldsType extends AbstractFormType
 {
-    const NAME = 'form';
+    const NAME = 'form_fields';
 
     /** @var FormLayoutBuilderInterface */
     protected $formLayoutBuilder;
