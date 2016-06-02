@@ -24,7 +24,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class RestDocHandler implements HandlerInterface
@@ -172,24 +172,26 @@ class RestDocHandler implements HandlerInterface
      */
     protected function getEntityClass($entityType)
     {
-        return $this->valueNormalizer->normalizeValue(
+        return ValueNormalizerUtil::convertToEntityClass(
+            $this->valueNormalizer,
             $entityType,
-            DataType::ENTITY_CLASS,
             $this->getRequestType()
         );
     }
 
     /**
-     * @param $entityClass
+     * @param string $entityClass
+     * @param bool   $throwException
      *
-     * @return string
+     * @return string|null
      */
-    protected function getEntityType($entityClass)
+    protected function getEntityType($entityClass, $throwException = true)
     {
-        return $this->valueNormalizer->normalizeValue(
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
             $entityClass,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
+            $this->getRequestType(),
+            $throwException
         );
     }
 
@@ -329,20 +331,18 @@ class RestDocHandler implements HandlerInterface
                     }
                 }
 
-                if ($filter instanceof ComparisonFilter) {
-                    if ($metadata->hasAssociation($filter->getField())) {
-                        $acceptances = array_map(function ($className) {
-                            /**
-                             * Entity type may be unavailable due to 'oro_entity.entity_alias_exclusions' rule
-                             */
-                            try {
-                                $type = $this->getEntityType($className);
-                            } catch (EntityAliasNotFoundException $e) {
-                                $type = '';
-                            }
-                            return $type;
-                        }, $metadata->getAssociation($filter->getField())->getAcceptableTargetClassNames());
-                        $options['relation'] = implode(', ', array_filter($acceptances));
+                if ($filter instanceof ComparisonFilter && $metadata->hasAssociation($filter->getField())) {
+                    $targetClassNames = $metadata->getAssociation($filter->getField())
+                        ->getAcceptableTargetClassNames();
+                    $targetEntityTypes = [];
+                    foreach ($targetClassNames as $targetClassName) {
+                        $targetEntityType = $this->getEntityType($targetClassName, false);
+                        if ($targetEntityType) {
+                            $targetEntityTypes[] = $targetEntityType;
+                        }
+                    }
+                    if (!empty($targetEntityTypes)) {
+                        $options['relation'] = implode(',', $targetEntityTypes);
                     }
                 }
 
