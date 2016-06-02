@@ -8,3 +8,11 @@ services:
             - '@oro_workflow.registry'
         tags:
             - { name: validator.constraint_validator, alias: oro_workflow_transition_is_allowed }
+
+    oro_workflow.validator.workflow_entity:
+        class: Oro\Bundle\WorkflowBundle\Validator\Constraints\WorkflowEntityValidator
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.provider.workflow'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_workflow.validator.workflow_entity }

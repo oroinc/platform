@@ -1,0 +1,9 @@
+oro:
+    workflow:
+        validator:
+            entity:
+                message:
+                    update: Entity could not be edited because of workflow restrictions.
+            field:
+                message:
+                    update: Field could not be edited because of workflow restrictions.

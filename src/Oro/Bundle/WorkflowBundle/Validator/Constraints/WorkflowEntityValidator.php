@@ -1,75 +1,110 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
+namespace Oro\Bundle\WorkflowBundle\Validator\Constraints;
 
-use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
-class WorkflowEntityVoter extends AbstractEntityVoter
+class WorkflowEntityValidator extends ConstraintValidator
 {
     /**
-     * @var array
-     */
-    protected $supportedAttributes = ['DELETE'];
-
-    /**
-     * array(
-     *      '<entityClass>' => array(
-     *          'acls' => array(
+     * [
+     *      '<entityClass>' => [
+     *          'acls' => [
      *              <WorkflowEntityAcl.id> => <WorkflowEntityAcl>,
      *              ...
-     *          ),
-     *          'entities' => array(
-     *              <entityId> => array(
+     *          ],
+     *          'entities' => [
+     *              <entityId> => [
      *                  'update' => true|false,
      *                  'delete' => true|false
-     *              ),
+     *              ],
      *              ...
-     *          )
-     *      ),
+     *          ]
+     *      ],
      *      ...
-     * )
+     * ]
      *
      * @var array
      */
     protected $entityAcls;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsClass($class)
-    {
-        $this->loadEntityAcls();
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
-        return array_key_exists($class, $this->entityAcls);
+    /** @var ConfigProvider */
+    protected $configProvider;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param ConfigProvider $configProvider
+     */
+    public function __construct(DoctrineHelper $doctrineHelper, ConfigProvider $configProvider)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->configProvider = $configProvider;
     }
 
     /**
-     * @param string $class
-     * @param int $identifier
-     * @param string $attribute
-     * @return int
+     * {@inheritdoc}
+     * @param WorkflowEntity $constraint
      */
-    protected function getPermissionForAttribute($class, $identifier, $attribute)
+    public function validate($value, Constraint $constraint)
+    {
+        if (!is_object($value)) {
+            return;
+        }
+
+        // Skip changes for workflow transition form
+        $root = $this->context->getRoot();
+        if ($root instanceof Form){
+            if (WorkflowTransitionType::NAME === $root->getName()) {
+                return;
+            }
+        }
+
+        if (!$this->configProvider->hasConfig($value)){
+            return;
+        }
+
+        $config = $this->configProvider->getConfig($value);
+        if (!$config->get('active_workflow', false, false)) {
+            return;
+        }
+
+        $permissions = $this->getEntityPermissions($value);
+        if ($permissions['update'] === false) {
+            // @todo: checks if entity has changes
+            $this->context->addViolation($constraint->updateEntityMessage);
+        }
+
+        // @todo: Add Violation for fields atPath here
+    }
+
+    /**
+     * @param object $value
+     *
+     * @return mixed
+     */
+    protected function getEntityPermissions($value)
     {
         $this->loadEntityAcls();
+
+        $class      = $this->doctrineHelper->getEntityClass($value);
+        $identifier = $this->doctrineHelper->getSingleEntityIdentifier($value);
+
         $this->loadEntityPermissions($class, $identifier);
 
-        switch ($attribute) {
-            case 'EDIT':
-                return $this->entityAcls[$class]['entities'][$identifier]['update']
-                    ? self::ACCESS_GRANTED
-                    : self::ACCESS_DENIED;
-
-            case 'DELETE':
-                return $this->entityAcls[$class]['entities'][$identifier]['delete']
-                    ? self::ACCESS_GRANTED
-                    : self::ACCESS_DENIED;
-
-            default:
-                return self::ACCESS_ABSTAIN;
-        }
+        return $this->entityAcls[$class]['entities'][$identifier];
     }
 
     /**
