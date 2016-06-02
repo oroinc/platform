@@ -93,12 +93,12 @@ class FixtureLoader
     }
 
     /**
-     * @param string $name
+     * @param string $entityName
      * @param TableNode $table
      */
-    public function loadTable($name, TableNode $table)
+    public function loadTable($entityName, TableNode $table)
     {
-        $className = $this->entityGuesser->guessEntityClass($name);
+        $className = $this->entityGuesser->guessEntityClass($entityName);
 
         $rows = $table->getRows();
         $headers = array_shift($rows);
@@ -118,14 +118,14 @@ class FixtureLoader
     }
 
     /**
-     * @param string $name
-     * @param integer $nbr
+     * @param string $entityName
+     * @param integer $numberOfEntities
      */
-    public function loadRandomEntities($name, $nbr)
+    public function loadRandomEntities($entityName, $numberOfEntities)
     {
-        $className = $this->entityGuesser->guessEntityClass($name);
+        $className = $this->entityGuesser->guessEntityClass($entityName);
 
-        for ($i = 0; $i < $nbr; $i++) {
+        for ($i = 0; $i < $numberOfEntities; $i++) {
             $object = new $className;
             $this->entitySupplement->completeRequired($object);
 
