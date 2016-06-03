@@ -48,8 +48,8 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
      * @param integer     $expectedStatusCode   expected status code of a response
      * @param array       $params               request parameters
      * @param array       $expects              response expectation
-     * @param string|null $idsReplacementMethod method to be used for correction ids
-     * @param bool|null   $reverse
+     * @param string|null $idsReplacementMethod method to be used for ids correction
+     * @param bool        $reverse              indicates that reverse sorting applied
      *
      * @dataProvider getParamsAndExpectation
      */
