@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 /**
  * Class MultiSelectGuesser
@@ -22,17 +21,16 @@ class MultiSelectGuesser extends ChoicesGuesser
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column, DatagridConfiguration $config)
+    public function guessColumnOptions($columnName, $entityName, $column, $enableInlineEditing = false)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
-        $behaviour = $config->offsetGetByPath(Configuration::BEHAVIOUR_CONFIG_PATH);
         if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_MANY) {
-                if ($behaviour === Configuration::BEHAVIOUR_ENABLE_ALL_VALUE) {
+                if ($enableInlineEditing) {
                     $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
                 }
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::MULTI_SELECT;

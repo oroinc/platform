@@ -21,9 +21,6 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
     /** @var MultiSelectGuesser */
     protected $guesser;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $datagridConfiguration;
-
     public function setUp()
     {
         $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
@@ -31,11 +28,6 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->datagridConfiguration = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -67,7 +59,7 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->expects($this->never())
             ->method('getAssociationMapping');
 
-        $guessed = $this->guesser->guessColumnOptions('test', 'test', [], $this->datagridConfiguration);
+        $guessed = $this->guesser->guessColumnOptions('test', 'test', []);
 
         $this->assertEquals([], $guessed);
     }
@@ -140,7 +132,7 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
                 ->willReturn([['key' => 'a1', 'test' => 'A1'], ['key' => 'a2', 'test' => 'A2']]);
         }
 
-        $guessed = $this->guesser->guessColumnOptions('test', 'test', $column, $this->datagridConfiguration);
+        $guessed = $this->guesser->guessColumnOptions('test', 'test', $column);
 
         $this->assertEquals($expected, $guessed);
     }

@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOpti
 
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 /**
  * Class RelationGuesser
@@ -21,7 +20,7 @@ class RelationGuesser implements GuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column, DatagridConfiguration $config)
+    public function guessColumnOptions($columnName, $entityName, $column, $enableInlineEditing = false)
     {
         $result = [];
         if (array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)

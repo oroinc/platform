@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOpti
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 /**
  * Class TextGuesser
@@ -26,16 +25,13 @@ class TextGuesser implements GuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column, DatagridConfiguration $config)
+    public function guessColumnOptions($columnName, $entityName, $column, $enableInlineEditing = false)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $metadata = $entityManager->getClassMetadata($entityName);
 
         $result = [];
-        $behaviour = $config->offsetGetByPath(Configuration::BEHAVIOUR_CONFIG_PATH);
-        if ($behaviour === Configuration::BEHAVIOUR_ENABLE_ALL_VALUE &&
-            $metadata->hasField($columnName) &&
-            !$metadata->hasAssociation($columnName)) {
+        if ($enableInlineEditing && $metadata->hasField($columnName) && !$metadata->hasAssociation($columnName)) {
             $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
         }
 
