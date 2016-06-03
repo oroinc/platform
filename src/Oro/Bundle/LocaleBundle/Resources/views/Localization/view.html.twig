@@ -1,4 +1,5 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% oro_title_set({params : {"%name%": entity.name}}) %}
 
@@ -34,6 +35,11 @@
         'class': 'active',
         'subblocks': [{data: [localizationInfo]}]
     }] %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': 'oro.locale.localization.child_localizations.label'|trans,
+        'subblocks': [{'data' : [dataGrid.renderGrid('oro-locale-localizations-children-grid', { localization_id: entity.id })], spanClass: 'order-line-items'}]
+    }]) %}
 
     {% set id = 'localization-view' %}
     {% set data = {'dataBlocks': dataBlocks} %}

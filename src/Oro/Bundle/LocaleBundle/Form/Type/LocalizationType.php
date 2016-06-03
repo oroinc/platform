@@ -26,7 +26,7 @@ class LocalizationType extends AbstractType
                 LocalizedFallbackValueCollectionType::NAME,
                 [
                     'required' => true,
-                    'label' => 'oro.locale.localization.titles.label',
+                    'label' => 'oro.locale.localization.title.label',
                     'options' => [
                         'constraints' => [new NotBlank(['message' => 'oro.locale.localization.titles.blank'])]
                     ]
@@ -34,13 +34,21 @@ class LocalizationType extends AbstractType
             )
             ->add(
                 'languageCode',
-                'oro_language_select',
-                ['required' => true, 'label' => 'oro.locale.localization.language_code.label']
+                LanguageSelectType::NAME,
+                [
+                    'required' => true,
+                    'label' => 'oro.locale.localization.language_code.label',
+                    'placeholder' => 'oro.locale.localization.form.placeholder.select_language'
+                ]
             )
             ->add(
                 'formattingCode',
-                'oro_formatting_select',
-                ['required' => true, 'label' => 'oro.locale.localization.formatting_code.label']
+                FormattingSelectType::NAME,
+                [
+                    'required' => true,
+                    'label' => 'oro.locale.localization.formatting_code.label',
+                    'placeholder' => 'oro.locale.localization.form.placeholder.select_formatting'
+                ]
             )
             ->add(
                 'parent',

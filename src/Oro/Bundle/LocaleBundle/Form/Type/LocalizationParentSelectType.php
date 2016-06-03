@@ -23,7 +23,7 @@ class LocalizationParentSelectType extends AbstractType
                 'autocomplete_alias' => 'oro_localization_parent',
                 'configs' => [
                     'component' => 'autocomplete-entity-parent',
-                    'placeholder' => 'oro.locale.localization.form.choose_parent'
+                    'placeholder' => 'oro.locale.localization.form.placeholder.select_parent_localization'
                 ]
             ]
         );
