@@ -17,6 +17,8 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Dumper\FileCacheDumper
         arguments:
             - '@symfony2_extension.kernel'
+        tags:
+            - { name: oro_test.dumper, priority: 20 }
 
 
     oro_test.listener.feature_isolation_subscriber:

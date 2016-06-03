@@ -6,7 +6,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-class FileCacheDumper implements CacheDumperInterface
+class FileCacheDumper implements DumperInterface
 {
     /** The max runtime for a process in seconds */
     const TIMEOUT = 30;
@@ -28,7 +28,8 @@ class FileCacheDumper implements CacheDumperInterface
     public function dump()
     {
         $this->runProcess(sprintf(
-            'tar -cf cache.tar -C %s .',
+            'tar -cf %scache.tar -C %s .',
+            $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
             $this->cacheDir
         ));
     }
@@ -43,7 +44,8 @@ class FileCacheDumper implements CacheDumperInterface
             $this->cacheDir
         ));
         $this->runProcess(sprintf(
-            'tar -xf cache.tar -C %s .',
+            'tar -xf %scache.tar -C %s .',
+            $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
             $this->cacheDir
         ));
 
