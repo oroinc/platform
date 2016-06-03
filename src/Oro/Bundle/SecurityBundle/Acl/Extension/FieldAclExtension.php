@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -55,6 +56,9 @@ class FieldAclExtension extends AbstractAclExtension
     /** @var EntityOwnerAccessor */
     protected $entityOwnerAccessor;
 
+    /** @var ConfigProvider */
+    protected $securityConfigProvider;
+
     /**
      * key = Permission
      * value = The identity of a permission mask builder
@@ -86,7 +90,8 @@ class FieldAclExtension extends AbstractAclExtension
         PermissionManager $permissionManager,
         AclGroupProviderInterface $groupProvider,
         DoctrineHelper $doctrineHelper,
-        EntityOwnerAccessor $entityOwnerAccessor
+        EntityOwnerAccessor $entityOwnerAccessor,
+        ConfigProvider $configProvider
     ) {
         $this->entityClassResolver = $entityClassResolver;
         $this->entityMetadataProvider = $entityMetadataProvider;
@@ -95,6 +100,7 @@ class FieldAclExtension extends AbstractAclExtension
         $this->entityOwnerAccessor = $entityOwnerAccessor;
         $this->decisionMaker = $decisionMaker;
         $this->objectIdAccessor = $objectIdAccessor;
+        $this->securityConfigProvider = $configProvider;
 
         $this->permissionToMaskBuilderIdentity = [
             'VIEW'   => FieldMaskBuilder::IDENTITY,
@@ -307,6 +313,12 @@ class FieldAclExtension extends AbstractAclExtension
     {
         // check whether we check permissions for a domain object
         if ($object === null || !is_object($object) || $object instanceof ObjectIdentityInterface) {
+            return true;
+        }
+
+        $securityConfig = $this->securityConfigProvider->getConfig($this->getObjectClassName($object));
+        // check if FACL is enabled for given object. If FACL not enabled - grant access
+        if (!($securityConfig->get('field_acl_supported') && $securityConfig->get('field_acl_enabled'))) {
             return true;
         }
 

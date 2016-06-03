@@ -29,6 +29,12 @@ oro_entity_config:
                 show_restricted_fields:
                     options:
                         default_value: false
+                        required_properties:
+                            -
+                               config_id:
+                                  scope:  security
+                               code:      field_acl_supported
+                               value:     true
                     form:
                         type:               checkbox
                         options:

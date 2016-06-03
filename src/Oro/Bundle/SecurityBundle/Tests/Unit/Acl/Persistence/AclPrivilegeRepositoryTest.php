@@ -94,12 +94,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|\Doctrine\Bundle\DoctrineBundle\Registry $registry */
-        $registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->repository = new AclPrivilegeRepository($this->manager, $this->translator, $registry);
+        $this->repository = new AclPrivilegeRepository($this->manager, $this->translator);
     }
 
     public function testGetPermissionNames()

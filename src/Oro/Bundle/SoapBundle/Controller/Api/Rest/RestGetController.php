@@ -181,8 +181,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                 $voteObject = $this->get('oro_entity.doctrine_helper')->createEntityInstance($entity['entity']);
 
                 foreach ($entity as $field => $value) {
-                    $isForbidden = !$securityFacade->isGranted('VIEW', new FieldVote($voteObject, $field));
-                    if ($isForbidden) {
+                    if (!$securityFacade->isGranted('VIEW', new FieldVote($voteObject, $field))) {
                         continue;
                     }
 
