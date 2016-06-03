@@ -63,7 +63,7 @@ oro:
             mass_notification:
               title: Maintenance Notifications
               template: Email Template
-              template.tooltip: The template to be used by default for maintenance notifications. {{ maintenance_message|nl2br }} variable is used as a placeholder for message coming from maintenance-notification command.
+              template.tooltip: The template to be used by default for maintenance notifications. <br />{{ maintenance_message|nl2br }} variable is used as a placeholder for message coming from maintenance-notification command.
               recipients: Recipients
               recipients.tooltip: Leave this field empty to send maintenance notification emails to all active users. To send notifications only to specific users, write in their email addresses separated by semicolon (;).
 
