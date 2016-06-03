@@ -15,9 +15,6 @@ oro_api:
                     name:
                         exclude: false
         Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee:
-            fields:
-                name:
-                    exclude: false
             filters:
                 fields:
                     name:
