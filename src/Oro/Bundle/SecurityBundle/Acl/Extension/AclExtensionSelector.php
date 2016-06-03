@@ -52,7 +52,7 @@ class AclExtensionSelector
     }
 
     /**
-     * Gets ACL extension by extension key
+     * Gets ACL extension by its key
      *
      * @param string $extensionKey
      *

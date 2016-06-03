@@ -36,10 +36,11 @@ class ObjectIdAccessor
             return $domainObject->getObjectIdentifier();
         } elseif (method_exists($domainObject, 'getId')) {
             return $domainObject->getId();
-        } elseif ($this->doctrineHelper->isManageableEntity($domainObject)
-            && $id = $this->doctrineHelper->getSingleEntityIdentifier($domainObject, false)
-        ) {
-            return $id;
+        } elseif ($this->doctrineHelper->isManageableEntity($domainObject)) {
+            $id = $this->doctrineHelper->getSingleEntityIdentifier($domainObject, false);
+            if ($id) {
+                return $id;
+            }
         }
 
         throw new InvalidDomainObjectException(

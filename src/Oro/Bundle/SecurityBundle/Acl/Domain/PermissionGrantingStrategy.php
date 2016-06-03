@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
@@ -12,6 +11,7 @@ use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 
 /**
  * The ACL extensions based permission granting strategy to apply to the access control list.
@@ -184,7 +184,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             foreach ($aces as $ace) {
                 if ($sid->equals($ace->getSecurityIdentity())) {
                     foreach ($masks as $requiredMask) {
-                        if ($this->compareMasks($requiredMask, $ace, $acl, $aclExt)) {
+                        if ($this->isMasksComparable($requiredMask, $ace, $acl, $aclExt)) {
                             if ($this->isAceApplicable($requiredMask, $ace, $aclExt)) {
                                 $isGranting = $ace->isGranting();
                                 if ($sid instanceof RoleSecurityIdentity) {
@@ -244,16 +244,16 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     }
 
     /**
-     * Compare required and mask from the ace. Return true if ace's mask matches
+     * Compares ACE mask with the required mask
      *
      * @param integer               $requiredMask
      * @param EntryInterface        $ace
      * @param AclInterface          $acl
      * @param AclExtensionInterface $extension
      *
-     * @return bool
+     * @return bool Return true if ace's mask matches
      */
-    protected function compareMasks(
+    protected function isMasksComparable(
         $requiredMask,
         EntryInterface $ace,
         AclInterface $acl,
