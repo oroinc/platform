@@ -125,7 +125,7 @@ class OroLocaleBundleInstaller implements Installation
     {
         $table = $schema->getTable('oro_localization_title');
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_fallback_locale_value'),
+            $schema->getTable('oro_fallback_localization_val'),
             ['localized_value_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]

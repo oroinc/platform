@@ -11,8 +11,6 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
-
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
  * @ORM\Table(name="oro_localization")
@@ -276,12 +274,12 @@ class Localization implements DatesAwareInterface
     }
 
     /**
-     * @param Locale|null $locale
+     * @param Localization|null $localization
      * @return LocalizedFallbackValue
      */
-    public function getTitle(Locale $locale = null)
+    public function getTitle(Localization $localization = null)
     {
-        return $this->getLocalizedFallbackValue($this->titles, $locale);
+        return $this->getLocalizedFallbackValue($this->titles, $localization);
     }
 
     /**

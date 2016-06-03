@@ -1,6 +1,6 @@
 <?php
 
-namespace OroB2B\Bundle\SaleBundle\Tests\Unit\Formatter;
+namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Translation\TranslatorInterface;

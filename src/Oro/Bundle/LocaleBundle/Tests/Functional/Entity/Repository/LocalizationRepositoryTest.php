@@ -1,6 +1,6 @@
 <?php
 
-namespace OroB2B\Bundle\WebsiteBundle\Tests\Functional\Entity\Repository;
+namespace Oro\Bundle\LocaleBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
