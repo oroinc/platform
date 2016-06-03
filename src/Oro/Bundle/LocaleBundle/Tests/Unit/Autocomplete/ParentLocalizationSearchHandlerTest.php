@@ -115,14 +115,14 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $local5 = $this->getLocalization(5, 'test5');
 
         $local4 = $this->getLocalization(4, 'test4');
-        $local4->addChildLocalization($local5);
-        $local4->addChildLocalization($local6);
+        $local4->addChild($local5);
+        $local4->addChild($local6);
 
         $local3 = $this->getLocalization(3, 'test3');
 
         $local42 = $this->getLocalization(42, 'test42');
-        $local42->addChildLocalization($local3);
-        $local42->addChildLocalization($local4);
+        $local42->addChild($local3);
+        $local42->addChild($local4);
 
         $local100 = $this->getLocalization(100, 'test100');
 

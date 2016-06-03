@@ -83,7 +83,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     public function submitDataProvider()
     {
         $localizationItem = $this->createLocalization('name', 'title', 'en', 'en');
-        $parentLocalization = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1]);
+        $parent = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1]);
 
         return [
             'without entity' =>
@@ -107,14 +107,14 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                             'titles' => [['string' => 'new_localization_item_title']],
                             'languageCode' => 'en_US',
                             'formattingCode' => 'en_US',
-                            'parentLocalization' => 1,
+                            'parent' => 1,
                         ],
                     'expectedData' => $this->createLocalization(
                         'new_localization_item_name',
                         'new_localization_item_title',
                         'en_US',
                         'en_US',
-                        $parentLocalization
+                        $parent
                     )
                 ],
         ];
@@ -125,7 +125,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      * @param string $title
      * @param string $languageCode
      * @param string $formattingCode
-     * @param Localization $parentLocalization
+     * @param Localization $parent
      *
      * @return Localization
      */
@@ -134,7 +134,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         $title,
         $languageCode,
         $formattingCode,
-        Localization $parentLocalization = null
+        Localization $parent = null
     ) {
         /** @var Localization $localization */
         $localization = $this->getEntity(
@@ -143,7 +143,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                 'name' => $name,
                 'languageCode' => $languageCode,
                 'formattingCode' => $formattingCode,
-                'parentLocalization' => $parentLocalization,
+                'parent' => $parent,
             ]
         );
 

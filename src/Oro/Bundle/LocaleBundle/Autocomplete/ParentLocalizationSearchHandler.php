@@ -14,8 +14,8 @@ class ParentLocalizationSearchHandler extends AbstractParentEntitySearchHandler
     {
         $ids = [];
 
-        if ($localization instanceof Localization && !$localization->getChildLocalizations()->isEmpty()) {
-            foreach ($localization->getChildLocalizations() as $child) {
+        if ($localization instanceof Localization && !$localization->getChilds()->isEmpty()) {
+            foreach ($localization->getChilds() as $child) {
                 $childrenIds = $this->getChildrenIds($child);
 
                 foreach ($childrenIds as $id) {

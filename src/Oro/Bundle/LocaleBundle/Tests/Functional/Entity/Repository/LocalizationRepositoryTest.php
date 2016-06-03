@@ -6,10 +6,9 @@ use Doctrine\ORM\EntityManager;
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
-use OroB2B\Bundle\WebsiteBundle\Entity\Repository\LocaleRepository;
 
 /**
  * @dbIsolation
@@ -22,7 +21,7 @@ class LocalizationRepositoryTest extends WebTestCase
     protected $em;
 
     /**
-     * @var LocaleRepository
+     * @var LocalizationRepository
      */
     protected $repository;
 
@@ -76,5 +75,13 @@ class LocalizationRepositoryTest extends WebTestCase
         /* @var $localeSettings LocaleSettings */
         $localeSettings = $this->getContainer()->get('oro_locale.settings');
         return $this->repository->findOneByLanguageCode($localeSettings->getLocale());
+    }
+
+    public function testGetLocalizationsCount()
+    {
+        $result = $this->repository->getLocalizationsCount();
+
+        $this->assertInternalType('int', $result);
+        $this->assertEquals(3, $result);
     }
 }
