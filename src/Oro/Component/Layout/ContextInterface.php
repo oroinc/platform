@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface ContextInterface extends \ArrayAccess
 {
@@ -10,7 +10,7 @@ interface ContextInterface extends \ArrayAccess
      * Returns the context variables resolver.
      * This resolver should be used to configure variables which can be added to the context.
      *
-     * @return OptionsResolverInterface
+     * @return OptionsResolver
      */
     public function getResolver();
 

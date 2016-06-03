@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
@@ -16,10 +15,9 @@ class LinkType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver
-            ->setOptional(['path', 'route_name', 'route_parameters', 'text', 'icon']);
+        $resolver->setDefined(['path', 'route_name', 'route_parameters', 'text', 'icon']);
     }
 
     /**
