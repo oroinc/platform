@@ -8,6 +8,8 @@ class WorkflowEntity extends Constraint
 {
     public $updateEntityMessage = 'oro.workflow.validator.entity.message.update';
 
+    public $createFieldMessage = 'oro.workflow.validator.field.message.create';
+
     public $updateFieldMessage = 'oro.workflow.validator.field.message.update';
 
     /**

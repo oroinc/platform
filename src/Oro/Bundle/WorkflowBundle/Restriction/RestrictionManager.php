@@ -140,6 +140,8 @@ class RestrictionManager
         $class = ClassUtils::getClass($entity);
         $id    = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
+        $this->loadClassRestrictions($class);
+        
         return $id
             ? $this->getRestrictionsForEntityIds($class, [$id])
             : $this->filterNewEntityRestrictions($this->restrictions[$class]);
