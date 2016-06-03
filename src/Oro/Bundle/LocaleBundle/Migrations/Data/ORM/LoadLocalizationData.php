@@ -49,4 +49,3 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $this->addReference('default_localization', $localization);
     }
 }
- 
