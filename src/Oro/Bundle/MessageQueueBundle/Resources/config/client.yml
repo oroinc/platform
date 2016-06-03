@@ -4,7 +4,7 @@ services:
         public: false
 
     oro_message_queue.client.driver:
-        class: 'Oro\Component\MessageQueue\Client\Driver'
+        class: 'Oro\Component\MessageQueue\Client\DriverInterface'
         public: false
         factory: ['Oro\Component\MessageQueue\Client\DriverFactory', 'create']
         arguments:

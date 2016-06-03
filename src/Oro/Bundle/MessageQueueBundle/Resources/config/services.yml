@@ -18,7 +18,7 @@ services:
             - { name: 'oro_message_queue.consumption.extension' }
 
     oro_message_queue.consumption.delay_redelivered_message_amqp_extension:
-        class: 'Oro\Component\MessageQueue\Consumption\Extension\DelayRedeliveredMessageAmqpExtension'
+        class: 'OroPro\Component\MessageQueue\Consumption\Extension\DelayRedeliveredMessageAmqpExtension'
         public: false
         tags:
             - { name: 'oro_message_queue.consumption.extension' }

@@ -1,7 +1,8 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
+use OroPro\Component\MessageQueue\Client\AmqpDriver;
+use OroPro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 
@@ -15,7 +16,7 @@ class DriverFactory
      */
     public static function create(ConnectionInterface $connection, Config $config)
     {
-        if ($connection instanceof  AmqpConnection) {
+        if ($connection instanceof AmqpConnection) {
             return new AmqpDriver($connection->createSession(), $config);
         } elseif ($connection instanceof NullConnection) {
             return new NullDriver($connection->createSession(), $config);

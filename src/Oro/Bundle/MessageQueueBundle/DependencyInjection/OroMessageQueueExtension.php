@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 
-use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
+use OroPro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -28,6 +28,10 @@ class OroMessageQueueExtension extends Extension
         }
 
         if (isset($config['transport']['amqp']) && $config['transport']['amqp']) {
+            if (false == class_exists(AmqpConnection::class)) {
+                throw new \LogicException('Amqp transport is not installed.');
+            }
+
             $amqpConfig = $config['transport']['amqp'];
             $connection = new Definition(AmqpConnection::class, [$amqpConfig]);
             $connection->setFactory([AmqpConnection::class, 'createFromConfig']);

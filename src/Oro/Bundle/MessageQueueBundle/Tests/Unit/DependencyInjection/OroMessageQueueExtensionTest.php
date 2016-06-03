@@ -2,7 +2,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
-use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
+use OroPro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\Alias;
