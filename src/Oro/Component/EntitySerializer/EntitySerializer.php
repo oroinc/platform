@@ -258,21 +258,11 @@ class EntitySerializer
         $idFieldName = $this->doctrineHelper->getEntityIdFieldName($entityClass);
         if ($useIdAsKey) {
             foreach ($entities as $entity) {
-                if ($this->fieldFilter
-                    && EntityAwareFilterInterface::FILTER_ALL === $this->fieldFilter->checkEntity($entity)) {
-                    continue;
-                }
-
                 $id          = $this->dataAccessor->getValue($entity, $idFieldName);
                 $result[$id] = $this->serializeItem($entity, $entityClass, $config);
             }
         } else {
             foreach ($entities as $entity) {
-                if ($this->fieldFilter
-                    && EntityAwareFilterInterface::FILTER_ALL === $this->fieldFilter->checkEntity($entity)) {
-                    continue;
-                }
-
                 $result[] = $this->serializeItem($entity, $entityClass, $config);
             }
         }
