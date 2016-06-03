@@ -11,7 +11,6 @@ use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntitySupplement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepository;
-use Symfony\Component\Finder\Finder;
 
 class FixtureLoader
 {
@@ -74,19 +73,7 @@ class FixtureLoader
      */
     public function loadFixtureFile($filename)
     {
-        $finder = new Finder();
-        $paths = array_merge($this->suite->getSetting('paths'), [$this->fallbackPath]);
-        $finder->in($paths)->name($filename);
-
-        if (!$finder->count()) {
-            throw new \InvalidArgumentException(sprintf(
-                'Can\'t find "%s" in pahts %s',
-                $filename,
-                implode(', ', $paths)
-            ));
-        }
-
-        $file = $finder->getIterator()->current()->getRealpath();
+        $file = $this->findFile($filename);
 
         $objects = $this->loader->load($file);
         $this->persister->persist($objects);
@@ -170,5 +157,46 @@ class FixtureLoader
                 $entityReference => $values
             ]
         ];
+    }
+
+    /**
+     * @param string $filename
+     * @return string Real path to file with fuxtures
+     * @throws \InvalidArgumentException
+     */
+    protected function findFile($filename)
+    {
+        $suitePaths = $this->suite->getSetting('paths');
+
+        if (!$file = $this->findFileInPath($filename, $suitePaths)) {
+            $file = $this->findFileInPath($filename, [$this->fallbackPath]);
+        }
+
+        if (!$file) {
+            throw new \InvalidArgumentException(sprintf(
+                'Can\'t find "%s" in pahts %s',
+                $filename,
+                implode(', ', array_merge($suitePaths, [$this->fallbackPath]))
+            ));
+        }
+
+        return $file;
+    }
+
+    /**
+     * @param string $filename
+     * @param array $paths
+     * @return string|null
+     */
+    private function findFileInPath($filename, array $paths)
+    {
+        foreach ($paths as $path) {
+            $file = $path.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        return null;
     }
 }
