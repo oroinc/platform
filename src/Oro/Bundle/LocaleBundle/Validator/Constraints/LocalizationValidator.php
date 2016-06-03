@@ -25,7 +25,7 @@ class LocalizationValidator extends ConstraintValidator
                 'Oro\Bundle\LocaleBundle\Entity\Localization'
             );
         }
-        $parentLocalization = $localization->getParentLocalization();
+        $parentLocalization = $localization->getParent();
 
         if (!$parentLocalization) {
             return;
