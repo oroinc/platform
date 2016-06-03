@@ -103,7 +103,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
             return strpos($tag, 'fixture-') === 0;
         });
 
-        if (0 === count($fixturesTags)) {
+        if (empty($fixturesTags)) {
             return;
         }
 
