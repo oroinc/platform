@@ -15,13 +15,14 @@ use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 /**
- * Calculates and sets the total number of records to "X-Include-Total-Count" response header,
+ * Calculates the total number of records and sets it
+ * to "X-Include-Total-Count" response header,
  * in case if it was requested by "X-Include: totalCount" request header.
  */
 class SetTotalCountHeader implements ProcessorInterface
 {
-    const HEADER_NAME = 'X-Include-Total-Count';
-    const HEADER_VALUE = 'totalCount';
+    const RESPONSE_HEADER_NAME = 'X-Include-Total-Count';
+    const REQUEST_HEADER_VALUE = 'totalCount';
 
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;
@@ -41,13 +42,13 @@ class SetTotalCountHeader implements ProcessorInterface
     {
         /** @var ListContext $context */
 
-        if ($context->getResponseHeaders()->has(self::HEADER_NAME)) {
+        if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
             // total count header is already set
             return;
         }
 
         $xInclude = $context->getRequestHeaders()->get(Context::INCLUDE_HEADER);
-        if (empty($xInclude) || !in_array(self::HEADER_VALUE, $xInclude, true)) {
+        if (empty($xInclude) || !in_array(self::REQUEST_HEADER_VALUE, $xInclude, true)) {
             // total count is not requested
             return;
         }
@@ -65,7 +66,7 @@ class SetTotalCountHeader implements ProcessorInterface
         }
 
         if (null !== $totalCount) {
-            $context->getResponseHeaders()->set(self::HEADER_NAME, $totalCount);
+            $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $totalCount);
         }
     }
 
@@ -77,7 +78,7 @@ class SetTotalCountHeader implements ProcessorInterface
     protected function executeTotalCountCallback($callback)
     {
         if (!is_callable($callback)) {
-            throw new \InvalidArgumentException(
+            throw new \RuntimeException(
                 sprintf(
                     'Expected callable for "totalCount", "%s" given.',
                     is_object($callback) ? get_class($callback) : gettype($callback)
@@ -87,7 +88,7 @@ class SetTotalCountHeader implements ProcessorInterface
 
         $totalCount = call_user_func($callback);
         if (!is_int($totalCount)) {
-            throw new \InvalidArgumentException(
+            throw new \RuntimeException(
                 sprintf(
                     'Expected integer as result of "totalCount" callback, "%s" given.',
                     is_object($totalCount) ? get_class($totalCount) : gettype($totalCount)
@@ -124,7 +125,7 @@ class SetTotalCountHeader implements ProcessorInterface
                 ->setMaxResults(null)
                 ->setFirstResult(null);
         } else {
-            throw new \InvalidArgumentException(
+            throw new \RuntimeException(
                 sprintf(
                     'Expected instance of Doctrine\ORM\QueryBuilder, Doctrine\ORM\Query'
                     . ', Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder'
