@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolation
@@ -275,7 +276,7 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
         foreach ($expectation['data'] as $index => $data) {
             $referenceName = $data['attributes'][$identifier];
 
-            /** @var TestEmployee $testEmployee */
+            /** @var User $referenceObject */
             $referenceObject = $this->getReference($referenceName);
             $expectation['data'][$index]['id'] = (string) $referenceObject->getId();
         }
