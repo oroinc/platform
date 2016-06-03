@@ -161,22 +161,9 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetStepExecutionWithQuery()
     {
-        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configuration->expects($this->once())
-            ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
-        $configuration->expects($this->once())
-            ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
-
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $em->expects($this->exactly(2))
-            ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
 
         $this->managerRegistry->expects($this->never())->method($this->anything());
 
