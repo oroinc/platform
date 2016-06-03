@@ -279,7 +279,7 @@ class OwnerTree implements OwnerTreeInterface
                 $this->getSubordinateBusinessUnitIds($buId),
                 $resultBuIds
             );
-            if (!empty($diff)) {
+            if ($diff) {
                 $resultBuIds = array_merge($resultBuIds, $diff);
             }
         }
@@ -380,9 +380,6 @@ class OwnerTree implements OwnerTreeInterface
     public function addDeepEntity($localLevelEntityId, $deepLevelEntityId)
     {
         if ($deepLevelEntityId !== null) {
-            if (!isset($this->subordinateBusinessUnitIds[$deepLevelEntityId])) {
-                $this->subordinateBusinessUnitIds[$deepLevelEntityId] = [];
-            }
             $this->subordinateBusinessUnitIds[$deepLevelEntityId][] = $localLevelEntityId;
         }
 
@@ -397,33 +394,27 @@ class OwnerTree implements OwnerTreeInterface
     public function buildTree()
     {
         $subordinateBusinessUnitIds = $this->subordinateBusinessUnitIds;
-        foreach ($subordinateBusinessUnitIds as &$deepLevelEntityIds) {
+
+        foreach ($subordinateBusinessUnitIds as $key => $deepLevelEntityIds) {
             if (!empty($deepLevelEntityIds)) {
                 /**
                  * We have to add some element to the end of array and remove it after processing,
                  * otherwise the last element of the original array will not be processed.
                  */
-                $deepLevelEntityIds[] = 'EndOfArray';
-                foreach ($deepLevelEntityIds as $position => $deepLevelEntityId) {
-                    if ($deepLevelEntityId === 'EndOfArray') {
-                        $deepLevelEntityIds = array_slice($deepLevelEntityIds, 0, -1);
-                        break;
-                    }
+                $copy = new \ArrayIterator($deepLevelEntityIds);
+                foreach ($copy as $position => $deepLevelEntityId) {
                     if (!empty($subordinateBusinessUnitIds[$deepLevelEntityId])) {
                         $diff = array_diff(
                             $subordinateBusinessUnitIds[$deepLevelEntityId],
-                            $deepLevelEntityIds
+                            $copy->getArrayCopy()
                         );
-                        if ($diff) {
-                            array_splice(
-                                $deepLevelEntityIds,
-                                $position,
-                                1,
-                                array_merge([$deepLevelEntityId], $diff)
-                            );
+                        foreach ($diff as $value) {
+                            $copy->append($value);
                         }
                     }
                 }
+
+                $subordinateBusinessUnitIds[$key] = $copy->getArrayCopy();
             }
         }
 
