@@ -3,28 +3,25 @@
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 
 class LanguageSelectType extends AbstractType
 {
     const NAME = 'oro_language_select';
 
-    const CONFIG_KEY_DEFAULT_LANGUAGE = 'oro_locale.language';
+    /**
+     * @var LocalizationChoicesProvider
+     */
+    private $provider;
 
     /**
-     * @var ConfigManager
+     * @param LocalizationChoicesProvider $provider
      */
-    private $configManager;
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(LocalizationChoicesProvider $provider)
     {
-        $this->configManager = $configManager;
+        $this->provider = $provider;
     }
 
     /**
@@ -34,8 +31,7 @@ class LanguageSelectType extends AbstractType
     {
         $resolver->setDefaults([
             'empty_value' => false,
-            'choices' => Intl::getLanguageBundle()
-                ->getLanguageNames($this->configManager->get(static::CONFIG_KEY_DEFAULT_LANGUAGE)),
+            'choices' => $this->provider->getLanguageChoices()
         ]);
     }
 
