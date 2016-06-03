@@ -156,7 +156,10 @@ class RestrictionManager
      */
     protected function getRestrictionsForEntityIds($entityClass, array $entityIds)
     {
-        $entitiesRestrictionsData = $this->getRestrictionRepository()->getEntitiesRestrictionsData($entityClass, $entityIds);
+        $entitiesRestrictionsData = $this->getRestrictionRepository()->getEntitiesRestrictionsData(
+            $entityClass,
+            $entityIds
+        );
 
         return array_map(
             function ($item) {

@@ -33,7 +33,7 @@ class WorkflowValidationLoader extends AbstractLoader
     {
         $className = $metadata->getClassName();
 
-        if (!$this->configProvider->hasConfig($className)){
+        if (!$this->configProvider->hasConfig($className)) {
             return false;
         }
 

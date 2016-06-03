@@ -97,8 +97,8 @@ class Workflow
         $this->stepManager             = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager        = $attributeManager ? $attributeManager : new BaseAttributeManager();
         $this->transitionManager       = $transitionManager ? $transitionManager : new TransitionManager();
-        $this->modelRestrictionManager = $modelRestrictionManager 
-            ? $modelRestrictionManager 
+        $this->modelRestrictionManager = $modelRestrictionManager
+            ? $modelRestrictionManager
             : new ModelRestrictionManager();
     }
 

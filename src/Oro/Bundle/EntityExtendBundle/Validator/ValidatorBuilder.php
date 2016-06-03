@@ -129,7 +129,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException(
-                'You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.'
+                'You cannot add custom mappings after setting a custom metadata factory. ' .
+                'Configure your metadata factory instead.'
             );
         }
 
@@ -145,7 +146,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException(
-                'You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.'
+                'You cannot add custom mappings after setting a custom metadata factory. ' .
+                'Configure your metadata factory instead.'
             );
         }
 
@@ -161,7 +163,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException(
-                'You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.'
+                'You cannot add custom mappings after setting a custom metadata factory. ' .
+                'Configure your metadata factory instead.'
             );
         }
 
@@ -177,7 +180,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException(
-                'You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.'
+                'You cannot add custom mappings after setting a custom metadata factory. ' .
+                'Configure your metadata factory instead.'
             );
         }
 
@@ -193,7 +197,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException(
-                'You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.'
+                'You cannot add custom mappings after setting a custom metadata factory. ' .
+                'Configure your metadata factory instead.'
             );
         }
 
@@ -209,7 +214,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException(
-                'You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.'
+                'You cannot add custom mappings after setting a custom metadata factory. ' .
+                'Configure your metadata factory instead.'
             );
         }
 
@@ -225,7 +231,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException(
-                'You cannot enable annotation mapping after setting a custom metadata factory. Configure your metadata factory instead.'
+                'You cannot enable annotation mapping after setting a custom metadata factory. ' .
+                'Configure your metadata factory instead.'
             );
         }
 
@@ -234,7 +241,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
                 !class_exists('Doctrine\Common\Cache\ArrayCache')
             ) {
                 throw new \RuntimeException(
-                    'Enabling annotation based constraint mapping requires the packages doctrine/annotations and doctrine/cache to be installed.'
+                    'Enabling annotation based constraint mapping requires the packages doctrine/annotations and ' .
+                    'doctrine/cache to be installed.'
                 );
             }
 
@@ -267,7 +275,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             null !== $this->annotationReader
         ) {
             throw new ValidatorException(
-                'You cannot set a custom metadata factory after adding custom mappings. You should do either of both.'
+                'You cannot set a custom metadata factory after adding custom mappings. ' .
+                'You should do either of both.'
             );
         }
 
@@ -283,7 +292,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException(
-                'You cannot set a custom metadata cache after setting a custom metadata factory. Configure your metadata factory instead.'
+                'You cannot set a custom metadata cache after setting a custom metadata factory. ' .
+                'Configure your metadata factory instead.'
             );
         }
 
@@ -299,7 +309,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     {
         if (null !== $this->propertyAccessor) {
             throw new ValidatorException(
-                'You cannot set a validator factory after setting a custom property accessor. Remove the call to setPropertyAccessor() if you want to call setConstraintValidatorFactory().'
+                'You cannot set a validator factory after setting a custom property accessor. ' .
+                'Remove the call to setPropertyAccessor() if you want to call setConstraintValidatorFactory().'
             );
         }
 
@@ -339,13 +350,15 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         @trigger_error(
             'The ' .
             __METHOD__ .
-            ' method is deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.',
+            ' method is deprecated since version 2.5 and will be removed in 3.0. ' .
+            'The validator will function without a property accessor.',
             E_USER_DEPRECATED
         );
 
         if (null !== $this->validatorFactory) {
             throw new ValidatorException(
-                'You cannot set a property accessor after setting a custom validator factory. Configure your validator factory instead.'
+                'You cannot set a property accessor after setting a custom validator factory. ' .
+                'Configure your validator factory instead.'
             );
         }
 

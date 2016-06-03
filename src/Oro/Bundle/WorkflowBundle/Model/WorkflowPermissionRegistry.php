@@ -71,7 +71,7 @@ class WorkflowPermissionRegistry
         $class      = $this->doctrineHelper->getEntityClass($entity);
         $identifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
-       return $this->getPermissionByClassAndIdentifier($class, $identifier);
+        return $this->getPermissionByClassAndIdentifier($class, $identifier);
     }
 
     /**
@@ -85,43 +85,6 @@ class WorkflowPermissionRegistry
         $this->loadEntityPermissions($class, $identifier);
 
         return $this->entityAcls[$class]['entities'][$identifier];
-    }
-
-    /**
-     * @param object $entity
-     *
-     * @return bool
-     */
-    public function hasRestrictedEntityFields($entity)
-    {
-        $fields = $this->getRestrictedEntityFields($entity);
-
-        return !empty($fields);
-    }
-
-    /**
-     * @param object $entity
-     *
-     * @return string[]
-     */
-    public function getRestrictedEntityFields($entity)
-    {
-        $class      = $this->doctrineHelper->getEntityClass($entity);
-        $identifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
-        return $this->getRestrictedFieldsByClassAndIdentifier($class, $identifier);
-    }
-
-    /**
-     * @param $class
-     * @param $identifier
-     *
-     * @return string[]
-     */
-    protected function getRestrictedFieldsByClassAndIdentifier($class, $identifier)
-    {
-        // @todo: execute restricted fields for $entity here
-        return [];
     }
 
     /**

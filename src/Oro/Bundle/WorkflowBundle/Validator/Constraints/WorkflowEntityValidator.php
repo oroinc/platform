@@ -120,8 +120,8 @@ class WorkflowEntityValidator extends ConstraintValidator
                 if ($fieldValue !== null) {
                     $this->addFieldViolation($restriction['field'], $constraint->createFieldMessage);
                 }
-            } elseif ($restriction['mode'] === 'disallow') {
-                $this->validateAllowedValues($object, $constraint, $restriction['field'], $restriction['values']);
+            } else {
+                $this->validateAllowedValues($object, $constraint, $restriction);
             }
         }
     }
@@ -146,12 +146,12 @@ class WorkflowEntityValidator extends ConstraintValidator
 
         if ($fields = array_intersect_key($changesSet, $restrictedFields)) {
             foreach ($restrictions as $restriction) {
-                 foreach ($fields as $key => $value) {
+                foreach ($fields as $key => $value) {
                     if ($restriction['field'] === $key) {
                         if ($restriction['mode'] === 'full') {
                             $this->addFieldViolation($key, $constraint->updateFieldMessage);
-                        } elseif ($restriction['mode'] === 'disallow') {
-                            $this->validateAllowedValues($object, $constraint, $key, $restriction['values']);
+                        } else {
+                            $this->validateAllowedValues($object, $constraint, $restriction);
                         }
                     }
                 }
@@ -162,18 +162,23 @@ class WorkflowEntityValidator extends ConstraintValidator
     /**
      * @param object         $object
      * @param WorkflowEntity $constraint
-     * @param string         $field
-     * @param array          $allowedValues
+     * @param array          $restriction
      */
-    protected function validateAllowedValues($object, WorkflowEntity $constraint, $field, array $allowedValues)
+    protected function validateAllowedValues($object, WorkflowEntity $constraint, $restriction)
     {
-        $fieldValue = $this->propertyAccessor->getValue($object, $field);
+        $fieldValue = $this->propertyAccessor->getValue($object, $restriction['field']);
         if (is_object($fieldValue)) {
             $fieldValue = $this->doctrineHelper->getSingleEntityIdentifier($fieldValue);
         }
 
-        if (in_array($fieldValue, $allowedValues, true)) {
-            $this->addFieldViolation($field, $constraint->updateFieldMessage);
+        if ($restriction['mode'] === 'allow') {
+            if (!in_array($fieldValue, $restriction['values'], true)) {
+                $this->addFieldViolation($restriction['field'], $constraint->updateFieldMessage);
+            }
+        } else {
+            if (in_array($fieldValue, $restriction['values'], true)) {
+                $this->addFieldViolation($restriction['field'], $constraint->updateFieldMessage);
+            }
         }
     }
 
