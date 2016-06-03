@@ -72,8 +72,8 @@ services:
     oro_soap.provider.metadata:
         alias: oro_soap.provider.metadata.chain
 
-    oro_soap.entity_serializer.query_factory:
-        class: Oro\Bundle\SoapBundle\Serializer\QueryFactory
+    oro_soap.entity_serializer.acl_protected_query_factory:
+        class: Oro\Bundle\SoapBundle\Serializer\AclProtectedQueryFactory
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
@@ -87,7 +87,7 @@ services:
             - '@oro_entity_config.config_manager'
             - '@oro_soap.entity_accessor'
             - '@oro_soap.entity_data_transformer'
-            - '@oro_soap.entity_serializer.query_factory'
+            - '@oro_soap.entity_serializer.acl_protected_query_factory'
         calls:
             - ["setFieldsFilter", ['@oro_security.serializer.filter_chain']]
 
