@@ -113,7 +113,7 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
         $violationBuilder = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
         $violationBuilder->expects($this->once())
             ->method('atPath')
-            ->with('parentLocalization')
+            ->with('parent')
             ->willReturnSelf();
         $this->context->expects($this->once())
             ->method('buildViolation')

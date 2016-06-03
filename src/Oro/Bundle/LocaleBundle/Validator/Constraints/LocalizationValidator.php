@@ -25,16 +25,16 @@ class LocalizationValidator extends ConstraintValidator
                 'Oro\Bundle\LocaleBundle\Entity\Localization'
             );
         }
-        $parentLocalization = $localization->getParent();
+        $parent = $localization->getParent();
 
-        if (!$parentLocalization) {
+        if (!$parent) {
             return;
         }
-        if ($localization->getId() === $parentLocalization->getId() ||
-            $this->localizationExists($parentLocalization, $localization)
+        if ($localization->getId() === $parent->getId() ||
+            $this->localizationExists($parent, $localization)
         ) {
             $this->context->buildViolation($constraint->messageCircularReference)
-                ->atPath('parentLocalization')
+                ->atPath('parent')
                 ->addViolation();
         }
     }

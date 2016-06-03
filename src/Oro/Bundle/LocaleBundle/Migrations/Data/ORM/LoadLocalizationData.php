@@ -4,7 +4,6 @@ namespace Oro\Bundle\LocaleBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -35,19 +34,17 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     {
         /* @var $localeSettings LocaleSettings */
         $localeSettings = $this->container->get('oro_locale.settings');
-        $code = $localeSettings->getLocale();
+        $localeCode = $localeSettings->getLocale();
+        $title = Intl::getLanguageBundle()->getLanguageName($localeSettings->getLanguage(), $localeCode);
 
         $localization = new Localization();
-        $localization->setName(
-            Intl::getLocaleBundle()->getLocaleName($localeSettings->getLanguage(), $code)
-        );
-        $localization
-            ->setLanguageCode($code)
-            ->setFormattingCode($code);
+        $localization->setName($title)
+            ->setDefaultTitle($title)
+            ->setLanguageCode($localeCode)
+            ->setFormattingCode($localeCode);
 
         $manager->persist($localization);
-        /* @var $manager EntityManager */
-        $manager->flush($localization);
+        $manager->flush();
 
         $this->addReference('default_localization', $localization);
     }
