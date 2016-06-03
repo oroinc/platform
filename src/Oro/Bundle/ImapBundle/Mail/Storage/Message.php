@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 use \Zend\Mail\Header\ContentType;
 use \Zend\Mail\Header\HeaderInterface;
 use \Zend\Mail\Storage\Part;
+use \Zend\Mail\Headers;
 
 class Message extends \Zend\Mail\Storage\Message
 {
@@ -49,6 +50,22 @@ class Message extends \Zend\Mail\Storage\Message
         } else {
             return $this->getPartContentType($this);
         }
+    }
+
+    /**
+     * Fix incorrect create headers object in ZF Mime\Decode::splitMessage
+     *
+     * {@inheritdoc}
+     */
+    public function getHeaders()
+    {
+        parent::getHeaders();
+
+        if (!$this->headers instanceof Headers) {
+            $this->headers = new Headers();
+        }
+
+        return $this->headers;
     }
 
     /**
