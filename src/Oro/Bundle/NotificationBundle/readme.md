@@ -7,16 +7,17 @@ Email notifications for system entity triggers (like entity update, delete, crea
 Console commands
 -------------
 
-oro:mass_notification:send
+oro:maintenance-notification
 -------------
 
-Command to send mass notification emails to all active users.
+Command to send maintenance notification emails.
 
-Params are:
+Parameters are:
 
 - `message` - message to insert into email body. Optional.
-- `subject` - email subject. Optional. If not provided, email subject from configuration is used.
-- `sender_name` - sender name. Optional. If not provided, sender name from configuration is used.
-- `sender_email` - sender email. Optional. If not provided, sender email from configuration is used.
+- `file` - path to the text file with message. Optional.
+- `subject` - email subject. Optional. If not provided, email subject from default maintenance template is used.
+- `sender_name` - sender name. Optional. If not provided, sender name from Notification Rules configuration is used.
+- `sender_email` - sender email. Optional. If not provided, sender email from Notification Rules configuration is used.
 
 To send notifications on production servers --env=prod option should be added to use production email settings.

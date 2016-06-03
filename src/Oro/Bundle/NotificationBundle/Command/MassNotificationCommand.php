@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
  */
 class MassNotificationCommand extends ContainerAwareCommand
 {
-    const COMMAND_NAME = 'oro:mass_notification:send';
+    const COMMAND_NAME = 'oro:maintenance-notification';
 
     /**
      * Console command configuration
@@ -23,7 +23,11 @@ class MassNotificationCommand extends ContainerAwareCommand
     public function configure()
     {
         $this->setName(self::COMMAND_NAME)
-            ->setDescription('Send mass notifications to users')
+            ->setDescription(
+                'Send mass notifications to all active application users ' .
+                'or to the emails specified in the Recipients list under ' .
+                'Maintenance Notification configuration settings'
+            )
             ->addOption(
                 'subject',
                 null,
@@ -35,6 +39,12 @@ class MassNotificationCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Notification message to send'
+            )
+            ->addOption(
+                'file',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Path to the text file with message.'
             )
             ->addOption(
                 'sender_name',
@@ -59,15 +69,24 @@ class MassNotificationCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln($this->getDescription());
         $subject     = $input->getOption('subject');
         $message     = $input->getOption('message');
         $senderName  = $input->getOption('sender_name');
         $senderEmail = $input->getOption('sender_email');
+        $filePath    = $input->getOption('file');
 
-        $service = $this->getContainer()->get('oro_notification.mass_notification_sender');
+        if ($filePath) {
+            if (!is_readable($filePath)) {
+                throw new \RuntimeException(
+                    sprintf('Could not read %s file', $filePath)
+                );
+            }
+            $message = file_get_contents($filePath);
+        }
 
-        $count = $service->send($message, $subject, $senderEmail, $senderName);
+        $sender = $this->getContainer()->get('oro_notification.mass_notification_sender');
+
+        $count = $sender->send($message, $subject, $senderEmail, $senderName);
 
         $output->writeln(sprintf('%s notifications have been added to the queue', $count));
     }

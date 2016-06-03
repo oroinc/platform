@@ -40,9 +40,9 @@ oro:
             owner.label:          Owner
 
         massnotification:
-            entity_label:         Mass Notification
-            entity_plural_label:  Mass Notifications
-            entity_description:   Represent mass email notifications
+            entity_label:         Maintenance Notification
+            entity_plural_label:  Maintenance Notifications
+            entity_description:   Represent maintenance email notifications
             id.label:             Id
             subject.label:        Subject
             sender.label:         From
@@ -53,17 +53,17 @@ oro:
             status.failed:        Failed
             scheduled_at.label:   Scheduled At
             processed_at.label:   Sent At
-            action:               View Mass Notifications
+            action:               View Maintenance Notifications
             block.info:           Notification Details
 
         system_configuration:
             email_notification_sender_email: Sender Email
             email_notification_sender_name: Sender Name
-            title: Notification Configuration
+            title: Notification Rules
             mass_notification:
-              title: Mass Notification Configuration
+              title: Maintenance Notifications
               template: Email Template
-              template.tooltip: The template to be used by default for system notifications.
+              template.tooltip: The template to be used by default for maintenance notifications. {{ maintenance_message|nl2br }} variable is used as a placeholder for message coming from maintenance-notification command.
               recipients: Recipients
-              recipients.tooltip: Leave this field empty to send mass notification emails to all active users. To send notifications only to specific users, write in their email addresses separated by semicolon (;).
+              recipients.tooltip: Leave this field empty to send maintenance notification emails to all active users. To send notifications only to specific users, write in their email addresses separated by semicolon (;).
 
