@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class DatagridTypeTest extends BlockTypeTestCase
 {
@@ -40,7 +40,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals('test-grid', $view->vars['grid_name']);
         $this->assertEquals('test-grid-test-scope', $view->vars['grid_full_name']);
         $this->assertEquals('test-scope', $view->vars['grid_scope']);
-        $this->assertEquals(['foo' => 'bar', 'enableFullScreenLayout' => true], $view->vars['grid_parameters']);
+        $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']);
         $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
     }
 
@@ -61,7 +61,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals('test-grid', $view->vars['grid_name']);
         $this->assertEquals('test-grid', $view->vars['grid_full_name']);
         $this->assertFalse(isset($view->vars['grid_scope']));
-        $this->assertEquals(['foo' => 'bar', 'enableFullScreenLayout' => true], $view->vars['grid_parameters']);
+        $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']);
         $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
     }
 
@@ -103,7 +103,7 @@ class DatagridTypeTest extends BlockTypeTestCase
     {
         $datagridType = new DatagridType($this->nameStrategy);
         $resolver = new OptionsResolver();
-        $datagridType->setDefaultOptions($resolver);
+        $datagridType->configureOptions($resolver);
 
         $actual = $resolver->resolve($options);
         $this->assertEquals($expectedOptions, $actual);
@@ -121,9 +121,7 @@ class DatagridTypeTest extends BlockTypeTestCase
                 ],
                 [
                     'grid_name' => 'test_grid',
-                    'grid_parameters' => [
-                        'enableFullScreenLayout' => true,
-                    ],
+                    'grid_parameters' => [],
                     'grid_render_parameters' => [],
                 ]
             ],
