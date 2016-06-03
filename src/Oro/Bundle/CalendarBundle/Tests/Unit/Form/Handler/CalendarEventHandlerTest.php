@@ -175,6 +175,10 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $owner->setOrganization($organization);
 
         $this->request->setMethod($method);
+        $this->form->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+
         $defaultCalendar = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Calendar')
             ->disableOriginalConstructor()
             ->getMock();
@@ -194,12 +198,15 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($owner));
 
         $this->form->expects($this->any())
-            ->method('get')
-            ->will($this->returnValue($this->form));
-
-        $this->form->expects($this->any())
             ->method('getData')
             ->will($this->returnValue([$context]));
+
+        $this->activityManager->expects($this->once())
+            ->method('setActivityTargets')
+            ->with(
+                $this->identicalTo($this->entity),
+                $this->identicalTo([$context, $owner])
+            );
 
         $this->activityManager->expects($this->never())
             ->method('removeActivityTarget');
