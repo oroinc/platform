@@ -13,11 +13,12 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
+    use LimitsExtensionsCommandTrait;
 
     /**
      * @var QueueConsumer
      */
-    private $consumer;
+    protected $consumer;
 
     /**
      * ConsumeMessagesCommand constructor.
@@ -35,7 +36,10 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     protected function configure()
     {
+        $this->configureLimitsExtensions();
+
         $this
+            ->setName('oro:message-queue:transport:consume')
             ->setDescription('A worker that consumes message from a broker. '.
                 'To use this broker you have to explicitly set a queue to consume from '.
                 'and a message processor service')
@@ -49,8 +53,6 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $loggerExtension = new LoggerExtension(new ConsoleLogger($output));
-
         $queueName = $input->getArgument('queue');
 
         /** @var MessageProcessorInterface $messageProcessor */
@@ -63,7 +65,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
             ));
         }
 
-        $runtimeExtensions = new Extensions([$loggerExtension]);
+        $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
 
         try {
             $this->consumer->consume($queueName, $messageProcessor, $runtimeExtensions);

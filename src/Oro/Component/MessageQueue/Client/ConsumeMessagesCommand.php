@@ -3,6 +3,7 @@ namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\Extensions;
+use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,6 +13,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsumeMessagesCommand extends Command
 {
+    use LimitsExtensionsCommandTrait;
+
    /**
     * @var QueueConsumer
     */
@@ -25,7 +28,7 @@ class ConsumeMessagesCommand extends Command
     /**
      * @var DriverInterface
      */
-    private $session;
+    protected $session;
 
     /**
      * @param QueueConsumer $consumer
@@ -46,6 +49,8 @@ class ConsumeMessagesCommand extends Command
      */
     protected function configure()
     {
+        $this->configureLimitsExtensions();
+
         $this
             ->setDescription('A client\'s worker that processes messages. '.
                 'By default it connects to default queue. '.
@@ -60,14 +65,13 @@ class ConsumeMessagesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $config = $this->session->getConfig();
-        
-        $loggerExtension = new LoggerExtension(new ConsoleLogger($output));
-        $runtimeExtensions = new Extensions([$loggerExtension]);
 
         $queueName = $input->getArgument('queue')
             ? $config->formatName($input->getArgument('queue'))
             : $config->getDefaultQueueName()
         ;
+
+        $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
 
         try {
             $this->consumer->consume($queueName, $this->processor, $runtimeExtensions);
