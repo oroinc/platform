@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
@@ -15,9 +14,9 @@ class OrderedListType extends AbstractContainerType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['type', 'start']);
+        $resolver->setDefined(['type', 'start']);
     }
 
     /**
