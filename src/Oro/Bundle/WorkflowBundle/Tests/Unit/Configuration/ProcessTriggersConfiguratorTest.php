@@ -57,7 +57,8 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
 
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->processCronScheduler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler')
+        $this->processCronScheduler = $this
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -72,50 +73,43 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     public function testImport()
     {
-        $triggersConfiguration = ['...triggers_configuration'];
+        $triggersConfiguration = ['definition_name' => [['exist'], ['not_exist']]];
         $definition = new ProcessDefinition();
         $definition->setName('definition_name');
-        $definitions = [$definition];
+        $definitions = ['definition_name' => $definition];
 
         $existentNewTrigger = new ProcessTrigger();
+        $existentNewTrigger->setDefinition($definition);
         $nonExistentNewTrigger = new ProcessTrigger();
 
-        $this->configurationBuilder->expects($this->once())
-            ->method('buildProcessTriggers')
-            ->with($triggersConfiguration, ['definition_name' => $definition])
-            ->willReturn([$existentNewTrigger, $nonExistentNewTrigger]);
+        $this->configurationBuilder->expects($this->exactly(2))
+            ->method('buildProcessTrigger')
+            ->willReturnMap([
+                [['exist'], $definition, $existentNewTrigger],
+                [['not_exist'], $definition, $nonExistentNewTrigger],
+            ]);
 
         $this->assertManagerRegistryCalled($this->triggerEntityClass);
         $this->assertObjectManagerCalledForRepository($this->triggerEntityClass);
 
-        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockExistentTrigger */
         $mockExistentTrigger = $this->getMock($this->triggerEntityClass);
 
-        $this->repository->expects($this->exactly(2))->method('findEqualTrigger')->willReturnMap(
-            [
-                [$existentNewTrigger, $mockExistentTrigger],
-                [$nonExistentNewTrigger, null]
-            ]
-        );
-
+        $nonExistentNewTrigger->setDefinition($definition);
         $mockExistentTrigger->expects($this->once())->method('import')->with($existentNewTrigger);
+        $mockExistentTrigger->expects($this->once())->method('isDefinitiveEqual')->willReturn($mockExistentTrigger);
+        $mockExistentTrigger->expects($this->exactly(2))->method('getCron')->willReturn('* * * * *');
 
-        $this->objectManager->expects($this->once())->method('persist')->with($nonExistentNewTrigger);
-
-        $this->objectManager->expects($this->once())->method('flush');
+        $this->objectManager->expects($this->once())->method('persist')->with($existentNewTrigger);
 
         //schedules
 
-        $this->repository->expects($this->once())->method('findAllCronTriggers')->willReturn([$mockExistentTrigger]);
+        $this->repository->expects($this->once())->method('findByDefinition')->willReturn([$mockExistentTrigger]);
 
         $this->processCronScheduler->expects($this->once())->method('add')->with($mockExistentTrigger);
 
-        $schedulesCreated = [new Schedule()];
-        $this->processCronScheduler->expects($this->once())->method('flush')->willReturn($schedulesCreated);
-
         //run import
         $this->processTriggersImport->configureTriggers($triggersConfiguration, $definitions);
-        $this->assertEquals($schedulesCreated, $this->processTriggersImport->getCreatedSchedules());
     }
 
     /**
@@ -138,10 +132,5 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($this->repository);
-    }
-
-    public function testGetCreatedSchedules()
-    {
-        $this->assertEquals([], $this->processTriggersImport->getCreatedSchedules(), 'no imports called. result []');
     }
 }

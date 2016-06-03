@@ -45,6 +45,9 @@ class ProcessConfigurator implements LoggerAwareInterface
         $this->setLogger(new NullLogger());
     }
 
+    /**
+     * @param LoggerInterface $logger
+     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;

@@ -48,7 +48,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $this->scheduleClass = 'Oro\Bundle\CronBundle\Entity\Schedule';
         $this->objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
+        $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
 
         $this->processCronScheduler = new ProcessTriggerCronScheduler(
             $this->scheduleManager,
@@ -98,8 +98,9 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->processCronScheduler->add($trigger);
 
         $this->objectManager->expects($this->once())->method('flush');
-        $this->assertEquals([$scheduleEntity], $this->processCronScheduler->flush());
-        $this->assertEquals([], $this->processCronScheduler->flush(), 'second flush should be empty');
+        $this->processCronScheduler->flush();
+        // second flush should be empty
+        $this->processCronScheduler->flush();
     }
 
     public function testAddException()

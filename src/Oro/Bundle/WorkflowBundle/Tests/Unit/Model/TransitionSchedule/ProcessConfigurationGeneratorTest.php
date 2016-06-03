@@ -87,11 +87,11 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
                 ],
                 [
                     ProcessConfigurationProvider::NODE_DEFINITIONS => [
-                        'workflow_name_transition_one_schedule_process' => [
-                            'label' => 'Scheduled transition "workflow_name_transition_one_schedule_process"',
+                        'stpn__workflow_name__transition_one' => [
+                            'label' => 'Scheduled transition "stpn__workflow_name__transition_one"',
                             'entity' => $this->workflowItemEntityClass,
                             'order' => 0,
-                            'exclude_definitions' => ['workflow_name_transition_one_schedule_process'],
+                            'exclude_definitions' => ['stpn__workflow_name__transition_one'],
                             'actions_configuration' => [
                                 '@run_action_group' => [
                                     'action_group' => 'oro_workflow_transition_process_schedule',
@@ -103,11 +103,11 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
                             ],
                             'pre_conditions' => []
                         ],
-                        'workflow_name_transition_three_schedule_process' => [
-                            'label' => 'Scheduled transition "workflow_name_transition_three_schedule_process"',
+                        'stpn__workflow_name__transition_three' => [
+                            'label' => 'Scheduled transition "stpn__workflow_name__transition_three"',
                             'entity' => $this->workflowItemEntityClass,
                             'order' => 0,
-                            'exclude_definitions' => ['workflow_name_transition_three_schedule_process'],
+                            'exclude_definitions' => ['stpn__workflow_name__transition_three'],
                             'actions_configuration' => [
                                 '@run_action_group' => [
                                     'action_group' => 'oro_workflow_transition_process_schedule',
@@ -121,10 +121,10 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
                         ]
                     ],
                     ProcessConfigurationProvider::NODE_TRIGGERS => [
-                        'workflow_name_transition_one_schedule_process' => [
+                        'stpn__workflow_name__transition_one' => [
                             ['cron' => '42 * * * *']
                         ],
-                        'workflow_name_transition_three_schedule_process' => [
+                        'stpn__workflow_name__transition_three' => [
                             ['cron' => '* * * * *']
                         ]
                     ]

@@ -87,6 +87,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
                     $existingTrigger = $this->pickExistentTrigger($storedTriggers, $newTrigger);
                     if ($existingTrigger) {
                         $this->update($existingTrigger, $newTrigger);
+                        $newTrigger = $existingTrigger;
                     } else {
                         $this->create($newTrigger);
                     }
@@ -188,7 +189,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         $this->logger->info(
             sprintf(
                 '>> process trigger: %s [%s] - %s',
-                $trigger->getDefinition()->getName(),
+                $trigger->getDefinition() ? $trigger->getDefinition()->getName() : '',
                 $trigger->getEvent() ?: 'cron:' . $trigger->getCron(),
                 $action
             )
@@ -234,7 +235,5 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
             $this->dirty = false;
             $this->processCronScheduler->flush();
         }
-
-
     }
 }

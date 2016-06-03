@@ -47,7 +47,6 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
 
     /**
      * @param array $definitionsConfiguration
-     * @return ProcessDefinition[]
      */
     public function configureDefinitions(array $definitionsConfiguration)
     {
@@ -80,6 +79,9 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
         }
     }
 
+    /**
+     * @param string $name
+     */
     public function removeDefinition($name)
     {
         /**@var ProcessDefinition $definition */

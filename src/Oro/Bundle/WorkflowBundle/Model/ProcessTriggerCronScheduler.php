@@ -71,6 +71,9 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
         }
     }
 
+    /**
+     * @param ProcessTrigger $trigger
+     */
     public function removeSchedule(ProcessTrigger $trigger)
     {
         if (!$trigger->getCron()) {
@@ -125,6 +128,10 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
         return $objectManager;
     }
 
+    /**
+     * @param string $action
+     * @param Schedule $schedule
+     */
     protected function notify($action, Schedule $schedule)
     {
         $this->logger->info(sprintf(

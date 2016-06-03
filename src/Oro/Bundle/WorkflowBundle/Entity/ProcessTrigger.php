@@ -416,6 +416,10 @@ class ProcessTrigger
         return $this;
     }
 
+    /**
+     * @param ProcessTrigger $trigger
+     * @return bool
+     */
     public function isDefinitiveEqual(ProcessTrigger $trigger)
     {
         if ($this->event !== $trigger->getEvent()
@@ -425,9 +429,9 @@ class ProcessTrigger
             return false;
         }
 
-        $own_definition = $this->definition ? $this->definition->getName() : null;
-        $outer_definition = $trigger->getDefinition() ? $trigger->getDefinition()->getName() : null;
+        $ownDefinition = $this->definition ? $this->definition->getName() : null;
+        $outerDefinition = $trigger->getDefinition() ? $trigger->getDefinition()->getName() : null;
 
-        return $own_definition === $outer_definition;
+        return $ownDefinition === $outerDefinition;
     }
 }

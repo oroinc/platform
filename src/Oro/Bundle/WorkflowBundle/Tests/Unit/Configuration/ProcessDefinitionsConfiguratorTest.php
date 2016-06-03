@@ -73,14 +73,8 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $definitionStoredExistent->expects($this->once())->method('import')->with($newDefinitionExistent);
-
         $this->objectManager->expects($this->once())->method('persist')->with($newDefinitionNonExistent);
-        $this->objectManager->expects($this->once())->method('flush');
-
-        $this->assertEquals(
-            ['existent' => $definitionStoredExistent, 'nonExistent' => $newDefinitionNonExistent],
-            $this->processDefinitionsConfigurator->configureDefinitions($definitionsConfiguration)
-        );
+        $this->processDefinitionsConfigurator->configureDefinitions($definitionsConfiguration);
     }
 
     /**
