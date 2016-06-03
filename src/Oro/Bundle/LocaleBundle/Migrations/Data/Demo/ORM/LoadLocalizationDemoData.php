@@ -46,20 +46,26 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
     public function load(ObjectManager $manager)
     {
         $registry = [];
+        $localeSettings = $this->container->get('oro_locale.settings');
+        $localeCode = $localeSettings->getLocale();
+
         foreach ($this->localizations as $item) {
             $code = $item['language'];
-            $name = $this->getLocaleNameByCode($code);
+            $name = Intl::getLanguageBundle()->getLanguageName($code, $localeCode);
 
             $localization = new Localization();
             $localization
                 ->setLanguageCode($item['language'])
                 ->setFormattingCode($item['formatting'])
-                ->setName($name);
+                ->setName($name)
+                ->setDefaultTitle($name);
 
             if ($item['parent']) {
                 $parentCode = $item['parent'];
 
-                $localization->setParent($registry[$parentCode]);
+                if (isset($registry[$parentCode])) {
+                    $localization->setParentLocalization($registry[$parentCode]);
+                }
             }
             $registry[$code] = $localization;
 
@@ -69,14 +75,5 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
         }
 
         $manager->flush();
-    }
-
-    /**
-     * @param string $code
-     * @return string
-     */
-    protected function getLocaleNameByCode($code)
-    {
-        return Intl::getLocaleBundle()->getLocaleName($code, $this->container->get('oro_locale.settings')->getLocale());
     }
 }
