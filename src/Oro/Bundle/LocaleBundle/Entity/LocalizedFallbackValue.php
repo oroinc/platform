@@ -84,7 +84,7 @@ class LocalizedFallbackValue
      * @var Localization|null
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\LocaleBundle\Entity\Localization")
-     * @ORM\JoinColumn(name="locale_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="localization_id", referencedColumnName="id", onDelete="CASCADE")
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
