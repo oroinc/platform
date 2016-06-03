@@ -34,7 +34,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     {
         $localeSettings = $this->container->get('oro_locale.settings');
         $localeCode = $localeSettings->getLocale();
-        $title = Intl::getLocaleBundle()->getLocaleName($localeSettings->getLanguage(), $localeCode);
+        $title = Intl::getLanguageBundle()->getLanguageName($localeSettings->getLanguage(), $localeCode);
 
         $localization = new Localization();
         $localization->setName($title)
