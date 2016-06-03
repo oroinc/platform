@@ -82,7 +82,7 @@ services:
         arguments:
             - '@oro_message_queue.client.queue_consumer'
             - '@oro_message_queue.client.delegate_message_processor'
-            - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
         tags:
             - { name: 'console.command' }
 

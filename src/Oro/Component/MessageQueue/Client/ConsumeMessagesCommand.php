@@ -1,14 +1,13 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
+use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\Extensions;
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsumeMessagesCommand extends Command
@@ -26,22 +25,25 @@ class ConsumeMessagesCommand extends Command
     protected $processor;
 
     /**
-     * @var DriverInterface
+     * @var DestinationMetaRegistry
      */
-    protected $session;
+    private $destinationMetaRegistry;
 
     /**
      * @param QueueConsumer $consumer
      * @param DelegateMessageProcessor $processor
-     * @param DriverInterface $session
+     * @param DestinationMetaRegistry $destinationMetaRegistry
      */
-    public function __construct(QueueConsumer $consumer, DelegateMessageProcessor $processor, DriverInterface $session)
-    {
+    public function __construct(
+        QueueConsumer $consumer,
+        DelegateMessageProcessor $processor,
+        DestinationMetaRegistry $destinationMetaRegistry
+    ) {
         parent::__construct('oro:message-queue:consume');
 
         $this->consumer = $consumer;
         $this->processor = $processor;
-        $this->session = $session;
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
     }
 
     /**
@@ -55,7 +57,7 @@ class ConsumeMessagesCommand extends Command
             ->setDescription('A client\'s worker that processes messages. '.
                 'By default it connects to default queue. '.
                 'It select an appropriate message processor based on a message headers')
-            ->addArgument('queue', InputArgument::OPTIONAL, 'Queues to consume from')
+            ->addArgument('clientDestinationName', InputArgument::OPTIONAL, 'Queues to consume messages from')
         ;
     }
 
@@ -64,17 +66,23 @@ class ConsumeMessagesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $config = $this->session->getConfig();
-
-        $queueName = $input->getArgument('queue')
-            ? $config->formatName($input->getArgument('queue'))
-            : $config->getDefaultQueueName()
-        ;
+        if ($clientDestinationName = $input->getArgument('clientDestinationName')) {
+            $this->consumer->bind(
+                $this->destinationMetaRegistry->getDestinationMeta($clientDestinationName)->getTransportName(),
+                $this->processor
+            );
+        } else {
+            foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $destinationMeta) {
+                $this->consumer->bind(
+                    $destinationMeta->getTransportName(),
+                    $this->processor
+                );
+            }
+        }
 
         $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
 
         try {
-            $this->consumer->bind($queueName, $this->processor);
             $this->consumer->consume($runtimeExtensions);
         } finally {
             $this->consumer->getConnection()->close();

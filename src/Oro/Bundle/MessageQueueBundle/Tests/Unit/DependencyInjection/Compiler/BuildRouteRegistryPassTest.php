@@ -6,6 +6,7 @@ use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\Destin
 use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\InvalidTopicSubscriber;
 use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\OnlyTopicNameTopicSubscriber;
 use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\ProcessorNameTopicSubscriber;
+use Oro\Component\MessageQueue\Client\Config;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -93,7 +94,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRoutes, $router->getArgument(1));
     }
 
-    public function testShouldSetDestinationToNullIfIsNotSetInTag()
+    public function testShouldSetDefaultDestinationIfNotSetInTag()
     {
         $container = new ContainerBuilder();
 
@@ -112,7 +113,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
 
         $expectedRoutes = [
             'topic' =>  [
-                ['processor-service-id', null]
+                ['processor-service-id', Config::DEFAULT_QUEUE_NAME]
             ]
         ];
 
@@ -136,7 +137,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
 
         $expectedRoutes = [
             'topic-subscriber-name' =>  [
-                ['processor-service-id', null]
+                ['processor-service-id', Config::DEFAULT_QUEUE_NAME]
             ]
         ];
 
@@ -160,7 +161,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
 
         $expectedRoutes = [
             'topic-subscriber-name' =>  [
-                ['subscriber-processor-name', null]
+                ['subscriber-processor-name', Config::DEFAULT_QUEUE_NAME]
             ]
         ];
 

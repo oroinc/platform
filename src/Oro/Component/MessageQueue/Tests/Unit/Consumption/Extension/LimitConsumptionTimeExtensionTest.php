@@ -23,9 +23,8 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($context->isExecutionInterrupted());
 
         // test
-        $extension = new LimitConsumptionTimeExtension(new \DateTime('+1 second'));
+        $extension = new LimitConsumptionTimeExtension(new \DateTime('-2 second'));
 
-        sleep(2);
         $extension->onBeforeReceive($context);
 
         $this->assertTrue($context->isExecutionInterrupted());
@@ -39,9 +38,8 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($context->isExecutionInterrupted());
 
         // test
-        $extension = new LimitConsumptionTimeExtension(new \DateTime('+1 second'));
+        $extension = new LimitConsumptionTimeExtension(new \DateTime('-2 second'));
 
-        sleep(2);
         $extension->onIdle($context);
 
         $this->assertTrue($context->isExecutionInterrupted());
@@ -55,9 +53,8 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($context->isExecutionInterrupted());
 
         // test
-        $extension = new LimitConsumptionTimeExtension(new \DateTime('+1 second'));
+        $extension = new LimitConsumptionTimeExtension(new \DateTime('-2 second'));
 
-        sleep(2);
         $extension->onPostReceived($context);
 
         $this->assertTrue($context->isExecutionInterrupted());
@@ -71,7 +68,7 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($context->isExecutionInterrupted());
 
         // test
-        $extension = new LimitConsumptionTimeExtension(new \DateTime('+1 day'));
+        $extension = new LimitConsumptionTimeExtension(new \DateTime('+2 second'));
 
         $extension->onBeforeReceive($context);
 
@@ -86,7 +83,7 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($context->isExecutionInterrupted());
 
         // test
-        $extension = new LimitConsumptionTimeExtension(new \DateTime('+1 day'));
+        $extension = new LimitConsumptionTimeExtension(new \DateTime('+2 second'));
 
         $extension->onIdle($context);
 
@@ -101,7 +98,7 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($context->isExecutionInterrupted());
 
         // test
-        $extension = new LimitConsumptionTimeExtension(new \DateTime('+1 day'));
+        $extension = new LimitConsumptionTimeExtension(new \DateTime('+2 second'));
 
         $extension->onPostReceived($context);
 

@@ -7,6 +7,7 @@ use Oro\Component\MessageQueue\Client\ConsumptionExtension\CreateQueueExtension;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use Psr\Log\LoggerInterface;
 
 class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,8 +25,16 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCreateQueueUsingQueueNameFromContext()
     {
+        $loggerMock = $this->getMock(LoggerInterface::class);
+        $loggerMock
+            ->expects($this->once())
+            ->method('debug')
+            ->with('[CreateQueueExtension] Make sure the queue theQueueName exists on a broker side.')
+        ;
+
         $context = new Context($this->createSessionMock());
         $context->setQueueName('theQueueName');
+        $context->setLogger($loggerMock);
 
         $driverMock = $this->createDriverMock();
         $driverMock
@@ -36,7 +45,7 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension = new CreateQueueExtension($driverMock);
 
-        $extension->onStart($context);
+        $extension->onBeforeReceive($context);
     }
 
     /**

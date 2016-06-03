@@ -44,7 +44,7 @@ class DestinationsCommand extends Command
         $count = 0;
         foreach ($this->destinationRegistry->getDestinationsMeta() as $destination) {
             $table->addRow([
-                $destination->getClientName() ?: 'NULL',
+                $destination->getClientName(),
                 $destination->getTransportName(),
                 implode(PHP_EOL, $destination->getSubscribers())
             ]);

@@ -5,6 +5,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationM
 use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\DestinationNameTopicSubscriber;
 use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\OnlyTopicNameTopicSubscriber;
 use Oro\Bundle\MessageQueueBundle\Tests\DependencyInjection\Compiler\Mock\ProcessorNameTopicSubscriber;
+use Oro\Component\MessageQueue\Client\Config;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -47,7 +48,7 @@ class BuildDestinationMetaRegistryPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $expectedDestinations = [
-            '' =>  ['subscribers' => ['processor']]
+            Config::DEFAULT_QUEUE_NAME =>  ['subscribers' => ['processor']]
         ];
 
         $this->assertEquals($expectedDestinations, $registry->getArgument(1));
@@ -69,7 +70,7 @@ class BuildDestinationMetaRegistryPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $expectedDestinations = [
-            '' =>  ['subscribers' => ['processor-service-id']]
+            Config::DEFAULT_QUEUE_NAME =>  ['subscribers' => ['processor-service-id']]
         ];
 
         $this->assertEquals($expectedDestinations, $registry->getArgument(1));
@@ -115,7 +116,7 @@ class BuildDestinationMetaRegistryPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $expectedDestinations = [
-            '' =>  ['subscribers' => ['processor-service-id']]
+            Config::DEFAULT_QUEUE_NAME =>  ['subscribers' => ['processor-service-id']]
         ];
 
         $this->assertEquals($expectedDestinations, $registry->getArgument(1));
@@ -137,7 +138,7 @@ class BuildDestinationMetaRegistryPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $expectedDestinations = [
-            '' =>  ['subscribers' => ['subscriber-processor-name']]
+            Config::DEFAULT_QUEUE_NAME =>  ['subscribers' => ['subscriber-processor-name']]
         ];
 
         $this->assertEquals($expectedDestinations, $registry->getArgument(1));

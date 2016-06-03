@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -42,11 +43,13 @@ class BuildRouteRegistryPass implements CompilerPassInterface
     {
         foreach ($class::getSubscribedTopics() as $topicName => $params) {
             if (is_string($params)) {
-                $configs[$params][] = [$serviceId, null];
+                $configs[$params][] = [$serviceId, Config::DEFAULT_QUEUE_NAME];
             } elseif (is_array($params)) {
                 $processorName = empty($params['processorName']) ? $serviceId : $params['processorName'];
-                $destinationName = empty($params['destinationName']) ? null : $params['destinationName'];
-
+                $destinationName = empty($params['destinationName']) ?
+                    Config::DEFAULT_QUEUE_NAME :
+                    $params['destinationName'];
+                
                 $configs[$topicName][] = [$processorName, $destinationName];
             } else {
                 throw new \LogicException(sprintf(
@@ -75,8 +78,10 @@ class BuildRouteRegistryPass implements CompilerPassInterface
             }
 
             $processorName = empty($tagAttribute['processorName']) ? $serviceId : $tagAttribute['processorName'];
-            $destinationName = empty($tagAttribute['destinationName']) ? null : $tagAttribute['destinationName'];
-
+            $destinationName = empty($tagAttribute['destinationName']) ?
+                Config::DEFAULT_QUEUE_NAME :
+                $tagAttribute['destinationName'];
+            
             $configs[$tagAttribute['topicName']][] = [$processorName, $destinationName];
         }
     }

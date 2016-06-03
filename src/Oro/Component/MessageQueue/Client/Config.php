@@ -6,6 +6,7 @@ class Config
     const PARAMETER_TOPIC_NAME = 'oro.message_queue.client.topic_name';
     const PARAMETER_PROCESSOR_NAME = 'oro.message_queue.client.processor_name';
     const PARAMETER_QUEUE_NAME = 'oro.message_queue.client.queue_name';
+    const DEFAULT_QUEUE_NAME = 'default';
 
     /**
      * @var string

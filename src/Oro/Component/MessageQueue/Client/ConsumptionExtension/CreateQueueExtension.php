@@ -26,8 +26,13 @@ class CreateQueueExtension implements ExtensionInterface
     /**
      * @param Context $context
      */
-    public function onStart(Context $context)
+    public function onBeforeReceive(Context $context)
     {
         $this->driver->createQueue($context->getQueueName());
+
+        $context->getLogger()->debug(sprintf(
+            '[CreateQueueExtension] Make sure the queue %s exists on a broker side.',
+            $context->getQueueName()
+        ));
     }
 }
