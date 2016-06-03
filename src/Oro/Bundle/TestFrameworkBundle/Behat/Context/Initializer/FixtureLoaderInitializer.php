@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Initializer\ContextInitializer;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoaderAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoaderAwareInterface;
 
 class FixtureLoaderInitializer implements ContextInitializer
 {
@@ -27,7 +27,7 @@ class FixtureLoaderInitializer implements ContextInitializer
      */
     public function initializeContext(Context $context)
     {
-        if ($context instanceof FixtureLoaderAware) {
+        if ($context instanceof FixtureLoaderAwareInterface) {
             $context->setFixtureLoader($this->fixtureLoader);
         }
     }

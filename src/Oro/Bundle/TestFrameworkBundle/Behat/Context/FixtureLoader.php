@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Nelmio\Alice\Fixtures\Loader;
 use Nelmio\Alice\Persister\Doctrine;
 use Oro\Bundle\EntityBundle\ORM\Registry;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityGuesser;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntitySupplement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepository;
 use Symfony\Component\Finder\Finder;
@@ -41,9 +41,9 @@ class FixtureLoader
     protected $suite;
 
     /**
-     * @var EntityGuesser
+     * @var EntityClassResolver
      */
-    protected $entityGuesser;
+    protected $entityClassResolver;
 
     /**
      * @var EntitySupplement
@@ -52,19 +52,19 @@ class FixtureLoader
 
     /**
      * @param Registry $registry
-     * @param EntityGuesser $entityGuesser
+     * @param EntityClassResolver $entityClassResolver
      * @param EntitySupplement $entitySupplement
      */
     public function __construct(
         Registry $registry,
-        EntityGuesser $entityGuesser,
+        EntityClassResolver $entityClassResolver,
         EntitySupplement $entitySupplement
     ) {
         $this->em = $registry->getManager();
         $this->persister = new Doctrine($this->em);
         $this->fallbackPath = str_replace('/', DIRECTORY_SEPARATOR, __DIR__.'/../../Tests/Behat');
         $this->loader = new Loader();
-        $this->entityGuesser = $entityGuesser;
+        $this->entityClassResolver = $entityClassResolver;
         $this->entitySupplement = $entitySupplement;
     }
 
@@ -98,7 +98,7 @@ class FixtureLoader
      */
     public function loadTable($entityName, TableNode $table)
     {
-        $className = $this->entityGuesser->guessEntityClass($entityName);
+        $className = $this->entityClassResolver->getEntityClass($entityName);
 
         $rows = $table->getRows();
         $headers = array_shift($rows);
@@ -123,13 +123,13 @@ class FixtureLoader
      */
     public function loadRandomEntities($entityName, $numberOfEntities)
     {
-        $className = $this->entityGuesser->guessEntityClass($entityName);
+        $className = $this->entityClassResolver->getEntityClass($entityName);
 
         for ($i = 0; $i < $numberOfEntities; $i++) {
-            $object = new $className;
-            $this->entitySupplement->completeRequired($object);
+            $entity = new $className;
+            $this->entitySupplement->completeRequired($entity);
 
-            $this->em->persist($object);
+            $this->em->persist($entity);
         }
 
         $this->em->flush();

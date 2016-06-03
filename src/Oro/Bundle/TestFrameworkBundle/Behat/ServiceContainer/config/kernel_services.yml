@@ -12,3 +12,8 @@ services:
         class: Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_entity.entity_alias_resolver']
+
+    oro_security.owner.metadata_provider.chain:
+        class: Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider
+        factory: ['@oro_test.kernel_service_factory', get]
+        arguments: ['oro_security.owner.metadata_provider.chain']
