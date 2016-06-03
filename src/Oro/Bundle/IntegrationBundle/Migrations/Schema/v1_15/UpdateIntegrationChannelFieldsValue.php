@@ -94,7 +94,6 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
         $baseUpdateSql = 'ALTER TABLE oro_integration_channel ALTER COLUMN %s TYPE JSON USING %s::JSON;';
 
         if ($platform instanceof PostgreSQL92Platform) {
-
             foreach ($this->fields as $fieldName) {
                 $updateSql .= sprintf($baseUpdateSql, $fieldName, $fieldName);
             }

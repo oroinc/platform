@@ -18,6 +18,7 @@ class UpdateIntegrationChannelSettingFieldsTypes implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPreQuery(new UpdateIntegrationChannelSettingFieldsValue());
+        
         $configType = Type::getType(ConfigType::TYPE);
         $table = $schema->getTable('oro_integration_channel');
 
