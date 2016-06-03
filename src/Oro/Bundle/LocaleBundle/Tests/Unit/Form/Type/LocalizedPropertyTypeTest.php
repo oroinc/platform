@@ -7,7 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
-use Oro\Bundle\LocaleBundle\Form\Type\LocaleCollectionType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\PercentTypeStub;
@@ -33,8 +33,8 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
      */
     protected function getExtensions()
     {
-        $localeCollection = new LocaleCollectionType($this->registry);
-        $localeCollection->setLocaleClass(self::LOCALE_CLASS);
+        $localizationCollection = new LocalizationCollectionType($this->registry);
+        $localizationCollection->setDataClass(self::LOCALIZATION_CLASS);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface $translator */
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
@@ -44,7 +44,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                 [
                     FallbackPropertyType::NAME => new FallbackPropertyType($translator),
                     FallbackValueType::NAME => new FallbackValueType(),
-                    LocaleCollectionType::NAME => $localeCollection,
+                    LocalizationCollectionType::NAME => $localizationCollection,
                     PercentTypeStub::NAME => new PercentTypeStub(),
                 ],
                 []
@@ -87,10 +87,10 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                 'defaultData' => null,
                 'viewData' => [
                     LocalizedPropertyType::FIELD_DEFAULT => null,
-                    LocalizedPropertyType::FIELD_LOCALES => [
+                    LocalizedPropertyType::FIELD_LOCALIZATIONS => [
                         1 => new FallbackType(FallbackType::SYSTEM),
-                        2 => new FallbackType(FallbackType::PARENT_LOCALE),
-                        3 => new FallbackType(FallbackType::PARENT_LOCALE),
+                        2 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
+                        3 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                     ]
                 ],
                 'submittedData' => null,
@@ -107,29 +107,29 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                     null => 5,
                     1    => 10,
                     2    => null,
-                    3    => new FallbackType(FallbackType::PARENT_LOCALE),
+                    3    => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                 ],
                 'viewData' => [
                     LocalizedPropertyType::FIELD_DEFAULT => 5,
-                    LocalizedPropertyType::FIELD_LOCALES => [
+                    LocalizedPropertyType::FIELD_LOCALIZATIONS => [
                         1 => 10,
                         2 => null,
-                        3 => new FallbackType(FallbackType::PARENT_LOCALE),
+                        3 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                     ]
                 ],
                 'submittedData' => [
                     LocalizedPropertyType::FIELD_DEFAULT => '10',
-                    LocalizedPropertyType::FIELD_LOCALES => [
+                    LocalizedPropertyType::FIELD_LOCALIZATIONS => [
                         1 => ['value' => '', 'fallback' => FallbackType::SYSTEM],
                         2 => ['value' => '5', 'fallback' => ''],
-                        3 => ['value' => '', 'fallback' => FallbackType::PARENT_LOCALE],
+                        3 => ['value' => '', 'fallback' => FallbackType::PARENT_LOCALIZATION],
                     ]
                 ],
                 'expectedData' => [
                     null => 10,
                     1    => new FallbackType(FallbackType::SYSTEM),
                     2    => 5,
-                    3    => new FallbackType(FallbackType::PARENT_LOCALE),
+                    3    => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                 ],
             ],
         ];

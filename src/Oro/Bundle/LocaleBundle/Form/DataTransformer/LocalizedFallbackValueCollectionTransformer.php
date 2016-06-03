@@ -15,7 +15,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizedFallbackValueCollectionTransformer implements DataTransformerInterface
 {
@@ -63,10 +63,10 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
         ];
 
         foreach ($value as $localizedFallbackValue) {
-            /** @var LocalizedFallbackValue $localizedFallbackValue */
-            $locale = $localizedFallbackValue->getLocale();
-            if ($locale) {
-                $key = $locale->getId();
+            /* @var $localizedFallbackValue LocalizedFallbackValue */
+            $localization = $localizedFallbackValue->getLocalization();
+            if ($localization) {
+                $key = $localization->getId();
             } else {
                 $key = 0;
             }
@@ -110,17 +110,17 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
 
         $result = new ArrayCollection();
 
-        foreach ($fieldValues as $localeId => $fieldValue) {
-            if (!$localeId) {
-                $localeId = 0;
+        foreach ($fieldValues as $localizationId => $fieldValue) {
+            if (!$localizationId) {
+                $localizationId = 0;
             }
 
             $entityId = null;
-            if (!empty($fieldIds[$localeId])) {
-                $entityId = $fieldIds[$localeId];
+            if (!empty($fieldIds[$localizationId])) {
+                $entityId = $fieldIds[$localizationId];
             }
 
-            $result->add($this->generateLocalizedFallbackValue($entityId, $localeId, $fieldValue));
+            $result->add($this->generateLocalizedFallbackValue($entityId, $localizationId, $fieldValue));
         }
 
         return $result;
@@ -128,11 +128,11 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
 
     /**
      * @param int|null $entityId
-     * @param int|null $localeId
+     * @param int|null $localizationId
      * @param string|FallbackType $fieldValue
      * @return LocalizedFallbackValue
      */
-    protected function generateLocalizedFallbackValue($entityId, $localeId, $fieldValue)
+    protected function generateLocalizedFallbackValue($entityId, $localizationId, $fieldValue)
     {
         $localizedFallbackValue = null;
         if ($entityId) {
@@ -141,7 +141,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
         if (!$localizedFallbackValue) {
             $localizedFallbackValue = new LocalizedFallbackValue();
         }
-        $localizedFallbackValue->setLocale($localeId ? $this->findLocale($localeId) : null);
+        $localizedFallbackValue->setLocalization($localizationId ? $this->findLocalization($localizationId) : null);
 
         if ($fieldValue instanceof FallbackType) {
             $localizedFallbackValue->setFallback($fieldValue->getType());
@@ -165,17 +165,17 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
 
     /**
      * @param int $id
-     * @return Locale
+     * @return Localization
      */
-    protected function findLocale($id)
+    protected function findLocalization($id)
     {
-        $locale = $this->registry->getRepository('OroB2BWebsiteBundle:Locale')->find($id);
+        $localization = $this->registry->getRepository('OroLocaleBundle:Localization')->find($id);
 
-        if (!$locale) {
-            throw new TransformationFailedException(sprintf('Undefined locale with ID=%s', $id));
+        if (!$localization) {
+            throw new TransformationFailedException(sprintf('Undefined localization with ID=%s', $id));
         }
 
-        return $locale;
+        return $localization;
     }
 
     /**

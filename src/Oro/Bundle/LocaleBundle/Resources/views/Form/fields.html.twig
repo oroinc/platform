@@ -58,12 +58,12 @@
             </td>
             <td class="fallback-status"></td>
         </tr>
-        {% for locale in form.locales %}
+        {% for localization in form.localizations %}
             <tr class="fallback-item" style="display: none;">
-                <td class="fallback-item-label {% if locale.vars.group_fallback_fields %}fallback-item-top{% endif %}">{{ locale.vars.label|trans }}</td>
-                <td {% if locale.vars.group_fallback_fields %}class="fallback-item-top"{% endif %} colspan="2">
-                    {{ form_widget(locale) }}
-                    {{ form_errors(locale) }}
+                <td class="fallback-item-label {% if localization.vars.group_fallback_fields %}fallback-item-top{% endif %}">{{ localization.vars.label|trans }}</td>
+                <td {% if localization.vars.group_fallback_fields %}class="fallback-item-top"{% endif %} colspan="2">
+                    {{ form_widget(localization) }}
+                    {{ form_errors(localization) }}
                 </td>
             </tr>
         {% endfor %}

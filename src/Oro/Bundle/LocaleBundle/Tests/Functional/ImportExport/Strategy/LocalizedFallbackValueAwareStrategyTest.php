@@ -11,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocaleCodeFormatter;
+use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
 use Oro\Bundle\LocaleBundle\ImportExport\Strategy\LocalizedFallbackValueAwareStrategy;
 
 /**
@@ -83,10 +83,10 @@ class LocalizedFallbackValueAwareStrategyTest extends WebTestCase
         $result = $this->strategy->process($entity);
 
         foreach ($result->getNames() as $localizedFallbackValue) {
-            $localeCode = LocaleCodeFormatter::formatName($localizedFallbackValue->getLocale());
-            $this->assertArrayHasKey($localeCode, $expectedNames);
+            $localizationCode = LocalizationCodeFormatter::formatName($localizedFallbackValue->getLocalization());
+            $this->assertArrayHasKey($localizationCode, $expectedNames);
 
-            $expectedName = $expectedNames[$localeCode];
+            $expectedName = $expectedNames[$localizationCode];
             if (!empty($expectedName['reference'])) {
                 /**
                  * Validate that id matched from existing collection and does not affect other entities
@@ -109,8 +109,12 @@ class LocalizedFallbackValueAwareStrategyTest extends WebTestCase
      */
     public function processDataProvider()
     {
-        $localeEnUs = $this->getEntity('OroB2B\Bundle\WebsiteBundle\Entity\Locale', ['code' => 'en_US']);
-        $localeEnCa = $this->getEntity('OroB2B\Bundle\WebsiteBundle\Entity\Locale', ['code' => 'en_CA']);
+        $localizationEnUs = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
+            'languageCode' => 'en_US'
+        ]);
+        $localizationEnCa = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
+            'languageCode' => 'en_CA'
+        ]);
 
         return [
             [
@@ -138,13 +142,13 @@ class LocalizedFallbackValueAwareStrategyTest extends WebTestCase
                                 'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
                                 [
                                     'string' => 'product.1 en_US Title',
-                                    'fallback' => 'parent_locale',
-                                    'locale' => $localeEnUs,
+                                    'fallback' => 'parent_localization',
+                                    'localization' => $localizationEnUs,
                                 ]
                             ),
                             $this->getEntity(
                                 'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                                ['string' => 'product.1 en_CA Title', 'locale' => $localeEnCa]
+                                ['string' => 'product.1 en_CA Title', 'localization' => $localizationEnCa]
                             ),
                         ]
                     ),
@@ -175,7 +179,7 @@ class LocalizedFallbackValueAwareStrategyTest extends WebTestCase
                     'names' => [
                         'en_US' => [
                             'string' => 'product.1 en_US Title',
-                            'fallback' => 'parent_locale',
+                            'fallback' => 'parent_localization',
                         ],
                         'en_CA' => [
                             'string' => 'product.1 en_CA Title',
@@ -218,7 +222,9 @@ class LocalizedFallbackValueAwareStrategyTest extends WebTestCase
      */
     public function skippedDataProvider()
     {
-        $localeEnUs = $this->getEntity('OroB2B\Bundle\WebsiteBundle\Entity\Locale', ['code' => 'en_US']);
+        $localizationEnUs = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
+            'languageCode' => 'en_US'
+        ]);
 
         return [
             'new product, no fallback from another entity' => [
@@ -250,7 +256,7 @@ class LocalizedFallbackValueAwareStrategyTest extends WebTestCase
                             ),
                             $this->getEntity(
                                 'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                                ['string' => 'product.4 en_US Title', 'locale' => $localeEnUs]
+                                ['string' => 'product.4 en_US Title', 'localization' => $localizationEnUs]
                             ),
                         ]
                     ),

@@ -29,7 +29,7 @@ class LocalizedFallbackValueAwareDataConverterTest extends WebTestCase
         }
 
         $this->loadFixtures(
-            ['OroB2B\Bundle\WebsiteBundle\Tests\Functional\DataFixtures\LoadLocaleData']
+            ['Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData']
         );
 
         $this->converter = new LocalizedFallbackValueAwareDataConverter(
@@ -41,8 +41,8 @@ class LocalizedFallbackValueAwareDataConverterTest extends WebTestCase
         $this->converter->setLocalizedFallbackValueClassName(
             $container->getParameter('oro_locale.entity.localized_fallback_value.class')
         );
-        $this->converter->setLocaleClassName(
-            $container->getParameter('orob2b_website.entity.locale.class')
+        $this->converter->setLocalizationClassName(
+            $container->getParameter('oro_locale.entity.localization.class')
         );
     }
 
@@ -67,24 +67,24 @@ class LocalizedFallbackValueAwareDataConverterTest extends WebTestCase
     public function importDataProvider()
     {
         return [
-            'default locale' => [
+            'default localization' => [
                 ['names.default.fallback' => 'system', 'names.default.value' => 'default value'],
                 ['names' => ['default' => ['fallback' => 'system', 'string' => 'default value']]],
             ],
-            'en locale' => [
+            'en localization' => [
                 ['names.en.fallback' => 'system', 'names.en.value' => 'en value'],
                 ['names' => ['en' => ['fallback' => 'system', 'string' => 'en value']]],
             ],
-            'custom locales' => [
+            'custom localizations' => [
                 [
-                    'names.en_US.fallback' => 'parent_locale',
+                    'names.en_US.fallback' => 'parent_localization',
                     'names.en_US.value' => '',
                     'names.en_CA.fallback' => '',
                     'names.en_CA.value' => 'en_CA value',
                 ],
                 [
                     'names' => [
-                        'en_US' => ['fallback' => 'parent_locale'],
+                        'en_US' => ['fallback' => 'parent_localization'],
                         'en_CA' => ['string' => 'en_CA value'],
                     ],
                 ],
@@ -115,7 +115,7 @@ class LocalizedFallbackValueAwareDataConverterTest extends WebTestCase
     public function exportDataProvider()
     {
         return [
-            'default locale' => [
+            'default localization' => [
                 ['names' => ['default' => ['fallback' => 'system', 'string' => 'default value']]],
                 [
                     'sku' => '',
@@ -149,7 +149,7 @@ class LocalizedFallbackValueAwareDataConverterTest extends WebTestCase
                     'variantFields' => '',
                 ],
             ],
-            'en locale' => [
+            'en localization' => [
                 ['names' => ['en' => ['fallback' => 'system', 'string' => 'en value']]],
                 [
                     'sku' => '',
@@ -183,10 +183,10 @@ class LocalizedFallbackValueAwareDataConverterTest extends WebTestCase
                     'variantFields' => '',
                 ],
             ],
-            'custom locales' => [
+            'custom localization' => [
                 [
                     'names' => [
-                        'en_US' => ['fallback' => 'parent_locale'],
+                        'en_US' => ['fallback' => 'parent_localization'],
                         'en_CA' => ['string' => 'en_CA value'],
                     ],
                 ],
@@ -198,7 +198,7 @@ class LocalizedFallbackValueAwareDataConverterTest extends WebTestCase
                     'names.default.value' => '',
                     'names.en.fallback' => '',
                     'names.en.value' => '',
-                    'names.en_US.fallback' => 'parent_locale',
+                    'names.en_US.fallback' => 'parent_localization',
                     'names.en_US.value' => '',
                     'names.en_CA.fallback' => '',
                     'names.en_CA.value' => 'en_CA value',

@@ -6,24 +6,23 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
-use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocaleCodeFormatter;
-
-use OroB2B\Bundle\WebsiteBundle\Entity\Repository\LocaleRepository;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
 
 class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConverter
 {
     const FIELD_VALUE = 'value';
     const FIELD_FALLBACK = 'fallback';
-    const DEFAULT_LOCALE = 'default';
+    const DEFAULT_LOCALIZATION = 'default';
 
     /** @var string */
-    protected $localeClassName;
+    protected $localizationClassName;
 
     /** @var string */
     protected $localizedFallbackValueClassName;
 
     /** @var string[] */
-    private $localeCodes;
+    private $languageCodes;
 
     /** @var ManagerRegistry */
     protected $registry;
@@ -40,11 +39,11 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
     }
 
     /**
-     * @param string $localeClassName
+     * @param string $localizationClassName
      */
-    public function setLocaleClassName($localeClassName)
+    public function setLocalizationClassName($localizationClassName)
     {
-        $this->localeClassName = $localeClassName;
+        $this->localizationClassName = $localizationClassName;
     }
 
     /**
@@ -55,17 +54,19 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         $this->localizedFallbackValueClassName = $localizedFallbackValueClassName;
     }
 
-    /** @return string[] */
-    protected function getLocaleCodes()
+    /**
+     * @return string[]
+     */
+    protected function getLanguageCodes()
     {
-        if (null === $this->localeCodes) {
-            /** @var LocaleRepository $localeRepository */
-            $localeRepository = $this->registry->getRepository($this->localeClassName);
-            $this->localeCodes = ArrayUtil::arrayColumn($localeRepository->getLocaleCodes(), 'code');
-            array_unshift($this->localeCodes, LocaleCodeFormatter::DEFAULT_LOCALE);
+        if (null === $this->languageCodes) {
+            /* @var $localizationRepository LocalizationRepository */
+            $localizationRepository = $this->registry->getRepository($this->localizationClassName);
+            $this->languageCodes = ArrayUtil::arrayColumn($localizationRepository->getLanguageCodes(), 'languageCode');
+            array_unshift($this->languageCodes, LocalizationCodeFormatter::DEFAULT_LOCALIZATION);
         }
 
-        return $this->localeCodes;
+        return $this->languageCodes;
     }
 
     /**
@@ -80,23 +81,23 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         $fieldOrder
     ) {
         if (is_a($field['related_entity_name'], $this->localizedFallbackValueClassName, true)) {
-            $localeCodes = $this->getLocaleCodes();
+            $localizationCodes = $this->getLanguageCodes();
             $targetField = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'fallback_field', 'string');
             $fieldName = $field['name'];
             $rules = [];
             $backendHeaders = [];
 
             $subOrder = 0;
-            foreach ($localeCodes as $localeCode) {
+            foreach ($localizationCodes as $localizationCode) {
                 $frontendHeader = $this->getHeader(
                     $fieldName,
-                    $localeCode,
+                    $localizationCode,
                     self::FIELD_FALLBACK,
                     $this->relationDelimiter
                 );
                 $backendHeader = $this->getHeader(
                     $fieldName,
-                    $localeCode,
+                    $localizationCode,
                     self::FIELD_FALLBACK,
                     $this->convertDelimiter
                 );
@@ -109,13 +110,13 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
 
                 $frontendHeader = $this->getHeader(
                     $fieldName,
-                    $localeCode,
+                    $localizationCode,
                     self::FIELD_VALUE,
                     $this->relationDelimiter
                 );
                 $backendHeader = $this->getHeader(
                     $fieldName,
-                    $localeCode,
+                    $localizationCode,
                     $targetField,
                     $this->convertDelimiter
                 );
@@ -150,6 +151,7 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
      */
     protected function getHeader($fieldName, $identity, $targetFieldName, $delimiter)
     {
-        return $fieldName . $delimiter . LocaleCodeFormatter::formatName($identity) . $delimiter . $targetFieldName;
+        return $fieldName . $delimiter . LocalizationCodeFormatter::formatName($identity) .
+            $delimiter . $targetFieldName;
     }
 }

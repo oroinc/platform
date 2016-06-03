@@ -11,3 +11,80 @@
     width: auto !important;
     min-width: 50px;
 }
+
+.fallback-container {
+  td {
+    vertical-align: top;
+    line-height: 29px;
+  }
+
+  td.fallback-item-use-fallback,
+  .fallback-status {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  input {
+    &[type="radio"],
+    &[type="checkbox"] {
+      margin-top: 0;
+    }
+  }
+
+  div {
+    &.input-widget-select {
+      width: auto !important;
+      float: left;
+
+      span {
+        padding-right: 18px;
+        min-width: 300px;
+      }
+    }
+  }
+}
+
+.mce-tinymce {
+  &.disabled {
+    button {
+      opacity: .4;
+    }
+
+    .disabled-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #eeeeee;
+      opacity: .4;
+    }
+  }
+}
+
+.fallback-item-top {
+  padding-top: 10px;
+}
+
+.fallback-item-value-top {
+  padding-top: 5px;
+}
+
+.fallback-item-label {
+  max-width: 160px;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+
+.fallback-item-value,
+.fallback-item-use-fallback {
+  width: 1px; /*fit to content*/
+  white-space: nowrap;
+}
+
+.fallback-status {
+  i {
+    font-size: 20px;
+    cursor: pointer;
+  }
+}

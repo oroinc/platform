@@ -6,11 +6,11 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 abstract class AbstractLocalizedType extends FormIntegrationTestCase
 {
-    const LOCALE_CLASS = 'OroB2B\Bundle\WebsiteBundle\Entity\Locale';
+    const LOCALIZATION_CLASS = 'Oro\Bundle\LocaleBundle\Entity\Localization';
 
     /**
      * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
@@ -28,18 +28,18 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
             ->getMockForAbstractClass();
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($this->getLocales()));
+            ->will($this->returnValue($this->getLocalizations()));
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $queryBuilder->expects($this->once())
             ->method('leftJoin')
-            ->with('locale.parentLocale', 'parentLocale')
+            ->with('l.parent', 'parent')
             ->will($this->returnSelf());
         $queryBuilder->expects($this->once())
             ->method('addOrderBy')
-            ->with('locale.id', 'ASC')
+            ->with('l.id', 'ASC')
             ->will($this->returnSelf());
         $queryBuilder->expects($this->once())
             ->method('getQuery')
@@ -50,47 +50,51 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
             ->getMock();
         $repository->expects($this->once())
             ->method('createQueryBuilder')
-            ->with('locale')
+            ->with('l')
             ->will($this->returnValue($queryBuilder));
 
         $this->registry->expects($this->once())
             ->method('getRepository')
-            ->with(self::LOCALE_CLASS)
+            ->with(self::LOCALIZATION_CLASS)
             ->will($this->returnValue($repository));
     }
 
     /**
-     * @return Locale[]
+     * @return Localization[]
      */
-    protected function getLocales()
+    protected function getLocalizations()
     {
-        $en   = $this->createLocale(1, 'en');
-        $enUs = $this->createLocale(2, 'en_US', $en);
-        $enCa = $this->createLocale(3, 'en_CA', $en);
+        $en   = $this->createLocalization(1, 'en', 'en');
+        $enUs = $this->createLocalization(2, 'en', 'en_US', $en);
+        $enCa = $this->createLocalization(3, 'en', 'en_CA', $en);
 
         return [$en, $enUs, $enCa];
     }
 
     /**
      * @param int $id
-     * @param string $code
-     * @param Locale|null $parentLocale
-     * @return Locale
+     * @param string $languageCode
+     * @param string $formattingCode
+     * @param Localization|null $parent
+     * @return Localization
      */
-    protected function createLocale($id, $code, $parentLocale = null)
+    protected function createLocalization($id, $languageCode, $formattingCode, $parent = null)
     {
-        $website = $this->getMockBuilder('OroB2B\Bundle\WebsiteBundle\Entity\Locale')
+        $website = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Entity\Localization')
             ->disableOriginalConstructor()
             ->getMock();
         $website->expects($this->any())
             ->method('getId')
             ->will($this->returnValue($id));
         $website->expects($this->any())
-            ->method('getCode')
-            ->will($this->returnValue($code));
+            ->method('getLanguageCode')
+            ->will($this->returnValue($languageCode));
         $website->expects($this->any())
-            ->method('getParentLocale')
-            ->will($this->returnValue($parentLocale));
+            ->method('getFormattingCode')
+            ->will($this->returnValue($formattingCode));
+        $website->expects($this->any())
+            ->method('getParent')
+            ->will($this->returnValue($parent));
 
         return $website;
     }

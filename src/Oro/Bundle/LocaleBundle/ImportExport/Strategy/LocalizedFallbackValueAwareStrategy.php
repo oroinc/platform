@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocaleCodeFormatter;
+use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
 
 class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrategy
 {
@@ -55,7 +55,7 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
         $fields = $this->fieldHelper->getRelations($this->entityName);
         foreach ($fields as $field) {
             if ($this->isLocalizedFallbackValue($field)) {
-                $this->setLocaleKeys($entity, $field);
+                $this->setLocalizationKeys($entity, $field);
             }
         }
 
@@ -77,14 +77,14 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
      * @param array $field
      * @throws \Exception
      */
-    protected function setLocaleKeys($entity, array $field)
+    protected function setLocalizationKeys($entity, array $field)
     {
         /** @var Collection|LocalizedFallbackValue[] $localizedFallbackValues */
         $localizedFallbackValues = $this->fieldHelper->getObjectValue($entity, $field['name']);
 
         $newLocalizedFallbackValues = new ArrayCollection();
         foreach ($localizedFallbackValues as $localizedFallbackValue) {
-            $key = LocaleCodeFormatter::formatName($localizedFallbackValue->getLocale());
+            $key = LocalizationCodeFormatter::formatName($localizedFallbackValue->getLocalization());
             $newLocalizedFallbackValues->set($key, $localizedFallbackValue);
         }
 
@@ -126,13 +126,14 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
 
         /** @var LocalizedFallbackValue $sourceValue */
         foreach ($sourceCollectionArray as $sourceValue) {
-            $sourceCollectionArray[LocaleCodeFormatter::formatKey($sourceValue->getLocale())] = $sourceValue->getId();
+            $key = LocalizationCodeFormatter::formatKey($sourceValue->getLocalization());
+            $sourceCollectionArray[$key] = $sourceValue->getId();
         }
 
         $importedCollection
             ->map(
                 function (LocalizedFallbackValue $importedValue) use ($sourceCollectionArray) {
-                    $key = LocaleCodeFormatter::formatKey($importedValue->getLocale());
+                    $key = LocalizationCodeFormatter::formatKey($importedValue->getLocalization());
                     if (array_key_exists($key, $sourceCollectionArray)) {
                         $this->fieldHelper->setObjectValue($importedValue, 'id', $sourceCollectionArray[$key]);
                     }

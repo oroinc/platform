@@ -4,12 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Functional\ImportExport\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizedFallbackValueCollectionNormalizer;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Component\Testing\Unit\EntityTrait;
-
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
 
 /**
  * @covers \Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizedFallbackValueCollectionNormalizer
@@ -37,7 +36,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
         $normalizer = new LocalizedFallbackValueCollectionNormalizer(
             $this->getContainer()->get('doctrine'),
             $this->getContainer()->getParameter('oro_locale.entity.localized_fallback_value.class'),
-            $this->getContainer()->getParameter('orob2b_website.entity.locale.class')
+            $this->getContainer()->getParameter('oro_locale.entity.localization.class')
         );
 
         $this->assertEquals(
@@ -52,29 +51,33 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
     public function normalizeDataProvider()
     {
         return [
-            'without locale' => [
+            'without localization' => [
                 [
                     $this->getEntity(
                         'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                        ['fallback' => 'system', 'string' => 'value', 'locale' => null]
+                        ['fallback' => 'system', 'string' => 'value', 'localization' => null]
                     ),
                 ],
                 ['default' => ['fallback' => 'system', 'string' => 'value', 'text' => null]],
             ],
-            'locale without code' => [
+            'localization without languageCode' => [
                 [
                     $this->getEntity(
                         'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                        ['fallback' => 'system', 'text' => 'value', 'locale' => new Locale()]
+                        ['fallback' => 'system', 'text' => 'value', 'localization' => new Localization()]
                     ),
                 ],
                 ['default' => ['fallback' => 'system', 'string' => null, 'text' => 'value']],
             ],
-            'locale with code' => [
+            'localization with languageCode' => [
                 [
                     $this->getEntity(
                         'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                        ['fallback' => 'system', 'text' => 'value', 'locale' => (new Locale())->setCode('en')]
+                        [
+                            'fallback' => 'system',
+                            'text' => 'value',
+                            'localization' => (new Localization())->setLanguageCode('en')
+                        ]
                     ),
                 ],
                 ['en' => ['fallback' => 'system', 'string' => null, 'text' => 'value']],
@@ -83,15 +86,23 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
                 [
                     $this->getEntity(
                         'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                        ['fallback' => 'system', 'text' => 'value', 'locale' => (new Locale())->setCode('en')]
+                        [
+                            'fallback' => 'system',
+                            'text' => 'value',
+                            'localization' => (new Localization())->setLanguageCode('en')
+                        ]
                     ),
                     $this->getEntity(
                         'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                        ['fallback' => 'system', 'string' => 'value', 'locale' => (new Locale())->setCode('en_CA')]
+                        [
+                            'fallback' => 'system',
+                            'string' => 'value',
+                            'localization' => (new Localization())->setLanguageCode('en_CA')
+                        ]
                     ),
                     $this->getEntity(
                         'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                        ['fallback' => 'system', 'text' => 'value', 'locale' => new Locale()]
+                        ['fallback' => 'system', 'text' => 'value', 'localization' => new Localization()]
                     ),
                 ],
                 [
@@ -116,7 +127,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
         $normalizer = new LocalizedFallbackValueCollectionNormalizer(
             $this->getContainer()->get('doctrine'),
             $this->getContainer()->getParameter('oro_locale.entity.localized_fallback_value.class'),
-            $this->getContainer()->getParameter('orob2b_website.entity.locale.class')
+            $this->getContainer()->getParameter('oro_locale.entity.localization.class')
         );
 
         $this->assertEquals($expectedData, $normalizer->denormalize($actualData, $class));
@@ -143,7 +154,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
                 'ArrayCollection<Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue>',
                 new ArrayCollection(),
             ],
-            'without locale' => [
+            'without localization' => [
                 ['default' => ['fallback' => 'system', 'string' => 'value', 'text' => null]],
                 'ArrayCollection<Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue>',
                 new ArrayCollection(
@@ -155,14 +166,18 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
                     ]
                 ),
             ],
-            'locale with code' => [
+            'localization with languageCode' => [
                 ['en' => ['fallback' => 'system', 'string' => 'value']],
                 'ArrayCollection<Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue>',
                 new ArrayCollection(
                     [
                         'en' => $this->getEntity(
                             'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                            ['fallback' => 'system', 'string' => 'value', 'locale' => (new Locale())->setCode('en')]
+                            [
+                                'fallback' => 'system',
+                                'string' => 'value',
+                                'localization' => (new Localization())->setLanguageCode('en'),
+                            ]
                         ),
                     ]
                 ),
@@ -171,7 +186,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
                 [
                     'default' => ['fallback' => 'system', 'string' => 'value', 'text' => null],
                     'en' => ['string' => 'value'],
-                    'en_CA' => ['fallback' => 'parent_locale', 'text' => 'value'],
+                    'en_CA' => ['fallback' => 'parent_localization', 'text' => 'value'],
                 ],
                 'ArrayCollection<Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue>',
                 new ArrayCollection(
@@ -182,14 +197,14 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
                         ),
                         'en' => $this->getEntity(
                             'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
-                            ['string' => 'value', 'locale' => (new Locale())->setCode('en')]
+                            ['string' => 'value', 'localization' => (new Localization())->setLanguageCode('en')]
                         ),
                         'en_CA' => $this->getEntity(
                             'Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue',
                             [
-                                'fallback' => 'parent_locale',
+                                'fallback' => 'parent_localization',
                                 'text' => 'value',
-                                'locale' => (new Locale())->setCode('en_CA'),
+                                'localization' => (new Localization())->setLanguageCode('en_CA'),
                             ]
                         ),
                     ]
@@ -215,7 +230,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
         $normalizer = new LocalizedFallbackValueCollectionNormalizer(
             $this->getContainer()->get('doctrine'),
             $this->getContainer()->getParameter('oro_locale.entity.localized_fallback_value.class'),
-            $this->getContainer()->getParameter('orob2b_website.entity.locale.class')
+            $this->getContainer()->getParameter('oro_locale.entity.localization.class')
         );
 
         $this->assertEquals($expected, $normalizer->supportsNormalization($data, [], $context));
@@ -268,7 +283,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends WebTestCase
         $normalizer = new LocalizedFallbackValueCollectionNormalizer(
             $this->getContainer()->get('doctrine'),
             $this->getContainer()->getParameter('oro_locale.entity.localized_fallback_value.class'),
-            $this->getContainer()->getParameter('orob2b_website.entity.locale.class')
+            $this->getContainer()->getParameter('oro_locale.entity.localization.class')
         );
 
         $this->assertEquals($expected, $normalizer->supportsDenormalization($data, $class, [], $context));

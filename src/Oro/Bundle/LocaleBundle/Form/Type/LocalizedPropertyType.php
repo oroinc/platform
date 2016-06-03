@@ -13,7 +13,7 @@ class LocalizedPropertyType extends AbstractType
     const NAME = 'oro_locale_localized_property';
 
     const FIELD_DEFAULT = 'default';
-    const FIELD_LOCALES = 'locales';
+    const FIELD_LOCALIZATIONS = 'localizations';
 
     /**
      * {@inheritdoc}
@@ -37,9 +37,9 @@ class LocalizedPropertyType extends AbstractType
                 $formType,
                 array_merge($formOptions, ['label' => 'oro.locale.fallback.value.default'])
             )
-            ->add(self::FIELD_LOCALES, LocaleCollectionType::NAME, ['type' => $formType, 'options' => $formOptions]);
+            ->add(self::FIELD_LOCALIZATIONS, LocalizationCollectionType::NAME, ['type' => $formType, 'options' => $formOptions]);
 
-        $builder->addViewTransformer(new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_LOCALES));
+        $builder->addViewTransformer(new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_LOCALIZATIONS));
     }
 
     /**

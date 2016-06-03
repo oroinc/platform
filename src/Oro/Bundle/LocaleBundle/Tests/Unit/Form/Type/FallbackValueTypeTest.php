@@ -109,13 +109,13 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
             'text with fallback' => [
                 'options' => [
                     'type'              => TextTypeStub::NAME,
-                    'enabled_fallbacks' => [FallbackType::PARENT_LOCALE],
+                    'enabled_fallbacks' => [FallbackType::PARENT_LOCALIZATION],
                     'group_fallback_fields' => false
                 ],
                 'defaultData'   => new FallbackType(FallbackType::SYSTEM),
                 'viewData'      => ['value' => null, 'use_fallback' => true, 'fallback' => FallbackType::SYSTEM],
-                'submittedData' => ['value' => '', 'use_fallback' => true, 'fallback' => FallbackType::PARENT_LOCALE],
-                'expectedData'  => new FallbackType(FallbackType::PARENT_LOCALE),
+                'submittedData' => ['value' => '', 'use_fallback' => true, 'fallback' => FallbackType::PARENT_LOCALIZATION],
+                'expectedData'  => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                 'expectedOptions' => ['group_fallback_fields' => false]
             ],
             'integer as null' => [
@@ -132,13 +132,13 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
             'richtext with fallback' => [
                 'options' => [
                     'type'              => OroRichTextTypeStub::NAME,
-                    'enabled_fallbacks' => [FallbackType::PARENT_LOCALE],
+                    'enabled_fallbacks' => [FallbackType::PARENT_LOCALIZATION],
                     'group_fallback_fields' => null
                 ],
                 'defaultData'   => new FallbackType(FallbackType::SYSTEM),
                 'viewData'      => ['value' => null, 'use_fallback' => true, 'fallback' => FallbackType::SYSTEM],
-                'submittedData' => ['value' => '', 'use_fallback' => true, 'fallback' => FallbackType::PARENT_LOCALE],
-                'expectedData'  => new FallbackType(FallbackType::PARENT_LOCALE),
+                'submittedData' => ['value' => '', 'use_fallback' => true, 'fallback' => FallbackType::PARENT_LOCALIZATION],
+                'expectedData'  => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                 'expectedOptions' => ['group_fallback_fields' => true]
             ]
         ];

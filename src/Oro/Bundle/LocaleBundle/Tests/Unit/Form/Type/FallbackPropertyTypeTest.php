@@ -30,8 +30,8 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $this->translator->expects($this->any())
             ->method('trans')
-            ->with('oro.locale.fallback.type.parent_locale')
-            ->willReturn('Parent Locale');
+            ->with('oro.locale.fallback.type.parent_localization')
+            ->willReturn('Parent Localization');
 
         $this->formType = new FallbackPropertyType($this->translator);
     }
@@ -80,35 +80,35 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                 ],
                 'submittedData' => FallbackType::SYSTEM,
             ],
-            'parent locale' => [
+            'parent localization' => [
                 'inputOptions' => [
-                    'enabled_fallbacks' => [FallbackType::PARENT_LOCALE]
+                    'enabled_fallbacks' => [FallbackType::PARENT_LOCALIZATION]
                 ],
                 'expectedOptions' => [
                     'required' => false,
                     'empty_value' => false,
                     'choices' => [
-                        FallbackType::PARENT_LOCALE => 'oro.locale.fallback.type.parent_locale',
+                        FallbackType::PARENT_LOCALIZATION => 'oro.locale.fallback.type.parent_localization',
                         FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
                     ],
                 ],
-                'submittedData' => FallbackType::PARENT_LOCALE,
+                'submittedData' => FallbackType::PARENT_LOCALIZATION,
             ],
-            'parent locale with suffix' => [
+            'parent localization with suffix' => [
                 'inputOptions' => [
-                    'enabled_fallbacks' => [FallbackType::PARENT_LOCALE],
-                    'locale' => 'en_US',
-                    'parent_locale' => 'en',
+                    'enabled_fallbacks' => [FallbackType::PARENT_LOCALIZATION],
+                    'localization' => 'en_US',
+                    'parent_localization' => 'en',
                 ],
                 'expectedOptions' => [
                     'required' => false,
                     'empty_value' => false,
                     'choices' => [
-                        FallbackType::PARENT_LOCALE => 'en [Parent Locale]',
+                        FallbackType::PARENT_LOCALIZATION => 'en [Parent Localization]',
                         FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
                     ],
                 ],
-                'submittedData' => FallbackType::PARENT_LOCALE,
+                'submittedData' => FallbackType::PARENT_LOCALIZATION,
             ],
             'custom choices' => [
                 'inputOptions' => [
@@ -124,23 +124,23 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
 
     public function testFinishView()
     {
-        $localeCode = 'en_US';
-        $parentLocaleCode = 'en';
+        $localizationCode = 'en_US';
+        $parentLocalizationCode = 'en';
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
         $form = $this->getMock('Symfony\Component\Form\FormInterface');
 
         $formView = new FormView();
         $this->formType->finishView($formView, $form, [
-            'locale' => $localeCode,
-            'parent_locale' => $parentLocaleCode,
+            'localization' => $localizationCode,
+            'parent_localization' => $parentLocalizationCode,
         ]);
 
         $this->assertArrayHasKey('attr', $formView->vars);
-        $this->assertArrayHasKey('data-locale', $formView->vars['attr']);
-        $this->assertArrayHasKey('data-parent-locale', $formView->vars['attr']);
-        $this->assertEquals($localeCode, $formView->vars['attr']['data-locale']);
-        $this->assertEquals($parentLocaleCode, $formView->vars['attr']['data-parent-locale']);
+        $this->assertArrayHasKey('data-localization', $formView->vars['attr']);
+        $this->assertArrayHasKey('data-parent-localization', $formView->vars['attr']);
+        $this->assertEquals($localizationCode, $formView->vars['attr']['data-localization']);
+        $this->assertEquals($parentLocalizationCode, $formView->vars['attr']['data-parent-localization']);
     }
 
     public function testGetName()

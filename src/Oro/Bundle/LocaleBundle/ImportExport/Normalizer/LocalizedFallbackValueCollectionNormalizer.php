@@ -6,9 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
 
 class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
 {
@@ -22,13 +21,13 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
     protected $value;
 
     /** @var string */
-    protected $localeClass;
+    protected $localizationClass;
 
-    /** @var Locale */
-    protected $locale;
+    /** @var Localization */
+    protected $localization;
 
-    /** @var Locale[] */
-    protected $locales = [];
+    /** @var Localization[] */
+    protected $localizations = [];
 
     /** @var bool[] */
     protected $isApplicable = [];
@@ -36,16 +35,16 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
     /**
      * @param ManagerRegistry $registry
      * @param string $localizedFallbackValueClass
-     * @param string $localeClass
+     * @param string $localizationClass
      */
-    public function __construct(ManagerRegistry $registry, $localizedFallbackValueClass, $localeClass)
+    public function __construct(ManagerRegistry $registry, $localizedFallbackValueClass, $localizationClass)
     {
         $this->registry = $registry;
         $this->localizedFallbackValueClass = $localizedFallbackValueClass;
-        $this->localeClass = $localeClass;
+        $this->localizationClass = $localizationClass;
 
         $this->value = new $localizedFallbackValueClass;
-        $this->locale = new $localeClass;
+        $this->localization = new $localizationClass;
     }
 
     /** {@inheritdoc} */
@@ -54,7 +53,7 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
         $result = [];
 
         foreach ($object as $item) {
-            $result[LocaleCodeFormatter::formatName($item->getLocale())] = [
+            $result[LocalizationCodeFormatter::formatName($item->getLocalization())] = [
                 'fallback' => $item->getFallback(),
                 'string' => $item->getString(),
                 'text' => $item->getText(),
@@ -75,16 +74,16 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
             return new ArrayCollection($data);
         }
         $result = new ArrayCollection();
-        foreach ($data as $localeCode => $item) {
+        foreach ($data as $localizationCode => $item) {
             /** @var LocalizedFallbackValue $object */
             $object = clone $this->value;
 
-            if ($localeCode !== LocaleCodeFormatter::DEFAULT_LOCALE) {
-                if (!array_key_exists($localeCode, $this->locales)) {
-                    $this->locales[$localeCode] = clone $this->locale;
-                    $this->locales[$localeCode]->setCode($localeCode);
+            if ($localizationCode !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION) {
+                if (!array_key_exists($localizationCode, $this->localizations)) {
+                    $this->localizations[$localizationCode] = clone $this->localization;
+                    $this->localizations[$localizationCode]->setLanguageCode($localizationCode);
                 }
-                $object->setLocale($this->locales[$localeCode]);
+                $object->setLocalization($this->localizations[$localizationCode]);
             }
 
             if (array_key_exists('fallback', $item)) {
@@ -97,7 +96,7 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
                 $object->setString((string)$item['string']);
             }
 
-            $result->set($localeCode, $object);
+            $result->set($localizationCode, $object);
         }
 
         return $result;

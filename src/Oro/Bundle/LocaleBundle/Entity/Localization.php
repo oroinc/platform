@@ -12,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
  * @ORM\Table(name="oro_localization")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
@@ -47,7 +47,7 @@ class Localization implements DatesAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=64, unique=true, nullable=false)
+     * @ORM\Column(type="string", length=255, unique=true, nullable=false)
      */
     protected $name;
 
@@ -68,21 +68,29 @@ class Localization implements DatesAwareInterface
     /**
      * @var Localization
      *
-     * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childLocalizations")
+     * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childs")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
-    protected $parentLocalization;
+    protected $parent;
 
     /**
      * @var Collection|Localization[]
      *
-     * @ORM\OneToMany(targetEntity="Localization", mappedBy="parentLocalization")
+     * @ORM\OneToMany(targetEntity="Localization", mappedBy="parent")
      */
-    protected $childLocalizations;
+    protected $childs;
 
     public function __construct()
     {
-        $this->childLocalizations = new ArrayCollection();
+        $this->childs = new ArrayCollection();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
     }
 
     /**
@@ -154,13 +162,13 @@ class Localization implements DatesAwareInterface
     }
 
     /**
-     * @param Localization $parentLocalization
+     * @param Localization $parent
      *
      * @return $this
      */
-    public function setParentLocalization(Localization $parentLocalization = null)
+    public function setParent(Localization $parent = null)
     {
-        $this->parentLocalization = $parentLocalization;
+        $this->parent = $parent;
 
         return $this;
     }
@@ -168,27 +176,27 @@ class Localization implements DatesAwareInterface
     /**
      * @return Localization
      */
-    public function getParentLocalization()
+    public function getParent()
     {
-        return $this->parentLocalization;
+        return $this->parent;
     }
 
     /**
      * @return Collection|Localization[]
      */
-    public function getChildLocalizations()
+    public function getChilds()
     {
-        return $this->childLocalizations;
+        return $this->childs;
     }
 
     /**
      * @param Localization $localization
      * @return $this
      */
-    public function addChildLocalization(Localization $localization)
+    public function addChild(Localization $localization)
     {
-        if (!$this->childLocalizations->contains($localization)) {
-            $this->childLocalizations->add($localization);
+        if (!$this->childs->contains($localization)) {
+            $this->childs->add($localization);
         }
 
         return $this;
@@ -198,21 +206,13 @@ class Localization implements DatesAwareInterface
      * @param Localization $localization
      * @return $this
      */
-    public function removeChildLocalization(Localization $localization)
+    public function removeChild(Localization $localization)
     {
-        if ($this->childLocalizations->contains($localization)) {
-            $this->childLocalizations->removeElement($localization);
-            $localization->setParentLocalization(null);
+        if ($this->childs->contains($localization)) {
+            $this->childs->removeElement($localization);
+            $localization->setParent(null);
         }
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->name;
     }
 }

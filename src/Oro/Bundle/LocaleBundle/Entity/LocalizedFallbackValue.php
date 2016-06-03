@@ -9,11 +9,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
-
 /**
  * @ORM\Table(
- *      name="oro_fallback_locale_value",
+ *      name="oro_fallback_localization_val",
  *      indexes={
  *          @ORM\Index(name="idx_fallback", columns={"fallback"}),
  *          @ORM\Index(name="idx_string", columns={"string"})
@@ -83,9 +81,9 @@ class LocalizedFallbackValue
     protected $text;
 
     /**
-     * @var Locale|null
+     * @var Localization|null
      *
-     * @ORM\ManyToOne(targetEntity="OroB2B\Bundle\WebsiteBundle\Entity\Locale")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\LocaleBundle\Entity\Localization")
      * @ORM\JoinColumn(name="locale_id", referencedColumnName="id", onDelete="CASCADE")
      * @ConfigField(
      *      defaultValues={
@@ -95,14 +93,14 @@ class LocalizedFallbackValue
      *      }
      * )
      */
-    protected $locale;
+    protected $localization;
 
     /**
      * @return array
      */
     public static function getFallbacks()
     {
-        return [FallbackType::SYSTEM, FallbackType::PARENT_LOCALE, FallbackType::NONE];
+        return [FallbackType::SYSTEM, FallbackType::PARENT_LOCALIZATION, FallbackType::NONE];
     }
 
     /**
@@ -171,20 +169,20 @@ class LocalizedFallbackValue
     }
 
     /**
-     * @return Locale|null
+     * @return Localization|null
      */
-    public function getLocale()
+    public function getLocalization()
     {
-        return $this->locale;
+        return $this->localization;
     }
 
     /**
-     * @param Locale|null $locale
+     * @param Localization|null $localization
      * @return $this
      */
-    public function setLocale(Locale $locale = null)
+    public function setLocalization(Localization $localization = null)
     {
-        $this->locale = $locale;
+        $this->localization = $localization;
 
         return $this;
     }

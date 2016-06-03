@@ -37,13 +37,13 @@ class FallbackValueType extends AbstractType
         ]);
 
         $resolver->setDefaults([
-            'data_class'                  => null,
-            'options'                     => [],
-            'fallback_type'               => FallbackPropertyType::NAME,
-            'fallback_type_locale'        => null,
-            'fallback_type_parent_locale' => null,
-            'enabled_fallbacks'           => [],
-            'group_fallback_fields'       => null
+            'data_class' => null,
+            'options' => [],
+            'fallback_type' => FallbackPropertyType::NAME,
+            'fallback_type_localization' => null,
+            'fallback_type_parent_localization' => null,
+            'enabled_fallbacks' => [],
+            'group_fallback_fields' => null
         ]);
 
         $resolver->setNormalizer('group_fallback_fields', function (Options $options, $value) {
@@ -74,9 +74,9 @@ class FallbackValueType extends AbstractType
                 $options['fallback_type'],
                 [
                     'enabled_fallbacks' => $options['enabled_fallbacks'],
-                    'locale'            => $options['fallback_type_locale'],
-                    'parent_locale'     => $options['fallback_type_parent_locale'],
-                    'required'          => false
+                    'localization' => $options['fallback_type_localization'],
+                    'parent_localization' => $options['fallback_type_parent_localization'],
+                    'required' => false
                 ]
             );
 

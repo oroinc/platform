@@ -20,7 +20,7 @@ class LocalizationType extends AbstractType
         $builder->add('name')
             ->add('languageCode', 'oro_language_select')
             ->add('formattingCode', 'oro_formatting_select')
-            ->add('parentLocalization', 'entity', [
+            ->add('parent', 'entity', [
                 'class' => 'Oro\Bundle\LocaleBundle\Entity\Localization',
                 'required' => false,
             ]);

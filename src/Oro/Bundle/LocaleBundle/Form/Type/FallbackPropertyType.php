@@ -56,10 +56,10 @@ class FallbackPropertyType extends AbstractType
                 'enabled_fallbacks'  => [],
                 'existing_fallbacks' => [
                     FallbackType::SYSTEM        => 'oro.locale.fallback.type.default',
-                    FallbackType::PARENT_LOCALE => 'oro.locale.fallback.type.parent_locale',
+                    FallbackType::PARENT_LOCALIZATION => 'oro.locale.fallback.type.parent_localization',
                 ],
-                'locale' => null,
-                'parent_locale' => null,
+                'localization' => null,
+                'parent_localization' => null,
             ]
         );
 
@@ -80,11 +80,11 @@ class FallbackPropertyType extends AbstractType
                     }
                 }
 
-                if (array_key_exists(FallbackType::PARENT_LOCALE, $choices) && $options['parent_locale']) {
-                    $choices[FallbackType::PARENT_LOCALE] = sprintf(
+                if (array_key_exists(FallbackType::PARENT_LOCALIZATION, $choices) && $options['parent_localization']) {
+                    $choices[FallbackType::PARENT_LOCALIZATION] = sprintf(
                         '%s [%s]',
-                        $options['parent_locale'],
-                        $this->translator->trans($choices[FallbackType::PARENT_LOCALE])
+                        $options['parent_localization'],
+                        $this->translator->trans($choices[FallbackType::PARENT_LOCALIZATION])
                     );
                 }
 
@@ -98,11 +98,13 @@ class FallbackPropertyType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['locale']) {
-            $view->vars['attr']['data-locale'] = $options['locale'];
+        if ($options['localization']) {
+            $view->vars['attr']['data-localization'] = $options['localization'];
+            $view->vars['attr']['test-localization'] = $options['localization'];
         }
-        if ($options['parent_locale']) {
-            $view->vars['attr']['data-parent-locale'] = $options['parent_locale'];
+        if ($options['parent_localization']) {
+            $view->vars['attr']['data-parent-localization'] = $options['parent_localization'];
+            $view->vars['attr']['test-parent-localization'] = $options['parent_localization'];
         }
     }
 }

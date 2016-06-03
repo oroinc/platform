@@ -390,7 +390,8 @@ define(function(require) {
                 return;
             }
 
-            var parentItemCode = $select.attr('data-parent-locale');
+            var parentItemCode = $select.attr('data-parent-localization');
+            console.log('parentIntemCode: ', parentItemCode, 'select: ', $select.val(), 'result: ', parentItemCode && $select.val() !== 'system' ? parentItemCode : $select.val());
             return parentItemCode && $select.val() !== 'system' ? parentItemCode : $select.val();
         },
 
@@ -408,7 +409,7 @@ define(function(require) {
             if ($select.length === 0) {
                 itemCode = 'system';
             } else {
-                itemCode = $select.attr('data-locale');
+                itemCode = $select.attr('data-localization');
             }
 
             return itemCode;

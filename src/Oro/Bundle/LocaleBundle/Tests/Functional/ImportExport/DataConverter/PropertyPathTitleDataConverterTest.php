@@ -23,7 +23,7 @@ class PropertyPathTitleDataConverterTest extends WebTestCase
         $this->initClient();
 
         $this->loadFixtures(
-            ['OroB2B\Bundle\WebsiteBundle\Tests\Functional\DataFixtures\LoadLocaleData']
+            ['Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData']
         );
 
         $container = $this->getContainer();

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub;
 
-use Oro\Bundle\LocaleBundle\Form\Type\LocaleCollectionType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 
-class LocaleCollectionTypeStub extends LocaleCollectionType
+class LocalizationCollectionTypeStub extends LocalizationCollectionType
 {
     /** {@inheritdoc} */
     public function __construct()
@@ -12,7 +12,7 @@ class LocaleCollectionTypeStub extends LocaleCollectionType
     }
 
     /** {@inheritdoc} */
-    protected function getLocales()
+    protected function getLocalizations()
     {
         return [];
     }

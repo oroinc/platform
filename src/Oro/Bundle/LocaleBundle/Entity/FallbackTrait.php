@@ -4,30 +4,31 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 trait FallbackTrait
 {
     /**
      * @param Collection|LocalizedFallbackValue[] $values
-     * @param Locale|null $locale
+     * @param Localization|null $localization
      * @return LocalizedFallbackValue
      */
-    protected function getLocalizedFallbackValue(Collection $values, Locale $locale = null)
+    protected function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
     {
         $filteredValues = $values->filter(
-            function (LocalizedFallbackValue $title) use ($locale) {
-                return $locale === $title->getLocale();
+            function (LocalizedFallbackValue $title) use ($localization) {
+                return $localization === $title->getLocalization();
             }
         );
 
         // TODO: implement with fallback
         if ($filteredValues->count() > 1) {
-            $localeTitle = $locale ? $locale->getTitle() : 'default';
-            throw new \LogicException(sprintf('There must be only one %s title', $localeTitle));
+            //$title = $localization ? $localization->getTitle() : 'default';
+            $title = $localization ? $localization->getName() : 'default';
+            throw new \LogicException(sprintf('There must be only one %s title', $title));
         }
         $value = $filteredValues->first();
-        if (!$value && $locale !== null) {
+        if (!$value && $localization !== null) {
             $value = $this->getLocalizedFallbackValue($values); // get default value
         }
 

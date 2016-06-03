@@ -9,7 +9,7 @@ services:
         calls:
             - [setRegistry, ["@doctrine"]]
             - [setLocalizedFallbackValueClassName, ['%oro_locale.entity.localized_fallback_value.class%']]
-            - [setLocaleClassName, ['%orob2b_website.entity.locale.class%']]
+            - [setLocalizationClassName, ['%oro_locale.entity.localization.class%']]
 
     oro_locale.importexport.strategy.localized_fallback_value_aware:
         class: 'Oro\Bundle\LocaleBundle\ImportExport\Strategy\LocalizedFallbackValueAwareStrategy'
@@ -22,6 +22,6 @@ services:
         arguments:
             - "@doctrine"
             - '%oro_locale.entity.localized_fallback_value.class%'
-            - '%orob2b_website.entity.locale.class%'
+            - '%oro_locale.entity.localization.class%'
         tags:
             - { name: oro_importexport.normalizer, priority: -5 }

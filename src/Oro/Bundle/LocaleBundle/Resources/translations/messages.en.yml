@@ -31,13 +31,13 @@ oro.locale:
             entity_plural_label:    'Localized fallback values'
             id.label:               'ID'
             fallback.label:         'Fallback'
-            locale.label:           'Locale'
+            localization.label:     'Localization'
             string.label:           'String value'
             text.label:             'Text value'
 
     fallback:
         type:
-            parent_locale: 'Parent Locale'
+            parent_localization: 'Parent Localization'
             default:       'Default Value'
 
         value:

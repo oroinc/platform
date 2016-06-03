@@ -7,3 +7,23 @@ Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
         string:
             - Length:
                 max: 255
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: name
+    properties:
+        languageCode:
+            - NotBlank: ~
+            - Length:
+                min: 2
+                max: 64
+        formattingCode:
+            - NotBlank: ~
+            - Length:
+                min: 2
+                max: 64
+        name:
+            - NotBlank: ~
+            - Length:
+                min: 2
+                max: 255

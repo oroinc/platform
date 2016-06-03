@@ -4,9 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
 use Oro\Component\Testing\Unit\EntityTestCase;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
-use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
 
 class LocalizedFallbackValueTest extends EntityTestCase
 {
@@ -14,8 +14,8 @@ class LocalizedFallbackValueTest extends EntityTestCase
     {
         $properties = [
             ['id', 1],
-            ['locale', new Locale()],
-            ['locale', null],
+            ['localization', new Localization()],
+            ['localization', null],
             ['fallback', FallbackType::SYSTEM],
             ['string', 'string'],
             ['text', 'text'],

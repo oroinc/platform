@@ -4,7 +4,7 @@ oro_menu_config:
             label: 'oro.locale.menu.localization.label'
             uri: '#'
 
-        locales:
+        localizations:
             label: 'oro.locale.menu.localizations.label'
             route: 'oro_locale_localization_index'
             extras:
@@ -17,7 +17,7 @@ oro_menu_config:
                     children:
                         localization:
                             children:
-                                locales: ~
+                                localizations: ~
 
 oro_titles:
     oro_locale_localization_index: ~

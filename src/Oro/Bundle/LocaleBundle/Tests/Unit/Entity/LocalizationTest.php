@@ -17,12 +17,12 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
             ['name', 'test_name'],
             ['languageCode', 'language_test_code'],
             ['formattingCode', 'formatting_test_code'],
-            ['parentLocalization', new Localization()],
+            ['parent', new Localization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
         ]);
         $this->assertPropertyCollections(new Localization(), [
-            ['childLocalizations', new Localization()],
+            ['childs', new Localization()],
         ]);
     }
 
