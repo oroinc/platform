@@ -10,6 +10,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolation
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RestCalendarEventWithAttendeesTest extends WebTestCase
 {
@@ -162,15 +164,23 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             ->getRepository('OroCalendarBundle:CalendarEvent')
             ->find($id);
 
-        $attendees = $this->sortAttendees($calendarEvent->getAttendees());
+        $attendees = $calendarEvent->getAttendees();
         $this->assertCount(3, $attendees);
 
-        $admin = $attendees[1];
+        $admin = $attendees->filter(
+            function ($element) {
+                return $element->getEmail() && $element->getEmail() === 'admin@example.com';
+            }
+        )->first();
         $this->assertEquals('admin@example.com', $admin->getEmail());
         $this->assertEquals('admin', $admin->getUser()->getUsername());
         $this->assertEquals($admin, $calendarEvent->getRelatedAttendee());
 
-        $simpleUser = $attendees[0];
+        $simpleUser = $attendees->filter(
+            function ($element) {
+                return $element->getEmail() && $element->getEmail() === 'simple_user@example.com';
+            }
+        )->first();
         $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
         $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
     }
