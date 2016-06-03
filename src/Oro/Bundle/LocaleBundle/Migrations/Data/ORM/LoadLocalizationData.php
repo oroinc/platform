@@ -4,7 +4,6 @@ namespace Oro\Bundle\LocaleBundle\Migrations\Schema\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -14,13 +13,11 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
@@ -28,7 +25,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     }
 
     /**
-     * @param ObjectManager $manager
+     * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
@@ -43,10 +40,8 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
             ->setFormattingCode($localeCode);
 
         $manager->persist($localization);
-        /** @var EntityManager $manager */
-        $manager->flush($localization);
+        $manager->flush();
 
         $this->addReference('default_localization', $localization);
     }
 }
- 
