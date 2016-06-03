@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
-class EntityGuesser
+class EntityClassResolver
 {
     /**
      * @var EntityAliasResolver
@@ -13,7 +13,7 @@ class EntityGuesser
     protected $aliasResolver;
 
     /**
-     * EntityGuesser constructor.
+     * EntityClassResolver constructor.
      * @param EntityAliasResolver $aliasResolver
      */
     public function __construct(EntityAliasResolver $aliasResolver)
@@ -25,16 +25,16 @@ class EntityGuesser
      * @param string $entityName
      * @return string
      */
-    public function guessEntityClass($entityName)
+    public function getEntityClass($entityName)
     {
-        return $this->aliasResolver->getClassByAlias($this->singularize($entityName));
+        return $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entityName));
     }
 
     /**
      * @param string $entityName
      * @return string
      */
-    protected function singularize($entityName)
+    protected function convertEntityNameToAlias($entityName)
     {
         $name = strtolower($entityName);
         $nameParts = explode(' ', $name);

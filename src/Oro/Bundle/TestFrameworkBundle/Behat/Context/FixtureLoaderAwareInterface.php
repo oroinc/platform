@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
-interface FixtureLoaderAware
+interface FixtureLoaderAwareInterface
 {
     /**
      * @param FixtureLoader $fixtureLoader
-     *
-     * @return null
      */
     public function setFixtureLoader(FixtureLoader $fixtureLoader);
 }

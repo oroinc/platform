@@ -11,12 +11,11 @@ use Behat\Behat\Tester\Exception\PendingException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoaderAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-use SensioLabs\Behat\PageObjectExtension\PageObject\Factory as PageObjectFactory;
 
 /**
  * Defines application features from the specific context.
@@ -25,7 +24,7 @@ class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroElementFactoryAware,
     KernelAwareContext,
-    FixtureLoaderAware
+    FixtureLoaderAwareInterface
 {
     use KernelDictionary;
 
@@ -201,8 +200,8 @@ JS;
     /**
      * @Given /^there (?:is|are) (\d+) ([\w ]+)$/
      */
-    public function thereIs($nbr, $name)
+    public function thereIs($numberOfEntities, $name)
     {
-        $this->fixtureLoader->loadRandomEntities($name, $nbr);
+        $this->fixtureLoader->loadRandomEntities($name, $numberOfEntities);
     }
 }

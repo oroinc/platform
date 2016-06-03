@@ -62,11 +62,11 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader
         arguments:
             - '@doctrine'
-            - '@oro_test.entity_guesser'
+            - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
 
-    oro_test.entity_guesser:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityGuesser
+    oro_test.entity_class_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver
         arguments: ['@oro_entity.entity_alias_resolver']
 
     oro_test.entity_supplement:
@@ -74,6 +74,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_test.reference_repository'
+            - '@oro_security.owner.metadata_provider.chain'
 
     oro_test.reference_repository:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepository

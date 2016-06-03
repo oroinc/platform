@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
-use Behat\Behat\Tester\Exception\PendingException;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker\Factory;
 use Faker\ORM\Doctrine\ColumnTypeGuesser;
 use Oro\Bundle\EntityBundle\ORM\Registry;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class EntitySupplement
 {
@@ -39,74 +40,81 @@ class EntitySupplement
     protected $columnTypeGuesser;
 
     /**
+     * @var MetadataProviderInterface
+     */
+    protected $metadataProvider;
+
+    /**
      * EntitySupplement constructor.
      * @param Registry $registry
      * @param ReferenceRepository $referenceRepository
+     * @param MetadataProviderInterface $metadataProvider
      */
-    public function __construct(Registry $registry, ReferenceRepository $referenceRepository)
-    {
+    public function __construct(
+        Registry $registry,
+        ReferenceRepository $referenceRepository,
+        MetadataProviderInterface $metadataProvider
+    ) {
         $this->registry = $registry;
         $this->referenceRepository = $referenceRepository;
         $this->accessor = PropertyAccess::createPropertyAccessor();
         $this->faker = Factory::create();
         $this->columnTypeGuesser = new ColumnTypeGuesser($this->faker);
+        $this->metadataProvider = $metadataProvider;
     }
 
     /**
-     * @param object $object Entity object
+     * @param object $entity
      */
-    public function completeRequired($object)
+    public function completeRequired($entity)
     {
-        $className = get_class($object);
+        $className = get_class($entity);
         /** @var ClassMetadataInfo $metadata */
         $metadata = $this->registry->getManagerForClass($className)->getClassMetadata($className);
 
-        $this->completeFields($object, $metadata);
-        $this->setOwnership($object, $metadata);
+        $this->completeFields($entity, $metadata);
+        $this->setOwnership($entity);
     }
 
     /**
-     * @param $object
-     * @param ClassMetadataInfo $metadata
-     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @param object $entity
      */
-    protected function setOwnership($object, ClassMetadataInfo $metadata)
+    protected function setOwnership($entity)
     {
-        if (method_exists($object, 'setOwner') && method_exists($object, 'getOwner')) {
-            if (!$object->getOwner() && isset($metadata->associationMappings['owner'])) {
-                $ownerMapping = $metadata->getAssociationMapping('owner');
+        /** @var OwnershipMetadata $ownershipMetadata */
+        $ownershipMetadata = $this->metadataProvider->getMetadata(ClassUtils::getRealClass($entity));
+        $ownerField = $ownershipMetadata->getOwnerFieldName();
+        $organizationField = $ownershipMetadata->getGlobalOwnerFieldName();
 
-                if ($ownerMapping['targetEntity'] === 'Oro\Bundle\UserBundle\Entity\User') {
-                    $object->setOwner($this->referenceRepository->references['admin']);
-                } elseif ($ownerMapping['targetEntity'] === 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit') {
-                    $object->setOwner($this->referenceRepository->references['unit']);
-                }
+        if ($ownerField && $this->accessor->getValue($entity, $ownerField)) {
+            if ($ownershipMetadata->isBasicLevelOwned()) {
+                $this->accessor->setValue($entity, $ownerField, $this->referenceRepository->references['admin']);
+            } elseif ($ownershipMetadata->isLocalLevelOwned()) {
+                $entity->setOwner($this->referenceRepository->references['business_unit']);
             }
         }
 
-        if (method_exists($object, 'setOrganization') && method_exists($object, 'getOrganization')) {
-            if (!$object->getOrganization()) {
-                $object->setOrganization($this->referenceRepository->references['organization']);
-            }
+        if ($organizationField && !$this->accessor->getValue($entity, $organizationField)) {
+            $entity->setOrganization($this->referenceRepository->references['organization']);
         }
     }
 
     /**
-     * @param $object
+     * @param object $entity
      * @param ClassMetadataInfo $metadata
      */
-    protected function completeFields($object, ClassMetadataInfo $metadata)
+    protected function completeFields($entity, ClassMetadataInfo $metadata)
     {
         foreach ($metadata->getFieldNames() as $fieldName) {
-            if (true === $metadata->isNullable($fieldName)
+            if ($metadata->isNullable($fieldName)
                 || true === $metadata->isIdentifier($fieldName)
-                || $metadata->getFieldValue($object, $fieldName)
+                || $metadata->getFieldValue($entity, $fieldName)
             ) {
                 continue;
             }
 
             $fakeData = $this->columnTypeGuesser->guessFormat($fieldName, $metadata);
-            $this->accessor->setValue($object, $fieldName, $fakeData());
+            $this->accessor->setValue($entity, $fieldName, $fakeData());
         }
     }
 }

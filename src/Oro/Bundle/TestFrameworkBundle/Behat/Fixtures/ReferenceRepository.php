@@ -33,7 +33,7 @@ class ReferenceRepository
 
         $this->references['admin'] = $user;
         $this->references['organization'] = $user->getOrganization();
-        $this->references['unit'] = $user->getOwner();
+        $this->references['business_unit'] = $user->getOwner();
     }
 
     public function clear()
@@ -59,7 +59,7 @@ class ReferenceRepository
 
         if (!$user) {
             throw new \InvalidArgumentException(
-                'Administrator user should exist to load dashboard configuration.'
+                'Administrator user should exist.'
             );
         }
 
