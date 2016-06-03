@@ -11,7 +11,7 @@ use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
-class FormTypeTest extends BlockTypeTestCase
+class FormFieldsTypeTest extends BlockTypeTestCase
 {
     /**
      * @dataProvider optionsDataProvider
