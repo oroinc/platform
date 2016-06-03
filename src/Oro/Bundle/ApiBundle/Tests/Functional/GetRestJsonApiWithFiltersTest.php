@@ -81,8 +81,6 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
             $expects = $this->{$idsReplacementMethod}($expects, $reverse);
         }
 
-        //print_r(json_decode($response->getContent()));
-
         $this->assertApiResponseStatusCodeEquals($response, $expectedStatusCode, $entityAlias, 'get list');
         $this->assertEquals($expects, json_decode($response->getContent(), true));
     }
