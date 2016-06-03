@@ -9,30 +9,16 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 class MessageTranslatorProcessor implements MessageProcessorInterface
 {
     /**
-     * @var MessageTranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var SessionInterface
-     */
-    protected $session;
-
-    /**
      * @var string
      */
     protected $topicName;
 
     /**
-     * @param SessionInterface $session
-     * @param MessageTranslatorInterface $translator
      * @param string $topicName
      */
-    public function __construct(SessionInterface $session, MessageTranslatorInterface $translator, $topicName)
+    public function __construct($topicName)
     {
         $this->topicName = $topicName;
-        $this->translator = $translator;
-        $this->session = $session;
     }
 
     /**
@@ -40,9 +26,9 @@ class MessageTranslatorProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $topic = $this->session->createTopic($this->topicName);
-        $newMessage = $this->translator->translate($message);
+        $topic = $session->createTopic($this->topicName);
+        $newMessage = $session->createMessage($message->getBody(), $message->getProperties(), $message->getHeaders());
 
-        $this->session->createProducer()->send($topic, $newMessage);
+        $session->createProducer()->send($topic, $newMessage);
     }
 }
