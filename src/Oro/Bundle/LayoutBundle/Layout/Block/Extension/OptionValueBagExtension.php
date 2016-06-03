@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ArrayOptionValueBuilder;
@@ -24,7 +23,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['resolve_value_bags' => true]);
     }

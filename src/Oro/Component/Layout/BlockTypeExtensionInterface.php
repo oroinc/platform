@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 interface BlockTypeExtensionInterface
 {
@@ -50,9 +50,9 @@ interface BlockTypeExtensionInterface
     /**
      * Overrides the default options from the extended type.
      *
-     * @param OptionsResolverInterface $resolver The resolver for the options.
+     * @param OptionsResolver $resolver The resolver for the options.
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver);
+    public function configureOptions(OptionsResolver $resolver);
 
     /**
      * Normalize options after they was resolved.

@@ -2,8 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\Type\AbstractType;
@@ -13,7 +12,7 @@ class LogoType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
