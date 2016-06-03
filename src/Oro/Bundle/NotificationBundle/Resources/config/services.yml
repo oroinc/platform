@@ -38,8 +38,6 @@ parameters:
 
     oro_notification.email_notification_entity_provider.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
 
-    oro_notification.mass_notification_status_formatter.class: Oro\Bundle\NotificationBundle\Formatter\StatusFormatter
-
     oro_notification.mass_notification_sender.class: Oro\Bundle\NotificationBundle\Model\MassNotificationSender
 
 services:
@@ -205,8 +203,3 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
         lazy: true
-
-    oro_notification.mass_notification_status_formatter:
-        class: %oro_notification.mass_notification_status_formatter.class%
-        arguments:
-            - '@translator'

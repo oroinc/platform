@@ -31,9 +31,10 @@ datagrid:
                 frontend_type: string
             status:
                 label: oro.notification.massnotification.status.label
-                frontend_type: string
-                type: callback
-                callable: "@oro_notification.mass_notification_status_formatter->format"
+                frontend_type: select
+                choices:
+                   - oro.notification.massnotification.status.failed
+                   - oro.notification.massnotification.status.success
 
         properties:
             id: ~
@@ -78,7 +79,9 @@ datagrid:
                     data_name: e.status
                     options:
                         field_options:
-                            choices: "@oro_notification.mass_notification_status_formatter->getStatusLabels"
+                            choices:
+                                0: oro.notification.massnotification.status.failed
+                                1: oro.notification.massnotification.status.success
 
     email-notification-grid:
         options:

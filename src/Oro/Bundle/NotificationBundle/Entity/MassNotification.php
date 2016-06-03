@@ -24,8 +24,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class MassNotification implements LogNotificationInterface
 {
-    const STATUS_FAILED  = 1;
-    const STATUS_SUCCESS = 2;
+    const STATUS_FAILED  = 0;
+    const STATUS_SUCCESS = 1;
 
     /**
      * @var integer
