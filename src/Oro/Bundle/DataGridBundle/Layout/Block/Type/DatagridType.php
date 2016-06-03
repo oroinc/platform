@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
@@ -29,28 +29,15 @@ class DatagridType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(['grid_name'])
-            ->setOptional(['grid_scope'])
-            ->setDefaults(['grid_parameters' => []])
-            ->setDefaults(['grid_render_parameters' => []])
-            ->setAllowedTypes(
-                [
-                    'grid_name' => 'string',
-                    'grid_scope' => 'string',
-                    'grid_parameters' => 'array',
-                    'grid_render_parameters' => 'array'
-                ]
-            )
-            ->setNormalizers(
-                [
-                    'grid_parameters' => function (Options $options, $value) {
-                        return array_merge(['enableFullScreenLayout' => true], $value);
-                    }
-                ]
-            );
+            ->setDefined(['grid_scope'])
+            ->setDefaults([
+                'grid_parameters' => [],
+                'grid_render_parameters' => []
+            ]);
     }
 
     /**
