@@ -8,6 +8,10 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
+
 use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
 
@@ -28,6 +32,17 @@ class LoadTestData extends AbstractFixture implements ContainerAwareInterface
      * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
+    {
+        $this->loadDepartmentEmployees($manager);
+        $this->loadOrganizationBusinessUnitUsers($manager);
+
+        $manager->flush();
+    }
+
+    /**
+     * @param ObjectManager $manager
+     */
+    protected function loadDepartmentEmployees(ObjectManager $manager)
     {
         $departments = [];
         for ($i = 0; $i < 3; $i++) {
@@ -62,7 +77,47 @@ class LoadTestData extends AbstractFixture implements ContainerAwareInterface
 
             $this->setReference('TestEmployee' . $i, $employee);
         }
+    }
 
-        $manager->flush();
+    protected function loadOrganizationBusinessUnitUsers(ObjectManager $manager)
+    {
+        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+
+        /** @var BusinessUnit[] $businessUnits */
+        $businessUnits = [];
+        for ($i = 1; $i <= 3; $i++) {
+            $businessUnit = new BusinessUnit();
+            $businessUnit
+                ->setName('TestBusinessUnit' . $i)
+                ->setOrganization($organization)
+                ->setEmail('TestBusinessUnit' . $i . '@local.com');
+
+            if (isset($businessUnits[0])) {
+                $businessUnit->setOwner($businessUnits[0]);
+            }
+
+            $manager->persist($businessUnit);
+
+            $this->setReference('TestBusinessUnit' . $i, $businessUnit);
+            $businessUnits[] = $businessUnit;
+        }
+
+        foreach ($businessUnits as $index => $businessUnit) {
+            for ($i = 1; $i <= 3; $i++) {
+                /** @var User $user */
+                $user = new User();
+                $user->setEnabled(true);
+                $user->setUsername('TestUsername_' . ($index + 1) . $i);
+                $user->setEmail('TestUsername_' . ($index + 1) . $i . '@local.com');
+                $user->setPassword('TestUsername_' . ($index + 1) . $i);
+                $user->setOrganization($businessUnit->getOrganization());
+                $user->setOwner($businessUnit);
+                $user->addBusinessUnit($businessUnit);
+
+                $manager->persist($user);
+
+                $this->setReference('TestUsername_' . ($index + 1) . $i, $user);
+            }
+        }
     }
 }

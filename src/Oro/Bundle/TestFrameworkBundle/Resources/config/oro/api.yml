@@ -5,6 +5,12 @@ oro_api:
                 fields:
                     name:
                         exclude: false
+                    email:
+                        exclude: false
+            sorters:
+                fields:
+                    email:
+                        exclude: false
         Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment:
             fields:
                 title:
@@ -18,4 +24,8 @@ oro_api:
             filters:
                 fields:
                     name:
+                        exclude: false
+            sorters:
+                fields:
+                    position:
                         exclude: false

@@ -12,12 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
 class GetRestJsonApiWithFiltersTest extends ApiTestCase
 {
     /**
-     * counter values depends on fixture, see DataFixtures\LoadTestData
-     */
-    const TEST_DEPARTMENTS_COUNT = 3;
-    const TEST_EMPLOYEES_COUNT   = 30;
-
-    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -49,7 +43,7 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
      * @param array       $params               request parameters
      * @param array       $expects              response expectation
      * @param string|null $idsReplacementMethod method to be used for ids correction
-     * @param bool        $reverse              indicates that reverse sorting applied
+     * @param string      $identifier           attribute name value to reach referenced object
      *
      * @dataProvider getParamsAndExpectation
      */
@@ -59,7 +53,7 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
         $params,
         $expects,
         $idsReplacementMethod = null,
-        $reverse = false
+        $identifier = null
     ) {
         $entityAlias = $this->valueNormalizer->normalizeValue(
             $className,
@@ -80,8 +74,8 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
         );
 
         $response = $this->client->getResponse();
-        if ($idsReplacementMethod) {
-            $expects = $this->{$idsReplacementMethod}($expects, $reverse);
+        if ($idsReplacementMethod && $identifier) {
+            $expects = $this->{$idsReplacementMethod}($expects, $identifier);
         }
 
         $this->assertApiResponseStatusCodeEquals($response, $expectedStatusCode, $entityAlias, 'get list');
@@ -96,7 +90,7 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
     public function getParamsAndExpectation()
     {
         return [
-            'filter by field'                                                              => [
+            'filter by field'                                                                              => [
                 'className'  => 'Oro\Bundle\UserBundle\Entity\User',
                 'statusCode' => 200,
                 'params'     => [
@@ -104,12 +98,12 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
                         'email' => 'admin@example.com'
                     ],
                     'fields' => [
-                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled,wrongFieldName'
+                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
                     ]
                 ],
                 'expects'    => $this->loadExpectation('output_1.yml')
             ],
-            'filter by field of related entity (user.owner)'                               => [
+            'filter by field of 2nd level related entity (user.owner)'                                     => [
                 'className'  => 'Oro\Bundle\UserBundle\Entity\User',
                 'statusCode' => 200,
                 'params'     => [
@@ -117,12 +111,49 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
                         'owner.name' => 'Main'
                     ],
                     'fields' => [
-                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled,wrongFieldName'
+                        'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled'
                     ]
                 ],
                 'expects'    => $this->loadExpectation('output_1.yml')
             ],
-            'filter by field of related entity with no result'                             => [
+            'filter by field of 3rd level related entity (user.owner.organization)'                        => [
+                'className'    => 'Oro\Bundle\UserBundle\Entity\User',
+                'statusCode'   => 200,
+                'params'       => [
+                    'filter' => [
+                        'owner.owner.email' => 'TestBusinessUnit1@local.com'
+                    ],
+                    'fields' => [
+                        'users' => 'username'
+                    ],
+                    'page'   => [
+                        'size' => 3
+                    ]
+                ],
+                'expects'      => $this->loadExpectation('output_filters_3.yml'),
+                'replacements' => 'replaceUserIdsInExpectation',
+                'identifier'   => 'username'
+            ],
+            'filter by field of 3rd level related entity (user.owner.organization) with 2nd level sorting' => [
+                'className'    => 'Oro\Bundle\UserBundle\Entity\User',
+                'statusCode'   => 200,
+                'params'       => [
+                    'filter' => [
+                        'owner.owner.email' => 'TestBusinessUnit1@local.com'
+                    ],
+                    'fields' => [
+                        'users' => 'username'
+                    ],
+                    'sort'   => '-owner.email',
+                    'page'   => [
+                        'size' => 3
+                    ]
+                ],
+                'expects'      => $this->loadExpectation('output_filters_4.yml'),
+                'replacements' => 'replaceUserIdsInExpectation',
+                'identifier'   => 'username'
+            ],
+            'filter by field of related entity with no result'                                             => [
                 'className'  => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
                 'statusCode' => 200,
                 'params'     => [
@@ -135,7 +166,7 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
                 ],
                 'expects'    => ['data' => []],
             ],
-            'filter by wrong field name'                                                   => [
+            'filter by wrong field name'                                                                   => [
                 'className'  => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
                 'statusCode' => 400,
                 'params'     => [
@@ -159,7 +190,7 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
                     ]
                 ],
             ],
-            'filter by field of related entity (employee.department)'                      => [
+            'filter by field of related entity (employee.department)'                                      => [
                 'className'    => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
                 'statusCode'   => 200,
                 'params'       => [
@@ -172,9 +203,9 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
                 ],
                 'expects'      => $this->loadExpectation('output_filters_1.yml'),
                 'replacements' => 'replaceTestEmployeeIdsInExpectation',
-                'reverse'      => false
+                'identifier'   => 'name'
             ],
-            'filter by field of related entity (employee.department) with reverse sorting' => [
+            'filter by field of related entity (employee.department) with reverse sorting'                 => [
                 'className'    => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
                 'statusCode'   => 200,
                 'params'       => [
@@ -188,32 +219,46 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
                 ],
                 'expects'      => $this->loadExpectation('output_filters_2.yml'),
                 'replacements' => 'replaceTestEmployeeIdsInExpectation',
-                'reverse'      => true
+                'identifier'   => 'name'
             ],
         ];
     }
 
     /**
-     * @param array $expectation
-     * @param bool  $reverse
+     * @param array  $expectation
+     * @param string $identifier
      *
      * @return array
      */
-    protected function replaceTestEmployeeIdsInExpectation(array $expectation, $reverse = false)
+    protected function replaceTestEmployeeIdsInExpectation(array $expectation, $identifier)
     {
         foreach ($expectation['data'] as $index => $data) {
-            $employeeReferenceName = 'TestEmployee';
-            if ($reverse) {
-                $employeeReferenceName .= (self::TEST_EMPLOYEES_COUNT - $index);
-            } else {
-                $employeeReferenceName .= ($index + 1);
-            }
+            $referenceName = $data['attributes'][$identifier];
+
+            /** @var TestEmployee $referenceObject */
+            $referenceObject = $this->getReference($referenceName);
+            $expectation['data'][$index]['id'] = (string) $referenceObject->getId();
+            $expectation['data'][$index]['relationships']['department']['data']['id']
+                = (string) $referenceObject->getDepartment()->getId();
+        }
+
+        return $expectation;
+    }
+
+    /**
+     * @param array  $expectation
+     * @param string $identifier
+     *
+     * @return array
+     */
+    protected function replaceUserIdsInExpectation(array $expectation, $identifier)
+    {
+        foreach ($expectation['data'] as $index => $data) {
+            $referenceName = $data['attributes'][$identifier];
 
             /** @var TestEmployee $testEmployee */
-            $testEmployee = $this->getReference($employeeReferenceName);
-            $expectation['data'][$index]['id'] = (string) $testEmployee->getId();
-            $expectation['data'][$index]['relationships']['department']['data']['id']
-                = (string) $testEmployee->getDepartment()->getId();
+            $referenceObject = $this->getReference($referenceName);
+            $expectation['data'][$index]['id'] = (string) $referenceObject->getId();
         }
 
         return $expectation;
