@@ -56,6 +56,9 @@ class SystemCalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $context = new User();
         ReflectionUtil::setId($context, 123);
 
+        $owner = new User();
+        ReflectionUtil::setId($owner, 321);
+
         $this->request->setMethod('POST');
         $defaultCalendar = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Calendar')
             ->disableOriginalConstructor()
@@ -63,13 +66,36 @@ class SystemCalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->entity->setCalendar($defaultCalendar);
 
         $this->form->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+
+        $this->form->expects($this->once())
+            ->method('has')
+            ->with('contexts')
+            ->will($this->returnValue(true));
+
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->will($this->returnValue(true));
+
+        $defaultCalendar->expects($this->once())
+            ->method('getOwner')
+            ->will($this->returnValue($owner));
+
+        $this->form->expects($this->any())
             ->method('getData')
             ->will($this->returnValue([$context]));
+
+        $this->activityManager->expects($this->once())
+            ->method('setActivityTargets')
+            ->with(
+                $this->identicalTo($this->entity),
+                $this->identicalTo([$context, $owner])
+            );
 
         $this->activityManager->expects($this->never())
             ->method('removeActivityTarget');
         $this->handler->process($this->entity);
-
 
         $this->assertSame($defaultCalendar, $this->entity->getCalendar());
     }
