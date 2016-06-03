@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Form;
 
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Component\Layout\BlockBuilderInterface;
-
-use Oro\Bundle\LayoutBundle\Layout\Block\Type\FieldsetType;
 
 class GroupingFormLayoutBuilder extends FormLayoutBuilder
 {
@@ -100,7 +96,7 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
         $this->layoutManipulator->add(
             $group['id'],
             isset($group['parentId']) ? $group['parentId'] : $this->builder->getId(),
-            FieldsetType::NAME,
+            'fieldset',
             ['title' => isset($group['title']) ? $group['title'] : '']
         );
     }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Command;
 
-use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,9 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\LayoutRegistryInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\LayoutBundle\Command\Util\DebugLayoutContext;
-use Oro\Bundle\LayoutBundle\Command\Util\DebugOptionsResolver;
+use Oro\Bundle\LayoutBundle\Command\Util\DebugOptionsResolverDecorator;
 
 class DebugCommand extends ContainerAwareCommand
 {
@@ -63,11 +64,10 @@ class DebugCommand extends ContainerAwareCommand
                 $output->writeln(' ' . $configurator);
             }
 
-            $this->dumpOptionResolver($context->getResolver(), $output);
+            $this->dumpOptionResolver($context->getOptionsResolverDecorator(), $output);
 
             $output->writeln('Known data values:');
-            /** @var TableHelper $table */
-            $table = $this->getHelper('table');
+            $table = new Table($output);
             $table->setHeaders(['Name']);
             $table->setRows([]);
             $dataValues = $context->data()->getKnownValues();
@@ -75,7 +75,7 @@ class DebugCommand extends ContainerAwareCommand
             foreach ($dataValues as $name) {
                 $table->addRow([$name]);
             }
-            $table->render($output);
+            $table->render();
 
             return;
         }
@@ -108,13 +108,12 @@ class DebugCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param DebugOptionsResolver $resolver
+     * @param DebugOptionsResolverDecorator $resolver
      * @param OutputInterface      $output
      */
-    protected function dumpOptionResolver(DebugOptionsResolver $resolver, OutputInterface $output)
+    protected function dumpOptionResolver(DebugOptionsResolverDecorator $resolver, OutputInterface $output)
     {
-        /** @var TableHelper $table */
-        $table = $this->getHelper('table');
+        $table = new Table($output);
 
         $output->writeln('Default options:');
         $table->setHeaders(['Name', 'Value']);
@@ -124,7 +123,7 @@ class DebugCommand extends ContainerAwareCommand
         foreach ($options as $name => $value) {
             $table->addRow([$name, $this->formatValue($value)]);
         }
-        $table->render($output);
+        $table->render();
 
         $output->writeln('Defined options:');
         $table->setHeaders(['Name', 'Type(s)']);
@@ -134,7 +133,7 @@ class DebugCommand extends ContainerAwareCommand
         foreach ($options as $name => $types) {
             $table->addRow([$name, implode(', ', $types)]);
         }
-        $table->render($output);
+        $table->render();
     }
 
     /**
@@ -168,20 +167,20 @@ class DebugCommand extends ContainerAwareCommand
      * @param string                  $blockTypeName
      * @param LayoutRegistryInterface $registry
      *
-     * @return DebugOptionsResolver
+     * @return DebugOptionsResolverDecorator
      */
     protected function getBlockTypeOptionsResolver($blockTypeName, LayoutRegistryInterface $registry)
     {
         $type       = $registry->getType($blockTypeName);
         $parentName = $type->getParent();
 
-        $optionsResolver = $parentName
+        $decorator = $parentName
             ? clone $this->getBlockTypeOptionsResolver($parentName, $registry)
-            : new DebugOptionsResolver();
+            : new DebugOptionsResolverDecorator(new OptionsResolver());
 
-        $type->setDefaultOptions($optionsResolver);
-        $registry->setDefaultOptions($blockTypeName, $optionsResolver);
+        $type->configureOptions($decorator->getOptionResolver());
+        $registry->configureOptions($blockTypeName, $decorator->getOptionResolver());
 
-        return $optionsResolver;
+        return $decorator;
     }
 }
