@@ -15,21 +15,25 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% set localeWidget %}
-        {{ oro_widget_render({
-            'widgetType': 'block',
-            'title': 'oro.locale.localization.widgets.localization_information'|trans,
-            'url': path('oro_locale_localization_info', {'id': entity.id})
-        }) }}
+    {% set localizationInfo %}
+        {{ UI.renderProperty('oro.locale.localization.name.label'|trans, entity.name) }}
+        {{ UI.renderProperty('oro.locale.localization.title.label'|trans, entity.defaultTitle) }}
+        {{ UI.renderProperty('oro.locale.localization.language_code.label'|trans, entity.languageCode|oro_language_code_title) }}
+        {{ UI.renderProperty('oro.locale.localization.formatting_code.label'|trans, entity.formattingCode|oro_formatting_code_title) }}
+
+        {% if entity.parent %}
+            {{ UI.renderHtmlProperty(
+                'oro.locale.localization.parent_localization.label'|trans,
+                UI.entityViewLink(entity.parent, entity.parent.name, 'oro_locale_localization_view')
+            ) }}
+        {% endif %}
     {% endset %}
 
-    {% set dataBlocks = [
-        {
-            'title': 'oro.locale.localization.sections.general'|trans,
-            'class': 'active',
-            'subblocks': [{data: [localeWidget]}]
-        }
-    ] %}
+    {% set dataBlocks = [{
+        'title': 'oro.locale.localization.sections.general'|trans,
+        'class': 'active',
+        'subblocks': [{data: [localizationInfo]}]
+    }] %}
 
     {% set id = 'localization-view' %}
     {% set data = {'dataBlocks': dataBlocks} %}

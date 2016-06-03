@@ -25,7 +25,7 @@ class LocalizationValidator extends ConstraintValidator
                 'Oro\Bundle\LocaleBundle\Entity\Localization'
             );
         }
-        $parentLocalization = $localization->getParentLocalization();
+        $parentLocalization = $localization->getParent();
 
         if (!$parentLocalization) {
             return;
@@ -53,7 +53,7 @@ class LocalizationValidator extends ConstraintValidator
         }
 
         foreach ($childLocalizations as $childLocalization) {
-            if ($this->checkLocalizationExists($localizationNeedle, $childLocalization)) {
+            if ($this->localizationExists($localizationNeedle, $childLocalization)) {
                 return true;
             }
         }

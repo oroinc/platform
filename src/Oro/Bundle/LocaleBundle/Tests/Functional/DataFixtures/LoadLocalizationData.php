@@ -25,6 +25,12 @@ class LoadLocalizationData extends AbstractFixture
             'parent' => 'en_US',
             'title' => 'English (Canada)',
         ],
+        [
+            'language' => 'es',
+            'formatting' => 'es',
+            'parent' => null,
+            'title' => 'Spanish',
+        ]
     ];
 
     /**
@@ -39,7 +45,8 @@ class LoadLocalizationData extends AbstractFixture
             $localization
                 ->setLanguageCode($item['language'])
                 ->setFormattingCode($item['formatting'])
-                ->setName($item['title']);
+                ->setName($item['title'])
+                ->setDefaultTitle($item['title']);
 
             if ($item['parent']) {
                 $localization->setParent($registry[$item['parent']]);

@@ -1,6 +1,23 @@
 Oro\Bundle\LocaleBundle\Entity\Localization:
     constraints:
         - Oro\Bundle\LocaleBundle\Validator\Constraints\Localization: ~
+    properties:
+        name:
+            - Length:
+                max: 255
+            - NotBlank: ~
+        titles:
+            - Valid: ~
+            - NotBlank:
+                message: 'oro.locale.localization.titles.blank'
+        languageCode:
+            - Length:
+                max: 16
+            - NotBlank: ~
+        formattingCode:
+            - Length:
+                max: 16
+            - NotBlank: ~
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     properties:

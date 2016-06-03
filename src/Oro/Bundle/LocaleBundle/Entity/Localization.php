@@ -26,7 +26,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
- *          },
+ *          }
  *      }
  * )
  */
@@ -74,14 +74,14 @@ class Localization implements DatesAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="language_code", type="string", length=64, nullable=false)
+     * @ORM\Column(name="language_code", type="string", length=16, nullable=false)
      */
     protected $languageCode;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="formatting_code", type="string", length=64, nullable=false)
+     * @ORM\Column(name="formatting_code", type="string", length=16, nullable=false)
      */
     protected $formattingCode;
 

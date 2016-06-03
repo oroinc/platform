@@ -4,15 +4,12 @@ namespace Oro\Bundle\LocaleBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\FormBundle\Model\UpdateHandler;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
@@ -35,22 +32,6 @@ class LocalizationController extends Controller
     {
         return [
             'entity' => $localization
-        ];
-    }
-
-    /**
-     * @Route("/info/{id}", name="oro_locale_localization_info", requirements={"id"="\d+"})
-     * @Template("OroLocaleBundle:Localization:widget\info.html.twig")
-     * @AclAncestor("oro_locale_localization_view")
-     *
-     * @param Localization $localization
-     *
-     * @return array
-     */
-    public function infoAction(Localization $localization)
-    {
-        return [
-            'entity' => $localization,
         ];
     }
 
@@ -112,21 +93,21 @@ class LocalizationController extends Controller
     {
         $form = $this->createForm('oro_localization', $localization);
 
-        /* @var $handler UpdateHandler */
+        /** @var $handler UpdateHandler */
         $handler = $this->get('oro_form.model.update_handler');
         return $handler->handleUpdate(
             $localization,
             $form,
             function (Localization $localization) {
                 return [
-                    'route'         => 'oro_locale_localization_update',
-                    'parameters'    => ['id' => $localization->getId()]
+                    'route' => 'oro_locale_localization_update',
+                    'parameters' => ['id' => $localization->getId()]
                 ];
             },
             function (Localization $localization) {
                 return [
-                    'route'         => 'oro_locale_localization_view',
-                    'parameters'    => ['id' => $localization->getId()]
+                    'route' => 'oro_locale_localization_view',
+                    'parameters' => ['id' => $localization->getId()]
                 ];
             },
             $this->get('translator')->trans('oro.locale.controller.localization.saved.message')
