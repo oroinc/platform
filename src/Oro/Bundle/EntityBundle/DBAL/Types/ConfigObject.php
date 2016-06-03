@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\DBAL\Types;
 
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\JsonArrayType;
 
@@ -20,6 +21,10 @@ class ConfigObject extends JsonArrayType
     /** {@inheritdoc} */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
+        if (null === $value) {
+            return null;
+        }
+
         $valueToDb = $value instanceof Config ? $value->toArray() : [];
 
         return parent::convertToDatabaseValue($valueToDb, $platform);
@@ -29,13 +34,18 @@ class ConfigObject extends JsonArrayType
      * @param mixed            $value
      * @param AbstractPlatform $platform
      *
-     * @return Config
+     * @return mixed
+     * @throws ConversionException
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
+        if (null === $value) {
+            return null;
+        }
+
         $convertedValue = parent::convertToPHPValue($value, $platform);
-        if (!is_array($convertedValue)) {
-            $convertedValue = [];
+        if (! is_array($convertedValue)) {
+            throw ConversionException::conversionFailed($value, $this->getName());
         }
 
         return Config::create($convertedValue);
