@@ -333,6 +333,7 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->scalarNode('field')
                         ->end()
                         ->enumNode('mode')
+                            ->defaultValue('full')
                             ->values(['full', 'disallow', 'allow'])
                         ->end()
                         ->arrayNode('values')

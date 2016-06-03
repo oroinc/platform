@@ -25,7 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
 class WorkflowRestrictionIdentity
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -42,7 +42,7 @@ class WorkflowRestrictionIdentity
     protected $restriction;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="entity_id", type="integer", nullable=false)
      */
@@ -57,7 +57,7 @@ class WorkflowRestrictionIdentity
     protected $workflowItem;
 
     /**
-     * @return integer
+     * @return int
      */
     public function getId()
     {

@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
@@ -14,7 +14,8 @@ use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 class RestrictionsExtension extends AbstractExtension
 {
     const ENTITY_RESTRICTIONS = 'entity_restrictions';
-    const PROPERTY_ID_PATH = '[properties][id]';
+    const PROPERTY_ID_PATH    = '[properties][id]';
+    const PROPERTIES_PATH     = '[properties]';
 
     /** @var GridConfigurationHelper */
     protected $gridConfigurationHelper;
@@ -149,6 +150,12 @@ class RestrictionsExtension extends AbstractExtension
         );
     }
 
+    /**
+     * @param string $entityClass
+     * @param array  $ids
+     *
+     * @return array
+     */
     protected function getEntitiesRestrictions($entityClass, array $ids)
     {
         $restrictionsData = $this->restrictionsManager->getEntitiesRestrictions($entityClass, $ids);
@@ -162,5 +169,29 @@ class RestrictionsExtension extends AbstractExtension
         }
 
         return $entityRestrictions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processConfigs(DatagridConfiguration $config)
+    {
+        $properties = $config->offsetGetByPath(self::PROPERTIES_PATH, []);
+        $property  = [self::ENTITY_RESTRICTIONS => $this->getPropertyDefinition()];
+        $config->offsetSetByPath(self::PROPERTIES_PATH, array_merge($properties, $property));
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPropertyDefinition()
+    {
+        return [
+            'type'           => 'callback',
+            'frontend_type'  => self::ENTITY_RESTRICTIONS,
+            'callable'       => function (ResultRecordInterface $record) {
+                return $record->getValue(self::ENTITY_RESTRICTIONS);
+            },
+        ];
     }
 }

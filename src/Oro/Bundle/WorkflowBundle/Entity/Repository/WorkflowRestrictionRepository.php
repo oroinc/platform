@@ -37,7 +37,7 @@ class WorkflowRestrictionRepository extends EntityRepository
                 'r.field',
                 'r.mode',
                 'r.values',
-                ('GROUP_CONCAT(ri.entityId) AS ids')
+                'GROUP_CONCAT(ri.entityId) AS ids'
             )
             ->groupBy('r.id')
             ->where($queryBuilder->expr()->in('ri.entityId', $entityIds))
