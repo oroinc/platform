@@ -473,6 +473,17 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        _triggerUpdate: function(newValue, oldValue) {
+            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+                _.result(this.subview('start'), 'updateFront');
+                _.result(this.subview('end'), 'updateFront');
+                this.trigger('update');
+            }
+        },
+
+        /**
+         * @inheritDoc
+         */
         _writeDOMValue: function(value) {
             var $typeInput;
             this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
