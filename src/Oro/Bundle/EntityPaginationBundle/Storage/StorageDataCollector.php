@@ -14,6 +14,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 
 class StorageDataCollector
 {
@@ -83,7 +84,8 @@ class StorageDataCollector
         foreach ($gridNames as $gridName) {
             try {
                 // datagrid manager automatically extracts all required parameters from request
-                $dataGrid = $this->datagridManager->getDatagridByRequestParams($gridName);
+                $dataGrid = $this->datagridManager
+                    ->getDatagridByRequestParams($gridName, [Manager::REQUIRE_ALL_EXTENSIONS => false]);
             } catch (\RuntimeException $e) {
                 // processing of invalid grid names
                 continue;
