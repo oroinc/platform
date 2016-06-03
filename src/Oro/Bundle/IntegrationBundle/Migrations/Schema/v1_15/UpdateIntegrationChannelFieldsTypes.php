@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_15;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\EntityBundle\DBAL\Types\ConfigType;
+use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObject as ConfigType;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -24,12 +24,12 @@ class UpdateIntegrationChannelSettingFieldsTypes implements Migration
 
         $table->changeColumn('synchronization_settings', [
             'type' => $configType,
-            'comment' => '(DC2Type:config_type)'
+            'comment' => '(DC2Type:config_object)'
         ]);
 
         $table->changeColumn('mapping_settings', [
             'type' => $configType,
-            'comment' => '(DC2Type:config_type)'
+            'comment' => '(DC2Type:config_object)'
         ]);
     }
 }

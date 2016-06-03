@@ -100,14 +100,14 @@ class Channel
     /**
      * @var ConfigObject
      *
-     * @ORM\Column(name="synchronization_settings", type="config_type", nullable=false)
+     * @ORM\Column(name="synchronization_settings", type="config_object", nullable=false)
      */
     protected $synchronizationSettings;
 
     /**
      * @var ConfigObject
      *
-     * @ORM\Column(name="mapping_settings", type="config_type", nullable=false)
+     * @ORM\Column(name="mapping_settings", type="config_object", nullable=false)
      */
     protected $mappingSettings;
 

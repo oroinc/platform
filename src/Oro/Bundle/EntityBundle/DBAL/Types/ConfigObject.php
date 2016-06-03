@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityBundle\DBAL\Types;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\JsonArrayType;
 
-use Oro\Component\Config\Common\ConfigObject;
+use Oro\Component\Config\Common\ConfigObject as Config;
 
-class ConfigType extends JsonArrayType
+class ConfigObject extends JsonArrayType
 {
-    const TYPE = 'config_type';
+    const TYPE = 'config_object';
 
     /** {@inheritdoc} */
     public function getName()
@@ -20,7 +20,7 @@ class ConfigType extends JsonArrayType
     /** {@inheritdoc} */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        $valueToDb = $value instanceof ConfigObject ? $value->toArray() : [];
+        $valueToDb = $value instanceof Config ? $value->toArray() : [];
 
         return parent::convertToDatabaseValue($valueToDb, $platform);
     }
@@ -29,7 +29,7 @@ class ConfigType extends JsonArrayType
      * @param mixed            $value
      * @param AbstractPlatform $platform
      *
-     * @return ConfigObject
+     * @return Config
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
@@ -38,6 +38,6 @@ class ConfigType extends JsonArrayType
             $convertedValue = [];
         }
 
-        return ConfigObject::create($convertedValue);
+        return Config::create($convertedValue);
     }
 }

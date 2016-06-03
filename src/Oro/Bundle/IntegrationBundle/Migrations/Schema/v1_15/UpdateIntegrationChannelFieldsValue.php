@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Component\Config\Common\ConfigObject;
 
-use Oro\Bundle\EntityBundle\DBAL\Types\ConfigType;
+use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObject as ConfigType;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQuery
@@ -33,7 +33,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
     public function getDescription()
     {
         return 'Convert columns "synchronization_settings" and "mapping_settings" ' .
-        'from the type "object" to the type "config_type" ';
+        'from the type "object" to the type "config_object" ';
     }
 
     /**
