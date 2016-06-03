@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Handler\SystemCalendarEventHandler;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 
 class SystemCalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,6 +49,29 @@ class SystemCalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             $this->om,
             $this->activityManager
         );
+    }
+
+    public function testProcessWithContexts()
+    {
+        $context = new User();
+        ReflectionUtil::setId($context, 123);
+
+        $this->request->setMethod('POST');
+        $defaultCalendar = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Calendar')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entity->setCalendar($defaultCalendar);
+
+        $this->form->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue([$context]));
+
+        $this->activityManager->expects($this->never())
+            ->method('removeActivityTarget');
+        $this->handler->process($this->entity);
+
+
+        $this->assertSame($defaultCalendar, $this->entity->getCalendar());
     }
 
     /**
