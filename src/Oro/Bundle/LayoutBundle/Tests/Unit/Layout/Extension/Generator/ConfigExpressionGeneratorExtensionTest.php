@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
+use Oro\Component\ConfigExpression\AssemblerInterface;
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension;
 
 class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var AssemblerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $expressionAssembler;
 
     /** @var ConfigExpressionGeneratorExtension */
@@ -30,7 +32,7 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('assemble');
 
         $this->extension->prepare(
-            [],
+            $this->createGeneratorData([]),
             $visitors
         );
 
@@ -45,9 +47,9 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('assemble');
 
         $this->extension->prepare(
-            [
+            $this->createGeneratorData([
                 ConfigExpressionGeneratorExtension::NODE_CONDITIONS => null
-            ],
+            ]),
             $visitors
         );
 
@@ -64,18 +66,18 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Condition\TrueCondition()));
 
         $this->extension->prepare(
-            [
+            $this->createGeneratorData([
                 ConfigExpressionGeneratorExtension::NODE_CONDITIONS => [
                     ['@true' => null]
                 ]
-            ],
+            ]),
             $visitors
         );
 
         $this->assertCount(1, $visitors);
         $this->assertInstanceOf(
             'Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionConditionVisitor',
-            $visitors[0]
+            $visitors->current()
         );
     }
 
@@ -89,11 +91,11 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->extension->prepare(
-            [
+            $this->createGeneratorData([
                 ConfigExpressionGeneratorExtension::NODE_CONDITIONS => [
                     ['@true' => null]
                 ]
-            ],
+            ]),
             $visitors
         );
 
@@ -114,12 +116,21 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new \Exception('some error')));
 
         $this->extension->prepare(
-            [
+            $this->createGeneratorData([
                 ConfigExpressionGeneratorExtension::NODE_CONDITIONS => [
                     ['@true' => null]
                 ]
-            ],
+            ]),
             $visitors
         );
+    }
+
+    /**
+     * @param array $source
+     * @return GeneratorData
+     */
+    protected function createGeneratorData(array $source)
+    {
+        return new GeneratorData($source);
     }
 }

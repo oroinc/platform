@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 use Oro\Component\ConfigExpression\AssemblerInterface;
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class ConfigExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
@@ -25,10 +26,10 @@ class ConfigExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorE
     /**
      * {@inheritdoc}
      */
-    public function prepare(array $source, VisitorCollection $visitorCollection)
+    public function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
     {
-        // prepare condition collection
-        if (!empty($source[self::NODE_CONDITIONS])) {
+        $source = $data->getSource();
+        if (is_array($source) && !empty($source[self::NODE_CONDITIONS])) {
             try {
                 $expr = $this->expressionAssembler->assemble($source[self::NODE_CONDITIONS]);
                 if ($expr) {

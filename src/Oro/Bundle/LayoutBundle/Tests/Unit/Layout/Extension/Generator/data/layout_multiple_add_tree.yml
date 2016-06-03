@@ -1,0 +1,27 @@
+layouts:
+    actions:
+        - '@addTree':
+            items:
+                header:
+                    blockType: header
+                css: # sequential declaration
+                    - style
+            tree:
+                root:
+                    header:
+                        css: ~
+        - '@addTree':
+            items:
+                body:
+                    blockType: content
+                    options:
+                        test: true
+                footer:
+                    blockType: header
+                copyrights:
+                    blockType: block
+            tree:
+                root:
+                    body:
+                    footer:
+                        copyrights: ~
