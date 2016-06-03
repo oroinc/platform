@@ -12,6 +12,7 @@ oro.locale:
 
         id.label: 'Id'
         name.label: 'Name'
+        titles.label: 'Titles'
         language_code.label: 'Language'
         formatting_code.label: 'Formatting'
         child_localizations.label: 'Child localizations'
@@ -34,6 +35,9 @@ oro.locale:
             localization.label:     'Localization'
             string.label:           'String value'
             text.label:             'Text value'
+
+        form:
+            choose_parent: 'Choose parent localization...'
 
     fallback:
         type:

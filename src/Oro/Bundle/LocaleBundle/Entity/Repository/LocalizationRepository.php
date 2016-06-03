@@ -37,4 +37,15 @@ class LocalizationRepository extends EntityRepository
             return !$localization->getParent();
         });
     }
+
+    /**
+     * @return int
+     */
+    public function getLocalizationsCount()
+    {
+        return (int)$this->createQueryBuilder('l')
+            ->select('COUNT(l.id) as localizationsCount')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

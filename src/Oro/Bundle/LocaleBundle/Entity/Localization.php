@@ -11,6 +11,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
+use OroB2B\Bundle\WebsiteBundle\Entity\Locale;
+
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
  * @ORM\Table(name="oro_localization")
@@ -27,13 +29,13 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "type"="ACL",
  *              "group_name"=""
  *          },
- *      },
-
+ *      }
  * )
  */
 class Localization implements DatesAwareInterface
 {
     use DatesAwareTrait;
+    use FallbackTrait;
 
     /**
      * @var int
@@ -50,6 +52,26 @@ class Localization implements DatesAwareInterface
      * @ORM\Column(type="string", length=255, unique=true, nullable=false)
      */
     protected $name;
+
+    /**
+     * @var Collection|LocalizedFallbackValue[]
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
+     *      cascade={"ALL"},
+     *      orphanRemoval=true
+     * )
+     * @ORM\JoinTable(
+     *      name="oro_localization_title",
+     *      joinColumns={
+     *          @ORM\JoinColumn(name="localization_id", referencedColumnName="id", onDelete="CASCADE")
+     *      },
+     *      inverseJoinColumns={
+     *          @ORM\JoinColumn(name="localized_value_id", referencedColumnName="id", onDelete="CASCADE", unique=true)
+     *      }
+     * )
+     */
+    protected $titles;
 
     /**
      * @var string
@@ -83,6 +105,7 @@ class Localization implements DatesAwareInterface
     public function __construct()
     {
         $this->childs = new ArrayCollection();
+        $this->titles = new ArrayCollection();
     }
 
     /**
@@ -212,6 +235,76 @@ class Localization implements DatesAwareInterface
             $this->childs->removeElement($localization);
             $localization->setParent(null);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LocalizedFallbackValue[]
+     */
+    public function getTitles()
+    {
+        return $this->titles;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $title
+     *
+     * @return $this
+     */
+    public function addTitle(LocalizedFallbackValue $title)
+    {
+        if (!$this->titles->contains($title)) {
+            $this->titles->add($title);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $title
+     *
+     * @return $this
+     */
+    public function removeTitle(LocalizedFallbackValue $title)
+    {
+        if ($this->titles->contains($title)) {
+            $this->titles->removeElement($title);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Locale|null $locale
+     * @return LocalizedFallbackValue
+     */
+    public function getTitle(Locale $locale = null)
+    {
+        return $this->getLocalizedFallbackValue($this->titles, $locale);
+    }
+
+    /**
+     * @return LocalizedFallbackValue
+     */
+    public function getDefaultTitle()
+    {
+        return $this->getLocalizedFallbackValue($this->titles);
+    }
+
+    /**
+     * @param $string
+     * @return $this
+     */
+    public function setDefaultTitle($string)
+    {
+        $oldTitle = $this->getDefaultTitle();
+        if ($oldTitle) {
+            $this->removeTitle($oldTitle);
+        }
+        $newTitle = new LocalizedFallbackValue();
+        $newTitle->setString($string);
+        $this->addTitle($newTitle);
 
         return $this;
     }

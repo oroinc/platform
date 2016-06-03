@@ -9,11 +9,11 @@ parameters:
 
 services:
     oro_locale.form.type.name_format:
-        class: '%oro_locale.form.type.name_format.class%'
+        class: %oro_locale.form.type.name_format.class%
         arguments:
             - '@oro_locale.formatter.name'
         tags:
-            - { name: form.type, alias: oro_name_format }
+            - { name: form.type, alias: "oro_name_format" }
 
     oro_locale.form.type.country:
         class: '%oro_locale.form.type.country.class%'
@@ -93,6 +93,20 @@ services:
             - { name: form.type, alias: oro_localization }
         calls:
             - [setDataClass, ['%oro_locale.entity.localization.class%']]
+
+    oro_locale.form.type.localization_parent_select:
+        class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType
+        tags:
+            - { name: form.type, alias: "oro_localization_parent_select" }
+
+    oro_locale.form.autocomplete.localization_parent.search_handler:
+        parent: oro_form.autocomplete.search_handler
+        class: 'Oro\Bundle\LocaleBundle\Autocomplete\ParentLocalizationSearchHandler'
+        arguments:
+            - '%oro_locale.entity.localization.class%'
+            - ["name"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: oro_localization_parent, acl_resource: oro_locale_localization_view }
 
     oro_locale.form.type.language_select:
         class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType
