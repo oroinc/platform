@@ -2,5 +2,5 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Dumper;
 
-interface DbDumperInterface extends DumperInterface
+interface CacheDumperInterface extends DumperInterface
 {}

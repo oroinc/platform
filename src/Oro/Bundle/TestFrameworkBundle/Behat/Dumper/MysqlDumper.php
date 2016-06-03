@@ -7,7 +7,7 @@ class MysqlDumper extends AbstractDbDumper
     /**
      * {@inheritdoc}
      */
-    public function dumpDb()
+    public function dump()
     {
         $this->runProcess(sprintf(
             'MYSQL_PWD=%s mysqldump -h %s -u %s %s > %s/%4$s.sql',
@@ -22,7 +22,7 @@ class MysqlDumper extends AbstractDbDumper
     /**
      * {@inheritdoc}
      */
-    public function restoreDb()
+    public function restore()
     {
         $this->runProcess(sprintf(
             'MYSQL_PWD=%s mysql -e "drop database %s;" -h %s -u %s'.

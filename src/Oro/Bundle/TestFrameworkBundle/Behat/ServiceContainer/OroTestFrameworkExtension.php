@@ -85,7 +85,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             0,
             $dumper
         );
-        $container->getDefinition('oro_test.listener.db_dump_subscriber')->replaceArgument(
+        $container->getDefinition('oro_test.listener.dump_environment_subscriber')->replaceArgument(
             0,
             $dumper
         );

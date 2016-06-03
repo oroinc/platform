@@ -3,22 +3,25 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Testwork\EventDispatcher\Event\BeforeExerciseCompleted;
-
+use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\CacheDumperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
 
-class DbDumpSubscriber implements EventSubscriberInterface
+class DumpEnvironmentSubscriber implements EventSubscriberInterface
 {
     /** @var  DbDumperInterface  */
     protected $dbDumper;
 
+    /** @var CacheDumperInterface */
+    protected $cacheDumper;
+
     /**
      * @param DbDumperInterface $dbDumper
      */
-    public function __construct(DbDumperInterface $dbDumper)
+    public function __construct(DbDumperInterface $dbDumper, CacheDumperInterface $cacheDumper)
     {
         $this->dbDumper = $dbDumper;
+        $this->cacheDumper = $cacheDumper;
     }
 
     /**
@@ -36,6 +39,7 @@ class DbDumpSubscriber implements EventSubscriberInterface
      */
     public function dbDump(BeforeExerciseCompleted $event)
     {
-        $this->dbDumper->dumpDb();
+        $this->dbDumper->dump();
+        $this->cacheDumper->dump();
     }
 }

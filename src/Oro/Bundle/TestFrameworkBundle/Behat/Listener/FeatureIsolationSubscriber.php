@@ -6,6 +6,7 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
+use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\CacheDumperInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepository;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\KernelServiceFactory;
@@ -25,6 +26,9 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     /** @var ReferenceRepository  */
     protected $referenceRepository;
 
+    /** @var CacheDumperInterface */
+    protected $cacheDumper;
+
     /**
      * @param DbDumperInterface $dbDumper
      * @param FixtureLoader $fixtureLoader
@@ -35,12 +39,14 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
         DbDumperInterface $dbDumper,
         FixtureLoader $fixtureLoader,
         KernelServiceFactory $kernelServiceFactory,
-        ReferenceRepository $referenceRepository
+        ReferenceRepository $referenceRepository,
+        CacheDumperInterface $cacheDumper
     ) {
         $this->dbDumper = $dbDumper;
         $this->fixtureLoader = $fixtureLoader;
         $this->kernelServiceFactory = $kernelServiceFactory;
         $this->referenceRepository = $referenceRepository;
+        $this->cacheDumper = $cacheDumper;
     }
 
     /**
@@ -80,6 +86,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     {
         $this->clearDependencies();
         $this->dbRestore();
+        $this->cacheRestore();
         $this->shutdownKernel();
     }
 
@@ -121,7 +128,12 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
 
     public function dbRestore()
     {
-        $this->dbDumper->restoreDb();
+        $this->dbDumper->restore();
+    }
+
+    public function cacheRestore()
+    {
+        $this->cacheDumper->restore();
     }
 
     public function shutdownKernel()

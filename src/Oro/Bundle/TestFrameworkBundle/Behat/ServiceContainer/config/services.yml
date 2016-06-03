@@ -13,6 +13,12 @@ services:
         tags:
             - { name: 'oro_test.db_dumper', driver: 'pdo_pgsql' }
 
+    oro_test.dumper.file_cache:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Dumper\FileCacheDumper
+        arguments:
+            - '@symfony2_extension.kernel'
+
+
     oro_test.listener.feature_isolation_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureIsolationSubscriber
         arguments:
@@ -20,13 +26,15 @@ services:
             - '@oro_test.context.fixture_loader'
             - '@oro_test.kernel_service_factory'
             - '@oro_test.reference_repository'
+            - '@oro_test.dumper.file_cache'
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
-    oro_test.listener.db_dump_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbDumpSubscriber'
+    oro_test.listener.dump_environment_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\DumpEnvironmentSubscriber'
         arguments:
             - ~
+            - '@oro_test.dumper.file_cache'
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
