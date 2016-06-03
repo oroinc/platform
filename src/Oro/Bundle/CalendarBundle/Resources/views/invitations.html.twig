@@ -33,6 +33,10 @@
                     {% endif %}
                     {{ attendeeName }}
                 {% endif %}
+                {% set typeId = attendee.type ? attendee.type.id : null %}
+                {%- if typeId %}
+                - {{ _self.get_attendee_type(typeId) }}
+                {% endif -%}
             </span>
         </li>
 {% endmacro %}
@@ -73,4 +77,14 @@
          data-page-component-module="oroui/js/app/components/view-component"
          data-page-component-options="{{ {'view': 'orocalendar/js/app/views/guest-notifier-view'}|json_encode }}">
     </div>
+{% endmacro %}
+
+{% macro get_attendee_type(typeId) %}
+    {%- if typeId == constant('Oro\\Bundle\\CalendarBundle\\Entity\\Attendee::TYPE_ORGANIZER') -%}
+        {{ 'oro.calendar.attendee.type.organizer.label'|trans }}
+    {%- elseif typeId == constant('Oro\\Bundle\\CalendarBundle\\Entity\\Attendee::TYPE_OPTIONAL') -%}
+        {{ 'oro.calendar.attendee.type.optional.label'|trans }}
+    {%- elseif typeId == constant('Oro\\Bundle\\CalendarBundle\\Entity\\Attendee::TYPE_REQUIRED') -%}
+        {{ 'oro.calendar.attendee.type.required.label'|trans }}
+    {%- endif -%}
 {% endmacro %}

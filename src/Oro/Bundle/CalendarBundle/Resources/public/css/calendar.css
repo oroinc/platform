@@ -257,3 +257,21 @@ i.invitation-status.icon-question-sign {
 .connection-menu-container > .dropdown-menu {
     display: block;
 }
+
+.form-horizontal .control-group .controls .recurrent-event-notifier {
+    padding-top: 14px;
+}
+
+.calendar-event-guests-widget {
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-event-guests-widget:hover {
+    width: auto;
+    white-space: inherit;
+    overflow: inherit;
+    text-overflow: inherit;
+}

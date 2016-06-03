@@ -175,6 +175,10 @@ oro:
             owner.label: Owner
             status.label: Status
             type.label: Type
+            type:
+                organizer.label: Organizer
+                optional.label: Optional
+                required.label: Required
 
         autocomplete:
             attendees: Calendar event Guests

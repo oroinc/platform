@@ -1,3 +1,5 @@
+{% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
+
 {% macro calendar_event_view_template(id) %}
 
 <script type="text/template" id="activity-context-activity-list">
@@ -35,6 +37,19 @@
                 <% if (recurringEventId && recurrencePattern) { %>
                     {{ UI.renderHtmlProperty('oro.calendar.calendarevent.recurrence.exception.label'|trans, '<%= formatter.string(recurrencePattern) %>') }}
                 <% } %>
+
+                <% var attendeesView = [];
+                _.each(attendees, function (element) {
+                    var result = '';
+                    if (_.isEmpty(element.email)  ){
+                        result = element.displayName
+                    } else {
+                        result = element.displayName + ' (' + element.email + ')';
+                    }
+                     attendeesView.push(result);
+                }); %>
+                {{ UI.renderAttribute('oro.calendar.calendarevent.attendees.label'|trans, '<div class="calendar-event-guests-widget"><%= attendeesView.join() %></div>') }}
+
                 <div class="activity-context-activity">
                 {{ UI.renderAttribute('oro.activity.contexts.label'|trans, '<div class="activity-context-activity-items"></div>') }}
                 </div>
