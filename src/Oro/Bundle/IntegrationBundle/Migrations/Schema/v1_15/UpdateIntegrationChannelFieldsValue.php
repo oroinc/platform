@@ -3,6 +3,8 @@
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_15;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
 
 use Psr\Log\LoggerInterface;
 
@@ -73,6 +75,33 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
                 $this->connection->executeUpdate($query, $params, $types);
+            }
+        }
+
+        $this->prepareColumnOnPostgreSQL92($platform, $logger, $dryRun);
+    }
+
+    /**
+     * @param AbstractPlatform $platform
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    protected function prepareColumnOnPostgreSQL92($platform, $logger, $dryRun)
+    {
+        $updateSql = '';
+        $baseUpdateSql = 'ALTER TABLE oro_integration_channel ALTER COLUMN %s TYPE JSON USING %s::JSON;';
+
+        if ($platform instanceof PostgreSQL92Platform) {
+
+            foreach ($this->fields as $fieldName) {
+                $updateSql .= sprintf($baseUpdateSql, $fieldName, $fieldName);
+            }
+
+            $this->logQuery($logger, $updateSql);
+            if (!$dryRun) {
+                $this->connection->executeUpdate($updateSql);
             }
         }
     }
