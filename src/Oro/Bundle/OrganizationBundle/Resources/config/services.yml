@@ -20,8 +20,6 @@ parameters:
     oro_organization.owner_deletion_manager.class:             Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager
     oro_organization.owner_assignment_checker.default.class:   Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentChecker
 
-    oro_organization.autocomplete.organization.search_handler: Oro\Bundle\OrganizationBundle\Autocomplete\OrganizationSearchHandler
-
     oro_organization.entity_config_dumper.extension.class:     Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension
 
     oro_organization.event.business_unit_grid_listener.class:  Oro\Bundle\OrganizationBundle\Event\BusinessUnitGridListener
@@ -34,6 +32,7 @@ parameters:
     oro_organization.provider.filter.busines_unit_choice_tree.class: Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider
 
     oro_organization.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
+    oro_organization.provider.busines_unit_acl.class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider
 
 services:
     #
@@ -213,3 +212,23 @@ services:
     oro_organization.organization.handler.delete:
         class: Oro\Bundle\OrganizationBundle\Handler\OrganizationDeleteHandler
         parent: oro_soap.handler.delete.abstract
+
+    oro_organization.validator.owner:
+        class: Oro\Bundle\OrganizationBundle\Validator\Constraints\OwnerValidator
+        arguments:
+           - '@doctrine'
+           - '@oro_organization.business_unit_manager'
+           - '@oro_security.owner.ownership_metadata_provider'
+           - '@oro_security.owner.entity_owner_accessor'
+           - '@oro_security.security_facade'
+           - '@oro_security.ownership_tree_provider'
+           - '@?security.acl.voter.basic_permissions'
+        tags:
+            - { name: validator.constraint_validator, alias: owner_validator }
+
+    oro_organization.provider.busines_unit_acl:
+        class: %oro_organization.provider.busines_unit_acl.class%
+        arguments:
+            - '@oro_security.security_facade'
+            - '@?security.acl.voter.basic_permissions'
+            - '@oro_security.ownership_tree_provider'

@@ -95,7 +95,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
             'Related entity with table inheritance'            => [
                 'params'  => [
                     'fields' => [
-                        'testdepartments' => 'id,name,staff'
+                        'testdepartments' => 'id,title,staff'
                     ],
                     'sort'   => '-id'
                 ],
@@ -105,7 +105,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
                 'params'  => [
                     'include' => 'staff',
                     'fields'  => [
-                        'testdepartments' => 'id,name,staff',
+                        'testdepartments' => 'id,title,staff',
                         'testemployees'   => 'id,name'
                     ],
                     'sort'    => '-id'

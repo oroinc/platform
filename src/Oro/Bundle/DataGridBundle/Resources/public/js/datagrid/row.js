@@ -1,9 +1,10 @@
 define([
     'jquery',
     'underscore',
-    'backgrid',
-    'oroui/js/tools'
-], function($, _, Backgrid, tools) {
+    'chaplin',
+    'oroui/js/tools',
+    './util'
+], function($, _, Chaplin, tools, util) {
     'use strict';
 
     var Row;
@@ -17,9 +18,12 @@ define([
      *
      * @export  orodatagrid/js/datagrid/row
      * @class   orodatagrid.datagrid.Row
-     * @extends Backgrid.Row
+     * @extends Chaplin.CollectionView
      */
-    Row = Backgrid.Row.extend({
+    Row = Chaplin.CollectionView.extend({
+        tagName: 'tr',
+        autoRender: false,
+        animationDuration: 0,
 
         /** @property */
         events: {
@@ -44,29 +48,46 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['themeOptions', 'template']));
-            Row.__super__.initialize.apply(this, arguments);
+            // itemView function is called as new this.itemView
+            // it is placed here to pass THIS within closure
+            var _this = this;
+            _.extend(this, _.pick(options, ['themeOptions', 'template', 'columns']));
+            // let descendants override itemView
+            if (!this.itemView) {
+                this.itemView = function(options) {
+                    var column = options.model;
+                    var cellOptions = {
+                        column: column,
+                        model: _this.model,
+                        themeOptions: {
+                            className: 'grid-cell grid-body-cell'
+                        }
+                    };
+                    if (column.get('name')) {
+                        cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
+                    }
+                    var Cell = column.get('cell');
+                    _this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
+                    var cell = new Cell(cellOptions);
+                    if (column.has('align')) {
+                        cell.$el.removeClass('align-left align-center align-right');
+                        cell.$el.addClass('align-' + column.get('align'));
+                    }
+                    if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
+                        cell.$el.addClass('skip-row-click');
+                    }
 
-            this.listenTo(this.columns, 'sort', this.updateCellsOrder);
-            this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
-        },
+                    // use columns collection as event bus since there is no alternatives
+                    _this.columns.trigger('afterMakeCell', _this, cell);
 
-        /**
-         * Handles columns sort event and updates order of cells
-         */
-        updateCellsOrder: function() {
-            var cell;
-            var fragment = document.createDocumentFragment();
-
-            for (var i = 0; i < this.columns.length; i++) {
-                cell = _.find(this.cells, {column: this.columns.at(i)});
-                if (cell) {
-                    fragment.appendChild(cell.el);
-                }
+                    return cell;
+                };
             }
 
-            this.$el.html(fragment);
-            this.trigger('columns:reorder');
+            this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
+
+            Row.__super__.initialize.apply(this, arguments);
+            this.cells = this.subviews;
         },
 
         /**
@@ -93,11 +114,8 @@ define([
             if (this.clickTimeout) {
                 clearTimeout(this.clickTimeout);
             }
-            _.each(this.cells, function(cell) {
-                cell.dispose();
-            });
-            delete this.cells;
             delete this.columns;
+            delete this.cells;
             Row.__super__.dispose.call(this);
         },
 
@@ -163,8 +181,8 @@ define([
                     return;
                 }
                 _this.trigger('clicked', _this, options);
-                for (var i = 0; i < _this.cells.length; i++) {
-                    var cell = _this.cells[i];
+                for (var i = 0; i < _this.subviews.length; i++) {
+                    var cell = _this.subviews[i];
                     if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
                         cell.onRowClicked(_this, e);
                     }
@@ -199,37 +217,6 @@ define([
             return text;
         },
 
-        /**
-         * @inheritDoc
-         */
-        makeCell: function(column) {
-            var cellOptions = {
-                column: column,
-                model: this.model,
-                themeOptions: {
-                    className: 'grid-cell grid-body-cell'
-                }
-            };
-            if (column.get('name')) {
-                cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
-            }
-            var Cell = column.get('cell');
-            this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
-            var cell = new Cell(cellOptions);
-            if (column.has('align')) {
-                cell.$el.removeClass('align-left align-center align-right');
-                cell.$el.addClass('align-' + column.get('align'));
-            }
-            if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
-                cell.$el.addClass('skip-row-click');
-            }
-
-            // use columns collection as event bus since there is no alternatives
-            this.columns.trigger('afterMakeCell', this, cell);
-
-            return cell;
-        },
-
         render: function() {
             if (this.template) {
                 this.renderCustomTemplate();
@@ -239,6 +226,15 @@ define([
             var state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
             this.$el.toggleClass('row-selected', state.selected);
+
+            if (this.$el.data('layout') === 'separate') {
+                var options = {};
+                if (this.$el.data('layout-model')) {
+                    options[this.$el.data('layout-model')] = this.model;
+                }
+                this.initLayout(options);
+            }
+
             return this;
         },
 
@@ -260,7 +256,6 @@ define([
                     e.stopPropagation();
                 });
             }
-
             return this;
         }
     });

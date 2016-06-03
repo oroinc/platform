@@ -4,10 +4,10 @@ oro:
                 groups:
                     google_settings.title: Google settings
                     google_integration_settings.title: Google Integration Settings
+                    google_integration_settings.tooltip: Please read <a href="https://support.google.com/cloud/answer/6158862?hl=en" target="_blank">instructions</a> for obtaining credentials. Make sure that your OroCRM domain is included into `Authorized JavaScript origins` and `Authorized redirect URIs`.
                 fields:
                     domains.label: Domains
                     domains.tooltip: Comma separated list of allowed domains
                     client_id:
                         label: Client Id
-                        tooltip: Please read <a href="https://support.google.com/cloud/answer/6158862?hl=en" target="_blank">instructions</a> for obtaining credentials. Make sure that your OroCRM domain is included into `Authorized JavaScript origins` and `Authorized redirect URIs`.
                     client_secret.label: Client secret

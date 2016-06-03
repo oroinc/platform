@@ -36,6 +36,11 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected $helper;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $configurableDataConverter;
+
     protected function setUp()
     {
         $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
@@ -56,11 +61,17 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->configurableDataConverter = $this
+            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->helper = new ImportStrategyHelper(
             $this->managerRegistry,
             $this->validator,
             $this->translator,
-            $this->fieldHelper
+            $this->fieldHelper,
+            $this->configurableDataConverter
         );
 
         $this->helper->setConfigProvider($this->extendConfigProvider);

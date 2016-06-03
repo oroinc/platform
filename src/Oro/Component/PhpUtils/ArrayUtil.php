@@ -274,7 +274,11 @@ class ArrayUtil
                     $first[$idx] = $value;
                 } else {
                     if (is_array($value)) {
-                        $first[$idx] = self::arrayMergeRecursiveDistinct($first[$idx], $value);
+                        if (is_array($first[$idx])) {
+                            $first[$idx] = self::arrayMergeRecursiveDistinct($first[$idx], $value);
+                        } else {
+                            $first[$idx] = $value;
+                        }
                     } else {
                         $first[$idx] = $value;
                     }
@@ -394,5 +398,36 @@ class ArrayUtil
         }
 
         return $array;
+    }
+
+    /**
+     * Returns the value in a nested associative array,
+     * where $path is an array of keys. Returns $defaultValue if the key
+     * is not present, or the not-found value if supplied.
+     *
+     * @param array $array
+     * @param array $path
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    public static function getIn(array $array, array $path, $defaultValue = null)
+    {
+        $propertyPath = implode(
+            '',
+            array_map(
+                function ($part) {
+                    return sprintf('[%s]', $part);
+                },
+                $path
+            )
+        );
+
+        $propertyAccessor = new PropertyAccessor();
+        if (!$propertyAccessor->isReadable($array, $propertyPath)) {
+            return $defaultValue;
+        }
+
+        return $propertyAccessor->getValue($array, $propertyPath);
     }
 }

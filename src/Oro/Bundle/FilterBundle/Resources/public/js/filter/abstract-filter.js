@@ -94,7 +94,7 @@ define([
          *
          * @property {Array.<string|jQuery|HTMLElement>}
          */
-        dropdownFitContainers: ['.ui-dialog-content', '#container:visible', 'body'],
+        dropdownFitContainers: ['.ui-dialog-content', '#container', 'body'],
 
         /**
          * Initialize.
@@ -129,7 +129,12 @@ define([
             this.listenTo(hintView, 'reset', this.reset);
         },
 
+        isRendered: function() {
+            return this._isRendered;
+        },
+
         rendered: function() {
+            this._isRendered = true;
             this.subview('hint').render();
         },
 

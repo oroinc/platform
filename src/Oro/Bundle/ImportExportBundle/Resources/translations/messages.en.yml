@@ -2,7 +2,6 @@ oro:
     importexport:
         action:
             export:  "Export entity records"
-            general: "General import/action operations"
             import:  "Import entity records"
 
         export:
@@ -27,11 +26,14 @@ oro:
             error %number%: "Error in row #%number%."
             label:          Import
             success:        "File was successfully imported."
+            alert:          "%added% entities were added, %updated% entities were updated"
             entity:         Import %entityName%
             tempate:        Download Data Template
             file:           File
             strategy:       Strategy
             importance:     Important
             columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
+            errors:
+                not_found_entity: Not found entity "%entity_name%"
 
 "Identity only": "Identity only"

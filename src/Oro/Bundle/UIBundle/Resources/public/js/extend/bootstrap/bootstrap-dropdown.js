@@ -3,6 +3,7 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     require('bootstrap');
     var toggleDropdown = '[data-toggle=dropdown]';
 
@@ -26,6 +27,7 @@ define(function(require) {
             if ($parent.hasClass('open')) {
                 $parent.trigger('hide.bs.dropdown');
             }
+            $(this).dropdown('detach', false);
         });
     }
 
@@ -47,6 +49,7 @@ define(function(require) {
                 if ($dropdown.is('.open')) {
                     $dropdown.trigger('hide.bs.dropdown').removeClass('open');
                 }
+                $el.dropdown('detach', false);
             }
         };
         $el.data('globalHandlers', globalHandlers);
@@ -59,19 +62,85 @@ define(function(require) {
     Dropdown.prototype.toggle = _.wrap(Dropdown.prototype.toggle, function(func, event) {
         beforeClearMenus();
         var result = func.apply(this, _.rest(arguments));
-        var href = $(this).attr('href');
-        var selector = $(this).attr('data-target') || /#/.test(href) && href;
-        var $parent = selector ? $(selector) : null;
 
-        if (!$parent || $parent.length === 0) {
-            $parent = $(this).parent();
-        }
+        var $parent = getParent($(this));
         if ($parent.hasClass('open')) {
             $parent.trigger('shown.bs.dropdown');
         }
 
+        $(this).dropdown('detach');
         return result;
     });
+
+    Dropdown.prototype.detach = function(isActive) {
+        var $this = $(this);
+        var container = $this.data('container');
+        var $container;
+        if (!container || !($container = $this.closest(container)).length) {
+            return;
+        }
+
+        var $parent = getParent($this);
+        isActive = isActive !== undefined ? isActive : $parent.hasClass('open');
+        var $dropdownMenu;
+        var $placeholder;
+
+        if (isActive && ($dropdownMenu = $parent.find('.dropdown-menu:first')).length) {
+            var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
+                display: 'block',
+                width: $dropdownMenu.outerWidth()
+            });
+            $placeholder = $('<div class="dropdown-menu__placeholder"/>');
+            $dropdownMenu.data('related-toggle', $this);
+            $placeholder.data('related-menu', $dropdownMenu);
+
+            /**
+             * Add detach class for dropdown, remember parent and dropdown styles.
+             * Then move dropdown to container and apply styles
+             */
+            $dropdownMenu.addClass('detach');
+            $dropdownMenu.after($placeholder)
+                .appendTo($container)
+                .css(css);
+
+            $this.data('related-data', {
+                $dropdownMenu: $dropdownMenu,
+                $placeholder: $placeholder
+            }).dropdown('updatePosition');
+        } else if (!isActive && ($placeholder = $parent.find('.dropdown-menu__placeholder')).length) {
+            $dropdownMenu = $placeholder.data('related-menu')
+                .removeAttr('style')
+                .removeClass('detach');
+
+            $this.removeData('related-data');
+            $placeholder.before($dropdownMenu).remove();
+        }
+    };
+
+    Dropdown.prototype.updatePosition = function() {
+        /**
+         * Sometimes, when dropdown opens in scrollable content, appears scrollbars.
+         * Scrollbars decrease content height and width, change elements position.
+         * When dropdown moved to container - scrollbars hiding and content returns to old dimensions and position.
+         * Styles that was applied to dropdown are wrong, because dimensions and position are changed.
+         * Following code fixes dropdown styles after that changes.
+         */
+        var obj = $(this).data('related-data');
+        if (typeof obj !== 'object') {
+            return false;
+        }
+        var $parent =  obj.$placeholder.parent();
+        var $dropdownMenu = obj.$dropdownMenu;
+        var parentOffset = $parent.offset();
+        var parentHeight = $parent.outerHeight();
+        var parentWidth = $parent.outerWidth();
+        $dropdownMenu.css({
+            top: parentOffset.top + parentHeight,
+            left: parentOffset.left,
+            width: parentWidth
+        });
+    };
+
     $(document)
         .on('click.dropdown.data-api', toggleDropdown, Dropdown.prototype.toggle)
         .on('tohide.bs.dropdown', function(e) {
@@ -97,6 +166,7 @@ define(function(require) {
     };
 
     $.fn.dropdown = function(option) {
+        var optionArgs = _.rest(arguments);
         return this.each(function() {
             var $this = $(this);
             var data = $this.data('dropdown');
@@ -104,7 +174,7 @@ define(function(require) {
                 $this.data('dropdown', (data = new Dropdown(this)));
             }
             if (typeof option === 'string') {
-                data[option].call($this);
+                data[option].apply($this, optionArgs);
             }
         });
     };
@@ -116,23 +186,17 @@ define(function(require) {
      * if a menu has data attribute "data-options="{&quot;html&quot;: true}""
      */
     (function() {
-        function makeFloating($dropdownMenu) {
-            var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
-                display: 'block',
-                width: $dropdownMenu.outerWidth(),
-                height: $dropdownMenu.outerHeight()
-            });
-            var $placeholder = $('<div class="dropdown-menu__placeholder"/>');
-            $placeholder.data('related-menu', $dropdownMenu);
+        function makeFloating($toggle, $dropdownMenu) {
+            if (!$toggle.data('container')) {
+                $toggle.data('container', 'body');
+            }
+            $toggle.dropdown('detach', true);
+            var $placeholder = $toggle.data('related-data').$placeholder;
             $dropdownMenu
-                .after($placeholder)
-                .appendTo('body')
                 .addClass('dropdown-menu__floating')
-                .css(css)
                 .one('mouseleave', function(e) {
                     $placeholder.trigger(e.type);
                 });
-
             function toClose() {
                 $placeholder.parent().trigger('tohide.bs.dropdown');
             }
@@ -141,26 +205,28 @@ define(function(require) {
                 .parents().add(window).on('scroll resize', toClose);
         }
 
-        function makeEmbedded($dropdownMenu, $placeholder) {
+        function makeEmbedded($toggle, $dropdownMenu, $placeholder) {
             $placeholder.parents().add(window)
                 .off('scroll resize', $placeholder.data('toCloseHandler'));
-            $dropdownMenu.removeClass('dropdown-menu__floating').removeAttr('style');
-            $placeholder.after($dropdownMenu).remove();
+            $dropdownMenu.removeClass('dropdown-menu__floating');
+            $toggle.dropdown('detach', false);
         }
 
         $(document)
             .on('shown.bs.dropdown', '.dropdown', function() {
+                var $toggle = $(toggleDropdown, this);
                 var $dropdownMenu = $('>.dropdown-menu', this);
                 var options = $dropdownMenu.data('options');
                 if (options && options.html) {
-                    makeFloating($dropdownMenu);
+                    makeFloating($toggle, $dropdownMenu);
                 }
             })
             .on('hide.bs.dropdown', '.dropdown.open', function() {
+                var $toggle = $(toggleDropdown, this);
                 var $placeholder = $('>.dropdown-menu__placeholder', this);
                 var $dropdownMenu = $placeholder.data('related-menu');
                 if ($dropdownMenu && $dropdownMenu.length) {
-                    makeEmbedded($dropdownMenu, $placeholder);
+                    makeEmbedded($toggle, $dropdownMenu, $placeholder);
                 }
             });
 
@@ -174,5 +240,14 @@ define(function(require) {
             return event.handler.name === 'clearMenus';
         });
         clickEvents.splice(clickEvents.indexOf(clearMenusHandler), 0, clickEvents.pop());
+
+        var _updateDropdownsPosition = function() {
+            $('.dropdown-menu').filter('.open, .detach').each(function() {
+                $(this).data('related-toggle').dropdown('updatePosition');
+            });
+        };
+
+        $(window).on('resize', _.debounce(_updateDropdownsPosition, 100));
+        mediator.on('layout:adjustHeight', _updateDropdownsPosition, this);
     })();
 });

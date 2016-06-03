@@ -38,6 +38,6 @@ class LockObject
         if ($this->counter === 0) {
             throw new \RuntimeException('Cannot remove a lock from already unlocked object.');
         }
-        $this->counter++;
+        $this->counter--;
     }
 }

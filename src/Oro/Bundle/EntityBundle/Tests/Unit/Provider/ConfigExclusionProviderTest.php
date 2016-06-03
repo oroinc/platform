@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider;
 
 class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
@@ -11,9 +13,7 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $hierarchyProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $hierarchyProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
         $hierarchyProvider->expects($this->any())
             ->method('getHierarchyForClassName')
             ->will(
@@ -81,68 +81,102 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
 
     public function fieldProvider()
     {
-        $entity1 = $this->getEntityMetadata(
-            'Test\Entity\Entity1',
-            [
-                'field1' => 'integer',
-                'field2' => 'string',
-                'field3' => 'date',
-                'field4' => 'text',
-                'field5' => 'date',
-                'field6' => 'float',
-            ]
-        );
-
-        $entity2 = $this->getEntityMetadata(
-            'Test\Entity\Entity2',
-            [
-                'field1' => 'integer',
-                'field2' => 'date',
-            ]
-        );
-
-        $entity3 = $this->getEntityMetadata(
-            'Test\Entity\Entity3',
-            [
-                'field1' => 'integer',
-            ]
-        );
-
         return [
-            [$entity1, 'field1', true],
-            [$entity1, 'field2', true],
-            [$entity1, 'field3', true],
-            [$entity1, 'field4', false],
-            [$entity1, 'field5', true],
-            [$entity1, 'field6', true],
-            [$entity2, 'field1', false],
-            [$entity2, 'field2', true],
-            [$entity3, 'field1', true],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity1',
+                [
+                    'field1' => 'integer',
+                    'field2' => 'string',
+                    'field3' => 'date',
+                    'field4' => 'text',
+                    'field5' => 'date',
+                    'field6' => 'float',
+                ]
+            ), 'field1', true],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity1',
+                [
+                    'field1' => 'integer',
+                    'field2' => 'string',
+                    'field3' => 'date',
+                    'field4' => 'text',
+                    'field5' => 'date',
+                    'field6' => 'float',
+                ]
+            ), 'field2', true],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity1',
+                [
+                    'field1' => 'integer',
+                    'field2' => 'string',
+                    'field3' => 'date',
+                    'field4' => 'text',
+                    'field5' => 'date',
+                    'field6' => 'float',
+                ]
+            ), 'field3', true],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity1',
+                [
+                    'field1' => 'integer',
+                    'field2' => 'string',
+                    'field3' => 'date',
+                    'field4' => 'text',
+                    'field5' => 'date',
+                    'field6' => 'float',
+                ]
+            ), 'field4', false],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity1',
+                [
+                    'field1' => 'integer',
+                    'field2' => 'string',
+                    'field3' => 'date',
+                    'field4' => 'text',
+                    'field5' => 'date',
+                    'field6' => 'float',
+                ]
+            ), 'field5', true],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity1',
+                [
+                    'field1' => 'integer',
+                    'field2' => 'string',
+                    'field3' => 'date',
+                    'field4' => 'text',
+                    'field5' => 'date',
+                    'field6' => 'float',
+                ]
+            ), 'field6', true],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity2',
+                [
+                    'field1' => 'integer',
+                    'field2' => 'date',
+                ]
+            ), 'field1', false],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity2',
+                [
+                    'field1' => 'integer',
+                    'field2' => 'date',
+                ]
+            ), 'field2', true],
+            [$this->getEntityMetadata(
+                'Test\Entity\Entity3',
+                [
+                    'field1' => 'integer',
+                ]
+            ), 'field1', true],
         ];
     }
 
     protected function getEntityMetadata($className, $fields = [])
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = new ClassMetadata($className);
 
-        $metadata->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($className));
-
-        $fieldTypes = [];
         foreach ($fields as $fieldName => $fieldType) {
-            $fieldTypes[] = [$fieldName, $fieldType];
-        }
-
-        if (empty($fieldTypes)) {
-            $metadata->expects($this->never())
-                ->method('getTypeOfField');
-        } else {
-            $metadata->expects($this->any())
-                ->method('getTypeOfField')
-                ->will($this->returnValueMap($fieldTypes));
+            $metadata->mapField(['fieldName' => $fieldName, 'type' => $fieldType]);
         }
 
         return $metadata;

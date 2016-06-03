@@ -48,7 +48,33 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.relation_config_provider'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, requestType: !json_api, priority: -28 }
+            - { name: oro.api.processor, action: get_config, extra: definition, requestType: rest&!json_api, priority: -28 }
+
+    oro_api.get_config.add_association_validators:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddAssociationValidators
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -45 }
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: update, priority: -45 }
+
+    oro_api.get_config.add_owner_not_null_validator:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerNotNullValidator
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.owner.ownership_metadata_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -50 }
+
+    oro_api.get_config.add_owner_validator:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_api.validation_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -51 }
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: update, priority: -51 }
 
     oro_api.get_config.filter_fields_by_extra:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra
@@ -78,6 +104,16 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: delete_list, requestType: rest, priority: -160 }
 
+    oro_api.get_config.complete_status_codes.create:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteCreateStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: create, requestType: rest, priority: -160 }
+
+    oro_api.get_config.complete_status_codes.update:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteUpdateStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: update, requestType: rest, priority: -160 }
+
     oro_api.get_config.set_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities
         arguments:
@@ -91,7 +127,7 @@ services:
             - '@oro_api.customize_loaded_data.processor'
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: definition&customize_loaded_data, priority: -160 }
 
     oro_api.get_config.set_description_for_entity:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDescriptionForEntity
@@ -150,17 +186,8 @@ services:
             - { name: oro.api.processor, action: get_config, extra: definition&expand_related_entities, priority: -5 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition&expand_related_entities, priority: -5 }
 
-    oro_api.get_config.complete_definition.fields:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfFields
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_exclusion_provider'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, priority: -20 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -20 }
-
-    oro_api.get_config.complete_definition.associations:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfAssociations
+    oro_api.get_config.complete_definition:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_exclusion_provider'
@@ -168,8 +195,8 @@ services:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: -30 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -30 }
 
-    oro_api.get_config.complete_definition:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition
+    oro_api.get_config.finish_completion_of_definition:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FinishCompletionOfDefinition
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: -40 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -40 }
@@ -178,11 +205,11 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeNotAccessibleRelations
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@router'
-            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_loader'
+            - '@oro_api.resources_cache'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, requestType: rest, priority: -60 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, requestType: rest, priority: -60 }
+            - { name: oro.api.processor, action: get_config, extra: definition, priority: -60 }
+            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -60 }
 
     oro_api.get_config.set_type_for_table_inheritance_relations:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetTypeForTableInheritanceRelations
@@ -263,6 +290,15 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition&sorters, priority: -140 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition&sorters, priority: -140 }
+
+    oro_api.get_config.set_data_transformers:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetDataTransformers
+        arguments:
+            - '@oro_api.data_transformer_registry'
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: definition&data_transformers, priority: -160 }
+            - { name: oro.api.processor, action: get_relation_config, extra: definition&data_transformers, priority: -160 }
 
     oro_api.get_config.set_description_for_fields:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetDescriptionForFields

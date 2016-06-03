@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
+use Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
@@ -10,9 +11,35 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
  */
 class ControllersTest extends WebTestCase
 {
+    /**
+     * @var \Closure
+     */
+    protected static $warmupCache;
+
     protected function setUp()
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->client->useHashNavigation(true);
+
+        // These tests breaks isolation between tests by modifying the cache.
+        // It leads to an exception in tests run after these ones.
+        // Internal Server Error: A model for "Extend\Entity\testExtendedEntity" was not found.
+        /** @var EntityCacheWarmer $entityCacheWarmup */
+        $entityCacheWarmup = $this->getContainer()->get('oro_entity_extend.entity.cache.warmer');
+        $cacheDir = $this->getClient()->getKernel()->getCacheDir();
+        self::$warmupCache = function () use ($entityCacheWarmup, $cacheDir) {
+            $entityCacheWarmup->warmUp($cacheDir);
+        };
+    }
+
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+
+        if (self::$warmupCache) {
+            call_user_func(self::$warmupCache);
+            self::$warmupCache = null;
+        }
     }
 
     public function testIndex()
@@ -114,7 +141,7 @@ class ControllersTest extends WebTestCase
     /**
      * @depends testView
      */
-    public function testCreateFieldReleation($id)
+    public function testCreateFieldRelation($id)
     {
         $types = [
             'oneToMany' => 'createSelectOneToMany',

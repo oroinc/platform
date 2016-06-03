@@ -15,6 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class OrganizationsSelectType extends AbstractType
 {
@@ -88,8 +90,7 @@ class OrganizationsSelectType extends AbstractType
             [
                 'class'    => 'OroOrganizationBundle:Organization',
                 'property' => 'name',
-                'multiple' => true,
-                'choices'  => $this->getOrganizationOptions(),
+                'multiple' => true
             ]
         );
         $builder->add(
@@ -130,12 +131,10 @@ class OrganizationsSelectType extends AbstractType
     }
 
     /**
-     * Prepare choice options for a select
-     *
-     * @return array
+     * @return User
      */
-    protected function getOrganizationOptions()
+    protected function getLoggedInUser()
     {
-        return $this->em->getRepository('OroOrganizationBundle:Organization')->getEnabled();
+        return $this->securityFacade->getLoggedUser();
     }
 }

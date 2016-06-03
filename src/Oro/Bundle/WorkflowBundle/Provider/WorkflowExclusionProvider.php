@@ -4,30 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\AbstractExclusionProvider;
 
 /**
  * The implementation of ExclusionProviderInterface that can be used to ignore
  * "workflowItem" and "workflowStep" relations.
  */
-class WorkflowExclusionProvider implements ExclusionProviderInterface
+class WorkflowExclusionProvider extends AbstractExclusionProvider
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isIgnoredEntity($className)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
-    {
-        return false;
-    }
-
     /**
      * {@inheritdoc}
      */

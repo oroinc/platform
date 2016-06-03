@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
@@ -18,18 +19,13 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     /** @var LoadFromConfigBag */
     protected $processor;
 
-    /** @var int */
-    protected $customizationProcessorCallIndex;
-
     protected function setUp()
     {
         parent::setUp();
 
-        $this->customizationProcessorCallIndex = 0;
-
         $this->entityHierarchyProvider = $this
             ->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
-        $this->configBag               = $this
+        $this->configBag = $this
             ->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigBag')
             ->disableOriginalConstructor()
             ->getMock();
@@ -40,6 +36,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             $this->entityHierarchyProvider,
             $this->configBag
         );
+
+        $this->context->setTargetAction('create');
     }
 
     public function testProcessWhenConfigAlreadyExists()
@@ -115,11 +113,13 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         $this->assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWithoutInheritance()
+    public function testProcessWithDescriptions()
     {
         $config = [
             'label'        => 'Test Entity',
             'plural_label' => 'Test Entities',
+            'form_type'    => 'test_form',
+            'form_options' => ['option' => 'value'],
             'fields'       => [
                 'field1' => null,
                 'field2' => null,
@@ -135,6 +135,106 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                     'field1' => null
                 ]
             ],
+            'actions'      => [
+                'create' => [
+                    'status_codes' => [
+                        123 => ['description' => 'status 123'],
+                        456 => ['exclude' => true]
+                    ],
+                    'form_type'    => 'action_form',
+                    'form_options' => ['action_option' => 'action_value'],
+                ]
+            ]
+        ];
+
+        $this->configBag->expects($this->once())
+            ->method('getConfig')
+            ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
+            ->willReturn($config);
+
+        $this->entityHierarchyProvider->expects($this->once())
+            ->method('getHierarchyForClassName')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn([]);
+
+        $this->context->setExtras([new DescriptionsConfigExtra(), new FiltersConfigExtra()]);
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'label'        => 'Test Entity',
+                'plural_label' => 'Test Entities',
+                'form_type'    => 'action_form',
+                'form_options' => ['action_option' => 'action_value'],
+                'status_codes' => [
+                    123 => ['description' => 'status 123'],
+                    456 => ['exclude' => true]
+                ],
+                'fields'       => [
+                    'field1' => null,
+                    'field2' => null,
+                    'field3' => null,
+                ]
+            ],
+            $this->context->getResult()
+        );
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1' => null,
+                ]
+            ],
+            $this->context->getFilters()
+        );
+        $this->assertFalse($this->context->hasSorters());
+        $this->assertFalse($this->context->has('actions'));
+    }
+
+    public function testProcessWithoutInheritance()
+    {
+        $config = [
+            'label'        => 'Test Entity',
+            'plural_label' => 'Test Entities',
+            'form_type'    => 'test_form',
+            'form_options' => ['option' => 'value'],
+            'fields'       => [
+                'field1' => null,
+                'field2' => null,
+                'field3' => [
+                    'exclude'      => true,
+                    'form_type'    => 'field_form',
+                    'form_options' => ['option' => 'value'],
+                ],
+            ],
+            'filters'      => [
+                'fields' => [
+                    'field1' => null
+                ]
+            ],
+            'sorters'      => [
+                'fields' => [
+                    'field1' => null
+                ]
+            ],
+            'actions'      => [
+                'create' => [
+                    'status_codes' => [
+                        123 => ['description' => 'status 123'],
+                        456 => ['exclude' => true]
+                    ],
+                    'form_type'    => 'action_form',
+                    'form_options' => ['action_option' => 'action_value'],
+                    'fields'       => [
+                        'field2' => [
+                            'exclude' => true
+                        ],
+                        'field3' => [
+                            'form_type'    => 'action_field_form',
+                            'form_options' => ['action_option' => 'value'],
+                        ],
+                    ]
+                ]
+            ]
         ];
 
         $this->configBag->expects($this->once())
@@ -154,10 +254,18 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             [
                 'label'        => 'Test Entity',
                 'plural_label' => 'Test Entities',
+                'form_type'    => 'action_form',
+                'form_options' => ['action_option' => 'action_value'],
                 'fields'       => [
                     'field1' => null,
-                    'field2' => null,
-                    'field3' => null,
+                    'field2' => [
+                        'exclude' => true
+                    ],
+                    'field3' => [
+                        'exclude'      => true,
+                        'form_type'    => 'action_field_form',
+                        'form_options' => ['action_option' => 'value'],
+                    ],
                 ]
             ],
             $this->context->getResult()
@@ -171,6 +279,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             $this->context->getFilters()
         );
         $this->assertFalse($this->context->hasSorters());
+        $this->assertFalse($this->context->has('actions'));
     }
 
     /**
@@ -197,6 +306,16 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                     'field1' => null
                 ]
             ],
+            'actions'      => [
+                'create' => [
+                    'fields' => [
+                        'field2' => [
+                            'form_type'    => 'field_form',
+                            'form_options' => ['option' => 'value'],
+                        ],
+                    ]
+                ]
+            ]
         ];
 
         $parentConfig1 = [
@@ -242,6 +361,22 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                     'field3' => null,
                 ]
             ],
+            'actions'      => [
+                'create' => [
+                    'form_type'    => 'parent3_action_form',
+                    'form_options' => ['parent3_action_option' => 'value'],
+                    'fields'       => [
+                        'field2' => [
+                            'form_type'    => 'parent3_action_field_form',
+                            'form_options' => ['parent3_action_option' => 'value'],
+                        ],
+                        'field3' => [
+                            'form_type'    => 'parent3_action_field_form',
+                            'form_options' => ['parent3_action_option' => 'value'],
+                        ],
+                    ]
+                ]
+            ]
         ];
 
         $this->configBag->expects($this->exactly(4))
@@ -270,13 +405,19 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 'order_by'     => [
                     'field2' => 'ASC'
                 ],
+                'form_type'    => 'parent3_action_form',
+                'form_options' => ['parent3_action_option' => 'value'],
                 'fields'       => [
                     'field1' => null,
                     'field2' => [
-                        'exclude' => true
+                        'exclude'      => true,
+                        'form_type'    => 'field_form',
+                        'form_options' => ['option' => 'value'],
                     ],
                     'field3' => [
-                        'exclude' => true
+                        'exclude'      => true,
+                        'form_type'    => 'parent3_action_field_form',
+                        'form_options' => ['parent3_action_option' => 'value'],
                     ],
                     'field4' => null,
                 ]

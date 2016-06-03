@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Twig;
 
+use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 
@@ -32,6 +33,8 @@ class IntegrationExtension extends Twig_Extension
     {
         return [
             new Twig_SimpleFunction('oro_integration_themes', [$this, 'getThemes']),
+            new Twig_SimpleFunction('oro_integration_is_switch_enabled', [$this, 'isSwitchEnabled']),
+            new Twig_SimpleFunction('oro_integration_is_delete_enabled', [$this, 'isDeleteEnabled']),
         ];
     }
 
@@ -51,6 +54,27 @@ class IntegrationExtension extends Twig_Extension
         $this->dispatcher->dispatch(LoadIntegrationThemesEvent::NAME, $event);
 
         return $event->getThemes();
+    }
+
+    /**
+     * @param int $editMode
+     *
+     * @return bool
+     */
+    public function isSwitchEnabled($editMode)
+    {
+        return EditModeUtils::isSwitchEnableAllowed($editMode);
+    }
+
+    /**
+     * @param int $editMode
+     *
+     * @return bool
+     */
+    public function isDeleteEnabled($editMode)
+    {
+        // edit mode which allows to edit integration allows to delete it.
+        return EditModeUtils::isEditAllowed($editMode);
     }
 
     /**

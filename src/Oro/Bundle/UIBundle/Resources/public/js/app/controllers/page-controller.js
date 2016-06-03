@@ -1,4 +1,5 @@
 define([
+    'asap',
     'jquery',
     'underscore',
     'chaplin',
@@ -6,7 +7,7 @@ define([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/models/page-model',
     'module'
-], function($, _, Chaplin, __, BaseController, PageModel, module) {
+], function(asap, $, _, Chaplin, __, BaseController, PageModel, module) {
     'use strict';
 
     var PageController;
@@ -181,10 +182,13 @@ define([
 
             this.publishEvent('page:update', pageData, actionArgs, jqXHR, updatePromises);
 
-            // once all views are have updated, trigger page:afterChange
-            $.when.apply($, updatePromises).done(_.debounce(function() {
-                self.publishEvent('page:afterChange');
-            }, 0));
+            // once all views has been updated, trigger page:afterChange
+            $.when.apply($, updatePromises).done(function() {
+                // let all embedded inline scripts finish their execution
+                asap(function() {
+                    self.publishEvent('page:afterChange');
+                });
+            });
         },
 
         /**
@@ -318,12 +322,12 @@ define([
                 mediator.trigger('page:beforeRefresh', queue);
                 options = options || {};
                 _.defaults(options, {forceStartup: true, force: true});
-                $.when.apply($, queue).done(function(customOptions) {
+                $.when.apply($, queue).done(_.bind(function(customOptions) {
                     _.extend(options, customOptions || {});
-                    utils.redirectTo({url: url}, options);
+                    this._processRedirect({url: url}, options);
                     mediator.trigger('page:afterRefresh');
-                });
-            });
+                }, this));
+            }, this);
 
             mediator.setHandler('submitPage', this._submitPage, this);
         },

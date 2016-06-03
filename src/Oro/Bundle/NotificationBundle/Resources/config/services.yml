@@ -139,6 +139,7 @@ services:
             - '@oro_email.email_renderer'
             - '@swiftmailer.mailer.db_spool_mailer'
             - '@oro_config.user'
+            - '@oro_email.mailer.processor'
         calls:
             - [ setEnv, [%kernel.environment%] ]
             - [ setMessageLimit, [100] ]

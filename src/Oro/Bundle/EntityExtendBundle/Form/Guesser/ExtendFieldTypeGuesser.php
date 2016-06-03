@@ -81,16 +81,22 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
         $fieldName     = $fieldConfigId->getFieldName();
         $extendConfig  = $this->extendConfigProvider->getConfig($className, $fieldName);
 
-        $isTypeNotExists = empty($this->typeMap[$fieldConfigId->getFieldType()]);
-        $options         = $this->getOptions($extendConfig, $fieldConfigId);
-        $options         = $this->addConstraintsToOptions($options, $extendConfig, $fieldConfigId);
+        if ($formConfig->has('type')) {
+            $isTypeNotExists = false;
+            $type = $formConfig->get('type');
+        } else {
+            $isTypeNotExists = empty($this->typeMap[$fieldConfigId->getFieldType()]);
+            $type = $this->typeMap[$fieldConfigId->getFieldType()]['type'];
+        }
 
+        $options = $this->getOptions($extendConfig, $fieldConfigId);
+        $options = $this->addConstraintsToOptions($options, $extendConfig, $fieldConfigId);
         if (!$this->isApplicableField($extendConfig) || $isTypeNotExists) {
             return $this->createDefaultTypeGuess();
         }
 
         $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
-        $type         = $this->typeMap[$fieldConfigId->getFieldType()]['type'];
+
         $options      = array_replace_recursive(
             [
                 'label'    => $entityConfig->get('label'),

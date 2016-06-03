@@ -1,4 +1,7 @@
 oro_api:
     entities:
-        Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment:
+            fields:
+                title:
+                    property_path: name
         Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee: ~

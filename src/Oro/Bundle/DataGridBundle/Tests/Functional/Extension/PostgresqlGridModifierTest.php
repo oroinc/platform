@@ -26,6 +26,7 @@ class PostgresqlGridModifierTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->client->useHashNavigation(true);
         $this->container = $this->client->getKernel()->getContainer();
         $this->loadFixtures([
             'Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadUserData',

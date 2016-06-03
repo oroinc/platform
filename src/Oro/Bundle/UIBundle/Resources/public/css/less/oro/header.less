@@ -378,7 +378,7 @@ header {
   }
   &.navbar {
     margin: 0;
-    z-index: 925; // .dropdown-menu z-index + 25 to be able to play with z-indexes
+    z-index: @oroZindexDropdown + 25; // .dropdown-menu z-index + 25 to be able to play with z-indexes
     #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
   }
 }

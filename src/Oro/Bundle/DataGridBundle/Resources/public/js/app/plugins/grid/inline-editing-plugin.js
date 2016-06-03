@@ -38,9 +38,11 @@ define(function(require) {
             this.listenTo(this.main.collection, {
                 beforeFetch: this.beforeGridCollectionFetch
             });
-            this.listenTo(this.main.columns, {
-                'change:renderable': this.onColumnStateChange
-            });
+            if (this.main.columns) {
+                this.listenColumnEvents();
+            } else {
+                this.listenToOnce(this.main, 'columns:ready', this.listenColumnEvents);
+            }
             this.listenTo(mediator, {
                 'page:beforeChange': this.removeActiveEditorComponents,
                 'openLink:before': this.beforePageChange,
@@ -52,16 +54,26 @@ define(function(require) {
             var ConcreteApiAccessor = this.options.metadata.inline_editing.save_api_accessor['class'];
             this.saveApiAccessor = new ConcreteApiAccessor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
-            this.main.body.refresh();
+            if (this.main.rendered) {
+                this.main.body.refresh();
+            }
             InlineEditingPlugin.__super__.enable.call(this);
             $(window).on('beforeunload.' + this.cid, _.bind(this.onWindowUnload, this));
+        },
+
+        listenColumnEvents: function() {
+            this.listenTo(this.main.columns, {
+                'change:renderable': this.onColumnStateChange
+            });
         },
 
         disable: function() {
             $(window).off('.' + this.cid);
             this.removeActiveEditorComponents();
-            this.main.$el.removeClass('grid-editable');
-            this.main.body.refresh();
+            if (!this.manager.disposing) {
+                this.main.$el.removeClass('grid-editable');
+                this.main.body.refresh();
+            }
             InlineEditingPlugin.__super__.disable.call(this);
         },
 
@@ -201,32 +213,27 @@ define(function(require) {
 
         getCellEditorOptions: function(cell) {
             var columnMetadata = cell.column.get('metadata');
-            var editor = (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.editor) ?
-                $.extend(true, {}, columnMetadata.inline_editing.editor) :
-                {};
+            var editor = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
+            var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
 
             if (!editor.component_options) {
                 editor.component_options = {};
             }
 
-            if (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.save_api_accessor) {
-                if (!(columnMetadata.inline_editing.save_api_accessor instanceof ApiAccessor)) {
+            if (saveApiAccessor) {
+                if (!(saveApiAccessor instanceof ApiAccessor)) {
                     var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
-                        columnMetadata.inline_editing.save_api_accessor);
+                        saveApiAccessor);
                     var ConcreteApiAccessor = saveApiOptions.class;
-                    columnMetadata.inline_editing.save_api_accessor = new ConcreteApiAccessor(
-                        _.omit(saveApiOptions, 'class'));
+                    saveApiAccessor = new ConcreteApiAccessor(_.omit(saveApiOptions, 'class'));
                 }
-                editor.save_api_accessor = columnMetadata.inline_editing.save_api_accessor;
+                editor.save_api_accessor = saveApiAccessor;
             } else {
                 // use main
                 editor.save_api_accessor = this.saveApiAccessor;
             }
 
-            var validationRules = (columnMetadata.inline_editing &&
-                columnMetadata.inline_editing.validation_rules) ?
-                columnMetadata.inline_editing.validation_rules :
-                {};
+            var validationRules = _.result(columnMetadata.inline_editing, 'validation_rules') || {};
 
             _.each(validationRules, function(params, ruleName) {
                 // normalize rule's params, in case is it was defined as 'NotBlank: ~'

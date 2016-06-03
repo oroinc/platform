@@ -18,7 +18,7 @@ define([
         var _len;
         var _len1;
         var _ref;
-        if (this.disposed) {
+        if (this.disposed || !this.$el) {
             return;
         }
 
@@ -33,7 +33,10 @@ define([
         Backbone.mediator.unsubscribe(null, null, this);
         this.off();
         this.stopListening();
-        if (this.$el) {
+
+        if (this.keepElement === false) {
+            this.$el.remove();
+        } else {
             this.undelegateEvents();
             this.$el.removeData();
         }
@@ -53,11 +56,11 @@ define([
     Backbone.View.prototype.getLayoutElement = function() {
         return this.$el;
     };
-    Backbone.View.prototype.initLayout = function() {
+    Backbone.View.prototype.initLayout = function(options) {
         // initializes layout
         Backbone.mediator.execute('layout:init', this.getLayoutElement());
         // initializes page components
-        return this.initPageComponents();
+        return this.initPageComponents(options);
     };
     /**
      * Create flag of deferred render

@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
+use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 
 class OperationExtension extends AbstractExtension
 {
@@ -27,6 +28,9 @@ class OperationExtension extends AbstractExtension
     /** @var OptionsHelper */
     protected $optionsHelper;
 
+    /** @var GridConfigurationHelper */
+    protected $gridConfigurationHelper;
+
     /** @var array */
     protected $datagridContext = [];
 
@@ -41,17 +45,20 @@ class OperationExtension extends AbstractExtension
      * @param ContextHelper $contextHelper
      * @param MassActionProviderRegistry $providerRegistry
      * @param OptionsHelper $optionsHelper
+     * @param GridConfigurationHelper $gridConfigurationHelper
      */
     public function __construct(
         OperationManager $operationManager,
         ContextHelper $contextHelper,
         MassActionProviderRegistry $providerRegistry,
-        OptionsHelper $optionsHelper
+        OptionsHelper $optionsHelper,
+        GridConfigurationHelper $gridConfigurationHelper
     ) {
         $this->operationManager = $operationManager;
         $this->contextHelper = $contextHelper;
         $this->providerRegistry = $providerRegistry;
         $this->optionsHelper = $optionsHelper;
+        $this->gridConfigurationHelper = $gridConfigurationHelper;
     }
 
     /**
@@ -77,6 +84,7 @@ class OperationExtension extends AbstractExtension
             return false;
         }
 
+        $this->processDatagridConfig($config);
         $this->processActionsConfig($config);
         $this->processMassActionsConfig($config);
 
@@ -127,12 +135,15 @@ class OperationExtension extends AbstractExtension
                 );
             }
 
-            return array_filter(
-                array_merge($actionsNew, $this->retrieveConfiguration($actionConfiguration, $record, $config)),
-                function ($item) {
-                    return $item === false || is_array($item);
+            $configuration = $this->retrieveConfiguration($actionConfiguration, $record, $config);
+
+            foreach ($actionsNew as $name => $action) {
+                if (!array_key_exists($name, $configuration) || $configuration[$name] !== false) {
+                    $configuration[$name] = $action;
                 }
-            );
+            }
+
+            return $configuration;
         };
     }
 
@@ -182,6 +193,18 @@ class OperationExtension extends AbstractExtension
         $frontendOptions = $this->optionsHelper->getFrontendOptions($operation, $context);
 
         return $frontendOptions['options'];
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     */
+    protected function processDatagridConfig(DatagridConfiguration $config)
+    {
+        $context = $this->contextHelper->getContext();
+
+        if (!empty($context['route'])) {
+            $config->offsetSetByPath('[options][urlParams][originalRoute]', $context['route']);
+        }
     }
 
     /**
@@ -257,10 +280,8 @@ class OperationExtension extends AbstractExtension
      */
     protected function getDatagridContext(DatagridConfiguration $config)
     {
-        $entityClass = $config->offsetGetByPath('[extended_entity_name]');
-
         return [
-            ContextHelper::ENTITY_CLASS_PARAM => $entityClass ?: $config->offsetGetByPath('[entity_name]'),
+            ContextHelper::ENTITY_CLASS_PARAM => $this->gridConfigurationHelper->getEntity($config),
             ContextHelper::DATAGRID_PARAM => $config->offsetGetByPath('[name]'),
             ContextHelper::GROUP_PARAM => $this->groups,
         ];

@@ -16,7 +16,6 @@ parameters:
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
     oro_action.layout.block_type.action_line_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType
-    oro_action.layout.block_type.action_combined_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionCombinedButtonsType
     oro_action.layout.data_provider.actions_data_rpovider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider
 
 services:
@@ -33,6 +32,13 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@property_accessor'
             - '@request_stack'
+
+    oro_action.helper.default_operation_request:
+        class: 'Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper'
+        public: true
+        arguments:
+            - '@request_stack'
+            - '@oro_action.helper.applications'
 
     oro_action.helper.applications:
         class: %oro_action.helper.applications.class%
@@ -139,6 +145,19 @@ services:
             - '@oro_action.helper.context'
             - '@oro_action.datagrid.mass_action_provider.registry'
             - '@oro_action.helper.options'
+            - '@oro_datagrid.grid_configuration.helper'
+        calls:
+            - [setGroups, [['', 'datagridRowAction']]]
+        tags:
+            - { name: oro_datagrid.extension }
+        lazy: true
+
+    oro_action.datagrid.extension.delete_mass_action:
+        class: Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_action.operation_manager'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
@@ -165,7 +184,10 @@ services:
             - { name: layout.block_type, alias: action_line_buttons }
 
     oro_action.layout.block_type.action_combined_buttons:
-        class: %oro_action.layout.block_type.action_combined_buttons.class%
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['action_combined_buttons']]
+            - [setParent, ['action_line_buttons']]
         tags:
             - { name: layout.block_type, alias: action_combined_buttons }
 
