@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\DataGridBundle\Layout\Block\Extension\TaggableDatagridExtension;
 
@@ -32,7 +31,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit_Framework_TestCase
     public function testSetDefaultOptions(array $options, array $expectedOptions)
     {
         $resolver = new OptionsResolver();
-        $this->extension->setDefaultOptions($resolver);
+        $this->extension->configureOptions($resolver);
         $actual = $resolver->resolve($options);
         $this->assertEquals($expectedOptions, $actual);
     }

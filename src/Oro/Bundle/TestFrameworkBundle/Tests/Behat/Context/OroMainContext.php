@@ -169,7 +169,7 @@ JS;
     }
 
     /**
-     * @Given /^(?:|I )open the menu "(?P<path>(?:[^"]|\\")*)" and click "(?P<linkLocator>(?:[^"]|\\")*)"$/
+     * @Given /^(?:|I )open the menu "(?P<path>(?:[^"]|\\")*)" (and|then) click "(?P<linkLocator>(?:[^"]|\\")*)"$/
      */
     public function iOpenTheMenuAndClick($path, $linkLocator)
     {
