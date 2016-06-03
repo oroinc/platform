@@ -10,7 +10,7 @@ use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\QueryFactory as ParentFactory;
 
-class QueryFactory extends ParentFactory
+class AclProtectedQueryFactory extends ParentFactory
 {
     /** @var AclHelper */
     protected $aclHelper;

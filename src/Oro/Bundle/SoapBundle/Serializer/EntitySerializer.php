@@ -11,7 +11,6 @@ use Oro\Component\EntitySerializer\DataTransformerInterface as BaseDataTransform
 use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntitySerializer as BaseEntitySerializer;
 use Oro\Component\EntitySerializer\FieldAccessor;
-use Oro\Component\EntitySerializer\QueryFactory;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Serializer\ExtendEntityFieldFilter;
@@ -26,14 +25,14 @@ class EntitySerializer extends BaseEntitySerializer
      * @param ConfigManager                $configManager
      * @param BaseDataAccessorInterface    $dataAccessor
      * @param BaseDataTransformerInterface $dataTransformer
-     * @param QueryFactory                 $queryFactory
+     * @param AclProtectedQueryFactory     $queryFactory
      */
     public function __construct(
         ManagerRegistry $doctrine,
         ConfigManager $configManager,
         BaseDataAccessorInterface $dataAccessor,
         BaseDataTransformerInterface $dataTransformer,
-        QueryFactory $queryFactory
+        AclProtectedQueryFactory $queryFactory
     ) {
         $doctrineHelper = new DoctrineHelper($doctrine);
         $fieldAccessor  = new FieldAccessor(
