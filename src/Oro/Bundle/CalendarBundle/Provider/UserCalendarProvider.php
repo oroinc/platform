@@ -290,6 +290,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 ) {
                     $exceptionFound = true;
                     if (empty($exception['isCancelled'])) {
+                        $exception['recurrencePattern'] = $occurrence['recurrencePattern'];
                         $recurringEvents[] = $exception;
                     }
                     unset($recurringExceptionEvents[$key]);

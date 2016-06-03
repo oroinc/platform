@@ -79,7 +79,10 @@
                     {{ UI.renderHtmlProperty('oro.calendar.calendarevent.attendees.label'|trans, invitations.calendar_event_invitation(invitationEvent)) }}
                 {% endif %}
                 {% if entity.recurrence %}
-                    {{ UI.renderProperty('oro.calendar.calendarevent.recurrence.alias.repeat'|trans, get_recurrence_text_value(entity.recurrence)) }}
+                    {{ UI.renderProperty('oro.calendar.calendarevent.recurrence.label'|trans, get_recurrence_text_value(entity.recurrence)) }}
+                {% endif %}
+                {% if entity.recurringEvent %}
+                    {{ UI.renderProperty('oro.calendar.calendarevent.recurrence.exception.label'|trans, get_recurrence_text_value(entity.recurringEvent.recurrence)) }}
                 {% endif %}
             </div>
             <div class="responsive-block">

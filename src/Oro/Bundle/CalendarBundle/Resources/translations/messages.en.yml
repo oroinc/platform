@@ -121,9 +121,8 @@ oro:
             origin.label: Origin
 
             recurrence.label:      Recurrence
-            recurrence.alias.repeat: Repeat
+            recurrence.exception.label: Part of Recurrence
             recurrence.alias.recurrent: Recurrent
-            recurrence.pattern: Recurrence Pattern
             recurrence.na: N/A
             recurring_event_exceptions.label: Recurring Event Exceptions
             recurring_event.label: Recurring Event
@@ -195,10 +194,6 @@ oro:
             start_time.label:       Start time
             end_time.label:         End time
             occurrences.label:      Occurrences
-
-            notifier:
-                all_events: All Events
-                all_events.label: All events in the series will be changed.
 
             patterns:
                 occurrences: "{1} , end after 1 occurrence|]1,Inf[ , end after %count% occurrences"

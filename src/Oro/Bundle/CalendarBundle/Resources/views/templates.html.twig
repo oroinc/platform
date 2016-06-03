@@ -19,9 +19,6 @@
     </div>
 </script>
 
-{% import 'OroCalendarBundle::recurringEvent.html.twig' as recurringEvent %}
-{{ recurringEvent.generateRecurrentEventNotifierTemplate() }}
-
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div class="widget-content">
@@ -33,7 +30,10 @@
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
                 <% if (recurrence) { %>
-                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.recurrence.alias.repeat'|trans, '<%= formatter.string(recurrencePattern) %>') }}
+                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.recurrence.label'|trans, '<%= formatter.string(recurrencePattern) %>') }}
+                <% } %>
+                <% if (recurringEventId && recurrencePattern) { %>
+                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.recurrence.exception.label'|trans, '<%= formatter.string(recurrencePattern) %>') }}
                 <% } %>
                 <div class="activity-context-activity">
                 {{ UI.renderAttribute('oro.activity.contexts.label'|trans, '<div class="activity-context-activity-items"></div>') }}
@@ -67,7 +67,6 @@
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
-    {% import 'OroCalendarBundle::recurringEvent.html.twig' as recurringEvent %}
     {% set data = [
             form_row(form.title),
             form_row(form.description),
@@ -76,7 +75,13 @@
             form_row(form.allDay),
             '<% if (recurrence) { %>' ~
                 UI.renderHtmlProperty(
-                    'oro.calendar.calendarevent.recurrence.alias.repeat'|trans,
+                    'oro.calendar.calendarevent.recurrence.label'|trans,
+                    '<%= recurrencePattern %>'
+                ) ~
+            '<% } %>',
+            '<% if (recurringEventId && recurrencePattern) { %>' ~
+                UI.renderHtmlProperty(
+                    'oro.calendar.calendarevent.recurrence.exception.label'|trans,
                     '<%= recurrencePattern %>'
                 ) ~
             '<% } %>',
@@ -104,10 +109,6 @@
                     {{ UI.scrollSubblock(null, data, true, false)|oro_js_template_content|raw }}
                     <% if (typeof notifiable !== 'undefined' && notifiable) { %>
                         {{ invitations.notifyGuestsComponent() }}
-                    <% } %>
-
-                    <% if (recurrence != null) { %>
-                        {{ recurringEvent.notifyRecurringEventEditComponent() }}
                     <% } %>
 
                     <div class="widget-actions form-actions" style="display: none;">

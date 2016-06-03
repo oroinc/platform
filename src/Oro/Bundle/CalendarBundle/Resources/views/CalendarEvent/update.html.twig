@@ -1,6 +1,5 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
-{% import 'OroCalendarBundle::recurringEvent.html.twig' as recurringEvent %}
 
 {% oro_title_set({params : {"%entity.title%": entity.title, "%entityName%": 'oro.calendar.calendarevent.entity_label'|trans } }) %}
 {% set entityId = entity.id %}
@@ -15,7 +14,6 @@
 {% endblock %}
 
 {% block pageHeader %}
-    {{ recurringEvent.generateRecurrentEventNotifierTemplate() }}
     {% if entityId %}
         {% set breadcrumbs = {
             'entity':      entity,
@@ -35,8 +33,13 @@
     {% set recurrencePattern = '' %}
     {% if entity.recurrence %}
         {% set recurrencePattern = UI.renderProperty(
-            'oro.calendar.calendarevent.recurrence.alias.repeat'|trans,
+            'oro.calendar.calendarevent.recurrence.label'|trans,
             get_recurrence_text_value(entity.recurrence)
+        ) %}
+    {% elseif entity.recurringEvent %}
+        {% set recurrencePattern = UI.renderProperty(
+            'oro.calendar.calendarevent.recurrence.exception.label'|trans,
+            get_recurrence_text_value(entity.recurringEvent.recurrence)
         ) %}
     {% endif %}
 
@@ -58,8 +61,7 @@
                     form_row(form.attendees),
                     entity.recurrence is null ? form_row(form.reminders) : null,
                     form_row(form.notifyInvitedUsers),
-                    entity.relatedAttendee  and entity.relatedAttendee.status and entity.parent is null and entity.childAttendees is not empty and entity.recurrence is null ? invitations.notifyGuestsComponent() : null,
-                    entity.recurrence is not null ? recurringEvent.notifyRecurringEventEditComponent() : null
+                    entity.relatedAttendee  and entity.relatedAttendee.status and entity.parent is null and entity.childAttendees is not empty and entity.recurrence is null ? invitations.notifyGuestsComponent() : null
                 ]
             }
         ]
