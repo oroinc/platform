@@ -60,14 +60,14 @@ services:
     oro_locale.form.type.language_select:
         class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType
         arguments:
-            - '@oro_config.global'
+            - '@oro_locale.provider.localization_choices'
         tags:
             - { name: form.type, alias: "oro_language_select" }
 
     oro_locale.form.type.formatting_select:
         class: Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType
         arguments:
-            - '@oro_config.global'
+            - '@oro_locale.provider.localization_choices'
         tags:
             - { name: form.type, alias: "oro_formatting_select" }
 

@@ -75,20 +75,38 @@ datagrid:
         filters:
             columns:
                 name:
-                    type:      string
-                    data_name: name
+                    type: string
+                    data_name: l.name
                 title:
                     type: string
                     data_name: title
+                languageCode:
+                    type: choice
+                    data_name: l.languageCode
+                    options:
+                        field_options:
+                            choices: "@oro_locale.provider.localization_choices->getLanguageChoices"
+                            translatable_options: false
+                formattingCode:
+                    type: choice
+                    data_name: l.formattingCode
+                    options:
+                        field_options:
+                            choices: "@oro_locale.provider.localization_choices->getFormattingChoices"
+                            translatable_options: false
                 parentName:
-                    type: string
-                    data_name: parentName
+                    type: choice
+                    data_name: pl.id
+                    options:
+                        field_options:
+                            choices: "@oro_locale.provider.localization_choices->getLocalizationChoices"
+                            translatable_options: false
                 createdAt:
                     type: datetime
-                    data_name: createdAt
+                    data_name: l.createdAt
                 updatedAt:
                     type: datetime
-                    data_name: updatedAt
+                    data_name: l.updatedAt
         properties:
             id: ~
             view_link:
@@ -97,8 +115,9 @@ datagrid:
                 params: [ id ]
         actions:
             view:
-                type:           navigate
-                label:          oro.grid.action.view
-                link:           view_link
-                icon:           eye-open
-                acl_resource:   oro_locale_localization_view
+                type: navigate
+                label: oro.grid.action.view
+                link: view_link
+                icon: eye-open
+                acl_resource: oro_locale_localization_view
+                row_action: true

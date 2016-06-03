@@ -238,3 +238,17 @@ services:
             - [setClassName, ['%oro_locale.entity.localization.class%']]
         tags:
             - { name: security.voter }
+
+    oro_locale.repository.localization:
+        class: Doctrine\ORM\EntityRepository
+        factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+        arguments:
+            - '%oro_locale.entity.localization.class%'
+
+    oro_locale.provider.localization_choices:
+        class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
+        arguments:
+            - '@oro_locale.repository.localization'
+            - '@oro_config.manager'
+            - '@oro_locale.formatter.language_code'
+            - '@oro_locale.formatter.formatting_code'
