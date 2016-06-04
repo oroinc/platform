@@ -278,13 +278,13 @@ datagrid:
                     type: string
                     data_name: u.lastName
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
 
     base-system-calendar-event-grid:
         source:

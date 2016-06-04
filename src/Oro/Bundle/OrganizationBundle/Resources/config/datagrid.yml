@@ -169,13 +169,13 @@ datagrid:
                     type: string
                     data_name: u.username
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
         sorters:
             columns:
                 hasCurrentBusinessUnit:
@@ -239,10 +239,10 @@ datagrid:
                     type: string
                     data_name: u.username
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
