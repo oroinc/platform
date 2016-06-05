@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matey
- * Date: 02.06.2016
- * Time: 15:57
- */
 
 namespace Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 

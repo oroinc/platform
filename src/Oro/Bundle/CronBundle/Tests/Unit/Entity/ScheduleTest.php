@@ -89,6 +89,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $args = ['test' => 'value', 'some' => 'data'];
         $this->object->setArguments($args);
 
+        sort($args);
         $this->assertSame(md5(json_encode($args)), $this->object->getArgumentsHash());
     }
 

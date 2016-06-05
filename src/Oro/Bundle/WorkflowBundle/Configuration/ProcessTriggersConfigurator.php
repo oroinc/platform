@@ -4,14 +4,19 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
-use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
+
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
+use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
+
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class ProcessTriggersConfigurator implements LoggerAwareInterface
 {
     /** @var LoggerInterface */
@@ -32,6 +37,9 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     /** @var ProcessTriggerCronScheduler */
     private $processCronScheduler;
 
+    /** @var ProcessTrigger[] */
+    private $triggers;
+
     /**
      * @param ProcessConfigurationBuilder $configurationBuilder
      * @param ManagerRegistry $registry
@@ -44,6 +52,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         $triggerEntityClass,
         ProcessTriggerCronScheduler $processCronScheduler
     ) {
+        $this->triggers = [];
         $this->configurationBuilder = $configurationBuilder;
         $this->registry = $registry;
         $this->triggerEntityClass = $triggerEntityClass;
@@ -51,6 +60,9 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         $this->setLogger(new NullLogger());
     }
 
+    /**
+     * @param LoggerInterface $logger
+     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -67,13 +79,13 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
      * @param array|ProcessDefinition[] $definitions array of definitions for triggers
      *
      * @return ProcessTrigger[]
-     * @throws \Oro\Component\Action\Exception\InvalidParameterException
      * @throws \LogicException
      */
     public function configureTriggers(array $triggersConfiguration, array $definitions)
     {
         /** @var ProcessTriggerRepository $triggerRepository */
         $triggerRepository = $this->getRepository();
+        $this->triggers = [];
 
         foreach ($definitions as $definition) {
             $definitionName = $definition->getName();
@@ -93,7 +105,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
                     } else {
                         $this->create($newTrigger);
                     }
-                    $this->ensureSchedule($newTrigger);
+                    $this->triggers[] = $newTrigger;
                 }
 
                 foreach ($storedTriggers as $triggerForRemove) {
@@ -235,6 +247,9 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
             $this->getObjectManager()->flush();
             $this->logger->info('>> process triggers modifications stored in DB');
             $this->dirty = false;
+            foreach ($this->triggers as $trigger) {
+                $this->ensureSchedule($trigger);
+            }
             $this->processCronScheduler->flush();
         }
     }

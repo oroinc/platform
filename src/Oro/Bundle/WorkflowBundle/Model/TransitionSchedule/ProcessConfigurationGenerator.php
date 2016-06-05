@@ -71,11 +71,15 @@ class ProcessConfigurationGenerator
                 'order' => 0,
                 'exclude_definitions' => [$processName],
                 'actions_configuration' => [
-                    '@run_action_group' => [
-                        'action_group' => 'oro_workflow_transition_process_schedule',
-                        'parameters' => [
-                            'workflowName' => $workflowName,
-                            'transitionName' => $transitionName
+                    [
+                        '@run_action_group' => [
+                            'parameters' => [
+                                'action_group' => 'oro_workflow_transition_process_schedule',
+                                'parameters_mapping' => [
+                                    'workflowName' => $workflowName,
+                                    'transitionName' => $transitionName
+                                ]
+                            ]
                         ]
                     ]
                 ],

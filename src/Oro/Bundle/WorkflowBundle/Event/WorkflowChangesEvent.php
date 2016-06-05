@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matey
- * Date: 02.06.2016
- * Time: 16:49
- */
 
 namespace Oro\Bundle\WorkflowBundle\Event;
 
@@ -16,6 +10,10 @@ class WorkflowChangesEvent extends Event
     /** @var WorkflowDefinition */
     private $definition;
 
+    /**
+     * WorkflowChangesEvent constructor.
+     * @param WorkflowDefinition $definition
+     */
     public function __construct(WorkflowDefinition $definition)
     {
         $this->definition = $definition;

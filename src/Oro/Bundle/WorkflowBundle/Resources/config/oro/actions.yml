@@ -8,7 +8,7 @@ action_groups:
         actions:
             - '@call_service_method':
                 service: oro_workflow.transition_schedule.items_fetcher
-                method: fetch
+                method: fetchWorkflowItemsIds
                 method_parameters: [$.workflowName, $.transitionName]
                 attribute: $.workflowItemIds
             - '@foreach':

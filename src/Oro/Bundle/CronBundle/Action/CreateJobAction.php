@@ -120,13 +120,19 @@ class CreateJobAction extends AbstractAction
             throw new \RuntimeException('Action is not initialized.');
         }
 
-        if (false === $this->canAddTheJob()) {
+        $args = [];
+        foreach ($this->options[self::OPTION_ARGUMENTS] as $key => $value) {
+            $value = $this->contextAccessor->getValue($context, $value);
+            $args[] = $key . '=' . $value;
+        }
+
+        if (false === $this->canAddTheJob($args)) {
             return;
         }
 
         $job = Job::create(
             $this->options[self::OPTION_COMMAND],
-            $this->options[self::OPTION_ARGUMENTS],
+            $args,
             true,
             $this->options[self::OPTION_QUEUE],
             $this->options[self::OPTION_PRIORITY]
@@ -147,9 +153,10 @@ class CreateJobAction extends AbstractAction
     /**
      * Checks if we can add a Job to a queue
      *
+     * @param array $args
      * @return bool
      */
-    private function canAddTheJob()
+    private function canAddTheJob(array $args)
     {
         if ($this->options[self::OPTION_ALLOW_DUPLICATES]) {
             return true;
@@ -157,7 +164,7 @@ class CreateJobAction extends AbstractAction
 
         return false === $this->jobManager->hasJobInQueue(
             $this->options[self::OPTION_COMMAND],
-            json_encode($this->options[self::OPTION_ARGUMENTS])
+            json_encode($args)
         );
     }
 

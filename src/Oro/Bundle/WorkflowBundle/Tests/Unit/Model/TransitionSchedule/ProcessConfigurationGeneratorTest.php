@@ -93,13 +93,17 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
                             'order' => 0,
                             'exclude_definitions' => ['stpn__workflow_name__transition_one'],
                             'actions_configuration' => [
-                                '@run_action_group' => [
-                                    'action_group' => 'oro_workflow_transition_process_schedule',
-                                    'parameters' => [
-                                        'workflowName' => 'workflow_name',
-                                        'transitionName' => 'transition_one'
-                                    ]
-                                ]
+                                [
+                                    '@run_action_group' => [
+                                        'parameters' => [
+                                            'action_group' => 'oro_workflow_transition_process_schedule',
+                                            'parameters_mapping' => [
+                                                'workflowName' => 'workflow_name',
+                                                'transitionName' => 'transition_one'
+                                            ]
+                                        ]
+                                    ],
+                                ],
                             ],
                             'pre_conditions' => []
                         ],
@@ -109,11 +113,15 @@ class ProcessConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
                             'order' => 0,
                             'exclude_definitions' => ['stpn__workflow_name__transition_three'],
                             'actions_configuration' => [
-                                '@run_action_group' => [
-                                    'action_group' => 'oro_workflow_transition_process_schedule',
-                                    'parameters' => [
-                                        'workflowName' => 'workflow_name',
-                                        'transitionName' => 'transition_three'
+                                [
+                                    '@run_action_group' => [
+                                        'parameters' => [
+                                            'action_group' => 'oro_workflow_transition_process_schedule',
+                                            'parameters_mapping' => [
+                                                'workflowName' => 'workflow_name',
+                                                'transitionName' => 'transition_three'
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ],

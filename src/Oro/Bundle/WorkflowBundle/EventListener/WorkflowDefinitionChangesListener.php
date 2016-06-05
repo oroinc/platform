@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
@@ -10,7 +12,6 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGener
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Provide logic for workflow scheduled transitions processes synchronization
@@ -44,6 +45,9 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         $this->scheduledTransitionProcessesLink = $scheduledTransitionProcessesLink;
     }
 
+    /**
+     * @param WorkflowChangesEvent $event
+     */
     public function generateProcessConfigurations(WorkflowChangesEvent $event)
     {
         $definition = $event->getDefinition();
@@ -52,6 +56,9 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
             ->generateForScheduledTransition($definition);
     }
 
+    /**
+     * @param WorkflowChangesEvent $event
+     */
     public function workflowCreated(WorkflowChangesEvent $event)
     {
         $workflowName = $event->getDefinition()->getName();
@@ -75,9 +82,8 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         
         $scheduledTransitionProcesses = $this->getScheduledTransitionProcesses();
         
-        if(array_key_exists($workflowName, $this->generatedConfigurations)) {
-            
-            $processConfigurator->configureProcesses($workflowDefinition);
+        if (array_key_exists($workflowName, $this->generatedConfigurations)) {
+            $processConfigurator->configureProcesses($this->generatedConfigurations[$workflowName]);
             $persistedProcessDefinitions = $scheduledTransitionProcesses->workflowRelated(
                 $workflowDefinition->getName()
             );
@@ -115,6 +121,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
 
     /**
      * @return ProcessConfigurator
+     * @throws \RuntimeException
      */
     protected function getProcessConfigurator()
     {
@@ -131,6 +138,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
 
     /**
      * @return ScheduledTransitionProcesses
+     * @throws \RuntimeException
      */
     protected function getScheduledTransitionProcesses()
     {
@@ -145,6 +153,9 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         return $service;
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return [
