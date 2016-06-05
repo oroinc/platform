@@ -139,19 +139,20 @@ services:
     # normalize_input
     #
 
-    oro_api.get_list.json_api.correct_sort_value:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\CorrectSortValue
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_input, requestType: json_api, priority: 10 }
-
     oro_api.get_list.normalize_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues
         arguments:
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -10 }
+            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 100 }
+
+    oro_api.get_list.json_api.correct_sort_value:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\CorrectSortValue
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_input, requestType: json_api, priority: 90 }
 
     oro_api.get_list.validate_sorting:
         class: Oro\Bundle\ApiBundle\Processor\GetList\ValidateSorting

@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
@@ -73,7 +72,7 @@ class BuildCriteria implements ProcessorInterface
             }
         }
 
-        // Process unknown filters
+        // process unknown filters
         $filterValues = $filterValues->getGroup('filter');
         foreach ($filterValues as $filterKey => $filterValue) {
             if (isset($processedFilterKeys[$filterKey])) {
@@ -83,33 +82,28 @@ class BuildCriteria implements ProcessorInterface
                 continue;
             }
 
-            $filterValueDataType = $this->getFilterValueDataType($context, $filterValue);
-            if (!$filterValueDataType) {
+            $filter = $this->getFilter($filterValue, $context);
+            if ($filter) {
+                $filter->apply($criteria, $filterValue);
+                $filters->add($filterKey, $filter);
+            } else {
                 $context->addError(
                     Error::createValidationError(
                         Constraint::FILTER,
                         sprintf('Filter "%s" is not supported.', $filterKey)
                     )->setSource(ErrorSource::createByParameter($filterKey))
                 );
-                continue;
             }
-
-            /** @var ComparisonFilter $filter */
-            $filter = new ComparisonFilter($filterValueDataType);
-            $filter->setField($filterValue->getPath());
-            $filter->apply($criteria, $filterValue);
-
-            $filters->add($filterKey, $filter);
         }
     }
 
     /**
-     * @param Context     $context
      * @param FilterValue $filterValue
+     * @param Context     $context
      *
-     * @return string|null
+     * @return ComparisonFilter|null
      */
-    protected function getFilterValueDataType($context, $filterValue)
+    protected function getFilter(FilterValue $filterValue, Context $context)
     {
         /** @var ClassMetadata $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
@@ -117,46 +111,83 @@ class BuildCriteria implements ProcessorInterface
             return null;
         }
 
-        $filterParts = explode('.', $filterValue->getPath());
-        $filterFieldName = array_pop($filterParts);
-
-        //all parts of filter path, except last one should be an associations
-        foreach ($filterParts as $filterPart) {
-            if (!$metadata->hasAssociation($filterPart)) {
-                return null;
-            }
-
-            $metadata = $this->doctrineHelper->getEntityMetadataForClass(
-                $metadata->getAssociationTargetClass($filterPart)
-            );
+        $fieldName = $filterValue->getPath();
+        $path = explode('.', $fieldName);
+        $associations = null;
+        if (count($path) > 1) {
+            $fieldName = array_pop($path);
+            list($filtersConfig, $associations) = $this->getAssociationFilters($path, $context, $metadata);
+        } else {
+            $filtersConfig = $context->getConfigOfFilters();
         }
-
-        //the last part of filter path should exist in metadata.
-        if (!$metadata->hasAssociation($filterFieldName) && !$metadata->hasField($filterFieldName)) {
+        if (!$filtersConfig) {
+            return null;
+        }
+        $filterConfig = $filtersConfig->getField($fieldName);
+        if (!$filterConfig) {
             return null;
         }
 
-        $className = $metadata->getName();
-        if ($metadata->hasAssociation($filterFieldName)) {
-            $className = $metadata->getAssociationTargetClass($filterFieldName);
+        $filterValueField = $filterConfig->getPropertyPath() ?: $fieldName;
+        if ($associations) {
+            $filterValueField = $associations . '.' . $filterValueField;
         }
 
-        $config = $this->configProvider->getConfig(
-            $className,
-            $context->getVersion(),
-            $context->getRequestType(),
-            [
-                new EntityDefinitionConfigExtra($context->getAction()),
-                new FiltersConfigExtra()
-            ]
-        );
+        $filter = new ComparisonFilter($filterConfig->getDataType());
+        $filter->setField($filterValueField);
 
-        if ($config->hasFilters() && $config->getFilters()->hasField($filterFieldName)) {
-            $filterFieldConfig = $config->getFilters()->getField($filterFieldName);
+        return $filter;
+    }
 
-            return $filterFieldConfig->getDataType();
+    /**
+     * @param string[]      $path
+     * @param Context       $context
+     * @param ClassMetadata $metadata
+     *
+     * @return array [filters config, associations]
+     */
+    protected function getAssociationFilters(array $path, Context $context, ClassMetadata $metadata)
+    {
+        $targetConfigExtras = [
+            new EntityDefinitionConfigExtra($context->getAction()),
+            new FiltersConfigExtra()
+        ];
+
+        $config = $context->getConfig();
+        $filters = null;
+        $associations = [];
+
+        foreach ($path as $fieldName) {
+            if (!$config->hasField($fieldName)) {
+                return [null, null];
+            }
+
+            $associationName = $config->getField($fieldName)->getPropertyPath() ?: $fieldName;
+            if (!$metadata->hasAssociation($associationName)) {
+                return [null, null];
+            }
+
+            $targetClass = $metadata->getAssociationTargetClass($associationName);
+            $metadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass, false);
+            if (!$metadata) {
+                return [null, null];
+            }
+
+            $targetConfig = $this->configProvider->getConfig(
+                $targetClass,
+                $context->getVersion(),
+                $context->getRequestType(),
+                $targetConfigExtras
+            );
+            if (!$targetConfig->hasDefinition()) {
+                return [null, null];
+            }
+
+            $config = $targetConfig->getDefinition();
+            $filters = $targetConfig->getFilters();
+            $associations[] = $associationName;
         }
 
-        return null;
+        return [$filters, implode('.', $associations)];
     }
 }

@@ -125,10 +125,10 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 ],
                 'association1' => null,
                 'association3' => null,
-                'association4'       => [
+                'association4' => [
                     'property_path' => 'realAssociation4'
                 ],
-                'association5'       => [
+                'association5' => [
                     'property_path' => 'realAssociation5'
                 ],
             ]
@@ -200,7 +200,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1'       => [
-                        'data_type' => 'string',
+                        'data_type'   => 'string',
                         'allow_array' => true
                     ],
                     'field2'       => [
@@ -252,82 +252,92 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field1'       => null,
-                'field2'       => [
+                'field1'   => null,
+                'field2'   => [
                     'exclude' => true
                 ],
-                'field3'       => null,
-                'field4'       => null,
-                'field5'       => null,
-                'field7'       => [
+                'field3'   => null,
+                'field4'   => null,
+                'field5'   => null,
+                'field7'   => [
                     'property_path' => 'realField7'
                 ],
-                'field8'       => [
+                'field8'   => [
                     'property_path' => 'realField8'
+                ],
+                'field105' => [
+                    'propertyPath' => 'realField104'
                 ],
             ]
         ];
 
         $filters = [
             'fields' => [
-                'field1'       => [
+                'field1'   => [
                     'data_type' => 'string'
                 ],
-                'field2'       => null,
-                'field3'       => [
+                'field2'   => null,
+                'field3'   => [
                     'exclude' => true
                 ],
-                'field8'       => [
+                'field8'   => [
                     'exclude' => true
                 ],
-
                 'field100' => [
                     'exclude' => true
                 ],
                 'field101' => [
-                    'exclude' => true,
+                    'exclude'   => true,
                     'data_type' => 'integer'
                 ],
                 'field102' => [
-                    'exclude' => true,
+                    'exclude'     => true,
                     'allow_array' => false
                 ],
                 'field103' => [
-                    'exclude' => true,
-                    'data_type' => 'integer',
+                    'exclude'     => true,
+                    'data_type'   => 'integer',
                     'allow_array' => true,
-                ]
+                ],
+                'field104' => [
+                    'propertyPath' => 'realField104'
+                ],
+                'field105' => [],
             ]
         ];
 
         $fieldsMetadata = [
-            'field100' => [
+            'field100'     => [
                 'type' => 'string',
             ],
-            'field101' => [
+            'field101'     => [
                 'type' => 'string',
             ],
-            'field102' => [
+            'field102'     => [
                 'type' => 'string',
             ],
-            'field103' => [
+            'field103'     => [
                 'type' => 'string',
-            ]
+            ],
+            'realField104' => [
+                'type' => 'string',
+            ],
+            'realField105' => [
+                'type' => 'string',
+            ],
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects($this->any())
             ->method('hasField')
-            ->with()
             ->willReturnCallback(function ($fieldName) use ($fieldsMetadata) {
                 return isset($fieldsMetadata[$fieldName]);
             });
         $rootEntityMetadata->expects($this->any())
-            ->method('getFieldMapping')
-            ->with()
+            ->method('getTypeOfField')
             ->willReturnCallback(function ($fieldName) use ($fieldsMetadata) {
                 return isset($fieldsMetadata[$fieldName])
-                    ? $fieldsMetadata[$fieldName]
+                    ? $fieldsMetadata[$fieldName]['type']
                     : null;
             });
 
@@ -364,25 +374,25 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
-                    'field1'       => [
-                        'data_type' => 'string',
+                    'field1' => [
+                        'data_type'   => 'string',
                         'allow_array' => true
                     ],
-                    'field2'       => [
+                    'field2' => [
                         'exclude' => true
                     ],
-                    'field3'       => [
+                    'field3' => [
                         'exclude' => true
                     ],
-                    'field5'       => [
+                    'field5' => [
                         'data_type'   => 'integer',
                         'allow_array' => true
                     ],
-                    'field7'       => [
+                    'field7' => [
                         'data_type'   => 'integer',
                         'allow_array' => true
                     ],
-                    'field8'       => [
+                    'field8' => [
                         'exclude'     => true,
                         'data_type'   => 'integer',
                         'allow_array' => true
@@ -399,14 +409,23 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         'allow_array' => true
                     ],
                     'field102' => [
-                        'exclude'     => true,
-                        'data_type'   => 'string',
+                        'exclude'   => true,
+                        'data_type' => 'string',
                     ],
                     'field103' => [
                         'exclude'     => true,
                         'data_type'   => 'integer',
                         'allow_array' => true
-                    ]
+                    ],
+                    'field104' => [
+                        'property_path' => 'realField104',
+                        'data_type'     => 'string',
+                        'allow_array'   => true
+                    ],
+                    'field105' => [
+                        'data_type'   => 'string',
+                        'allow_array' => true
+                    ],
                 ]
             ],
             $this->context->getFilters()

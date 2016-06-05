@@ -37,7 +37,7 @@ class CompleteFilters extends CompleteSection
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         /** @var FiltersConfig $section */
-        $this->completePreConfiguredFieldFilters($section, $metadata);
+        $this->completePreConfiguredFieldFilters($section, $metadata, $definition);
         $this->completeIndexedFieldFilters($section, $metadata, $definition);
         $this->completeAssociationFilters($section, $metadata, $definition);
     }
@@ -45,24 +45,34 @@ class CompleteFilters extends CompleteSection
     /**
      * @param FiltersConfig          $filters
      * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
      */
     protected function completePreConfiguredFieldFilters(
         FiltersConfig $filters,
-        ClassMetadata $metadata
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
     ) {
         $filtersFields = $filters->getFields();
-        foreach ($filtersFields as $fieldName => $filterFieldConfig) {
-            if (!$metadata->hasField($fieldName)) {
+        foreach ($filtersFields as $fieldName => $filter) {
+            $propertyPath = $filter->getPropertyPath();
+            if (!$propertyPath) {
+                $field = $definition->getField($fieldName);
+                if ($field) {
+                    $propertyPath = $field->getPropertyPath();
+                }
+            }
+            if (!$propertyPath) {
+                $propertyPath = $fieldName;
+            }
+            if (!$metadata->hasField($propertyPath)) {
                 continue;
             }
 
-            $fieldMapping = $metadata->getFieldMapping($fieldName);
-
-            if (!$filterFieldConfig->hasDataType()) {
-                $filterFieldConfig->setDataType($fieldMapping['type']);
+            if (!$filter->hasDataType()) {
+                $filter->setDataType($metadata->getTypeOfField($propertyPath));
             }
-            if (!$filterFieldConfig->hasArrayAllowed()) {
-                $filterFieldConfig->setArrayAllowed();
+            if (!$filter->hasArrayAllowed()) {
+                $filter->setArrayAllowed();
             }
         }
     }

@@ -27,7 +27,7 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
 
         parent::setUp();
 
-        $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadTestData']);
+        $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadFiltersTestData']);
     }
 
     /**

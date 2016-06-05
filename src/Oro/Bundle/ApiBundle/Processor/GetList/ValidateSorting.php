@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
-use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
@@ -57,8 +57,8 @@ class ValidateSorting implements ProcessorInterface
             return;
         }
 
-        $sortFilterValue = $this->getSortFilterValue($context->getFilterValues(), $sortFilterKey);
-        if (empty($sortFilterValue)) {
+        $sortFilterValue = $context->getFilterValues()->get($sortFilterKey);
+        if (null === $sortFilterValue) {
             return;
         }
 
@@ -94,46 +94,30 @@ class ValidateSorting implements ProcessorInterface
     }
 
     /**
-     * @param FilterValueAccessorInterface $filterValues
-     * @param string                       $filterKey
-     *
-     * @return array|null
-     */
-    protected function getSortFilterValue(FilterValueAccessorInterface $filterValues, $filterKey)
-    {
-        $filterValue = null;
-        if ($filterValues->has($filterKey)) {
-            $filterValue = $filterValues->get($filterKey);
-            if (null !== $filterValue) {
-                $filterValue = $filterValue->getValue();
-                if (empty($filterValue)) {
-                    $filterValue = null;
-                }
-            }
-        }
-
-        return $filterValue;
-    }
-
-    /**
-     * @param array   $orderBy
-     * @param Context $context
+     * @param FilterValue $filterValue
+     * @param Context     $context
      *
      * @return string[] The list of fields that cannot be used for sorting
      */
-    protected function validateSortValues($orderBy, Context $context)
+    protected function validateSortValues(FilterValue $filterValue, Context $context)
     {
+        $orderBy = $filterValue->getValue();
+        if (empty($orderBy)) {
+            return [];
+        }
+
         $sorters = $context->getConfigOfSorters();
 
         $unsupportedFields = [];
         foreach ($orderBy as $fieldName => $direction) {
             $path = explode('.', $fieldName);
-            if (count($path) > 1) {
-                if (!$this->validateAssociationSorter($path, $context)) {
-                    $unsupportedFields[] = $fieldName;
-                }
-            } elseif (!$this->validateSorter($fieldName, $sorters)) {
+            $propertyPath = count($path) > 1
+                ? $this->validateAssociationSorter($path, $context)
+                : $this->validateSorter($fieldName, $sorters);
+            if (!$propertyPath) {
                 $unsupportedFields[] = $fieldName;
+            } elseif ($propertyPath !== $fieldName) {
+                $this->renameSortField($filterValue, $fieldName, $propertyPath);
             }
         }
 
@@ -141,38 +125,64 @@ class ValidateSorting implements ProcessorInterface
     }
 
     /**
+     * @param FilterValue $filterValue
+     * @param string      $oldFieldName
+     * @param string      $newFieldName
+     */
+    protected function renameSortField(FilterValue $filterValue, $oldFieldName, $newFieldName)
+    {
+        $orderBy = $filterValue->getValue();
+        $updatedOrderBy = [];
+        foreach ($orderBy as $fieldName => $direction) {
+            if ($fieldName === $oldFieldName) {
+                $fieldName = $newFieldName;
+            }
+            $updatedOrderBy[$fieldName] = $direction;
+        }
+        $filterValue->setValue($updatedOrderBy);
+    }
+
+    /**
      * @param string             $fieldName
      * @param SortersConfig|null $sorters
      *
-     * @return bool
+     * @return string|null The real field name if the sorting is allowed; otherwise, NULL
      */
     protected function validateSorter($fieldName, SortersConfig $sorters = null)
     {
-        return
-            null !== $sorters
-            && $sorters->hasField($fieldName)
-            && !$sorters->getField($fieldName)->isExcluded();
+        if (null === $sorters) {
+            return null;
+        }
+
+        $sorter = $sorters->getField($fieldName);
+        if (null === $sorter || $sorter->isExcluded()) {
+            return null;
+        }
+
+        return $sorter->getPropertyPath() ?: $fieldName;
     }
 
     /**
      * @param string[] $path
      * @param Context  $context
      *
-     * @return bool
+     * @return string|null The real association path if the sorting is allowed; otherwise, NULL
      */
     protected function validateAssociationSorter(array $path, Context $context)
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
         if (!$metadata) {
-            return false;
-        }
-        $targetFieldName = array_pop($path);
-        $targetSorters = $this->getAssociationSorters($path, $context, $metadata);
-        if (!$this->validateSorter($targetFieldName, $targetSorters)) {
-            return false;
+            return null;
         }
 
-        return true;
+        $targetFieldName = array_pop($path);
+        list($targetSorters, $associations) = $this->getAssociationSorters($path, $context, $metadata);
+        $targetFieldName = $this->validateSorter($targetFieldName, $targetSorters);
+        if (!$targetFieldName) {
+            return null;
+        }
+
+        return $associations . '.' . $targetFieldName;
     }
 
     /**
@@ -180,7 +190,7 @@ class ValidateSorting implements ProcessorInterface
      * @param Context       $context
      * @param ClassMetadata $metadata
      *
-     * @return SortersConfig|null
+     * @return array [sorters config, associations]
      */
     protected function getAssociationSorters(array $path, Context $context, ClassMetadata $metadata)
     {
@@ -189,24 +199,24 @@ class ValidateSorting implements ProcessorInterface
             new SortersConfigExtra()
         ];
 
-        $sorters = null;
-
         $config = $context->getConfig();
+        $sorters = null;
+        $associations = [];
 
         foreach ($path as $fieldName) {
             if (!$config->hasField($fieldName)) {
-                return null;
+                return [null, null];
             }
 
             $associationName = $config->getField($fieldName)->getPropertyPath() ?: $fieldName;
             if (!$metadata->hasAssociation($associationName)) {
-                return null;
+                return [null, null];
             }
 
             $targetClass = $metadata->getAssociationTargetClass($associationName);
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass, false);
             if (!$metadata) {
-                return null;
+                return [null, null];
             }
 
             $targetConfig = $this->configProvider->getConfig(
@@ -216,13 +226,14 @@ class ValidateSorting implements ProcessorInterface
                 $targetConfigExtras
             );
             if (!$targetConfig->hasDefinition()) {
-                return null;
+                return [null, null];
             }
 
             $config = $targetConfig->getDefinition();
             $sorters = $targetConfig->getSorters();
+            $associations[] = $associationName;
         }
 
-        return $sorters;
+        return [$sorters, implode('.', $associations)];
     }
 }

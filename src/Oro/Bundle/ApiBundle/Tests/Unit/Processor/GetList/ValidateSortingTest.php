@@ -135,6 +135,28 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->assertEmpty($this->context->getErrors());
     }
 
+    public function testProcessWhenSortByAllowedRenamedFieldRequested()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name1']);
+        $primaryEntityConfig->getField('name1')->setPropertyPath('name');
+        $primarySortersConfig = $this->getSortersConfig(['name1']);
+        $primarySortersConfig->getField('name1')->setPropertyPath('name');
+
+        $this->prepareFilters('name1');
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfSorters($primarySortersConfig);
+
+        $this->processor->process($this->context);
+
+        $this->assertEmpty($this->context->getErrors());
+        $this->assertEquals(
+            ['name' => 'ASC'],
+            $this->context->getFilterValues()->get('sort')->getValue()
+        );
+    }
+
     public function testProcessWhenSortByAllowedAssociationFieldRequested()
     {
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['category']);
@@ -161,6 +183,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         $this->assertEmpty($this->context->getErrors());
+        $this->assertEquals(
+            ['category.name' => 'ASC'],
+            $this->context->getFilterValues()->get('sort')->getValue()
+        );
     }
 
     public function testProcessWhenSortByAllowedRenamedAssociationRequested()
@@ -190,6 +216,46 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         $this->assertEmpty($this->context->getErrors());
+        $this->assertEquals(
+            ['category.name' => 'ASC'],
+            $this->context->getFilterValues()->get('sort')->getValue()
+        );
+    }
+
+    public function testProcessWhenSortByAllowedRenamedAssociationAndRenamedRelatedFieldRequested()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['category1']);
+        $primaryEntityConfig->getField('category1')->setPropertyPath('category');
+
+        $categoryConfig = $this->getConfig(['name1'], ['name1']);
+        $categoryConfig->getDefinition()->getField('name1')->setPropertyPath('name');
+        $categoryConfig->getSorters()->getField('name1')->setPropertyPath('name');
+
+        $this->prepareFilters('category1.name1');
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $this->getEntityClass('Category'),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [
+                    new EntityDefinitionConfigExtra($this->context->getAction()),
+                    new SortersConfigExtra()
+                ]
+            )
+            ->willReturn($categoryConfig);
+
+        $this->processor->process($this->context);
+
+        $this->assertEmpty($this->context->getErrors());
+        $this->assertEquals(
+            ['category.name' => 'ASC'],
+            $this->context->getFilterValues()->get('sort')->getValue()
+        );
     }
 
     public function testProcessWhenSortByNotAllowedAssociationFieldRequested()

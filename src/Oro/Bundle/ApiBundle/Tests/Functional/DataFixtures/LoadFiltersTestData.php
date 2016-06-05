@@ -15,7 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
 
-class LoadTestData extends AbstractFixture implements ContainerAwareInterface
+class LoadFiltersTestData extends AbstractFixture implements ContainerAwareInterface
 {
     /** @var ContainerInterface */
     protected $container;

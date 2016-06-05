@@ -87,14 +87,14 @@ services:
     oro_api.delete_list.validate_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\ValidateFilterValues
         tags:
-            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 0 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 200 }
 
     oro_api.delete_list.normalize_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues
         arguments:
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: -10 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 100 }
 
     #
     # build_query

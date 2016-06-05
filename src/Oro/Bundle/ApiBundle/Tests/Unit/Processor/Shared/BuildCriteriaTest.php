@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 
+use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria;
@@ -52,161 +51,286 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->assertFalse($this->context->hasQuery());
     }
 
-    /**
-     * @dataProvider processDataProvider
-     */
-    public function testProcess($className, $fields, $query, $expected)
+    public function testProcessFilteringByPrimaryEntityFields()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('getQueryString')
-            ->willReturnCallback(function () use ($query) {
-                return implode('&', $query);
-            });
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string', 'label' => 'string']);
 
-        $this->configProvider->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(function () use ($fields) {
-                $config = new Config();
-                $config->setDefinition($this->getEntityDefinitionConfig(array_keys($fields)));
-                $config->setFilters($this->getFiltersConfig($fields));
+        $request = $this->getRequest('filter[label]=val1&filter[name]=val2');
 
-                return $config;
-            });
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
 
-        $this->context->setClassName($className);
+        $this->context->setClassName($this->getEntityClass('Category'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
         $this->context->setFilterValues(new RestFilterValueAccessor($request));
-        $this->context->setCriteria(new Criteria());
+        $this->context->setCriteria($this->getCriteria());
 
         $this->processor->process($this->context);
 
-        list($errors, $criteria) = $expected;
+        $this->assertEquals(
+            new CompositeExpression(
+                'AND',
+                [
+                    new Comparison('label', '=', 'val1'),
+                    new Comparison('name', '=', 'val2')
+                ]
+            ),
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertCount(0, $this->context->getErrors());
+    }
 
-        $this->assertEquals($errors, $this->context->getErrors());
-        $this->assertEquals($criteria, $this->context->getCriteria()->getWhereExpression());
+    public function testProcessFilteringByUnknownPrimaryEntityField()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string', 'label' => 'string']);
+
+        $request = $this->getRequest('filter[label1]=test');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setClassName($this->getEntityClass('Category'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
+
+        $this->assertNull(
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertEquals(
+            [
+                Error::createValidationError(
+                    Constraint::FILTER,
+                    sprintf('Filter "%s" is not supported.', 'filter[label1]')
+                )->setSource(ErrorSource::createByParameter('filter[label1]'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessFilteringByPrimaryEntityFieldWhichCannotBuUsedForFiltering()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
+
+        $request = $this->getRequest('filter[label]=test');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setClassName($this->getEntityClass('Category'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
+
+        $this->assertNull(
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertEquals(
+            [
+                Error::createValidationError(
+                    Constraint::FILTER,
+                    sprintf('Filter "%s" is not supported.', 'filter[label]')
+                )->setSource(ErrorSource::createByParameter('filter[label]'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessFilteringByRelatedEntityField()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[category.name]=test');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn(
+                $this->getConfig(
+                    ['name'],
+                    ['name' => 'string']
+                )
+            );
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            new Comparison('category.name', '=', 'test'),
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertCount(0, $this->context->getErrors());
+    }
+
+    public function testProcessFilteringByRelatedEntityFieldWhenAssociationDoesNotExist()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[category1.name]=test');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
+
+        $this->assertNull(
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertEquals(
+            [
+                Error::createValidationError(
+                    Constraint::FILTER,
+                    sprintf('Filter "%s" is not supported.', 'filter[category1.name]')
+                )->setSource(ErrorSource::createByParameter('filter[category1.name]'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessFilteringByRelatedEntityFieldWhenAssociationIsRenamed()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category1']);
+        $primaryEntityConfig->getField('category1')->setPropertyPath('category');
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[category1.name]=test');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn(
+                $this->getConfig(
+                    ['name'],
+                    ['name' => 'string']
+                )
+            );
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            new Comparison('category.name', '=', 'test'),
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertCount(0, $this->context->getErrors());
+    }
+
+    public function testProcessFilteringByRenamedRelatedEntityField()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[category.name1]=test');
+
+        $categoryConfig = $this->getConfig(
+            ['name1'],
+            ['name1' => 'string']
+        );
+        $categoryConfig->getDefinition()->getField('name1')->setPropertyPath('name');
+        $categoryConfig->getFilters()->getField('name1')->setPropertyPath('name');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($categoryConfig);
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            new Comparison('category.name', '=', 'test'),
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertCount(0, $this->context->getErrors());
+    }
+
+    public function testProcessFilteringByRenamedAssociationAndRenamedRelatedEntityField()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category1']);
+        $primaryEntityConfig->getField('category1')->setPropertyPath('category');
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[category1.name1]=test');
+
+        $categoryConfig = $this->getConfig(
+            ['name1'],
+            ['name1' => 'string']
+        );
+        $categoryConfig->getDefinition()->getField('name1')->setPropertyPath('name');
+        $categoryConfig->getFilters()->getField('name1')->setPropertyPath('name');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($categoryConfig);
+
+        $this->context->setClassName($this->getEntityClass('User'));
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setCriteria($this->getCriteria());
+
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            new Comparison('category.name', '=', 'test'),
+            $this->context->getCriteria()->getWhereExpression()
+        );
+        $this->assertCount(0, $this->context->getErrors());
     }
 
     /**
-     * @return array
+     * @param string $entityShortClass
      *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return string
      */
-    public function processDataProvider()
+    protected function getEntityClass($entityShortClass)
     {
-        $integerFilter = new ComparisonFilter('integer');
-        $stringFilter  = new ComparisonFilter('string');
+        return self::ENTITY_NAMESPACE . $entityShortClass;
+    }
 
-        return [
-            'simple filters' => [
-                'className' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
-                'fields' => [
-                    'name' => clone $stringFilter,
-                    'label' => clone $stringFilter
-                ],
-                'query' => [
-                    'filter[label]=test',
-                    'filter[name]=test'
-                ],
-                'expected' => [
-                    [],
-                    new CompositeExpression(
-                        'AND',
-                        [
-                            new Comparison('label', '=', 'test'),
-                            new Comparison('name', '=', 'test')
-                        ]
-                    )
-                ]
-            ],
-            'not existing field filter' => [
-                'className' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
-                'fields' => [
-                    'name' => clone $stringFilter,
-                    'label' => clone $stringFilter
-                ],
-                'query' => [
-                    'filter[label123]=test',
-                ],
-                'expected' => [
-                    [
-                        Error::createValidationError(
-                            Constraint::FILTER,
-                            sprintf('Filter "%s" is not supported.', 'filter[label123]')
-                        )->setSource(ErrorSource::createByParameter('filter[label123]'))
-                    ],
-                    null
-                ]
-            ],
-            'subresource filters' => [
-                'className' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
-                'fields' => [
-                    'id' => clone $integerFilter,
-                    'name' => clone $stringFilter
-                ],
-                'query' => [
-                    'filter[category.name]=test'
-                ],
-                'expected' => [
-                    [],
-                    new Comparison('category.name', '=', 'test'),
-                ]
-            ],
-            'subresource filters, all are associations' => [
-                'className' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
-                'fields' => [
-                    'id' => clone $integerFilter,
-                    'name' => clone $stringFilter,
-                    'category' => clone $integerFilter
-                ],
-                'query' => [
-                    'filter[products.category]=1'
-                ],
-                'expected' => [
-                    [],
-                    new Comparison('products.category', '=', 1),
-                ]
-            ],
-            'subresource filters, all associations, last not found' => [
-                'className' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
-                'fields' => [
-                    'id' => clone $integerFilter,
-                    'name' => clone $stringFilter,
-                ],
-                'query' => [
-                    'filter[products.category]=1'
-                ],
-                'expected' => [
-                    [
-                        Error::createValidationError(
-                            Constraint::FILTER,
-                            sprintf('Filter "%s" is not supported.', 'filter[products.category]')
-                        )->setSource(ErrorSource::createByParameter('filter[products.category]'))
-                    ],
-                    null
-                ]
-            ],
-            'wrong subresource' => [
-                'className' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
-                'fields' => [
-                    'id' => clone $integerFilter,
-                    'name' => clone $stringFilter
-                ],
-                'query' => [
-                    'filter[wrongField.name]=test'
-                ],
-                'expected' => [
-                    [
-                        Error::createValidationError(
-                            Constraint::FILTER,
-                            sprintf('Filter "%s" is not supported.', 'filter[wrongField.name]')
-                        )->setSource(ErrorSource::createByParameter('filter[wrongField.name]'))
-                    ],
-                    null
-                ]
-            ]
-        ];
+    /**
+     * @param string[] $fields
+     * @param array    $filterFields
+     *
+     * @return Config
+     */
+    protected function getConfig(array $fields = [], array $filterFields = [])
+    {
+        $config = new Config();
+        $config->setDefinition($this->getEntityDefinitionConfig($fields));
+        $config->setFilters($this->getFiltersConfig($filterFields));
+
+        return $config;
     }
 
     /**
@@ -225,16 +349,46 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     }
 
     /**
-     * @param array $fields
+     * @param array $filterFields
+     *
      * @return FiltersConfig
      */
-    protected function getFiltersConfig(array $fields = [])
+    protected function getFiltersConfig(array $filterFields = [])
     {
         $config = new FiltersConfig();
-        foreach ($fields as $field => $filterFieldConfig) {
-            $config->addField($field, $filterFieldConfig);
+        foreach ($filterFields as $field => $dataType) {
+            $config->addField($field)->setDataType($dataType);
         }
 
         return $config;
+    }
+
+    /**
+     * @param $queryString
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getRequest($queryString)
+    {
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->expects($this->once())
+            ->method('getQueryString')
+            ->willReturn($queryString);
+
+        return $request;
+    }
+
+    /**
+     * @return Criteria
+     */
+    protected function getCriteria()
+    {
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return new Criteria($resolver);
     }
 }

@@ -29,3 +29,29 @@ oro_api:
                 fields:
                     position:
                         exclude: false
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+            fields:
+                renamedId:
+                    property_path: id
+                renamedName:
+                    property_path: name
+            filters:
+                fields:
+                    renamedName:
+                        exclude: false
+            sorters:
+                fields:
+                    renamedName:
+                        exclude: false
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProductType:
+            fields:
+                renamedName:
+                    property_path: name
+            filters:
+                fields:
+                    renamedName:
+                        exclude: false
+            sorters:
+                fields:
+                    renamedName:
+                        exclude: false
