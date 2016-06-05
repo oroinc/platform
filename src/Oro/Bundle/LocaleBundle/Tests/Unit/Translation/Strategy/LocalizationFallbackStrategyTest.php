@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 
@@ -94,12 +93,12 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
         $firstLevelEn = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
             'languageCode' => 'en',
             'formattingCode' => 'en_EN',
-            'childs' => new ArrayCollection([$secondLevelLevelEn])]
+            'childLocalizations' => new ArrayCollection([$secondLevelLevelEn])]
         );
         $en = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
             'languageCode' => 'en',
             'formattingCode' => 'en',
-            'childs' => new ArrayCollection([$firstLevelEn])
+            'childLocalizations' => new ArrayCollection([$firstLevelEn])
         ]);
         $firstLevelRu = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
             'languageCode' => 'ru',
@@ -108,7 +107,7 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
         $ru = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
             'languageCode' => 'ru',
             'formattingCode' => 'ru',
-            'childs' => new ArrayCollection([$firstLevelRu])
+            'childLocalizations' => new ArrayCollection([$firstLevelRu])
         ]);
         $localizations = [
             'en' => ['en' => ['en' => []]],

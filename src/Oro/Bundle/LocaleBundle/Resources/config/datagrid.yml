@@ -21,7 +21,7 @@ datagrid:
                 join:
                     left:
                         - { join: l.titles, alias: t}
-                        - { join: l.parent, alias: pl }
+                        - { join: l.parentLocalization, alias: pl }
                 where:
                     and:
                         - t.localization IS NULL

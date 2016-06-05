@@ -31,10 +31,10 @@ class LocalizationRepository extends EntityRepository
     {
         $localizations = $this->createQueryBuilder('l')
             ->addSelect('children')
-            ->leftJoin('l.childs', 'children')
+            ->leftJoin('l.childLocalizations', 'children')
             ->getQuery()->execute();
         return array_filter($localizations, function (Localization $localization) {
-            return !$localization->getParent();
+            return !$localization->getParentLocalization();
         });
     }
 

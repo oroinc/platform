@@ -55,7 +55,7 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())->method('buildViolation');
         $localization1 = $this->createLocalization('loca1', 1);
         $localization2 = $this->createLocalization('loca2', 2);
-        $localization1->setParent($localization2);
+        $localization1->setParentLocalization($localization2);
 
         $this->validator->validate($localization1, $this->constraint);
     }
@@ -68,14 +68,14 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
         $localization2 = $this->createLocalization('loca2', 2);
         $localization3 = $this->createLocalization('loca3', 3);
 
-        $localization1->setParent($localization2);
-        $localization1->addChild($localization3);
+        $localization1->setParentLocalization($localization2);
+        $localization1->addChildLocalization($localization3);
 
-        $localization2->setParent($localization3);
-        $localization2->addChild($localization1);
+        $localization2->setParentLocalization($localization3);
+        $localization2->addChildLocalization($localization1);
 
-        $localization3->setParent($localization3);
-        $localization3->addChild($localization2);
+        $localization3->setParentLocalization($localization3);
+        $localization3->addChildLocalization($localization2);
 
         $this->validator->validate($localization3, $this->constraint);
     }
@@ -85,7 +85,7 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
         $this->expectViolation();
 
         $localization1 = $this->createLocalization('loca1', 1);
-        $localization1->setParent($localization1);
+        $localization1->setParentLocalization($localization1);
 
         $this->validator->validate($localization1, $this->constraint);
     }
@@ -113,7 +113,7 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
         $violationBuilder = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
         $violationBuilder->expects($this->once())
             ->method('atPath')
-            ->with('parent')
+            ->with('parentLocalization')
             ->willReturnSelf();
         $this->context->expects($this->once())
             ->method('buildViolation')

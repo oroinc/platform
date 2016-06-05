@@ -18,12 +18,12 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
             ['name', 'test_name'],
             ['languageCode', 'language_test_code'],
             ['formattingCode', 'formatting_test_code'],
-            ['parent', new Localization()],
+            ['parentLocalization', new Localization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
         ]);
         $this->assertPropertyCollections(new Localization(), [
-            ['childs', new Localization()],
+            ['childLocalizations', new Localization()],
             ['titles', new LocalizedFallbackValue()],
         ]);
     }
@@ -64,8 +64,8 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
     public function testConstruct()
     {
         $entity = new Localization();
-        $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getChilds());
-        $this->assertEmpty($entity->getChilds()->toArray());
+        $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getChildLocalizations());
+        $this->assertEmpty($entity->getChildLocalizations()->toArray());
         $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getTitles());
         $this->assertEmpty($entity->getTitles()->toArray());
     }

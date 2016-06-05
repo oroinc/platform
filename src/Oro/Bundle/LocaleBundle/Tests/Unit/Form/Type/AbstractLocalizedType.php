@@ -35,7 +35,7 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
             ->getMock();
         $queryBuilder->expects($this->once())
             ->method('leftJoin')
-            ->with('l.parent', 'parent')
+            ->with('l.parentLocalization', 'parent')
             ->will($this->returnSelf());
         $queryBuilder->expects($this->once())
             ->method('addOrderBy')
@@ -75,10 +75,10 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
      * @param int $id
      * @param string $languageCode
      * @param string $formattingCode
-     * @param Localization|null $parent
+     * @param Localization|null $parentLocalization
      * @return Localization
      */
-    protected function createLocalization($id, $languageCode, $formattingCode, $parent = null)
+    protected function createLocalization($id, $languageCode, $formattingCode, $parentLocalization = null)
     {
         $website = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Entity\Localization')
             ->disableOriginalConstructor()
@@ -93,8 +93,8 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
             ->method('getFormattingCode')
             ->will($this->returnValue($formattingCode));
         $website->expects($this->any())
-            ->method('getParent')
-            ->will($this->returnValue($parent));
+            ->method('getParentLocalization')
+            ->will($this->returnValue($parentLocalization));
 
         return $website;
     }

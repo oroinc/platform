@@ -25,16 +25,16 @@ class LocalizationValidator extends ConstraintValidator
                 'Oro\Bundle\LocaleBundle\Entity\Localization'
             );
         }
-        $parent = $localization->getParent();
+        $parentLocalization = $localization->getParentLocalization();
 
-        if (!$parent) {
+        if (!$parentLocalization) {
             return;
         }
-        if ($localization->getId() === $parent->getId() ||
-            $this->localizationExists($parent, $localization)
+        if ($localization->getId() === $parentLocalization->getId() ||
+            $this->localizationExists($parentLocalization, $localization)
         ) {
             $this->context->buildViolation($constraint->messageCircularReference)
-                ->atPath('parent')
+                ->atPath('parentLocalization')
                 ->addViolation();
         }
     }
@@ -47,7 +47,7 @@ class LocalizationValidator extends ConstraintValidator
      */
     private function localizationExists(Entity\Localization $localizationNeedle, Entity\Localization $localization)
     {
-        $childLocalizations = $localization->getChilds();
+        $childLocalizations = $localization->getChildLocalizations();
         if ($childLocalizations->contains($localizationNeedle)) {
             return true;
         }

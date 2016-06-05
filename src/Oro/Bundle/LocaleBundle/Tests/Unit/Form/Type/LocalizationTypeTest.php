@@ -107,7 +107,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                             'titles' => [['string' => 'new_localization_item_title']],
                             'languageCode' => 'en_US',
                             'formattingCode' => 'en_US',
-                            'parent' => 1,
+                            'parentLocalization' => 1,
                         ],
                     'expectedData' => $this->createLocalization(
                         'new_localization_item_name',
@@ -125,7 +125,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      * @param string $title
      * @param string $languageCode
      * @param string $formattingCode
-     * @param Localization $parent
+     * @param Localization $parentLocalization
      *
      * @return Localization
      */
@@ -134,7 +134,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         $title,
         $languageCode,
         $formattingCode,
-        Localization $parent = null
+        Localization $parentLocalization = null
     ) {
         /** @var Localization $localization */
         $localization = $this->getEntity(
@@ -143,7 +143,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                 'name' => $name,
                 'languageCode' => $languageCode,
                 'formattingCode' => $formattingCode,
-                'parent' => $parent,
+                'parentLocalization' => $parentLocalization,
             ]
         );
 
