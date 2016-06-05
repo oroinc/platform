@@ -135,44 +135,6 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
                 'replacements' => 'replaceUserIdsInExpectation',
                 'identifier'   => 'username'
             ],
-            'filter by field of 3rd level related entity (user.owner.organization) with 2nd level sorting' => [
-                'className'    => 'Oro\Bundle\UserBundle\Entity\User',
-                'statusCode'   => 200,
-                'params'       => [
-                    'filter' => [
-                        'owner.owner.email' => 'TestBusinessUnit1@local.com'
-                    ],
-                    'fields' => [
-                        'users' => 'username'
-                    ],
-                    'sort'   => 'owner.email',
-                    'page'   => [
-                        'size' => 6
-                    ]
-                ],
-                'expects'      => $this->loadExpectation('output_filters_4.yml'),
-                'replacements' => 'replaceUserIdsInExpectation',
-                'identifier'   => 'username'
-            ],
-            'filter by field of 3rd level related entity (user.owner.organization) with 2nd level reverse sorting' => [
-                'className'    => 'Oro\Bundle\UserBundle\Entity\User',
-                'statusCode'   => 200,
-                'params'       => [
-                    'filter' => [
-                        'owner.owner.email' => 'TestBusinessUnit1@local.com'
-                    ],
-                    'fields' => [
-                        'users' => 'username'
-                    ],
-                    'sort'   => '-owner.email',
-                    'page'   => [
-                        'size' => 6
-                    ]
-                ],
-                'expects'      => $this->loadExpectation('output_filters_5.yml'),
-                'replacements' => 'replaceUserIdsInExpectation',
-                'identifier'   => 'username'
-            ],
             'filter by field of related entity with no result'                                             => [
                 'className'  => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
                 'statusCode' => 200,
@@ -222,22 +184,6 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
                     ]
                 ],
                 'expects'      => $this->loadExpectation('output_filters_1.yml'),
-                'replacements' => 'replaceTestEmployeeIdsInExpectation',
-                'identifier'   => 'name'
-            ],
-            'filter by field of related entity (employee.department) with reverse sorting'                 => [
-                'className'    => 'Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee',
-                'statusCode'   => 200,
-                'params'       => [
-                    'filter' => [
-                        'department.name' => 'TestDepartment2'
-                    ],
-                    'sort'   => '-id',
-                    'page'   => [
-                        'size' => 3
-                    ]
-                ],
-                'expects'      => $this->loadExpectation('output_filters_2.yml'),
                 'replacements' => 'replaceTestEmployeeIdsInExpectation',
                 'identifier'   => 'name'
             ],
