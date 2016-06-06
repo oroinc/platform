@@ -6,22 +6,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-abstract class AbstractDbDumper implements DumperInterface
+class FileCacheDumper implements DumperInterface
 {
     /** The max runtime for a process in seconds */
     const TIMEOUT = 30;
-
-    /** @var string */
-    protected $dbHost;
-
-    /** @var string */
-    protected $dbName;
-
-    /** @var string */
-    protected $dbPass;
-
-    /** @var string */
-    protected $dbUser;
 
     /** @var string */
     protected $cacheDir;
@@ -31,14 +19,36 @@ abstract class AbstractDbDumper implements DumperInterface
      */
     public function __construct(KernelInterface $kernel)
     {
-        $kernel->boot();
-        $container = $kernel->getContainer();
-
         $this->cacheDir = $kernel->getCacheDir();
-        $this->dbHost = $container->getParameter('database_host');
-        $this->dbName = $container->getParameter('database_name');
-        $this->dbUser = $container->getParameter('database_user');
-        $this->dbPass = $container->getParameter('database_password');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dump()
+    {
+        $this->runProcess(sprintf(
+            'tar -cf %scache.tar -C %s .',
+            $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
+            $this->cacheDir
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function restore()
+    {
+        $this->runProcess(sprintf(
+            'rm -rf %s && mkdir %1$s',
+            $this->cacheDir
+        ));
+        $this->runProcess(sprintf(
+            'tar -xf %scache.tar -C %s .',
+            $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
+            $this->cacheDir
+        ));
+
     }
 
     /**
