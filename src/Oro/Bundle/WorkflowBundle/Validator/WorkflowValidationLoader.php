@@ -5,25 +5,25 @@ namespace Oro\Bundle\WorkflowBundle\Validator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 
 class WorkflowValidationLoader extends AbstractLoader
 {
-    /** @var ConfigProvider */
-    protected $configProvider;
+    /** @var WorkflowPermissionRegistry */
+    protected $permissionRegistry;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var RestrictionManager */
+    protected $restrictionManager;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigProvider $configProvider
+     * @param WorkflowPermissionRegistry $permissionRegistry
+     * @param RestrictionManager         $restrictionManager
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigProvider $configProvider)
+    public function __construct(WorkflowPermissionRegistry $permissionRegistry, RestrictionManager $restrictionManager)
     {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->configProvider = $configProvider;
+        $this->permissionRegistry = $permissionRegistry;
+        $this->restrictionManager = $restrictionManager;
     }
 
     /**
@@ -31,15 +31,11 @@ class WorkflowValidationLoader extends AbstractLoader
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
-        $className = $metadata->getClassName();
+        $class = $metadata->getClassName();
 
-        if (!$this->configProvider->hasConfig($className)) {
-            return false;
-        }
-
-        $config = $this->configProvider->getConfig($className);
-
-        if ($config->get('active_workflow', false, false)) {
+        if ($this->permissionRegistry->supportsClass($class, false) ||
+            $this->restrictionManager->hasEntityClassRestrictions($class, false)
+        ) {
             $metadata->addConstraint(
                 $this->newConstraint('Oro\Bundle\WorkflowBundle\Validator\Constraints\WorkflowEntity')
             );
