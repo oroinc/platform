@@ -18,8 +18,10 @@ class RemoveTotalCountHeader implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if ($context->hasErrors() && $context->getResponseHeaders()->has(SetTotalCountHeader::HEADER_NAME)) {
-            $context->getResponseHeaders()->remove(SetTotalCountHeader::HEADER_NAME);
+        if ($context->hasErrors()
+            && $context->getResponseHeaders()->has(SetTotalCountHeader::RESPONSE_HEADER_NAME)
+        ) {
+            $context->getResponseHeaders()->remove(SetTotalCountHeader::RESPONSE_HEADER_NAME);
         }
     }
 }

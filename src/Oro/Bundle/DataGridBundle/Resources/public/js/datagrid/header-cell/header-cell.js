@@ -30,6 +30,8 @@ define([
         /** @property {Boolean} */
         allowNoSorting: true,
 
+        keepElement: false,
+
         /**
          * Initialize.
          *
@@ -102,7 +104,7 @@ define([
                 this.$el.width(this.column.get('width'));
             }
 
-            if (!_.isUndefined(this.column.attributes.cell.prototype.className)) {
+            if (!_.isFunction(this.column.attributes.cell.prototype.className)) {
                 this.$el.addClass(this.column.attributes.cell.prototype.className);
             }
 

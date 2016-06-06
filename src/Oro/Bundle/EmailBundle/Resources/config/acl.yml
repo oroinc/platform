@@ -4,6 +4,18 @@ oro_email_email_view:
     permission: VIEW
     group_name: ""
 
+oro_email_email_body_view:
+    type: entity
+    class: OroEmailBundle:EmailBody
+    permission: VIEW
+    group_name: ""
+
+oro_email_email_attachment_view:
+    type: entity
+    class: OroEmailBundle:EmailAttachment
+    permission: VIEW
+    group_name: ""
+
 oro_email_email_create:
     type: entity
     class: OroEmailBundle:EmailUser

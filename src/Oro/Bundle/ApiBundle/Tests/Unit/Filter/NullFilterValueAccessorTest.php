@@ -27,6 +27,6 @@ class NullFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->nullFilterValueAccessor->get('key'));
         $this->assertFalse($this->nullFilterValueAccessor->has('key'));
         $this->assertEmpty($this->nullFilterValueAccessor->getAll());
-        $this->assertEmpty($this->nullFilterValueAccessor->getAll('group'));
+        $this->assertEmpty($this->nullFilterValueAccessor->getGroup('group'));
     }
 }

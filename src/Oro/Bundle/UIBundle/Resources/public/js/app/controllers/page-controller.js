@@ -1,4 +1,5 @@
 define([
+    'asap',
     'jquery',
     'underscore',
     'chaplin',
@@ -6,7 +7,7 @@ define([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/models/page-model',
     'module'
-], function($, _, Chaplin, __, BaseController, PageModel, module) {
+], function(asap, $, _, Chaplin, __, BaseController, PageModel, module) {
     'use strict';
 
     var PageController;
@@ -182,9 +183,12 @@ define([
             this.publishEvent('page:update', pageData, actionArgs, jqXHR, updatePromises);
 
             // once all views has been updated, trigger page:afterChange
-            $.when.apply($, updatePromises).done(_.debounce(function() {
-                self.publishEvent('page:afterChange');
-            }, 0));
+            $.when.apply($, updatePromises).done(function() {
+                // let all embedded inline scripts finish their execution
+                asap(function() {
+                    self.publishEvent('page:afterChange');
+                });
+            });
         },
 
         /**

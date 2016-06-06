@@ -9,6 +9,7 @@ use FOS\RestBundle\Util\Codes;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -71,7 +72,9 @@ class NoteController extends Controller
      */
     public function infoAction(Note $entity)
     {
-        return array('entity' => $entity);
+        $attachmentProvider = $this->get('oro_attachment.provider.attachment');
+        $attachment = $attachmentProvider->getAttachmentInfo($entity);
+        return ['entity' => $entity, 'attachment' => $attachment];
     }
 
     /**
@@ -123,10 +126,23 @@ class NoteController extends Controller
             $responseData['saved'] = true;
             $responseData['model'] = $this->getNoteManager()->getEntityViewModel($entity);
         }
-        $responseData['form']       = $this->get('oro_note.form.note')->createView();
-        $responseData['formAction'] = $formAction;
+        $responseData['form']        = $this->getForm()->createView();
+        $responseData['formAction']  = $formAction;
+        if ($entity->getId()) {
+            $responseData['submitLabel'] = $this->get('translator')->trans('oro.note.save.label');
+        } else {
+            $responseData['submitLabel'] = $this->get('translator')->trans('oro.note.add.label');
+        }
 
         return $responseData;
+    }
+
+    /**
+     * @return FormInterface
+     */
+    public function getForm()
+    {
+        return $this->get('oro_note.form.note');
     }
 
     /**

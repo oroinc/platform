@@ -35,6 +35,8 @@ Microsecond: Microsecond
 "Error! Incorrect server response.": "Error! Incorrect server response."
 "Sorry, unexpected error was occurred": "Sorry, unexpected error was occurred"
 "Please select a file...": "Please select a file..."
+"Attach file:": "Attach file:"
+"Upload": "Upload"
 "Choose File": "Choose File"
 "Searching...": "Searching..."
 "No matches found": "No matches found"

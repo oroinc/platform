@@ -4,8 +4,11 @@ namespace Oro\Bundle\ApiBundle\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Component\EntitySerializer\ConfigUtil;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
+use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Component\EntitySerializer\EntityConfig;
+use Oro\Component\EntitySerializer\FieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -19,32 +22,28 @@ class ObjectNormalizer
     /** @var DataAccessorInterface */
     protected $dataAccessor;
 
-    /** @var array */
-    private $normalizers = [];
+    /** @var DataTransformerInterface */
+    protected $dataTransformer;
 
-    /** @var ObjectNormalizerInterface[]|null */
-    private $sortedNormalizers;
+    /** @var ObjectNormalizerRegistry */
+    private $normalizerRegistry;
 
     /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param DataAccessorInterface $dataAccessor
+     * @param ObjectNormalizerRegistry $normalizerRegistry
+     * @param DoctrineHelper           $doctrineHelper
+     * @param DataAccessorInterface    $dataAccessor
+     * @param DataTransformerInterface $dataTransformer
      */
-    public function __construct(DoctrineHelper $doctrineHelper, DataAccessorInterface $dataAccessor)
-    {
+    public function __construct(
+        ObjectNormalizerRegistry $normalizerRegistry,
+        DoctrineHelper $doctrineHelper,
+        DataAccessorInterface $dataAccessor,
+        DataTransformerInterface $dataTransformer
+    ) {
+        $this->normalizerRegistry = $normalizerRegistry;
         $this->doctrineHelper = $doctrineHelper;
-        $this->dataAccessor   = $dataAccessor;
-    }
-
-    /**
-     * Registers a normalizer for a specific object type
-     *
-     * @param ObjectNormalizerInterface $normalizer
-     * @param int                       $priority
-     */
-    public function addNormalizer(ObjectNormalizerInterface $normalizer, $priority = 0)
-    {
-        $this->normalizers[$priority][] = $normalizer;
-        $this->sortedNormalizers        = null;
+        $this->dataAccessor = $dataAccessor;
+        $this->dataTransformer = $dataTransformer;
     }
 
     /**
@@ -70,7 +69,7 @@ class ObjectNormalizer
      */
     protected function normalizeEntity($entity, $level)
     {
-        $result   = [];
+        $result = [];
         $metadata = $this->doctrineHelper->getEntityMetadata($entity);
 
         $nextLevel = $level + 1;
@@ -102,7 +101,7 @@ class ObjectNormalizer
     protected function normalizePlainObject($object, $level)
     {
         $result = [];
-        $refl   = new \ReflectionClass($object);
+        $refl = new \ReflectionClass($object);
 
         $nextLevel = $level + 1;
 
@@ -117,15 +116,15 @@ class ObjectNormalizer
 
     /**
      * @param object       $object
-     * @param EntityConfig $config
      * @param int          $level
+     * @param EntityConfig $config
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function normalizeObjectByConfig($object, EntityConfig $config, $level)
+    protected function normalizeObjectByConfig($object, $level, EntityConfig $config)
     {
         if (!$config->isExcludeAll()) {
             throw new \RuntimeException(
@@ -138,15 +137,18 @@ class ObjectNormalizer
         }
 
         $result = [];
+        $entityClass = ClassUtils::getClass($object);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->isExcluded()) {
                 continue;
             }
 
-            $value        = null;
+            $value = null;
             $propertyPath = $field->getPropertyPath() ?: $fieldName;
-            if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {
+            if (ConfigUtil::isMetadataProperty($propertyPath)) {
+                $value = $this->getMetadataProperty($entityClass, $propertyPath);
+            } elseif ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {
                 $targetEntity = $field->getTargetEntity();
                 if (null !== $targetEntity) {
                     $childFieldNames = array_keys($targetEntity->getFields());
@@ -167,8 +169,10 @@ class ObjectNormalizer
                         }
                         $value = $childValue;
                     } else {
-                        $value = $this->normalizeObjectByConfig($value, $targetEntity, $level + 1);
+                        $value = $this->normalizeValue($value, $level + 1, $targetEntity);
                     }
+                } else {
+                    $value = $this->transformValue($entityClass, $fieldName, $value, $field);
                 }
             }
             $result[$fieldName] = $value;
@@ -176,7 +180,7 @@ class ObjectNormalizer
 
         $postSerializeHandler = $config->getPostSerializeHandler();
         if (null !== $postSerializeHandler) {
-            $result = call_user_func($postSerializeHandler, $result);
+            $result = $this->postSerialize($result, $postSerializeHandler);
         }
 
         return $result;
@@ -197,24 +201,24 @@ class ObjectNormalizer
                 $val = $this->normalizeValue($val, $nextLevel, $config);
             }
         } elseif (is_object($value)) {
-            $objectNormalizer = $this->getObjectNormalizer($value);
+            $objectNormalizer = $this->normalizerRegistry->getObjectNormalizer($value);
             if (null !== $objectNormalizer) {
                 $value = $objectNormalizer->normalize($value);
             } elseif ($value instanceof \Traversable) {
-                $result    = [];
+                $result = [];
                 $nextLevel = $level + 1;
                 foreach ($value as $val) {
                     $result[] = $this->normalizeValue($val, $nextLevel, $config);
                 }
                 $value = $result;
             } elseif (null !== $config) {
-                $value = $this->normalizeObjectByConfig($value, $config, $level);
+                $value = $this->normalizeObjectByConfig($value, $level, $config);
             } elseif ($this->doctrineHelper->isManageableEntity($value)) {
                 if ($level <= static::MAX_NESTING_LEVEL) {
                     $value = $this->normalizeEntity($value, $level);
                 } else {
                     $entityId = $this->doctrineHelper->getEntityIdentifier($value);
-                    $count    = count($entityId);
+                    $count = count($entityId);
                     if ($count === 1) {
                         $value = reset($entityId);
                     } elseif ($count > 1) {
@@ -248,23 +252,68 @@ class ObjectNormalizer
     }
 
     /**
-     * @param object $object
+     * @param string           $entityClass
+     * @param string           $fieldName
+     * @param mixed            $fieldValue
+     * @param FieldConfig|null $fieldConfig
      *
-     * @return ObjectNormalizerInterface|null
+     * @return mixed
      */
-    protected function getObjectNormalizer($object)
+    protected function transformValue($entityClass, $fieldName, $fieldValue, FieldConfig $fieldConfig = null)
     {
-        if (null === $this->sortedNormalizers) {
-            krsort($this->normalizers);
-            $this->sortedNormalizers = call_user_func_array('array_merge', $this->normalizers);
-        }
+        return $this->dataTransformer->transform(
+            $entityClass,
+            $fieldName,
+            $fieldValue,
+            null !== $fieldConfig ? $fieldConfig->toArray(true) : []
+        );
+    }
 
-        foreach ($this->sortedNormalizers as $normalizer) {
-            if ($normalizer->supports($object)) {
-                return $normalizer;
-            }
+    /**
+     * Returns a value of a metadata property
+     *
+     * @param string $entityClass
+     * @param string $propertyPath
+     *
+     * @return mixed
+     */
+    public function getMetadataProperty($entityClass, $propertyPath)
+    {
+        switch ($propertyPath) {
+            case ConfigUtil::DISCRIMINATOR:
+                return $this->getEntityDiscriminator($entityClass);
+            case ConfigUtil::CLASS_NAME:
+                return $entityClass;
         }
 
         return null;
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    public function getEntityDiscriminator($entityClass)
+    {
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
+        if (null === $metadata) {
+            return null;
+        }
+
+        $map = array_flip($metadata->discriminatorMap);
+
+        return $map[$entityClass];
+    }
+
+    /**
+     * @param array    $item
+     * @param callable $handler
+     *
+     * @return array
+     */
+    protected function postSerialize(array $item, $handler)
+    {
+        return call_user_func($handler, $item);
     }
 }

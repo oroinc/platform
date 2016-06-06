@@ -179,6 +179,18 @@ class EmailManager
     }
 
     /**
+     * Gets emails by ids
+     *
+     * @param int[] $ids
+     *
+     * @return Email[]
+     */
+    public function findEmailsByIds($ids)
+    {
+        return $this->em->getRepository('OroEmailBundle:Email')->findEmailsByIds($ids);
+    }
+
+    /**
      * Prepare emails to set status. If need get all from thread
      *
      * @param Email $entity

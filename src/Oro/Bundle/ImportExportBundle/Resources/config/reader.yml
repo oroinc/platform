@@ -17,6 +17,7 @@ services:
             - '@oro_security.owner.ownership_metadata_provider'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
+            - [setAclHelper, ['@oro_security.acl_helper']]
 
     oro_importexport.reader.template_fixture:
         class: %oro_importexport.reader.template_fixture.class%
