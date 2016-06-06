@@ -19,7 +19,7 @@ datagrid:
                 join:
                     left:
                         - { join: l.titles, alias: t}
-                        - { join: l.parent, alias: pl }
+                        - { join: l.parentLocalization, alias: pl }
                 where:
                     and:
                         - t.localization IS NULL
@@ -139,7 +139,7 @@ datagrid:
             query:
                 where:
                     and:
-                        - l.parent = :localization_id
+                        - l.parentLocalization = :localization_id
             bind_parameters:
                 - localization_id
         columns:

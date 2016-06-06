@@ -75,6 +75,7 @@ class LocalizationControllerTest extends WebTestCase
      */
     public function testUpdate()
     {
+        /** @var Localization $localization */
         $localization = $this->getLocalization(self::NAME);
         $this->assertNotEmpty($localization);
 
@@ -97,13 +98,11 @@ class LocalizationControllerTest extends WebTestCase
 
                 $formValues['oro_localization']['titles']['values']['localizations'][$localeId] = $value;
             }
-
-
         }
 
         $formValues['oro_localization']['languageCode'] = self::UPDATED_LANGUAGE_CODE;
         $formValues['oro_localization']['formattingCode'] = self::UPDATED_FORMATTING_CODE;
-        $formValues['oro_localization']['parent'] = $parent->getId();
+        $formValues['oro_localization']['parentLocalization'] = $parent->getId();
 
         $this->client->followRedirects(true);
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);

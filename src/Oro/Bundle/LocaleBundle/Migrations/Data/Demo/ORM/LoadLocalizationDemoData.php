@@ -64,7 +64,7 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
                 $parentCode = $item['parent'];
 
                 if (isset($registry[$parentCode])) {
-                    $localization->setParent($registry[$parentCode]);
+                    $localization->setParentLocalization($registry[$parentCode]);
                 }
             }
             $registry[$code] = $localization;

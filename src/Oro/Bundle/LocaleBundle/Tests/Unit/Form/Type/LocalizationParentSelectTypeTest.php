@@ -53,7 +53,7 @@ class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
                     $this->assertEquals(
                         [
                             'component' => 'autocomplete-entity-parent',
-                            'placeholder' => 'oro.locale.localization.form.choose_parent'
+                            'placeholder' => 'oro.locale.localization.form.placeholder.select_parent_localization'
                         ],
                         $options['configs']
                     );
