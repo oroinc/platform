@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -16,12 +17,17 @@ class BuildQuery implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var CriteriaConnector */
+    protected $criteriaConnector;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper    $doctrineHelper
+     * @param CriteriaConnector $criteriaConnector
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, CriteriaConnector $criteriaConnector)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->criteriaConnector = $criteriaConnector;
     }
 
     /**
@@ -49,7 +55,7 @@ class BuildQuery implements ProcessorInterface
         }
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
-        $this->doctrineHelper->applyCriteria($query, $criteria);
+        $this->criteriaConnector->applyCriteria($query, $criteria);
 
         $context->setQuery($query);
     }

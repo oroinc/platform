@@ -5,7 +5,6 @@ namespace Oro\Component\Layout;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsResolverException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class LayoutContext implements ContextInterface
 {
@@ -15,7 +14,7 @@ class LayoutContext implements ContextInterface
     /** @var ContextDataCollection */
     protected $dataCollection;
 
-    /** @var OptionsResolverInterface */
+    /** @var OptionsResolver */
     protected $resolver;
 
     /** @var boolean */
@@ -188,7 +187,7 @@ class LayoutContext implements ContextInterface
     }
 
     /**
-     * @return OptionsResolverInterface
+     * @return OptionsResolver
      */
     protected function createResolver()
     {

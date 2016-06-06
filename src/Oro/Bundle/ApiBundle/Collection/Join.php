@@ -33,11 +33,27 @@ class Join extends BaseJoin
     }
 
     /**
+     * @param string $join
+     */
+    public function setJoin($join)
+    {
+        $this->join = $join;
+    }
+
+    /**
      * @param string $joinType
      */
     public function setJoinType($joinType)
     {
         $this->joinType = $joinType;
+    }
+
+    /**
+     * @param string $condition
+     */
+    public function setCondition($condition)
+    {
+        $this->condition = $condition;
     }
 
     /**
