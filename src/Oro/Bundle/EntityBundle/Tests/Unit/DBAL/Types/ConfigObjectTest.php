@@ -6,12 +6,12 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 use Oro\Component\Config\Common\ConfigObject;
-use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObject as ConfigType;
+use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
 
 class ConfigObjectTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ConfigType
+     * @var ConfigObjectType
      */
     protected $type;
 
@@ -22,10 +22,10 @@ class ConfigObjectTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!Type::hasType(ConfigType::TYPE)) {
-            Type::addType(ConfigType::TYPE, 'Oro\Bundle\EntityBundle\DBAL\Types\ConfigObject');
+        if (!Type::hasType(ConfigObjectType::TYPE)) {
+            Type::addType(ConfigObjectType::TYPE, 'Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType');
         }
-        $this->type = Type::getType(ConfigType::TYPE);
+        $this->type = Type::getType(ConfigObjectType::TYPE);
         $this->platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
             ->disableOriginalConstructor()
             ->getMock();

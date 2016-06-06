@@ -43,6 +43,6 @@ You can use this field type like:
     protected $mapConfigField;
 ```
 
-This three data types are available in extend fields. You can create new fields with this types. Additionally in view pages, in grids and in edit pages this fields will be automatically formatted with currency or percent formatters.
+This two data types ( **money** and **percent** ) are available in extend fields. You can create new fields with this types. Additionally in view pages, in grids and in edit pages this fields will be automatically formatted with currency or percent formatters.
 
 In grid, for percent data type will be automatically generated percent filter.

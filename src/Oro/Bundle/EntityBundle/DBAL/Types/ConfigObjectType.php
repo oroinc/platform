@@ -6,9 +6,9 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\JsonArrayType;
 
-use Oro\Component\Config\Common\ConfigObject as Config;
+use Oro\Component\Config\Common\ConfigObject;
 
-class ConfigObject extends JsonArrayType
+class ConfigObjectType extends JsonArrayType
 {
     const TYPE = 'config_object';
 
@@ -25,7 +25,7 @@ class ConfigObject extends JsonArrayType
             return null;
         }
 
-        $valueToDb = $value instanceof Config ? $value->toArray() : [];
+        $valueToDb = $value instanceof ConfigObject ? $value->toArray() : [];
 
         return parent::convertToDatabaseValue($valueToDb, $platform);
     }
@@ -48,6 +48,6 @@ class ConfigObject extends JsonArrayType
             throw ConversionException::conversionFailed($value, $this->getName());
         }
 
-        return Config::create($convertedValue);
+        return ConfigObject::create($convertedValue);
     }
 }

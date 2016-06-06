@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Component\Config\Common\ConfigObject;
 
-use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObject as ConfigType;
+use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQuery
@@ -47,7 +47,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
         $result = $this->connection->fetchAll($query);
 
         $oldType = Type::getType(Type::OBJECT);
-        $newType = Type::getType(ConfigType::TYPE);
+        $newType = Type::getType(ConfigObjectType::TYPE);
         $platform = $this->connection->getDatabasePlatform();
 
         foreach ($result as $channel) {
@@ -68,8 +68,8 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
             ];
             $types  = [
                 'id'    => 'integer',
-                'syncSettingsValue' => ConfigType::TYPE,
-                'mapSettingsValue'  => ConfigType::TYPE
+                'syncSettingsValue' => ConfigObjectType::TYPE,
+                'mapSettingsValue'  => ConfigObjectType::TYPE
             ];
 
             $this->logQuery($logger, $query, $params, $types);
@@ -78,30 +78,31 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
             }
         }
 
-        $this->prepareColumnOnPostgreSQL92($platform, $logger, $dryRun);
+        if ($platform instanceof PostgreSQL92Platform) {
+            $this->prepareColumnOnPostgreSQL92($logger, $dryRun);
+        }
     }
 
     /**
-     * @param AbstractPlatform $platform
      * @param LoggerInterface $logger
      * @param bool $dryRun
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    protected function prepareColumnOnPostgreSQL92($platform, $logger, $dryRun)
+    protected function prepareColumnOnPostgreSQL92($logger, $dryRun)
     {
         $updateSql = '';
-        $baseUpdateSql = 'ALTER TABLE oro_integration_channel ALTER COLUMN %s TYPE JSON USING %s::JSON;';
+        $baseUpdateColumnTypeSql = 'ALTER TABLE oro_integration_channel ALTER COLUMN %s TYPE JSON USING %s::JSON;';
+        $baseUpdateColumnCommentSql = 'COMMENT ON COLUMN oro_integration_channel.%s IS \'(DC2Type:config_type)\';';
 
-        if ($platform instanceof PostgreSQL92Platform) {
-            foreach ($this->fields as $fieldName) {
-                $updateSql .= sprintf($baseUpdateSql, $fieldName, $fieldName);
-            }
+        foreach ($this->fields as $fieldName) {
+            $updateSql .= sprintf($baseUpdateColumnTypeSql, $fieldName, $fieldName);
+            $updateSql .= sprintf($baseUpdateColumnCommentSql, $fieldName);
+        }
 
-            $this->logQuery($logger, $updateSql);
-            if (!$dryRun) {
-                $this->connection->executeUpdate($updateSql);
-            }
+        $this->logQuery($logger, $updateSql);
+        if (!$dryRun) {
+            $this->connection->executeUpdate($updateSql);
         }
     }
 
