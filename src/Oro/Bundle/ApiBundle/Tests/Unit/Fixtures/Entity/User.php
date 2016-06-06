@@ -44,6 +44,12 @@ class User
      */
     protected $products;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=false)
+     **/
+    protected $owner;
+
     public function __construct()
     {
         $this->groups   = new ArrayCollection();
@@ -154,6 +160,22 @@ class User
             $this->products->removeElement($product);
             $product->setOwner(null);
         }
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param User|null $owner
+     */
+    public function setOwner(User $owner = null)
+    {
+        $this->owner = $owner;
     }
 
     /**
