@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
+
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -41,7 +42,7 @@ class LocalizationRepositoryTest extends WebTestCase
         $prevLogger = $this->em->getConnection()->getConfiguration()->getSQLLogger();
         $this->em->getConnection()->getConfiguration()->setSQLLogger($queryAnalyzer);
 
-        /** @var Locaization[] $result */
+        /** @var Localization[] $result */
         $result = $this->repository->findRootsWithChildren();
 
         $this->assertEquals($localizations, $result);

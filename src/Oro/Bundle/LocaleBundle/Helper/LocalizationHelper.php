@@ -41,7 +41,6 @@ class LocalizationHelper
      */
     public function getCurrentLocalization()
     {
-        //return $this->getRepository()->findOneByCode('en');
         return $this->getRepository()->findOneByLanguageCode('en');
     }
 

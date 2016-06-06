@@ -391,7 +391,7 @@ define(function(require) {
             }
 
             var parentItemCode = $select.attr('data-parent-localization');
-            console.log('parentIntemCode: ', parentItemCode, 'select: ', $select.val(), 'result: ', parentItemCode && $select.val() !== 'system' ? parentItemCode : $select.val());
+
             return parentItemCode && $select.val() !== 'system' ? parentItemCode : $select.val();
         },
 

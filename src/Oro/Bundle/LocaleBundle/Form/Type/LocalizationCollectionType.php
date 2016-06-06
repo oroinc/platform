@@ -86,18 +86,18 @@ class LocalizationCollectionType extends AbstractType
             $parent = null;
             if ($localization->getParentLocalization()) {
                 $enabledFallbacks = array_merge($enabledFallbacks, [FallbackType::PARENT_LOCALIZATION]);
-                $parent = $parentCode = $localization->getParentLocalization()->getName(); // TODO: use title
+                $parent = $localization->getParentLocalization()->getName();
             }
 
             $builder->add(
                 $localization->getId(),
                 $options['value_type'],
                 [
-                    'label' => $localization->getName(), // TODO: use title
+                    'label' => $localization->getName(),
                     'type' => $options['type'],
                     'options' => $options['options'],
                     'fallback_type' => $options['fallback_type'],
-                    'fallback_type_localization' => $localization->getName(), // TODO: use title
+                    'fallback_type_localization' => $localization->getName(),
                     'fallback_type_parent_localization' => $parent,
                     'enabled_fallbacks' => $enabledFallbacks,
                     'group_fallback_fields' => $options['group_fallback_fields']
