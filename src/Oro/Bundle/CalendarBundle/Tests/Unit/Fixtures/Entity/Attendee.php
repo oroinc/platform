@@ -10,7 +10,6 @@ use Oro\Bundle\CalendarBundle\Entity\Attendee as BaseAttendee;
 class Attendee extends BaseAttendee
 {
     protected $status;
-    protected $origin;
     protected $type;
 
     public function __construct($id = null)
@@ -27,16 +26,6 @@ class Attendee extends BaseAttendee
     public function getStatus()
     {
         return $this->status;
-    }
-
-    public function setOrigin($origin)
-    {
-        $this->origin = $origin;
-    }
-
-    public function getOrigin()
-    {
-        return $this->origin;
     }
 
     public function getType()

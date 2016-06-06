@@ -41,6 +41,7 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->request = new Request();
         $this->request->request = new ParameterBag($data = []);
+        $this->request->query = new ParameterBag(['send_notification' => true]);
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();

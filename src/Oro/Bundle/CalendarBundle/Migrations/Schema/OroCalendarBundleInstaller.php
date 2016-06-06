@@ -123,18 +123,6 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
         $this->extendExtension->addEnumField(
             $schema,
             $table,
-            'origin',
-            Attendee::ORIGIN_ENUM_CODE,
-            false,
-            false,
-            [
-                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM]
-            ]
-        );
-
-        $this->extendExtension->addEnumField(
-            $schema,
-            $table,
             'type',
             Attendee::TYPE_ENUM_CODE,
             false,

@@ -16,7 +16,6 @@ class CalendarEventAttendeesApiType extends AbstractType
         $builder
             ->add('displayName')
             ->add('email')
-            ->add('origin')
             ->add('status')
             ->add('type');
     }

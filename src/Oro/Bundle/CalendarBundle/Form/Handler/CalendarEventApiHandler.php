@@ -118,11 +118,6 @@ class CalendarEventApiHandler
                     ->find(Attendee::STATUS_NONE);
                 $attendee->setStatus($status);
 
-                $origin = $this->manager
-                    ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
-                    ->find(Attendee::ORIGIN_CLIENT);
-                $attendee->setOrigin($origin);
-
                 $type = $this->manager
                     ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE))
                     ->find(Attendee::TYPE_OPTIONAL);
@@ -149,14 +144,16 @@ class CalendarEventApiHandler
         $this->manager->persist($entity);
         $this->manager->flush();
 
-        if ($new) {
-            $this->emailSendProcessor->sendInviteNotification($entity);
-        } else {
-            $this->emailSendProcessor->sendUpdateParentEventNotification(
-                $entity,
-                $originalAttendees,
-                $notify
-            );
+        if ($this->request->query->get('send_notification', false)) {
+            if ($new) {
+                $this->emailSendProcessor->sendInviteNotification($entity);
+            } else {
+                $this->emailSendProcessor->sendUpdateParentEventNotification(
+                    $entity,
+                    $originalAttendees,
+                    $notify
+                );
+            }
         }
     }
 }

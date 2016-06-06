@@ -297,6 +297,7 @@ services:
         class: %oro_calendar.calendar_event.handler.delete.class%
         parent: oro_soap.handler.delete.abstract
         calls:
+            - [setRequestStack, ['@request_stack']]
             - [setCalendarConfig, ['@oro_calendar.system_calendar_config']]
             - [setSecurityFacade, ['@oro_security.security_facade']]
             - [setEmailSendProcessor, ['@oro_calendar.send_processor.email']]

@@ -166,19 +166,6 @@ class CalendarEventType extends AbstractType
 
             $event->setOrigin($calendarEventServer);
         }
-
-        $attendeeServer = $this->registry
-            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
-            ->find(Attendee::ORIGIN_SERVER);
-
-        $attendees = $event->getAttendees();
-        foreach ($attendees as $attendee) {
-            if ($attendee->getOrigin()) {
-                continue;
-            }
-
-            $attendee->setOrigin($attendeeServer);
-        }
     }
 
     /**

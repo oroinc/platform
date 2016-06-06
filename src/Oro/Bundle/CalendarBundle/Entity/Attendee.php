@@ -32,12 +32,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 class Attendee extends ExtendAttendee
 {
     const STATUS_ENUM_CODE = 'ce_attendee_status';
-    const ORIGIN_ENUM_CODE = 'ce_attendee_origin';
     const TYPE_ENUM_CODE = 'ce_attendee_type';
-
-    const ORIGIN_SERVER = 'server';
-    const ORIGIN_CLIENT = 'client';
-    const ORIGIN_EXTERNAL = 'external';
 
     const STATUS_NONE = 'none';
     const STATUS_ACCEPTED = 'accepted';

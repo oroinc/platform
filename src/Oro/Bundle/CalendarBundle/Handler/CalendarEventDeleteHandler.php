@@ -5,6 +5,8 @@ namespace Oro\Bundle\CalendarBundle\Handler;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
@@ -15,6 +17,9 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class CalendarEventDeleteHandler extends DeleteHandler
 {
+    /** @var RequestStack */
+    protected $requestStack;
+
     /** @var SystemCalendarConfig */
     protected $calendarConfig;
 
@@ -23,6 +28,18 @@ class CalendarEventDeleteHandler extends DeleteHandler
 
     /** @var EmailSendProcessor */
     protected $emailSendProcessor;
+
+    /**
+     * @param RequestStack $requestStack
+     *
+     * @return $this
+     */
+    public function setRequestStack(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+
+        return $this;
+    }
 
     /**
      * @param EmailSendProcessor $emailSendProcessor
@@ -113,6 +130,19 @@ class CalendarEventDeleteHandler extends DeleteHandler
             $em->remove($entity->getRecurrence());
         }
         parent::processDelete($entity, $em);
-        $this->emailSendProcessor->sendDeleteEventNotification($entity);
+
+        if ($this->shouldSendNotification()) {
+            $this->emailSendProcessor->sendDeleteEventNotification($entity);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldSendNotification()
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        return !$request || (bool) $request->query->get('send_notification', false);
     }
 }

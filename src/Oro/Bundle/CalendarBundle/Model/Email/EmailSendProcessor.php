@@ -56,10 +56,6 @@ class EmailSendProcessor
     {
         if (!$calendarEvent->getParent() && count($calendarEvent->getChildAttendees()) > 0) {
             foreach ($calendarEvent->getChildAttendees() as $attendee) {
-                if (!$this->notifiable($attendee)) {
-                    continue;
-                }
-
                 $this->addEmailNotification(
                     $attendee->getCalendarEvent(),
                     [$attendee->getEmail()],
@@ -97,7 +93,7 @@ class EmailSendProcessor
         }
         // Send notification to new invitees
         foreach ($childAttendees as $attendee) {
-            if ($this->notifiable($attendee) && false === $originalAttendees->contains($attendee)) {
+            if (false === $originalAttendees->contains($attendee)) {
                 $this->addEmailNotification(
                     $attendee->getCalendarEvent(),
                     [$attendee->getEmail()],
@@ -106,7 +102,7 @@ class EmailSendProcessor
             }
         }
         foreach ($originalAttendees as $attendee) {
-            if ($this->notifiable($attendee) && false === $childAttendees->contains($attendee)) {
+            if (false === $childAttendees->contains($attendee)) {
                 $this->addEmailNotification(
                     $attendee->getCalendarEvent(),
                     [$attendee->getEmail()],
@@ -205,10 +201,6 @@ class EmailSendProcessor
         $emails = [];
         /** @var CalendarEvent $notifyEvent */
         foreach ($parentEvent->getChildAttendees() as $attendee) {
-            if (!$this->notifiable($attendee)) {
-                continue;
-            }
-
             $emails[] = $attendee->getEmail();
         }
 
@@ -228,9 +220,6 @@ class EmailSendProcessor
         }
 
         $relatedAttendee = $parent->getRelatedAttendee();
-        if (!$this->notifiable($relatedAttendee)) {
-            return [];
-        }
 
         return [$relatedAttendee->getEmail()];
     }
@@ -247,17 +236,5 @@ class EmailSendProcessor
         $emailNotification->setEntity($entity);
         $emailNotification->setTemplateName($templateName);
         $this->emailNotifications[] = $emailNotification;
-    }
-
-    /**
-     * @param Attendee $attendee
-     *
-     * @return bool
-     */
-    protected function notifiable(Attendee $attendee)
-    {
-        $origin = $attendee->getOrigin();
-
-        return $origin && $origin->getId() === 'server';
     }
 }

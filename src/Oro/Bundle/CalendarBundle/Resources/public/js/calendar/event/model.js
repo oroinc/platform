@@ -57,7 +57,7 @@ define([
             url = Backbone.Model.prototype.url.call(this, arguments);
             this.id = id;
 
-            return url;
+            return url + '?send_notification=true';
         },
 
         save: function(key, val, options) {

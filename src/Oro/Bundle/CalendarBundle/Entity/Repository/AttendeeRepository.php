@@ -64,10 +64,9 @@ class AttendeeRepository extends EntityRepository
         $qb = $this->createQueryBuilder('attendee');
         $queryResult = $qb
             ->select('attendee.displayName, attendee.email, attendee.createdAt, attendee.updatedAt')
-            ->addSelect('attendee_origin.id AS origin, attendee_status.id as status, attendee_type.id as type')
+            ->addSelect('attendee_status.id as status, attendee_type.id as type')
             ->addSelect('event.id as calendarEventId')
             ->join('attendee.calendarEvent', 'event')
-            ->leftJoin('attendee.origin', 'attendee_origin')
             ->leftJoin('attendee.status', 'attendee_status')
             ->leftJoin('attendee.type', 'attendee_type')
             ->where($qb->expr()->in('event.id', ':calendar_event'))

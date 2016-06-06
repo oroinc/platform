@@ -10,8 +10,6 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
  * @method Attendee setType(AbstractEnumValue $value)
  * @method AbstractEnumValue getStatus
  * @method Attendee setStatus(AbstractEnumValue $value)
- * @method AbstractEnumValue getOrigin
- * @method Attendee setOrigin(AbstractEnumValue $value)
  */
 class ExtendAttendee
 {

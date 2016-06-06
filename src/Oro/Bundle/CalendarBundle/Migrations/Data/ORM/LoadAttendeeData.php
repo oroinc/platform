@@ -37,25 +37,6 @@ class LoadAttendeeData extends AbstractFixture
     ];
 
     /** @var array */
-    protected $originEnumData = [
-        Attendee::ORIGIN_CLIENT   => [
-            'label'    => 'Client',
-            'priority' => 1,
-            'default'  => true
-        ],
-        Attendee::ORIGIN_SERVER   => [
-            'label'    => 'Server',
-            'priority' => 2,
-            'default'  => false
-        ],
-        Attendee::ORIGIN_EXTERNAL => [
-            'label'    => 'External',
-            'priority' => 3,
-            'default'  => false
-        ]
-    ];
-
-    /** @var array */
     protected $typeEnumData = [
         Attendee::TYPE_ORGANIZER => [
             'label'    => 'Organizer',
@@ -80,7 +61,6 @@ class LoadAttendeeData extends AbstractFixture
     public function load(ObjectManager $manager)
     {
         $this->loadData($manager, Attendee::STATUS_ENUM_CODE, $this->statusEnumData);
-        $this->loadData($manager, Attendee::ORIGIN_ENUM_CODE, $this->originEnumData);
         $this->loadData($manager, Attendee::TYPE_ENUM_CODE, $this->typeEnumData);
     }
 
