@@ -5,9 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,9 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
+
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Component\DoctrineUtils\ORM\LikeQueryHelperTrait;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class ScheduledTransitionProcesses
 {
@@ -35,7 +37,6 @@ class ScheduledTransitionProcesses
     /**
      * @param ScheduledTransitionProcessName $scheduledTransitionProcessName
      * @return ProcessDefinition|null
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function get(ScheduledTransitionProcessName $scheduledTransitionProcessName)
     {

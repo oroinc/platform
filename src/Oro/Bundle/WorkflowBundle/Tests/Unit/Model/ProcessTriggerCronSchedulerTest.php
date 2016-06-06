@@ -13,29 +13,19 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
 
 class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ScheduleManager|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ScheduleManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $scheduleManager;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $scheduleClass;
 
-    /**
-     * @var ProcessTriggerCronScheduler
-     */
+    /** @var ProcessTriggerCronScheduler */
     protected $processCronScheduler;
 
-    /**
-     * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $objectManager;
 
     protected function setUp()
