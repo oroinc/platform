@@ -75,6 +75,13 @@ class Localization implements DatesAwareInterface
      * @var string
      *
      * @ORM\Column(name="language_code", type="string", length=16, nullable=false)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $languageCode;
 
