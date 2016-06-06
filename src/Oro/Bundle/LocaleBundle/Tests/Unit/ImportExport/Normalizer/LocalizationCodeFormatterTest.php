@@ -35,9 +35,9 @@ class LocalizationCodeFormatterTest extends \PHPUnit_Framework_TestCase
             [null, 'default'],
             ['', 'default'],
             [false, 'default'],
-            ['en', 'en'],
+            ['English', 'English'],
             [new Localization(), 'default'],
-            [(new Localization())->setLanguageCode('en'), 'en'],
+            [(new Localization())->setName('English'), 'English'],
         ];
     }
 
@@ -61,9 +61,9 @@ class LocalizationCodeFormatterTest extends \PHPUnit_Framework_TestCase
             [null, null],
             ['', null],
             [false, null],
-            ['en', 'en'],
+            ['English', 'English'],
             [new Localization(), null],
-            [(new Localization())->setLanguageCode('en'), 'en'],
+            [(new Localization())->setName('English'), 'English'],
         ];
     }
 }

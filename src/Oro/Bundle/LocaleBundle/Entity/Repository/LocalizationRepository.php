@@ -7,19 +7,19 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
- * @method Localization|null findOneByLanguageCode($code)
+ * @method Localization|null findOneByName($name)
  */
 class LocalizationRepository extends EntityRepository
 {
     /**
      * @return array
      */
-    public function getLanguageCodes()
+    public function getNames()
     {
         $qb = $this->createQueryBuilder('l');
 
         return $qb
-            ->select('l.languageCode')
+            ->select('l.name')
             ->getQuery()
             ->getScalarResult();
     }

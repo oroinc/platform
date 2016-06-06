@@ -22,7 +22,7 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
     protected $localizedFallbackValueClassName;
 
     /** @var string[] */
-    private $languageCodes;
+    private $names;
 
     /** @var ManagerRegistry */
     protected $registry;
@@ -57,16 +57,16 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
     /**
      * @return string[]
      */
-    protected function getLanguageCodes()
+    protected function getNames()
     {
-        if (null === $this->languageCodes) {
+        if (null === $this->names) {
             /* @var $localizationRepository LocalizationRepository */
             $localizationRepository = $this->registry->getRepository($this->localizationClassName);
-            $this->languageCodes = ArrayUtil::arrayColumn($localizationRepository->getLanguageCodes(), 'languageCode');
-            array_unshift($this->languageCodes, LocalizationCodeFormatter::DEFAULT_LOCALIZATION);
+            $this->names = ArrayUtil::arrayColumn($localizationRepository->getNames(), 'name');
+            array_unshift($this->names, LocalizationCodeFormatter::DEFAULT_LOCALIZATION);
         }
 
-        return $this->languageCodes;
+        return $this->names;
     }
 
     /**
@@ -81,7 +81,7 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         $fieldOrder
     ) {
         if (is_a($field['related_entity_name'], $this->localizedFallbackValueClassName, true)) {
-            $localizationCodes = $this->getLanguageCodes();
+            $localizationCodes = $this->getNames();
             $targetField = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'fallback_field', 'string');
             $fieldName = $field['name'];
             $rules = [];

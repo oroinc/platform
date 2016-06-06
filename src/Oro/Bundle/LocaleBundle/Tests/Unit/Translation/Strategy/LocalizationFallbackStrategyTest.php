@@ -87,31 +87,36 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
     public function getLocaleFallbacksDataProvider()
     {
         $secondLevelLevelEn = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
+            'name' => 'English1',
             'languageCode' => 'en',
             'formattingCode' => 'en_FR',
         ]);
         $firstLevelEn = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
+            'name' => 'English2',
             'languageCode' => 'en',
             'formattingCode' => 'en_EN',
             'childLocalizations' => new ArrayCollection([$secondLevelLevelEn])]
         );
         $en = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
+            'name' => 'English3',
             'languageCode' => 'en',
             'formattingCode' => 'en',
             'childLocalizations' => new ArrayCollection([$firstLevelEn])
         ]);
         $firstLevelRu = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
+            'name' => 'Russian1',
             'languageCode' => 'ru',
             'formattingCode' => 'ru_RU',
         ]);
         $ru = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
+            'name' => 'Russian2',
             'languageCode' => 'ru',
             'formattingCode' => 'ru',
             'childLocalizations' => new ArrayCollection([$firstLevelRu])
         ]);
         $localizations = [
-            'en' => ['en' => ['en' => []]],
-            'ru' => ['ru' => []],
+            'English3' => ['English2' => ['English1' => []]],
+            'Russian2' => ['Russian1' => []],
         ];
         return [
             ['entities' => [$en, $ru], 'localizations' => $localizations],

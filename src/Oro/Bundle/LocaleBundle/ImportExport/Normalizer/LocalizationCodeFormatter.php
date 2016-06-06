@@ -19,12 +19,12 @@ class LocalizationCodeFormatter
         }
 
         if ($localization instanceof Localization) {
-            $code = $localization->getLanguageCode();
-            if (!$code) {
+            $name = $localization->getName();
+            if (!$name) {
                 return self::DEFAULT_LOCALIZATION;
             }
 
-            return (string)$code;
+            return (string)$name;
         }
 
         return (string)$localization;
@@ -41,12 +41,12 @@ class LocalizationCodeFormatter
         }
 
         if ($localization instanceof Localization) {
-            $code = $localization->getLanguageCode();
-            if (!$code) {
+            $name = $localization->getName();
+            if (!$name) {
                 return null;
             }
 
-            return (string)$code;
+            return (string)$name;
         }
 
         return (string)$localization;

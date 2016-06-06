@@ -37,14 +37,18 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $localeCode = $localeSettings->getLocale();
         $title = Intl::getLanguageBundle()->getLanguageName($localeSettings->getLanguage(), $localeCode);
 
-        $localization = new Localization();
-        $localization->setName($title)
-            ->setDefaultTitle($title)
-            ->setLanguageCode($localeCode)
-            ->setFormattingCode($localeCode);
+        $localization = $manager->getRepository('OroLocaleBundle:Localization')->findOneBy(['name' => $title]);
 
-        $manager->persist($localization);
-        $manager->flush();
+        if (!$localization) {
+            $localization = new Localization();
+            $localization->setName($title)
+                ->setDefaultTitle($title)
+                ->setLanguageCode($localeCode)
+                ->setFormattingCode($localeCode);
+
+            $manager->persist($localization);
+            $manager->flush();
+        }
 
         $this->addReference('default_localization', $localization);
     }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Migrations\Data\Demo\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -49,27 +50,35 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
         $localeSettings = $this->container->get('oro_locale.settings');
         $localeCode = $localeSettings->getLocale();
 
+        /* @var $repository EntityRepository */
+        $repository = $manager->getRepository('OroLocaleBundle:Localization');
+
         foreach ($this->localizations as $item) {
-            $code = $item['language'];
-            $name = Intl::getLanguageBundle()->getLanguageName($code, $localeCode);
+            $code = $item['formatting'];
+            $name = Intl::getLocaleBundle()->getLocaleName($code, $localeCode);
 
-            $localization = new Localization();
-            $localization
-                ->setLanguageCode($item['language'])
-                ->setFormattingCode($item['formatting'])
-                ->setName($name)
-                ->setDefaultTitle($name);
+            $localization = $repository->findOneBy(['name' => $name]);
 
-            if ($item['parent']) {
-                $parentCode = $item['parent'];
+            if (!$localization) {
+                $localization = new Localization();
+                $localization
+                    ->setLanguageCode($item['language'])
+                    ->setFormattingCode($item['formatting'])
+                    ->setName($name)
+                    ->setDefaultTitle($name);
 
-                if (isset($registry[$parentCode])) {
-                    $localization->setParentLocalization($registry[$parentCode]);
+                if ($item['parent']) {
+                    $parentCode = $item['parent'];
+
+                    if (isset($registry[$parentCode])) {
+                        $localization->setParentLocalization($registry[$parentCode]);
+                    }
                 }
-            }
-            $registry[$code] = $localization;
 
-            $manager->persist($localization);
+                $manager->persist($localization);
+            }
+
+            $registry[$code] = $localization;
 
             $this->addReference('localization_' . $code, $localization);
         }

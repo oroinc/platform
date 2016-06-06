@@ -74,16 +74,16 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
             return new ArrayCollection($data);
         }
         $result = new ArrayCollection();
-        foreach ($data as $localizationCode => $item) {
+        foreach ($data as $localizationName => $item) {
             /** @var LocalizedFallbackValue $object */
             $object = clone $this->value;
 
-            if ($localizationCode !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION) {
-                if (!array_key_exists($localizationCode, $this->localizations)) {
-                    $this->localizations[$localizationCode] = clone $this->localization;
-                    $this->localizations[$localizationCode]->setLanguageCode($localizationCode);
+            if ($localizationName !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION) {
+                if (!array_key_exists($localizationName, $this->localizations)) {
+                    $this->localizations[$localizationName] = clone $this->localization;
+                    $this->localizations[$localizationName]->setName($localizationName);
                 }
-                $object->setLocalization($this->localizations[$localizationCode]);
+                $object->setLocalization($this->localizations[$localizationName]);
             }
 
             if (array_key_exists('fallback', $item)) {
@@ -96,7 +96,7 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
                 $object->setString((string)$item['string']);
             }
 
-            $result->set($localizationCode, $object);
+            $result->set($localizationName, $object);
         }
 
         return $result;
