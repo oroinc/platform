@@ -51,7 +51,7 @@ class LocalizationType extends AbstractType
                 ]
             )
             ->add(
-                'parent',
+                'parentLocalization',
                 LocalizationParentSelectType::NAME,
                 ['required' => false, 'label' => 'oro.locale.localization.parent_localization.label']
             );

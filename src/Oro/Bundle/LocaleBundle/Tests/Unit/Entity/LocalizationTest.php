@@ -18,12 +18,12 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
             ['name', 'test_name'],
             ['languageCode', 'language_test_code'],
             ['formattingCode', 'formatting_test_code'],
-            ['parent', new Localization()],
+            ['parentLocalization', new Localization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
         ]);
         $this->assertPropertyCollections(new Localization(), [
-            ['childs', new Localization()],
+            ['childLocalizations', new Localization()],
             ['titles', new LocalizedFallbackValue()],
         ]);
     }
@@ -64,8 +64,8 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
     public function testConstruct()
     {
         $entity = new Localization();
-        $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getChils());
-        $this->assertEmpty($entity->getChilds()->toArray());
+        $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getChildLocalizations());
+        $this->assertEmpty($entity->getChildLocalizations()->toArray());
         $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getTitles());
         $this->assertEmpty($entity->getTitles()->toArray());
     }
@@ -84,7 +84,7 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $entity->getTitles()->toArray());
         $this->assertEquals([$defaultTitle, $firstTitle, $secondTitle], array_values($entity->getTitles()->toArray()));
 
-        $this->assertEquals($secondTitle, $entity->getTitle($secondTitle->getLocale()));
+        $this->assertEquals($secondTitle, $entity->getTitle($secondTitle->getLocalization()));
         $this->assertEquals($defaultTitle, $entity->getTitle());
 
         $entity->removeTitle($firstTitle)->removeTitle($firstTitle)->removeTitle($defaultTitle);
@@ -132,19 +132,19 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $locale
+     * @param string $localization
      * @param bool|false $default
      * @return LocalizedFallbackValue
      */
-    protected function createLocalizedValue($locale, $default = false)
+    protected function createLocalizedValue($localization, $default = false)
     {
         $localized = (new LocalizedFallbackValue())->setString('some string');
 
         if (!$default) {
-            $locale = new Locale();
-            $locale->setTitle($locale);
+            $localization = new Localization();
+            $localization->setDefaultTitle($localization);
 
-            $localized->setLocale($locale);
+            $localized->setLocalization($localization);
         }
 
         return $localized;

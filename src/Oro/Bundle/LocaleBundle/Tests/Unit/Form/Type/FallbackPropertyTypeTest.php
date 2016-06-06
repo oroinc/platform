@@ -125,7 +125,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
     public function testFinishView()
     {
         $localizationCode = 'en_US';
-        $parentLocalizationCode = 'en';
+        $parentCode = 'en';
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
         $form = $this->getMock('Symfony\Component\Form\FormInterface');
@@ -133,14 +133,14 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $formView = new FormView();
         $this->formType->finishView($formView, $form, [
             'localization' => $localizationCode,
-            'parent_localization' => $parentLocalizationCode,
+            'parent_localization' => $parentCode,
         ]);
 
         $this->assertArrayHasKey('attr', $formView->vars);
         $this->assertArrayHasKey('data-localization', $formView->vars['attr']);
         $this->assertArrayHasKey('data-parent-localization', $formView->vars['attr']);
         $this->assertEquals($localizationCode, $formView->vars['attr']['data-localization']);
-        $this->assertEquals($parentLocalizationCode, $formView->vars['attr']['data-parent-localization']);
+        $this->assertEquals($parentCode, $formView->vars['attr']['data-parent-localization']);
     }
 
     public function testGetName()

@@ -47,7 +47,7 @@ class LocalizationValidator extends ConstraintValidator
      */
     private function localizationExists(Entity\Localization $localizationNeedle, Entity\Localization $localization)
     {
-        $childLocalizations = $localization->getChilds();
+        $childLocalizations = $localization->getChildLocalizations();
         if ($childLocalizations->contains($localizationNeedle)) {
             return true;
         }

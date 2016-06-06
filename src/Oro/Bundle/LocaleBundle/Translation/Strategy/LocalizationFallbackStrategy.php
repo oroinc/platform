@@ -92,7 +92,7 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
     protected function localizationToArray(Localization $localization)
     {
         $children = [];
-        foreach ($localization->getChilds() as $child) {
+        foreach ($localization->getChildLocalizations() as $child) {
             $children = array_merge($children, $this->localizationToArray($child));
         }
         return [$localization->getLanguageCode() => $children];

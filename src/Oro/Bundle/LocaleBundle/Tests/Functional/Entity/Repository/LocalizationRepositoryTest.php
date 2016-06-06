@@ -62,7 +62,7 @@ class LocalizationRepositoryTest extends WebTestCase
     protected function visitChildren(Localization $localization)
     {
         $localization->getLanguageCode();
-        foreach ($localization->getChilds() as $child) {
+        foreach ($localization->getChildLocalizations() as $child) {
             $this->visitChildren($child);
         }
     }

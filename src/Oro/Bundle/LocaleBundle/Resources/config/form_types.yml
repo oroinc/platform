@@ -47,28 +47,6 @@ services:
     oro_locale.form.type.quarter:
         class: '%oro_locale.form.type.quarter.class%'
         tags:
-            - { name: form.type, alias: "oro_quarter" }
-
-    #Localization Form Types
-    oro_locale.form.type.localization:
-        class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationType
-        tags:
-            - { name: form.type, alias: "oro_localization" }
-        calls:
-            - [setDataClass, ['%oro_locale.entity.localization.class%']]
-
-    oro_locale.form.type.language_select:
-        class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType
-        arguments:
-            - '@oro_locale.provider.localization_choices'
-        tags:
-            - { name: form.type, alias: "oro_language_select" }
-
-    oro_locale.form.type.formatting_select:
-        class: Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType
-        arguments:
-            - '@oro_locale.provider.localization_choices'
-        tags:
             - { name: form.type, alias: "oro_formatting_select" }
 
     oro_locale.form.type.fallback_property:
@@ -133,13 +111,13 @@ services:
     oro_locale.form.type.language_select:
         class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType
         arguments:
-            - '@oro_config.global'
+            - '@oro_locale.provider.localization_choices'
         tags:
             - { name: form.type, alias: oro_language_select }
 
     oro_locale.form.type.formatting_select:
         class: Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType
         arguments:
-            - '@oro_config.global'
+            - '@oro_locale.provider.localization_choices'
         tags:
             - { name: form.type, alias: oro_formatting_select }

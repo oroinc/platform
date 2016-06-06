@@ -53,7 +53,7 @@ class OroLocaleBundle implements Migration
     {
         $table = $schema->createTable('oro_fallback_localization_val');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('locale_id', 'integer', ['notnull' => false]);
+        $table->addColumn('localization_id', 'integer', ['notnull' => false]);
         $table->addColumn('fallback', 'string', ['notnull' => false, 'length' => 64]);
         $table->addColumn('string', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('text', 'text', ['notnull' => false]);
@@ -102,7 +102,7 @@ class OroLocaleBundle implements Migration
         $table = $schema->getTable('oro_fallback_localization_val');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_localization'),
-            ['locale_id'],
+            ['localization_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );

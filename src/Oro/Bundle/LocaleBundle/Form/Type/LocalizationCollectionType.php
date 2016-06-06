@@ -84,9 +84,9 @@ class LocalizationCollectionType extends AbstractType
             // calculate enabled fallbacks for the specific localization
             $enabledFallbacks = $options['enabled_fallbacks'];
             $parent = null;
-            if ($localization->getParent()) {
+            if ($localization->getParentLocalization()) {
                 $enabledFallbacks = array_merge($enabledFallbacks, [FallbackType::PARENT_LOCALIZATION]);
-                $parent = $parentCode = $localization->getParent()->getName(); // TODO: use title
+                $parent = $parentCode = $localization->getParentLocalization()->getName(); // TODO: use title
             }
 
             $builder->add(
@@ -129,7 +129,7 @@ class LocalizationCollectionType extends AbstractType
             $entityRepository = $this->registry->getRepository($this->dataClass);
 
             $this->localizations = $entityRepository->createQueryBuilder('l')
-                ->leftJoin('l.parent', 'parent')
+                ->leftJoin('l.parentLocalization', 'parent')
                 ->addOrderBy('l.id', 'ASC')
                 ->getQuery()
                 ->getResult();
@@ -152,7 +152,7 @@ class LocalizationCollectionType extends AbstractType
         foreach ($this->getLocalizations() as $localization) {
             $localizationId = $localization->getId();
             if (!array_key_exists($localizationId, $data)) {
-                if ($localization->getParent()) {
+                if ($localization->getParentLocalization()) {
                     $data[$localizationId] = new FallbackType(FallbackType::PARENT_LOCALIZATION);
                 } else {
                     $data[$localizationId] = new FallbackType(FallbackType::SYSTEM);

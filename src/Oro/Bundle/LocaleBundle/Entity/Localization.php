@@ -88,21 +88,21 @@ class Localization implements DatesAwareInterface
     /**
      * @var Localization
      *
-     * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childs")
+     * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childLocalizations")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
-    protected $parent;
+    protected $parentLocalization;
 
     /**
      * @var Collection|Localization[]
      *
-     * @ORM\OneToMany(targetEntity="Localization", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="Localization", mappedBy="parentLocalization")
      */
-    protected $childs;
+    protected $childLocalizations;
 
     public function __construct()
     {
-        $this->childs = new ArrayCollection();
+        $this->childLocalizations = new ArrayCollection();
         $this->titles = new ArrayCollection();
     }
 
@@ -183,13 +183,13 @@ class Localization implements DatesAwareInterface
     }
 
     /**
-     * @param Localization $parent
+     * @param Localization $parentLocalization
      *
      * @return $this
      */
-    public function setParent(Localization $parent = null)
+    public function setParentLocalization(Localization $parentLocalization = null)
     {
-        $this->parent = $parent;
+        $this->parentLocalization = $parentLocalization;
 
         return $this;
     }
@@ -197,41 +197,41 @@ class Localization implements DatesAwareInterface
     /**
      * @return Localization
      */
-    public function getParent()
+    public function getParentLocalization()
     {
-        return $this->parent;
+        return $this->parentLocalization;
     }
 
     /**
      * @return Collection|Localization[]
      */
-    public function getChilds()
+    public function getChildLocalizations()
     {
-        return $this->childs;
+        return $this->childLocalizations;
     }
 
     /**
-     * @param Localization $localization
+     * @param Localization $childLocalization
      * @return $this
      */
-    public function addChild(Localization $localization)
+    public function addChildLocalization(Localization $childLocalization)
     {
-        if (!$this->childs->contains($localization)) {
-            $this->childs->add($localization);
+        if (!$this->childLocalizations->contains($childLocalization)) {
+            $this->childLocalizations->add($childLocalization);
         }
 
         return $this;
     }
 
     /**
-     * @param Localization $localization
+     * @param Localization $childLocalization
      * @return $this
      */
-    public function removeChild(Localization $localization)
+    public function removeChildLocalization(Localization $childLocalization)
     {
-        if ($this->childs->contains($localization)) {
-            $this->childs->removeElement($localization);
-            $localization->setParent(null);
+        if ($this->childLocalizations->contains($childLocalization)) {
+            $this->childLocalizations->removeElement($childLocalization);
+            $childLocalization->setParentLocalization(null);
         }
 
         return $this;
