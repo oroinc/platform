@@ -42,7 +42,7 @@ class LoadLocalizationData extends AbstractFixture
                 ->setName($item['title']);
 
             if ($item['parent']) {
-                $localization->setParent($registry[$item['parent']]);
+                $localization->setParentLocalization($registry[$item['parent']]);
             }
             $registry[$code] = $localization;
 
