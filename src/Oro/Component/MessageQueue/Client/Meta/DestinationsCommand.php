@@ -3,6 +3,7 @@ namespace Oro\Component\MessageQueue\Client\Meta;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -42,7 +43,12 @@ class DestinationsCommand extends Command
         $table->setHeaders(['Client Name', 'Transport Name', 'Subscribers']);
 
         $count = 0;
+        $firstRow = true;
         foreach ($this->destinationRegistry->getDestinationsMeta() as $destination) {
+            if (false == $firstRow) {
+                $table->addRow(new TableSeparator());
+            }
+
             $table->addRow([
                 $destination->getClientName(),
                 $destination->getTransportName(),
@@ -50,6 +56,7 @@ class DestinationsCommand extends Command
             ]);
 
             $count++;
+            $firstRow = false;
         }
 
         $output->writeln(sprintf('Found %s destinations', $count));

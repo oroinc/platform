@@ -4,12 +4,9 @@ namespace Oro\Component\MessageQueue\Router;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface as TransportSession;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 
-class RouterMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class RouterMessageProcessor implements MessageProcessorInterface
 {
-    const TOPIC = 'message_queue.router';
-
     /**
      * @var object
      */
@@ -28,7 +25,7 @@ class RouterMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      */
     public function process(MessageInterface $message, TransportSession $session)
     {
-        if ($this->router instanceof  RecipientListRouterInterface) {
+        if ($this->router instanceof RecipientListRouterInterface) {
             $this->routeOneToMany($this->router, $message, $session);
         } else {
             throw new \LogicException(sprintf('Unsupported router given %s', get_class($this->router)));
@@ -42,19 +39,14 @@ class RouterMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @param MessageInterface $message
      * @param TransportSession $session
      */
-    protected function routeOneToMany(RecipientListRouterInterface $router, MessageInterface $message, TransportSession $session)
-    {
+    protected function routeOneToMany(
+        RecipientListRouterInterface $router,
+        MessageInterface $message,
+        TransportSession $session
+    ) {
         $producer = $session->createProducer();
         foreach ($router->route($message) as $recipient) {
             $producer->send($recipient->getDestination(), $recipient->getMessage());
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedTopics()
-    {
-        return [self::TOPIC];
     }
 }

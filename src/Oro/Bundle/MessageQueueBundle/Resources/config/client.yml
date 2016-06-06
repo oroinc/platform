@@ -31,7 +31,7 @@ services:
         arguments:
             - '@oro_message_queue.client.router'
         tags:
-            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: 'oro_message_queue.client.message_processor', 'topicName': 'oro_message_queue.route_message' }
 
     oro_message_queue.client.message_processor_registry:
         class: 'Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry'
