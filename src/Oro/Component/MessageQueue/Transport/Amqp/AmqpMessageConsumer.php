@@ -7,8 +7,6 @@ use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
-use PhpAmqpLib\Wire\AMQPAbstractCollection;
-use PhpAmqpLib\Wire\AMQPArray;
 use PhpAmqpLib\Wire\AMQPTable;
 
 class AmqpMessageConsumer implements MessageConsumerInterface
@@ -41,7 +39,7 @@ class AmqpMessageConsumer implements MessageConsumerInterface
     {
         $this->isInit = false;
 
-        $this->queue = $queue;
+        $this->queue = clone $queue;
         $this->session = $session;
     }
 
@@ -63,7 +61,7 @@ class AmqpMessageConsumer implements MessageConsumerInterface
     public function receive($timeout = 0)
     {
         $this->initialize();
-        
+
         try {
             $this->receivedMessage = null;
             $this->session->getChannel()->wait($allowedMethods = [], $nonBlocking = false, $timeout);
@@ -71,6 +69,8 @@ class AmqpMessageConsumer implements MessageConsumerInterface
             return $this->receivedMessage;
         } catch (AMQPTimeoutException $e) {
             return null;
+        } finally {
+            $this->session->getChannel()->basic_cancel($this->queue->getConsumerTag());
         }
     }
 
@@ -126,15 +126,11 @@ class AmqpMessageConsumer implements MessageConsumerInterface
 
     protected function initialize()
     {
-        if ($this->isInit) {
-            return;
-        }
-
         $callback = function (AMQPLibMessage $internalMessage) {
             $this->receivedMessage = $this->convertMessage($internalMessage);
         };
 
-        $this->session->getChannel()->basic_consume(
+        $this->queue->setConsumerTag($this->session->getChannel()->basic_consume(
             $this->queue->getQueueName(),
             $this->queue->getConsumerTag(),
             $this->queue->isNoLocal(),
@@ -142,9 +138,7 @@ class AmqpMessageConsumer implements MessageConsumerInterface
             $this->queue->isExclusive(),
             $this->queue->isNoWait(),
             $callback
-        );
-
-        $this->isInit = true;
+        ));
     }
 
     /**

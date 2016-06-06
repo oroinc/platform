@@ -30,7 +30,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('processor', $processor);
 
         $router = new Definition();
-        $router->setArguments(['', '']);
+        $router->setArguments([null, null, null]);
         $container->setDefinition('oro_message_queue.client.router', $router);
 
         $pass = new BuildRouteRegistryPass();
@@ -42,7 +42,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertEquals($expectedRoutes, $router->getArgument(1));
+        $this->assertEquals($expectedRoutes, $router->getArgument(2));
     }
 
     public function testShouldThrowExceptionIfTopicNameIsNotSet()
@@ -60,7 +60,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('processor', $processor);
 
         $router = new Definition();
-        $router->setArguments(['', '']);
+        $router->setArguments([null, null, null]);
         $container->setDefinition('oro_message_queue.client.router', $router);
 
         $pass = new BuildRouteRegistryPass();
@@ -79,7 +79,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('processor-service-id', $processor);
 
         $router = new Definition();
-        $router->setArguments(['', '']);
+        $router->setArguments([null, null, null]);
         $container->setDefinition('oro_message_queue.client.router', $router);
 
         $pass = new BuildRouteRegistryPass();
@@ -91,7 +91,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertEquals($expectedRoutes, $router->getArgument(1));
+        $this->assertEquals($expectedRoutes, $router->getArgument(2));
     }
 
     public function testShouldSetDefaultDestinationIfNotSetInTag()
@@ -105,7 +105,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('processor-service-id', $processor);
 
         $router = new Definition();
-        $router->setArguments(['', '']);
+        $router->setArguments([null, null, null]);
         $container->setDefinition('oro_message_queue.client.router', $router);
 
         $pass = new BuildRouteRegistryPass();
@@ -117,7 +117,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertEquals($expectedRoutes, $router->getArgument(1));
+        $this->assertEquals($expectedRoutes, $router->getArgument(2));
     }
 
     public function testShouldBuildRouteFromSubscriberIfOnlyTopicNameSpecified()
@@ -129,7 +129,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('processor-service-id', $processor);
 
         $router = new Definition();
-        $router->setArguments(['', '']);
+        $router->setArguments([null, null, null]);
         $container->setDefinition('oro_message_queue.client.router', $router);
 
         $pass = new BuildRouteRegistryPass();
@@ -141,7 +141,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertEquals($expectedRoutes, $router->getArgument(1));
+        $this->assertEquals($expectedRoutes, $router->getArgument(2));
     }
 
     public function testShouldBuildRouteFromSubscriberIfProcessorNameSpecified()
@@ -153,7 +153,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('processor-service-id', $processor);
 
         $router = new Definition();
-        $router->setArguments(['', '']);
+        $router->setArguments([null, null, null]);
         $container->setDefinition('oro_message_queue.client.router', $router);
 
         $pass = new BuildRouteRegistryPass();
@@ -165,7 +165,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertEquals($expectedRoutes, $router->getArgument(1));
+        $this->assertEquals($expectedRoutes, $router->getArgument(2));
     }
 
     public function testShouldBuildRouteFromSubscriberIfDestinationNameSpecified()
@@ -177,7 +177,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('processor-service-id', $processor);
 
         $router = new Definition();
-        $router->setArguments(['', '']);
+        $router->setArguments([null, null, null]);
         $container->setDefinition('oro_message_queue.client.router', $router);
 
         $pass = new BuildRouteRegistryPass();
@@ -189,7 +189,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertEquals($expectedRoutes, $router->getArgument(1));
+        $this->assertEquals($expectedRoutes, $router->getArgument(2));
     }
 
     public function testShouldThrowExceptionWhenTopicSubscriberConfigurationIsInvalid()

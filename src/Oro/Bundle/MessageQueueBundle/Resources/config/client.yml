@@ -23,6 +23,7 @@ services:
         public: false
         arguments:
             - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
             - []
 
     oro_message_queue.client.route_message_processor:

@@ -31,7 +31,7 @@ class BuildRouteRegistryPass implements CompilerPassInterface
         }
 
         $routerDef = $container->getDefinition($routerId);
-        $routerDef->replaceArgument(1, $configs);
+        $routerDef->replaceArgument(2, $configs);
     }
 
     /**

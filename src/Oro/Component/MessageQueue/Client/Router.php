@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
+use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Router\RecipientListRouterInterface as RuterInterface;
 use Oro\Component\MessageQueue\Router\Recipient;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -10,20 +11,29 @@ class Router implements RuterInterface
     /**
      * @var DriverInterface
      */
-    protected $session;
+    protected $driver;
 
     /**
      * @var array
      */
     protected $routes;
+    /**
+     * @var DestinationMetaRegistry
+     */
+    private $destinationMetaRegistry;
 
     /**
-     * @param DriverInterface $session
-     * @param array   $routes
+     * @param DriverInterface $driver
+     * @param DestinationMetaRegistry $destinationMetaRegistry
+     * @param array $routes
      */
-    public function __construct(DriverInterface $session, array $routes = [])
-    {
-        $this->session = $session;
+    public function __construct(
+        DriverInterface $driver,
+        DestinationMetaRegistry $destinationMetaRegistry,
+        array $routes = []
+    ) {
+        $this->driver = $driver;
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
         $this->routes = $routes;
     }
 
@@ -32,7 +42,7 @@ class Router implements RuterInterface
      * @param string $processorName
      * @param string $queueName
      */
-    public function addRoute($topicName, $processorName, $queueName = null)
+    public function addRoute($topicName, $processorName, $queueName)
     {
         if (empty($topicName)) {
             throw new \InvalidArgumentException('The topic name must not be empty');
@@ -40,6 +50,10 @@ class Router implements RuterInterface
 
         if (empty($processorName)) {
             throw new \InvalidArgumentException('The processor name must not be empty');
+        }
+
+        if (empty($queueName)) {
+            throw new \InvalidArgumentException('The queue name must not be empty');
         }
 
         if (false == array_key_exists($topicName, $this->routes)) {
@@ -80,7 +94,7 @@ class Router implements RuterInterface
                 $recipient = $this->createRecipient(
                     $message,
                     $route[0],
-                    $route[1] ?: $this->session->getConfig()->getDefaultQueueName()
+                    $this->destinationMetaRegistry->getDestinationMeta($route[1])->getTransportName()
                 );
 
                 yield $recipient;
@@ -101,12 +115,12 @@ class Router implements RuterInterface
         $properties[Config::PARAMETER_PROCESSOR_NAME] = $processorName;
         $properties[Config::PARAMETER_QUEUE_NAME] = $queueName;
 
-        $newMessage = $this->session->createMessage();
+        $newMessage = $this->driver->createMessage();
         $newMessage->setProperties($properties);
         $newMessage->setHeaders($message->getHeaders());
         $newMessage->setBody($message->getBody());
 
-        $queue = $this->session->createQueue($queueName);
+        $queue = $this->driver->createQueue($queueName);
 
         return new Recipient($queue, $newMessage);
     }

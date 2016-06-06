@@ -30,17 +30,34 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         new AmqpMessageConsumer($this->createAmqpSessionStub(), new AmqpQueue('aName'));
     }
 
-    public function testShouldSubscribeToQueueOnFirstReceiveCall()
+    public function testShouldSubscribeRegisterConsumerBeforeReceiveAndCancelAfter()
     {
         $channelMock = $this->createAmqpChannel();
         $channelMock
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('basic_consume')
             ->with('theQueueName')
         ;
         $channelMock
-            ->expects($this->exactly(2))
+            ->expects($this->at(1))
             ->method('wait')
+        ;
+        $channelMock
+            ->expects($this->at(2))
+            ->method('basic_cancel')
+        ;
+        $channelMock
+            ->expects($this->at(3))
+            ->method('basic_consume')
+            ->with('theQueueName')
+        ;
+        $channelMock
+            ->expects($this->at(4))
+            ->method('wait')
+        ;
+        $channelMock
+            ->expects($this->at(5))
+            ->method('basic_cancel')
         ;
 
         $sessionStub = $this->createAmqpSessionStub($channelMock);
@@ -122,11 +139,11 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer->receive();
     }
 
-    public function testShouldRegisterCreateMessageCallbackOnFirstReceiveCall()
+    public function testShouldRegisterCreateMessageCallbackOnEveryReceiveCall()
     {
         $channelMock = $this->createAmqpChannel();
         $channelMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('basic_consume')
             ->willReturnCallback(function () {
                 $this->assertInstanceOf('Closure', func_get_arg(6));
@@ -462,6 +479,10 @@ class AMQPChannelStub extends AMQPChannel
     public function basic_get($queue = '', $no_ack = false, $ticket = null)
     {
         return $this->receivedInternalMessage;
+    }
+
+    public function basic_cancel($consumer_tag, $nowait = false, $noreturn = false)
+    {
     }
 }
 
