@@ -54,11 +54,6 @@ class Workflow
     protected $transitionManager;
 
     /**
-     * @var ModelRestrictionManager
-     */
-    protected $modelRestrictionManager;
-
-    /**
      * @var string
      */
     protected $label;
@@ -72,15 +67,19 @@ class Workflow
      * @var WorkflowDefinition
      */
     protected $definition;
+    
+    /**
+     * @var Collection
+     */
+    protected $restrictions;
 
     /**
      * @param EntityConnector                            $entityConnector
      * @param AclManager                                 $aclManager
-     * @param ModelRestrictionManager|RestrictionManager $restrictionManager
+     * @param RestrictionManager $restrictionManager
      * @param StepManager|null                           $stepManager
      * @param BaseAttributeManager|null                  $attributeManager
      * @param TransitionManager|null                     $transitionManager
-     * @param ModelRestrictionManager                    $modelRestrictionManager
      */
     public function __construct(
         EntityConnector $entityConnector,
@@ -88,8 +87,7 @@ class Workflow
         RestrictionManager $restrictionManager,
         StepManager $stepManager = null,
         BaseAttributeManager $attributeManager = null,
-        TransitionManager $transitionManager = null,
-        ModelRestrictionManager $modelRestrictionManager = null
+        TransitionManager $transitionManager = null
     ) {
         $this->entityConnector         = $entityConnector;
         $this->aclManager              = $aclManager;
@@ -97,9 +95,6 @@ class Workflow
         $this->stepManager             = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager        = $attributeManager ? $attributeManager : new BaseAttributeManager();
         $this->transitionManager       = $transitionManager ? $transitionManager : new TransitionManager();
-        $this->modelRestrictionManager = $modelRestrictionManager
-            ? $modelRestrictionManager
-            : new ModelRestrictionManager();
     }
 
     /**
@@ -172,14 +167,6 @@ class Workflow
     public function getTransitionManager()
     {
         return $this->transitionManager;
-    }
-
-    /**
-     * @return ModelRestrictionManager
-     */
-    public function getModelRestrictionManager()
-    {
-        return $this->modelRestrictionManager;
     }
 
     /**
@@ -511,6 +498,26 @@ class Workflow
     {
         $this->definition = $definition;
 
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getRestrictions()
+    {
+        return $this->restrictions;
+    }
+
+    /**
+     * @param Collection $restrictions
+     *
+     * @return Workflow
+     */
+    public function setRestrictions($restrictions)
+    {
+        $this->restrictions = $restrictions;
+        
         return $this;
     }
 }

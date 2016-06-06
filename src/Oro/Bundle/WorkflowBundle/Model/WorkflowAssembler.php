@@ -111,7 +111,7 @@ class WorkflowAssembler extends BaseAbstractAssembler
             ->setEntityAttributeName($definition->getEntityAttributeName());
         $workflow->getTransitionManager()
             ->setTransitions($transitions);
-        $workflow->getModelRestrictionManager()->setRestrictions($restrictions);
+        $workflow->setRestrictions($restrictions);
         
         if ($definition->getStartStep()) {
             $startStepName = $definition->getStartStep()->getName();
@@ -242,7 +242,14 @@ class WorkflowAssembler extends BaseAbstractAssembler
             $attributes
         );
     }
-    
+
+    /**
+     * @param array      $configuration
+     * @param Collection $steps
+     * @param Collection $attributes
+     *
+     * @return Restriction[]|Collection
+     */
     protected function assembleRestrictions(array $configuration, Collection $steps, Collection $attributes)
     {
         return $this->restrictionAssembler->assemble($configuration, $steps, $attributes);

@@ -148,7 +148,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      */
     protected function setEntityRestrictions(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
-        $restrictions = $workflow->getModelRestrictionManager()->getRestrictions();
+        $restrictions = $workflow->getRestrictions();
         $workflowDefinition->getConfiguration();
         $workflowRestrictions = [];
         foreach ($restrictions as $restriction) {

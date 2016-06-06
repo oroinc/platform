@@ -78,7 +78,7 @@ class WorkflowRestriction
      *
      * @ORM\Column(name="mode_values", type="json_array", nullable=true)
      */
-    protected $values;
+    protected $values = [];
 
     /**
      * @var Collection|WorkflowRestrictionIdentity[]
@@ -282,10 +282,17 @@ class WorkflowRestriction
     {
         $this
             ->setField($restriction->getField())
+            ->setAttribute($restriction->getAttribute())
             ->setEntityClass($restriction->getEntityClass())
             ->setMode($restriction->getMode())
             ->setValues($restriction->getValues());
 
+        if (null !== $restriction->getStep()) {
+            $this->setStep(
+                $this->getDefinition()->getStepByName($restriction->getStep()->getName())
+            );
+        }
+        
         return $this;
     }
 }

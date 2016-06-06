@@ -133,7 +133,8 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
                 'configs'     => [
                     'allowClear'  => true,
                     'placeholder' => $newPlaceholder
-                ]
+                ],
+                'disabled_values' => []
             ],
             $resolvedOptions
         );
