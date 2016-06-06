@@ -87,6 +87,11 @@ class CalendarEventApiHandler
                 if ($this->form->has('contexts') && $this->request->request->has('contexts')) {
                     $contexts = $this->form->get('contexts')->getData();
                     $this->activityManager->setActivityTargets($entity, $contexts);
+                } elseif (!$entity->getId() && $entity->getRecurringEvent()) {
+                    $this->activityManager->setActivityTargets(
+                        $entity,
+                        $entity->getRecurringEvent()->getActivityTargetEntities()
+                    );
                 }
 
                 $this->onSuccess(
