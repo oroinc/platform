@@ -15,4 +15,6 @@ class WorkflowEvents
     const WORKFLOW_BEFORE_CREATE = 'workflowBeforeCreate';
     const WORKFLOW_CREATED = 'workflowCreated';
     const WORKFLOW_DELETED = 'workflowDeleted';
+    const WORKFLOW_ACTIVATED = 'workflowActivated';
+    const WORKFLOW_DEACTIVATED = 'workflowDeactivated';
 }

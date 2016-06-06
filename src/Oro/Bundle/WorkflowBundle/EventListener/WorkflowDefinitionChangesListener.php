@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
@@ -75,30 +76,14 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     public function workflowUpdated(WorkflowChangesEvent $event)
     {
         $workflowDefinition = $event->getDefinition();
-        
-        $workflowName = $event->getDefinition()->getName();
 
-        $processConfigurator = $this->getProcessConfigurator();
-        
-        $scheduledTransitionProcesses = $this->getScheduledTransitionProcesses();
-        
+        $workflowName = $workflowDefinition->getName();
+
         if (array_key_exists($workflowName, $this->generatedConfigurations)) {
-            $processConfigurator->configureProcesses($this->generatedConfigurations[$workflowName]);
-            $persistedProcessDefinitions = $scheduledTransitionProcesses->workflowRelated(
-                $workflowDefinition->getName()
+            $this->reconfigureTransitionProcesses(
+                $this->generatedConfigurations[$workflowName],
+                $workflowDefinition
             );
-            
-            $generated = $this->generatedConfigurations[$workflowName];
-
-            $toDelete = [];
-            foreach ($persistedProcessDefinitions as $processDefinition) {
-                $name = $processDefinition->getName();
-                if (!array_key_exists($name, $generated[ProcessConfigurationProvider::NODE_DEFINITIONS])) {
-                    $toDelete[] = $processDefinition->getName();
-                }
-            }
-
-            $processConfigurator->removeProcesses($toDelete);
         }
     }
 
@@ -107,8 +92,35 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
      */
     public function workflowDeleted(WorkflowChangesEvent $event)
     {
+        $this->cleanProcesses($event->getDefinition());
+    }
+
+    /**
+     * @param WorkflowChangesEvent $event
+     */
+    public function workflowActivated(WorkflowChangesEvent $event)
+    {
         $definition = $event->getDefinition();
 
+        $this->reconfigureTransitionProcesses(
+            $this->generator->generateForScheduledTransition($definition),
+            $definition
+        );
+    }
+
+    /**
+     * @param WorkflowChangesEvent $event
+     */
+    public function workflowDeactivated(WorkflowChangesEvent $event)
+    {
+        $this->cleanProcesses($event->getDefinition());
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     */
+    protected function cleanProcesses(WorkflowDefinition $definition)
+    {
         $workflowScheduledProcesses = $this->getScheduledTransitionProcesses()->workflowRelated($definition->getName());
 
         $toDelete = [];
@@ -117,6 +129,30 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         }
 
         $this->getProcessConfigurator()->removeProcesses($toDelete);
+    }
+
+    /**
+     * @param array $processConfigurations
+     * @param WorkflowDefinition $definition
+     */
+    protected function reconfigureTransitionProcesses(array $processConfigurations, WorkflowDefinition $definition)
+    {
+        $processConfigurator = $this->getProcessConfigurator();
+
+        $processConfigurator->configureProcesses($processConfigurations);
+        $persistedProcessDefinitions = $this->getScheduledTransitionProcesses()->workflowRelated(
+            $definition->getName()
+        );
+
+        $toDelete = [];
+        foreach ($persistedProcessDefinitions as $processDefinition) {
+            $name = $processDefinition->getName();
+            if (!array_key_exists($name, $processConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS])) {
+                $toDelete[] = $processDefinition->getName();
+            }
+        }
+
+        $processConfigurator->removeProcesses($toDelete);
     }
 
     /**
@@ -153,6 +189,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         return $service;
     }
 
+
     /**
      * @return array
      */
@@ -163,7 +200,9 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
             WorkflowEvents::WORKFLOW_BEFORE_UPDATE => 'generateProcessConfigurations',
             WorkflowEvents::WORKFLOW_CREATED => 'workflowCreated',
             WorkflowEvents::WORKFLOW_UPDATED => 'workflowUpdated',
-            WorkflowEvents::WORKFLOW_DELETED => 'workflowDeleted'
+            WorkflowEvents::WORKFLOW_DELETED => 'workflowDeleted',
+            WorkflowEvents::WORKFLOW_ACTIVATED => 'workflowActivated',
+            WorkflowEvents::WORKFLOW_DEACTIVATED => 'workflowDeactivated'
         ];
     }
 }

@@ -7,12 +7,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -48,6 +51,11 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $configManager;
 
+    /**
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $eventDispatcher;
+
     protected function setUp()
     {
         $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
@@ -66,12 +74,15 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
+        
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->workflowManager = new WorkflowManager(
             $this->registry,
             $this->workflowRegistry,
             $this->doctrineHelper,
-            $this->configManager
+            $this->configManager,
+            $this->eventDispatcher
         );
     }
 
@@ -81,6 +92,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         unset($this->workflowRegistry);
         unset($this->doctrineHelper);
         unset($this->workflowManager);
+        unset($this->eventDispatcher);
     }
 
     public function testGetStartTransitions()
@@ -1025,9 +1037,17 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     public function testDeactivateWorkflow()
     {
         $entityClass = '\DateTime';
+        $workflowMock = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $entityConfig->expects($this->once())->method('set')->with('active_workflow', null);
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowByEntityClass')
+            ->with($entityClass)
+            ->willReturn($workflowMock);
 
         $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -1041,6 +1061,17 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($workflowConfigProvider));
         $this->configManager->expects($this->once())->method('persist')->with($entityConfig);
         $this->configManager->expects($this->once())->method('flush');
+
+        $definition = new WorkflowDefinition();
+        $workflowMock->expects($this->once())->method('getDefinition')->willReturn($definition);
+        $this->eventDispatcher->expects($this->once())->method('dispatch')->with(
+            $this->equalTo(WorkflowEvents::WORKFLOW_DEACTIVATED),
+            $this->callback(function($e) use ($definition){
+                /** @var WorkflowChangesEvent $e*/
+                $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent', $e);
+                $this->assertSame($definition, $e->getDefinition());
+            })
+        );
 
         $this->workflowManager->deactivateWorkflow($entityClass);
     }
