@@ -30,5 +30,7 @@ class MessageTranslatorProcessor implements MessageProcessorInterface
         $newMessage = $session->createMessage($message->getBody(), $message->getProperties(), $message->getHeaders());
 
         $session->createProducer()->send($topic, $newMessage);
+
+        return self::ACK;
     }
 }
