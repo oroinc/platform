@@ -426,8 +426,7 @@ define([
                 data.attendees = _.map(attendees, function(attendee) {
                     return {
                         displayName: attendee.displayName,
-                        email: attendee.email,
-                        origin: attendee.origin ? attendee.origin : 'server'
+                        email: attendee.email
                     };
                 });
             }

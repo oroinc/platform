@@ -43,7 +43,6 @@ class ConvertCalendarEventOwnerToAttendee extends ParametrizedMigrationQuery
             'user_id' => 'c.user_owner_id',
             'calendar_event_id' => 'ce.id',
             'status_id' => 'NULL',
-            'origin_id' => 'NULL',
             'type_id' => 'NULL',
             'email' => 'u.email',
             'display_name' => 'CONCAT(u.first_name, \' \', u.last_name)',

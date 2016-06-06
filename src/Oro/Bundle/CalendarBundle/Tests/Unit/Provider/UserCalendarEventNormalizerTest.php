@@ -307,7 +307,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         [
                             'displayName' => 'user',
                             'email'       => 'user@example.com',
-                            'origin'      => Attendee::ORIGIN_SERVER,
                             'status'      => Attendee::STATUS_NONE,
                         ]
                     ],
@@ -341,7 +340,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                             'user_id'     => null,
                             'createdAt'   => null,
                             'updatedAt'   => null,
-                            'origin'      => Attendee::ORIGIN_SERVER,
                             'status'      => Attendee::STATUS_NONE,
                             'type'        => null,
                         ]
@@ -444,12 +442,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     $status = new TestEnumValue($attendeeData['status'], $attendeeData['status']);
                     $attendee->setStatus($status);
                 }
-
-                if (array_key_exists('origin', $attendeeData)) {
-                    $origin = new TestEnumValue($attendeeData['origin'], $attendeeData['origin']);
-                    $attendee->setOrigin($origin);
-                }
-
 
                 $event->addAttendee($attendee);
             }

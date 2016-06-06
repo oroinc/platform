@@ -202,7 +202,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'user_id'     => $this->getObjectValue($attendee, 'user.id'),
                 'createdAt'   => $attendee->getCreatedAt(),
                 'updatedAt'   => $attendee->getUpdatedAt(),
-                'origin'      => $this->getObjectValue($attendee, 'origin.id'),
                 'status'      => $this->getObjectValue($attendee, 'status.id'),
                 'type'        => $this->getObjectValue($attendee, 'type.id'),
             ]);

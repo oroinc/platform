@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Handler;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Handler\CalendarEventDeleteHandler;
@@ -52,6 +54,7 @@ class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler->setSecurityFacade($this->securityFacade);
         $this->handler->setOwnerDeletionManager($ownerDeletionManager);
         $this->handler->setEmailSendProcessor($this->emailSendProcessor);
+        $this->handler->setRequestStack(new RequestStack());
     }
 
     public function testHandleDelete()

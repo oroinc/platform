@@ -24,19 +24,8 @@ class UpdateAttendeeData extends AbstractFixture implements DependentFixtureInte
      */
     public function load(ObjectManager $manager)
     {
-        $this->updateOrigin($manager);
         $this->updateStatus($manager);
         $this->updateType($manager);
-    }
-
-    /**
-     * @param EntityManager $em
-     */
-    protected function updateOrigin(EntityManager $em)
-    {
-        $query = $em->createQuery('UPDATE OroCalendarBundle:Attendee a SET a.origin = :origin');
-        $query->setParameter('origin', Attendee::ORIGIN_SERVER);
-        $query->execute();
     }
 
     /**

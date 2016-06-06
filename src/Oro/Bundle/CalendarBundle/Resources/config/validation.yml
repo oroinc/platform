@@ -41,8 +41,6 @@ Oro\Bundle\CalendarBundle\Entity\Attendee:
     constraints:
         - Oro\Bundle\CalendarBundle\Validator\Constraints\Attendee: ~
     properties:
-        origin:
-            - NotBlank:     ~
         email:
             - Email: ~
             - Length:
