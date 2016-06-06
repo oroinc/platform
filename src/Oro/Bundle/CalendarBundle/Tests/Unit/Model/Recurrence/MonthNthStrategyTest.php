@@ -268,6 +268,24 @@ class MonthNthStrategyTest extends AbstractTestStrategy
                     '2016-06-11'
                 ],
             ],
+            'start = startTime < end < endTime with X occurrence' => [
+                'params' => [
+                    'daysOfWeek' => [
+                        'monday',
+                    ],
+                    'instance' => Recurrence::INSTANCE_LAST,
+                    'interval' => 1,
+                    'occurrences' => 10,
+                    'start' => '2016-06-27 07:00:00',
+                    'end' => '2016-08-04 07:00:00',
+                    'startTime' => '2016-06-27 07:00:00',
+                    'endTime' => '2016-12-31 07:00:00',
+                ],
+                'expected' => [
+                    '2016-06-27 07:00:00',
+                    '2016-07-25 07:00:00'
+                ],
+            ],
         ];
     }
 

@@ -332,6 +332,24 @@ class YearNthStrategyTest extends AbstractTestStrategy
                     '2018-04-14',
                 ],
             ],
+            'startTime = start < end < endTime' => [
+                'params' => [
+                    'instance' => Recurrence::INSTANCE_FIRST,
+                    'interval' => 12, // a number of months, which is a multiple of 12
+                    'monthOfYear' => 7,
+                    'daysOfWeek' => [
+                        'friday',
+                    ],
+                    'occurrences' => 10,
+                    'start' => '2016-05-29 07:00:00',
+                    'end' => '2016-07-03 07:00:00',
+                    'startTime' => '2016-07-01 07:00:00',
+                    'endTime' => '2025-07-04 07:00:00',
+                ],
+                'expected' => [
+                    '2016-07-01 07:00:00',
+                ],
+            ],
         ];
     }
 

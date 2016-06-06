@@ -119,11 +119,12 @@ class YearNthStrategy extends AbstractStrategy
         $instanceRelativeValue = $this->getInstanceRelativeValue($instance);
         $month = date('M', mktime(0, 0, 0, $monthOfYear));
         $year = $occurrenceDate->format('Y');
+        $time = $occurrenceDate->format('H:i:s.u');
         $nextDays = [];
         if ($instance === Recurrence::INSTANCE_FIRST || $instance === Recurrence::INSTANCE_LAST) {
             foreach ($dayOfWeek as $day) {
                 $nextDays[] = new \DateTime(
-                    "{$instanceRelativeValue} {$day} of {$month} {$year}",
+                    "{$instanceRelativeValue} {$day} of {$month} {$year} {$time}",
                     $this->getTimeZone()
                 );
             }
@@ -136,7 +137,10 @@ class YearNthStrategy extends AbstractStrategy
         while (count($days) < $instance) {
             $instanceRelativeValue = $this->getInstanceRelativeValue($currentInstance);
             foreach ($dayOfWeek as $day) {
-                $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}", $this->getTimeZone());
+                $days[] = new \DateTime(
+                    "{$instanceRelativeValue} {$day} of {$month} {$year} {$time}",
+                    $this->getTimeZone()
+                );
             }
             $currentInstance++;
         }
