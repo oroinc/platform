@@ -775,7 +775,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         }
 
-        $workflow = new Workflow($entityConnector, $aclManager, null, $attributeManager, $transitionManager);
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $workflow = new Workflow($entityConnector, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager);
         $workflow->setName($workflowName);
         return $workflow;
     }

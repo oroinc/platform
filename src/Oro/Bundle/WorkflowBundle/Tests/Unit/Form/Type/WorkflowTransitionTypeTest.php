@@ -61,7 +61,12 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $workflow = new Workflow($entityConnector, $aclManager);
+
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $workflow = new Workflow($entityConnector, $aclManager, $restrictionManager);
         $workflow->getTransitionManager()->setTransitions(array($transition));
 
         $options = array(
