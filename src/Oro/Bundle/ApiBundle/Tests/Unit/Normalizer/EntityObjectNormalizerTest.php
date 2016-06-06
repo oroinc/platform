@@ -127,7 +127,8 @@ class EntityObjectNormalizerTest extends OrmRelatedTestCase
                 'name'     => 'user_name',
                 'category' => null,
                 'groups'   => [],
-                'products' => []
+                'products' => [],
+                'owner'    => null
             ],
             $result
         );
@@ -145,7 +146,8 @@ class EntityObjectNormalizerTest extends OrmRelatedTestCase
                 'name'     => 'user_name',
                 'category' => 'owner_category_name',
                 'groups'   => [11, 22],
-                'products' => [123]
+                'products' => [123],
+                'owner'    => null
             ],
             $result
         );
