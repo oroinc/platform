@@ -16,7 +16,8 @@ class DestinationMetaRegistryTest extends \PHPUnit_Framework_TestCase
 
         $registry = new DestinationMetaRegistry(
             new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            $destinations
+            $destinations,
+            'default'
         );
 
         $this->assertAttributeEquals($destinations, 'destinationsMeta', $registry);
@@ -26,7 +27,8 @@ class DestinationMetaRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $registry = new DestinationMetaRegistry(
             new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            []
+            [],
+            'default'
         );
 
         $this->setExpectedException(
@@ -44,7 +46,8 @@ class DestinationMetaRegistryTest extends \PHPUnit_Framework_TestCase
 
         $registry = new DestinationMetaRegistry(
             new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            $destinations
+            $destinations,
+            'theDestinationName'
         );
 
         $destination = $registry->getDestinationMeta('theDestinationName');
@@ -62,7 +65,8 @@ class DestinationMetaRegistryTest extends \PHPUnit_Framework_TestCase
 
         $registry = new DestinationMetaRegistry(
             new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            $destinations
+            $destinations,
+            'default'
         );
 
         $destination = $registry->getDestinationMeta('theClientDestinationName');
@@ -81,7 +85,8 @@ class DestinationMetaRegistryTest extends \PHPUnit_Framework_TestCase
 
         $registry = new DestinationMetaRegistry(
             new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            $destinations
+            $destinations,
+            'default'
         );
 
         $destinations = $registry->getDestinationsMeta();
@@ -94,6 +99,9 @@ class DestinationMetaRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $destinations);
 
         $this->assertSame('fooDestinationName', $destinations[0]->getClientName());
+        $this->assertSame('aprefix.foodestinationname', $destinations[0]->getTransportName());
+
         $this->assertSame('barDestinationName', $destinations[1]->getClientName());
+        $this->assertSame('aprefix.bardestinationname', $destinations[1]->getTransportName());
     }
 }

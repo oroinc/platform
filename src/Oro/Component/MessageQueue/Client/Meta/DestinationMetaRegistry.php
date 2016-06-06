@@ -14,15 +14,22 @@ class DestinationMetaRegistry
      * @var Config
      */
     private $config;
+    
+    /**
+     * @var string
+     */
+    private $defaultQueueClientName;
 
     /**
      * @param Config $config
      * @param array $destinationsMeta
+     * @param string $defaultQueueClientName
      */
-    public function __construct(Config $config, array $destinationsMeta)
+    public function __construct(Config $config, array $destinationsMeta, $defaultQueueClientName)
     {
         $this->config = $config;
         $this->destinationsMeta = $destinationsMeta;
+        $this->defaultQueueClientName = $defaultQueueClientName;
     }
 
     /**
@@ -39,7 +46,7 @@ class DestinationMetaRegistry
             ));
         }
 
-        $transportName = $clientDestinationName ?
+        $transportName = $this->defaultQueueClientName === $clientDestinationName ?
             $this->config->getDefaultQueueName() :
             $this->config->formatName($clientDestinationName)
         ;

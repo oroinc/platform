@@ -47,7 +47,7 @@ services:
     oro_message_queue.client.meta.destination_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry'
         public: true
-        arguments: ['@oro_message_queue.client.config', []]
+        arguments: ['@oro_message_queue.client.config', [], 'default']
 
     oro_message_queue.client.delegate_message_processor:
         class: 'Oro\Component\MessageQueue\Client\DelegateMessageProcessor'

@@ -99,7 +99,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $tester->execute([]);
     }
 
-    public function testShouldExecuteConsumptionAndUseCustomClientDestinationNameButDefaultQueueFromArgument()
+    public function testShouldExecuteConsumptionAndUseCustomClientDestinationName()
     {
         $processor = $this->createDelegateMessageProcessorMock();
 
@@ -113,7 +113,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer
             ->expects($this->once())
             ->method('bind')
-            ->with('aprefixt.adefaultqueuename', $this->identicalTo($processor))
+            ->with('aprefixt.non-default-queue', $this->identicalTo($processor))
         ;
         $consumer
             ->expects($this->once())
@@ -127,7 +127,6 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         ;
 
         $destinationMetaRegistry = $this->createDestinationMetaRegistry([
-            'default' => [],
             'non-default-queue' => []
         ]);
 
@@ -188,7 +187,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Config('aPrefixt', 'aRouterMessageProcessorName', 'aRouterQueueName', 'aDefaultQueueName');
 
-        return new DestinationMetaRegistry($config, $destinationNames);
+        return new DestinationMetaRegistry($config, $destinationNames, 'default');
     }
 
     /**
