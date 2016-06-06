@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -16,17 +17,21 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 class CorrectSortValue implements ProcessorInterface
 {
     const SORT_FILTER_KEY = 'sort';
-    const ARRAY_DELIMITER = ',';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper  $doctrineHelper
+     * @param ValueNormalizer $valueNormalizer
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, ValueNormalizer $valueNormalizer)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -47,36 +52,50 @@ class CorrectSortValue implements ProcessorInterface
             return;
         }
 
-        $filterValue = null;
         $filterValues = $context->getFilterValues();
-        if ($filterValues->has(self::SORT_FILTER_KEY)) {
-            $filterValue = $filterValues->get(self::SORT_FILTER_KEY);
-        } else {
-            $defaultValue = $this->getSortFilterDefaultValue($context->getFilters());
-            if (!empty($defaultValue)) {
-                $filterValue = new FilterValue(self::SORT_FILTER_KEY, $defaultValue);
-                $filterValues->set(self::SORT_FILTER_KEY, $filterValue);
+        $sortFilterValue = $filterValues->get(self::SORT_FILTER_KEY);
+        if (null === $sortFilterValue) {
+            $sortFilter = $context->getFilters()->get(self::SORT_FILTER_KEY);
+            if ($sortFilter instanceof StandaloneFilterWithDefaultValue) {
+                $defaultValue = $sortFilter->getDefaultValueString();
+                if (!empty($defaultValue)) {
+                    $defaultValue = $this->valueNormalizer->normalizeValue(
+                        $defaultValue,
+                        $sortFilter->getDataType(),
+                        $context->getRequestType(),
+                        $sortFilter->isArrayAllowed()
+                    );
+                    $sortFilterValue = new FilterValue(self::SORT_FILTER_KEY, $defaultValue);
+                    $filterValues->set(self::SORT_FILTER_KEY, $sortFilterValue);
+                }
             }
         }
-        if (null !== $filterValue) {
-            $filterValue->setValue(
-                $this->normalizeValue($filterValue->getValue(), $entityClass)
+        if (null !== $sortFilterValue) {
+            $sortFilterValue->setValue(
+                $this->normalizeValue($sortFilterValue->getValue(), $entityClass, $context->getConfig())
             );
         }
     }
 
     /**
-     * @param FilterCollection $filters
+     * @param mixed                       $value
+     * @param string                      $entityClass
+     * @param EntityDefinitionConfig|null $config
      *
-     * @return string|null
+     * @return mixed
      */
-    protected function getSortFilterDefaultValue(FilterCollection $filters)
+    protected function normalizeValue($value, $entityClass, EntityDefinitionConfig $config = null)
     {
-        $result = null;
-        if ($filters->has(self::SORT_FILTER_KEY)) {
-            $sortFilter = $filters->get(self::SORT_FILTER_KEY);
-            if ($sortFilter instanceof StandaloneFilterWithDefaultValue) {
-                $result = $sortFilter->getDefaultValueString();
+        if (empty($value) || !is_array($value)) {
+            return $value;
+        }
+
+        $result = [];
+        foreach ($value as $fieldName => $direction) {
+            if ('id' === $fieldName) {
+                $this->addEntityIdentifierFieldNames($result, $entityClass, $direction, $config);
+            } else {
+                $result[$fieldName] = $direction;
             }
         }
 
@@ -84,46 +103,26 @@ class CorrectSortValue implements ProcessorInterface
     }
 
     /**
-     * @param mixed  $value
-     * @param string $entityClass
-     *
-     * @return mixed
+     * @param string[]                    $result
+     * @param string                      $entityClass
+     * @param string                      $direction
+     * @param EntityDefinitionConfig|null $config
      */
-    protected function normalizeValue($value, $entityClass)
-    {
-        if (empty($value) || !is_string($value)) {
-            return $value;
-        }
-
-        $result = [];
-        $items = explode(self::ARRAY_DELIMITER, $value);
-        foreach ($items as $item) {
-            switch (trim($item)) {
-                case 'id':
-                    $this->addEntityIdentifierFieldNames($result, $entityClass);
-                    break;
-                case '-id':
-                    $this->addEntityIdentifierFieldNames($result, $entityClass, true);
-                    break;
-                default:
-                    $result[] = $item;
-                    break;
-            }
-        }
-
-        return implode(self::ARRAY_DELIMITER, $result);
-    }
-
-    /**
-     * @param string[] $result
-     * @param string   $entityClass
-     * @param bool     $desc
-     */
-    protected function addEntityIdentifierFieldNames(array &$result, $entityClass, $desc = false)
-    {
+    protected function addEntityIdentifierFieldNames(
+        array &$result,
+        $entityClass,
+        $direction,
+        EntityDefinitionConfig $config = null
+    ) {
         $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        foreach ($idFieldNames as $fieldName) {
-            $result[] = $desc ? '-' . $fieldName : $fieldName;
+        foreach ($idFieldNames as $propertyPath) {
+            if (null !== $config) {
+                $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
+                if ($fieldName) {
+                    $propertyPath = $fieldName;
+                }
+            }
+            $result[$propertyPath] = $direction;
         }
     }
 }

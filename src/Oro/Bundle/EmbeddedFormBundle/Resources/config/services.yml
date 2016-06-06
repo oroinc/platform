@@ -39,11 +39,17 @@ services:
             - '@oro_embedded_form.manager'
 
     oro_embedded_form.layout.block_type.success_message:
-        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormSuccessType
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptions, [{message: {default: ''}, form_id: {default: null}}]]
+            - [setName, ['embed_form_success']]
         tags:
              - { name: layout.block_type, alias: embed_form_success }
 
     oro_embedded_form.layout.block_type.default_form:
-        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptions, [{form: {default: null}, form: {default: null}}]]
+            - [setName, ['embed_form_legacy_form']]
         tags:
              - { name: layout.block_type, alias: embed_form_legacy_form }

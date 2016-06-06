@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class ActionLineButtonsTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,7 +52,7 @@ class ActionLineButtonsTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('execution'));
 
         $resolver = new OptionsResolver();
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
 
         $entity = new \stdClass();
         $expected = [

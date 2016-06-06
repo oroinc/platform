@@ -82,12 +82,28 @@ class JoinTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testSetJoin()
+    {
+        $join = new Join(Join::LEFT_JOIN, 'Test\Entity');
+
+        $join->setJoin('Test\Entity1');
+        $this->assertEquals('Test\Entity1', $join->getJoin());
+    }
+
     public function testSetJoinType()
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity');
 
         $join->setJoinType(Join::INNER_JOIN);
         $this->assertSame(Join::INNER_JOIN, $join->getJoinType());
+    }
+
+    public function testSetCondition()
+    {
+        $join = new Join(Join::LEFT_JOIN, 'Test\Entity');
+
+        $join->setCondition('test condition');
+        $this->assertEquals('test condition', $join->getCondition());
     }
 
     public function testSetAlias()
