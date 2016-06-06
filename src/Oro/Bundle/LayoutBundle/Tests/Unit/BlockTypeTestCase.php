@@ -29,7 +29,7 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
         $layoutFactoryBuilder
             ->addType(new Type\RootType())
             ->addType(new Type\BodyType())
-            ->addType(new Type\FormType($this->formLayoutBuilder))
+            ->addType(new Type\FormFieldsType($this->formLayoutBuilder))
             ->addType(new Type\FormStartType())
             ->addType(new Type\FormEndType())
             ->addType(new Type\FormFieldType())

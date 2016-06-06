@@ -3,7 +3,7 @@ layout:
         - '@add':
             id:        embedded_form
             parentId:  content
-            blockType: form
+            blockType: form_fields
             options:
                 form_name: embedded_form
                 split_to_fields: true
