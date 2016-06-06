@@ -36,7 +36,7 @@ class WorkflowRestrictionIdentity
     /**
      * @var WorkflowRestriction
      *
-     * @ORM\ManyToOne(targetEntity="WorkflowRestriction")
+     * @ORM\ManyToOne(targetEntity="WorkflowRestriction", inversedBy="restrictionIdentities")
      * @ORM\JoinColumn(name="workflow_restriction_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $restriction;

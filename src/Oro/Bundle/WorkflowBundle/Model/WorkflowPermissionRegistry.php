@@ -48,7 +48,6 @@ class WorkflowPermissionRegistry
         $this->configProvider = $configProvider;
     }
 
-
     /**
      * @param $class
      *
@@ -124,7 +123,9 @@ class WorkflowPermissionRegistry
     {
         $this->loadEntityAcls();
 
-        if (array_key_exists($identifier, $this->entityAcls[$class]['entities'])) {
+        if (isset($this->entityAcls[$class]['entities']) &&
+            array_key_exists($identifier, $this->entityAcls[$class]['entities'])
+        ) {
             return;
         }
 
