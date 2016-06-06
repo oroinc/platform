@@ -14,6 +14,18 @@
   -moz-osx-font-smoothing: grayscale;
   transform: translate(0, 0);
 }
+.fa-2x {
+  font-size: 2em;
+}
+.fa-3x {
+  font-size: 3em;
+}
+.fa-4x {
+  font-size: 4em;
+}
+.fa-5x {
+  font-size: 5em;
+}
 .fa-google:before {
   content: "\f1a0";
 }
@@ -26,4 +38,22 @@
 .fa-toggle-down:before,
 .fa-caret-square-o-down:before {
     content: "\f150";
+}
+.fa-file-pdf-o:before {
+    content: "\f1c1";
+}
+.fa-file-text-o:before {
+    content: "\f0f6";
+}
+.fa-file-powerpoint-o:before {
+    content: "\f1c4";
+}
+.fa-file-image-o:before {
+    content: "\f1c5";
+}
+.fa-file-excel-o:before {
+    content: "\f1c3";
+}
+.fa-file-movie-o:before {
+    content: "\f1c8";
 }

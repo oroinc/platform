@@ -162,8 +162,10 @@ define([
                 return;
             }
             delete this.choices;
-            this.selectWidget.dispose();
-            delete this.selectWidget;
+            if (this.selectWidget) {
+                this.selectWidget.dispose();
+                delete this.selectWidget;
+            }
             SelectFilter.__super__.dispose.call(this);
         },
 

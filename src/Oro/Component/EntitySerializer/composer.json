@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "Entity", "Serializer"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "doctrine/common": "~2.3",
         "doctrine/orm": "~2.3",
         "symfony/dependency-injection": "~2.3",

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
@@ -11,6 +10,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 
 class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $criteriaConnector;
+
     /** @var BuildQuery */
     protected $processor;
 
@@ -18,10 +20,14 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
     {
         parent::setUp();
 
-        $this->processor = new BuildQuery($this->doctrineHelper);
+        $this->criteriaConnector = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\CriteriaConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->processor = new BuildQuery($this->doctrineHelper, $this->criteriaConnector);
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $qb = $this->getQueryBuilderMock();
 
@@ -31,12 +37,24 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
         $this->assertSame($qb, $this->context->getQuery());
     }
 
+    public function testProcessWhenCriteriaObjectDoesNotExist()
+    {
+        $this->processor->process($this->context);
+
+        $this->assertFalse($this->context->hasQuery());
+    }
+
     public function testProcessForNotManageableEntity()
     {
         $className = 'Test\Class';
 
         $this->notManageableClassNames = [$className];
 
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context->setCriteria(new Criteria($resolver));
         $this->context->setClassName($className);
         $this->processor->process($this->context);
 
@@ -51,7 +69,9 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $criteria = new Criteria($resolver);
-        $criteria->andWhere(new Comparison('name', '=', 'test'));
+
+        $this->criteriaConnector->expects($this->once())
+            ->method('applyCriteria');
 
         $this->context->setClassName($className);
         $this->context->setCriteria($criteria);
@@ -61,11 +81,8 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
         /** @var QueryBuilder $query */
         $query = $this->context->getQuery();
         $this->assertEquals(
-            sprintf('SELECT e FROM %s e WHERE e.name = :name', $className),
+            sprintf('SELECT e FROM %s e', $className),
             $query->getDQL()
         );
-        $parameter = $query->getParameters()->first();
-        $this->assertEquals('name', $parameter->getName());
-        $this->assertEquals('test', $parameter->getValue());
     }
 }

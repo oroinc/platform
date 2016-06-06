@@ -12,16 +12,11 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
     /** @var NormalizeFilterKeys */
     protected $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
-
     protected function setUp()
     {
         parent::setUp();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-
-        $this->processor = new NormalizeFilterKeys($this->doctrineHelper, $this->translator);
+        $this->processor = new NormalizeFilterKeys($this->doctrineHelper);
     }
 
     public function testProcessOnExistingQuery()
@@ -51,13 +46,6 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
      */
     public function testProcess($className, $filters)
     {
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->willReturnCallback(
-                function ($inputText) {
-                    return '_' . $inputText;
-                }
-            );
         $filtersDefinition = new FilterCollection();
         foreach (array_keys($filters) as $fieldName) {
             $filter = new ComparisonFilter('integer');
@@ -84,14 +72,14 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
             [
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
                 [
-                    'id'   => ['expectedKey' => 'filter[id]', 'expectedDescription' => '_oro.entity.identifier_field'],
+                    'id'   => ['expectedKey' => 'filter[id]', 'expectedDescription' => 'The identifier of an entity'],
                     'name' => ['expectedKey' => 'filter[name]', 'expectedDescription' => null]
                 ]
             ],
             [
                 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
                 [
-                    'name'  => ['expectedKey' => 'filter[id]', 'expectedDescription' => '_oro.entity.identifier_field'],
+                    'name'  => ['expectedKey' => 'filter[id]', 'expectedDescription' => 'The identifier of an entity'],
                     'label' => ['expectedKey' => 'filter[label]', 'expectedDescription' => null],
                 ]
             ],

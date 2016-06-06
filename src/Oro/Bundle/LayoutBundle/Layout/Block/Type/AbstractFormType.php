@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface;
 
@@ -15,7 +14,7 @@ abstract class AbstractFormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setDefaults(
@@ -23,8 +22,7 @@ abstract class AbstractFormType extends AbstractType
                     'form' => null,
                     'form_name' => 'form',
                 ]
-            )
-            ->setAllowedTypes(['form_name' => 'string']);
+            );
     }
 
     /**
