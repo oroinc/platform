@@ -113,7 +113,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
                     $this->dropSchedule($triggerForRemove);
                 }
 
-                //$removed[] = $storedTriggers;
                 unset($triggersConfiguration[$definitionName]);
             }
         }

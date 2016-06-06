@@ -5,10 +5,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 
+use Psr\Log\AbstractLogger;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 class ProcessConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -76,11 +79,57 @@ class ProcessConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->processConfigurator->configureProcesses($processConfigurations);
     }
 
+    public function testSetLogger()
+    {
+        $reflection = new \ReflectionClass('Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator');
+        $property = $reflection->getProperty('logger');
+        $property->setAccessible(true);
+        /** @var AbstractLogger $logger */
+        $logger = $this->getMockForAbstractClass('Psr\Log\AbstractLogger');
+        $this->assertNotEquals($logger, $property->getValue($this->processConfigurator));
+        $this->processConfigurator->setLogger($logger);
+        $this->assertEquals($logger, $property->getValue($this->processConfigurator));
+    }
+
+    public function testRemoveProcesses()
+    {
+        $definition = new ProcessDefinition();
+        $names = [
+            'process_exist',
+            'process_not_exist',
+        ];
+
+        //definitions repository mock
+        $definitionsRepositoryMock = $this->assertObjectManagerCalledForRepository(self::CLASS_NAME);
+        $definitionsRepositoryMock->expects($this->exactly(2))
+            ->method('find')
+            ->willReturnMap([
+                ['process_exist', $definition],
+                ['process_not_exist', null],
+            ]);
+
+        $this->definitionsConfigurator->expects($this->once())
+            ->method('removeDefinition')
+            ->with('process_exist');
+
+        $this->definitionsConfigurator->expects($this->once())
+            ->method('flush');
+
+        $this->triggersConfigurator->expects($this->once())
+            ->method('removeDefinitionTriggers')
+            ->with($definition);
+
+        $this->triggersConfigurator->expects($this->once())
+            ->method('flush');
+
+        $this->processConfigurator->removeProcesses($names);
+    }
+
     /**
      * @param string $entityClass
      * @return ObjectRepository|\PHPUnit_Framework_MockObject_MockObject
      */
-    public function assertObjectManagerCalledForRepository($entityClass)
+    private function assertObjectManagerCalledForRepository($entityClass)
     {
         $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
 
