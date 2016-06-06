@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
-use Oro\Component\Testing\Unit\EntityTestCase;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
-class LocalizedFallbackValueTest extends EntityTestCase
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+
+class LocalizedFallbackValueTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTestCaseTrait;
+    
     public function testAccessors()
     {
         $properties = [

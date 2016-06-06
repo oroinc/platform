@@ -14,7 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
  * @ORM\Table(name="oro_localization")
- * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      routeName="oro_locale_localization_index",
  *      routeView="oro_locale_localization_view",
@@ -26,7 +25,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
- *          },
+ *          }
  *      }
  * )
  */
@@ -104,14 +103,6 @@ class Localization implements DatesAwareInterface
     {
         $this->childLocalizations = new ArrayCollection();
         $this->titles = new ArrayCollection();
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getName();
     }
 
     /**
@@ -305,5 +296,13 @@ class Localization implements DatesAwareInterface
         $this->addTitle($newTitle);
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
     }
 }

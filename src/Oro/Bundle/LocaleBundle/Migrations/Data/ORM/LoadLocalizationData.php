@@ -20,7 +20,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     protected $container;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
@@ -28,7 +28,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     }
 
     /**
-     * @param ObjectManager $manager
+     * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {

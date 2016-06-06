@@ -5,9 +5,9 @@ namespace Oro\Bundle\LocaleBundle\Translation\Strategy;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 
 class LocalizationFallbackStrategy implements TranslationStrategyInterface
 {
@@ -81,8 +81,10 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
      */
     protected function getRootLocalizations()
     {
-        return $this->registry->getManagerForClass($this->entityClass)
-            ->getRepository($this->entityClass)->findRootsWithChildren();
+        /** @var LocalizationRepository $repository */
+        $repository = $this->registry->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
+        
+        return $repository->findRootsWithChildren();
     }
 
     /**
