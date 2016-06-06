@@ -13,6 +13,9 @@ class ChainExclusionProvider extends BaseExclusionProvider
     /** @var EntityRuleMatcher */
     protected $matcher;
 
+    /** @var array */
+    protected $cache = [];
+
     /**
      * @param EntityHierarchyProviderInterface $entityHierarchyProvider
      * @param array                            $includeRules
@@ -41,11 +44,18 @@ class ChainExclusionProvider extends BaseExclusionProvider
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        if ($this->matcher->isMatched($this->getFieldProperties($metadata, $fieldName))) {
-            return false;
+        if (isset($this->cache[$metadata->name][$fieldName])) {
+            return $this->cache[$metadata->name][$fieldName];
         }
 
-        return parent::isIgnoredField($metadata, $fieldName);
+        $result = false;
+        if (!$this->matcher->isMatched($this->getFieldProperties($metadata, $fieldName))) {
+            $result = parent::isIgnoredField($metadata, $fieldName);
+        }
+
+        $this->cache[$metadata->name][$fieldName] = $result;
+
+        return $result;
     }
 
     /**
@@ -53,11 +63,18 @@ class ChainExclusionProvider extends BaseExclusionProvider
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
-        if ($this->matcher->isMatched($this->getFieldProperties($metadata, $associationName))) {
-            return false;
+        if (isset($this->cache[$metadata->name][$associationName])) {
+            return $this->cache[$metadata->name][$associationName];
         }
 
-        return parent::isIgnoredRelation($metadata, $associationName);
+        $result = false;
+        if (!$this->matcher->isMatched($this->getFieldProperties($metadata, $associationName))) {
+            $result = parent::isIgnoredRelation($metadata, $associationName);
+        }
+
+        $this->cache[$metadata->name][$associationName] = $result;
+
+        return $result;
     }
 
     /**

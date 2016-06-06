@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 
-use Oro\Bundle\ApiBundle\Collection\FieldVisitor;
+use Oro\Bundle\ApiBundle\Util\FieldVisitor;
 
 class FieldVisitorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Oro\Bundle\ApiBundle\Collection\FieldVisitor */
+    /** @var FieldVisitor */
     protected $fieldVisitor;
 
     /**
