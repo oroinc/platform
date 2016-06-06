@@ -84,7 +84,8 @@
         "behat/mink-extension": "^2.0",
         "behat/mink-selenium2-driver":"1.*",
         "bossa/phpspec2-expect": "~1.0",
-        "behat/symfony2-extension": "2.1.1"
+        "behat/symfony2-extension": "2.1.1",
+        "nelmio/alice": "^2.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
