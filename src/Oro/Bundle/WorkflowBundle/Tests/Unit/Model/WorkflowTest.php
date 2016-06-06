@@ -779,7 +779,14 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $workflow = new Workflow($entityConnector, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager);
+        $workflow = new Workflow(
+            $entityConnector,
+            $aclManager,
+            $restrictionManager,
+            null,
+            $attributeManager,
+            $transitionManager
+        );
         $workflow->setName($workflowName);
         return $workflow;
     }
