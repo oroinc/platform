@@ -48,7 +48,9 @@
                     }
                      attendeesView.push(result);
                 }); %>
-                {{ UI.renderAttribute('oro.calendar.calendarevent.attendees.label'|trans, '<div class="calendar-event-guests-widget"><%= attendeesView.join() %></div>') }}
+                <% if (attendeesView.length > 0) { %>
+                    {{ UI.renderAttribute('oro.calendar.calendarevent.attendees.label'|trans, '<div class="calendar-event-guests-widget"><%= attendeesView.join() %></div>') }}
+                <% } %>
 
                 <div class="activity-context-activity">
                 {{ UI.renderAttribute('oro.activity.contexts.label'|trans, '<div class="activity-context-activity-items"></div>') }}
