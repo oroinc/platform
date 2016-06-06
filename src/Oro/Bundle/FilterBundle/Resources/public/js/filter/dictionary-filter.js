@@ -81,7 +81,7 @@ define(function(require) {
             DictionaryFilter.__super__.reset.apply(this, arguments);
             var select2element = this.$el.find(this.elementSelector);
             var data = select2element.inputWidget('data');
-            if (data.length) {
+            if (data) {
                 this.previousData = data;
             }
             select2element.inputWidget('data',  null);
