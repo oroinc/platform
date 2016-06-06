@@ -84,7 +84,7 @@ class CalendarEventApiHandler
 
                 // TODO: should be refactored after finishing BAP-8722
                 // Contexts handling should be moved to common for activities form handler
-                if ($this->form->has('contexts')) {
+                if ($this->form->has('contexts') && $this->request->request->has('contexts')) {
                     $contexts = $this->form->get('contexts')->getData();
                     $this->activityManager->setActivityTargets($entity, $contexts);
                 }
