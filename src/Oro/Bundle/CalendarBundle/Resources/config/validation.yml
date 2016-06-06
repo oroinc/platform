@@ -44,6 +44,7 @@ Oro\Bundle\CalendarBundle\Entity\Attendee:
         origin:
             - NotBlank:     ~
         email:
+            - Email: ~
             - Length:
                 max: 255
         displayName:
