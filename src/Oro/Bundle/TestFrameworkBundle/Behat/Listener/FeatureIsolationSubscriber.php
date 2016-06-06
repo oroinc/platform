@@ -6,15 +6,15 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DumperInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepository;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\KernelServiceFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FeatureIsolationSubscriber implements EventSubscriberInterface
 {
-    /** @var  DbDumperInterface  */
-    protected $dbDumper;
+    /** @var DumperInterface[] */
+    protected $dumpers;
 
     /** @var FixtureLoader */
     protected $fixtureLoader;
@@ -26,18 +26,18 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     protected $referenceRepository;
 
     /**
-     * @param DbDumperInterface $dbDumper
+     * @param DumperInterface[] $dumpers
      * @param FixtureLoader $fixtureLoader
      * @param KernelServiceFactory $kernelServiceFactory
      * @param ReferenceRepository $referenceRepository
      */
     public function __construct(
-        DbDumperInterface $dbDumper,
+        array $dumpers,
         FixtureLoader $fixtureLoader,
         KernelServiceFactory $kernelServiceFactory,
         ReferenceRepository $referenceRepository
     ) {
-        $this->dbDumper = $dbDumper;
+        $this->dumpers = $dumpers;
         $this->fixtureLoader = $fixtureLoader;
         $this->kernelServiceFactory = $kernelServiceFactory;
         $this->referenceRepository = $referenceRepository;
@@ -79,7 +79,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     public function afterFeature(AfterFeatureTested $event)
     {
         $this->clearDependencies();
-        $this->dbRestore();
+        $this->restore();
         $this->shutdownKernel();
     }
 
@@ -119,9 +119,11 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
         $this->fixtureLoader->clearReferences();
     }
 
-    public function dbRestore()
+    public function restore()
     {
-        $this->dbDumper->restoreDb();
+        foreach ($this->dumpers as $dumper) {
+            $dumper->restore();
+        }
     }
 
     public function shutdownKernel()

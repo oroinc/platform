@@ -14,12 +14,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
+    const DUMPER_TAG = 'oro_test.dumper';
+
     /**
      * {@inheritdoc}
      */
@@ -28,7 +31,8 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
         $this->processElements($container);
-        $this->processDbIsolationSubscribers($container);
+        $this->processDbDumpers($container);
+        $this->processIsolationSubscribers($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -73,29 +77,45 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
     }
 
+    public function processDbDumpers(ContainerBuilder $container)
+    {
+        $dbDumper = $this->getDbDumper($container);
+        $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
+    }
+
     /**
      * @param ContainerBuilder $container
      * @throws OutOfBoundsException When
      * @throws InvalidArgumentException
      */
-    private function processDbIsolationSubscribers(ContainerBuilder $container)
+    private function processIsolationSubscribers(ContainerBuilder $container)
     {
-        $dumper = $this->getDumper($container);
+        $dumpers = [];
+
+        foreach ($container->findTaggedServiceIds(self::DUMPER_TAG) as $id => $attributes) {
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $dumpers[$priority][] = new Reference($id);
+        }
+
+        // sort by priority and flatten
+        krsort($dumpers);
+        $dumpers = call_user_func_array('array_merge', $dumpers);
+
         $container->getDefinition('oro_test.listener.feature_isolation_subscriber')->replaceArgument(
             0,
-            $dumper
+            $dumpers
         );
-        $container->getDefinition('oro_test.listener.db_dump_subscriber')->replaceArgument(
+        $container->getDefinition('oro_test.listener.dump_environment_subscriber')->replaceArgument(
             0,
-            $dumper
+            $dumpers
         );
     }
 
     /**
      * @param ContainerBuilder $container
-     * @return Reference
+     * @return Definition
      */
-    private function getDumper(ContainerBuilder $container)
+    private function getDbDumper(ContainerBuilder $container)
     {
         $driver = $container->get(Symfony2Extension::KERNEL_ID)->getContainer()->getParameter('database_driver');
 
@@ -109,7 +129,7 @@ class OroTestFrameworkExtension implements TestworkExtension
                     continue;
                 }
 
-                return new Reference($id);
+                return $container->getDefinition($id);
             }
         }
 
