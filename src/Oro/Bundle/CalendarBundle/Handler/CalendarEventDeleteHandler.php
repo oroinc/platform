@@ -142,10 +142,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
     protected function shouldSendNotification()
     {
         $request = $this->requestStack->getCurrentRequest();
-        if (!$request) {
-            return true;
-        }
 
-        return (bool) $request->query->get('send_notification', false);
+        return !$request || (bool) $request->query->get('send_notification', false);
     }
 }
