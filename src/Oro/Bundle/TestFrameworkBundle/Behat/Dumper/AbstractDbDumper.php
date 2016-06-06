@@ -6,7 +6,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-abstract class AbstractDbDumper implements DbDumperInterface
+abstract class AbstractDbDumper implements DumperInterface
 {
     /** The max runtime for a process in seconds */
     const TIMEOUT = 30;

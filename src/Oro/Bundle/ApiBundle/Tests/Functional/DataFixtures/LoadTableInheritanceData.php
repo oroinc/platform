@@ -5,25 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
 
-class LoadTableInheritanceData extends AbstractFixture implements ContainerAwareInterface
+class LoadTableInheritanceData extends AbstractFixture
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
     /**
      * {@inheritdoc}
      */
