@@ -121,7 +121,7 @@ class WorkflowEntityValidator extends ConstraintValidator
                     $this->addFieldViolation($restriction['field'], $constraint->createFieldMessage);
                 }
             } else {
-                $this->validateAllowedValues($object, $constraint, $restriction);
+                $this->validateAllowedValues($object, $constraint->createFieldMessage, $restriction);
             }
         }
     }
@@ -151,7 +151,7 @@ class WorkflowEntityValidator extends ConstraintValidator
                         if ($restriction['mode'] === 'full') {
                             $this->addFieldViolation($key, $constraint->updateFieldMessage);
                         } else {
-                            $this->validateAllowedValues($object, $constraint, $restriction);
+                            $this->validateAllowedValues($object, $constraint->updateFieldMessage, $restriction);
                         }
                     }
                 }
@@ -160,11 +160,11 @@ class WorkflowEntityValidator extends ConstraintValidator
     }
 
     /**
-     * @param object         $object
-     * @param WorkflowEntity $constraint
-     * @param array          $restriction
+     * @param object $object
+     * @param string $message
+     * @param array  $restriction
      */
-    protected function validateAllowedValues($object, WorkflowEntity $constraint, $restriction)
+    protected function validateAllowedValues($object, $message, $restriction)
     {
         $fieldValue = $this->propertyAccessor->getValue($object, $restriction['field']);
         if (is_object($fieldValue)) {
@@ -173,11 +173,11 @@ class WorkflowEntityValidator extends ConstraintValidator
 
         if ($restriction['mode'] === 'allow') {
             if (!in_array($fieldValue, $restriction['values'], true)) {
-                $this->addFieldViolation($restriction['field'], $constraint->updateFieldMessage);
+                $this->addFieldViolation($restriction['field'], $message);
             }
         } else {
             if (in_array($fieldValue, $restriction['values'], true)) {
-                $this->addFieldViolation($restriction['field'], $constraint->updateFieldMessage);
+                $this->addFieldViolation($restriction['field'], $message);
             }
         }
     }

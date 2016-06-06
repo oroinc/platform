@@ -145,7 +145,6 @@ class RestrictionManager
         return $id
             ? $this->getRestrictionsForEntityIds($class, [$id])
             : $this->filterNewEntityRestrictions($this->restrictions[$class]);
-
     }
 
     /**
