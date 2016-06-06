@@ -16,6 +16,8 @@ class WorkflowRestrictionRepository extends EntityRepository
     public function getClassRestrictions($entityClass)
     {
         return $this->createQueryBuilder('r')
+            ->select('r, definition')
+            ->join('r.definition', 'definition')
             ->where('r.entityClass = :entityClass')
             ->setParameter('entityClass', $entityClass)
             ->getQuery()

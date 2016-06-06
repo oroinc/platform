@@ -12,7 +12,6 @@ use Doctrine\ORM\EntityManager;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
@@ -24,9 +23,6 @@ class WorkflowEntityValidator extends ConstraintValidator
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
-
-    /** @var ConfigProvider */
-    protected $configProvider;
 
     /** @var WorkflowPermissionRegistry */
     protected $permissionRegistry;
@@ -40,20 +36,17 @@ class WorkflowEntityValidator extends ConstraintValidator
     /**
      * @param EntityManager              $entityManager
      * @param DoctrineHelper             $doctrineHelper
-     * @param ConfigProvider             $configProvider
      * @param WorkflowPermissionRegistry $permissionRegistry
      * @param RestrictionManager         $restrictionManager
      */
     public function __construct(
         EntityManager $entityManager,
         DoctrineHelper $doctrineHelper,
-        ConfigProvider $configProvider,
         WorkflowPermissionRegistry $permissionRegistry,
         RestrictionManager $restrictionManager
     ) {
         $this->entityManager      = $entityManager;
         $this->doctrineHelper     = $doctrineHelper;
-        $this->configProvider     = $configProvider;
         $this->permissionRegistry = $permissionRegistry;
         $this->restrictionManager = $restrictionManager;
 
@@ -78,12 +71,10 @@ class WorkflowEntityValidator extends ConstraintValidator
             }
         }
 
-        if (!$this->configProvider->hasConfig($value)) {
-            return;
-        }
-
-        $config = $this->configProvider->getConfig($value);
-        if (!$config->get('active_workflow', false, false)) {
+        $class = $this->doctrineHelper->getEntityClass($value);
+        if (!($this->permissionRegistry->supportsClass($class) ||
+              $this->restrictionManager->hasEntityClassRestrictions($class))
+        ) {
             return;
         }
 
@@ -94,8 +85,8 @@ class WorkflowEntityValidator extends ConstraintValidator
             $permissions = $this->permissionRegistry->getEntityPermissions($value);
             if ($permissions['UPDATE'] === false || $restrictions) {
                 $unitOfWork = $this->entityManager->getUnitOfWork();
-                $class      = $this->entityManager->getClassMetadata($this->configProvider->getClassName($value));
-                $unitOfWork->computeChangeSet($class, $value);
+                $classMetadata = $this->entityManager->getClassMetadata($class);
+                $unitOfWork->computeChangeSet($classMetadata, $value);
                 if ($permissions['UPDATE'] === false) {
                     if ($unitOfWork->isScheduledForUpdate($value)) {
                         $this->context->addViolation($constraint->updateEntityMessage);

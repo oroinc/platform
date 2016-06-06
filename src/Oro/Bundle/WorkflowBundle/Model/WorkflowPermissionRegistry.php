@@ -32,11 +32,17 @@ class WorkflowPermissionRegistry
      */
     protected $entityAcls;
 
+    /** @var array */
+    protected $supportedClasses;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /** @var ConfigProvider */
     protected $configProvider;
+
+    /** @var WorkflowManager */
+    protected $workflowManager;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -48,17 +54,32 @@ class WorkflowPermissionRegistry
         $this->configProvider = $configProvider;
     }
 
-
     /**
-     * @param $class
+     * @param string $class
+     * @param bool   $activeWorkflows
      *
      * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class, $activeWorkflows = true)
     {
         $this->loadEntityAcls();
 
-        return array_key_exists($class, $this->entityAcls);
+        $supportedClasses = $this->supportedClasses;
+
+        foreach ($supportedClasses as $relatedClass => $supportedClass) {
+            $support = in_array($class, $supportedClass, true);
+            if ($activeWorkflows) {
+                $config = $this->configProvider->getConfig($relatedClass);
+
+                $support = $support && $config->get('active_workflow', false, false);
+            }
+
+            if ($support) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -99,9 +120,14 @@ class WorkflowPermissionRegistry
         /** @var WorkflowEntityAcl[] $entityAcls */
         $entityAcls = $this->doctrineHelper
             ->getEntityRepository('OroWorkflowBundle:WorkflowEntityAcl')
-            ->findAll();
+            ->createQueryBuilder('a')
+            ->select('a, definition')
+            ->join('a.definition', 'definition')
+            ->getQuery()
+            ->getResult();
 
-        $this->entityAcls = [];
+        $this->entityAcls       = [];
+        $this->supportedClasses = [];
         foreach ($entityAcls as $entityAcl) {
             $entityClass = $entityAcl->getEntityClass();
 
@@ -113,6 +139,15 @@ class WorkflowPermissionRegistry
             }
 
             $this->entityAcls[$entityClass]['acls'][$entityAcl->getId()] = $entityAcl;
+
+            $relatedEntity = $entityAcl->getDefinition()->getRelatedEntity();
+            if (!array_key_exists($relatedEntity, $this->supportedClasses)) {
+                $this->supportedClasses[$relatedEntity] = [];
+            }
+
+            if (!in_array($entityClass, $this->supportedClasses[$relatedEntity], true)) {
+                $this->supportedClasses[$relatedEntity][] = $entityClass;
+            }
         }
     }
 
@@ -124,7 +159,9 @@ class WorkflowPermissionRegistry
     {
         $this->loadEntityAcls();
 
-        if (array_key_exists($identifier, $this->entityAcls[$class]['entities'])) {
+        if (isset($this->entityAcls[$class]['entities']) &&
+            array_key_exists($identifier, $this->entityAcls[$class]['entities'])
+        ) {
             return;
         }
 

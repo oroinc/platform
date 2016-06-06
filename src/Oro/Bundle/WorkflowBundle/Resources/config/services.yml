@@ -112,6 +112,7 @@ services:
 
     oro_workflow.permission_registry:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry
+        public: false
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.provider.workflow'
@@ -146,11 +147,12 @@ services:
         class: Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader
         public: false
         arguments:
-            - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.provider.workflow'
+            - '@oro_workflow.permission_registry'
+            - '@oro_workflow.restriction.manager'
 
     oro_workflow.restriction.manager:
         class: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager
+        public: false
         arguments:
             - '@oro_workflow.manager'
             - '@oro_entity.doctrine_helper'
