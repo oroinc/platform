@@ -14,10 +14,10 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
     const NODE_ITEMS = 'items';
     const NODE_TREE = 'tree';
 
-    const ACTION_ADD_TREE = '@addTree';
-    const ACTION_ADD = '@add';
+    const ACTION_ADD_TREE_KEY = '@addTree';
+    const ACTION_ADD_KEY = '@add';
 
-    const PATH_ATTR = '__path';
+    const PATH_KEY = '__path';
 
     /**
      * {@inheritdoc}
@@ -27,50 +27,37 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
         $source = $data->getSource();
         if (is_array($source) && isset($source[self::NODE_ACTIONS])) {
             // traversing through actions, looking for "@addTree" action
-            $actions = $source[self::NODE_ACTIONS];
-            $newActions = [];
-            foreach ($actions as $nodeNo => $actionDefinition) {
+            $transformedActions = new \ArrayObject();
+            foreach ($source[self::NODE_ACTIONS] as $nodeNo => $actionDefinition) {
                 // do not validate syntax, error will be thrown afterwards
                 $actionName = is_array($actionDefinition) ? key($actionDefinition) : '';
 
-                if (self::ACTION_ADD_TREE === $actionName) {
-                    $path = self::NODE_ACTIONS.'.'.$nodeNo;
-                    $actionNode = reset($actionDefinition);
+                if (self::ACTION_ADD_TREE_KEY !== $actionName) {
+                    $transformedActions->append($actionDefinition);
+                    continue;
+                }
+                $path = self::NODE_ACTIONS.'.'.$nodeNo;
+                $actionNode = reset($actionDefinition);
 
-                    // looking for items, parent and tree it self
-                    if (!isset($actionNode[self::NODE_ITEMS], $actionNode[self::NODE_TREE])) {
-                        throw new SyntaxException(
-                            'expected array with keys "items" and "tree"',
-                            $actionDefinition,
-                            $path
-                        );
-                    }
+                // looking for items, parent and tree it self
+                if (!isset($actionNode[self::NODE_ITEMS], $actionNode[self::NODE_TREE])) {
+                    throw new SyntaxException('expected array with keys "items" and "tree"', $actionDefinition, $path);
+                }
 
-                    $transformedActions = [];
-                    $treeParent = key($actionNode[self::NODE_TREE]);
-                    $tree = current($actionNode[self::NODE_TREE]);
-                    try {
-                        $this->processTree($transformedActions, $tree, $treeParent, $actionNode[self::NODE_ITEMS]);
-                    } catch (\LogicException $e) {
-                        throw new SyntaxException(
-                            'invalid tree definition. '.$e->getMessage(),
-                            $actionDefinition,
-                            $path
-                        );
-                    }
+                if (count($actionNode[self::NODE_TREE]) !== 1) {
+                    throw new SyntaxException('tree expects only one child', $actionDefinition, $path);
+                }
 
-                    // pre-generate "path" option in order to show correct path if validation error will occur
-                    array_walk(
-                        $transformedActions,
-                        function (&$val) use ($path) {
-                            $val[self::PATH_ATTR] = $path;
-                        }
-                    );
-                    $newActions = array_merge($newActions, $transformedActions);
-                    unset($source[self::NODE_ACTIONS][$nodeNo]);
+                $tree = reset($actionNode[self::NODE_TREE]);
+                $treeParent = key($actionNode[self::NODE_TREE]);
+                try {
+                    $this->processTree($transformedActions, $tree, $treeParent, $actionNode[self::NODE_ITEMS], $path);
+                } catch (\LogicException $e) {
+                    throw new SyntaxException('invalid tree definition. '.$e->getMessage(), $actionDefinition, $path);
                 }
             }
-            $source[self::NODE_ACTIONS] = array_merge($source[self::NODE_ACTIONS], $newActions);
+            $source[self::NODE_ACTIONS] = $transformedActions->getArrayCopy();
+
             $data->setSource($source);
         }
     }
@@ -78,12 +65,13 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
     /**
      * Walk recursively through the tree, completing block definition in tree by found correspondent data "items" list
      *
-     * @param array $actions
+     * @param \ArrayObject $actions
      * @param mixed $currentSubTree
      * @param string $parentId
      * @param array $items
+     * @param string $path
      */
-    protected function processTree(array &$actions, $currentSubTree, $parentId, array $items)
+    protected function processTree(\ArrayObject $actions, $currentSubTree, $parentId, array $items, $path)
     {
         if (!is_array($currentSubTree)) {
             return;
@@ -106,9 +94,12 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
                 array_unshift($itemDefinition, $blockId, $parentId);
             }
 
-            $actions[] = [self::ACTION_ADD => $itemDefinition];
+            $actions->append([
+                self::ACTION_ADD_KEY => $itemDefinition,
+                self::PATH_KEY => $path,
+            ]);
 
-            $this->processTree($actions, $subtree, $blockId, $items);
+            $this->processTree($actions, $subtree, $blockId, $items, $path);
         }
     }
 }

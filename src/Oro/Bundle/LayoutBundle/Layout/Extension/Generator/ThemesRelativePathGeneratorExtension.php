@@ -21,37 +21,25 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
         $source = $data->getSource();
         $file = $data->getFilename();
 
-        if (is_array($source) && is_string($file) && isset($source[self::NODE_ACTIONS])) {
-            $this->each($source[self::NODE_ACTIONS], function (&$actionDefinition) use ($file) {
+        if (is_array($source) && $file && array_key_exists(self::NODE_ACTIONS, $source)) {
+            $source[self::NODE_ACTIONS] = array_map(function ($actionDefinition) use ($file) {
                 $actionName = is_array($actionDefinition) ? key($actionDefinition) : '';
                 if (in_array($actionName, [self::ACTION_SET_BLOCK_THEME_TREE, self::ACTION_SET_FORM_THEME_TREE], true)
                     && array_key_exists(self::NODE_THEMES, $actionDefinition[$actionName])
                 ) {
                     $themes = $actionDefinition[$actionName][self::NODE_THEMES];
                     $themes = $themes === null ? [null] : (array)$themes;
-                    $this->each($themes, function (&$theme) use ($file) {
-                        $theme = $this->prepareThemePath($theme, $file);
-                    });
+                    $themes = array_map(function ($theme) use ($file) {
+                        return $this->prepareThemePath($theme, $file);
+                    }, $themes);
                     if (count($themes) === 1) {
                         $themes = reset($themes);
                     }
                     $actionDefinition[$actionName][self::NODE_THEMES] = $themes;
                 }
-            });
+                return $actionDefinition;
+            }, $source[self::NODE_ACTIONS]);
             $data->setSource($source);
-        }
-    }
-
-    /**
-     * @param mixed $value
-     * @param callable $callable
-     */
-    protected function each(&$value, callable $callable)
-    {
-        if (is_array($value)) {
-            foreach ($value as &$childValue) {
-                $callable($childValue);
-            }
         }
     }
 

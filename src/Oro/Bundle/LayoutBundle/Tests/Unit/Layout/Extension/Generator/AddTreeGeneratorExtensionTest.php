@@ -44,23 +44,23 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $source = Yaml::parse(__DIR__.'/data/layout.yml')['layouts'];
         $sourceMultiple = Yaml::parse(__DIR__.'/data/layout_multiple_add_tree.yml')['layouts'];
-
         return [
             'tree' => [
                 'source' => $source,
                 'expectedSource' => [
                     'actions' => [
+                        ['@add' => ['meta', 'header', 'text']],
                         [
                             '@add' => [
                                 'id' => 'header',
                                 'blockType' => 'header',
                                 'parentId' => 'root',
                             ],
-                            '__path' => 'actions.0',
+                            '__path' => 'actions.1',
                         ],
                         [
                             '@add' => ['css', 'header', 'style'],
-                            '__path' => 'actions.0',
+                            '__path' => 'actions.1',
                         ],
                         [
                             '@add' => [
@@ -69,7 +69,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                                 'parentId' => 'root',
                                 'options' => ['test' => true],
                             ],
-                            '__path' => 'actions.0',
+                            '__path' => 'actions.1',
                         ],
                         [
                             '@add' => [
@@ -77,7 +77,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                                 'blockType' => 'header',
                                 'parentId' => 'root',
                             ],
-                            '__path' => 'actions.0',
+                            '__path' => 'actions.1',
                         ],
                         [
                             '@add' => [
@@ -85,7 +85,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                                 'blockType' => 'block',
                                 'parentId' => 'footer',
                             ],
-                            '__path' => 'actions.0',
+                            '__path' => 'actions.1',
                         ],
                     ]
                 ],
@@ -94,17 +94,18 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 'source' => $sourceMultiple,
                 'expectedSource' => [
                     'actions' => [
+                        ['@add' => ['meta', 'header', 'text']],
                         [
                             '@add' => [
                                 'id' => 'header',
                                 'blockType' => 'header',
                                 'parentId' => 'root',
                             ],
-                            '__path' => 'actions.0',
+                            '__path' => 'actions.1',
                         ],
                         [
                             '@add' => ['css', 'header', 'style'],
-                            '__path' => 'actions.0',
+                            '__path' => 'actions.1',
                         ],
                         [
                             '@add' => [
@@ -113,7 +114,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                                 'parentId' => 'root',
                                 'options' => ['test' => true],
                             ],
-                            '__path' => 'actions.1',
+                            '__path' => 'actions.2',
                         ],
                         [
                             '@add' => [
@@ -121,7 +122,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                                 'blockType' => 'header',
                                 'parentId' => 'root',
                             ],
-                            '__path' => 'actions.1',
+                            '__path' => 'actions.2',
                         ],
                         [
                             '@add' => [
@@ -129,7 +130,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                                 'blockType' => 'block',
                                 'parentId' => 'footer',
                             ],
-                            '__path' => 'actions.1',
+                            '__path' => 'actions.2',
                         ],
                     ]
                 ],
@@ -141,11 +142,11 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
      * @dataProvider prepareExceptionDataProvider
      *
      * @param array $source
-     * @param string $exception
+     * @param string $message
      */
-    public function testPrepareExceptions(array $source, $exception)
+    public function testPrepareExceptions(array $source, $message)
     {
-        $this->setExpectedException('\Oro\Component\Layout\Exception\SyntaxException', $exception);
+        $this->setExpectedException('\Oro\Component\Layout\Exception\SyntaxException', $message);
         $visitorCollection = new VisitorCollection();
         $this->extension->prepare(new GeneratorData($source), $visitorCollection);
     }
@@ -162,7 +163,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         ['@addTree' => null]
                     ]
                 ],
-                'exception' => 'expected array with keys "items" and "tree" at "actions.0"'
+                'message' => 'expected array with keys "items" and "tree" at "actions.0"',
             ],
             '@addTree item not found in "items" list' => [
                 'source' => [
@@ -170,7 +171,23 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         ['@addTree' => ['items' => [], 'tree' => ['root' => ['head' => null]]]]
                     ]
                 ],
-                'exception' => 'invalid tree definition. Item with id "head" not found in items list at "actions.0"'
+                'message' => 'invalid tree definition. Item with id "head" not found in items list at "actions.0"'
+            ],
+            '@addTree several roots' => [
+                'source' => [
+                    'actions' => [
+                        ['@addTree' => ['items' => [], 'tree' => ['root' => [], 'head' => []]]]
+                    ]
+                ],
+                'message' => 'tree expects only one child at "actions.0"'
+            ],
+            '@addTree no root' => [
+                'source' => [
+                    'actions' => [
+                        ['@addTree' => ['items' => [], 'tree' => []]]
+                    ]
+                ],
+                'message' => 'tree expects only one child at "actions.0"'
             ],
         ];
     }
