@@ -40,7 +40,7 @@ datagrid:
                 where:
                     and:
                         - targetCalendar.owner = @oro_security.security_facade->getLoggedUserId
-                        - event.isCancelled <> 1
+                        - event.isCancelled = false
                 groupBy: event.id, calendar.name, owner.firstName, owner.lastName, parentId, ownerId
         columns:
             title:
