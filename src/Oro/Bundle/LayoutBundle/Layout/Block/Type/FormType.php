@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\BlockBuilderInterface;
 
@@ -11,6 +9,28 @@ class FormType extends AbstractContainerType
 {
     const NAME = 'form';
     const FIELD_SEPARATOR = '_';
+
+    public function __construct()
+    {
+        $this->options = [
+            'form_name'             => 'form',
+            'form'                  => null,
+            'form_action'           => null,
+            'form_route_name'       => null,
+            'form_route_parameters' => null,
+            'form_method'           => null,
+            'form_enctype'          => null,
+            'form_data'             => null,
+            'form_prefix'           => null,
+            'form_field_prefix'     => null,
+            'form_group_prefix'     => null,
+            'render_rest'           => null,
+            'preferred_fields'      => null,
+            'groups'                => null,
+            'split_to_fields'       => null,
+        ];
+
+    }
 
     /**
      * {@inheritdoc}
@@ -45,6 +65,8 @@ class FormType extends AbstractContainerType
                 'form_field_prefix',
                 'form_group_prefix',
                 'split_to_fields',
+                'form_data',
+                'preferred_fields'
             ]
         );
 
@@ -61,36 +83,6 @@ class FormType extends AbstractContainerType
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver
-            ->setDefaults(
-                [
-                    'form' => null,
-                    'form_name' => 'form',
-                ]
-            )->setOptional(
-                [
-                    'form_action',
-                    'form_route_name',
-                    'form_route_parameters',
-                    'form_method',
-                    'form_enctype',
-                    'form_data',
-                    'form_prefix',
-                    'form_field_prefix',
-                    'form_group_prefix',
-                    'render_rest',
-                    'preferred_fields',
-                    'groups',
-                    'split_to_fields',
-                ]
-            );
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getName()
@@ -100,9 +92,9 @@ class FormType extends AbstractContainerType
 
     /**
      * @param BlockBuilderInterface $builder
-     * @param string $name
-     * @param array $options
-     * @param array $passedOptions
+     * @param string                $name
+     * @param array                 $options
+     * @param array                 $passedOptions
      */
     protected function addBlockType(BlockBuilderInterface $builder, $name, array $options, array $passedOptions)
     {
