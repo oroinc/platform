@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CalendarBundle\Model;
 
-use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
 use Oro\Bundle\CalendarBundle\Entity;
 
 class Recurrence
@@ -78,15 +78,6 @@ class Recurrence
     /** @var StrategyInterface  */
     protected $recurrenceStrategy;
 
-    /**
-     * @param ValidatorInterface $validator
-     */
-    public function __construct(ValidatorInterface $validator, StrategyInterface $recurrenceStrategy)
-    {
-        $this->validator = $validator;
-        $this->recurrenceStrategy = $recurrenceStrategy;
-    }
-
     /** @var array */
     public static $instanceRelativeValues = [
         self::INSTANCE_FIRST => 'first',
@@ -110,6 +101,16 @@ class Recurrence
         self::DAY_SATURDAY,
         self::DAY_SUNDAY,
     ];
+
+    /**
+     * @param ValidatorInterface $validator
+     * @param StrategyInterface $recurrenceStrategy
+     */
+    public function __construct(ValidatorInterface $validator, StrategyInterface $recurrenceStrategy)
+    {
+        $this->validator = $validator;
+        $this->recurrenceStrategy = $recurrenceStrategy;
+    }
 
     /**
      * @param Entity\Recurrence $recurrence

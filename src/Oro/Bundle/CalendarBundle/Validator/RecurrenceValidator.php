@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class RecurrenceValidator extends ConstraintValidator

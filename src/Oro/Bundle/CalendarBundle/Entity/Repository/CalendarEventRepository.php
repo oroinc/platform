@@ -254,21 +254,22 @@ class CalendarEventRepository extends EntityRepository
 
         //add condition that recurrence dates and filter dates are crossing
         $expr = $queryBuilder->expr();
-        $queryBuilder->orWhere(
-            $expr->andX(
-                $expr->lte('r.startTime', ':endDate'),
-                $expr->gte('r.calculatedEndTime', ':startDate')
+        $queryBuilder
+            ->orWhere(
+                $expr->andX(
+                    $expr->lte('r.startTime', ':endDate'),
+                    $expr->gte('r.calculatedEndTime', ':startDate')
+                )
             )
-        )
             ->orWhere(
                 $expr->andX(
                     $expr->isNotNull('e.originalStart'),
                     $expr->lte('e.originalStart', ':endDate'),
                     $expr->gte('e.originalStart', ':startDate')
                 )
-            );
-        $queryBuilder->setParameter('startDate', $startDate);
-        $queryBuilder->setParameter('endDate', $endDate);
+            )
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate);
 
         return $this;
     }

@@ -86,7 +86,7 @@ class AttendeeSearchHandler extends ContextSearchHandler
             $attendee = $this->attendeeRelationManager->createAttendee($object);
             if (!$attendee) {
                 throw new \LogicException(
-                    'Attendee cound\'t be created for "%s" entity',
+                    'Attendee couldn\'t be created for "%s" entity',
                     ClassUtils::getClass($object)
                 );
             }

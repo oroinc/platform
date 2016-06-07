@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
