@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -14,6 +13,7 @@ use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesApiType;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\ReminderBundle\Form\Type\MethodType;

@@ -42,8 +42,8 @@ class AttendeeRepository extends EntityRepository
                 ->join('a.calendarEvent', 'e')
                 ->join('e.calendar', 'c')
                 ->join('c.organization', 'o')
-                ->andWhere('o.id = :organization');
-            $qb->setParameter('organization', $organization);
+                ->andWhere('o.id = :organization')
+                ->setParameter('organization', $organization);
         }
 
         return $qb->getQuery()

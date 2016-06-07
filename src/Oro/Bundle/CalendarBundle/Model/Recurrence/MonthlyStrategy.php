@@ -75,6 +75,7 @@ class MonthlyStrategy extends AbstractStrategy
      * Returns occurrence date according to last occurrence date and recurrence interval.
      *
      * @param integer $interval A number of months.
+     * @param integer $dayOfMonth
      * @param \DateTime $date
      *
      * @return \DateTime
