@@ -176,7 +176,7 @@ define(function(require) {
     (function() {
         function makeFloating($toggle, $dropdownMenu) {
             if (!$toggle.data('container')) {
-                $toggle.data('container', 'body');
+                $toggle.data('container', 'body, .ui-dialog');
             }
             $toggle.dropdown('detach', true);
             var $placeholder = $dropdownMenu.data('related-placeholder');
