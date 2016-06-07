@@ -16,23 +16,23 @@ class LocalizationRepository extends EntityRepository
      */
     public function getLanguageCodes()
     {
-        $qb = $this->createQueryBuilder('l');
-
-        return $qb
+        return $this->createQueryBuilder('l')
             ->select('l.languageCode')
             ->getQuery()
             ->getScalarResult();
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function findRootsWithChildren()
     {
         $localizations = $this->createQueryBuilder('l')
             ->addSelect('children')
             ->leftJoin('l.childLocalizations', 'children')
-            ->getQuery()->execute();
+            ->getQuery()
+            ->execute();
+        
         return array_filter($localizations, function (Localization $localization) {
             return !$localization->getParentLocalization();
         });

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
+
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;

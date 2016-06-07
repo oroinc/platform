@@ -28,7 +28,7 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
             ->getMockForAbstractClass();
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($this->getLocalizations()));
+            ->willReturn($this->getLocalizations());
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()

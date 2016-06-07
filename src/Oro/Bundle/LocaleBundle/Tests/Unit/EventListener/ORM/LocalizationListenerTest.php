@@ -22,25 +22,25 @@ class LocalizationListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->strategy = $this->getMockBuilder(
-            'Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy'
-        )->disableOriginalConstructor()->getMock();
+        $this->strategy = $this
+            ->getMockBuilder('Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy')
+            ->disableOriginalConstructor()
+            ->getMock();
+        
         $this->listener = new LocalizationListener($this->strategy);
     }
 
     public function testPostPersist()
     {
         $args = $this->getLifecycleEventArgsMock();
-        $this->strategy->expects($this->once())
-            ->method('clearCache');
+        $this->strategy->expects($this->once())->method('clearCache');
         $this->listener->postPersist(new Localization(), $args);
     }
 
     public function testPostUpdate()
     {
         $args = $this->getLifecycleEventArgsMock();
-        $this->strategy->expects($this->once())
-            ->method('clearCache');
+        $this->strategy->expects($this->once())->method('clearCache');
         $this->listener->postUpdate(new Localization(), $args);
     }
 
@@ -50,6 +50,7 @@ class LocalizationListenerTest extends \PHPUnit_Framework_TestCase
     protected function getLifecycleEventArgsMock()
     {
         return $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }
