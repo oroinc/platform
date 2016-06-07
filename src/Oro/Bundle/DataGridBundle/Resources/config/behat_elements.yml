@@ -1,0 +1,19 @@
+Grid:
+  selector: "div.grid-container"
+  class: "Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid"
+
+GridPaginator:
+  selector: "div.toolbar div.pagination"
+  class: "Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator"
+
+GridFloatingMenu:
+  selector: ".dropdown-menu__floating"
+  class: "Oro\Bundle\TestFrameworkBundle\Behat\Element\Element"
+
+MassActionHeadCheckbox:
+  selector: "div.grid-container th.grid-header-cell-massAction div.btn-group .btn"
+  class: "Oro\Bundle\TestFrameworkBundle\Behat\Element\Element"
+
+PageSize:
+  selector: "div.page-size"
+  class: "Oro\Bundle\TestFrameworkBundle\Behat\Element\Element"
