@@ -1,0 +1,41 @@
+services:
+    oro_api.form.switchable_extension:
+        public: false
+        class: Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension
+        arguments:
+            - '@service_container'
+
+    oro_api.form.extension:
+        public: false
+        class: '%form.extension.class%'
+        arguments:
+            - '@service_container'
+            - [] # All services with tag "oro.api.form.type" are inserted here by ConfigurationCompilerPass
+            - [] # All services with tag "oro.api.form.type_extension" are inserted here by ConfigurationCompilerPass
+            - [] # All services with tag "oro.api.form.type_guesser" are inserted here by ConfigurationCompilerPass
+
+    oro_api.form.guesser.metadata:
+        class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
+        arguments:
+            - [] # Data type mappings are inserted here by ConfigurationCompilerPass
+        tags:
+            - { name: oro.api.form.type_guesser, priority: 10 }
+
+    oro_api.form.type.boolean:
+        class: Oro\Bundle\ApiBundle\Form\Type\BooleanType
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_boolean }
+
+    oro_api.form.type.entity:
+        class: Oro\Bundle\ApiBundle\Form\Type\EntityType
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_entity }
+
+    oro_api.validator.access_granted:
+        class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_api.validator.access_granted }

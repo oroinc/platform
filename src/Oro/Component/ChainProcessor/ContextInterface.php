@@ -30,8 +30,6 @@ interface ContextInterface extends \ArrayAccess
      *
      * @param string $key   The name of an attribute
      * @param mixed  $value The value of an attribute
-     *
-     * @return mixed|null
      */
     public function set($key, $value);
 

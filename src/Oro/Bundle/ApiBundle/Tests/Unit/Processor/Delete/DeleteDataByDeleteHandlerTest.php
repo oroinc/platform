@@ -87,7 +87,7 @@ class DeleteDataByDeleteHandlerTest extends DeleteProcessorTestCase
             ->getMock();
         $this->container->expects($this->once())
             ->method('get')
-            ->with(DeleteDataByDeleteHandler::DEFAULT_DELETE_HANDLER)
+            ->with('oro_soap.handler.delete')
             ->willReturn($deleteHandler);
 
         $em = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')

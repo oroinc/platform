@@ -12,12 +12,17 @@ class ResourcesLoader
     /** @var ActionProcessorInterface */
     protected $processor;
 
+    /** @var ResourcesCache */
+    protected $resourcesCache;
+
     /**
      * @param ActionProcessorInterface $processor
+     * @param ResourcesCache           $resourcesCache
      */
-    public function __construct(ActionProcessorInterface $processor)
+    public function __construct(ActionProcessorInterface $processor, ResourcesCache $resourcesCache)
     {
         $this->processor = $processor;
+        $this->resourcesCache = $resourcesCache;
     }
 
     /**
@@ -30,6 +35,11 @@ class ResourcesLoader
      */
     public function getResources($version, RequestType $requestType)
     {
+        $resources = $this->resourcesCache->getResources($version, $requestType);
+        if (null !== $resources) {
+            return $resources;
+        }
+
         /** @var CollectResourcesContext $context */
         $context = $this->processor->createContext();
         $context->setVersion($version);
@@ -37,6 +47,9 @@ class ResourcesLoader
 
         $this->processor->process($context);
 
-        return array_values($context->getResult()->toArray());
+        $resources = array_values($context->getResult()->toArray());
+        $this->resourcesCache->save($version, $requestType, $resources);
+
+        return $resources;
     }
 }

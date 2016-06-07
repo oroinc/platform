@@ -17,14 +17,14 @@ class FilterValue
     protected $operator;
 
     /**
-     * @param string $path
-     * @param mixed  $value
-     * @param string $operator
+     * @param string      $path
+     * @param mixed       $value
+     * @param string|null $operator
      */
-    public function __construct($path, $value, $operator)
+    public function __construct($path, $value, $operator = null)
     {
-        $this->path     = $path;
-        $this->value    = $value;
+        $this->path = $path;
+        $this->value = $value;
         $this->operator = $operator;
     }
 
@@ -71,7 +71,7 @@ class FilterValue
     /**
      * Gets an operator of a filter.
      *
-     * @return string
+     * @return string|null
      */
     public function getOperator()
     {
@@ -81,7 +81,7 @@ class FilterValue
     /**
      * Sets an operator of a filter.
      *
-     * @param string $operator
+     * @param string|null $operator
      */
     public function setOperator($operator)
     {

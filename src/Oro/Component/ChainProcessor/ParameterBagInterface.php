@@ -27,8 +27,6 @@ interface ParameterBagInterface extends \IteratorAggregate, \Countable, \ArrayAc
      *
      * @param string $key   The name of a parameter
      * @param mixed  $value The value of a parameter
-     *
-     * @return mixed|null
      */
     public function set($key, $value);
 

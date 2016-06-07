@@ -132,22 +132,4 @@ class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($config->isArrayAllowed());
         $this->assertEquals([], $config->toArray());
     }
-
-    public function testDefaultValue()
-    {
-        $config = new FilterFieldConfig();
-        $this->assertNull($config->getDefaultValue());
-
-        $config->setDefaultValue('val');
-        $this->assertEquals('val', $config->getDefaultValue());
-        $this->assertEquals(['default_value' => 'val'], $config->toArray());
-
-        $config->setDefaultValue(null);
-        $this->assertNull($config->getDefaultValue());
-        $this->assertEquals([], $config->toArray());
-
-        $config->setDefaultValue('');
-        $this->assertEquals('', $config->getDefaultValue());
-        $this->assertEquals(['default_value' => ''], $config->toArray());
-    }
 }

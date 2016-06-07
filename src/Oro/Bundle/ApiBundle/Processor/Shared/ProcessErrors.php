@@ -10,7 +10,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 
 /**
- * Checks if there are any errors in the Context, and if so, raise an exception for the first error.
+ * Checks if there are any errors in the Context,
+ * and if so, raises an exception for the first error.
  */
 class ProcessErrors implements ProcessorInterface
 {

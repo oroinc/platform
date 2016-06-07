@@ -80,7 +80,6 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
         }
 
         $extendFieldConfig = $this->configManager->getFieldConfig('extend', $metadata->name, $associationName);
-
         if (!ExtendHelper::isFieldAccessible($extendFieldConfig)) {
             return true;
         }

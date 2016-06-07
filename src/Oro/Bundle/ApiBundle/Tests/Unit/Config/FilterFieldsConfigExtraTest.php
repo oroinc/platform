@@ -40,7 +40,7 @@ class FilterFieldsConfigExtraTest extends \PHPUnit_Framework_TestCase
 
     public function testIsPropagable()
     {
-        $this->assertFalse($this->extra->isPropagable());
+        $this->assertTrue($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()

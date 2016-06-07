@@ -116,7 +116,11 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
             'roles'      => [
                 ['id' => 789, 'name' => 'Role1'],
                 ['id' => 780, 'name' => 'Role2']
-            ]
+            ],
+            'otherRoles' => [ // this is used to test that "included" collection does not contain duplicates
+                ['id' => 789, 'name' => 'Role1'],
+                ['id' => 780, 'name' => 'Role2']
+            ],
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -130,6 +134,8 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         $metadata->addAssociation($this->getAssociationMetadata('products', 'Test\Product', true));
         $metadata->addAssociation($this->getAssociationMetadata('roles', 'Test\Role', true));
         $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->getFieldMetadata('name'));
+        $metadata->addAssociation($this->getAssociationMetadata('otherRoles', 'Test\Role', true));
+        $metadata->getAssociation('otherRoles')->getTargetMetadata()->addField($this->getFieldMetadata('name'));
 
         $this->documentBuilder->setDataObject($object, $metadata);
         $this->assertEquals(
@@ -175,6 +181,18 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                             'data' => []
                         ],
                         'roles'      => [
+                            'data' => [
+                                [
+                                    'type' => 'test_role',
+                                    'id'   => '789'
+                                ],
+                                [
+                                    'type' => 'test_role',
+                                    'id'   => '780'
+                                ]
+                            ]
+                        ],
+                        'otherRoles' => [
                             'data' => [
                                 [
                                     'type' => 'test_role',
@@ -450,15 +468,18 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $error = new Error();
         $error->setStatusCode(500);
+        $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorObject($error);
+        $this->documentBuilder->setErrorObject($error, $metadata);
         $this->assertEquals(
             [
                 'errors' => [
                     [
-                        'code'   => '500',
+                        'status' => '500',
+                        'code'   => 'errCode',
                         'title'  => 'some error',
                         'detail' => 'some error details'
                     ]
@@ -472,15 +493,18 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $error = new Error();
         $error->setStatusCode(500);
+        $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorCollection([$error]);
+        $this->documentBuilder->setErrorCollection([$error], $metadata);
         $this->assertEquals(
             [
                 'errors' => [
                     [
-                        'code'   => '500',
+                        'status' => '500',
+                        'code'   => 'errCode',
                         'title'  => 'some error',
                         'detail' => 'some error details'
                     ]

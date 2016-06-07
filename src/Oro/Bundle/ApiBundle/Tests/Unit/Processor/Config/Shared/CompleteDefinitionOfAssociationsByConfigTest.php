@@ -22,7 +22,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
     {
         parent::setUp();
 
-        $this->doctrineHelper         = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->relationConfigProvider = $this
@@ -74,6 +74,9 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                 'association4' => [
                     'exclusion_policy' => 'all'
                 ],
+                'association5' => [
+                    'property_path' => 'realAssociation5'
+                ],
             ]
         ];
 
@@ -89,22 +92,25 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
             ->method('getAssociationMappings')
             ->willReturn(
                 [
-                    'association1' => [
+                    'association1'     => [
                         'targetEntity' => 'Test\Association1Target'
                     ],
-                    'association2' => [
+                    'association2'     => [
                         'targetEntity' => 'Test\Association2Target'
                     ],
-                    'association3' => [
+                    'association3'     => [
                         'targetEntity' => 'Test\Association3Target'
                     ],
-                    'association4' => [
+                    'association4'     => [
                         'targetEntity' => 'Test\Association4Target'
+                    ],
+                    'realAssociation5' => [
+                        'targetEntity' => 'Test\Association5Target'
                     ],
                 ]
             );
 
-        $this->relationConfigProvider->expects($this->exactly(3))
+        $this->relationConfigProvider->expects($this->exactly(4))
             ->method('getRelationConfig')
             ->willReturnMap(
                 [
@@ -132,6 +138,21 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                     ],
                     [
                         'Test\Association3Target',
+                        $this->context->getVersion(),
+                        $this->context->getRequestType(),
+                        $this->context->getPropagableExtras(),
+                        $this->createRelationConfigObject(
+                            [
+                                'exclusion_policy' => 'all',
+                                'collapse'         => true,
+                                'fields'           => [
+                                    'id' => null
+                                ]
+                            ]
+                        )
+                    ],
+                    [
+                        'Test\Association5Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
                         $this->context->getPropagableExtras(),
@@ -179,6 +200,14 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                     ],
                     'association4' => [
                         'exclusion_policy' => 'all'
+                    ],
+                    'association5' => [
+                        'property_path'    => 'realAssociation5',
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
                     ],
                 ]
             ],

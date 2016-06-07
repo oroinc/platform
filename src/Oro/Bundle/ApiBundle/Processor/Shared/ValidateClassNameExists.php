@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
  * Makes sure that the class name of an entity exists in the Context.
@@ -20,7 +22,12 @@ class ValidateClassNameExists implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         if (empty($entityClass)) {
-            throw new \RuntimeException('The name of an entity class must be set in the context.');
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::ENTITY_TYPE,
+                    'The name of an entity class must be set in the context.'
+                )
+            );
         }
     }
 }

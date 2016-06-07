@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\NodeInterface;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
@@ -24,6 +27,9 @@ abstract class LoadFromConfigBag implements ProcessorInterface
 
     /** @var EntityHierarchyProviderInterface */
     protected $entityHierarchyProvider;
+
+    /** @var NodeInterface */
+    private $configurationTree;
 
     /**
      * @param ConfigExtensionRegistry          $configExtensionRegistry
@@ -97,28 +103,31 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     protected function loadConfig($entityClass, $version)
     {
         $config = $this->getConfig($entityClass, $version);
-        if (null === $config) {
+        $isInherit = true;
+        if (null !== $config) {
+            $isInherit = $this->getInheritAndThenRemoveIt($config);
+        } else {
             $config = [];
         }
-        $isInherit = $this->isInherit($config);
-        if (array_key_exists(ConfigUtil::INHERIT, $config)) {
-            unset($config[ConfigUtil::INHERIT]);
-        }
         if ($isInherit) {
+            $configs = [$config];
             $parentClasses = $this->entityHierarchyProvider->getHierarchyForClassName($entityClass);
             foreach ($parentClasses as $parentClass) {
-                $parentConfig = $this->getConfig($parentClass, $version);
-                if (!empty($parentConfig)) {
-                    $isInherit = $this->isInherit($parentConfig);
-                    if (array_key_exists(ConfigUtil::INHERIT, $parentConfig)) {
-                        unset($parentConfig[ConfigUtil::INHERIT]);
-                    }
-                    $config = empty($config)
-                        ? $parentConfig
-                        : $this->mergeConfigs($config, $parentConfig);
+                $config = $this->getConfig($parentClass, $version);
+                if (!empty($config)) {
+                    $isInherit = $this->getInheritAndThenRemoveIt($config);
+                    $configs[] = $config;
                     if (!$isInherit) {
                         break;
                     }
+                }
+            }
+            if (count($configs) === 1) {
+                $config = $configs[0];
+            } else {
+                $config = array_pop($configs);
+                while (!empty($configs)) {
+                    $config = $this->mergeConfigs(array_pop($configs), $config);
                 }
             }
         }
@@ -142,11 +151,16 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      *
      * @return bool
      */
-    public static function isInherit(array $config)
+    public static function getInheritAndThenRemoveIt(array &$config)
     {
-        return
-            !isset($config[ConfigUtil::INHERIT])
-            || $config[ConfigUtil::INHERIT];
+        if (array_key_exists(ConfigUtil::INHERIT, $config)) {
+            $isInherit = $config[ConfigUtil::INHERIT];
+            unset($config[ConfigUtil::INHERIT]);
+        } else {
+            $isInherit = true;
+        }
+
+        return $isInherit;
     }
 
     /**
@@ -169,6 +183,31 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     }
 
     /**
+     * @param array $config
+     * @param array $parentConfig
+     *
+     * @return array
+     */
+    protected function mergeConfigs(array $config, array $parentConfig)
+    {
+        $processor = new Processor();
+
+        return $processor->process($this->getConfigurationTree(), [$parentConfig, $config]);
+    }
+
+    /**
+     * @return NodeInterface
+     */
+    protected function getConfigurationTree()
+    {
+        if (null === $this->configurationTree) {
+            $this->configurationTree = $this->createConfigurationTree();
+        }
+
+        return $this->configurationTree;
+    }
+
+    /**
      * @param string $entityClass
      * @param string $version
      *
@@ -177,10 +216,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     abstract protected function getConfig($entityClass, $version);
 
     /**
-     * @param array $config
-     * @param array $parentConfig
-     *
-     * @return array
+     * @return NodeInterface
      */
-    abstract protected function mergeConfigs(array $config, array $parentConfig);
+    abstract protected function createConfigurationTree();
 }

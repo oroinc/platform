@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
  * Checks whether at least one filter is provided.
@@ -35,7 +35,12 @@ class ValidateFilterValues implements ProcessorInterface
         }
 
         if (!$hasFilters) {
-            throw new BadRequestHttpException('At least one filter must be provided.');
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::FILTER,
+                    'At least one filter must be provided.'
+                )
+            );
         }
     }
 }

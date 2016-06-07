@@ -10,6 +10,7 @@ use Oro\Component\EntitySerializer\EntityConfig;
 class FiltersConfig implements EntityConfigInterface
 {
     use Traits\ConfigTrait;
+    use Traits\FindFieldTrait;
     use Traits\ExclusionPolicyTrait;
 
     /** a list of filters */
@@ -28,7 +29,7 @@ class FiltersConfig implements EntityConfigInterface
     protected $items = [];
 
     /** @var FilterFieldConfig[] */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
@@ -125,6 +126,32 @@ class FiltersConfig implements EntityConfigInterface
         return isset($this->fields[$fieldName])
             ? $this->fields[$fieldName]
             : null;
+    }
+
+    /**
+     * Finds the configuration of the filter by its name or property path.
+     * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
+     *
+     * @param string $fieldName
+     * @param bool   $findByPropertyPath
+     *
+     * @return FilterFieldConfig|null
+     */
+    public function findField($fieldName, $findByPropertyPath = false)
+    {
+        return $this->doFindField($fieldName, $findByPropertyPath);
+    }
+
+    /**
+     * Finds the name of the filter by its property path.
+     *
+     * @param string $propertyPath
+     *
+     * @return string|null
+     */
+    public function findFieldNameByPropertyPath($propertyPath)
+    {
+        return $this->doFindFieldNameByPropertyPath($propertyPath);
     }
 
     /**

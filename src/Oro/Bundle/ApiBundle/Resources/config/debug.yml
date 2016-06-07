@@ -3,13 +3,13 @@ services:
         public: false
         class: Oro\Component\ChainProcessor\Debug\TraceLogger
         arguments:
-            - "data_api"
-            - "@?debug.stopwatch"
+            - 'data_api'
+            - '@?debug.stopwatch'
 
     oro_api.profiler.data_collector:
         public: false
         class: Oro\Component\ChainProcessor\Debug\ActionProcessorDataCollector
         arguments:
-            - "@oro_api.profiler.logger"
+            - '@oro_api.profiler.logger'
         tags:
             - { name: data_collector, template: OroApiBundle:Collector:api.html.twig, id: data_api }

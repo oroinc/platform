@@ -71,7 +71,6 @@ class GetRestJsonApiTest extends ApiTestCase
             // test "delete" request
             if (!in_array('delete', $excludedActions, true)) {
                 $this->checkDeleteRequest($entityAlias, $id, $excludedActions);
-
             }
         }
     }
@@ -114,7 +113,7 @@ class GetRestJsonApiTest extends ApiTestCase
                 $this->client->request(
                     'DELETE',
                     $this->getUrl(
-                        'oro_rest_api_delete_list',
+                        'oro_rest_api_cdelete',
                         ['entity' => $entityAlias, 'filter[id]' => implode(',', $id)]
                     ),
                     [],
@@ -128,14 +127,8 @@ class GetRestJsonApiTest extends ApiTestCase
                 if ($response->getStatusCode() !== 204) {
                     // process delete errors
                     $data = $this->jsonToArray($response->getContent());
-                    $errors = [
-                        'An operation is forbidden. Reason: has assignments',
-                        'An operation is forbidden. Reason: has users',
-                        'An operation is forbidden. Reason: self delete',
-                        'An operation is forbidden. Reason: organization has assignments'
-                    ];
-                    $this->assertContains($data['errors'][0]['detail'], $errors);
                     $this->assertEquals(403, $response->getStatusCode());
+                    $this->assertEquals($data['errors'][0]['title'], 'forbidden exception');
                 } elseif (!in_array('get', $excludedActions, true)) {
                     // check if entity was really deleted
                     $this->checkGetRequest($entityAlias, $id[0], 404);
@@ -165,13 +158,8 @@ class GetRestJsonApiTest extends ApiTestCase
         if ($response->getStatusCode() !== 204) {
             // process delete errors
             $data = $this->jsonToArray($response->getContent());
-            $errors = [
-                'An operation is forbidden. Reason: has assignments',
-                'An operation is forbidden. Reason: self delete',
-                'An operation is forbidden. Reason: organization has assignments'
-            ];
-            $this->assertContains($data['errors'][0]['detail'], $errors);
             $this->assertEquals(403, $response->getStatusCode());
+            $this->assertEquals($data['errors'][0]['title'], 'forbidden exception');
         } elseif (!in_array('get', $excludedActions, true)) {
             // check if entity was really deleted
             $this->checkGetRequest($entityAlias, $id, 404);
