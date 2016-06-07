@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model\TransitionSchedule;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName;
 
@@ -26,7 +27,11 @@ class ScheduledTransitionProcessesTest extends WebTestCase
     {
         $this->initClient();
         $this->registry = $this->getContainer()->get('doctrine');
-        $this->repository = new ScheduledTransitionProcesses($this->registry, self::PROCESS_DEFINITION_ENTITY_CLASS);
+        $this->scheduledTransitionProcesses = new ScheduledTransitionProcesses(
+            $this->registry,
+            self::PROCESS_DEFINITION_ENTITY_CLASS
+        );
+
         $this->loadFixtures(
             [
                 'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessDefinitionData',
@@ -35,10 +40,16 @@ class ScheduledTransitionProcessesTest extends WebTestCase
     }
 
     /**
+     * @param ScheduledTransitionProcessName $scheduledTransitionProcessName
+     * @param ProcessDefinition $expected
+     *
      * @dataProvider getDataProvider
      */
-    public function testGet(ScheduledTransitionProcessName $scheduledTransitionProcessName, $exception = null)
-    {
+    public function testGet(
+        ScheduledTransitionProcessName $scheduledTransitionProcessName,
+        ProcessDefinition $expected = null
+    ) {
+
     }
 
     /**
@@ -48,35 +59,25 @@ class ScheduledTransitionProcessesTest extends WebTestCase
     {
         return [
             [
-                new ScheduledTransitionProcessName('wf1', 'tr1'),
-                'exception' => new \Exception()
+                new ScheduledTransitionProcessName('NON_EXISTING_WF', 'NON_EXISTING_TR'),
+                null
             ],
             [
-                new ScheduledTransitionProcessName('wf2', 'tr2'),
-                'exception' => null
+                new ScheduledTransitionProcessName('wtf2', 'tr2'),
             ],
         ];
     }
 
-    /**
-     * @param string $workflow
-     *
-     * @dataProvider workflowRelatedDataProvider
-     */
-    public function testWorkflowRelated($workflow)
+    public function testWorkflowRelated()
     {
-
-    }
-
-    /**
-     * @return array
-     */
-    public function workflowRelatedDataProvider()
-    {
-        return [];
+        $this->assertInternalType(
+            'array',
+            $this->scheduledTransitionProcesses->workflowRelated('SAMPLE_WORKFLOW_NAME')
+        );
     }
 
     public function testAll()
     {
+        $this->assertInternalType('array', $this->scheduledTransitionProcesses->all());
     }
 }
