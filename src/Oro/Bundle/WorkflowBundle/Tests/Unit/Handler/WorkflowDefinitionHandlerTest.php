@@ -85,12 +85,15 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($existingDefinition);
         }
 
+        if(!$existingDefinition && !$newDefinition){
+            $this->entityManager->expects($this->once())->method('persist')->with($definition);
+        }
+
         $this->handler->updateWorkflowDefinition($definition, $newDefinition);
 
         if ($newDefinition) {
             $this->assertEquals($definition, $newDefinition);
         }
-
 
         if ($existingDefinition) {
             $this->assertEquals($definition, $existingDefinition);
@@ -128,6 +131,11 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
                 'existingDefinition' => $definition1,
                 'newDefinition' => null,
             ],
+            'created definition' => [
+                'definition' => $definition1,
+                'existingDefinition' => null,
+                'newDefinition' => null
+            ]
         ];
     }
 

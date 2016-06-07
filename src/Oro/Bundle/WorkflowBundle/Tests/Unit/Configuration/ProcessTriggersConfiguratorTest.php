@@ -62,7 +62,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testImport()
+    public function testConfigureTriggers()
     {
         $triggersConfiguration = ['definition_name' => [['exist'], ['not_exist']]];
         $definition = new ProcessDefinition();
@@ -88,12 +88,24 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $nonExistentNewTrigger->setDefinition($definition);
         $mockExistentTrigger->expects($this->once())->method('import')->with($existentNewTrigger);
-        $mockExistentTrigger->expects($this->once())->method('isDefinitiveEqual')->willReturn($mockExistentTrigger);
+        $mockExistentTrigger->expects($this->once())->method('isDefinitiveEqual')->willReturn(true);
+
+        $mockUnaffectedTrigger = $this->getMock($this->triggerEntityClass);
+        $mockUnaffectedTrigger->expects($this->any())->method('isDefinitiveEqual')->willReturn(false);
         $this->objectManager->expects($this->once())->method('persist')->with($existentNewTrigger);
-        $this->repository->expects($this->once())->method('findByDefinition')->willReturn([$mockExistentTrigger]);
+
+        $this->repository->expects($this->once())
+            ->method('findByDefinition')->willReturn([$mockExistentTrigger, $mockUnaffectedTrigger]);
+
+        //delete unaffected
+        $this->objectManager->expects($this->once())->method('remove')->with($mockUnaffectedTrigger);
+        $mockUnaffectedTrigger->expects($this->any())->method('getCron')->willReturn('string'); //in dropSchedule
+        $this->processCronScheduler->expects($this->once())->method('removeSchedule')->with($mockUnaffectedTrigger);
 
         //run import
         $this->processTriggersImport->configureTriggers($triggersConfiguration, $definitions);
+
+        $this->assertAttributeEquals(true, 'dirty', $this->processTriggersImport);
     }
 
     /**

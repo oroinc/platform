@@ -91,13 +91,19 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
         $arguments = $this->buildArguments($trigger);
 
         $schedules = array_filter($schedules, function (Schedule $schedule) use ($arguments) {
-            return $schedule->getArguments() == $arguments;
+            $scheduleArgs = $schedule->getArguments();
+            sort($scheduleArgs);
+            return $scheduleArgs == $arguments;
         });
 
-        foreach ($schedules as $schedule) {
-            $this->getObjectManager()->remove($schedule);
-            $this->dirty = true;
-            $this->notify('deleted', $schedule);
+        if (count($schedules) !== 0) {
+            $objectManager = $this->getObjectManager();
+
+            foreach ($schedules as $schedule) {
+                $objectManager->remove($schedule);
+                $this->dirty = true;
+                $this->notify('deleted', $schedule);
+            }
         }
     }
 
@@ -108,10 +114,12 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
      */
     protected function buildArguments(ProcessTrigger $trigger)
     {
-        return [
+        $args = [
             sprintf('--name=%s', $trigger->getDefinition()->getName()),
             sprintf('--id=%d', $trigger->getId())
         ];
+        sort($args);
+        return $args;
     }
 
     /**
