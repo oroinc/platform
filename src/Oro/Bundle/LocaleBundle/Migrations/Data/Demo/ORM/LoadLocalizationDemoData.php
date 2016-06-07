@@ -54,8 +54,8 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
         $repository = $manager->getRepository('OroLocaleBundle:Localization');
 
         foreach ($this->localizations as $item) {
-            $code = $item['formatting'];
-            $name = Intl::getLocaleBundle()->getLocaleName($code, $localeCode);
+            $code = $item['language'];
+            $name = Intl::getLocaleBundle()->getLocaleName($item['formatting'], $localeCode);
 
             $localization = $repository->findOneBy(['name' => $name]);
 
