@@ -51,7 +51,6 @@ services:
 
     oro_locale.form.type.fallback_property:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType'
-        public: true
         arguments:
             - '@translator'
         tags:
@@ -59,13 +58,11 @@ services:
 
     oro_locale.form.type.fallback_value:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType'
-        public: true
         tags:
             - { name: form.type, alias: oro_locale_fallback_value }
 
     oro_locale.form.type.localization_collection:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType'
-        public: true
         arguments:
             - '@doctrine'
         calls:
@@ -75,13 +72,11 @@ services:
 
     oro_locale.form.type.localized_property:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType'
-        public: true
         tags:
             - { name: form.type, alias: oro_locale_localized_property }
 
     oro_locale.form.type.localzed_fallback_value_colection:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType'
-        public: true
         arguments:
             - '@doctrine'
         tags:
