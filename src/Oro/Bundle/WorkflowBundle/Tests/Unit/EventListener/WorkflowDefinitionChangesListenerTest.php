@@ -12,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionChangesListener;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
@@ -23,16 +24,19 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
     protected $generator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ServiceLink */
-    protected $importLink;
+    protected $processConfiguratorLink;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ServiceLink */
-    protected $scheduleLink;
+    protected $scheduledTransitionProcessesLink;
 
     /** @var WorkflowDefinitionChangesListener */
     protected $listener;
 
-    /** @var ProcessConfigurator */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessConfigurator */
     protected $processConfigurator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ScheduledTransitionProcesses */
+    protected $scheduledTransitionProcesses;
 
     protected function setUp()
     {
@@ -46,24 +50,28 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->importLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
+        $this->scheduledTransitionProcesses = $this->getMockBuilder(
+            'Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses'
+        )->disableOriginalConstructor()->getMock();
+
+        $this->processConfiguratorLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->scheduleLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
+        $this->scheduledTransitionProcessesLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->listener = new WorkflowDefinitionChangesListener(
             $this->generator,
-            $this->importLink,
-            $this->scheduleLink
+            $this->processConfiguratorLink,
+            $this->scheduledTransitionProcessesLink
         );
     }
 
     protected function tearDown()
     {
-        unset($this->listener, $this->generator, $this->importLink);
+        unset($this->listener, $this->generator, $this->processConfiguratorLink);
     }
 
     public function testGenerateProcessConfigurations()
@@ -118,7 +126,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->setGeneratedConfigurations(['test_workflow' => ['definitions' => ['configuration']]]);
 
-        $this->importLink->expects($this->once())->method('getService')->willReturn(new \stdClass());
+        $this->processConfiguratorLink->expects($this->once())->method('getService')->willReturn(new \stdClass());
 
         $this->listener->workflowCreated($this->createEvent($entity));
     }
@@ -134,7 +142,8 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $entity->setName('test_workflow');
         $this->assertImportExecuted($entity, ['test_workflow' => ['definitions' => ['configuration']]]);
 
-        $this->scheduleLink->expects($this->once())->method('getService')->willReturn(new \stdClass());
+        $this->scheduledTransitionProcessesLink->expects($this->once())->method('getService')
+            ->willReturn(new \stdClass());
 
         $this->listener->workflowUpdated($this->createEvent($entity));
     }
@@ -147,7 +156,9 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
                 WorkflowEvents::WORKFLOW_BEFORE_UPDATE => 'generateProcessConfigurations',
                 WorkflowEvents::WORKFLOW_CREATED => 'workflowCreated',
                 WorkflowEvents::WORKFLOW_UPDATED => 'workflowUpdated',
-                WorkflowEvents::WORKFLOW_DELETED => 'workflowDeleted'
+                WorkflowEvents::WORKFLOW_DELETED => 'workflowDeleted',
+                WorkflowEvents::WORKFLOW_ACTIVATED => 'workflowActivated',
+                WorkflowEvents::WORKFLOW_DEACTIVATED => 'workflowDeactivated'
             ],
             WorkflowDefinitionChangesListener::getSubscribedEvents()
         );
@@ -193,7 +204,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $import->expects($this->any())->method('configureProcesses')
             ->with($configurations[$workflowDefinition->getName()]);
 
-        $this->importLink->expects($this->once())
+        $this->processConfiguratorLink->expects($this->once())
             ->method('getService')
             ->willReturn($import);
     }
@@ -201,7 +212,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
     protected function assertImportNotExecuted()
     {
         $this->generator->expects($this->never())->method($this->anything());
-        $this->importLink->expects($this->never())->method($this->anything());
+        $this->processConfiguratorLink->expects($this->never())->method($this->anything());
     }
 
     protected function assertScheduleExecuted()
@@ -217,8 +228,81 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $processDefinition->setName('process1');
         $scheduleService->expects($this->once())->method('workflowRelated')->willReturn([$processDefinition]);
 
-        $this->scheduleLink->expects($this->once())
+        $this->scheduledTransitionProcessesLink->expects($this->once())
             ->method('getService')
             ->willReturn($scheduleService);
+    }
+
+    public function testWorkflowActivated()
+    {
+        $workflowName = 'test_workflow';
+        $definition = new WorkflowDefinition();
+        $definition->setName($workflowName);
+
+        $processDefinition = new ProcessDefinition();
+        $processDefinition->setName('generated_process');
+
+        $generatedProcessConfiguration = [
+            'definitions' => [
+                'generated_process' => ['process_config']
+            ]
+        ];
+
+        $this->generator->expects($this->once())
+            ->method('generateForScheduledTransition')
+            ->with($definition)
+            ->willReturn($generatedProcessConfiguration);
+
+        $this->assertProcessConfiguratorRetrieved();
+        $this->processConfigurator->expects($this->once())
+            ->method('configureProcesses')
+            ->with($generatedProcessConfiguration);
+
+        $this->assertTransitionProcessesRetrieved();
+
+        $this->scheduledTransitionProcesses->expects($this->once())
+            ->method('workflowRelated')
+            ->with($workflowName)
+            ->willReturn([$processDefinition]);
+
+        $this->processConfigurator->expects($this->once())->method('removeProcesses')->with([]);
+
+        $this->listener->workflowActivated($this->createEvent($definition));
+    }
+
+    private function assertProcessConfiguratorRetrieved()
+    {
+        $this->processConfiguratorLink->expects($this->once())
+            ->method('getService')
+            ->willReturn($this->processConfigurator);
+    }
+
+    private function assertTransitionProcessesRetrieved()
+    {
+        $this->scheduledTransitionProcessesLink->expects($this->once())
+            ->method('getService')->willReturn($this->scheduledTransitionProcesses);
+    }
+
+    public function testWorkflowDeactivated()
+    {
+        $definition = new WorkflowDefinition();
+        $definition->setName('deactivated_workflow');
+
+        $this->assertTransitionProcessesRetrieved();
+
+        $storedProcess = new ProcessDefinition();
+        $storedProcess->setName('process_to_delete');
+
+        $this->scheduledTransitionProcesses->expects($this->once())
+            ->method('workflowRelated')
+            ->with('deactivated_workflow')
+            ->willReturn([$storedProcess]);
+
+        $this->assertProcessConfiguratorRetrieved();
+        $this->processConfigurator->expects($this->once())
+            ->method('removeProcesses')
+            ->with(['process_to_delete']);
+
+        $this->listener->workflowDeactivated($this->createEvent($definition));
     }
 }

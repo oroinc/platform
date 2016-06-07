@@ -189,7 +189,6 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         return $service;
     }
 
-
     /**
      * @return array
      */

@@ -999,6 +999,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         if ($workflowIdentifier instanceof WorkflowDefinition) {
             $workflowName = $workflowIdentifier->getName();
             $entityClass = $workflowIdentifier->getRelatedEntity();
+            $workflowDefinition = $workflowIdentifier;
         } else {
             $workflowName = $workflowIdentifier;
             $entityClass = '\DateTime';
@@ -1009,7 +1010,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->setMethods(null)
                 ->getMock();
-            $workflow->setName($workflowName);
+            $workflowDefinition->setName($workflowName);
             $workflow->setDefinition($workflowDefinition);
             $this->workflowRegistry->expects($this->once())->method('getWorkflow')->with($workflowIdentifier)
                 ->will($this->returnValue($workflow));
@@ -1030,6 +1031,16 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($workflowConfigProvider));
         $this->configManager->expects($this->once())->method('persist')->with($entityConfig);
         $this->configManager->expects($this->once())->method('flush');
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->equalTo(WorkflowEvents::WORKFLOW_ACTIVATED),
+                $this->logicalAnd(
+                    $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent'),
+                    $this->attributeEqualTo('definition', $workflowDefinition)
+                )
+            );
 
         $this->workflowManager->activateWorkflow($workflowIdentifier);
     }
@@ -1064,14 +1075,15 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $definition = new WorkflowDefinition();
         $workflowMock->expects($this->once())->method('getDefinition')->willReturn($definition);
-        $this->eventDispatcher->expects($this->once())->method('dispatch')->with(
-            $this->equalTo(WorkflowEvents::WORKFLOW_DEACTIVATED),
-            $this->callback(function($e) use ($definition){
-                /** @var WorkflowChangesEvent $e*/
-                $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent', $e);
-                $this->assertSame($definition, $e->getDefinition());
-            })
-        );
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->equalTo(WorkflowEvents::WORKFLOW_DEACTIVATED),
+                $this->logicalAnd(
+                    $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent'),
+                    $this->attributeEqualTo('definition', $definition)
+                )
+            );
 
         $this->workflowManager->deactivateWorkflow($entityClass);
     }

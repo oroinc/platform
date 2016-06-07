@@ -377,9 +377,9 @@ class WorkflowManager
      */
     public function activateWorkflow($workflowIdentifier)
     {
-        $definition = !$workflowIdentifier instanceof WorkflowDefinition
-            ? $this->getWorkflow($workflowIdentifier)->getDefinition()
-            : $workflowIdentifier;
+        $definition = $workflowIdentifier instanceof WorkflowDefinition
+            ? $workflowIdentifier
+            : $this->getWorkflow($workflowIdentifier)->getDefinition();
 
         $entityClass = $definition->getRelatedEntity();
         $workflowName = $definition->getName();
