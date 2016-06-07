@@ -380,7 +380,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler->update($data, $this->form, 'Saved');
     }
 
-    public function testSaveFormBeforeFormDataSetInterrupted()
+    public function testHandleUpdateBeforeFormDataSetInterrupted()
     {
         $entity = $this->getObject();
         $this->request->expects($this->never())
