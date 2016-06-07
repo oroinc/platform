@@ -72,13 +72,15 @@ class WorkflowEntityValidator extends ConstraintValidator
         }
 
         $class = $this->doctrineHelper->getEntityClass($value);
-        if (!($this->permissionRegistry->supportsClass($class) ||
-              $this->restrictionManager->hasEntityClassRestrictions($class))
-        ) {
+        $hasClassRestrictions = $this->restrictionManager->hasEntityClassRestrictions($class);
+        $restrictions = [];
+        if (!($this->permissionRegistry->supportsClass($class) || $hasClassRestrictions)) {
             return;
         }
+        if ($hasClassRestrictions) {
+            $restrictions = $this->restrictionManager->getEntityRestrictions($value);
+        }
 
-        $restrictions = $this->restrictionManager->getEntityRestrictions($value);
         if ($this->doctrineHelper->isNewEntity($value)) {
             $this->validateNewEntity($value, $constraint, $restrictions);
         } else {
@@ -86,7 +88,7 @@ class WorkflowEntityValidator extends ConstraintValidator
             if ($permissions['UPDATE'] === false || $restrictions) {
                 $unitOfWork = $this->entityManager->getUnitOfWork();
                 $classMetadata = $this->entityManager->getClassMetadata($class);
-                $unitOfWork->computeChangeSet($classMetadata, $value);
+                $unitOfWork->recomputeSingleEntityChangeSet($classMetadata, $value);
                 if ($permissions['UPDATE'] === false) {
                     if ($unitOfWork->isScheduledForUpdate($value)) {
                         $this->context->addViolation($constraint->updateEntityMessage);

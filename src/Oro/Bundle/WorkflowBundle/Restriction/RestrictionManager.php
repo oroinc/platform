@@ -17,12 +17,17 @@ class RestrictionManager
     /**
      * @var array [$entityClass => WorkflowRestriction[], ...]
      */
-    protected $restrictions;
+    protected $restrictions = [];
 
     /**
      * @var array [$entityClass => [$workflowName => $workflowData, ...], ...]
      */
-    protected $workflows;
+    protected $workflows = [];
+
+    /**
+     * @var array [id, ...]
+     */
+    protected $activeRestrictions = [];
 
     /**
      * @var WorkflowRestrictionRepository
@@ -51,7 +56,6 @@ class RestrictionManager
 
     /**
      * @param string $entityClass
-     *
      * @param bool   $activeWorkflows
      *
      * @return bool
@@ -62,7 +66,7 @@ class RestrictionManager
         $restrictions = $this->restrictions[$entityClass];
 
         if ($activeWorkflows) {
-            $restrictions = $this->filterByActiveWorkflows($restrictions, $entityClass);
+            $restrictions = $this->filterByActiveWorkflows($restrictions);
         }
 
         return !empty($restrictions);
@@ -80,14 +84,17 @@ class RestrictionManager
         if (!$this->doctrineHelper->isManageableEntity($entityClass) || empty($identifiers)) {
             return [];
         }
+        $this->loadClassRestrictions($entityClass);
 
-        return $this->getRestrictionsForEntityIds($entityClass, $identifiers);
+        return $this->filterByActiveWorkflows(
+            $this->getRestrictionsForEntityIds($entityClass, $identifiers)
+        );
     }
 
     /**
      * @param object $entity
      *
-     * @return array [['field' => $field, 'mode' => $mode, 'values' => $values], ...]
+     * @return array [['field' => $field, 'mode' => $mode, 'values' => $values, ?'ids' => $ids], ...]
      */
     public function getEntityRestrictions($entity)
     {
@@ -99,9 +106,11 @@ class RestrictionManager
 
         $this->loadClassRestrictions($class);
 
-        return $id
+        $restrictions = $id
             ? $this->getRestrictionsForEntityIds($class, [$id])
             : $this->filterNewEntityRestrictions($this->restrictions[$class]);
+
+        return $this->filterByActiveWorkflows($restrictions);
     }
 
     /**
@@ -165,53 +174,34 @@ class RestrictionManager
     }
 
     /**
-     * @param WorkflowRestriction[] $restrictions
+     * @param array $restrictions
      *
      * @return array
      */
     protected function filterNewEntityRestrictions(array $restrictions)
     {
-        $filtered = [];
-        foreach ($restrictions as $restriction) {
-            if (!$restriction->getStep()) {
-                $filtered[] = [
-                    'field'  => $restriction->getField(),
-                    'mode'   => $restriction->getMode(),
-                    'values' => $restriction->getValues()
-                ];
-            };
-        }
+        return array_filter(
+            $restrictions,
+            function (array $restriction) {
+                return !$restriction['step'];
+            }
+        );
 
-        return $filtered;
     }
 
     /**
      * @param WorkflowRestriction[] $restrictions
      *
-     * @param string                $entityClass
-     *
      * @return WorkflowRestriction[]
      */
-    protected function filterByActiveWorkflows(array $restrictions, $entityClass)
+    protected function filterByActiveWorkflows(array $restrictions)
     {
-        $filtered = [];
-        foreach ($restrictions as $restriction) {
-            $workflowDefinition = $restriction->getDefinition();
-            $workflowName       = $workflowDefinition->getName();
-            if (!isset($this->workflows[$entityClass][$workflowName])) {
-                $workflow = $this->workflowManager
-                    ->getApplicableWorkflowByEntityClass(
-                        $workflowDefinition->getRelatedEntity()
-                    );
-
-                $this->workflows[$entityClass][$workflowName] = ['is_active' => null !== $workflow];
+        return array_filter(
+            $restrictions,
+            function (array $restriction) {
+                return in_array($restriction['id'], $this->activeRestrictions);
             }
-            if ($this->workflows[$entityClass][$workflowName]['is_active']) {
-                $filtered[] = $restriction;
-            }
-        }
-
-        return $filtered;
+        );
     }
 
     /**
@@ -233,7 +223,28 @@ class RestrictionManager
     protected function loadClassRestrictions($entityClass)
     {
         if (!isset($this->restrictions[$entityClass])) {
-            $this->restrictions[$entityClass] = $this->getRestrictionRepository()->getClassRestrictions($entityClass);
+            $classRestrictions = $this->getRestrictionRepository()->getClassRestrictions($entityClass);
+            foreach ($classRestrictions as $classRestriction) {
+                $workflowName = $classRestriction['workflowName'];
+                if (!isset($this->workflows[$entityClass][$workflowName])) {
+                    $workflow = $this->workflowManager
+                        ->getApplicableWorkflowByEntityClass(
+                            $classRestriction['relatedEntity']
+                        );
+                    if (null !== $workflow) {
+                        if ($workflow->getName() === $workflowName) {
+                            $this->workflows[$entityClass][$workflowName] = ['is_active' => true];
+                        } else {
+                            $this->workflows[$entityClass][$workflowName] = ['is_active' => false];
+                            $this->workflows[$entityClass][$workflow->getName()] = ['is_active' => true];
+                        }
+                    }
+                }
+                if ($this->workflows[$entityClass][$workflowName]['is_active']) {
+                    $this->activeRestrictions[] = $classRestriction['id'];
+                }
+            }
+            $this->restrictions[$entityClass] = $classRestrictions;
         }
     }
 }

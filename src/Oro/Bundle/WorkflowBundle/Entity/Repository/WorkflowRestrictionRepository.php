@@ -16,12 +16,21 @@ class WorkflowRestrictionRepository extends EntityRepository
     public function getClassRestrictions($entityClass)
     {
         return $this->createQueryBuilder('r')
-            ->select('r, definition')
-            ->join('r.definition', 'definition')
+            ->select(
+                'r.id',
+                'r.entityClass',
+                'IDENTITY(r.step) AS step',
+                'r.mode', 
+                'r.field',
+                'r.values', 
+                'd.relatedEntity',
+                'd.name AS workflowName'
+            )
+            ->join('r.definition', 'd')
             ->where('r.entityClass = :entityClass')
             ->setParameter('entityClass', $entityClass)
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
     }
 
     /**
@@ -36,6 +45,7 @@ class WorkflowRestrictionRepository extends EntityRepository
         return $queryBuilder
             ->leftJoin('r.restrictionIdentities', 'ri')
             ->select(
+                'r.id',
                 'r.field',
                 'r.mode',
                 'r.values',
