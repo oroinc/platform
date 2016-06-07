@@ -30,7 +30,10 @@ class ProcessConfigurationGenerator
      */
     public function generateForScheduledTransition(WorkflowDefinition $workflowDefinition)
     {
-        $processConfigurations = [];
+        $processConfigurations = [
+            ProcessConfigurationProvider::NODE_DEFINITIONS => [],
+            ProcessConfigurationProvider::NODE_TRIGGERS => []
+        ];
         $workflowName = $workflowDefinition->getName();
         foreach ($this->getTransitionsConfigurations($workflowDefinition) as $name => $transitionConfiguration) {
             if (array_key_exists('schedule', $transitionConfiguration)) {
@@ -59,7 +62,7 @@ class ProcessConfigurationGenerator
      */
     private function createProcessConfiguration($workflowName, $transitionName, $cronExpression)
     {
-        $processName = $this->generateScheduledTransitionProcessName($workflowName, $transitionName);
+        $processName = $this->createProcessName($workflowName, $transitionName);
 
         $definitionConfiguration = [
             $processName => [
@@ -68,11 +71,15 @@ class ProcessConfigurationGenerator
                 'order' => 0,
                 'exclude_definitions' => [$processName],
                 'actions_configuration' => [
-                    '@run_action_group' => [
-                        'action_group' => 'oro_workflow_transition_process_schedule',
-                        'parameters' => [
-                            'workflowName' => $workflowName,
-                            'transitionName' => $transitionName
+                    [
+                        '@run_action_group' => [
+                            'parameters' => [
+                                'action_group' => 'oro_workflow_transition_process_schedule',
+                                'parameters_mapping' => [
+                                    'workflowName' => $workflowName,
+                                    'transitionName' => $transitionName
+                                ]
+                            ]
                         ]
                     ]
                 ],
@@ -107,8 +114,8 @@ class ProcessConfigurationGenerator
      * @param string $transitionName
      * @return string
      */
-    protected function generateScheduledTransitionProcessName($workflowName, $transitionName)
+    protected function createProcessName($workflowName, $transitionName)
     {
-        return sprintf('%s_%s_schedule_process', $workflowName, $transitionName);
+        return (string)(new ScheduledTransitionProcessName($workflowName, $transitionName));
     }
 }

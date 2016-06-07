@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
@@ -46,12 +48,16 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry $managerRegistry */
         $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
         $managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
         $this->handler = new WorkflowDefinitionHandler(
             $assembler,
+            $eventDispatcher,
             $managerRegistry,
             'OroWorkflowBundle:WorkflowDefinition'
         );
@@ -79,12 +85,15 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($existingDefinition);
         }
 
+        if(!$existingDefinition && !$newDefinition){
+            $this->entityManager->expects($this->once())->method('persist')->with($definition);
+        }
+
         $this->handler->updateWorkflowDefinition($definition, $newDefinition);
 
         if ($newDefinition) {
             $this->assertEquals($definition, $newDefinition);
         }
-
 
         if ($existingDefinition) {
             $this->assertEquals($definition, $existingDefinition);
@@ -122,6 +131,11 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
                 'existingDefinition' => $definition1,
                 'newDefinition' => null,
             ],
+            'created definition' => [
+                'definition' => $definition1,
+                'existingDefinition' => null,
+                'newDefinition' => null
+            ]
         ];
     }
 

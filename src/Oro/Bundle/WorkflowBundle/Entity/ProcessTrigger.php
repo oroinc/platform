@@ -396,7 +396,7 @@ class ProcessTrigger
      */
     public static function getAllowedEvents()
     {
-        return array(self::EVENT_CREATE, self::EVENT_UPDATE, self::EVENT_DELETE);
+        return [self::EVENT_CREATE, self::EVENT_UPDATE, self::EVENT_DELETE];
     }
 
     /**
@@ -414,5 +414,24 @@ class ProcessTrigger
             ->setCron($trigger->getCron());
 
         return $this;
+    }
+
+    /**
+     * @param ProcessTrigger $trigger
+     * @return bool
+     */
+    public function isDefinitiveEqual(ProcessTrigger $trigger)
+    {
+        if ($this->event !== $trigger->getEvent()
+            || $this->field !== $trigger->getField()
+            || $this->cron !== $trigger->getCron()
+        ) {
+            return false;
+        }
+
+        $ownDefinition = $this->definition ? $this->definition->getName() : null;
+        $outerDefinition = $trigger->getDefinition() ? $trigger->getDefinition()->getName() : null;
+
+        return $ownDefinition === $outerDefinition;
     }
 }

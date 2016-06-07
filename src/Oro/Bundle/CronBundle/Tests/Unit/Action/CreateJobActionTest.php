@@ -6,14 +6,14 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\CronBundle\Action\CreateJobAction;
 use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 
 use Oro\Component\Action\Model\ContextAccessor;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -152,7 +152,7 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
     {
         $this->createJobAction->initialize([
             CreateJobAction::OPTION_COMMAND => 'help',
-            CreateJobAction::OPTION_ARGUMENTS => ['--env=test'],
+            CreateJobAction::OPTION_ARGUMENTS => ['--env' => 'test'],
             CreateJobAction::OPTION_ALLOW_DUPLICATES => false,
             CreateJobAction::OPTION_COMMIT => true,
             CreateJobAction::OPTION_PRIORITY => 42,
@@ -236,7 +236,7 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
     {
         $this->createJobAction->initialize([
             CreateJobAction::OPTION_COMMAND => 'help',
-            CreateJobAction::OPTION_ARGUMENTS => ['--env=test'],
+            CreateJobAction::OPTION_ARGUMENTS => ['--env' => 'test'],
             CreateJobAction::OPTION_ALLOW_DUPLICATES => false,
             CreateJobAction::OPTION_COMMIT => false, // <-- no commit
             CreateJobAction::OPTION_ATTRIBUTE => new PropertyPath('result')
@@ -295,6 +295,10 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
         $this->createJobAction->execute(new ActionData());
     }
 
+    /**
+     * @param string $string
+     * @param ObjectManager $mockObject
+     */
     private function assertResolvingObjectManager($string, $mockObject)
     {
         $this->managerRegistry->expects($this->once())

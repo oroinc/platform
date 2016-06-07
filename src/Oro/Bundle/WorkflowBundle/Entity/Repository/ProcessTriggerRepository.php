@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessTriggerRepository extends EntityRepository
@@ -15,12 +16,12 @@ class ProcessTriggerRepository extends EntityRepository
     public function findEqualTrigger(ProcessTrigger $trigger)
     {
         return $this->findOneBy(
-            array(
+            [
                 'event' => $trigger->getEvent(),
                 'field' => $trigger->getField(),
                 'definition' => $trigger->getDefinition(),
                 'cron' => $trigger->getCron()
-            )
+            ]
         );
     }
 
@@ -76,6 +77,22 @@ class ProcessTriggerRepository extends EntityRepository
         if (null !== $enabled) {
             $queryBuilder->andWhere('definition.enabled = :enabled')->setParameter('enabled', $enabled);
         }
+
+        return $queryBuilder->getQuery()->execute();
+    }
+
+    /**
+     * @param ProcessDefinition $definition
+     * @return mixed
+     */
+    public function findByDefinition(ProcessDefinition $definition)
+    {
+        $queryBuilder = $this->createQueryBuilder('trigger')
+            ->select('trigger, definition')
+            ->innerJoin('trigger.definition', 'definition');
+
+        $queryBuilder->andWhere('definition.name = :definition_name');
+        $queryBuilder->setParameter('definition_name', $definition->getName());
 
         return $queryBuilder->getQuery()->execute();
     }

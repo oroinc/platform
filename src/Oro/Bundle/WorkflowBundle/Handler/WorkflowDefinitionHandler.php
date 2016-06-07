@@ -6,7 +6,11 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionHandler
@@ -14,23 +18,29 @@ class WorkflowDefinitionHandler
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
-    /** @var ManagerRegistry  */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
     /** @var string */
     protected $entityClass;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /**
      * @param WorkflowAssembler $workflowAssembler
+     * @param EventDispatcherInterface $eventDispatcher
      * @param ManagerRegistry $managerRegistry
      * @param string $entityClass
      */
     public function __construct(
         WorkflowAssembler $workflowAssembler,
+        EventDispatcherInterface $eventDispatcher,
         ManagerRegistry $managerRegistry,
         $entityClass
     ) {
         $this->workflowAssembler = $workflowAssembler;
+        $this->eventDispatcher = $eventDispatcher;
         $this->managerRegistry = $managerRegistry;
         $this->entityClass = $entityClass;
     }
@@ -38,11 +48,16 @@ class WorkflowDefinitionHandler
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @param WorkflowDefinition|null $newDefinition
+     * @throws \Exception
      */
     public function updateWorkflowDefinition(
         WorkflowDefinition $workflowDefinition,
         WorkflowDefinition $newDefinition = null
     ) {
+
+        $em = $this->getEntityManager();
+        $created = false;
+
         if ($newDefinition) {
             $workflowDefinition->import($newDefinition);
         } else {
@@ -50,19 +65,31 @@ class WorkflowDefinitionHandler
             $existingDefinition = $this->getEntityRepository()->find($workflowDefinition->getName());
             if ($existingDefinition) {
                 $workflowDefinition = $existingDefinition->import($workflowDefinition);
+            } else {
+                $em->persist($workflowDefinition);
+                $created = true;
             }
         }
         $this->workflowAssembler->assemble($workflowDefinition);
 
-        $em = $this->getEntityManager();
+        $this->eventDispatcher->dispatch(
+            $created ? WorkflowEvents::WORKFLOW_BEFORE_CREATE : WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
+            new WorkflowChangesEvent($workflowDefinition)
+        );
+
         $em->beginTransaction();
         try {
-            $em->persist($workflowDefinition);
             $em->flush($workflowDefinition);
             $em->commit();
         } catch (\Exception $exception) {
             $em->rollback();
+            throw $exception;
         }
+
+        $this->eventDispatcher->dispatch(
+            $created ? WorkflowEvents::WORKFLOW_CREATED : WorkflowEvents::WORKFLOW_UPDATED,
+            new WorkflowChangesEvent($workflowDefinition)
+        );
     }
 
     /**
@@ -78,6 +105,11 @@ class WorkflowDefinitionHandler
         $em = $this->getEntityManager();
         $em->remove($workflowDefinition);
         $em->flush();
+
+        $this->eventDispatcher->dispatch(
+            WorkflowEvents::WORKFLOW_DELETED,
+            new WorkflowChangesEvent($workflowDefinition)
+        );
 
         return true;
     }

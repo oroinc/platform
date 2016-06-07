@@ -74,13 +74,13 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset(
-        $this->container,
-        $this->repo,
-        $this->workflowManager,
-        $this->managerRegistry,
-        $this->input,
-        $this->output,
-        $this->command
+            $this->container,
+            $this->repo,
+            $this->workflowManager,
+            $this->managerRegistry,
+            $this->input,
+            $this->output,
+            $this->command
         );
     }
 
