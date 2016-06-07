@@ -126,27 +126,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: 100 }
 
-    oro_api.get.complete_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get, group: build_query, priority: -50 }
-
-    oro_api.get.protect_query_by_acl:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.acl_helper'
-            - '@oro_security.acl.annotation_provider'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: get, group: build_query, priority: -90 }
-
     oro_api.get.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.criteria_connector'
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -100 }
 
@@ -160,11 +144,6 @@ services:
             - '@oro_api.entity_serializer'
         tags:
             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
-
-    oro_api.get.load_data_by_orm_query:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery
-        tags:
-            - { name: oro.api.processor, action: get, group: load_data, priority: -20 }
 
     #
     # normalize_data

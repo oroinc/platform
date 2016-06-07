@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
 {
@@ -30,7 +30,7 @@ abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
     }
 
