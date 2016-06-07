@@ -91,11 +91,14 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
             'languageCode' => 'en',
             'formattingCode' => 'en_FR',
         ]);
-        $firstLevelEn = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
-            'name' => 'English2',
-            'languageCode' => 'en',
-            'formattingCode' => 'en_EN',
-            'childLocalizations' => new ArrayCollection([$secondLevelLevelEn])]
+        $firstLevelEn = $this->getEntity(
+            'Oro\Bundle\LocaleBundle\Entity\Localization',
+            [
+                'name' => 'English2',
+                'languageCode' => 'en',
+                'formattingCode' => 'en_EN',
+                'childLocalizations' => new ArrayCollection([$secondLevelLevelEn])
+            ]
         );
         $en = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
             'name' => 'English3',
