@@ -140,3 +140,4 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 
 ####LayoutBundle
 - The class Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType was renamed to FormFieldsType
+- Added new block type Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType. This block type create three child block in buildBlock method: `FormStartType`, `FormType`, `FormEndType`.

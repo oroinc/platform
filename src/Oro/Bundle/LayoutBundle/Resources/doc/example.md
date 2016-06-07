@@ -1182,7 +1182,7 @@ layout:
 ```
 
 Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block)
-For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form.
+For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form. Also we can use only one block type `form` which create three child block: `form_start`, `form_fields`, `form_end`.
 
 All that is left is to define the search autocomplete block in our block theme file we'll:
 ```twig

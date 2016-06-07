@@ -51,7 +51,7 @@ The **OroLayoutBundle** introduces a set of block types that allow to easily bui
 | `body` | [BodyType.php](../../Layout/Block/Type/BodyType.php) | `<body>` |
 | `form_start` | [FormStartType.php](../../Layout/Block/Type/FormStartType.php) | `<form>` |
 | `form_end` | [FormEndType.php](../../Layout/Block/Type/FormEndType.php) | `</form>` |
-| `form` | [FormType.php](../../Layout/Block/Type/FormType.php) | This block type create three child block: form_start, form, form_end |
+| `form` | [FormType.php](../../Layout/Block/Type/FormType.php) | This block type create three child block: `form_start`, `form_fields`, `form_end` |
 | `form_fields` | [FormFieldsType.php](../../Layout/Block/Type/FormFieldsType.php) | Adds form fields based on the Symfony form |
 | `form_field` | [FormFieldType.php](../../Layout/Block/Type/FormFieldType.php) |  Block will be rendered differently depending on the field type of the Symfony form |
 | `fieldset` | [FieldsetType.php](../../Layout/Block/Type/FieldsetType.php) | `<fieldset>` |
