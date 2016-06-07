@@ -15,7 +15,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowAssembler;
 
-    /** @var \Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier */
+    /** @var TriggerScheduleOptionsVerifier */
     protected $verifier;
 
     /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */

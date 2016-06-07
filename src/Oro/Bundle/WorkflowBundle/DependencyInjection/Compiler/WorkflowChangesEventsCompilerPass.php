@@ -33,7 +33,8 @@ class WorkflowChangesEventsCompilerPass implements CompilerPassInterface
                     );
                 }
                 $dispatcherDefinition->addMethodCall(
-                    'addListener', [
+                    'addListener',
+                    [
                         $attributes['event'],
                         new Reference($service),
                         array_key_exists('priority', $attributes) ? $attributes['priority'] : 0

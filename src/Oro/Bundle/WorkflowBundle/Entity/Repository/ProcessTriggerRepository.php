@@ -81,6 +81,10 @@ class ProcessTriggerRepository extends EntityRepository
         return $queryBuilder->getQuery()->execute();
     }
 
+    /**
+     * @param ProcessDefinition $definition
+     * @return mixed
+     */
     public function findByDefinition(ProcessDefinition $definition)
     {
         $queryBuilder = $this->createQueryBuilder('trigger')

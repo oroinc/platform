@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -59,7 +60,7 @@ class JobController extends Controller
      * @Route("/run-daemon", name="oro_cron_job_run_daemon")
      * @AclAncestor("oro_jobs")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function runDaemonAction(Request $request)
     {
@@ -98,7 +99,7 @@ class JobController extends Controller
      * @Route("/stop-daemon", name="oro_cron_job_stop_daemon")
      * @AclAncestor("oro_jobs")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function stopDaemonAction(Request $request)
     {
@@ -130,7 +131,7 @@ class JobController extends Controller
      * @Route("/status", name="oro_cron_job_status")
      * @AclAncestor("oro_jobs")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function statusAction(Request $request)
     {

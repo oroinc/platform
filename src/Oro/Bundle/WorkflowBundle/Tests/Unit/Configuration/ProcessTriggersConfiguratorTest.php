@@ -96,7 +96,6 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->processTriggersImport->configureTriggers($triggersConfiguration, $definitions);
     }
 
-
     /**
      * @dataProvider flushDataProvider
      * @param bool $dirty
