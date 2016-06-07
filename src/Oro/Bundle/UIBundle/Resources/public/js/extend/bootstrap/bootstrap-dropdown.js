@@ -122,11 +122,15 @@ define(function(require) {
                 width: $dropdownMenu.outerWidth(),
                 height: $dropdownMenu.outerHeight()
             });
+            var $appendTo = $dropdownMenu.closest('body, .ui-dialog');
+            var appendToRect = $appendTo[0].getBoundingClientRect();
+            css.top -= appendToRect.top;
+            css.left -= appendToRect.left;
             var $placeholder = $('<div class="dropdown-menu__placeholder"/>');
             $placeholder.data('related-menu', $dropdownMenu);
             $dropdownMenu
                 .after($placeholder)
-                .appendTo('body')
+                .appendTo($appendTo)
                 .addClass('dropdown-menu__floating')
                 .css(css);
 
