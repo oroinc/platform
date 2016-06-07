@@ -6,8 +6,10 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter\Stub\WorkflowEntity;
@@ -25,6 +27,11 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
+     */
+    protected $configProvider;
+
+    /**
      * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowPermissionRegistry
      */
     protected $permissionRegistry;
@@ -35,10 +42,10 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->permissionRegistry = new WorkflowPermissionRegistry($this->doctrineHelper, $configProvider);
+        $this->permissionRegistry = new WorkflowPermissionRegistry($this->doctrineHelper, $this->configProvider);
 
         $this->voter = new WorkflowEntityVoter($this->doctrineHelper, $this->permissionRegistry);
     }
@@ -80,8 +87,13 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsClass($class, $expected)
     {
+        $definition = new WorkflowDefinition();
+        $definition->setRelatedEntity('SupportedClass');
+
         $entityAcl = new WorkflowEntityAcl();
         $entityAcl->setEntityClass('SupportedClass');
+        $entityAcl->setDefinition($definition);
+        
         $this->setRegistryRepositories([$entityAcl]);
 
         $this->assertEquals($expected, $this->voter->supportsClass($class));
@@ -108,10 +120,14 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testVote($expected, $object, array $attributes = [], $updatable = true, $deletable = true)
     {
+        $definition = new WorkflowDefinition();
+        $definition->setRelatedEntity('SupportedClass');
+
         $entityAcl = new WorkflowEntityAcl();
         $entityAcl->setEntityClass('WorkflowEntity')
             ->setUpdatable($updatable)
-            ->setDeletable($deletable);
+            ->setDeletable($deletable)
+            ->setDefinition($definition);
 
         $aclIdentity = new WorkflowEntityAclIdentity();
         $aclIdentity->setAcl($entityAcl);
@@ -254,11 +270,13 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
         $entityIdentifier = null,
         array $aclIdentities = []
     ) {
-        $entityAclRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityAclRepository =
+            $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+                ->disableOriginalConstructor()
+                ->setMethods(['getWorkflowEntityAcls'])
+                ->getMock();
         $entityAclRepository->expects($this->any())
-            ->method('findAll')
+            ->method('getWorkflowEntityAcls')
             ->will($this->returnValue($entityAcls));
 
         $aclIdentityRepository =
@@ -289,6 +307,20 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $config->expects($this->any())
+            ->method('get')
+            ->with('active_workflow', false, false)
+            ->willReturn(true);
+
+        $this->configProvider
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturn($config);
     }
 
     /**

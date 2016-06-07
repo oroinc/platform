@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclRepository;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
 
 class WorkflowPermissionRegistry
@@ -117,14 +118,9 @@ class WorkflowPermissionRegistry
             return;
         }
 
-        /** @var WorkflowEntityAcl[] $entityAcls */
-        $entityAcls = $this->doctrineHelper
-            ->getEntityRepository('OroWorkflowBundle:WorkflowEntityAcl')
-            ->createQueryBuilder('a')
-            ->select('a, definition')
-            ->join('a.definition', 'definition')
-            ->getQuery()
-            ->getResult();
+        /** @var WorkflowEntityAclRepository $repository */
+        $repository = $this->doctrineHelper->getEntityRepository('OroWorkflowBundle:WorkflowEntityAcl');
+        $entityAcls = $repository->getWorkflowEntityAcls();
 
         $this->entityAcls       = [];
         $this->supportedClasses = [];
