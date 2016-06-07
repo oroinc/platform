@@ -39,7 +39,9 @@ class ScheduleManager
         sort($arguments);
 
         $schedules = array_filter($schedules, function (Schedule $schedule) use ($arguments) {
-            return $schedule->getArguments() == $arguments;
+            $scheduleArgs = $schedule->getArguments();
+            sort($scheduleArgs);
+            return $scheduleArgs == $arguments;
         });
 
         return count($schedules) > 0;

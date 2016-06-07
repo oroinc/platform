@@ -71,6 +71,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(100500);
 
         $arguments = ['--name=process-definition-name', '--id=100500'];
+        sort($arguments);
 
         //hasSchedule
         $this->scheduleManager->expects($this->once())
@@ -140,6 +141,8 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
             'InvalidArgumentException',
             'Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler supports only cron schedule triggers.'
         );
+
+        $this->processCronScheduler->removeSchedule($mockTrigger);
     }
 
     public function testAddException()
