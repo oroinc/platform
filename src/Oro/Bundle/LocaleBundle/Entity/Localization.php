@@ -113,6 +113,14 @@ class Localization implements DatesAwareInterface
     }
 
     /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    /**
      * @return int
      */
     public function getId()
@@ -303,13 +311,5 @@ class Localization implements DatesAwareInterface
         $this->addTitle($newTitle);
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getName();
     }
 }

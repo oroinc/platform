@@ -115,8 +115,8 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
             'childLocalizations' => new ArrayCollection([$firstLevelRu])
         ]);
         $localizations = [
-            'English3' => ['English2' => ['English1' => []]],
-            'Russian2' => ['Russian1' => []],
+            'en' => ['en' => ['en' => []]],
+            'ru' => ['ru' => []],
         ];
         return [
             ['entities' => [$en, $ru], 'localizations' => $localizations],
