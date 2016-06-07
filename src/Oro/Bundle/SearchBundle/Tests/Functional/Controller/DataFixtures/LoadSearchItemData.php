@@ -21,8 +21,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-    const COUNT = 9;
-
     /**
      * @var ContainerInterface
      */
@@ -42,7 +40,8 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
     public function load(ObjectManager $manager)
     {
         $this->loadItems($manager);
-        $this->ensureItemsLoaded();
+
+        $this->getSearchIndexer()->reindex();
     }
 
     /**
@@ -95,27 +94,10 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
     }
 
     /**
-     * Ensure that items loaded to search index
-     *
-     * @throws \LogicException
+     * @return \Oro\Bundle\SearchBundle\Engine\OrmIndexer
      */
-    protected function ensureItemsLoaded()
+    protected function getSearchIndexer()
     {
-        $query = new Query();
-        $query->from('oro_test_item');
-
-        $requestCounts = 20;
-        do {
-            $result = $this->container->get('oro_search.search.engine')->search($query);
-            $isLoaded = $result->getRecordsCount() == self::COUNT;
-            if (!$isLoaded) {
-                $requestCounts++;
-                sleep(1);
-            }
-        } while (!$isLoaded && $requestCounts > 0);
-
-        if (!$isLoaded) {
-            throw new \LogicException('Search items are not loaded');
-        }
+        return $this->container->get('oro_search.search.engine.indexer');
     }
 }

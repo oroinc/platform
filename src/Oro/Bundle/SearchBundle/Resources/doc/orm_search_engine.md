@@ -42,11 +42,6 @@ parameters:
 Features
 --------
 
-ORM search engine overrides index listener class with it's own implementation
-_Oro\Bundle\SearchBundle\EventListener\OrmIndexListener_. This listener disables multiple flushes
-for save and delete operation and run only one flush instead. Also it can be temporary disabled that allows to
-perform operation with big data faster.
-
 Another one feature of ORM engine is fulltext index processing. Configuration defines fulltext manager
 _Oro\Bundle\SearchBundle\Engine\FulltextIndexManager_ that used during installation and inside special listener -
 it allows system to create fulltext indexes bypassing Doctrine processing.

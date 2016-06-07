@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
-
 use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
-use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 
 class DemoDataMigrationListener
 {
-    /** @var EngineInterface */
-    protected $searchEngine;
+    /** @var IndexerInterface */
+    protected $searchIndexer;
 
     /** @var IndexListener */
     protected $searchListener;
@@ -22,12 +21,12 @@ class DemoDataMigrationListener
     protected $isExceptionOccurred;
 
     /**
-     * @param EngineInterface $searchEngine
+     * @param IndexerInterface $searchIndexer
      * @param IndexListener $searchListener
      */
-    public function __construct(EngineInterface $searchEngine, IndexListener $searchListener)
+    public function __construct(IndexerInterface $searchIndexer, IndexListener $searchListener)
     {
-        $this->searchEngine = $searchEngine;
+        $this->searchIndexer = $searchIndexer;
         $this->searchListener = $searchListener;
     }
 
@@ -48,7 +47,7 @@ class DemoDataMigrationListener
     {
         if (!$this->isExceptionOccurred && $this->isProcessingRequired($event)) {
             if ($event->getExitCode() === 0) {
-                $this->searchEngine->reindex();
+                $this->searchIndexer->reindex();
             }
             $this->searchListener->setEnabled(true);
         }

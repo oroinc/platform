@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
@@ -13,7 +14,7 @@ class DemoDataMigrationListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $searchEngine;
+    protected $searchIndexer;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -27,13 +28,13 @@ class DemoDataMigrationListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->searchEngine = $this->getMock('Oro\Bundle\SearchBundle\Engine\EngineInterface');
+        $this->searchIndexer = $this->getMock(IndexerInterface::class);
 
         $this->searchListener = $this->getMockBuilder('Oro\Bundle\SearchBundle\EventListener\IndexListener')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new DemoDataMigrationListener($this->searchEngine, $this->searchListener);
+        $this->listener = new DemoDataMigrationListener($this->searchIndexer, $this->searchListener);
     }
 
     /**
@@ -66,18 +67,18 @@ class DemoDataMigrationListenerTest extends \PHPUnit_Framework_TestCase
     {
         if ($fixturesType == LoadDataFixturesCommand::DEMO_FIXTURES_TYPE) {
             if ($exitCode === 0) {
-                $this->searchEngine->expects($this->once())
+                $this->searchIndexer->expects($this->once())
                     ->method('reindex')
                     ->with();
             } else {
-                $this->searchEngine->expects($this->never())
+                $this->searchIndexer->expects($this->never())
                     ->method('reindex');
             }
             $this->searchListener->expects($this->once())
                 ->method('setEnabled')
                 ->with(true);
         } else {
-            $this->searchEngine->expects($this->never())
+            $this->searchIndexer->expects($this->never())
                 ->method('reindex');
             $this->searchListener->expects($this->never())
                 ->method('setEnabled');

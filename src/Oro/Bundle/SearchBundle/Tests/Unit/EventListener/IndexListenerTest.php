@@ -6,6 +6,7 @@ use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\EventListener\IndexListener;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
@@ -20,7 +21,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $searchEngine;
+    protected $searchIndexer;
 
     /**
      * @var array
@@ -41,7 +42,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->searchEngine = $this->getMock('Oro\Bundle\SearchBundle\Engine\EngineInterface');
+        $this->searchIndexer = $this->getMock(IndexerInterface::class);
     }
 
     public function testOnFlush()
@@ -110,18 +111,14 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPostFlushNoEntities()
     {
-        $this->searchEngine->expects($this->never())->method('save');
-        $this->searchEngine->expects($this->never())->method('delete');
+        $this->searchIndexer->expects($this->never())->method('save');
+        $this->searchIndexer->expects($this->never())->method('delete');
 
         $listener = $this->createListener();
         $listener->postFlush(new PostFlushEventArgs($this->createEntityManager()));
     }
 
-    /**
-     * @param bool $realTime
-     * @dataProvider postFlushDataProvider
-     */
-    public function testPostFlush($realTime)
+    public function testPostFlush()
     {
         $insertedEntity = $this->createTestEntity('inserted');
         $insertedEntities = ['inserted' => $insertedEntity];
@@ -144,10 +141,13 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
         $entityManager->expects($this->once())->method('getReference')
             ->will($this->returnValue($deletedEntity));
 
-        $this->searchEngine->expects($this->once())->method('save')->with($insertedEntities, $realTime);
-        $this->searchEngine->expects($this->once())->method('delete')->with($deletedEntities, $realTime);
+        $this->searchIndexer
+            ->expects($this->once())
+            ->method('save')
+            ->with(array_merge($insertedEntities, $deletedEntities))
+        ;
 
-        $listener = $this->createListener($realTime);
+        $listener = $this->createListener();
         $listener->onFlush(new OnFlushEventArgs($entityManager));
         $listener->postFlush(new PostFlushEventArgs($entityManager));
 
@@ -185,28 +185,6 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEmpty('deletedEntities', $listener);
     }
 
-    /**
-     * @return array
-     */
-    public function postFlushDataProvider()
-    {
-        return [
-            'realtime' => [true],
-            'queued'   => [false],
-        ];
-    }
-
-    public function testSetRealTimeUpdate()
-    {
-        $listener = $this->createListener();
-
-        $this->assertAttributeEquals(true, 'realTimeUpdate', $listener);
-        $listener->setRealTimeUpdate(false);
-        $this->assertAttributeEquals(false, 'realTimeUpdate', $listener);
-        $listener->setRealTimeUpdate(true);
-        $this->assertAttributeEquals(true, 'realTimeUpdate', $listener);
-    }
-
     public function testSetEntitiesConfig()
     {
         $listener = $this->createListener();
@@ -218,13 +196,11 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool $realTime
      * @return IndexListener
      */
-    protected function createListener($realTime = true)
+    protected function createListener()
     {
-        $listener = new IndexListener($this->doctrineHelper, $this->searchEngine);
-        $listener->setRealTimeUpdate($realTime);
+        $listener = new IndexListener($this->doctrineHelper, $this->searchIndexer);
         $listener->setEntitiesConfig($this->entitiesMapping);
 
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')

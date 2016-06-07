@@ -11,7 +11,6 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
-use Oro\Bundle\SearchBundle\EventListener\OrmIndexListener;
 
 class LoadDataFixturesCommand extends ContainerAwareCommand
 {
