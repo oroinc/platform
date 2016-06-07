@@ -4,11 +4,16 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use WebDriver\Exception\ElementNotVisible;
 
 class Grid extends Element
 {
+    /**
+     * @param string $title
+     * @throws \Exception
+     */
     public function clickMassActionLink($title)
     {
         $massActionsButton = $this->getMassActionButton();
@@ -25,6 +30,10 @@ class Grid extends Element
         return $paginator->getTotalRecordsCount();
     }
 
+    /**
+     * @param int $number
+     * @throws ExpectationException
+     */
     public function checkFirstRecords($number)
     {
         $rows = $this->getRows();
@@ -76,7 +85,7 @@ class Grid extends Element
     }
 
     /**
-     * @param $title
+     * @param string $title
      * @throws \Exception
      */
     public function massCheck($title)
@@ -85,6 +94,10 @@ class Grid extends Element
         $this->elementFactory->createElement('GridFloatingMenu')->clickLink($title);
     }
 
+    /**
+     * @param int $number
+     * @throws ElementNotFoundException
+     */
     public function selectPageSize($number)
     {
         $pageSizeElement = $this->elementFactory->createElement('PageSize');
@@ -97,6 +110,11 @@ class Grid extends Element
         expect($this->getRows())->toHaveCount(0);
     }
 
+    /**
+     * @param string $content
+     * @param string $action
+     * @throws ExpectationException
+     */
     public function clickActionLink($content, $action)
     {
         $row = $this->getRowByContent($content);
@@ -114,7 +132,7 @@ class Grid extends Element
     }
 
     /**
-     * @return \Behat\Mink\Element\NodeElement[]
+     * @return NodeElement[]
      */
     private function getRows()
     {
@@ -122,7 +140,7 @@ class Grid extends Element
     }
 
     /**
-     * @param $content
+     * @param string $content
      * @return NodeElement
      * @throws ExpectationException
      */
