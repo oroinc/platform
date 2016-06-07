@@ -29,7 +29,6 @@ class FormType extends AbstractContainerType
             'groups'                => null,
             'split_to_fields'       => null,
         ];
-
     }
 
     /**
