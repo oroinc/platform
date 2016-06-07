@@ -50,6 +50,11 @@ services:
              - { name: layout.block_type, alias: body }
 
     oro_layout.block_type.form:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType
+        tags:
+             - { name: layout.block_type, alias: form }
+
+    oro_layout.block_type.form_fields:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType
         arguments:
             - '@oro_layout.form_layout_builder'
