@@ -20,9 +20,18 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.cancelButton(path('oro_user_profile_view')) }}
-    {% set html = UI.saveAndCloseButton({'action': {'route': 'oro_user_profile_view'}}) %}
+    {% set html = UI.saveAndCloseButton({
+        'route': 'oro_user_profile_view'
+    }) %}
+    {% if resource_granted('oro_user_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_user_create'
+        }) %}
+    {% endif %}
     {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
-        {% set html = html ~ UI.saveAndStayButton({ 'action': {'route': 'oro_user_profile_update'}}) %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_user_profile_update'
+        }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}

@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\UIBundle\Route;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class Router
 {
     const ACTION_PARAMETER     = 'input_action';
     const ACTION_SAVE_AND_STAY = 'save_and_stay';
-    const ACTION_SAVE_CLOSE = 'save_and_close';
+    const ACTION_SAVE_CLOSE    = 'save_and_close';
 
     /**
      * @var Request
@@ -66,10 +65,10 @@ class Router
      *                                  an access denied error happens. So, be careful if you decide to not specify
      *                                  this parameter.
      * @return RedirectResponse
-     * @throws \InvalidArgumentException If a route date is not valid
-     * @deprecated Will be removed in 1.11. Use redirectToAfterSaveAction instead
+     * @throws \LogicException If a route date is not valid
+     * @deprecated Since 1.10, use redirect instead.
      */
-    public function redirectAfterSave(array $saveAndStayRoute = [], array $saveAndCloseRoute = [], $entity = null)
+    public function redirectAfterSave(array $saveAndStayRoute, array $saveAndCloseRoute, $entity = null)
     {
         switch ($this->request->get(self::ACTION_PARAMETER)) {
             case self::ACTION_SAVE_AND_STAY:
@@ -91,7 +90,7 @@ class Router
                 /**
                  * Avoids of BC break
                  */
-                return $this->redirectToAfterSaveAction($entity);
+                return $this->redirect($entity);
         }
 
         if (!isset($routeData['route'])) {
@@ -112,37 +111,170 @@ class Router
      *
      * @return RedirectResponse
      */
-    public function redirectToAfterSaveAction($context)
+    public function redirect($context)
     {
-        $route = $this->request->get(self::ACTION_PARAMETER);
-        if (empty($route)) {
-            throw new \InvalidArgumentException('The "input_action" parameter required');
-        }
-
-        $route = json_decode($route, true);
-        if (empty($route['route'])) {
-            throw new \InvalidArgumentException('The "route" attribute required');
-        }
-
-        $routeParams = [];
-        if (isset($route['params'])) {
-            $routeParams = $route['params'];
-            if ($context) {
-                $resolveEntityRelatedParamsCallback = function ($parameter) use ($context) {
-                    if (strpos($parameter, '$.') === 0) {
-                        $parameterParts = explode('$.', $parameter, 2);
-                        return $this->propertyAccessor->getValue($context, $parameterParts[1]);
-                    }
-
-                    return $parameter;
-                };
-
-                $routeParams = array_map($resolveEntityRelatedParamsCallback, $routeParams);
-            }
-        }
+        $routeData = $this->parseRouteData(
+            $this->getRawRouteData($this->request),
+            $context
+        );
 
         return new RedirectResponse(
-            $this->router->generate($route['route'], $routeParams)
+            $this->router->generate($routeData['route'], $routeData['params'])
         );
+    }
+
+    /**
+     * Gets data for routing from request parameter with name self::ACTION_PARAMETER
+     *
+     * Expected input value is a JSON value with keys "route" (required) and "params" (optional).
+     * For example:
+     * <code>
+     *  {"route": "some_route_name", "params": {"some_parameter_name": "some_value"}}
+     * </code>
+     *
+     * @param Request $request
+     * @return String JSON string representing raw route data taken from request.
+     * @throws \InvalidArgumentException If value is empty in request.
+     */
+    protected function getRawRouteData(Request $request)
+    {
+        $result = $request->get(self::ACTION_PARAMETER);
+
+        if (empty($result)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Request parameter "%s" is required to make redirect.',
+                    self::ACTION_PARAMETER
+                )
+            );
+        }
+
+        if (!is_string($result)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Request parameter "%s" must be string, %s is given.',
+                    self::ACTION_PARAMETER,
+                    is_object($result) ? get_class($result) : gettype($result)
+                )
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Parses data for routing based on JSON string.
+     *
+     * @param string $rawRouteData JSON string with keys "route" (required) and "params" (optional).
+     * @param array|object|null $context
+     * @return array An array with keys "route" and "parameters".
+     * @throws \InvalidArgumentException
+     */
+    protected function parseRouteData($rawRouteData, $context)
+    {
+        $arrayData = json_decode($rawRouteData, true);
+
+        if (!is_array($arrayData)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot parse route data from request parameter "%s". Invalid JSON string is given: %s.',
+                    self::ACTION_PARAMETER,
+                    $rawRouteData
+                )
+            );
+        }
+
+        return [
+            'route' => $this->parseRouteName($arrayData, $context),
+            'params' => $this->parseRouteParams($arrayData, $context),
+        ];
+    }
+
+    /**
+     * Parses value of route name.
+     *
+     * @param array $arrayData
+     * @param array|object|null $context
+     * @return mixed
+     */
+    protected function parseRouteName($arrayData, $context)
+    {
+        if (empty($arrayData['route'])) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot parse route name from request parameter "%s". Value of key "%s" cannot be empty: %s',
+                    self::ACTION_PARAMETER,
+                    'route',
+                    json_encode($arrayData)
+                )
+            );
+        }
+
+        if (!is_string($arrayData['route'])) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot parse route name from request parameter "%s". Value of key "%s" must be string: %s',
+                    self::ACTION_PARAMETER,
+                    'route',
+                    json_encode($arrayData)
+                )
+            );
+        }
+
+        return $arrayData['route'];
+    }
+
+    /**
+     * Parses value of route parameters.
+     *
+     * @param array $arrayData
+     * @param array|object|null $context
+     * @return mixed
+     */
+    protected function parseRouteParams($arrayData, $context)
+    {
+        if (empty($arrayData['params'])) {
+            return [];
+        } elseif (!is_array($arrayData['params'])) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot parse route name from request parameter "%s". Value of key "%s" must be array: %s',
+                    self::ACTION_PARAMETER,
+                    'params',
+                    json_encode($arrayData)
+                )
+            );
+        } elseif (!$context) {
+            return $arrayData['params'];
+        }
+
+        $result = $arrayData['params'];
+
+        foreach ($result as $name => $value) {
+            $result[$name] = $this->parseRouteParam($name, $value, $context);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Parses parameter passed to router data.
+     *
+     * Considers a value of parameter as a property path if it starts from '$'. For that case value of this property
+     * will be taken from $context
+     *
+     * @param string $name Parameter name
+     * @param mixed $value Parameter value of property path
+     * @param array|object|null $context
+     * @return mixed Value of parsed parameter
+     */
+    protected function parseRouteParam($name, $value, $context)
+    {
+        if (strpos($value, '$') === 0) {
+            $propertyPath = substr($value, 1);
+            $value = $this->propertyAccessor->getValue($context, $propertyPath);
+        }
+
+        return $value;
     }
 }

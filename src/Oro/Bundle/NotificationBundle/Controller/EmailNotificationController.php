@@ -77,7 +77,7 @@ class EmailNotificationController extends Controller
                 $this->get('translator')->trans('oro.notification.controller.emailnotification.saved.message')
             );
 
-            return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         return array(

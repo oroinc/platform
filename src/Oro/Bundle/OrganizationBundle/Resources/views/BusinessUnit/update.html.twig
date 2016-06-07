@@ -35,17 +35,18 @@
     {% endif %}
     {{ UI.cancelButton(path('oro_business_unit_index')) }}
     {% set html = UI.saveAndCloseButton({
-        'action': {
-            'route': 'oro_business_unit_view',
-            'params': {'id': '$.id'}
-        }
+        'route': 'oro_business_unit_view',
+        'params': {'id': '$id'}
     }) %}
+    {% if resource_granted('oro_business_unit_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_business_unit_create'
+        }) %}
+    {% endif %}
     {% if form.vars.value.id or resource_granted('oro_business_unit_update') %}
         {% set html = html ~ UI.saveAndStayButton({
-            'action': {
-                'route': 'oro_business_unit_update',
-                'params': {'id': '$.id'}
-            }
+            'route': 'oro_business_unit_update',
+            'params': {'id': '$id'}
         }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}

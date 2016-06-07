@@ -7,16 +7,17 @@
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_entityconfig_index')) }}
     {% set html = UI.saveAndCloseButton({
-        'action': {
-            'route': 'oro_entityconfig_view',
-            'params': {'id': '$.id'}
-        }
+        'route': 'oro_entityconfig_view',
+        'params': {'id': '$id'}
     }) %}
+    {% if resource_granted('oro_entityextend_entity_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_entityextend_entity_create'
+        }) %}
+    {% endif %}
     {% set html = html ~ UI.saveAndStayButton({
-        'action': {
-            'route': 'oro_entityconfig_update',
-            'params': {'id': '$.id'}
-        }
+        'route': 'oro_entityconfig_update',
+        'params': {'id': '$id'}
     }) %}
     {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}

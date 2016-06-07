@@ -135,7 +135,7 @@ class SystemCalendarController extends Controller
                     $this->get('translator')->trans('oro.calendar.controller.systemcalendar.saved.message')
                 );
 
-                return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
+                return $this->get('oro_ui.router')->redirect($entity);
             }
             $saved = true;
         }

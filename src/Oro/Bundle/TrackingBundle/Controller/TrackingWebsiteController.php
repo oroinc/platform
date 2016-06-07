@@ -93,7 +93,7 @@ class TrackingWebsiteController extends Controller
      */
     public function update(TrackingWebsite $trackingWebsite)
     {
-        return $this->get('oro_form.model.update_handler')->handleEntityUpdateRequest(
+        return $this->get('oro_form.model.update_handler')->update(
             $trackingWebsite,
             $this->createForm($this->getFormType(), $trackingWebsite),
             $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')

@@ -142,15 +142,15 @@ class UserController extends Controller
                 $this->get('translator')->trans('oro.user.controller.user.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         return [
-            'entity'                  => $entity,
-            'form'                    => $this->get('oro_user.form.user')->createView(),
+            'entity'       => $entity,
+            'form'         => $this->get('oro_user.form.user')->createView(),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete an owner and related entities or reassign related entities to another owner before
-            'allow_delete'            => $this->isUserDeleteAllowed($entity)
+            'allow_delete' => $this->isUserDeleteAllowed($entity)
         ];
     }
 

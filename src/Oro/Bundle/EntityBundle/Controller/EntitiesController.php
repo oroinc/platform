@@ -288,7 +288,7 @@ class EntitiesController extends Controller
                     $this->get('translator')->trans('oro.entity.controller.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirectToAfterSaveAction($record);
+                return $this->get('oro_ui.router')->redirect($record);
             }
         }
 

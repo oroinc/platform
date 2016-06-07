@@ -71,6 +71,7 @@ class SegmentController extends Controller
      *      id="oro_segment_create",
      *      type="entity",
      *      permission="CREATE",
+     *      permission="CREATE",
      *      class="OroSegmentBundle:Segment"
      * )
      */
@@ -96,27 +97,40 @@ class SegmentController extends Controller
     }
 
     /**
+     * @Route("/refresh/{id}", name="oro_segment_refresh", requirements={"id"="\d+"}, defaults={"id"=0})
+     *
+     * @param Segment $entity
+     * @return array
+     * @AclAncestor("oro_segment_update")
+     */
+    public function refreshAction(Segment $entity)
+    {
+        if ($entity->isStaticType()) {
+            $this->get('oro_segment.static_segment_manager')->run($entity);
+
+            $this->get('session')->getFlashBag()->add(
+                'success',
+                $this->get('translator')->trans('oro.segment.refresh_dialog.success')
+            );
+        }
+
+        return $this->redirectToRoute('oro_segment_view', ['id' => $entity->getId()]);
+    }
+
+    /**
      * @param Segment $entity
      *
      * @return array
      */
     protected function update(Segment $entity)
     {
-        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
-        $isNewEntity = null == $entity->getId();
-
         if ($this->get('oro_segment.form.handler.segment')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.segment.entity.saved')
             );
 
-            $isSaveAndRefresh = $this->getRequest()->get(Router::ACTION_PARAMETER) === 'save_and_refresh';
-            if ($entity->getType()->getName() == SegmentType::TYPE_STATIC && ($isSaveAndRefresh || $isNewEntity)) {
-                $this->get('oro_segment.static_segment_manager')->run($entity);
-            }
-
-            return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         return [

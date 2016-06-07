@@ -114,7 +114,7 @@ class ConfigController extends Controller
                     $this->get('translator')->trans('oro.entity_config.controller.config_entity.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
+                return $this->get('oro_ui.router')->redirect($entity);
             }
         }
 
@@ -234,7 +234,7 @@ class ConfigController extends Controller
                     $this->get('translator')->trans('oro.entity_config.controller.config_field.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirectToAfterSaveAction(['entity' => $field]);
+                return $this->get('oro_ui.router')->redirect($field);
             }
         }
 

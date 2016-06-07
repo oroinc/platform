@@ -17,7 +17,9 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block content %}
-    {% set saveButton    = UI.saveAndCloseButton('oro.config.actions.save_settings'|trans) %}
+    {% set saveButton = UI.saveAndStayButton({
+        'label': 'oro.config.actions.save_settings'|trans
+    }) %}
     {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
     {% set options = {
         pageReload: attribute(form.vars.block_config, activeSubGroup).page_reload,

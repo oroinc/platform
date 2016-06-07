@@ -108,7 +108,7 @@ class RoleController extends Controller
                 $this->get('translator')->trans('oro.user.controller.role.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         return array(

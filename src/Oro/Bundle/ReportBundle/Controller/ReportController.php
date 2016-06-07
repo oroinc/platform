@@ -134,7 +134,7 @@ class ReportController extends Controller
                 $this->get('translator')->trans('Report saved')
             );
 
-            return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         return [

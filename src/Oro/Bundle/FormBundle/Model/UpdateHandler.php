@@ -63,7 +63,7 @@ class UpdateHandler
     }
 
     /**
-     * @deprecated since 1.9 and will be removed after 1.11. Use handleEntityUpdateRequest method instead
+     * @deprecated since 1.10 and will be removed after 1.12. Use update method instead
      *
      * @param object $entity
      * @param FormInterface $form
@@ -109,50 +109,66 @@ class UpdateHandler
     }
 
     /**
-     * @param object $entity
-     * @param FormInterface $form
-     * @param string $saveMessage
-     * @param null|object $formHandler
-     * @param callable|null $resultCallback
-     * @return array|RedirectResponse
+     * Handles update action of controller used to create or update entity on separate page or widget dialog.
+     *
+     * @param object $data Data of form
+     * @param FormInterface $form Form instance
+     * @param string $saveMessage Message added to session flash bag in case if form will be saved successfully
+     *               and if form is not submitted from widget.
+     * @param null|callable $formHandler Callback to handle form, by default method saveForm used.
+     * @return array|RedirectResponse Returns an array
+     *                                  if form wasn't successfully submitted
+     *                                  or when request method is not PUT and POST,
+     *                                  or if form was submitted from widget dialog,
+     *                                returns RedirectResponse
+     *                                  if form was successfully submitted from create/update page
+     * @throws \InvalidArgumentException
      */
-    public function handleEntityUpdateRequest(
-        $entity,
+    public function update(
+        $data,
         FormInterface $form,
         $saveMessage,
-        $formHandler = null,
-        $resultCallback = null
+        $formHandler = null
     ) {
         if ($formHandler) {
-            if (method_exists($formHandler, 'process') && $formHandler->process($entity)) {
-                return $this->constructResponse($form, $entity, $saveMessage, $resultCallback);
+            if (is_object($formHandler) && method_exists($formHandler, 'process')) {
+                if ($formHandler->process($data)) {
+                    return $this->constructResponse($form, $data, $saveMessage);
+                }
+            } else {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Argument $formHandler should be an object with method "process", %s given.',
+                        is_object($formHandler) ? get_class($formHandler) : gettype($formHandler)
+                    )
+                );
             }
-        } elseif ($this->saveForm($form, $entity)) {
-            return $this->constructResponse($form, $entity, $saveMessage, $resultCallback);
+        } elseif ($this->saveForm($form, $data)) {
+            return $this->constructResponse($form, $data, $saveMessage);
         }
 
-        return $this->getResult($entity, $form, $resultCallback);
+        return $this->getResult($data, $form);
     }
 
     /**
      * @param FormInterface $form
-     * @param object $entity
+     * @param object $data
      * @return bool
      * @throws \Exception
      */
-    protected function saveForm(FormInterface $form, $entity)
+    protected function saveForm(FormInterface $form, $data)
     {
-        $event = new FormProcessEvent($form, $entity);
+        $event = new FormProcessEvent($form, $data);
         $this->eventDispatcher->dispatch(Events::BEFORE_FORM_DATA_SET, $event);
 
         if ($event->isFormProcessInterrupted()) {
             return false;
         }
 
-        $form->setData($entity);
+        $form->setData($data);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $event = new FormProcessEvent($form, $entity);
+            $event = new FormProcessEvent($form, $data);
             $this->eventDispatcher->dispatch(Events::BEFORE_FORM_SUBMIT, $event);
 
             if ($event->isFormProcessInterrupted()) {
@@ -162,18 +178,18 @@ class UpdateHandler
             $form->submit($this->request);
 
             if ($form->isValid()) {
-                $manager = $this->doctrineHelper->getEntityManager($entity);
+                $manager = $this->doctrineHelper->getEntityManager($data);
 
                 $manager->beginTransaction();
                 try {
-                    $manager->persist($entity);
-                    $this->eventDispatcher->dispatch(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $entity));
+                    $manager->persist($data);
+                    $this->eventDispatcher->dispatch(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $data));
                     $manager->flush();
-                    $this->eventDispatcher->dispatch(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $entity));
+                    $this->eventDispatcher->dispatch(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $data));
                     $manager->commit();
-                } catch (\Exception $e) {
+                } catch (\Exception $exception) {
                     $manager->rollback();
-                    throw $e;
+                    throw $exception;
                 }
 
                 return true;
@@ -184,7 +200,7 @@ class UpdateHandler
     }
 
     /**
-     * @deprecated since 1.9 and will be removed after 1.11
+     * @deprecated since 1.10 and will be removed after 1.12
      *
      * @param FormInterface $form
      * @param object $entity
@@ -227,8 +243,8 @@ class UpdateHandler
     /**
      * @param FormInterface $form
      * @param object $entity
-     * @param               $saveMessage
-     * @param null          $resultCallback
+     * @param string $saveMessage
+     * @param null $resultCallback
      *
      * @return array|RedirectResponse
      */
@@ -242,7 +258,7 @@ class UpdateHandler
         } else {
             $this->session->getFlashBag()->add('success', $saveMessage);
 
-            return $this->router->redirectToAfterSaveAction($entity);
+            return $this->router->redirect($entity);
         }
     }
 
