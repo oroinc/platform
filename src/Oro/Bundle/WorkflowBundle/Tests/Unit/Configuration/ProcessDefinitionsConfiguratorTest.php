@@ -48,7 +48,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testImport()
+    public function testConfigureDefinitions()
     {
         $definitionsConfiguration = ['...configuration'];
 
@@ -81,7 +81,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $entityClass
      */
-    public function assertManagerRegistryCalled($entityClass)
+    private function assertManagerRegistryCalled($entityClass)
     {
         $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
@@ -92,7 +92,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $entityClass
      */
-    public function assertObjectManagerCalledForRepository($entityClass)
+    private function assertObjectManagerCalledForRepository($entityClass)
     {
         $this->objectManager->expects($this->once())
             ->method('getRepository')
