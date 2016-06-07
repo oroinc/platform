@@ -75,7 +75,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
                 ->willReturn($hasRestrictions);
             $this->restrictionsManager
                 ->expects($this->once())
-                ->method('getEntitiesRestrictions')
+                ->method('getEntityRestrictions')
                 ->with($data)
                 ->willReturn($restrictions);
         }

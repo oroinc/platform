@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Grid;
+namespace Oro\Bundle\WorkflowBundle\Datagrid\Extension;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -158,7 +158,7 @@ class RestrictionsExtension extends AbstractExtension
      */
     protected function getEntitiesRestrictions($entityClass, array $ids)
     {
-        $restrictionsData = $this->restrictionsManager->getEntitiesRestrictions($entityClass, $ids);
+        $restrictionsData = $this->restrictionsManager->getRestrictionsByClassAndIdentifiers($entityClass, $ids);
         $entityRestrictions = [];
         foreach ($restrictionsData as $restrictionData) {
             $ids = $restrictionData['ids'];

@@ -9,7 +9,6 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestrictionIdentity;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -70,27 +69,39 @@ class RestrictionManager
     }
 
     /**
-     * @param string     $entityOrClass
-     * @param array|null $entityIds
+     * @param string $entityClass
+     * @param array  $identifiers
      *
-     * @return array [['field' => $field, 'mode' => $mode, 'values' => $values, ?'ids' => $ids], ...]
+     * @return array [['field' => $field, 'mode' => $mode, 'values' => $values, 'ids' => $ids], ...]
+     *
      */
-    public function getEntitiesRestrictions($entityOrClass, array $entityIds = null)
+    public function getRestrictionsByClassAndIdentifiers($entityClass, array $identifiers = [])
     {
-        if (!$this->doctrineHelper->isManageableEntity($entityOrClass)) {
+        if (!$this->doctrineHelper->isManageableEntity($entityClass) || empty($identifiers)) {
             return [];
         }
-        if (is_object($entityOrClass)) {
-            return $this->getSingleEntityRestrictions($entityOrClass);
-        } else {
-            if (empty($entityIds)) {
-                throw new InvalidArgumentException(
-                    'Entity object or entity class with identifiers array should be provided'
-                );
-            }
 
-            return $this->getRestrictionsForEntityIds($entityOrClass, $entityIds);
+        return $this->getRestrictionsForEntityIds($entityClass, $identifiers);
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return array [['field' => $field, 'mode' => $mode, 'values' => $values], ...]
+     */
+    public function getEntityRestrictions($entity)
+    {
+        if (!$this->doctrineHelper->isManageableEntity($entity)) {
+            return [];
         }
+        $class = ClassUtils::getClass($entity);
+        $id    = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+        $this->loadClassRestrictions($class);
+
+        return $id
+            ? $this->getRestrictionsForEntityIds($class, [$id])
+            : $this->filterNewEntityRestrictions($this->restrictions[$class]);
     }
 
     /**
@@ -128,23 +139,6 @@ class RestrictionManager
         $workflowItem->setRestrictionIdentities($restrictionIdentities);
 
         return $workflowItem;
-    }
-
-    /**
-     * @param $entity
-     *
-     * @return array
-     */
-    protected function getSingleEntityRestrictions($entity)
-    {
-        $class = ClassUtils::getClass($entity);
-        $id    = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
-        $this->loadClassRestrictions($class);
-        
-        return $id
-            ? $this->getRestrictionsForEntityIds($class, [$id])
-            : $this->filterNewEntityRestrictions($this->restrictions[$class]);
     }
 
     /**

@@ -42,7 +42,7 @@ services:
             - [addWorkflowStepColumn, ["stepLabel"]]
 
     oro_workflow.datagrid.extension.restrictions:
-        class: Oro\Bundle\WorkflowBundle\Grid\RestrictionsExtension
+        class: Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension
         arguments:
             - '@oro_datagrid.grid_configuration.helper'
             - '@oro_workflow.restriction.manager'

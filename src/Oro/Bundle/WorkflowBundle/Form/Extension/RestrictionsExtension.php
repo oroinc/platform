@@ -65,7 +65,7 @@ class RestrictionsExtension extends AbstractTypeExtension
                     return;
                 }
                 $form         = $event->getForm();
-                $restrictions = $this->restrictionsManager->getEntitiesRestrictions($data);
+                $restrictions = $this->restrictionsManager->getEntityRestrictions($data);
                 foreach ($restrictions as $restriction) {
                     if ($form->has($restriction['field'])) {
                         $this->applyRestriction($restriction, $form);

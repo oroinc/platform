@@ -79,17 +79,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         }
         $attributeManager = new AttributeManager($attributes);
 
-        $modelRestrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ModelRestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $modelRestrictionManager->expects($this->any())
-            ->method('getRestrictions')
-            ->willReturn([]);
-
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
-            ->setMethods(array('getStepManager', 'getAttributeManager', 'getModelRestrictionManager'))
+            ->setMethods(array('getStepManager', 'getAttributeManager', 'getRestrictions'))
             ->getMock();
         $workflow->expects($this->any())
             ->method('getStepManager')
@@ -98,9 +90,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             ->method('getAttributeManager')
             ->will($this->returnValue($attributeManager));
         $workflow->expects($this->any())
-            ->method('getModelRestrictionManager')
-            ->will($this->returnValue($modelRestrictionManager));
-
+            ->method('getRestrictions')
+            ->will($this->returnValue([]));
+        
         $workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
             ->disableOriginalConstructor()
             ->setMethods(array('assemble'))

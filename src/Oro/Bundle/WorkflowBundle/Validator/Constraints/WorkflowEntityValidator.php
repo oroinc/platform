@@ -78,7 +78,7 @@ class WorkflowEntityValidator extends ConstraintValidator
             return;
         }
 
-        $restrictions = $this->restrictionManager->getEntitiesRestrictions($value);
+        $restrictions = $this->restrictionManager->getEntityRestrictions($value);
         if ($this->doctrineHelper->isNewEntity($value)) {
             $this->validateNewEntity($value, $constraint, $restrictions);
         } else {

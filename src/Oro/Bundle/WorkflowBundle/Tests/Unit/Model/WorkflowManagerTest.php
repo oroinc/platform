@@ -1098,7 +1098,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 ->setMethods(array('resetWorkflowData'))
                 ->getMock();
         $workflowItemsRepository->expects($this->once())->method('resetWorkflowData')
-            ->with($entityClass, array($name));
+            ->with($entityClass);
 
         $this->registry->expects($this->once())
             ->method('getRepository')
