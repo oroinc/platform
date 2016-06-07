@@ -16,7 +16,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
      * @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $workflowManager;
-    
+
     /**
      * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -37,13 +37,13 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->restrictionsManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->workflowManager     = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper      = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         $this->extension = new RestrictionsExtension(
             $this->workflowManager,
             $this->doctrineHelper,
@@ -53,16 +53,16 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
     }
 
     /**
-     * @dataProvider testBuildFormDataProvider
+     * @dataProvider testBuildViewDataProvider
      *
      * @param array $options
+     * @param array $fields
      * @param array $restrictions
-     *
      */
-    public function testBuildForm(array $options, array $fields = [], array $restrictions = [])
+    public function testBuildView(array $options, array $fields = [], array $restrictions = [])
     {
         $hasRestrictions = !empty($restrictions);
-        $data = [1];
+        $data            = [1];
 
         if (!empty($options['data_class']) &&
             empty($options['disable_workflow_restrictions']) &&
@@ -79,14 +79,15 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
                 ->with($data)
                 ->willReturn($restrictions);
         }
-        $builder      = $this->factory->createNamedBuilder('test_entity');
+        $builder = $this->factory->createNamedBuilder('test_entity');
         foreach ($fields as $field) {
             $builder->add($field['name'], null, []);
         }
 
         $form = $builder->getForm();
-        $this->extension->buildForm($builder, $options);
         $form->setData($data);
+        $formView = $form->createView();
+        $this->extension->buildView($formView, $form, $options);
         foreach ($fields as $field) {
             $this->assertEquals(
                 $field['disabled'],
@@ -110,10 +111,10 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->assertEquals('form', $this->extension->getExtendedType());
     }
 
-    public function testBuildFormDataProvider()
+    public function testBuildViewDataProvider()
     {
         return [
-            'enabled extension' => [
+            'enabled extension'          => [
                 ['disable_workflow_restrictions' => false, 'data_class' => 'test'],
                 [
                     ['name' => 'test_field_1', 'disabled' => true],
@@ -133,14 +134,14 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
                     ['field' => 'test_field_3', 'mode' => 'full'],
                 ]
             ],
-            'disabled extension' => [
+            'disabled extension'         => [
                 ['disable_workflow_restrictions' => false],
                 [
                     ['name' => 'test_field_1', 'disabled' => false],
                     ['name' => 'test_field_2', 'disabled' => false]
                 ],
             ],
-            'no data_class option' => [
+            'no data_class option'       => [
                 ['disable_workflow_restrictions' => true],
                 [
                     ['name' => 'test_field_1', 'disabled' => false],
