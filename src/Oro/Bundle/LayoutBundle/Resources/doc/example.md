@@ -122,7 +122,7 @@ Customizing block rendering
 ---------------------------------
 
 As you have seen in the previous section we are using the `setBlockTheme` action in our layout update file. This is the block theme responsible for defining how layout blocks are rendered.
-Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file.
+Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file. Also you can use relative path for block theme like `default.html.twig`, or just use `~` if name of block theme and layout update is the same.
 
 ```twig
 {% block _page_container_widget %}

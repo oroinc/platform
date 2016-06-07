@@ -8,7 +8,7 @@ use Oro\Component\PhpUtils\ReflectionClassHelper;
 
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
-    const NODE_ACTIONS   = 'actions';
+    const NODE_ACTIONS = 'actions';
 
     const PATH_ATTR = '__path';
 

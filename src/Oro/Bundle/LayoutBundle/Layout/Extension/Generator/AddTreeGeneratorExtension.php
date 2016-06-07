@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
 use Oro\Component\Layout\Exception\SyntaxException;
+use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
@@ -10,14 +11,11 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
-    const NODE_ACTIONS = 'actions';
     const NODE_ITEMS = 'items';
     const NODE_TREE = 'tree';
 
     const ACTION_ADD_TREE_KEY = '@addTree';
     const ACTION_ADD_KEY = '@add';
-
-    const PATH_KEY = '__path';
 
     /**
      * {@inheritdoc}
@@ -25,18 +23,19 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
     public function prepare(GeneratorData $data, VisitorCollection $collection)
     {
         $source = $data->getSource();
-        if (is_array($source) && isset($source[self::NODE_ACTIONS])) {
+        $actionsKey = ConfigLayoutUpdateGenerator::NODE_ACTIONS;
+        if (is_array($source) && isset($source[$actionsKey])) {
             // traversing through actions, looking for "@addTree" action
-            $transformedActions = new \ArrayObject();
-            foreach ($source[self::NODE_ACTIONS] as $nodeNo => $actionDefinition) {
+            $transformedActions = [];
+            foreach ($source[$actionsKey] as $nodeNo => $actionDefinition) {
                 // do not validate syntax, error will be thrown afterwards
                 $actionName = is_array($actionDefinition) ? key($actionDefinition) : '';
 
                 if (self::ACTION_ADD_TREE_KEY !== $actionName) {
-                    $transformedActions->append($actionDefinition);
+                    $transformedActions[] = $actionDefinition;
                     continue;
                 }
-                $path = self::NODE_ACTIONS.'.'.$nodeNo;
+                $path = $actionsKey.'.'.$nodeNo;
                 $actionNode = reset($actionDefinition);
 
                 // looking for items, parent and tree it self
@@ -56,7 +55,7 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
                     throw new SyntaxException('invalid tree definition. '.$e->getMessage(), $actionDefinition, $path);
                 }
             }
-            $source[self::NODE_ACTIONS] = $transformedActions->getArrayCopy();
+            $source[$actionsKey] = $transformedActions;
 
             $data->setSource($source);
         }
@@ -65,13 +64,13 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
     /**
      * Walk recursively through the tree, completing block definition in tree by found correspondent data "items" list
      *
-     * @param \ArrayObject $actions
+     * @param array $actions
      * @param mixed $currentSubTree
      * @param string $parentId
      * @param array $items
      * @param string $path
      */
-    protected function processTree(\ArrayObject $actions, $currentSubTree, $parentId, array $items, $path)
+    protected function processTree(array &$actions, $currentSubTree, $parentId, array $items, $path)
     {
         if (!is_array($currentSubTree)) {
             return;
@@ -94,10 +93,10 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
                 array_unshift($itemDefinition, $blockId, $parentId);
             }
 
-            $actions->append([
+            $actions[] = [
                 self::ACTION_ADD_KEY => $itemDefinition,
-                self::PATH_KEY => $path,
-            ]);
+                ConfigLayoutUpdateGenerator::PATH_ATTR => $path,
+            ];
 
             $this->processTree($actions, $subtree, $blockId, $items, $path);
         }

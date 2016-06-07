@@ -52,6 +52,24 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit_Framework_TestCa
                 'filename' => '/path',
                 'expectedSource' => ['actions' => [['@add' => ['id' => 'block_id']]]],
             ],
+            'empty_theme' => [
+                'source' => [
+                    'actions' => [['@setBlockTheme' => ['themes' => '']]]
+                ],
+                'filename' => '/path',
+                'expectedSource' => [
+                    'actions' => [['@setBlockTheme' => ['themes' => '']]]
+                ],
+            ],
+            'resource' => [
+                'source' => [
+                    'actions' => [['@setBlockTheme' => ['themes' => '@OroBundle/layouts/default/page.html.twig']]]
+                ],
+                'filename' => '/path',
+                'expectedSource' => [
+                    'actions' => [['@setBlockTheme' => ['themes' => '@OroBundle/layouts/default/page.html.twig']]]
+                ],
+            ],
             'twig_resource' => [
                 'source' => [
                     'actions' => [['@setBlockTheme' => ['themes' => 'OroBundle:layouts:default/page.html.twig']]]

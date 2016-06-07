@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
+use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
-    const NODE_ACTIONS = 'actions';
-    const NODE_THEMES = 'themes';
-    const ACTION_SET_FORM_THEME_TREE = '@setFormTheme';
-    const ACTION_SET_BLOCK_THEME_TREE = '@setBlockTheme';
+    const THEMES_KEY = 'themes';
+    const ACTION_SET_FORM_THEME = '@setFormTheme';
+    const ACTION_SET_BLOCK_THEME = '@setBlockTheme';
 
     /**
      * {@inheritdoc}
@@ -21,13 +21,14 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
         $source = $data->getSource();
         $file = $data->getFilename();
 
-        if (is_array($source) && $file && array_key_exists(self::NODE_ACTIONS, $source)) {
-            $source[self::NODE_ACTIONS] = array_map(function ($actionDefinition) use ($file) {
+        $actionsKey = ConfigLayoutUpdateGenerator::NODE_ACTIONS;
+        if (is_array($source) && $file && array_key_exists($actionsKey, $source)) {
+            $source[$actionsKey] = array_map(function ($actionDefinition) use ($file) {
                 $actionName = is_array($actionDefinition) ? key($actionDefinition) : '';
-                if (in_array($actionName, [self::ACTION_SET_BLOCK_THEME_TREE, self::ACTION_SET_FORM_THEME_TREE], true)
-                    && array_key_exists(self::NODE_THEMES, $actionDefinition[$actionName])
+                if (in_array($actionName, [self::ACTION_SET_BLOCK_THEME, self::ACTION_SET_FORM_THEME], true)
+                    && array_key_exists(self::THEMES_KEY, $actionDefinition[$actionName])
                 ) {
-                    $themes = $actionDefinition[$actionName][self::NODE_THEMES];
+                    $themes = $actionDefinition[$actionName][self::THEMES_KEY];
                     $themes = $themes === null ? [null] : (array)$themes;
                     $themes = array_map(function ($theme) use ($file) {
                         return $this->prepareThemePath($theme, $file);
@@ -35,10 +36,10 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
                     if (count($themes) === 1) {
                         $themes = reset($themes);
                     }
-                    $actionDefinition[$actionName][self::NODE_THEMES] = $themes;
+                    $actionDefinition[$actionName][self::THEMES_KEY] = $themes;
                 }
                 return $actionDefinition;
-            }, $source[self::NODE_ACTIONS]);
+            }, $source[$actionsKey]);
             $data->setSource($source);
         }
     }
@@ -53,7 +54,7 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
         $relativePath = null;
         if ($theme === null) {
             $relativePath = basename($file, '.yml').'.html.twig';
-        } elseif (strpos($theme, ':') === false && strpos($theme, '/') !== 0) {
+        } elseif (strpos($theme, ':') === false && strpos($theme, '/') !== 0 && strpos($theme, '@') !== 0) {
             $relativePath = $theme;
         }
         if ($relativePath) {
