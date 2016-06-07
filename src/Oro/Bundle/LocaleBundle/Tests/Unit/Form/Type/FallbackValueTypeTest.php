@@ -114,7 +114,11 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
                 ],
                 'defaultData'   => new FallbackType(FallbackType::SYSTEM),
                 'viewData'      => ['value' => null, 'use_fallback' => true, 'fallback' => FallbackType::SYSTEM],
-                'submittedData' => ['value' => '', 'use_fallback' => true, 'fallback' => FallbackType::PARENT_LOCALIZATION],
+                'submittedData' => [
+                    'value' => '',
+                    'use_fallback' => true,
+                    'fallback' => FallbackType::PARENT_LOCALIZATION
+                ],
                 'expectedData'  => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                 'expectedOptions' => ['group_fallback_fields' => false]
             ],
@@ -137,7 +141,11 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
                 ],
                 'defaultData'   => new FallbackType(FallbackType::SYSTEM),
                 'viewData'      => ['value' => null, 'use_fallback' => true, 'fallback' => FallbackType::SYSTEM],
-                'submittedData' => ['value' => '', 'use_fallback' => true, 'fallback' => FallbackType::PARENT_LOCALIZATION],
+                'submittedData' => [
+                    'value' => '',
+                    'use_fallback' => true,
+                    'fallback' => FallbackType::PARENT_LOCALIZATION
+                ],
                 'expectedData'  => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                 'expectedOptions' => ['group_fallback_fields' => true]
             ]
