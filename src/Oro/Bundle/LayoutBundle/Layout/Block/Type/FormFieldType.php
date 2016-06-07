@@ -3,13 +3,10 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class FormFieldType extends AbstractFormType
 {
@@ -18,17 +15,10 @@ class FormFieldType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
-        $resolver
-            ->setRequired(['form_name', 'field_path'])
-            ->setAllowedTypes(
-                [
-                    'form_name'  => 'string',
-                    'field_path' => 'string'
-                ]
-            );
+        parent::configureOptions($resolver);
+        $resolver->setRequired(['form_name', 'field_path']);
     }
 
     /**
