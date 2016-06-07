@@ -1,6 +1,7 @@
 Oro\Bundle\LocaleBundle\Entity\Localization:
     constraints:
         - Oro\Bundle\LocaleBundle\Validator\Constraints\Localization: ~
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: name
     properties:
         name:
             - Length:
