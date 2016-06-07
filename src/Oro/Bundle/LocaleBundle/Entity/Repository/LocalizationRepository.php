@@ -25,14 +25,16 @@ class LocalizationRepository extends EntityRepository
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function findRootsWithChildren()
     {
         $localizations = $this->createQueryBuilder('l')
             ->addSelect('children')
             ->leftJoin('l.childLocalizations', 'children')
-            ->getQuery()->execute();
+            ->getQuery()
+            ->execute();
+
         return array_filter($localizations, function (Localization $localization) {
             return !$localization->getParentLocalization();
         });

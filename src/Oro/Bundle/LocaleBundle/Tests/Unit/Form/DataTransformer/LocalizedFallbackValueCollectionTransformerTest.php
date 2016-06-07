@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -10,13 +11,17 @@ use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectio
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
+use Oro\Component\Testing\Unit\EntityTrait;
+
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
      */
     protected $registry;
 
@@ -274,12 +279,6 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
      */
     protected function createLocalization($id)
     {
-        $localization = new Localization();
-
-        $reflection = new \ReflectionProperty(get_class($localization), 'id');
-        $reflection->setAccessible(true);
-        $reflection->setValue($localization, $id);
-
-        return $localization;
+        return $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => $id]);
     }
 }

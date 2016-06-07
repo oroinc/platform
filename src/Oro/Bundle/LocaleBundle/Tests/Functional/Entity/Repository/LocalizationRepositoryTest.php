@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
+
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -44,7 +45,7 @@ class LocalizationRepositoryTest extends WebTestCase
         /** @var Localization[] $result */
         $result = $this->repository->findRootsWithChildren();
 
-        $this->assertEquals($localizations, $result);
+        $this->assertEquals(array_values($localizations), array_values($result));
 
         foreach ($result as $root) {
             $this->visitChildren($root);
