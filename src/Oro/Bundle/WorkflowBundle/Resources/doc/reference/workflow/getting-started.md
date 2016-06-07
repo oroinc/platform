@@ -323,17 +323,17 @@ WorkflowBundle provides following console commands to work with workflows.
 
 #### oro:workflow:definitions:load
 
-This command loads workflows configuration from *.yml configuration files to the database. It used
-during application installation and update. Command has two optional options:
+This command loads workflow's configurations from *.yml configuration files to the database. It used
+during application installation and update processes. Command has two optional options:
 
 - **--directories** - specifies directories used to find configuration files (multiple values allowed);
 - **--workflows** - specifies names of the workflows that should be loaded (multiple values allowed).
 
-**Note:** You should run this command if workflow configuration was changed to upload your changes to DB.
+**Note:** You must execute this command every time when workflow configurations were changed at "*.yml" files.
 
 #### oro:workflow:transit
 
-This command perform transition with specified name for WorkflowItem with specified id. It used for performing scheduled
+This command perform transition with specified name for WorkflowItem with specified ID. It used for performing scheduled
 transitions. Command has two required option:
 
 - **--workflow-item** - identifier of WorkflowItem.
