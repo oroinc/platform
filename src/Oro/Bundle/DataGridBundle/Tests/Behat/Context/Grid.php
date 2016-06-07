@@ -34,7 +34,8 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
      * @When I don't select any record from Grid
      */
     public function iDonTSelectAnyRecordFromGrid()
-    {}
+    {
+    }
 
     /**
      * @When I click ":title" link from mass action dropdown
