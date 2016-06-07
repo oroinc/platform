@@ -86,37 +86,33 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         $parent = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 1]);
 
         return [
-            'without entity' =>
-                [
-                    'defaultData' => null,
-                    'submittedData' =>
-                        [
-                            'name' => 'NAME',
-                            'titles' => [['string' => 'TITLE']],
-                            'languageCode' => 'ru',
-                            'formattingCode' => 'ru',
-                        ],
-                    'expectedData' => $this->createLocalization('NAME', 'TITLE', 'ru', 'ru'),
+            'without entity' => [
+                'defaultData' => null,
+                'submittedData' => [
+                    'name' => 'NAME',
+                    'titles' => [['string' => 'TITLE']],
+                    'languageCode' => 'ru',
+                    'formattingCode' => 'ru',
                 ],
-            'with entity' =>
-                [
-                    'defaultData' => $localizationItem,
-                    'submittedData' =>
-                        [
-                            'name' => 'new_localization_item_name',
-                            'titles' => [['string' => 'new_localization_item_title']],
-                            'languageCode' => 'en_US',
-                            'formattingCode' => 'en_US',
-                            'parentLocalization' => 1,
-                        ],
-                    'expectedData' => $this->createLocalization(
-                        'new_localization_item_name',
-                        'new_localization_item_title',
-                        'en_US',
-                        'en_US',
-                        $parent
-                    )
+                'expectedData' => $this->createLocalization('NAME', 'TITLE', 'ru', 'ru'),
+            ],
+            'with entity' => [
+                'defaultData' => $localizationItem,
+                'submittedData' => [
+                    'name' => 'new_localization_item_name',
+                    'titles' => [['string' => 'new_localization_item_title']],
+                    'languageCode' => 'en_US',
+                    'formattingCode' => 'en_US',
+                    'parentLocalization' => 1,
                 ],
+                'expectedData' => $this->createLocalization(
+                    'new_localization_item_name',
+                    'new_localization_item_title',
+                    'en_US',
+                    'en_US',
+                    $parent
+                )
+            ]
         ];
     }
 
