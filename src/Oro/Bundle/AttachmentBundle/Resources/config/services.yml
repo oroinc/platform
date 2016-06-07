@@ -145,6 +145,7 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_attachment.association_helper'
+            - '@oro_attachment.manager'
 
     oro_attachment.exclusion_provider:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentExclusionProvider

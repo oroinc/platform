@@ -18,11 +18,15 @@
   &.with-subwidgets{
     overflow: hidden;
     position: relative;
+    display: block;
   }
   & > li.sub-widget {
     padding: 0 15px;
     margin: 15px 0 15px -1px;
     background: none;
+    float: left;
+    display: block;
+    position: static;
     &:nth-child(3n) {
       #sub-widget-with-separator();
     }
