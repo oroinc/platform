@@ -3,25 +3,24 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-
 class ProcessConfigurator implements LoggerAwareInterface
 {
     /** @var ManagerRegistry */
-    private $registry;
+    protected $registry;
 
     /** @var ProcessDefinitionsConfigurator */
-    private $definitionsConfigurator;
+    protected $definitionsConfigurator;
 
     /** @var ProcessTriggersConfigurator */
-    private $triggersConfigurator;
+    protected $triggersConfigurator;
 
     /** @var string */
     protected $definitionClass;
@@ -50,6 +49,7 @@ class ProcessConfigurator implements LoggerAwareInterface
 
     /**
      * @param LoggerInterface $logger
+     * @return null|void
      */
     public function setLogger(LoggerInterface $logger)
     {
@@ -63,7 +63,6 @@ class ProcessConfigurator implements LoggerAwareInterface
      */
     public function configureProcesses(array $processConfigurations = [])
     {
-
         if (array_key_exists(ProcessConfigurationProvider::NODE_DEFINITIONS, $processConfigurations)) {
             $this->definitionsConfigurator->configureDefinitions(
                 $processConfigurations[ProcessConfigurationProvider::NODE_DEFINITIONS]
@@ -107,14 +106,6 @@ class ProcessConfigurator implements LoggerAwareInterface
      */
     protected function getRepository()
     {
-        return $this->getObjectManager()->getRepository($this->definitionClass);
-    }
-
-    /**
-     * @return ObjectManager|null
-     */
-    protected function getObjectManager()
-    {
-        return $this->registry->getManagerForClass($this->definitionClass);
+        return $this->registry->getManagerForClass($this->definitionClass)->getRepository($this->definitionClass);
     }
 }

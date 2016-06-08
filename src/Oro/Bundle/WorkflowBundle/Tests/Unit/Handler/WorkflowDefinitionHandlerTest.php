@@ -85,7 +85,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($existingDefinition);
         }
 
-        if(!$existingDefinition && !$newDefinition){
+        if (!$existingDefinition && !$newDefinition) {
             $this->entityManager->expects($this->once())->method('persist')->with($definition);
         }
 
@@ -148,11 +148,11 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testDeleteWorkflowDefinition(WorkflowDefinition $definition, $expected)
     {
         $this->entityManager
-            ->expects($this->exactly((int) $expected))
+            ->expects($this->exactly((int)$expected))
             ->method('remove');
 
         $this->entityManager
-            ->expects($this->exactly((int) $expected))
+            ->expects($this->exactly((int)$expected))
             ->method('flush');
 
         $this->assertEquals($expected, $this->handler->deleteWorkflowDefinition($definition));

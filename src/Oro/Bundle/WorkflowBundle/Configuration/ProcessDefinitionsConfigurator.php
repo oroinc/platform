@@ -28,6 +28,9 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     /** @var ObjectManager */
     private $objectManager;
 
+    /** @var array|ProcessDefinition[] */
+    private $toPersist = [];
+
     /** @var bool */
     private $dirty = false;
 
@@ -109,7 +112,7 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
      */
     protected function create(ProcessDefinition $newDefinition)
     {
-        $this->getObjectManager()->persist($newDefinition);
+        $this->toPersist[] = $newDefinition;
         $this->dirty = true;
         $this->notify('created', $newDefinition);
     }
@@ -117,7 +120,13 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     public function flush()
     {
         if ($this->dirty) {
-            $this->getObjectManager()->flush();
+            $objectManager = $this->getObjectManager();
+            if(count($this->toPersist) !== 0) {
+                while ($definition = array_shift($this->toPersist)) {
+                    $objectManager->persist($definition);
+                }
+            }
+            $objectManager->flush();
             $this->logger->info('Process definitions configuration updates are stored into database');
             $this->dirty = false;
         } else {

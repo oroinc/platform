@@ -43,7 +43,6 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
 
         $this->entityConnector = $this->getMock('Oro\Bundle\WorkflowBundle\Model\EntityConnector');
 
-
         $this->verifier = new TriggerScheduleOptionsVerifier(
             $this->workflowAssembler,
             $this->queryFactory,

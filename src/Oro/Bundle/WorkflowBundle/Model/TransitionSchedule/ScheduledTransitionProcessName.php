@@ -24,27 +24,6 @@ class ScheduledTransitionProcessName
     }
 
     /**
-     * @param string $name
-     * @return ScheduledTransitionProcessName
-     */
-    public static function createFromName($name)
-    {
-        $chunks = explode(self::DELIMITER, (string)$name);
-
-        if (empty($chunks[0]) || $chunks[0] !== self::IDENTITY_PREFIX || empty($chunks[1]) || empty($chunks[2])) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Can not restore name object. Provided name `%s` is not valid `%s` representation.',
-                    $name,
-                    __CLASS__
-                )
-            );
-        }
-
-        return new self($chunks[1], $chunks[2]);
-    }
-    
-    /**
      * @return string
      */
     public function getTransitionName()

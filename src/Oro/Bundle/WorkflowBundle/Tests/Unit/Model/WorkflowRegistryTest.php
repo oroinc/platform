@@ -194,7 +194,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('getUnitOfWork'))
+            ->setMethods(['getUnitOfWork'])
             ->getMock();
         $entityManager->expects($this->any())->method('getUnitOfWork')
             ->will($this->returnValue($unitOfWork));

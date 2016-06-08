@@ -229,5 +229,3 @@ services:
         arguments:
             - "@doctrine"
             - "%oro_workflow.process_definition.entity.class%"
-
-

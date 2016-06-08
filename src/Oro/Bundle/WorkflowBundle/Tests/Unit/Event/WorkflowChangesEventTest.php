@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matey
- * Date: 07.06.2016
- * Time: 15:58
- */
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
@@ -13,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 
 class WorkflowChangesEventTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDefinitionAware()
+    public function testGetDefinition()
     {
         $definition = new WorkflowDefinition();
 

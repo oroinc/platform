@@ -9,9 +9,12 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /** @var ProcessConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationBuilder;
 
@@ -74,8 +77,38 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $definitionStoredExistent->expects($this->once())->method('import')->with($newDefinitionExistent);
-        $this->objectManager->expects($this->once())->method('persist')->with($newDefinitionNonExistent);
         $this->processDefinitionsConfigurator->configureDefinitions($definitionsConfiguration);
+
+        $this->assertAttributeEquals(true, 'dirty', $this->processDefinitionsConfigurator);
+        $this->assertAttributeEquals([$newDefinitionNonExistent], 'toPersist', $this->processDefinitionsConfigurator);
+    }
+
+    public function testFlush()
+    {
+        $processDefinitionToPersist = new ProcessDefinition();
+        $this->setValue($this->processDefinitionsConfigurator, 'dirty', true);
+        $this->setValue(
+            $this->processDefinitionsConfigurator,
+            'toPersist',
+            [
+                $processDefinitionToPersist
+            ]
+        );
+
+        $this->assertManagerRegistryCalled($this->definitionClass);
+        $this->objectManager->expects($this->once())->method('persist')->with($processDefinitionToPersist);
+        $this->objectManager->expects($this->once())->method('flush');
+
+        $this->processDefinitionsConfigurator->flush();
+
+        $this->assertAttributeEquals(false, 'dirty', $this->processDefinitionsConfigurator);
+    }
+
+    public function testEmptyFlush()
+    {
+        $this->assertManagerRegistryCalled($this->definitionClass);
+        $this->objectManager->expects($this->never())->method($this->anything());
+        $this->processDefinitionsConfigurator->flush();
     }
 
     /**
@@ -98,5 +131,25 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($this->repository);
+    }
+
+    public function testRemoveDefinitions()
+    {
+        $definitionName = 'definitionName';
+        $definitionObject = (new ProcessDefinition())->setName($definitionName);
+
+        $this->assertManagerRegistryCalled($this->definitionClass);
+        $this->assertObjectManagerCalledForRepository($this->definitionClass);
+
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with($definitionName)
+            ->willReturn($definitionObject);
+        $this->objectManager->expects($this->once())->method('remove')->with($definitionObject);
+
+        $this->processDefinitionsConfigurator->removeDefinitions([$definitionName]);
+
+        $this->assertAttributeEquals(true, 'dirty', $this->processDefinitionsConfigurator);
+
     }
 }

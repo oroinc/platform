@@ -12,8 +12,6 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
 
-use Oro\Component\DependencyInjection\ServiceLink;
-
 /**
  * Provide logic for workflow scheduled transitions processes synchronization
  */
@@ -22,28 +20,28 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     /** @var ProcessConfigurationGenerator */
     protected $generator;
 
-    /** @var ServiceLink */
-    protected $processConfiguratorLink;
+    /** @var \Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator */
+    protected $processConfigurator;
 
     /** @var ScheduledTransitionProcesses */
-    protected $scheduledTransitionProcessesLink;
+    protected $scheduledTransitionProcesses;
 
     /** @var array */
     private $generatedConfigurations = [];
 
     /**
      * @param ProcessConfigurationGenerator $generator
-     * @param ServiceLink $processConfiguratorServiceLink
-     * @param serviceLink $scheduledTransitionProcessesLink
+     * @param ProcessConfigurator $processConfigurator
+     * @param ScheduledTransitionProcesses $scheduledTransitionProcesses
      */
     public function __construct(
         ProcessConfigurationGenerator $generator,
-        ServiceLink $processConfiguratorServiceLink,
-        ServiceLink $scheduledTransitionProcessesLink
+        ProcessConfigurator $processConfigurator,
+        ScheduledTransitionProcesses $scheduledTransitionProcesses
     ) {
         $this->generator = $generator;
-        $this->processConfiguratorLink = $processConfiguratorServiceLink;
-        $this->scheduledTransitionProcessesLink = $scheduledTransitionProcessesLink;
+        $this->processConfigurator = $processConfigurator;
+        $this->scheduledTransitionProcesses = $scheduledTransitionProcesses;
     }
 
     /**
@@ -65,7 +63,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         $workflowName = $event->getDefinition()->getName();
 
         if (array_key_exists($workflowName, $this->generatedConfigurations)) {
-            $this->getProcessConfigurator()->configureProcesses($this->generatedConfigurations[$workflowName]);
+            $this->processConfigurator->configureProcesses($this->generatedConfigurations[$workflowName]);
             unset($this->generatedConfigurations[$workflowName]);
         }
     }
@@ -121,14 +119,14 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
      */
     protected function cleanProcesses(WorkflowDefinition $definition)
     {
-        $workflowScheduledProcesses = $this->getScheduledTransitionProcesses()->workflowRelated($definition->getName());
+        $workflowScheduledProcesses = $this->scheduledTransitionProcesses->workflowRelated($definition->getName());
 
         $toDelete = [];
         foreach ($workflowScheduledProcesses as $processDefinition) {
             $toDelete[] = $processDefinition->getName();
         }
 
-        $this->getProcessConfigurator()->removeProcesses($toDelete);
+        $this->processConfigurator->removeProcesses($toDelete);
     }
 
     /**
@@ -137,10 +135,8 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
      */
     protected function reconfigureTransitionProcesses(array $processConfigurations, WorkflowDefinition $definition)
     {
-        $processConfigurator = $this->getProcessConfigurator();
-
-        $processConfigurator->configureProcesses($processConfigurations);
-        $persistedProcessDefinitions = $this->getScheduledTransitionProcesses()->workflowRelated(
+        $this->processConfigurator->configureProcesses($processConfigurations);
+        $persistedProcessDefinitions = $this->scheduledTransitionProcesses->workflowRelated(
             $definition->getName()
         );
 
@@ -152,41 +148,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
             }
         }
 
-        $processConfigurator->removeProcesses($toDelete);
-    }
-
-    /**
-     * @return ProcessConfigurator
-     * @throws \RuntimeException
-     */
-    protected function getProcessConfigurator()
-    {
-        $service = $this->processConfiguratorLink->getService();
-
-        if (!$service instanceof ProcessConfigurator) {
-            throw new \RuntimeException(
-                'Instance of Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator expected.'
-            );
-        }
-
-        return $service;
-    }
-
-    /**
-     * @return ScheduledTransitionProcesses
-     * @throws \RuntimeException
-     */
-    protected function getScheduledTransitionProcesses()
-    {
-        $service = $this->scheduledTransitionProcessesLink->getService();
-
-        if (!$service instanceof ScheduledTransitionProcesses) {
-            throw new \RuntimeException(
-                'Instance of Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses expected.'
-            );
-        }
-
-        return $service;
+        $this->processConfigurator->removeProcesses($toDelete);
     }
 
     /**
