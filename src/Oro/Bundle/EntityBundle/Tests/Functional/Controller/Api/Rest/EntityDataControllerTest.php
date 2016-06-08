@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use FOS\RestBundle\Util\Codes;
@@ -16,7 +17,7 @@ class EntityDataControllerTest extends WebTestCase
 {
     public function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->loadFixtures([
             'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadUserData',
             'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadRoleData',
@@ -28,22 +29,14 @@ class EntityDataControllerTest extends WebTestCase
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\User');
 
-        $id = $user->getId();
-        $fieldName = 'id';
-        $content = sprintf('{"%s":"%s"}', $fieldName, 1);
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
             [],
             [],
             [],
-            $content
+            '{"id": 1}'
         );
 
         $this->assertEquals(Codes::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
@@ -51,24 +44,13 @@ class EntityDataControllerTest extends WebTestCase
 
     public function testShouldReturnNotFoundIfSuchEntityNotExist()
     {
-        /** @var User $user */
-        $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\Test');
-
-        $id = $user->getId();
-        $fieldName = 'id';
-        $content = sprintf('{"%s":"%s"}', $fieldName, 1);
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_Test/10',
             [],
             [],
             [],
-            $content
+            '{"id": 1}'
         );
 
         $this->assertEquals(Codes::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
@@ -78,177 +60,113 @@ class EntityDataControllerTest extends WebTestCase
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\User');
 
-        $id = $user->getId();
-        $fieldName = 'firstName';
-        $content = sprintf('{"%s":"%s"}', $fieldName, 'Test1');
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
             [],
             [],
             [],
-            $content
+            '{"firstName": "Test1"}'
         );
 
         $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
 
-        $this->getContainer()->get('doctrine')->getManager()->clear();
-        $repository = $this->getContainer()->get('doctrine')->getRepository('Oro\Bundle\UserBundle\Entity\User');
-        $object = $repository->find($id);
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $this->assertEquals('Test1', $accessor->getValue($object, $fieldName));
+        $this->refreshEntity($user);
+        $this->assertEquals('Test1', $user->getFirstName());
     }
 
     public function testShouldCorrectlyUpdateIntEntityField()
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\User');
-
-        $id = $user->getId();
-        $fieldName = 'loginCount';
-        $content = sprintf('{"%s":"%s"}', $fieldName, 10);
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
             [],
             [],
             [],
-            $content
+            '{"loginCount": 10}'
         );
 
         $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
 
-        $this->getContainer()->get('doctrine')->getManager()->clear();
-        $repository = $this->getContainer()->get('doctrine')->getRepository('Oro\Bundle\UserBundle\Entity\User');
-        $object = $repository->find($id);
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $this->assertEquals(10, $accessor->getValue($object, $fieldName));
+        $this->refreshEntity($user);
+        $this->assertEquals(10, $user->getLoginCount());
     }
 
     public function testShouldCorrectlyUpdateBooleanEntityField()
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\User');
 
-        $id = $user->getId();
-        $fieldName = 'enabled';
-        $content = sprintf('{"%s":"%s"}', $fieldName, false);
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
             [],
             [],
             [],
-            $content
+            '{"enabled": false}'
         );
 
         $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
 
-        $this->getContainer()->get('doctrine')->getManager()->clear();
-        $repository = $this->getContainer()->get('doctrine')->getRepository('Oro\Bundle\UserBundle\Entity\User');
-        $object = $repository->find($id);
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $this->assertEquals(false, $accessor->getValue($object, $fieldName));
+        $this->refreshEntity($user);
+        $this->assertFalse($user->isEnabled());
     }
 
     public function testShouldCorrectlyUpdateDateEntityField()
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\User');
 
-        $id = $user->getId();
-        $fieldName = 'birthday';
-        $content = sprintf('{"%s":"%s"}', $fieldName, '2000-05-05T00:00:00+0000');
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
             [],
             [],
             [],
-            $content
+            '{"birthday": "2000-05-05T00:00:00+0000"}'
         );
 
         $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
 
-        $this->getContainer()->get('doctrine')->getManager()->clear();
-        $repository = $this->getContainer()->get('doctrine')->getRepository('Oro\Bundle\UserBundle\Entity\User');
-        $object = $repository->find($id);
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $this->assertEquals(new \DateTime('2000-05-05T00:00:00+0000'), $accessor->getValue($object, $fieldName));
+        $this->refreshEntity($user);
+        $this->assertEquals(new \DateTime('2000-05-05T00:00:00+0000'), $user->getBirthday());
     }
 
     public function testShouldCorrectlyUpdateDateTimeEntityField()
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\User');
 
-        $id = $user->getId();
-        $fieldName = 'lastLogin';
-        $content = sprintf('{"%s":"%s"}', $fieldName, '2000-05-05T01:05:05+0000');
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
             [],
             [],
             [],
-            $content
+            '{"lastLogin":"2000-05-05T01:05:05+0000"}'
         );
 
         $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
 
-        $this->getContainer()->get('doctrine')->getManager()->clear();
-        $repository = $this->getContainer()->get('doctrine')->getRepository('Oro\Bundle\UserBundle\Entity\User');
-        $object = $repository->find($id);
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $this->assertEquals(new \DateTime('2000-05-05T01:05:05+0000'), $accessor->getValue($object, $fieldName));
+        $this->refreshEntity($user);
+        $this->assertEquals(new \DateTime('2000-05-05T01:05:05+0000'), $user->getLastLogin());
     }
 
     public function testShouldNotAllowChangeEntityFieldValueIfNotValid()
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\User');
 
-        $id = $user->getId();
-        $fieldName = 'email';
-        $content = sprintf('{"%s":"%s"}', $fieldName, 'test');
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
             [],
             [],
             [],
-            $content
+            '{"email": "test"}'
         );
 
         $this->assertEquals(Codes::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
@@ -264,22 +182,14 @@ class EntityDataControllerTest extends WebTestCase
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName('Oro\Bundle\UserBundle\Entity\User');
 
-        $id = $user->getId();
-        $fieldName = 'username';
-        $content = sprintf('{"%s":"%s"}', $fieldName, '');
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
             [],
             [],
             [],
-            $content
+            '{"username": ""}'
         );
 
         $this->assertEquals(Codes::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
@@ -353,6 +263,18 @@ class EntityDataControllerTest extends WebTestCase
             );
             $this->assertEquals('Validation Failed', $response['message']);
         }
+    }
+
+    /**
+     * @param object $entity
+     */
+    protected function refreshEntity($entity)
+    {
+        /** @var RegistryInterface $registry */
+        $registry = $this->getContainer()->get('doctrine');
+
+        $registry->getManager()->clear();
+        $registry->getManager()->find(get_class($entity), $entity->getId());
     }
 
     /**
