@@ -28,11 +28,9 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
                 if (in_array($actionName, [self::ACTION_SET_BLOCK_THEME, self::ACTION_SET_FORM_THEME], true)
                     && array_key_exists(self::THEMES_KEY, $actionDefinition[$actionName])
                 ) {
-                    $themes = $actionDefinition[$actionName][self::THEMES_KEY];
-                    $themes = $themes === null ? [null] : (array)$themes;
                     $themes = array_map(function ($theme) use ($file) {
                         return $this->prepareThemePath($theme, $file);
-                    }, $themes);
+                    }, (array)$actionDefinition[$actionName][self::THEMES_KEY]);
                     if (count($themes) === 1) {
                         $themes = reset($themes);
                     }
@@ -51,14 +49,8 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
      */
     protected function prepareThemePath($theme, $file)
     {
-        $relativePath = null;
-        if ($theme === null) {
-            $relativePath = basename($file, '.yml').'.html.twig';
-        } elseif (strpos($theme, ':') === false && strpos($theme, '/') !== 0 && strpos($theme, '@') !== 0) {
-            $relativePath = $theme;
-        }
-        if ($relativePath) {
-            $absolutePath = realpath(dirname($file).'/'.$relativePath);
+        if ($theme && strpos($theme, ':') === false && strpos($theme, '/') !== 0 && strpos($theme, '@') !== 0) {
+            $absolutePath = realpath(dirname($file).'/'.$theme);
             if ($absolutePath) {
                 return $absolutePath;
             }

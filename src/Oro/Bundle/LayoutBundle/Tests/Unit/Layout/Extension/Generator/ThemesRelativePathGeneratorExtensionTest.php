@@ -93,14 +93,14 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit_Framework_TestCa
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => null]]]],
                 'filename' => __DIR__.'/data/layout.yml',
                 'expectedSource' => [
-                    'actions' => [['@setBlockTheme' => ['themes' => __DIR__.'/data/layout.html.twig']]]
+                    'actions' => [['@setBlockTheme' => ['themes' => []]]]
                 ],
             ],
             'themes_null_in_array' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => [null]]]]],
                 'filename' => __DIR__.'/data/layout.yml',
                 'expectedSource' => [
-                    'actions' => [['@setBlockTheme' => ['themes' => __DIR__.'/data/layout.html.twig']]]
+                    'actions' => [['@setBlockTheme' => ['themes' => null]]]
                 ],
             ],
             'themes_null_and_relative' => [
@@ -111,7 +111,7 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit_Framework_TestCa
                         [
                             '@setBlockTheme' => [
                                 'themes' => [
-                                    __DIR__.'/data/layout.html.twig',
+                                    null,
                                     __DIR__.'/data/sub/update.html.twig',
                                 ]
                             ]
