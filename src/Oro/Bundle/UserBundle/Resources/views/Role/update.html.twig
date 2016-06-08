@@ -112,25 +112,87 @@
         }] ) %}
     {% endif %}
 
-    {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': privilegeConfig.label|trans,
-            'subblocks': [
-                {
-                    'title': '',
-                    'useSpan': false,
-                    'data': [
-                        form_widget(form.children[privilegeBlock])
-                    ]
-                }
-            ]
-        }]) %}
-    {% endfor %}
+    {% set rolePermissionsGrid %}
+        {% set _gridName = 'role-permission-grid' %}
+        {% set _gridOptions = {
+            gridName: _gridName,
+            inputName: _gridName,
+            name: _gridName,
+            enableFilters: false,
+            enableViews: false,
+            showViewsInNavbar: false,
+            builders: [
+                'orouser/js/datagrid/roles-datagrid-builder'
+            ],
+            metadata: {
+                mode: 'client',
+                state: {
+                    pageSize: 999999999,
+                },
+                initialState: {
+                    pageSize: 999999999,
+                },
+                options: {
+                    gridName: _gridName,
+                    toolbarOptions: {
+                        placement: {
+                            top: false
+                        }
+                    }
+                },
+                columns: [
+                    {
+                        "label": "Entity",
+                        "type": "string",
+                        "translatable": true,
+                        "name": "entity",
+                        "order": 0,
+                        "editable": false,
+                        "renderable": true,
+                        "sortable": false
+                    },
+                    {
+                        "label": "Permissions",
+                        "type": "action-permissions",
+                        "translatable": true,
+                        "name": "permissions",
+                        "order": 1,
+                        "editable": false,
+                        "renderable": true,
+                        "sortable": false
+                    }
+                ]
+            },
+            data: {
+                data: gridData
+            }
+        } %}
+
+        <div data-page-component-module="orodatagrid/js/app/components/datagrid-component"
+             data-page-component-name="{{ _gridOptions.gridName }}"
+             data-page-component-options="{{ _gridOptions|json_encode }}"
+             class="inner-grid">
+        </div>
+    {% endset %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': privilegesConfig['entity'].label|trans,
+        'subblocks': [
+            {
+                'title': '',
+                'useSpan': false,
+                'data': [
+                    rolePermissionsGrid,
+                    form_widget(form.children['entity']),
+                    form_widget(form.children['action'])
+                ]
+            }
+        ]
+    }]) %}
 
     {% set dataBlocks = dataBlocks|merge([{
         'title' : 'oro.user.entity_plural_label'|trans,
-        'subblocks':
-        [
+        'subblocks': [
             {
                 'title' : null,
                 'useSpan': false,

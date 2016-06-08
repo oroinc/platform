@@ -115,9 +115,56 @@ class RoleController extends Controller
             );
         }
 
+        // @todo: redevelop it as grid
+        $form = $aclRoleHandler->createView();
+        $translator = $this->get('translator');
+        $permissionManager = $this->get('oro_security.acl.permission_manager');
+
+        $form->children['entity']->children;
+        $gridData = [];
+        foreach ($form->children['entity']->children as $child) {
+            $identity = $child->children['identity'];
+            $item = [
+                'entity' => $translator->trans($identity->children['name']->vars['value']),
+                'entityId' => $identity->children['id']->vars['value'],
+                'permissions' => []
+            ];
+            // all data transformation are taken from form type blocks
+            foreach ($child->vars['privileges_config']['permissions'] as $field) {
+                foreach ($child->children['permissions']->children as $permission) {
+                    if ($permission->vars['value']->getName() === $field) {
+                        $accessLevelVars = $permission->children['accessLevel']->vars;
+                        $permissionEntity = $permissionManager->getPermissionByName($field);
+                        $permissionLabel = $permissionEntity->getLabel() ? $permissionEntity->getLabel() : $field;
+                        $permissionDescription = '';
+                        if ($permissionEntity->getDescription()) {
+                            $permissionDescription = $translator->trans($permissionEntity->getDescription());
+                        }
+                        $valueText = $accessLevelVars['translation_prefix'] .
+                            (empty($accessLevelVars['level_label']) ? 'NONE' : $accessLevelVars['level_label']);
+                        $valueText = $translator->trans($valueText, [], $accessLevelVars['translation_domain']);
+                        $item['permissions'][] = [
+                            'id' => $permissionEntity->getId(),
+                            'name' => $permissionEntity->getName(),
+                            'label' => $translator->trans($permissionLabel),
+                            'description' => $permissionDescription,
+                            'full_name' => $accessLevelVars['full_name'],
+                            'identity' => $accessLevelVars['identity'],
+                            'value' => $accessLevelVars['value'],
+                            'value_text' => $valueText
+                        ];
+                        break;
+                    }
+                }
+            }
+
+            $gridData[] = $item;
+        }
+
         return array(
             'entity' => $entity,
-            'form' => $aclRoleHandler->createView(),
+            'form' => $form,
+            'gridData' => $gridData,
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete a role and un-assign it from all users or reassign users to another role before

@@ -5,3 +5,5 @@ config:
         'oro/select2-acl-user-autocomplete-component': 'bundles/orouser/js/components/select2-acl-user-autocomplete-component.js'
         'orouser/js/views/role-view': 'bundles/orouser/js/views/role-view.js'
         'orouser/js/tools/acl-users-search-api-accessor': 'bundles/orouser/js/tools/acl-users-search-api-accessor.js'
+        'orouser/js/datagrid/roles-datagrid-builder': 'orouser/js/datagrid/roles-datagrid-builder.js'
+        'oro/datagrid/cell/action-permissions-cell': 'orouser/js/datagrid/cell/action-permissions-cell.js'
