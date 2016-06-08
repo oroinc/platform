@@ -10,6 +10,8 @@ UPGRADE FROM 1.9 to 1.10
 
 ####EntityBundle:
 - The implementation of `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` was changed. Now the loaded entity aliases is saved into a cache that gives significant performance gain. Also, from now, you can implement `Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface` to create aliases for any entities not only for ORM entities.
+- The `Oro\Bundle\EntityBundle\Controller\Api\Rest\EntityDataController::patchAction` was fixed to return correct HTTP status code. Previous implementation was 
+always returning 204 (No Content), now it returns HTTP 200 (OK) if the response contains content. 
 
 ####EntityConfigBundle:
 - Entity config class metadata now allows any `route*` options, that can be used for CRUD routes configuration - as well as already existing `routeName`, `routeView` and `routeCreate` options.
