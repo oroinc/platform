@@ -130,7 +130,9 @@ define([
             var state = {};
             _.each(this.filters, function(filter, name) {
                 var shortName = '__' + name;
-                if (filter.enabled) {
+                if (_.has(this.collection.initialState.filters, name)) {
+                    state[name] = filter.getValue();
+                } else if (filter.enabled) {
                     if (!filter.isEmpty()) {
                         state[name] = filter.getValue();
                     } else if (!filter.defaultEnabled) {
