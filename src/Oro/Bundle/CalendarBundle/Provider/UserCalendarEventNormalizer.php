@@ -243,7 +243,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
      *
      * @param $entity
      *
-     * @return self
+     * @return UserCalendarEventNormalizer
      */
     protected function transformRecurrenceData(&$entity)
     {

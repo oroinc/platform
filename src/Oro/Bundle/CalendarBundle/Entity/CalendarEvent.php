@@ -405,7 +405,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param Calendar $calendar
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setCalendar(Calendar $calendar = null)
     {
@@ -433,7 +433,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param SystemCalendar $systemCalendar
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setSystemCalendar(SystemCalendar $systemCalendar = null)
     {
@@ -461,7 +461,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param string $title
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setTitle($title)
     {
@@ -485,7 +485,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param  string $description
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setDescription($description)
     {
@@ -509,7 +509,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param \DateTime $start
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setStart($start)
     {
@@ -540,7 +540,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param \DateTime $end
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setEnd($end)
     {
@@ -564,7 +564,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param bool $allDay
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setAllDay($allDay)
     {
@@ -590,7 +590,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      * @param string|null $backgroundColor The color in hex format, e.g. #FF0000.
      *                                     Set it to null to allow UI to calculate the background color automatically.
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setBackgroundColor($backgroundColor)
     {
@@ -790,7 +790,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param Collection|CalendarEvent[] $calendarEvents
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function resetRecurringEventExceptions($calendarEvents)
     {
@@ -808,7 +808,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param CalendarEvent $calendarEvent
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function addRecurringEventException(CalendarEvent $calendarEvent)
     {
@@ -825,7 +825,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param CalendarEvent $calendarEvent
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function removeRecurringEventException(CalendarEvent $calendarEvent)
     {
@@ -842,7 +842,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param CalendarEvent|null $recurringEvent
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setRecurringEvent(CalendarEvent $recurringEvent = null)
     {
@@ -876,7 +876,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param \DateTime|null $originalStart
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setOriginalStart(\DateTime $originalStart = null)
     {
@@ -890,7 +890,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param bool $isCancelled
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setIsCancelled($isCancelled = false)
     {
@@ -1019,7 +1019,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @param Recurrence|null $recurrence
      *
-     * @return self
+     * @return CalendarEvent
      */
     public function setRecurrence(Recurrence $recurrence = null)
     {

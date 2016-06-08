@@ -14,7 +14,7 @@ class DelegateStrategy implements StrategyInterface
      *
      * @param StrategyInterface $strategy
      *
-     * @return self
+     * @return DelegateStrategy
      */
     public function add(StrategyInterface $strategy)
     {

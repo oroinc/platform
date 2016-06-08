@@ -132,7 +132,7 @@ class WeeklyStrategy extends AbstractStrategy
      *
      * @param $weekDays
      *
-     * @return self
+     * @return WeeklyStrategy
      */
     protected function sortWeekDays(&$weekDays)
     {
