@@ -187,7 +187,6 @@ class EmailRecipientsHelper
         $alias,
         $entityClass
     ) {
-
         $searchRecipients = $this->search->simpleSearch(
             $args->getQuery(),
             0,
@@ -206,7 +205,7 @@ class EmailRecipientsHelper
 
             $primaryEmailsQb->andWhere($primaryEmailsQb->expr()->in(sprintf('%s.id', $alias), ':entity_id_list'));
             $primaryEmailsQb->setParameter(
-                ':entity_id_list',
+                'entity_id_list',
                 array_map(function (Result\Item $searchRecipient) {
                     return $searchRecipient->getRecordId();
                 }, $searchRecipients->getElements())
