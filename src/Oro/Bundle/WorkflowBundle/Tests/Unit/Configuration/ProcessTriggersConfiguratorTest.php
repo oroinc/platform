@@ -142,10 +142,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->setValue($this->processTriggersConfigurator, 'dirty', true);
         $this->setValue($this->processTriggersConfigurator, 'triggers', $triggers);
 
-        $this->managerRegistry->expects($this->exactly((int)$dirty))
-            ->method('getManagerForClass')
-            ->with($this->triggerEntityClass)
-            ->willReturn($this->objectManager);
+        $this->assertManagerRegistryCalled($this->triggerEntityClass);
 
         $this->processCronScheduler
             ->expects($this->exactly($expectedSchedulesCount))
@@ -156,6 +153,34 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->processTriggersConfigurator->flush();
 
         $this->assertAttributeEquals(false, 'dirty', $this->processTriggersConfigurator);
+    }
+
+    /**
+     * @return array
+     */
+    public function flushDataProvider()
+    {
+        $triggerWithCron = new ProcessTrigger();
+        $triggerWithCron->setCron('* * * * *');
+        $triggerWithoutCron = new ProcessTrigger();
+
+        return [
+            'no changes' => [
+                'dirty' => false,
+                'triggers' => [],
+                'expected' => 0,
+            ],
+            'no triggers' => [
+                'dirty' => true,
+                'triggers' => [],
+                'expected' => 0,
+            ],
+            'with triggers' => [
+                'dirty' => true,
+                'triggers' => [$triggerWithCron, $triggerWithoutCron],
+                'expected' => 1,
+            ],
+        ];
     }
 
     public function testFlushRemoves()
@@ -191,33 +216,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->processTriggersConfigurator->flush();
     }
 
-    /**
-     * @return array
-     */
-    public function flushDataProvider()
-    {
-        $triggerWithCron = new ProcessTrigger();
-        $triggerWithCron->setCron('* * * * *');
-        $triggerWithoutCron = new ProcessTrigger();
 
-        return [
-            'no changes' => [
-                'dirty' => false,
-                'triggers' => [],
-                'expected' => 0,
-            ],
-            'no triggers' => [
-                'dirty' => true,
-                'triggers' => [],
-                'expected' => 0,
-            ],
-            'with triggers' => [
-                'dirty' => true,
-                'triggers' => [$triggerWithCron, $triggerWithoutCron],
-                'expected' => 1,
-            ],
-        ];
-    }
 
     /**
      * @param string $entityClass
