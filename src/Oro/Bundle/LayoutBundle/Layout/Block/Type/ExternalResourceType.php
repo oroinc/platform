@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class ExternalResourceType extends AbstractType
 {
@@ -15,11 +14,11 @@ class ExternalResourceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(['rel', 'href'])
-            ->setOptional(['type']);
+            ->setDefined(['type']);
     }
 
     /**

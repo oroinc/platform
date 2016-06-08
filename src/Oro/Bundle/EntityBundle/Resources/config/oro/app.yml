@@ -1,11 +1,13 @@
 doctrine:
     dbal:
         types:
-            percent: Oro\DBAL\Types\PercentType
-            money:   Oro\DBAL\Types\MoneyType
-            object:  Oro\DBAL\Types\ObjectType
-            array:   Oro\DBAL\Types\ArrayType
+            percent:      Oro\DBAL\Types\PercentType
+            money:        Oro\DBAL\Types\MoneyType
+            object:       Oro\DBAL\Types\ObjectType
+            array:        Oro\DBAL\Types\ArrayType
+            config_object:  Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType
             duration: Oro\Bundle\EntityBundle\DoctrineExtensions\DBAL\Types\DurationType
+
     orm:
         dql:
             datetime_functions:
