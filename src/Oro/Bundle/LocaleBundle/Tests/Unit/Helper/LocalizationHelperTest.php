@@ -47,8 +47,6 @@ class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($this->repository);
 
-
-
         $this->helper = new LocalizationHelper($this->registry);
         $this->helper->setEntityClass(self::ENTITY_CLASS);
     }
