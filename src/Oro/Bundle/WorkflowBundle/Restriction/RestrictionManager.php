@@ -240,7 +240,7 @@ class RestrictionManager
                         }
                     }
                 }
-                if ($this->workflows[$entityClass][$workflowName]['is_active']) {
+                if (!empty($this->workflows[$entityClass][$workflowName]['is_active'])) {
                     $this->activeRestrictions[] = $classRestriction['id'];
                 }
             }
