@@ -92,7 +92,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertImportExecuted($entity, ['test_workflow' => ['definitions' => ['configuration']]]);
 
-        $this->listener->workflowCreated($this->createEvent($entity));
+        $this->listener->workflowAfterCreate($this->createEvent($entity));
     }
 
     public function testWorkflowUpdated()
@@ -102,7 +102,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertImportExecuted($entity, ['test_workflow' => ['definitions' => ['configuration']]]);
         $this->assertScheduleExecuted();
 
-        $this->listener->workflowUpdated($this->createEvent($entity));
+        $this->listener->workflowAfterUpdate($this->createEvent($entity));
     }
 
     public function testWorkflowDeleted()
@@ -112,7 +112,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertImportExecuted($entity, ['test_workflow' => ['definitions' => ['configuration']]]);
         $this->assertScheduleExecuted();
 
-        $this->listener->workflowDeleted($this->createEvent(new WorkflowDefinition()));
+        $this->listener->workflowAfterDelete($this->createEvent(new WorkflowDefinition()));
     }
 
     /**
@@ -128,7 +128,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->processConfiguratorLink->expects($this->once())->method('getService')->willReturn(new \stdClass());
 
-        $this->listener->workflowCreated($this->createEvent($entity));
+        $this->listener->workflowAfterCreate($this->createEvent($entity));
     }
 
     /**
@@ -145,7 +145,7 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $this->scheduledTransitionProcessesLink->expects($this->once())->method('getService')
             ->willReturn(new \stdClass());
 
-        $this->listener->workflowUpdated($this->createEvent($entity));
+        $this->listener->workflowAfterUpdate($this->createEvent($entity));
     }
 
     public function testGetSubscribedEvents()
@@ -154,9 +154,9 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
             [
                 WorkflowEvents::WORKFLOW_BEFORE_CREATE => 'generateProcessConfigurations',
                 WorkflowEvents::WORKFLOW_BEFORE_UPDATE => 'generateProcessConfigurations',
-                WorkflowEvents::WORKFLOW_CREATED => 'workflowCreated',
-                WorkflowEvents::WORKFLOW_UPDATED => 'workflowUpdated',
-                WorkflowEvents::WORKFLOW_DELETED => 'workflowDeleted',
+                WorkflowEvents::WORKFLOW_AFTER_CREATE => 'workflowAfterCreate',
+                WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'workflowAfterUpdate',
+                WorkflowEvents::WORKFLOW_AFTER_DELETE => 'workflowAfterDelete',
                 WorkflowEvents::WORKFLOW_ACTIVATED => 'workflowActivated',
                 WorkflowEvents::WORKFLOW_DEACTIVATED => 'workflowDeactivated'
             ],

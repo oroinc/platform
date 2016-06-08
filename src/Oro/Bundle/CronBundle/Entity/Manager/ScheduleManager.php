@@ -36,12 +36,10 @@ class ScheduleManager
     {
         $schedules = $this->getRepository()->findBy(['command' => $command, 'definition' => $definition]);
 
-        sort($arguments);
+        $argumentsSchedule = (new Schedule())->setArguments($arguments);
 
-        $schedules = array_filter($schedules, function (Schedule $schedule) use ($arguments) {
-            $scheduleArgs = $schedule->getArguments();
-            sort($scheduleArgs);
-            return $scheduleArgs == $arguments;
+        $schedules = array_filter($schedules, function (Schedule $schedule) use ($argumentsSchedule) {
+            return $schedule->getArgumentsHash() === $argumentsSchedule->getArgumentsHash();
         });
 
         return count($schedules) > 0;

@@ -110,7 +110,7 @@ class Schedule
 
     /**
      * @param array $arguments
-     * @return Schedule
+     * @return $this
      */
     public function setArguments(array $arguments)
     {

@@ -429,9 +429,9 @@ class ProcessTrigger
             return false;
         }
 
-        $ownDefinition = $this->definition ? $this->definition->getName() : null;
-        $outerDefinition = $trigger->getDefinition() ? $trigger->getDefinition()->getName() : null;
+        $ownDefinitionName = $this->definition ? $this->definition->getName() : null;
+        $outerDefinitionName = $trigger->getDefinition() ? $trigger->getDefinition()->getName() : null;
 
-        return $ownDefinition === $outerDefinition;
+        return $ownDefinitionName === $outerDefinitionName;
     }
 }

@@ -82,17 +82,18 @@ class ProcessTriggerRepository extends EntityRepository
     }
 
     /**
-     * @param ProcessDefinition $definition
+     * @param string $definitionName
      * @return mixed
+     * @todo cover by function test in BAP-10408
      */
-    public function findByDefinition(ProcessDefinition $definition)
+    public function findByDefinitionName($definitionName)
     {
         $queryBuilder = $this->createQueryBuilder('trigger')
             ->select('trigger, definition')
             ->innerJoin('trigger.definition', 'definition');
 
         $queryBuilder->andWhere('definition.name = :definition_name');
-        $queryBuilder->setParameter('definition_name', $definition->getName());
+        $queryBuilder->setParameter('definition_name', $definitionName);
 
         return $queryBuilder->getQuery()->execute();
     }

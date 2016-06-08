@@ -5,10 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Event;
 class WorkflowEvents
 {
     const WORKFLOW_BEFORE_UPDATE = 'workflowBeforeUpdate';
-    const WORKFLOW_UPDATED = 'workflowUpdated';
+    const WORKFLOW_AFTER_UPDATE = 'workflowAfterUpdate';
     const WORKFLOW_BEFORE_CREATE = 'workflowBeforeCreate';
-    const WORKFLOW_CREATED = 'workflowCreated';
-    const WORKFLOW_DELETED = 'workflowDeleted';
+    const WORKFLOW_AFTER_CREATE = 'workflowAfterCreate';
+    const WORKFLOW_AFTER_DELETE = 'workflowAfterDelete';
     const WORKFLOW_ACTIVATED = 'workflowActivated';
     const WORKFLOW_DEACTIVATED = 'workflowDeactivated';
 }

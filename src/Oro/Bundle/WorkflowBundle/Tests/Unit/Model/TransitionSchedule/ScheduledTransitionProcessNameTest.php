@@ -15,7 +15,7 @@ class ScheduledTransitionProcessNameTest extends \PHPUnit_Framework_TestCase
     public function testRestore()
     {
         $name = 'stpn__a_w__e-w';
-        $result = ScheduledTransitionProcessName::restore($name);
+        $result = ScheduledTransitionProcessName::createFromName($name);
 
         $this->assertInstanceOf(
             'Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName',
@@ -23,20 +23,34 @@ class ScheduledTransitionProcessNameTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($name, $result->getName());
-        $this->assertEquals('a_w', $result->getWorkflow());
-        $this->assertEquals('e-w', $result->getTransition());
+        $this->assertEquals('a_w', $result->getWorkflowName());
+        $this->assertEquals('e-w', $result->getTransitionName());
     }
 
-    public function testRestoreFailureException()
+    /**
+     * @dataProvider restoreExceptionCases
+     * @param string $name
+     */
+    public function testRestoreFailureException($name)
     {
-        $name = 'stpn_a_w_e-w';
         $this->setExpectedException(
             'InvalidArgumentException',
-            'Can not restore name object. Provided name `stpn_a' .
-            '_w_e-w` is not valid `Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName`' .
-            ' representation.'
+            'Can not restore name object. ' .
+            sprintf('Provided name `%s` is not valid ', $name) .
+            '`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName` representation.'
         );
-        ScheduledTransitionProcessName::restore($name);
+        ScheduledTransitionProcessName::createFromName($name);
+    }
+
+    public function restoreExceptionCases(){
+        return [
+            'wrong prefix'=>['asd - ewe qeq'],
+            'wrong delimiters - prefix' => ['stpn_qwe_e_q'],
+            'wrong delimiter1' => ['stpn_e__q'],
+            'wrong delimiter2' => ['stpn__e_q'],
+            'wrong workflow name' => ['stpn__0__q'],
+            'wrong transition name' => ['stpn__e__0'],
+        ];
     }
 
     public function testUnfilledNameException()

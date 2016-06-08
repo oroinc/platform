@@ -27,11 +27,11 @@ class ScheduledTransitionProcessName
      * @param string $name
      * @return ScheduledTransitionProcessName
      */
-    public static function restore($name)
+    public static function createFromName($name)
     {
         $chunks = explode(self::DELIMITER, (string)$name);
 
-        if (!array_key_exists(0, $chunks) || $chunks[0] !== self::IDENTITY_PREFIX) {
+        if (empty($chunks[0]) || $chunks[0] !== self::IDENTITY_PREFIX || empty($chunks[1]) || empty($chunks[2])) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'Can not restore name object. Provided name `%s` is not valid `%s` representation.',
@@ -43,11 +43,11 @@ class ScheduledTransitionProcessName
 
         return new self($chunks[1], $chunks[2]);
     }
-
+    
     /**
      * @return string
      */
-    public function getTransition()
+    public function getTransitionName()
     {
         return $this->transition;
     }
@@ -55,7 +55,7 @@ class ScheduledTransitionProcessName
     /**
      * @return string
      */
-    public function getWorkflow()
+    public function getWorkflowName()
     {
         return $this->workflow;
     }
@@ -72,13 +72,5 @@ class ScheduledTransitionProcessName
         }
 
         return implode(self::DELIMITER, [self::IDENTITY_PREFIX, $this->workflow, $this->transition]);
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getName();
     }
 }

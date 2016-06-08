@@ -89,7 +89,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
 
         foreach ($definitions as $definition) {
             $definitionName = $definition->getName();
-            $storedTriggers = $triggerRepository->findByDefinition($definition);
+            $storedTriggers = $triggerRepository->findByDefinitionName($definition->getName());
 
             if (array_key_exists($definitionName, $triggersConfiguration)) {
                 foreach ($triggersConfiguration[$definitionName] as $triggerConfiguration) {
@@ -234,7 +234,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
      */
     public function removeDefinitionTriggers(ProcessDefinition $definition)
     {
-        foreach ($this->getRepository()->findByDefinition($definition) as $trigger) {
+        foreach ($this->getRepository()->findByDefinitionName($definition->getName()) as $trigger) {
             $this->delete($trigger);
             $this->dropSchedule($trigger);
         }

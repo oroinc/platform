@@ -60,7 +60,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     /**
      * @param WorkflowChangesEvent $event
      */
-    public function workflowCreated(WorkflowChangesEvent $event)
+    public function workflowAfterCreate(WorkflowChangesEvent $event)
     {
         $workflowName = $event->getDefinition()->getName();
 
@@ -73,7 +73,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     /**
      * @param WorkflowChangesEvent $event
      */
-    public function workflowUpdated(WorkflowChangesEvent $event)
+    public function workflowAfterUpdate(WorkflowChangesEvent $event)
     {
         $workflowDefinition = $event->getDefinition();
 
@@ -90,7 +90,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     /**
      * @param WorkflowChangesEvent $event
      */
-    public function workflowDeleted(WorkflowChangesEvent $event)
+    public function workflowAfterDelete(WorkflowChangesEvent $event)
     {
         $this->cleanProcesses($event->getDefinition());
     }
@@ -197,9 +197,9 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         return [
             WorkflowEvents::WORKFLOW_BEFORE_CREATE => 'generateProcessConfigurations',
             WorkflowEvents::WORKFLOW_BEFORE_UPDATE => 'generateProcessConfigurations',
-            WorkflowEvents::WORKFLOW_CREATED => 'workflowCreated',
-            WorkflowEvents::WORKFLOW_UPDATED => 'workflowUpdated',
-            WorkflowEvents::WORKFLOW_DELETED => 'workflowDeleted',
+            WorkflowEvents::WORKFLOW_AFTER_CREATE => 'workflowAfterCreate',
+            WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'workflowAfterUpdate',
+            WorkflowEvents::WORKFLOW_AFTER_DELETE => 'workflowAfterDelete',
             WorkflowEvents::WORKFLOW_ACTIVATED => 'workflowActivated',
             WorkflowEvents::WORKFLOW_DEACTIVATED => 'workflowDeactivated'
         ];

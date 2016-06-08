@@ -95,7 +95,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->objectManager->expects($this->once())->method('persist')->with($existentNewTrigger);
 
         $this->repository->expects($this->once())
-            ->method('findByDefinition')->willReturn([$mockExistentTrigger, $mockUnaffectedTrigger]);
+            ->method('findByDefinitionName')->willReturn([$mockExistentTrigger, $mockUnaffectedTrigger]);
 
         //delete unaffected
         $this->objectManager->expects($this->once())->method('remove')->with($mockUnaffectedTrigger);

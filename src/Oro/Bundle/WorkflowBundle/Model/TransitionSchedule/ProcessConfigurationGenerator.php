@@ -116,6 +116,6 @@ class ProcessConfigurationGenerator
      */
     protected function createProcessName($workflowName, $transitionName)
     {
-        return (string)(new ScheduledTransitionProcessName($workflowName, $transitionName));
+        return (new ScheduledTransitionProcessName($workflowName, $transitionName))->getName();
     }
 }

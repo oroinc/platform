@@ -87,7 +87,7 @@ class WorkflowDefinitionHandler
         }
 
         $this->eventDispatcher->dispatch(
-            $created ? WorkflowEvents::WORKFLOW_CREATED : WorkflowEvents::WORKFLOW_UPDATED,
+            $created ? WorkflowEvents::WORKFLOW_AFTER_CREATE : WorkflowEvents::WORKFLOW_AFTER_UPDATE,
             new WorkflowChangesEvent($workflowDefinition)
         );
     }
@@ -107,7 +107,7 @@ class WorkflowDefinitionHandler
         $em->flush();
 
         $this->eventDispatcher->dispatch(
-            WorkflowEvents::WORKFLOW_DELETED,
+            WorkflowEvents::WORKFLOW_AFTER_DELETE,
             new WorkflowChangesEvent($workflowDefinition)
         );
 

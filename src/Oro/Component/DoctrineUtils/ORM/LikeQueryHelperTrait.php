@@ -4,6 +4,7 @@ namespace Oro\Component\DoctrineUtils\ORM;
 
 /**
  * Methods for safe LIKE querying.
+ * @link https://gist.github.com/francisbesset/b7a49c90f8684e0cf4fe - original source
  */
 trait LikeQueryHelperTrait
 {
