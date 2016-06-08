@@ -90,7 +90,8 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
                 'configs'     => [
                     'allowClear'  => true,
                     'placeholder' => 'oro.form.choose_value'
-                ]
+                ],
+                'disabled_values' => []
             ],
             $resolvedOptions
         );
@@ -132,7 +133,8 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
                 'configs'     => [
                     'allowClear'  => true,
                     'placeholder' => $newPlaceholder
-                ]
+                ],
+                'disabled_values' => []
             ],
             $resolvedOptions
         );
