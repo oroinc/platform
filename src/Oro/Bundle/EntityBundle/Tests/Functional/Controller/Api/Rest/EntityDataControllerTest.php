@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
+use Oro\Component\Testing\ResponseExtension;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -15,6 +16,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EntityDataControllerTest extends WebTestCase
 {
+    use ResponseExtension;
+
     public function setUp()
     {
         $this->initClient([], $this->generateWsseAuthHeader(), true);
@@ -30,30 +33,18 @@ class EntityDataControllerTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference('simple_user');
 
-        $this->client->request(
-            'PATCH',
-            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
-            [],
-            [],
-            [],
-            '{"id": 1}'
-        );
+        $this->sendPatch('/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(), '{"id": 1}');
 
-        $this->assertEquals(Codes::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_FORBIDDEN);
+        $this->assertLastResponseContentTypeJson();
     }
 
     public function testShouldReturnNotFoundIfSuchEntityNotExist()
     {
-        $this->client->request(
-            'PATCH',
-            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_Test/10',
-            [],
-            [],
-            [],
-            '{"id": 1}'
-        );
+        $this->sendPatch('/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_NotExist/10', '{"id": 1}');
 
-        $this->assertEquals(Codes::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_INTERNAL_SERVER_ERROR);
+        $this->assertLastResponseContentTypeJson();
     }
 
     public function testShouldCorrectlyUpdateStringEntityField()
@@ -61,16 +52,12 @@ class EntityDataControllerTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference('simple_user');
 
-        $this->client->request(
-            'PATCH',
+        $this->sendPatch(
             '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
-            [],
-            [],
-            [],
             '{"firstName": "Test1"}'
         );
 
-        $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
 
         $this->refreshEntity($user);
         $this->assertEquals('Test1', $user->getFirstName());
@@ -80,16 +67,13 @@ class EntityDataControllerTest extends WebTestCase
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $this->client->request(
-            'PATCH',
+
+        $this->sendPatch(
             '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
-            [],
-            [],
-            [],
             '{"loginCount": 10}'
         );
 
-        $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
 
         $this->refreshEntity($user);
         $this->assertEquals(10, $user->getLoginCount());
@@ -100,16 +84,12 @@ class EntityDataControllerTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference('simple_user');
 
-        $this->client->request(
-            'PATCH',
+        $this->sendPatch(
             '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
-            [],
-            [],
-            [],
             '{"enabled": false}'
         );
 
-        $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
 
         $this->refreshEntity($user);
         $this->assertFalse($user->isEnabled());
@@ -120,16 +100,12 @@ class EntityDataControllerTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference('simple_user');
 
-        $this->client->request(
-            'PATCH',
+        $this->sendPatch(
             '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
-            [],
-            [],
-            [],
             '{"birthday": "2000-05-05T00:00:00+0000"}'
         );
 
-        $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
 
         $this->refreshEntity($user);
         $this->assertEquals(new \DateTime('2000-05-05T00:00:00+0000'), $user->getBirthday());
@@ -140,16 +116,12 @@ class EntityDataControllerTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference('simple_user');
 
-        $this->client->request(
-            'PATCH',
+        $this->sendPatch(
             '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
-            [],
-            [],
-            [],
             '{"lastLogin":"2000-05-05T01:05:05+0000"}'
         );
 
-        $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
 
         $this->refreshEntity($user);
         $this->assertEquals(new \DateTime('2000-05-05T01:05:05+0000'), $user->getLastLogin());
@@ -160,22 +132,16 @@ class EntityDataControllerTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference('simple_user');
 
-        $this->client->request(
-            'PATCH',
+        $this->sendPatch(
             '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
-            [],
-            [],
-            [],
             '{"email": "test"}'
         );
 
-        $this->assertEquals(Codes::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_BAD_REQUEST);
+        $this->assertLastResponseContentTypeJson();
 
-        $response = $this->getJsonResponseContent(
-            $this->client->getResponse(),
-            $this->client->getResponse()->getStatusCode()
-        );
-        $this->assertEquals('Validation Failed', $response['message']);
+        $content = $this->getLastResponseJsonContent();
+        $this->assertEquals('Validation Failed', $content['message']);
     }
 
     public function testShouldNotAllowChangeEntityFieldValueIfNotValidBecauseNewValueIsEmpty()
@@ -183,22 +149,16 @@ class EntityDataControllerTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference('simple_user');
 
-        $this->client->request(
-            'PATCH',
+        $this->sendPatch(
             '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
-            [],
-            [],
-            [],
             '{"username": ""}'
         );
 
-        $this->assertEquals(Codes::HTTP_BAD_REQUEST, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_BAD_REQUEST);
+        $this->assertLastResponseContentTypeJson();
 
-        $response = $this->getJsonResponseContent(
-            $this->client->getResponse(),
-            $this->client->getResponse()->getStatusCode()
-        );
-        $this->assertEquals('Validation Failed', $response['message']);
+        $content = $this->getLastResponseJsonContent();
+        $this->assertEquals('Validation Failed', $content['message']);
     }
 
     /**
@@ -263,6 +223,15 @@ class EntityDataControllerTest extends WebTestCase
             );
             $this->assertEquals('Validation Failed', $response['message']);
         }
+    }
+
+    /**
+     * @param string $url
+     * @param string $content
+     */
+    protected function sendPatch($url, $content)
+    {
+        $this->client->request('PATCH', $url, [], [], [], $content);
     }
 
     /**
