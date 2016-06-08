@@ -206,19 +206,6 @@ define(function(require) {
                 default:
                     throw new Error('Unknown behaviour');
             }
-            // apply entity restrictions to editable columns
-            if (editable) {
-                var modelRestrictions = cell.model.has('entity_restrictions') ?
-                    cell.model.get('entity_restrictions') :
-                    [];
-                var fieldName = cell.column.get('name');
-                var fieldRestrictions = _.filter(modelRestrictions, function (restriction) {
-                    return restriction.field === fieldName;
-                });
-                if (!_.isEmpty(fieldRestrictions)) {
-                    return false;
-                }
-            }
 
             return editable ?
                 this.getCellEditorOptions(cell).save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
@@ -226,9 +213,13 @@ define(function(require) {
         },
 
         getCellEditorOptions: function(cell) {
+            var fieldName = cell.column.get('name');
             var columnMetadata = cell.column.get('metadata');
             var editor = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
             var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
+            var fieldRestrictions = _.find(cell.model.get('entity_restrictions'), function (restriction) {
+                return restriction.field === fieldName;
+            });
 
             if (!editor.component_options) {
                 editor.component_options = {};
@@ -258,6 +249,10 @@ define(function(require) {
                 className: this.buildClassNames(editor, cell).join(' '),
                 validationRules: validationRules
             });
+
+            if (fieldRestrictions) {
+                editor.viewOptions.fieldRestrictions = fieldRestrictions;
+            }
 
             return editor;
         },

@@ -105,14 +105,17 @@ define(function(require) {
 
         getAvailableOptions: function(options) {
             var choices = this.options.choices;
-            var result = [];
+            var results = [];
+            var fieldRestrictions = _.result(this.options, 'fieldRestrictions');
+            var disabledChoices = _.result(fieldRestrictions, 'mode') === 'disallow' ? fieldRestrictions.values : [];
             _.each(choices, function(text, id) {
-                result.push({
+                results.push({
                     id: id,
-                    text: text
+                    text: text,
+                    disabled: _.indexOf(disabledChoices, id) !== -1
                 });
             });
-            return result;
+            return results;
         },
 
         render: function() {
