@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\DataGridBundle\Common\DataObject as ConfigObject;
+use Oro\Component\Config\Common\ConfigObject;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -100,14 +100,14 @@ class Channel
     /**
      * @var ConfigObject
      *
-     * @ORM\Column(name="synchronization_settings", type="object", nullable=false)
+     * @ORM\Column(name="synchronization_settings", type="config_object", nullable=false)
      */
     protected $synchronizationSettings;
 
     /**
      * @var ConfigObject
      *
-     * @ORM\Column(name="mapping_settings", type="object", nullable=false)
+     * @ORM\Column(name="mapping_settings", type="config_object", nullable=false)
      */
     protected $mappingSettings;
 

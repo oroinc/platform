@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
-use Oro\Bundle\DataGridBundle\Common\DataObject;
+use Oro\Component\Config\Common\ConfigObject;
 
-class PropertyConfiguration extends DataObject
+class PropertyConfiguration extends ConfigObject
 {
 }
