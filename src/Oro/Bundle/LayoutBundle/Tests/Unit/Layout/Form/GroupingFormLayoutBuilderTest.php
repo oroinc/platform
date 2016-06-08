@@ -9,7 +9,6 @@ use Symfony\Component\Form\ResolvedFormType;
 use Oro\Component\Layout\BlockBuilderInterface;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
-use Oro\Bundle\LayoutBundle\Layout\Block\Type\FieldsetType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType;
 use Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder;
 
@@ -128,7 +127,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::GROUP_PREFIX . 'group1',
                 self::ROOT_ID,
-                FieldsetType::NAME,
+                'fieldset',
                 ['title' => 'Group 1']
             )
             ->will($this->returnSelf());
@@ -137,7 +136,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::GROUP_PREFIX . 'group2',
                 self::ROOT_ID,
-                FieldsetType::NAME,
+                'fieldset',
                 ['title' => 'Group 2']
             )
             ->will($this->returnSelf());
@@ -222,7 +221,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::GROUP_PREFIX . 'group1',
                 self::ROOT_ID,
-                FieldsetType::NAME,
+                'fieldset',
                 ['title' => 'Group 1']
             )
             ->will($this->returnSelf());
@@ -231,7 +230,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::GROUP_PREFIX . 'group2',
                 self::ROOT_ID,
-                FieldsetType::NAME,
+                'fieldset',
                 ['title' => 'Group 2']
             )
             ->will($this->returnSelf());
@@ -316,7 +315,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::GROUP_PREFIX . 'group1',
                 self::ROOT_ID,
-                FieldsetType::NAME,
+                'fieldset',
                 ['title' => 'Group 1']
             )
             ->will($this->returnSelf());
@@ -325,7 +324,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(
                 self::GROUP_PREFIX . 'group2',
                 self::ROOT_ID,
-                FieldsetType::NAME,
+                'fieldset',
                 ['title' => 'Group 2']
             )
             ->will($this->returnSelf());

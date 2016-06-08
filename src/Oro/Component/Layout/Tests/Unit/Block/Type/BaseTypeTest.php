@@ -38,22 +38,6 @@ class BaseTypeTest extends BaseBlockTypeTestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
-    public function testSetDefaultOptionsWithInvalidAttr()
-    {
-        $this->resolveOptions(BaseType::NAME, ['attr' => 'test_attr']);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
-    public function testSetDefaultOptionsWithInvalidLabelAttr()
-    {
-        $this->resolveOptions(BaseType::NAME, ['label_attr' => 'test_label_attr']);
-    }
-
     public function testBuildViewWithoutOptions()
     {
         $view = $this->getBlockBuilder(BaseType::NAME, [], 'test:block--1')

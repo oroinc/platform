@@ -33,3 +33,4 @@ config:
         'orolocale/js/formatter/number': 'bundles/orolocale/js/formatter/number.js'
         'orolocale/js/formatter/datetime': 'bundles/orolocale/js/formatter/datetime.js'
         'orolocale/js/moment-l10n': 'bundles/orolocale/js/moment-l10n.js'
+        'orolocale/js/app/views/fallback-view': 'bundles/orolocale/js/app/views/fallback-view.js'

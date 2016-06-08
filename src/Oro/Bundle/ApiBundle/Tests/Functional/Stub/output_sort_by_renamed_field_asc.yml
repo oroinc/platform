@@ -1,0 +1,21 @@
+data:
+  0:
+    type: "testproducts"
+    id: auto
+    attributes:
+      renamedName: "product 1"
+    relationships:
+      productType:
+        data:
+            type: "testproducttypes"
+            id: "type1"
+  1:
+    type: "testproducts"
+    id: auto
+    attributes:
+      renamedName: "product 2"
+    relationships:
+      productType:
+        data:
+            type: "testproducttypes"
+            id: "type2"
