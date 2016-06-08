@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
 /**
  * @dbIsolation
@@ -88,7 +89,6 @@ class WorkflowControllerTest extends WebTestCase
         }
     }
 
-
     /**
      * @param WorkflowAwareEntity $entity
      *
@@ -128,6 +128,9 @@ class WorkflowControllerTest extends WebTestCase
         $testEntity = $this->createNewEntity();
         $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
+        $repositoryProcess = $this->getRepository('OroWorkflowBundle:ProcessDefinition');
+        $processesBefore = $repositoryProcess->findAll();
+
         // deactivate workflow for entity
         $this->client->request(
             'GET',
@@ -141,6 +144,9 @@ class WorkflowControllerTest extends WebTestCase
 
         $this->assertActivationResult($result);
         $this->assertActiveWorkflow($this->entityClass, null);
+
+        $processes = $repositoryProcess->findAll();
+        $this->assertCount(count($processesBefore) - 1, $processes);
 
         // assert that entity still has relation to workflow
         $testEntity = $this->refreshEntity($testEntity);
@@ -165,6 +171,9 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEntityWorkflowItem($testEntity, null);
     }
 
+    /**
+     * @return WorkflowAwareEntity
+     */
     protected function createNewEntity()
     {
         $testEntity = new WorkflowAwareEntity();
@@ -221,5 +230,17 @@ class WorkflowControllerTest extends WebTestCase
         } else {
             $this->assertNull($this->getWorkflowManager()->getApplicableWorkflowByEntityClass($entityClass));
         }
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return ObjectRepository
+     */
+    protected function getRepository($entityClass)
+    {
+        return $this->getContainer()->get('doctrine')
+            ->getManagerForClass($entityClass)
+            ->getRepository($entityClass);
     }
 }

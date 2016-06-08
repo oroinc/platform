@@ -7,6 +7,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 /**
@@ -36,15 +37,15 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
      *
      * @param array $expectedMessages
      * @param array $expectedDefinitions
+     * @param array $expectedProcesses
      */
-    public function testExecute(array $expectedMessages, array $expectedDefinitions)
+    public function testExecute(array $expectedMessages, array $expectedDefinitions, array $expectedProcesses)
     {
-        /** @var ObjectRepository $repository */
-        $repository = $this->getContainer()->get('doctrine')
-            ->getManagerForClass('OroWorkflowBundle:WorkflowDefinition')
-            ->getRepository('OroWorkflowBundle:WorkflowDefinition');
+        $repositoryWorkflow = $this->getRepository('OroWorkflowBundle:WorkflowDefinition');
+        $repositoryProcess = $this->getRepository('OroWorkflowBundle:ProcessDefinition');
 
-        $definitionsBefore = $repository->findAll();
+        $definitionsBefore = $repositoryWorkflow->findAll();
+        $processesBefore = $repositoryProcess->findAll();
 
         $result = $this->runCommand(self::NAME);
 
@@ -53,11 +54,17 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             $this->assertContains($message, $result);
         }
 
-        $definitions = $repository->findAll();
+        $definitions = $repositoryWorkflow->findAll();
+        $processes = $repositoryProcess->findAll();
 
-        $this->assertCount(count($definitionsBefore) + 2, $definitions);
-        foreach ($expectedDefinitions as $definition) {
-            $this->assertDefinitionLoaded($definitions, $definition);
+        $this->assertCount(count($definitionsBefore) + count($expectedDefinitions), $definitions);
+        $this->assertCount(count($processesBefore) + count($expectedProcesses), $processes);
+        foreach ($expectedDefinitions as $definitionName) {
+            $this->assertDefinitionLoaded($definitions, $definitionName);
+        }
+
+        foreach ($expectedProcesses as $processName) {
+            $this->assertProcessLoaded($processes, $processName);
         }
     }
 
@@ -74,6 +81,9 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
                 'expectedDefinitions' => [
                     'first_workflow',
                     'second_workflow'
+                ],
+                'expectedProcesses' => [
+                    'stpn__first_workflow__second_transition',
                 ],
             ]
         ];
@@ -95,5 +105,35 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         }
 
         $this->assertTrue($found);
+    }
+
+    /**
+     * @param array|ProcessDefinition[] $processDefinitions
+     * @param string $name
+     */
+    protected function assertProcessLoaded(array $processDefinitions, $name)
+    {
+        $found = false;
+
+        foreach ($processDefinitions as $definition) {
+            if (strpos($definition->getName(), $name) !== false) {
+                $found = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($found);
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return ObjectRepository
+     */
+    protected function getRepository($entityClass)
+    {
+        return $this->getContainer()->get('doctrine')
+            ->getManagerForClass($entityClass)
+            ->getRepository($entityClass);
     }
 }

@@ -8,7 +8,7 @@ workflows:
                 label: 'Second Step'
                 order: 1
                 is_final: false
-                allowed_transitions: []
+                allowed_transitions: ['second_transition']
         attributes: []
         transitions:
             second_transition:
@@ -17,6 +17,9 @@ workflows:
                 transition_definition: second_transition_definition
                 frontend_options:
                     icon: bar
+                schedule:
+                    cron: '* * * * *'
+                    filter: 'e.id = 7'
         transition_definitions:
             second_transition_definition: []
 
