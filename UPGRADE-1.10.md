@@ -112,7 +112,7 @@ UPGRADE FROM 1.9 to 1.10
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
 
 ####DataGridBundle
-- The class Oro\Bundle\DataGridBundle\Common\Object was renamed to DataObject
+- Moved and renamed class `Oro\Bundle\DataGridBundle\Common\Object` to `Oro\Component\Config\Common\ConfigObject`
 - Changed priority in next extensions:
     * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260
     * Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier from -251 to -261
@@ -154,3 +154,8 @@ Classes `Oro/Bundle/EmbeddedFormBundle/Layout/Block/Type/EmbedFormSuccessType` a
 ####ActionBundle:
 - Layout block types was replaced with DI only configuration for `abstract_configurable` block,
 class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was removed.
+
+####Layout Component:
+- `\Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface::prepare()` signature was changed from `prepare(array $source, VisitorCollection $visitorCollection);` to `prepare(Oro\Component\Layout\Loader\Generator\GeneratorData $data, VisitorCollection $visitorCollection);`
+- `@addTree` layout update action is `\Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension` now
+- Layout update `@setFormTheme` and `@setBlockTheme` actions can accept relative paths now
