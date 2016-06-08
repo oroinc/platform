@@ -441,10 +441,9 @@ define(function(require) {
 
         onSaveSuccess: function(response) {
             if (!this.options.cell.disposed && this.options.cell.$el) {
-                if (response) {
-                    var routeParametersRenameMap = _.invert(this.options.cell.column.get('metadata').inline_editing.
-                        save_api_accessor.routeParametersRenameMap);
-                    _.each(response, function(item, i) {
+                if (response && response.hasOwnProperty('fields')) {
+                    var routeParametersRenameMap = _.invert(this.options.save_api_accessor.routeParametersRenameMap);
+                    _.each(response.fields, function(item, i) {
                         var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
                         if (this.options.cell.model.has(propName)) {
                             this.options.cell.model.set(propName, item);
