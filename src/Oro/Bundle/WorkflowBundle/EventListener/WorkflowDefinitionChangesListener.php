@@ -2,29 +2,35 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
-use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
+
+use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName;
+use Oro\Component\DoctrineUtils\ORM\LikeQueryHelperTrait;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Provide logic for workflow scheduled transitions processes synchronization
  */
 class WorkflowDefinitionChangesListener implements EventSubscriberInterface
 {
+    use LikeQueryHelperTrait;
+
     /** @var ProcessConfigurationGenerator */
     protected $generator;
 
     /** @var \Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator */
     protected $processConfigurator;
 
-    /** @var ScheduledTransitionProcesses */
-    protected $scheduledTransitionProcesses;
+    /** @var ProcessDefinitionRepository */
+    protected $processDefinitionRepository;
 
     /** @var array */
     private $generatedConfigurations = [];
@@ -32,16 +38,16 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     /**
      * @param ProcessConfigurationGenerator $generator
      * @param ProcessConfigurator $processConfigurator
-     * @param ScheduledTransitionProcesses $scheduledTransitionProcesses
+     * @param ProcessDefinitionRepository $processDefinitionRepository
      */
     public function __construct(
         ProcessConfigurationGenerator $generator,
         ProcessConfigurator $processConfigurator,
-        ScheduledTransitionProcesses $scheduledTransitionProcesses
+        ProcessDefinitionRepository $processDefinitionRepository
     ) {
         $this->generator = $generator;
         $this->processConfigurator = $processConfigurator;
-        $this->scheduledTransitionProcesses = $scheduledTransitionProcesses;
+        $this->processDefinitionRepository = $processDefinitionRepository;
     }
 
     /**
@@ -82,6 +88,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
                 $this->generatedConfigurations[$workflowName],
                 $workflowDefinition
             );
+            unset($this->generatedConfigurations);
         }
     }
 
@@ -90,7 +97,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
      */
     public function workflowAfterDelete(WorkflowChangesEvent $event)
     {
-        $this->cleanProcesses($event->getDefinition());
+        $this->removeRelatedProcesses($event->getDefinition());
     }
 
     /**
@@ -111,15 +118,15 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
      */
     public function workflowDeactivated(WorkflowChangesEvent $event)
     {
-        $this->cleanProcesses($event->getDefinition());
+        $this->removeRelatedProcesses($event->getDefinition());
     }
 
     /**
      * @param WorkflowDefinition $definition
      */
-    protected function cleanProcesses(WorkflowDefinition $definition)
+    protected function removeRelatedProcesses(WorkflowDefinition $definition)
     {
-        $workflowScheduledProcesses = $this->scheduledTransitionProcesses->workflowRelated($definition->getName());
+        $workflowScheduledProcesses = $this->getWorkflowRelatedProcessDefinitions($definition->getName());
 
         $toDelete = [];
         foreach ($workflowScheduledProcesses as $processDefinition) {
@@ -136,10 +143,9 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     protected function reconfigureTransitionProcesses(array $processConfigurations, WorkflowDefinition $definition)
     {
         $this->processConfigurator->configureProcesses($processConfigurations);
-        $persistedProcessDefinitions = $this->scheduledTransitionProcesses->workflowRelated(
-            $definition->getName()
-        );
 
+        //check for removal
+        $persistedProcessDefinitions = $this->getWorkflowRelatedProcessDefinitions($definition->getName());
         $toDelete = [];
         foreach ($persistedProcessDefinitions as $processDefinition) {
             $name = $processDefinition->getName();
@@ -149,6 +155,25 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         }
 
         $this->processConfigurator->removeProcesses($toDelete);
+    }
+
+    /**
+     * @param string $workflowName
+     * @return ProcessDefinition[]
+     */
+    protected function getWorkflowRelatedProcessDefinitions($workflowName)
+    {
+        // stpn__workflow!_name__
+        $matchWorkflowRelated = implode(
+            ScheduledTransitionProcessName::DELIMITER,
+            [ScheduledTransitionProcessName::IDENTITY_PREFIX, $workflowName, '']
+        );
+
+        // stpn!_!_workflow!_name!_!_%  - escaped with ! like expression for all transitions
+        return $this->processDefinitionRepository->findLikeName(
+            $this->makeLikeParam($matchWorkflowRelated, '%s%%'),
+            '!'
+        );
     }
 
     /**

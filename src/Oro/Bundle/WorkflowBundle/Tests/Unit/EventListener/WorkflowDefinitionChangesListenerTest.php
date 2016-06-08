@@ -3,40 +3,34 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionChangesListener;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
-
-use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessConfigurationGenerator */
     protected $generator;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ServiceLink */
-    protected $processConfiguratorLink;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ServiceLink */
-    protected $scheduledTransitionProcessesLink;
-
-    /** @var WorkflowDefinitionChangesListener */
-    protected $listener;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessConfigurator */
     protected $processConfigurator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ScheduledTransitionProcesses */
-    protected $scheduledTransitionProcesses;
+    /** @var WorkflowDefinitionChangesListener */
+    protected $listener;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessDefinitionRepository */
+    protected $processDefinitionRepository;
 
     protected function setUp()
     {
@@ -50,102 +44,105 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->scheduledTransitionProcesses = $this->getMockBuilder(
-            'Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses'
-        )->disableOriginalConstructor()->getMock();
-
-        $this->processConfiguratorLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->scheduledTransitionProcessesLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->processDefinitionRepository = $this
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository')
+            ->disableOriginalConstructor()->getMock();
 
         $this->listener = new WorkflowDefinitionChangesListener(
             $this->generator,
-            $this->processConfiguratorLink,
-            $this->scheduledTransitionProcessesLink
+            $this->processConfigurator,
+            $this->processDefinitionRepository
         );
     }
 
     protected function tearDown()
     {
-        unset($this->listener, $this->generator, $this->processConfiguratorLink);
+        unset($this->listener, $this->generator, $this->processConfigurator);
     }
 
     public function testGenerateProcessConfigurations()
     {
-        $workflowDefinition = new WorkflowDefinition();
+        $workflowDefinition = (new WorkflowDefinition())->setName('workflow');
 
         $this->generator->expects($this->once())
             ->method('generateForScheduledTransition')
-            ->with($workflowDefinition);
+            ->with($workflowDefinition)->willReturn(['generated']);
 
         $this->listener->generateProcessConfigurations($this->createEvent($workflowDefinition));
+
+        $this->assertAttributeEquals(
+            ['workflow' => ['generated']],
+            'generatedConfigurations',
+            $this->listener,
+            'Generated configuration should be stored for later events.'
+        );
     }
 
-    public function testWorkflowCreated()
+    public function testWorkflowAfterCreate()
     {
         $entity = new WorkflowDefinition();
         $entity->setName('test_workflow');
 
-        $this->assertImportExecuted($entity, ['test_workflow' => ['definitions' => ['configuration']]]);
+        $this->setValue($this->listener, 'generatedConfigurations', ['test_workflow' => ['generated_config']]);
+
+        $this->processConfigurator->expects($this->any())->method('configureProcesses')
+            ->with(['generated_config']);
 
         $this->listener->workflowAfterCreate($this->createEvent($entity));
+
+        $this->assertAttributeEquals(
+            [],
+            'generatedConfigurations',
+            $this->listener,
+            'Processed configuration should be cleared.'
+        );
     }
 
-    public function testWorkflowUpdated()
+    public function testWorkflowAfterUpdate()
     {
         $entity = new WorkflowDefinition();
         $entity->setName('test_workflow');
-        $this->assertImportExecuted($entity, ['test_workflow' => ['definitions' => ['configuration']]]);
-        $this->assertScheduleExecuted();
+
+        $generatedDefinition = [
+            'definitions' => ['newly_generated_process_definition' => ['generated']]
+        ];
+
+        $this->setValue(
+            $this->listener,
+            'generatedConfigurations',
+            [
+                'test_workflow' => $generatedDefinition
+            ]
+        );
+
+        $this->processConfigurator->expects($this->any())->method('configureProcesses')
+            ->with($generatedDefinition);
+
+        $processIsOk = (new ProcessDefinition())->setName('newly_generated_process_definition');
+        $processToDelete = (new ProcessDefinition())->setName('trash_process');
+
+        $this->processDefinitionRepository->expects($this->once())->method('findLikeName')->with(
+            'stpn!_!_test!_workflow!_!_%',
+            '!'
+        )->willReturn([$processIsOk, $processToDelete]);
+
+        $this->processConfigurator->expects($this->once())->method('removeProcesses')->with(['trash_process']);
 
         $this->listener->workflowAfterUpdate($this->createEvent($entity));
     }
 
-    public function testWorkflowDeleted()
+    public function testWorkflowAfterDelete()
     {
-        $entity = new WorkflowDefinition();
-        $entity->setName('test_workflow');
-        $this->assertImportExecuted($entity, ['test_workflow' => ['definitions' => ['configuration']]]);
-        $this->assertScheduleExecuted();
+        $workflowDefinition = new WorkflowDefinition();
+        $workflowDefinition->setName('test_workflow');
+        $processToDelete = (new ProcessDefinition())->setName('trash_process');
+        $this->processDefinitionRepository->expects($this->once())->method('findLikeName')->with(
+            'stpn!_!_test!_workflow!_!_%',
+            '!'
+        )->willReturn([$processToDelete]);
+        $this->processConfigurator->expects($this->once())->method('removeProcesses')->with(['trash_process']);
 
-        $this->listener->workflowAfterDelete($this->createEvent(new WorkflowDefinition()));
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Instance of Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator expected.
-     */
-    public function testProcessImportLinkException()
-    {
-        $entity = new WorkflowDefinition();
-        $entity->setName('test_workflow');
-
-        $this->setGeneratedConfigurations(['test_workflow' => ['definitions' => ['configuration']]]);
-
-        $this->processConfiguratorLink->expects($this->once())->method('getService')->willReturn(new \stdClass());
-
-        $this->listener->workflowAfterCreate($this->createEvent($entity));
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Instance of
-     * Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses expected.
-     */
-    public function testScheduleLinkException()
-    {
-        $entity = new WorkflowDefinition();
-        $entity->setName('test_workflow');
-        $this->assertImportExecuted($entity, ['test_workflow' => ['definitions' => ['configuration']]]);
-
-        $this->scheduledTransitionProcessesLink->expects($this->once())->method('getService')
-            ->willReturn(new \stdClass());
-
-        $this->listener->workflowAfterUpdate($this->createEvent($entity));
+        $this->listener->workflowAfterDelete($this->createEvent($workflowDefinition));
     }
 
     public function testGetSubscribedEvents()
@@ -190,47 +187,10 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $property->setValue($this->listener, $generatedConfigurations);
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @param array $configurations
-     */
-    protected function assertImportExecuted(WorkflowDefinition $workflowDefinition, array $configurations)
-    {
-        $this->setGeneratedConfigurations($configurations);
-        /** @var ProcessConfigurator|\PHPUnit_Framework_MockObject_MockObject $import */
-        $import = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $import->expects($this->any())->method('configureProcesses')
-            ->with($configurations[$workflowDefinition->getName()]);
-
-        $this->processConfiguratorLink->expects($this->once())
-            ->method('getService')
-            ->willReturn($import);
-    }
-
     protected function assertImportNotExecuted()
     {
         $this->generator->expects($this->never())->method($this->anything());
-        $this->processConfiguratorLink->expects($this->never())->method($this->anything());
-    }
-
-    protected function assertScheduleExecuted()
-    {
-        /** @var ProcessConfigurator|\PHPUnit_Framework_MockObject_MockObject $import */
-        $scheduleService = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var ProcessConfigurator|\PHPUnit_Framework_MockObject_MockObject $import */
-        $processDefinition = new ProcessDefinition();
-        $processDefinition->setName('process1');
-        $scheduleService->expects($this->once())->method('workflowRelated')->willReturn([$processDefinition]);
-
-        $this->scheduledTransitionProcessesLink->expects($this->once())
-            ->method('getService')
-            ->willReturn($scheduleService);
+        $this->processConfigurator->expects($this->never())->method($this->anything());
     }
 
     public function testWorkflowActivated()
@@ -253,16 +213,13 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
             ->with($definition)
             ->willReturn($generatedProcessConfiguration);
 
-        $this->assertProcessConfiguratorRetrieved();
         $this->processConfigurator->expects($this->once())
             ->method('configureProcesses')
             ->with($generatedProcessConfiguration);
 
-        $this->assertTransitionProcessesRetrieved();
-
-        $this->scheduledTransitionProcesses->expects($this->once())
-            ->method('workflowRelated')
-            ->with($workflowName)
+        $this->processDefinitionRepository->expects($this->once())
+            ->method('findLikeName')
+            ->with('stpn!_!_test!_workflow!_!_%', '!')
             ->willReturn([$processDefinition]);
 
         $this->processConfigurator->expects($this->once())->method('removeProcesses')->with([]);
@@ -270,35 +227,19 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->workflowActivated($this->createEvent($definition));
     }
 
-    private function assertProcessConfiguratorRetrieved()
-    {
-        $this->processConfiguratorLink->expects($this->once())
-            ->method('getService')
-            ->willReturn($this->processConfigurator);
-    }
-
-    private function assertTransitionProcessesRetrieved()
-    {
-        $this->scheduledTransitionProcessesLink->expects($this->once())
-            ->method('getService')->willReturn($this->scheduledTransitionProcesses);
-    }
-
     public function testWorkflowDeactivated()
     {
         $definition = new WorkflowDefinition();
         $definition->setName('deactivated_workflow');
 
-        $this->assertTransitionProcessesRetrieved();
-
         $storedProcess = new ProcessDefinition();
         $storedProcess->setName('process_to_delete');
 
-        $this->scheduledTransitionProcesses->expects($this->once())
-            ->method('workflowRelated')
-            ->with('deactivated_workflow')
+        $this->processDefinitionRepository->expects($this->once())
+            ->method('findLikeName')
+            ->with('stpn!_!_deactivated!_workflow!_!_%', '!')
             ->willReturn([$storedProcess]);
 
-        $this->assertProcessConfiguratorRetrieved();
         $this->processConfigurator->expects($this->once())
             ->method('removeProcesses')
             ->with(['process_to_delete']);
