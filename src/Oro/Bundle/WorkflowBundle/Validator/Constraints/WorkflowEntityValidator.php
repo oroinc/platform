@@ -86,11 +86,8 @@ class WorkflowEntityValidator extends ConstraintValidator
         } else {
             $permissions = $this->permissionRegistry->getEntityPermissions($value);
             if ($permissions['UPDATE'] === false || $restrictions) {
-                $unitOfWork = $this->entityManager->getUnitOfWork();
-                $classMetadata = $this->entityManager->getClassMetadata($class);
-                $unitOfWork->recomputeSingleEntityChangeSet($classMetadata, $value);
                 if ($permissions['UPDATE'] === false) {
-                    if ($unitOfWork->isScheduledForUpdate($value)) {
+                    if ($this->getEntityChangeSet($value)) {
                         $this->context->addViolation($constraint->updateEntityMessage);
                     }
                 } else {
@@ -126,8 +123,8 @@ class WorkflowEntityValidator extends ConstraintValidator
      */
     protected function validateUpdatedFields($object, WorkflowEntity $constraint, array $restrictions)
     {
-        $unitOfWork       = $this->entityManager->getUnitOfWork();
-        $changesSet       = $unitOfWork->getEntityChangeSet($object);
+        $changesSet = $this->getEntityChangeSet($object);
+
         $restrictedFields = array_flip(
             array_map(
                 function ($restriction) {
@@ -150,6 +147,32 @@ class WorkflowEntityValidator extends ConstraintValidator
                 }
             }
         }
+    }
+
+    /**
+     * @param $object
+     *
+     * @return array
+     */
+    protected function getEntityChangeSet($object)
+    {
+        $class         = $this->doctrineHelper->getEntityClass($object);
+        $classMetadata = $this->entityManager->getClassMetadata($class);
+
+        $unitOfWork = $this->entityManager->getUnitOfWork();
+        $unitOfWork->recomputeSingleEntityChangeSet($classMetadata, $object);
+
+        $changesSet = $unitOfWork->getEntityChangeSet($object);
+
+        // @todo: This filter should be removed after BAP-10777
+        $changesSet = array_filter(
+            $changesSet,
+            function ($change) {
+                return $change[0] != $change[1];
+            }
+        );
+
+        return $changesSet;
     }
 
     /**
