@@ -2,16 +2,16 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class BlockOptionsResolver
 {
     /** @var LayoutRegistryInterface */
     protected $registry;
 
-    /** @var OptionsResolverInterface[] */
+    /** @var OptionsResolver[] */
     protected $resolvers = [];
 
     /**
@@ -42,7 +42,7 @@ class BlockOptionsResolver
     /**
      * @param string|BlockTypeInterface $blockType
      *
-     * @return OptionsResolverInterface
+     * @return OptionsResolver
      */
     protected function getOptionResolver($blockType)
     {
@@ -64,8 +64,8 @@ class BlockOptionsResolver
                 ? clone $this->getOptionResolver($parentName)
                 : new OptionsResolver();
 
-            $type->setDefaultOptions($optionsResolver);
-            $this->registry->setDefaultOptions($name, $optionsResolver);
+            $type->configureOptions($optionsResolver);
+            $this->registry->configureOptions($name, $optionsResolver);
 
             $this->resolvers[$name] = $optionsResolver;
         }

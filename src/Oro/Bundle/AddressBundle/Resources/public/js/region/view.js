@@ -25,6 +25,7 @@ define([
          */
         initialize: function(options) {
             this.target = $(options.target);
+            this.targetLabel = $('label[for="' + this.target.attr('id') + '"]');
             this.$simpleEl = $(options.simpleEl);
 
             this.target.closest('.controls').append(this.$simpleEl);
@@ -54,8 +55,10 @@ define([
                     this.addRequiredFlag(this.$simpleEl);
                 }
                 this.target.inputWidget('show');
+                this.targetLabel.show();
             } else {
                 this.target.inputWidget('hide');
+                this.targetLabel.hide();
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }

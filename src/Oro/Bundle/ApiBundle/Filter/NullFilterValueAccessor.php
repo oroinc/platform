@@ -26,6 +26,13 @@ class NullFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
+    public function remove($key)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getGroup($group)
     {
         return [];
