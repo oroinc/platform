@@ -71,7 +71,6 @@ class SegmentController extends Controller
      *      id="oro_segment_create",
      *      type="entity",
      *      permission="CREATE",
-     *      permission="CREATE",
      *      class="OroSegmentBundle:Segment"
      * )
      */

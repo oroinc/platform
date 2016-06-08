@@ -58,15 +58,14 @@ class SegmentHandler
      */
     public function process(Segment $entity)
     {
-        $isNewEntity = null == $entity->getId();
-
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
-                $this->onSuccess($entity, $isNewEntity);
+                $this->onSuccess($entity);
+
                 return true;
             }
         }
@@ -75,13 +74,12 @@ class SegmentHandler
     }
 
     /**
-     * "Success" form handler
-     *
      * @param Segment $entity
-     * @param bool $isNewEntity
      */
-    protected function onSuccess(Segment $entity, $isNewEntity)
+    protected function onSuccess(Segment $entity)
     {
+        $isNewEntity = is_null($entity->getId());
+
         $entityManager = $this->managerRegistry->getManager();
         $entityManager->persist($entity);
         $entityManager->flush();

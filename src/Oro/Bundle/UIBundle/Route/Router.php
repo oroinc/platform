@@ -108,18 +108,21 @@ class Router
 
     /**
      * @param array|object|null $context
-     *
      * @return RedirectResponse
      */
     public function redirect($context)
     {
-        $routeData = $this->parseRouteData(
-            $this->getRawRouteData($this->request),
-            $context
-        );
+        $arrayData = json_decode($this->getRawRouteData($this->request), true);
+
+        /**
+         * Default route should be used in case of no input_action in request
+         */
+        if (!is_array($arrayData)) {
+            return new RedirectResponse($this->request->getUri());
+        }
 
         return new RedirectResponse(
-            $this->router->generate($routeData['route'], $routeData['params'])
+            $this->router->generate($this->parseRouteName($arrayData), $this->parseRouteParams($arrayData, $context))
         );
     }
 
@@ -134,22 +137,12 @@ class Router
      *
      * @param Request $request
      * @return String JSON string representing raw route data taken from request.
-     * @throws \InvalidArgumentException If value is empty in request.
      */
     protected function getRawRouteData(Request $request)
     {
         $result = $request->get(self::ACTION_PARAMETER);
 
-        if (empty($result)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Request parameter "%s" is required to make redirect.',
-                    self::ACTION_PARAMETER
-                )
-            );
-        }
-
-        if (!is_string($result)) {
+        if ($result && !is_string($result)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'Request parameter "%s" must be string, %s is given.',
@@ -168,24 +161,22 @@ class Router
      * @param string $rawRouteData JSON string with keys "route" (required) and "params" (optional).
      * @param array|object|null $context
      * @return array An array with keys "route" and "parameters".
-     * @throws \InvalidArgumentException
      */
     protected function parseRouteData($rawRouteData, $context)
     {
         $arrayData = json_decode($rawRouteData, true);
 
+        /**
+         * Default route should be used in case of no input_action in request
+         */
         if (!is_array($arrayData)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Cannot parse route data from request parameter "%s". Invalid JSON string is given: %s.',
-                    self::ACTION_PARAMETER,
-                    $rawRouteData
-                )
-            );
+            return [
+                'route' => $this->request->getRequestUri()
+            ];
         }
 
         return [
-            'route' => $this->parseRouteName($arrayData, $context),
+            'route' => $this->parseRouteName($arrayData),
             'params' => $this->parseRouteParams($arrayData, $context),
         ];
     }
@@ -194,10 +185,9 @@ class Router
      * Parses value of route name.
      *
      * @param array $arrayData
-     * @param array|object|null $context
-     * @return mixed
+     * @return string
      */
-    protected function parseRouteName($arrayData, $context)
+    protected function parseRouteName(array $arrayData)
     {
         if (empty($arrayData['route'])) {
             throw new \InvalidArgumentException(
@@ -231,11 +221,12 @@ class Router
      * @param array|object|null $context
      * @return mixed
      */
-    protected function parseRouteParams($arrayData, $context)
+    protected function parseRouteParams(array $arrayData, $context)
     {
         if (empty($arrayData['params'])) {
             return [];
-        } elseif (!is_array($arrayData['params'])) {
+        }
+        if (!is_array($arrayData['params'])) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'Cannot parse route name from request parameter "%s". Value of key "%s" must be array: %s',
@@ -244,17 +235,18 @@ class Router
                     json_encode($arrayData)
                 )
             );
-        } elseif (!$context) {
-            return $arrayData['params'];
         }
 
-        $result = $arrayData['params'];
-
-        foreach ($result as $name => $value) {
-            $result[$name] = $this->parseRouteParam($name, $value, $context);
+        $parsedParameters = $arrayData['params'];
+        if (!$context) {
+            return $parsedParameters;
         }
 
-        return $result;
+        foreach ($arrayData['params'] as $parameterName => $parameterValue) {
+            $parsedParameters[$parameterName] = $this->parseRouteParam($parameterValue, $context);
+        }
+
+        return $parsedParameters;
     }
 
     /**
@@ -263,18 +255,16 @@ class Router
      * Considers a value of parameter as a property path if it starts from '$'. For that case value of this property
      * will be taken from $context
      *
-     * @param string $name Parameter name
-     * @param mixed $value Parameter value of property path
+     * @param string $parameterValue Parameter value or path to property
      * @param array|object|null $context
      * @return mixed Value of parsed parameter
      */
-    protected function parseRouteParam($name, $value, $context)
+    protected function parseRouteParam($parameterValue, $context)
     {
-        if (strpos($value, '$') === 0) {
-            $propertyPath = substr($value, 1);
-            $value = $this->propertyAccessor->getValue($context, $propertyPath);
+        if (strpos($parameterValue, '$') === 0) {
+            return $this->propertyAccessor->getValue($context, substr($parameterValue, 1));
         }
 
-        return $value;
+        return $parameterValue;
     }
 }

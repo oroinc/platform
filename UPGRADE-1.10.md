@@ -104,7 +104,6 @@ UPGRADE FROM 1.9 to 1.10
 - 'oro_form.extension.random_id' service was renamed to 'oro_form.extension.additional_attr'
 - Form field identifier - 'data-name' attribute generation added to 'AdditionalAttrExtension'
 - Method `Oro\Bundle\FormBundle\Model\UpdateHandler::handleUpdate` marked as deprecated. Use `Oro\Bundle\FormBundle\Model\UpdateHandler::update` instead.
-- Method `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` marked as deprecated. Use method `Oro\Bundle\UIBundle\Route\Router::redirect` instead. 
 - In previous version client of methods `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` and `Oro\Bundle\FormBundle\Model\UpdateHandler::handleUpdate`
 was responsible to pass redirect data in arguments, for example:
 ```
@@ -171,6 +170,7 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 <a href="sample2.jpg" data-gallery="unique-id"></a>
 ```
 
+- Method `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` marked as deprecated. Use method `Oro\Bundle\UIBundle\Route\Router::redirect` instead.
 - Use of Twig macroses `saveAndCloseButton` and `saveAndStayButton` was changed. In old version client was responsible to pass just a label of button.
 In this new version client responsible to specify route and parameters which will be used to make redirect if form will successfully saved.
 Before:
