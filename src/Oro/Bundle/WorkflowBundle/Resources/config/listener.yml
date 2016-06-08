@@ -56,6 +56,7 @@ services:
         arguments:
             - '@oro_workflow.transition_schedule.process_configuration_generator'
             - '@oro_workflow.process.configurator'
-            - '@oro_workflow.transition_schedule_processes'
+            - '@doctrine'
+            - '%oro_workflow.process_definition.entity.class%'
         tags:
             - { name: oro_workflow.changes.subscriber }
