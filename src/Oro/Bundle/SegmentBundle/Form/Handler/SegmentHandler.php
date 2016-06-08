@@ -78,10 +78,12 @@ class SegmentHandler
      */
     protected function onSuccess(Segment $entity)
     {
-        $isNewEntity = is_null($entity->getId());
-
         $entityManager = $this->managerRegistry->getManager();
-        $entityManager->persist($entity);
+
+        $isNewEntity = is_null($entity->getId());
+        if ($isNewEntity) {
+            $entityManager->persist($entity);
+        }
         $entityManager->flush();
 
         if ($isNewEntity && $entity->isStaticType()) {
