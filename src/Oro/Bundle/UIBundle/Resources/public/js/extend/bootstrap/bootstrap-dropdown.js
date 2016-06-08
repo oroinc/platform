@@ -3,6 +3,7 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     require('bootstrap');
     var toggleDropdown = '[data-toggle=dropdown]';
 
@@ -85,8 +86,16 @@ define(function(require) {
         var $placeholder;
 
         if (isActive && ($dropdownMenu = $parent.find('.dropdown-menu:first')).length) {
+            var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
+                display: 'block',
+                width: $dropdownMenu.outerWidth()
+            });
+            var originalPosition = {
+                parent: $parent.offset(),
+                dropdownMenu: $dropdownMenu.offset()
+            };
             $placeholder = $('<div class="dropdown-menu__placeholder"/>');
-            $dropdownMenu.data('related-placeholder', $placeholder);
+            $dropdownMenu.data('related-toggle', $this);
             $placeholder.data('related-menu', $dropdownMenu);
 
             /**
@@ -94,39 +103,46 @@ define(function(require) {
              * Then move dropdown to container and apply styles
              */
             $dropdownMenu.addClass('detach');
-            var oldParentOffset = $parent.offset();
-            var oldParentWidth = $parent.outerWidth();
-            var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
-                display: 'block',
-                width: $dropdownMenu.outerWidth(),
-                height: $dropdownMenu.outerHeight()
-            });
             $dropdownMenu.after($placeholder)
                 .appendTo($container)
                 .css(css);
 
-            /**
-             * Sometimes, when dropdown opens in scrollable content, appears scrollbars.
-             * Scrollbars decrease content height and width, change elements position.
-             * When dropdown moved to container - scrollbars hiding and content returns to old dimensions and position.
-             * Styles that was applied to dropdown are wrong, because dimensions and position are changed.
-             * Following code fixes dropdown styles after that changes.
-             */
-            var currentParentOffset = $parent.offset();
-            var currentParentWidth = $parent.outerWidth();
-            var currentOffset = $dropdownMenu.offset();
-            css.top += css.top - currentOffset.top  + currentParentOffset.top - oldParentOffset.top;
-            css.left += css.left - currentOffset.left  + currentParentOffset.left - oldParentOffset.left;
-            css.width += currentParentWidth - oldParentWidth;
-            $dropdownMenu.css(css);
+            $this.data('related-data', {
+                $dropdownMenu: $dropdownMenu,
+                $placeholder: $placeholder,
+                originalPosition: originalPosition
+            }).dropdown('updatePosition');
         } else if (!isActive && ($placeholder = $parent.find('.dropdown-menu__placeholder')).length) {
             $dropdownMenu = $placeholder.data('related-menu')
                 .removeAttr('style')
-                .removeClass('detach')
-                .removeData('related-placeholder');
+                .removeClass('detach');
 
+            $this.removeData('related-data');
             $placeholder.before($dropdownMenu).remove();
         }
+    };
+
+    Dropdown.prototype.updatePosition = function() {
+        /**
+         * Sometimes, when dropdown opens in scrollable content, appears scrollbars.
+         * Scrollbars decrease content height and width, change elements position.
+         * When dropdown moved to container - scrollbars hiding and content returns to old dimensions and position.
+         * Styles that was applied to dropdown are wrong, because dimensions and position are changed.
+         * Following code fixes dropdown styles after that changes.
+         */
+        var obj = $(this).data('related-data');
+        if (typeof obj !== 'object') {
+            return false;
+        }
+        var $parent =  obj.$placeholder.parent();
+        var $dropdownMenu = obj.$dropdownMenu;
+        var dropdownMenuOriginalPosition = obj.originalPosition.dropdownMenu;
+        var parentOriginalPosition = obj.originalPosition.parent;
+        var parentPosition = $parent.offset();
+        $dropdownMenu.css({
+            top: dropdownMenuOriginalPosition.top + parentPosition.top - parentOriginalPosition.top,
+            left: dropdownMenuOriginalPosition.left + parentPosition.left - parentOriginalPosition.left
+        });
     };
 
     $(document)
@@ -179,7 +195,7 @@ define(function(require) {
                 $toggle.data('container', 'body');
             }
             $toggle.dropdown('detach', true);
-            var $placeholder = $dropdownMenu.data('related-placeholder');
+            var $placeholder = $toggle.data('related-data').$placeholder;
             $dropdownMenu
                 .addClass('dropdown-menu__floating')
                 .one('mouseleave', function(e) {
@@ -228,5 +244,14 @@ define(function(require) {
             return event.handler.name === 'clearMenus';
         });
         clickEvents.splice(clickEvents.indexOf(clearMenusHandler), 0, clickEvents.pop());
+
+        var _updateDropdownsPosition = function() {
+            $('.dropdown-menu').filter('.open, .detach').each(function() {
+                $(this).data('related-toggle').dropdown('updatePosition');
+            });
+        };
+
+        $(window).on('resize', _.debounce(_updateDropdownsPosition, 100));
+        mediator.on('layout:adjustHeight', _updateDropdownsPosition, this);
     })();
 });

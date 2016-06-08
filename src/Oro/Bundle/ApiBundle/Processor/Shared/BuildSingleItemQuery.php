@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Builds ORM QueryBuilder object that will be used to get an entity by its identifier.
@@ -15,12 +16,17 @@ class BuildSingleItemQuery implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var CriteriaConnector */
+    protected $criteriaConnector;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper    $doctrineHelper
+     * @param CriteriaConnector $criteriaConnector
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, CriteriaConnector $criteriaConnector)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->criteriaConnector = $criteriaConnector;
     }
 
     /**
@@ -48,7 +54,7 @@ class BuildSingleItemQuery implements ProcessorInterface
         }
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
-        $this->doctrineHelper->applyCriteria($query, $criteria);
+        $this->criteriaConnector->applyCriteria($query, $criteria);
 
         $entityId = $context->getId();
         $idFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
