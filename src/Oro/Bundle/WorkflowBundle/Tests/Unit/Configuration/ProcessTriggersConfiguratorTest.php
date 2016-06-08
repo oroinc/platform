@@ -144,9 +144,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertManagerRegistryCalled($this->triggerEntityClass);
 
-        $this->processCronScheduler
-            ->expects($this->exactly($expectedSchedulesCount))
-            ->method('add');
+        $this->processCronScheduler->expects($this->exactly($expectedSchedulesCount))->method('add');
 
         $this->objectManager->expects($this->once())->method('flush');
 
@@ -215,8 +213,6 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->processTriggersConfigurator->flush();
     }
-
-
 
     /**
      * @param string $entityClass

@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessTriggerRepository extends EntityRepository
@@ -88,13 +87,12 @@ class ProcessTriggerRepository extends EntityRepository
      */
     public function findByDefinitionName($definitionName)
     {
-        $queryBuilder = $this->createQueryBuilder('trigger')
+        return $this->createQueryBuilder('trigger')
             ->select('trigger, definition')
-            ->innerJoin('trigger.definition', 'definition');
-
-        $queryBuilder->andWhere('definition.name = :definition_name');
-        $queryBuilder->setParameter('definition_name', $definitionName);
-
-        return $queryBuilder->getQuery()->execute();
+            ->innerJoin('trigger.definition', 'definition')
+            ->andWhere('definition.name = :definition_name')
+            ->setParameter('definition_name', $definitionName)
+            ->getQuery()
+            ->execute();
     }
 }

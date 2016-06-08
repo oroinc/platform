@@ -87,12 +87,26 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $processDefinitionToPersist = new ProcessDefinition();
         $processDefinitionToRemove = new ProcessDefinition();
+        $processDefinitionToRemoveNotManaged = new ProcessDefinition();
+
         $this->setValue($this->processDefinitionsConfigurator, 'dirty', true);
         $this->setValue($this->processDefinitionsConfigurator,'toPersist',[$processDefinitionToPersist]);
-        $this->setValue($this->processDefinitionsConfigurator, 'toRemove', [$processDefinitionToRemove]);
+        $this->setValue(
+            $this->processDefinitionsConfigurator,
+            'toRemove',
+            [$processDefinitionToRemove, $processDefinitionToRemoveNotManaged]
+        );
 
         $this->assertManagerRegistryCalled($this->definitionClass);
         $this->objectManager->expects($this->once())->method('persist')->with($processDefinitionToPersist);
+        $this->objectManager->expects($this->exactly(2))
+            ->method('contains')
+            ->willReturnMap(
+                [
+                    [$processDefinitionToRemove, true],
+                    [$processDefinitionToRemoveNotManaged, false]
+                ]
+            );
         $this->objectManager->expects($this->once())->method('remove')->with($processDefinitionToRemove);
         $this->objectManager->expects($this->once())->method('flush');
 
@@ -146,7 +160,6 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->processDefinitionsConfigurator->removeDefinition($definitionName);
 
         $this->assertAttributeEquals(true, 'dirty', $this->processDefinitionsConfigurator);
-
         $this->assertAttributeEquals([$definitionObject], 'toRemove', $this->processDefinitionsConfigurator);
     }
 }

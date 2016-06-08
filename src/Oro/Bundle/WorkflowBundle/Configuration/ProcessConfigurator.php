@@ -5,11 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 class ProcessConfigurator implements LoggerAwareInterface
 {
@@ -48,8 +48,7 @@ class ProcessConfigurator implements LoggerAwareInterface
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @return null|void
+     * {@inheritdoc}
      */
     public function setLogger(LoggerInterface $logger)
     {

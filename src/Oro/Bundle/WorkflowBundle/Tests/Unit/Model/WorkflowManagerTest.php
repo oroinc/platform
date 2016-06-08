@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -14,8 +16,6 @@ use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -88,11 +88,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->registry);
-        unset($this->workflowRegistry);
-        unset($this->doctrineHelper);
-        unset($this->workflowManager);
-        unset($this->eventDispatcher);
+        unset(
+            $this->registry,
+            $this->workflowRegistry,
+            $this->doctrineHelper,
+            $this->workflowManager,
+            $this->eventDispatcher
+        );
     }
 
     public function testGetStartTransitions()

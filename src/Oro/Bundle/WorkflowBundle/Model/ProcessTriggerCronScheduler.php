@@ -92,7 +92,8 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
             ['command' => self::$command, 'definition' => $trigger->getCron()]
         );
 
-        $argsSchedule = (new Schedule())->setArguments($this->buildArguments($trigger));
+        $argsSchedule = new Schedule();
+        $argsSchedule->setArguments($this->buildArguments($trigger));
 
         $schedules = array_filter($schedules, function (Schedule $schedule) use ($argsSchedule) {
             return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
