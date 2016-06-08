@@ -221,7 +221,7 @@ class CalendarEventRepository extends EntityRepository
      *
      * @param QueryBuilder $queryBuilder
      *
-     * @return self
+     * @return CalendarEventRepository
      */
     protected function addRecurrenceData(QueryBuilder $queryBuilder)
     {
@@ -245,7 +245,7 @@ class CalendarEventRepository extends EntityRepository
      * @param \DateTime $startDate
      * @param \DateTime $endDate
      *
-     * @return self
+     * @return CalendarEventRepository
      */
     protected function addRecurrencesConditions(QueryBuilder $queryBuilder, $startDate, $endDate)
     {

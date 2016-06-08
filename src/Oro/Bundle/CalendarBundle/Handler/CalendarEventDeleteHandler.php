@@ -32,7 +32,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
     /**
      * @param RequestStack $requestStack
      *
-     * @return $this
+     * @return CalendarEventDeleteHandler
      */
     public function setRequestStack(RequestStack $requestStack)
     {
@@ -44,7 +44,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
     /**
      * @param EmailSendProcessor $emailSendProcessor
      *
-     * @return self
+     * @return CalendarEventDeleteHandler
      */
     public function setEmailSendProcessor(EmailSendProcessor $emailSendProcessor)
     {
@@ -56,7 +56,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
     /**
      * @param SystemCalendarConfig $calendarConfig
      *
-     * @return self
+     * @return CalendarEventDeleteHandler
      */
     public function setCalendarConfig(SystemCalendarConfig $calendarConfig)
     {
@@ -68,7 +68,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
     /**
      * @param SecurityFacade $securityFacade
      *
-     * @return self
+     * @return CalendarEventDeleteHandler
      */
     public function setSecurityFacade(SecurityFacade $securityFacade)
     {
