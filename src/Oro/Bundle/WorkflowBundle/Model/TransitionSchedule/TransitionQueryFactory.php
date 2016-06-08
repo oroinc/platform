@@ -29,12 +29,6 @@ class TransitionQueryFactory
      */
     public function create(array $workflowSteps, $entityClass, $dqlFilter = null)
     {
-        if (count($workflowSteps) === 0) {
-            throw new \InvalidArgumentException(
-                'At least one step, in which transition can be performed from, must be provided.'
-            );
-        }
-
         $queryBuilder = $this->getEntityRepositoryForClass($entityClass)
             ->createQueryBuilder('e')
             ->select('wi.id')

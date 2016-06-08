@@ -14,9 +14,6 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
 class ProcessTriggersConfigurator implements LoggerAwareInterface
 {
     /** @var LoggerInterface */
@@ -42,15 +39,15 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
 
     /**
      * @param ProcessConfigurationBuilder $configurationBuilder
+     * @param ProcessTriggerCronScheduler $processCronScheduler
      * @param ManagerRegistry $registry
      * @param string $triggerEntityClass
-     * @param ProcessTriggerCronScheduler $processCronScheduler
      */
     public function __construct(
         ProcessConfigurationBuilder $configurationBuilder,
+        ProcessTriggerCronScheduler $processCronScheduler,
         ManagerRegistry $registry,
-        $triggerEntityClass,
-        ProcessTriggerCronScheduler $processCronScheduler
+        $triggerEntityClass
     ) {
         $this->triggers = [];
         $this->configurationBuilder = $configurationBuilder;

@@ -168,9 +168,9 @@ services:
         class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator
         arguments:
             - '@oro_workflow.configuration.builder.process_configuration'
+            - '@oro_workflow.process.cron_scheduler'
             - '@doctrine'
             - '%oro_workflow.process_trigger.entity.class%'
-            - '@oro_workflow.process.cron_scheduler'
 
     oro_workflow.process.configurator:
         class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator
