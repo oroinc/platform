@@ -20,9 +20,9 @@ class WorkflowRestrictionRepository extends EntityRepository
                 'r.id',
                 'r.entityClass',
                 'IDENTITY(r.step) AS step',
-                'r.mode', 
+                'r.mode',
                 'r.field',
-                'r.values', 
+                'r.values',
                 'd.relatedEntity',
                 'd.name AS workflowName'
             )
