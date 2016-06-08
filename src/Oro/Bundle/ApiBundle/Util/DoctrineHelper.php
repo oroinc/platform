@@ -3,9 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
@@ -28,37 +26,6 @@ class DoctrineHelper extends BaseHelper
         $this->manageableEntityClasses[$entityClass] = $isManageable;
 
         return $isManageable;
-    }
-
-    /**
-     * Adds criteria to the query.
-     *
-     * @param QueryBuilder $qb
-     * @param Criteria     $criteria
-     */
-    public function applyCriteria(QueryBuilder $qb, Criteria $criteria)
-    {
-        $joins = $criteria->getJoins();
-        if (!empty($joins)) {
-            $basePlaceholders = [];
-            foreach ($joins as $path => $join) {
-                $basePlaceholders[sprintf(Criteria::PLACEHOLDER_TEMPLATE, $path)] = $join->getAlias();
-            }
-            $basePlaceholders[Criteria::ROOT_ALIAS_PLACEHOLDER] = QueryUtils::getSingleRootAlias($qb);
-            foreach ($joins as $join) {
-                $alias        = $join->getAlias();
-                $placeholders = array_merge($basePlaceholders, [Criteria::ENTITY_ALIAS_PLACEHOLDER => $alias]);
-                $joinExpr     = strtr($join->getJoin(), $placeholders);
-                $condition    = $join->getCondition();
-                if ($condition) {
-                    $condition = strtr($condition, $placeholders);
-                }
-
-                $method = strtolower($join->getJoinType()) . 'Join';
-                $qb->{$method}($joinExpr, $alias, $join->getConditionType(), $condition, $join->getIndexBy());
-            }
-        }
-        $qb->addCriteria($criteria);
     }
 
     /**
