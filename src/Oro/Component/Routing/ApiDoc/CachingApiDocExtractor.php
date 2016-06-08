@@ -3,15 +3,27 @@
 namespace Oro\Component\Routing\ApiDoc;
 
 use Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor as BaseExtractor;
-use Oro\Component\Routing\RouteCollectionUtil;
 
-class CachingApiDocExtractor extends BaseExtractor
+use Symfony\Component\Routing\Route;
+
+use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
+
+class CachingApiDocExtractor extends BaseExtractor implements RouteOptionsResolverAwareInterface
 {
+    use ApiDocExtractorTrait;
+
+    /** @var Route[]|null */
+    protected $routes;
+
     /**
      * {@inheritdoc}
      */
     public function getRoutes()
     {
-        return RouteCollectionUtil::filterHidden(parent::getRoutes());
+        if (null === $this->routes) {
+            $this->routes = $this->processRoutes(parent::getRoutes());
+        }
+
+        return $this->routes;
     }
 }

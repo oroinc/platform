@@ -10,6 +10,7 @@ define(function(require) {
     require('jquery-ui');
 
     ColumnManagerCollectionView = BaseCollectionView.extend({
+        animationDuration: 0,
         template: require('tpl!orodatagrid/templates/column-manager/column-manager-collection.html'),
         itemView: ColumnManagerItemView,
 

@@ -175,7 +175,10 @@ class RendererTest extends LayoutTestCase
                 'body',
                 [
                     'class_prefix' => 'content',
-                    'attr' => ['class' => '{{ class_prefix }}-body']
+                    'attr' => [
+                        'class' => '{{ class_prefix }}-body',
+                        'data-json' => ['test1'],
+                    ],
                 ]
             )
             ->add('list', 'content', 'list')
@@ -362,7 +365,7 @@ class RendererTest extends LayoutTestCase
         </script>
         <link rel="stylesheet" href="test.css"/>
     </head>
-<body class="content-body test-body class2">
+<body class="content-body test-body class2" data-json="{&quot;0&quot;:&quot;test1&quot;}">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
     <input type="text" name="search"/>
     <input type="submit" name="btn2" value="Btn2"/>

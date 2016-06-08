@@ -4,6 +4,8 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_9;
 
 use Psr\Log\LoggerInterface;
 
+use Doctrine\DBAL\Connection;
+
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class FixCalendarsQuery extends ParametrizedMigrationQuery
@@ -47,13 +49,16 @@ class FixCalendarsQuery extends ParametrizedMigrationQuery
             }
         }
 
+
         // remove calendars
         // as long as calendar events are also duplicated in all calendars there is no need to take care about them
+        $types = ['id' => Connection::PARAM_INT_ARRAY];
         $batches = array_chunk($calendarsForDeletion, 1000);
         foreach ($batches as $batch) {
-            $sql = 'DELETE FROM oro_calendar WHERE id IN (' . implode(',', array_fill(0, count($batch), '?')) . ')';
-            $this->logQuery($logger, $sql, $batch);
-            $this->connection->executeQuery($sql, $batch);
+            $params = ['id' => $batch];
+            $sql = 'DELETE FROM oro_calendar WHERE id IN (:id)';
+            $this->logQuery($logger, $sql, $params, $types);
+            $this->connection->executeQuery($sql, $params, $types);
         }
     }
 }

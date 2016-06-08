@@ -236,6 +236,14 @@ define(function(require) {
             var optionsSelectors = [];
 
             _.each(filters, function(filter) {
+                if (!filter.isRendered()) {
+                    var oldEl = filter.$el;
+                    // filter rendering process replaces $el
+                    filter.render();
+                    // so we need to replace element which keeps place in DOM with actual filter $el after rendering
+                    oldEl.replaceWith(filter.$el);
+                    filter.rendered();
+                }
                 filter.enable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
@@ -297,10 +305,13 @@ define(function(require) {
                 if (_.isFunction(filter.setDropdownContainer)) {
                     filter.setDropdownContainer(this.dropdownContainer);
                 }
-                filter.render();
                 if (!filter.enabled) {
-                    filter.hide();
+                    // append element to reserve space
+                    // empty elements are hidden by default
+                    $filterItems.append(filter.$el);
+                    return;
                 }
+                filter.render();
                 $filterItems.append(filter.$el);
                 filter.rendered();
             }, this);

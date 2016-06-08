@@ -1,0 +1,23 @@
+services:
+    oro_api.data_transformer_registry:
+        public: false
+        class: Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry
+        lazy: true
+
+    oro_api.data_transformer.datetime:
+        public: false
+        class: Oro\Bundle\ApiBundle\DataTransformer\DateTimeToStringTransformer
+        tags:
+            - { name: oro.api.data_transformer, dataType: datetime }
+
+    oro_api.data_transformer.date:
+        public: false
+        class: Oro\Bundle\ApiBundle\DataTransformer\DateToStringTransformer
+        tags:
+            - { name: oro.api.data_transformer, dataType: date }
+
+    oro_api.data_transformer.time:
+        public: false
+        class: Oro\Bundle\ApiBundle\DataTransformer\TimeToStringTransformer
+        tags:
+            - { name: oro.api.data_transformer, dataType: time }

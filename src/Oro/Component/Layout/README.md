@@ -76,6 +76,16 @@ $layout = $layoutFactory->createLayoutBuilder()
 echo $layout->render();
 ```
 
+Also you can render only layout subtree instead of full tree.
+For this you should add `root_id` variable to context.
+
+```php
+$context->getResolver()->setOptional(['root_id']);
+$context->set('root_id', 'some_block_id');
+...
+echo $layout->render();
+```
+
 For deeper understanding of how the layout works you can investigate [Layouts](./Layouts.php) class, the `getLayout` method of [LayoutBuilder](./LayoutBuilder.php) class and [BlockFactory](./BlockFactory.php) class. Also pay attention to the `postExecuteAction` method of [DeferredLayoutManipulator](./DeferredLayoutManipulator.php) class and [LayoutRegistry](./LayoutRegistry.php) class.
 
 

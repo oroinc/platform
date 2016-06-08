@@ -4,17 +4,14 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
+use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * Excludes relations that are pointed to not accessible resources.
@@ -26,25 +23,28 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var RouterInterface */
-    protected $router;
+    /** @var ResourcesLoader */
+    protected $resourcesLoader;
 
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    /** @var ResourcesCache */
+    protected $resourcesCache;
+
+    /** @var array */
+    private $accessibleResources;
 
     /**
      * @param DoctrineHelper  $doctrineHelper
-     * @param RouterInterface $router
-     * @param ValueNormalizer $valueNormalizer
+     * @param ResourcesLoader $resourcesLoader
+     * @param ResourcesCache  $resourcesCache
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        RouterInterface $router,
-        ValueNormalizer $valueNormalizer
+        ResourcesLoader $resourcesLoader,
+        ResourcesCache $resourcesCache
     ) {
         $this->doctrineHelper  = $doctrineHelper;
-        $this->router          = $router;
-        $this->valueNormalizer = $valueNormalizer;
+        $this->resourcesLoader = $resourcesLoader;
+        $this->resourcesCache  = $resourcesCache;
     }
 
     /**
@@ -66,16 +66,21 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
             return;
         }
 
-        $this->updateRelations($definition, $entityClass, $context->getRequestType());
+        $this->updateRelations($definition, $entityClass, $context->getVersion(), $context->getRequestType());
     }
 
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
+     * @param string                 $version
      * @param RequestType            $requestType
      */
-    protected function updateRelations(EntityDefinitionConfig $definition, $entityClass, RequestType $requestType)
-    {
+    protected function updateRelations(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $version,
+        RequestType $requestType
+    ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $fields   = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
@@ -90,7 +95,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
             $mapping        = $metadata->getAssociationMapping($propertyPath);
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
-            if (!$this->isResourceForRelatedEntityAccessible($targetMetadata, $requestType)) {
+            if (!$this->isResourceForRelatedEntityAccessible($targetMetadata, $version, $requestType)) {
                 $field->setExcluded();
             }
         }
@@ -98,19 +103,23 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
     /**
      * @param ClassMetadata $targetMetadata
+     * @param string        $version
      * @param RequestType   $requestType
      *
      * @return bool
      */
-    protected function isResourceForRelatedEntityAccessible(ClassMetadata $targetMetadata, RequestType $requestType)
-    {
-        if ($this->isResourceAccessible($targetMetadata->name, $requestType)) {
+    protected function isResourceForRelatedEntityAccessible(
+        ClassMetadata $targetMetadata,
+        $version,
+        RequestType $requestType
+    ) {
+        if ($this->isResourceAccessible($targetMetadata->name, $version, $requestType)) {
             return true;
         }
         if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
             // check that at least one inherited entity has Data API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
-                if ($this->isResourceAccessible($inheritedEntityClass, $requestType)) {
+                if ($this->isResourceAccessible($inheritedEntityClass, $version, $requestType)) {
                     return true;
                 }
             }
@@ -121,92 +130,22 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
     /**
      * @param string      $entityClass
+     * @param string      $version
      * @param RequestType $requestType
      *
      * @return bool
      */
-    protected function isResourceAccessible($entityClass, RequestType $requestType)
+    protected function isResourceAccessible($entityClass, $version, RequestType $requestType)
     {
-        $result = false;
-
-        $uri = $this->getEntityResourceUri($entityClass, $requestType);
-        if ($uri) {
-            $matchingContext = $this->router->getContext();
-
-            $prevMethod = $matchingContext->getMethod();
-            $matchingContext->setMethod('GET');
-            try {
-                $match = $this->router->match($uri);
-                $matchingContext->setMethod($prevMethod);
-                if ($this->isAcceptableMatch($match)) {
-                    $result = true;
-                }
-            } catch (RoutingException $e) {
-                // any exception from UrlMatcher means that the requested resource is not accessible
-                $matchingContext->setMethod($prevMethod);
+        if (null === $this->accessibleResources) {
+            $accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
+            if (null === $accessibleResources) {
+                $this->resourcesLoader->getResources($version, $requestType);
+                $accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
             }
+            $this->accessibleResources = array_fill_keys($accessibleResources, true);
         }
 
-        return $result;
-    }
-
-    /**
-     * @param string      $entityClass
-     * @param RequestType $requestType
-     *
-     * @return string|null
-     */
-    protected function getEntityResourceUri($entityClass, RequestType $requestType)
-    {
-        $uri        = null;
-        $entityType = $this->convertToEntityType($entityClass, $requestType);
-        if ($entityType) {
-            try {
-                $uri = $this->router->generate(
-                    'oro_rest_api_cget',
-                    ['entity' => $entityType]
-                );
-            } catch (RoutingException $e) {
-                // ignore any exceptions
-            }
-        }
-
-        if ($uri) {
-            $baseUrl = $this->router->getContext()->getBaseUrl();
-            if ($baseUrl) {
-                $uri = substr($uri, strlen($baseUrl));
-            }
-        }
-
-        return $uri;
-    }
-
-    /**
-     * @param string      $entityClass
-     * @param RequestType $requestType
-     *
-     * @return string|null
-     */
-    protected function convertToEntityType($entityClass, RequestType $requestType)
-    {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $requestType,
-            false
-        );
-    }
-
-    /**
-     * @param array $match
-     *
-     * @return bool
-     */
-    protected function isAcceptableMatch(array $match)
-    {
-        // @todo: need to investigate how to avoid "'_webservice_definition' !== $match['_route']" check (BAP-8996)
-        return
-            isset($match['_route'])
-            && '_webservice_definition' !== $match['_route'];
+        return isset($this->accessibleResources[$entityClass]);
     }
 }

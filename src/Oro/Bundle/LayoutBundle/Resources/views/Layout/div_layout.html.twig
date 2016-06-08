@@ -30,7 +30,10 @@
             class: attr.class|replace({'{{ class_prefix }}': class_prefix})
         }) %}
     {% endif %}
-    {% for attrname, attrvalue in attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
+    {% for attrname, attrvalue in attr %}
+        {% if (attrvalue is iterable) %}{% set attrvalue = attrvalue|json_encode(constant('JSON_FORCE_OBJECT')) %}{% endif %}
+        {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}
+    {% endfor %}
 {%- endblock %}
 
 {% block block_label_attributes -%}

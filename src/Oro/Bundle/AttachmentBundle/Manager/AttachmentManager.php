@@ -20,6 +20,7 @@ use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Stream\Local as LocalStream;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
@@ -32,6 +33,8 @@ class AttachmentManager
     const DEFAULT_IMAGE_HEIGHT = 100;
     const SMALL_IMAGE_WIDTH = 32;
     const SMALL_IMAGE_HEIGHT = 32;
+    const THUMBNAIL_WIDTH  = 110;
+    const THUMBNAIL_HEIGHT = 80;
 
     /** @var Filesystem */
     protected $filesystem;
@@ -342,10 +345,10 @@ class AttachmentManager
     /**
      * Get filetype icon
      *
-     * @param File $entity
+     * @param FileExtensionInterface $entity
      * @return string
      */
-    public function getAttachmentIconClass(File $entity)
+    public function getAttachmentIconClass(FileExtensionInterface $entity)
     {
         return isset($this->fileIcons[$entity->getExtension()])
             ? $this->fileIcons[$entity->getExtension()]
@@ -452,6 +455,28 @@ class AttachmentManager
         $this->copyStreamToStorage($sourceStream, $fileCopy->getFilename());
 
         return $fileCopy;
+    }
+    
+    /**
+     * Check if content type is an image
+     *
+     * @param string $contentType
+     * @return bool
+     */
+    public function isImageType($contentType)
+    {
+        return in_array(
+            $contentType,
+            ['image/gif','image/jpeg','image/pjpeg','image/png']
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function getFileIcons()
+    {
+        return $this->fileIcons;
     }
 
     /**

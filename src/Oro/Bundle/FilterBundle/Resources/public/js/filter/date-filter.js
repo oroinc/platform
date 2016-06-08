@@ -140,7 +140,7 @@ define(function(require) {
 
         /**
          * Flag to allow filter type change if start or end date is missing
-         * 
+         *
          * @property
          */
         autoUpdateRangeFilterType: true,
@@ -471,21 +471,20 @@ define(function(require) {
          * Apply additional logic for "between" filters
          * - Swap start and end dates if end date is behind start date
          * - Change filter type to more than/less than, when only one date is filled
-         * 
+         *
          * @param {*} value
          * @param {boolean} updateDom
          * @protected
          */
         _updateRangeFilter: function(value, updateDom) {
             var oldValue = tools.deepClone(value);
+            var type = parseInt(value.type);
             if (value.value &&
-                (value.type == this.typeValues.between || value.type == this.typeValues.notBetween))
-            {
+                (type === this.typeValues.between || type === this.typeValues.notBetween)) {
                 if (value.value.start && value.value.end) {
                     //if both dates are filled
                     if (!this.dateVariableHelper.isDateVariable(value.value.end) &&
-                        !this.dateVariableHelper.isDateVariable(value.value.start))
-                    {
+                        !this.dateVariableHelper.isDateVariable(value.value.start)) {
                         //swap end/start date if no variables are used and end date is behind start date
                         var end = datetimeFormatter.getMomentForBackendDateTime(value.value.end);
                         var start = datetimeFormatter.getMomentForBackendDateTime(value.value.start);
@@ -498,9 +497,9 @@ define(function(require) {
                 } else {
                     if (value.value.start || value.value.end) {
                         //if only one date is filled replace filter type to less than or more than
-                        if (value.type == this.typeValues.between) {
+                        if (type === this.typeValues.between) {
                             value.type = value.value.end ? this.typeValues.lessThan : this.typeValues.moreThan;
-                        } else if (value.type == this.typeValues.notBetween) {
+                        } else if (type === this.typeValues.notBetween) {
                             if (!value.value.end) {
                                 //less than type expects end date
                                 value.type = this.typeValues.lessThan;

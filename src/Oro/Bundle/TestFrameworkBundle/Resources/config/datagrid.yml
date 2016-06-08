@@ -1,0 +1,27 @@
+datagrid:
+    items-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - item.id
+                    - item.stringValue
+                from:
+                    - { table: %oro_test.entity.item.class%, alias: item }
+        columns:
+            id:
+                label: id
+            stringValue:
+                label: stringValue
+
+    items-values-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - itemValue.id
+                from:
+                    - { table: %oro_test.entity.item_value.class%, alias: itemValue }
+        columns:
+            id:
+                label: id

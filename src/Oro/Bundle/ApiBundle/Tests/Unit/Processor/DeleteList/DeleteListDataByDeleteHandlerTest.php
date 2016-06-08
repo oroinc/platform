@@ -86,7 +86,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->getMock();
         $this->container->expects($this->once())
             ->method('get')
-            ->with(DeleteListDataByDeleteHandler::DEFAULT_DELETE_HANDLER)
+            ->with('oro_soap.handler.delete')
             ->willReturn($deleteHandler);
 
         $this->doctrineHelper->expects($this->never())
@@ -116,7 +116,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->getMock();
         $this->container->expects($this->once())
             ->method('get')
-            ->with(DeleteListDataByDeleteHandler::DEFAULT_DELETE_HANDLER)
+            ->with('oro_soap.handler.delete')
             ->willReturn($deleteHandler);
 
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')

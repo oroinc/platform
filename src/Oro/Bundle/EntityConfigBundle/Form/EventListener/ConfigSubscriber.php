@@ -179,6 +179,10 @@ class ConfigSubscriber implements EventSubscriberInterface
         $extendConfig = $extendConfigProvider->getConfigById($extendConfigId);
         $pendingChanges = $extendConfig->get('pending_changes', false, []);
 
+        if (!$pendingChanges) {
+            return $data;
+        }
+
         $scopes = array_keys($pendingChanges);
         foreach ($scopes as $scope) {
             if (!isset($data[$scope])) {

@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Loads configuration from the "relations" section of "Resources/config/oro/api.yml"
- * for all associations were not configured yet
+ * for all associations that were not configured yet.
  */
 class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
 {
@@ -80,8 +80,9 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
     ) {
         $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $associations = $metadata->getAssociationMappings();
-        foreach ($associations as $fieldName => $mapping) {
-            if ($definition->hasField($fieldName)) {
+        foreach ($associations as $propertyPath => $mapping) {
+            $field = $definition->findField($propertyPath, true);
+            if (null !== $field && $field->hasTargetEntity()) {
                 continue;
             }
 
@@ -100,7 +101,9 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
                     }
                 }
 
-                $field = $definition->addField($fieldName);
+                if (null === $field) {
+                    $field = $definition->addField($propertyPath);
+                }
                 if ($targetEntity->isCollapsed()) {
                     $field->setCollapsed();
                     $targetEntity->setCollapsed(false);

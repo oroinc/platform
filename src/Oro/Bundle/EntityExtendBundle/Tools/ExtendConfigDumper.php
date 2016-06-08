@@ -535,7 +535,7 @@ class ExtendConfigDumper
             }
 
             $pendingChanges[$config->getId()->getClassName()] = $configPendingChanges;
-            $config->set('pending_changes', []);
+            $config->remove('pending_changes');
             $this->configManager->persist($config);
         }
 

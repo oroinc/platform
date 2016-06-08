@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "Routing"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "symfony/config": "~2.3",
         "symfony/http-kernel": "~2.3",
         "symfony/routing": "~2.3",

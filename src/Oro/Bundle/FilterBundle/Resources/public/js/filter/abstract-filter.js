@@ -129,7 +129,12 @@ define([
             this.listenTo(hintView, 'reset', this.reset);
         },
 
+        isRendered: function() {
+            return this._isRendered;
+        },
+
         rendered: function() {
+            this._isRendered = true;
             this.subview('hint').render();
         },
 

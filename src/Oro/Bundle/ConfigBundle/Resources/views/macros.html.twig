@@ -225,11 +225,17 @@
         block.title       - fieldset label
         block.description - fieldset description (optional)
         block.data        - fields data
+        block.tooltip     - fieldset tooltip (optional)
 #}
 {% macro renderFieldset(block) %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
     <fieldset class="form-horizontal form-horizontal-large">
         <h5 class="user-fieldset">
-            <span>{{ block.title|trans }}</span>
+            <span>{{ block.title|trans }}
+                {% if block.tooltip is defined and block.tooltip != '' %}
+                    <label class="control-label header-tooltips">{{ ui.tooltip(block.tooltip, {}, 'right') }}</label>
+                {% endif %}
+            </span>
         </h5>
 
         {% if block.description is defined and block.description != '' %}

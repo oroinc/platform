@@ -202,12 +202,6 @@ class HiddenRoutesPass implements CompilerPassInterface
     const EXPECTED_MATCHER_DUMPER_CLASS = 'Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper';
     const NEW_MATCHER_DUMPER_CLASS      = 'Oro\Component\Routing\Matcher\PhpMatcherDumper';
 
-    const API_DOC_EXTRACTOR_CLASS_PARAM            = 'nelmio_api_doc.extractor.api_doc_extractor.class';
-    const EXPECTED_API_DOC_EXTRACTOR_CLASS         = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
-    const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
-    const NEW_API_DOC_EXTRACTOR_CLASS              = 'Oro\Component\Routing\ApiDoc\ApiDocExtractor';
-    const NEW_CACHING_API_DOC_EXTRACTOR_CLASS      = 'Oro\Component\Routing\ApiDoc\CachingApiDocExtractor';
-
     /**
      * {@inheritdoc}
      */
@@ -219,15 +213,6 @@ class HiddenRoutesPass implements CompilerPassInterface
             );
             if ($newClass) {
                 $container->setParameter(self::MATCHER_DUMPER_CLASS_PARAM, $newClass);
-            }
-        }
-
-        if ($container->hasParameter(self::API_DOC_EXTRACTOR_CLASS_PARAM)) {
-            $newClass = $this->getNewApiDocExtractorClass(
-                $container->getParameter(self::API_DOC_EXTRACTOR_CLASS_PARAM)
-            );
-            if ($newClass) {
-                $container->setParameter(self::API_DOC_EXTRACTOR_CLASS_PARAM, $newClass);
             }
         }
     }
@@ -242,6 +227,38 @@ class HiddenRoutesPass implements CompilerPassInterface
         return self::EXPECTED_MATCHER_DUMPER_CLASS === $currentClass
             ? self::NEW_MATCHER_DUMPER_CLASS
             : null;
+    }
+}
+```
+
+``` php
+<?php
+
+namespace Acme\Bundle\AppBundle\DependencyInjection\Compiler;
+
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+class ApiDocHiddenRoutesPass implements CompilerPassInterface
+{
+    const API_DOC_EXTRACTOR_SERVICE                = 'nelmio_api_doc.extractor.api_doc_extractor';
+    const EXPECTED_API_DOC_EXTRACTOR_CLASS         = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
+    const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
+    const NEW_API_DOC_EXTRACTOR_CLASS              = 'Oro\Component\Routing\ApiDoc\ApiDocExtractor';
+    const NEW_CACHING_API_DOC_EXTRACTOR_CLASS      = 'Oro\Component\Routing\ApiDoc\CachingApiDocExtractor';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContainerBuilder $container)
+    {
+        if ($container->hasDefinition(self::API_DOC_EXTRACTOR_SERVICE)) {
+            $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
+            $newClass = $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass());
+            if ($newClass) {
+                $apiDocExtractorDef->setClass($newClass);
+            }
+        }
     }
 
     /**
@@ -269,9 +286,11 @@ class HiddenRoutesPass implements CompilerPassInterface
 namespace Acme\Bundle\AppBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Acme\Bundle\AppBundle\DependencyInjection\Compiler\HiddenRoutesPass;
+use Acme\Bundle\AppBundle\DependencyInjection\Compiler\ApiDocHiddenRoutesPass;
 
 class AcmeAppBundle extends Bundle
 {
@@ -283,6 +302,7 @@ class AcmeAppBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new HiddenRoutesPass());
+        $container->addCompilerPass(new ApiDocHiddenRoutesPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 }
 ```
@@ -327,7 +347,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
             }
             $route->setRequirement(self::ENTITY_ATTRIBUTE, '\w+');
 
-			// mark the common route as hidden
+            // mark the common route as hidden
             $route->setOption('hidden', true);
         }
     }
@@ -342,7 +362,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 
             $this->supportedEntities = [];
             foreach ($entities as $className) {
-	            $pluralAlias = ... get entity plural alias ...
+                $pluralAlias = ... get entity plural alias ...
                 $this->supportedEntities[] = $pluralAlias;
             }
         }

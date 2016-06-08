@@ -34,16 +34,16 @@ class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLocaleFallbacks()
     {
-        $currentLocale = 'fr';
+        $currentLanguage = 'fr';
 
         $this->localeSettings->expects($this->once())
-            ->method('getLocale')
-            ->willReturn($currentLocale);
+            ->method('getLanguage')
+            ->willReturn($currentLanguage);
 
         $this->assertEquals(
             [
                 Configuration::DEFAULT_LOCALE => [
-                    $currentLocale => [],
+                    $currentLanguage => [],
                 ],
             ],
             $this->strategy->getLocaleFallbacks()

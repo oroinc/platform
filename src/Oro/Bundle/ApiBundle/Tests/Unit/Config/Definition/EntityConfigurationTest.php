@@ -40,26 +40,14 @@ class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
         $configExtensionRegistry->addExtension(new ActionsConfigExtension());
         $configExtensionRegistry->addExtension(new TestConfigExtension());
 
-        list(
-            $extraSections,
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-            ) = $configExtensionRegistry->getConfigurationSettings();
-
         $configuration = new EntityConfiguration(
             ApiConfiguration::ENTITIES_SECTION,
             new EntityDefinitionConfiguration(),
-            $extraSections,
+            $configExtensionRegistry->getConfigurationSettings(),
             1
         );
         $configBuilder = new TreeBuilder();
-        $configuration->configure(
-            $configBuilder->root('entity')->children(),
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-        );
+        $configuration->configure($configBuilder->root('entity')->children());
 
         $processor = new Processor();
         $result    = $processor->process($configBuilder->buildTree(), [$config]);

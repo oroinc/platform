@@ -44,11 +44,13 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
         if ($this->installed) {
             $locales = [
                 Configuration::DEFAULT_LOCALE => [
-                    $this->localeSettings->getLocale() => []
+                    $this->localeSettings->getLanguage() => []
                 ]
             ];
         } else {
-            $locales = [Configuration::DEFAULT_LOCALE => []];
+            $locales = [
+                Configuration::DEFAULT_LOCALE => []
+            ];
         }
 
         return $locales;

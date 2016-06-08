@@ -8,4 +8,5 @@ OroApiBundle Documentation
  - [Processors](./processors.md)
  - [Debug commands](./debug_commands.md)
  - [**X-Include** header](./headers.md)
+ - [Forms Configuration](./forms.md)
  - [How To](./how_to.md)

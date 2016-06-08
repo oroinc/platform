@@ -1,0 +1,41 @@
+services:
+    oro_test.dumper.mysql:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Dumper\MysqlDumper'
+        arguments:
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: 'oro_test.db_dumper', driver: 'pdo_mysql' }
+
+    oro_test.dumper.pgsql:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Dumper\PgsqlDumper'
+        arguments:
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: 'oro_test.db_dumper', driver: 'pdo_pgsql' }
+
+    oro_test.listener.db_restore_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbRestoreSubscriber'
+        arguments:
+            - ~
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
+    oro_test.listener.db_dump_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbDumpSubscriber'
+        arguments:
+            - ~
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
+    oro_element_factory:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory'
+        arguments:
+            - '@mink'
+            - ~
+
+    oro_behat_element_factory_initializer:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ElementFactoryInitializer'
+        arguments:
+            - '@oro_element_factory'
+        tags:
+            - { name: 'context.initializer' }

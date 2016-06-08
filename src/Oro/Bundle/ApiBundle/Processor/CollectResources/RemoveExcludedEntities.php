@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
@@ -30,12 +29,12 @@ class RemoveExcludedEntities implements ProcessorInterface
     {
         /** @var CollectResourcesContext $context */
 
-        $context->setResult(
-            $context->getResult()->filter(
-                function (ApiResource $resource) {
-                    return !$this->entityExclusionProvider->isIgnoredEntity($resource->getEntityClass());
-                }
-            )
-        );
+        $resources = $context->getResult();
+        $entityClasses = array_keys($resources->toArray());
+        foreach ($entityClasses as $entityClass) {
+            if ($this->entityExclusionProvider->isIgnoredEntity($entityClass)) {
+                $resources->remove($entityClass);
+            }
+        }
     }
 }

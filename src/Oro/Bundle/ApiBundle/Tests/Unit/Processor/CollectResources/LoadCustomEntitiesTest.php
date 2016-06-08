@@ -35,9 +35,19 @@ class LoadCustomEntitiesTest extends \PHPUnit_Framework_TestCase
             ->with('extend', null, true)
             ->willReturn(
                 [
-                    $this->getEntityConfig('Test\Entity1', ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM]),
-                    $this->getEntityConfig('Test\Entity2', ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM]),
+                    $this->getEntityConfig(
+                        'Test\Entity1',
+                        ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM]
+                    ),
+                    $this->getEntityConfig(
+                        'Test\Entity2',
+                        ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM]
+                    ),
                     $this->getEntityConfig('Test\Entity3'),
+                    $this->getEntityConfig(
+                        'Test\Entity4',
+                        ['is_extend' => true, 'owner' => ExtendScope::OWNER_SYSTEM, 'is_deleted' => true]
+                    ),
                 ]
             );
 
@@ -45,7 +55,7 @@ class LoadCustomEntitiesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                new ApiResource('Test\Entity1'),
+                'Test\Entity1' => new ApiResource('Test\Entity1'),
             ],
             $context->getResult()->toArray()
         );

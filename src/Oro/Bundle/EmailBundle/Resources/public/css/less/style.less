@@ -407,17 +407,100 @@ span.icon.grid .icon-paperclip {
       min-width: 100%;
     }
   }
-  .email-attachments-list {
-    list-style: none;
-    margin: 0;
-    .email-attachments-list-item {
-      display: inline-block;
-      padding: 0 15px 0 0;
-      white-space: nowrap;
-      .icon {
-        color: #444;
-        font-size: 15px;
-        margin-right: 1px;
+  .email-attachments-list-cont {
+    h6 {
+      margin:0 10px 0 0;
+      font-size: 13px;
+    }
+    .email-attachments-list {
+      padding-top: 10px;
+      clear: both;
+      list-style: none;
+      margin: 0;
+      max-width: 700px;
+      .email-attachments-list-item {
+        display: inline-block;
+        white-space: nowrap;
+        margin: 0 13px 10px 0;
+        @media only screen and (max-width: 500px) {
+          margin-right: 10px;
+          .email-attachments-file {
+            display: none; //hide thumbnails on mobile
+          }
+        }
+        .thumbnail {
+          width: 110px;
+          height: 80px;
+          padding:0;
+          text-align: center;
+          background: #eeeeee;
+          border-radius: 6px;
+          border:none;
+          .fa {
+            padding-top: 20px;
+            color: #fff;
+          }
+        }
+        .link-to-record {
+          padding-top: 10px;
+          .dropdown-toggle {
+            display: inline-block;
+            width: 110px;
+            overflow: hidden;
+            @media only screen and (max-width: 500px) {
+              font-size: 13px;
+            }
+            &:focus {
+              font-weight: normal;
+            }
+          }
+          .dropdown-menu {
+            padding: 5px 15px;
+            a {
+              display: block;
+              text-align: left;
+              span {
+                margin-left: 7px;
+                color: #777;
+              }
+              &:hover {
+                span {
+                  color: #777;
+                }
+              }
+            }
+            .view-image {
+              display: none;
+            }
+            @media only screen and (max-width: 500px) {
+              .view-image {
+                display: block;
+              }
+            }
+          }
+          .fa {
+            color: #444;
+            font-size: 15px;
+            margin-right: 1px;
+            margin-left: 0;
+          }
+        }
+      }
+    }
+    .email-attachments-list.name-only {
+      .email-attachments-list-item {
+        margin-bottom: 0;
+        .email-attachments-file {
+          display: none;
+        }
+        .link-to-record {
+          padding-top: 0;
+          .dropdown-menu {
+            .view-image {
+              display: block;
+            }
+          }
+        }
       }
     }
   }
@@ -646,6 +729,10 @@ a.attachment .icon .icon-link {
 .attachment-list-popup .attachment-list-row {
   line-height: 26px;
   font-size: 11px;
+  .popover-content {
+    padding: 10px;
+    min-width: 110px;
+  }
 }
 
 .attachment-list-popup .attachment-list-row input.checkbox {

@@ -18,6 +18,7 @@ define([
      * @extends oroui/js/app/views/base/view
      */
     ActionHeaderCell = BaseView.extend({
+        keepElement: false,
         /** @property */
         className: 'action-column renderable',
 

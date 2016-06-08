@@ -38,6 +38,10 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
      */
     protected $attributeGuesser;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $dispatcher;
 
     protected function setUp()
     {
@@ -48,13 +52,15 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->defaultValuesListener = $this->createDefaultValuesListenerMock();
         $this->initActionListener = $this->createInitActionsListenerMock();
         $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
+        $this->dispatcher = $this->createDispatcherMock();
 
         $this->type = $this->createWorkflowAttributesType(
             $this->workflowRegistry,
             $this->attributeGuesser,
             $this->defaultValuesListener,
             $this->initActionListener,
-            $this->requiredAttributesListener
+            $this->requiredAttributesListener,
+            $this->dispatcher
         );
     }
 

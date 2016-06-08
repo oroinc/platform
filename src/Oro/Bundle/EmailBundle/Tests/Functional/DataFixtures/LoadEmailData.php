@@ -37,6 +37,11 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
     protected $container;
 
     /**
+     * @var string
+     */
+    protected $attachmentFile;
+
+    /**
      * {@inheritdoc}
      */
     public function getDependencies()
@@ -85,6 +90,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 $this->templates[] = array_combine($headers, array_values($data));
             }
         }
+        $this->attachmentFile = file_get_contents($dictionaryDir . DIRECTORY_SEPARATOR. "test.png");
     }
 
     /**
@@ -125,11 +131,21 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 true
             );
 
+            $attachmentContent = $this->emailEntityBuilder->attachmentContent(
+                base64_encode($this->attachmentFile),
+                'base64'
+            );
+            $attachment = $this->emailEntityBuilder->attachment('test.png', 'image/png');
+            $attachment->setContent($attachmentContent);
+
+            $emailBody->addAttachment($attachment);
+
             $emailUser->getEmail()->setEmailBody($emailBody);
             $emailUser->getEmail()->setMessageId(sprintf('<id+&?= %s@%s>', $index, 'bap.migration.generated'));
             $this->setReference('email_' . ($index + 1), $emailUser->getEmail());
             $this->setReference('emailUser_' . ($index + 1), $emailUser);
             $this->setReference('emailBody_' . ($index + 1), $emailBody);
+            $this->setReference('emailAttachment_' . ($index + 1), $attachment);
         }
 
         $emailUser->setOwner($adminUser);

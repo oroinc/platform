@@ -25,6 +25,11 @@ class SubBlockConfig implements FormConfigInterface
     protected $priority;
 
     /**
+     * @var string
+     */
+    protected $tooltip;
+
+    /**
      * @var array
      */
     protected $data = array();
@@ -165,16 +170,33 @@ class SubBlockConfig implements FormConfigInterface
     }
 
     /**
+     * @return string
+     */
+    public function getTooltip()
+    {
+        return $this->tooltip;
+    }
+
+    /**
+     * @param string $tooltip
+     */
+    public function setTooltip($tooltip)
+    {
+        $this->tooltip = $tooltip;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
     {
-        return array(
+        return [
             'code'        => $this->code,
             'title'       => $this->title,
             'description' => $this->description,
+            'tooltip'     => $this->tooltip,
             'data'        => $this->data,
             'useSpan'     => $this->useSpan !== null ? $this->useSpan : true
-        );
+        ];
     }
 }

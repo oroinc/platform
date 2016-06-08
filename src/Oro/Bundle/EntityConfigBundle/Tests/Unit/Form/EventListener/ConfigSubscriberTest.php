@@ -227,17 +227,16 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($providers));
 
         if (null === $expectedConfigData) {
-            $this->configManager->expects($this->once())
+            $this->configManager->expects($this->never())
                 ->method('persist');
         } else {
             $expectedConfig = new Config(new EntityConfigId('entity', 'Entity\Test'));
             foreach ($expectedConfigData as $code => $val) {
                 $expectedConfig->set($code, $val);
             }
-            $this->configManager->expects($this->exactly(2))
+            $this->configManager->expects($this->exactly(1))
                 ->method('persist')
                 ->withConsecutive(
-                    [new Config(new EntityConfigId('extend'), ['pending_changes' => []])],
                     [$expectedConfig]
                 );
         }

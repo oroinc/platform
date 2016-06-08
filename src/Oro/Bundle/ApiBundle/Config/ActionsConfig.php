@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 class ActionsConfig
 {
     /** @var ActionConfig[] [action name => ActionConfig, ...] */
-    private $actions = [];
+    protected $actions = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
