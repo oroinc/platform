@@ -110,6 +110,13 @@ services:
             - '@oro_workflow.workflow_assembler'
             - '@oro_entity_config.provider.workflow'
 
+    oro_workflow.permission_registry:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.provider.workflow'
+
     oro_workflow.exclusion_provider.workflow_item_step:
         class: Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider
         public: false
@@ -135,3 +142,17 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
+
+    oro_workflow.validation_loader:
+        class: Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader
+        public: false
+        arguments:
+            - '@oro_workflow.permission_registry'
+            - '@oro_workflow.restriction.manager'
+
+    oro_workflow.restriction.manager:
+        class: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager
+        public: false
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_entity.doctrine_helper'

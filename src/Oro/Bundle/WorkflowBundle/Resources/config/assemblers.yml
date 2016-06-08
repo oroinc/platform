@@ -53,6 +53,7 @@ services:
             - '@oro_workflow.attribute_assembler'
             - '@oro_workflow.step_assembler'
             - '@oro_workflow.transition_assembler'
+            - '@oro_workflow.restriction_assembler'
             - '@translator'
 
     oro_workflow.form_options_assembler:
@@ -61,3 +62,6 @@ services:
             - '@oro_workflow.action_factory'
         calls:
             - [addConfigurationPass,  ['@oro_workflow.configuration_pass.replace_property_path']]
+
+    oro_workflow.restriction_assembler:
+        class: Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler
