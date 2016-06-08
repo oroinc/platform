@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 trait FallbackTrait
 {
@@ -30,7 +31,7 @@ trait FallbackTrait
         $value = $filteredValues->first();
         if ($value) {
             switch ($value->getFallback()) {
-                case FallbackType::PARENT_LOCALE:
+                case FallbackType::PARENT_LOCALIZATION:
                     $value = $this->getLocalizedFallbackValue($values, $localization->getParentLocale());
                     break;
                 case FallbackType::SYSTEM:
