@@ -175,13 +175,15 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Request parameter "input_action" is required to make redirect.
-     */
-    public function testRedirectFailsWhenInputActionIsEmpty()
+    public function testRedirectWillBeToTheSamePageIfInputActionIsEmpty()
     {
-        $this->router->redirect([]);
+        $expectedUrl = '/example/view/1';
+        $this->request->expects($this->once())
+            ->method('getUri')
+            ->willReturn($expectedUrl);
+
+        $response = $this->router->redirect([]);
+        $this->assertEquals($response->getTargetUrl(), $expectedUrl);
     }
 
     /**
@@ -194,22 +196,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
             ->willReturn(['invalid_value']);
-
-        $this->router->redirect([]);
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot parse route data from request parameter "input_action". Invalid JSON string is given: invalid_json
-     */
-    // @codingStandardsIgnoreEnd
-    public function testRedirectFailsWhenInputActionIsNotValieJson()
-    {
-        $this->request->expects($this->any())
-            ->method('get')
-            ->with(Router::ACTION_PARAMETER)
-            ->willReturn('invalid_json');
 
         $this->router->redirect([]);
     }
