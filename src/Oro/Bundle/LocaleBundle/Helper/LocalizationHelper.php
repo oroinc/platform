@@ -43,11 +43,14 @@ class LocalizationHelper
     {
         $items = $this->getRepository()->findBy([], ['id' => 'ASC']);
 
-        $items = array_merge(array_filter($items, function (Localization $localization) {
-            return $localization->getLanguageCode() === 'en';
-        }), $items);
-
-        return reset($items);
+        $withEnglish = array_filter(
+            $items,
+            function (Localization $localization) {
+                return $localization->getLanguageCode() === 'en';
+            }
+        );
+        
+        return $withEnglish ? reset($withEnglish) : reset($items);
     }
 
     /**
