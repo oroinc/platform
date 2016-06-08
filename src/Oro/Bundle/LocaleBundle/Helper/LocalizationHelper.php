@@ -41,7 +41,13 @@ class LocalizationHelper
      */
     public function getCurrentLocalization()
     {
-        return $this->getRepository()->findOneByName('English');
+        $items = $this->getRepository()->findBy([], ['id' => 'ASC']);
+
+        $items = array_merge(array_filter($items, function (Localization $localization) {
+            return $localization->getLanguageCode() === 'en';
+        }), $items);
+
+        return reset($items);
     }
 
     /**
