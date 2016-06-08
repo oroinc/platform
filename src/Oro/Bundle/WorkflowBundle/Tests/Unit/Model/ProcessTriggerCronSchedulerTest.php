@@ -8,7 +8,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
 
@@ -130,7 +129,6 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $this->processCronScheduler->removeSchedule($mockTrigger);
 
-        //$this->assertAttributeEquals(true, 'dirty', $this->processCronScheduler);
     }
 
     public function testException()

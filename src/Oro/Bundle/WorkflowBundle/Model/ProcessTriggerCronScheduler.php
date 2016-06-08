@@ -26,6 +26,12 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
     /** @var bool */
     protected $dirty = false;
 
+    /** @var array|Schedule[] */
+    protected $forRemove = [];
+
+    /** @var array|Schedule[] */
+    protected $forPersist = [];
+
     /** @var ManagerRegistry */
     private $registry;
 
@@ -63,11 +69,9 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
 
         $arguments = $this->buildArguments($trigger);
 
-        $objectManager = $this->getObjectManager();
-
         if (!$this->scheduleManager->hasSchedule(self::$command, $arguments, $trigger->getCron())) {
             $schedule = $this->scheduleManager->createSchedule(self::$command, $arguments, $trigger->getCron());
-            $objectManager->persist($schedule);
+            $this->forPersist[] = $schedule;
             $this->dirty = true;
             $this->notify('created', $schedule);
         }
@@ -88,19 +92,15 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
             ['command' => self::$command, 'definition' => $trigger->getCron()]
         );
 
-        $arguments = $this->buildArguments($trigger);
+        $argsSchedule = (new Schedule())->setArguments($this->buildArguments($trigger));
 
-        $schedules = array_filter($schedules, function (Schedule $schedule) use ($arguments) {
-            $scheduleArgs = $schedule->getArguments();
-            sort($scheduleArgs);
-            return $scheduleArgs == $arguments;
+        $schedules = array_filter($schedules, function (Schedule $schedule) use ($argsSchedule) {
+            return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
         });
 
         if (count($schedules) !== 0) {
-            $objectManager = $this->getObjectManager();
-
             foreach ($schedules as $schedule) {
-                $objectManager->remove($schedule);
+                $this->forRemove[] = $schedule;
                 $this->dirty = true;
                 $this->notify('deleted', $schedule);
             }
@@ -118,7 +118,7 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
             sprintf('--name=%s', $trigger->getDefinition()->getName()),
             sprintf('--id=%d', $trigger->getId())
         ];
-        sort($args);
+
         return $args;
     }
 
@@ -169,7 +169,17 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
     public function flush()
     {
         if ($this->dirty) {
-            $this->getObjectManager()->flush();
+            $objectManager = $this->getObjectManager();
+
+            while ($toPersist = array_shift($this->forPersist)) {
+                $objectManager->persist($toPersist);
+            }
+            while ($toRemove = array_shift($this->forRemove)) {
+                if ($objectManager->contains($toRemove)) {
+                    $objectManager->remove($toRemove);
+                }
+            }
+            $objectManager->flush();
             $this->dirty = false;
             $this->logger->info('>>> process trigger schedule modification persisted.');
         }

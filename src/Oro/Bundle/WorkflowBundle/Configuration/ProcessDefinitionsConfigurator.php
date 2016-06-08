@@ -31,6 +31,9 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     /** @var array|ProcessDefinition[] */
     private $toPersist = [];
 
+    /** @var array|ProcessDefinition[] */
+    private $toRemove = [];
+
     /** @var bool */
     private $dirty = false;
 
@@ -75,23 +78,13 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     }
 
     /**
-     * @param string|array $names
-     */
-    public function removeDefinitions($names)
-    {
-        foreach ((array)$names as $name) {
-            $this->removeDefinition($name);
-        }
-    }
-
-    /**
      * @param string $name
      */
     public function removeDefinition($name)
     {
         /**@var ProcessDefinition $definition */
         $definition = $this->getRepository()->find($name);
-        $this->getObjectManager()->remove($definition);
+        $this->toRemove[] = $definition;
         $this->dirty = true;
         $this->notify('deleted', $definition);
     }
@@ -121,9 +114,12 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     {
         if ($this->dirty) {
             $objectManager = $this->getObjectManager();
-            if(count($this->toPersist) !== 0) {
-                while ($definition = array_shift($this->toPersist)) {
-                    $objectManager->persist($definition);
+            while ($createdDefinition = array_shift($this->toPersist)) {
+                $objectManager->persist($createdDefinition);
+            }
+            while ($definitionToDelete = array_shift($this->toRemove)) {
+                if ($objectManager->contains($definitionToDelete)) {
+                    $objectManager->remove($definitionToDelete);
                 }
             }
             $objectManager->flush();

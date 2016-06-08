@@ -20,7 +20,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     protected $logger;
 
     /** @var bool */
-    protected $dirty;
+    protected $dirty = false;
 
     /** @var ProcessConfigurationBuilder */
     private $configurationBuilder;
@@ -36,6 +36,12 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
 
     /** @var ProcessTrigger[] */
     private $triggers;
+
+    /** @var array|ProcessDefinition[] */
+    private $forRemove = [];
+
+    /** @var array|ProcessDefinition[] */
+    private $forPersist = [];
 
     /**
      * @param ProcessConfigurationBuilder $configurationBuilder
@@ -57,9 +63,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
         $this->setLogger(new NullLogger());
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
+    /** {@inheritdoc} */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -100,13 +104,13 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
                         $this->update($existingTrigger, $newTrigger);
                         $newTrigger = $existingTrigger;
                     } else {
-                        $this->create($newTrigger);
+                        $this->addForPersist($newTrigger);
                     }
                     $this->triggers[] = $newTrigger;
                 }
 
                 foreach ($storedTriggers as $triggerForRemove) {
-                    $this->delete($triggerForRemove);
+                    $this->addForRemove($triggerForRemove);
                     $this->dropSchedule($triggerForRemove);
                 }
 
@@ -163,7 +167,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
      * @param ProcessTrigger $existingTrigger
      * @param ProcessTrigger $newTrigger
      */
-    protected function update(ProcessTrigger $existingTrigger, ProcessTrigger $newTrigger)
+    private function update(ProcessTrigger $existingTrigger, ProcessTrigger $newTrigger)
     {
         $existingTrigger->import($newTrigger);
         $this->dirty = true;
@@ -173,9 +177,9 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     /**
      * @param ProcessTrigger $newTrigger
      */
-    protected function create(ProcessTrigger $newTrigger)
+    private function addForPersist(ProcessTrigger $newTrigger)
     {
-        $this->getObjectManager()->persist($newTrigger);
+        $this->forPersist[] = $newTrigger;
         $this->dirty = true;
         $this->notify('created', $newTrigger);
     }
@@ -183,9 +187,9 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     /**
      * @param ProcessTrigger $processTrigger
      */
-    protected function delete(ProcessTrigger $processTrigger)
+    private function addForRemove(ProcessTrigger $processTrigger)
     {
-        $this->getObjectManager()->remove($processTrigger);
+        $this->forRemove[] = $processTrigger;
         $this->dirty = true;
         $this->notify('deleted', $processTrigger);
     }
@@ -232,7 +236,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     public function removeDefinitionTriggers(ProcessDefinition $definition)
     {
         foreach ($this->getRepository()->findByDefinitionName($definition->getName()) as $trigger) {
-            $this->delete($trigger);
+            $this->addForRemove($trigger);
             $this->dropSchedule($trigger);
         }
     }
@@ -240,12 +244,27 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     public function flush()
     {
         if ($this->dirty) {
-            $this->getObjectManager()->flush();
+            $objectManager = $this->getObjectManager();
+
+            while ($triggerToPersist = array_shift($this->forPersist)) {
+                $objectManager->persist($triggerToPersist);
+            }
+
+            while ($triggerToDelete = array_shift($this->forRemove)) {
+                if($objectManager->contains($triggerToDelete)){
+                    $objectManager->remove($triggerToDelete);
+                }
+            }
+            
+            $objectManager->flush();
+
             $this->logger->info('>> process triggers modifications stored in DB');
             $this->dirty = false;
+            
             foreach ($this->triggers as $trigger) {
                 $this->ensureSchedule($trigger);
             }
+            
             $this->processCronScheduler->flush();
         }
     }
