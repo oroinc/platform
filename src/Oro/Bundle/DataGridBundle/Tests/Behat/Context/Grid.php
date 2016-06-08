@@ -152,6 +152,22 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * @When confirm deletion
+     */
+    public function confirmDeletion()
+    {
+        $this->elementFactory->createElement('Modal')->clickLink('Yes, Delete');
+    }
+
+    /**
+     * @When cancel deletion
+     */
+    public function cancelDeletion()
+    {
+        $this->elementFactory->createElement('Modal')->clickLink('Cancel');
+    }
+
+    /**
      * @return GridElement
      */
     private function getGrid()
