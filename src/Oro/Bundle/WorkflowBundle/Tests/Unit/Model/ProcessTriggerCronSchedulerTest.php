@@ -70,7 +70,6 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(100500);
 
         $arguments = ['--name=process-definition-name', '--id=100500'];
-        sort($arguments);
 
         //hasSchedule
         $this->scheduleManager->expects($this->once())
@@ -94,41 +93,44 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->processCronScheduler->flush();
     }
 
-    public function testRemoveSchedule()
+    public function testRemoveScheduleAndFlush()
     {
         /** @var \Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject */
         $mockTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
+
         /** @var \Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition|\PHPUnit_Framework_MockObject_MockObject */
         $mockProcessDefinition = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition');
+        $mockProcessDefinition->expects($this->once())->method('getName')->willReturn('process_name');
 
         $mockTrigger->expects($this->exactly(2))->method('getCron')->willReturn('* * * * *');
         $mockTrigger->expects($this->exactly(1))->method('getId')->willReturn(42);
         $mockTrigger->expects($this->once())->method('getDefinition')->willReturn($mockProcessDefinition);
-        $mockProcessDefinition->expects($this->once())->method('getName')->willReturn('process_name');
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
-        $this->objectManager->expects($this->once())->method('getRepository')->with($this->scheduleClass)
-            ->willReturn($repository);
 
-        $arguments = ['--name=process_name', '--id=42'];
-
-        $foundMatchedSchedule = (new Schedule())->setArguments($arguments);
+        $foundMatchedSchedule = (new Schedule())->setArguments(['--name=process_name', '--id=42']);
         $foundNonMatchedSchedule = (new Schedule())->setArguments(['--name=process_name', '--id=41']);
 
+        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository->expects($this->once())
             ->method('findBy')
-            ->with(
-                ['command' => HandleProcessTriggerCommand::NAME, 'definition' => '* * * * *']
-            )->willReturn(
-                [
-                    $foundMatchedSchedule,
-                    $foundNonMatchedSchedule
-                ]
-            );
+            ->with(['command' => HandleProcessTriggerCommand::NAME, 'definition' => '* * * * *'])
+            ->willReturn([$foundMatchedSchedule, $foundNonMatchedSchedule]);
+
+        $this->objectManager->expects($this->once())
+            ->method('getRepository')
+            ->with($this->scheduleClass)
+            ->willReturn($repository);
+        $this->objectManager->expects($this->once())
+            ->method('contains')
+            ->with($foundMatchedSchedule)
+            ->willReturn(true);
 
         $this->objectManager->expects($this->once())->method('remove')->with($foundMatchedSchedule);
 
         $this->processCronScheduler->removeSchedule($mockTrigger);
 
+        $this->processCronScheduler->flush();
+        // second flush should be empty
+        $this->processCronScheduler->flush();
     }
 
     public function testException()
