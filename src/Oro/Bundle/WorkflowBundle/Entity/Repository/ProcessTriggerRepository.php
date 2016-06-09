@@ -83,7 +83,6 @@ class ProcessTriggerRepository extends EntityRepository
     /**
      * @param string $definitionName
      * @return mixed
-     * @todo cover by function test in BAP-10408
      */
     public function findByDefinitionName($definitionName)
     {
