@@ -103,9 +103,9 @@ class EmailRecipientsProviderArgs
             return $recipient->getEntity() && $recipient->getEntity()->getClass() === $class;
         });
 
-        return array_values(array_map(function (Recipient $recipient) {
+        return array_map(function (Recipient $recipient) {
             return $recipient->getBasicNameWithOrganization();
-        }, $filteredRecipients));
+        }, $filteredRecipients);
     }
 
     /**
