@@ -19,6 +19,11 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
      */
     public function testPostRecurringEvent()
     {
+        $recurringEvents = self::$recurringEventParameters;
+        $recurringEvents['recurrence']['interval'] = '0'; //check that it will be validated
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $recurringEvents);
+        $this->getJsonResponseContent($this->client->getResponse(), 400);
+
         $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), self::$recurringEventParameters);
         $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
@@ -70,14 +75,30 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
         $data['id'] = $event->getId();
         $data['recurrenceId'] = $event->getRecurrence()->getId();
         $recurringEventParameters = self::$recurringEventParameters;
-        $recurringEventParameters['recurrence'] = null; // recurring event will become regular event.
+        $recurringEventParameters['recurrence']['interval'] = '0';
         $this->client->request(
             'PUT',
             $this->getUrl('oro_api_put_calendarevent', ['id' => $data['id']]),
             $recurringEventParameters
         );
+        $this->getJsonResponseContent($this->client->getResponse(), 400);
 
+        $recurringEventParameters['recurrence'] = 'test_string'; //should be validated
+        $this->client->request(
+            'PUT',
+            $this->getUrl('oro_api_put_calendarevent', ['id' => $data['id']]),
+            $recurringEventParameters
+        );
+        $this->getJsonResponseContent($this->client->getResponse(), 400);
+
+        $recurringEventParameters['recurrence'] = ''; // recurring event will become regular event.
+        $this->client->request(
+            'PUT',
+            $this->getUrl('oro_api_put_calendarevent', ['id' => $data['id']]),
+            $recurringEventParameters
+        );
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->findOneBy(['id' => $data['id']]);
         $this->assertNull($event->getRecurrence());
