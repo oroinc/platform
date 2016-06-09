@@ -117,8 +117,8 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
                 'IDENTITY(bu.organization) organization',
                 'IDENTITY(bu.owner) owner' //aka parent business unit
             ])
-            ->addSelect('(CASE WHEN bu.owner IS NULL THEN 0 ELSE 1 END) AS HIDDEN ORDER')
-            ->addOrderBy('ORDER, owner', 'ASC')
+            ->addSelect('(CASE WHEN bu.owner IS NULL THEN 0 ELSE 1 END) AS HIDDEN ORD')
+            ->addOrderBy('ORD, owner', 'ASC')
             ->getQuery()
             ->getArrayResult();
 
