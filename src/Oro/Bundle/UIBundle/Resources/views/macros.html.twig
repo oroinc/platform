@@ -638,6 +638,108 @@
 {% endmacro %}
 
 {#
+    Outputs a button with "Save and Close" label. After save application will show a page configured by parameter with name "action".
+    For parameters description see documentation of saveActionButton macros.
+
+    For backward compatibility macros supports input parameter as a label of button.
+#}
+{% macro saveAndCloseButton(parametersOrLabel) %}
+    {% set defaultParameters = {
+        'class': 'btn-success',
+        'label': 'Save and Close'|trans
+    } %}
+
+    {% if parametersOrLabel is iterable %}
+        {% set parameters = parametersOrLabel %}
+    {% else %}
+        {# @deprecated since 1.10, support backward compatibility #}
+        {% set parameters = {
+            'label': parametersOrLabel|default('Save and Close'|trans),
+            'action': 'save_and_close'
+        } %}
+    {% endif %}
+
+    {% set parameters = defaultParameters|merge(parameters) %}
+
+    {{ _self.saveActionButton(parameters) }}
+{% endmacro %}
+
+{#
+    Outputs a button with "Save and Stay" label. After save application will show a page configured by parameter with name "action".
+    For parameters description see documentation of saveActionButton macros.
+
+    For backward compatibility macros supports input parameter as a label of button.
+#}
+{% macro saveAndStayButton(parametersOrLabel) %}
+    {% if parametersOrLabel is iterable %}
+        {% set parameters = parametersOrLabel %}
+    {% else %}
+        {# @deprecated since 1.10, support backward compatibility #}
+        {% set parameters = {
+            'label': parametersOrLabel|default('Save'|trans),
+            'action': 'save_and_stay'
+        } %}
+    {% endif %}
+
+    {{ _self.saveActionButton(parameters) }}
+{% endmacro %}
+
+{#
+    Outputs a button with "Save and New" label. After save application will show a page configured by parameter with name "action".
+    For parameters description see documentation of saveActionButton macros.
+#}
+{% macro saveAndNewButton(parameters) %}
+    {% set defaultParameters = {
+        'label': 'Save and New'|trans
+    } %}
+
+    {% set parameters = defaultParameters|merge(parameters) %}
+
+    {{ _self.saveActionButton(parameters) }}
+{% endmacro %}
+
+{#
+    Outputs generic button with "Save" label and redirect behavior. Redirect is configured with parameter "route"
+    and "route_params". Route params could contain paths instead of values if value will be available only after save.
+
+    Parameters - array
+        [
+            'type' - button type, should be "button" or "submit"
+            'class' - CSS class
+            'label' - label of button
+            'route' - Optional name of route to make a redirect.
+            'params' - Optional list of route parameters. In case if value of parameter will be available only
+                after save you can pass property path. For example: ['id': '$id']. '$' at the means property path.
+                So when controller will handle save it will redirect to route using actual id value of entity.
+            'action' - Contains data used by controller to make redirect. This value is prepared automatically
+                based on route and route_params so you don't need to use this attribute directly.
+        ]
+#}
+{% macro saveActionButton(parameters) %}
+    {% set defaultParameters = {
+        'type': 'submit',
+        'class': 'btn-success main-group',
+        'label': 'Save'|trans,
+    } %}
+
+    {% if parameters.action is defined %}
+        {# @deprecated since 1.10, support backward compatibility #}
+    {% elseif parameters.route is defined %}
+        {# Prepare action parameter based on route #}
+        {% set action = {'route': parameters.route} %}
+        {% if parameters.params is defined %}
+            {% set action = action|merge({'params': parameters.params}) %}
+        {% endif %}
+        {% set parameters = parameters|merge({'action': action|json_encode}) %}
+    {% endif %}
+
+    {% set parameters = defaultParameters|merge(parameters) %}
+
+    {{ _self.buttonType(parameters) }}
+{% endmacro %}
+
+
+{#
     Button macros with custom button type
     Parameters - array:
         [
@@ -658,20 +760,6 @@
             {{ parameters.label }}
         </button>
     </div>
-{% endmacro %}
-
-{% macro saveAndCloseButton(label) %}
-    {% if label is empty %}
-        {% set label = 'Save and Close'|trans %}
-    {% endif %}
-    {{ _self.buttonType({'type': 'submit', 'class': 'btn-success', 'label': label}) }}
-{% endmacro %}
-
-{% macro saveAndStayButton(label) %}
-    {% if label is empty %}
-        {% set label = 'Save'|trans %}
-    {% endif %}
-    {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
 {% endmacro %}
 
 {#
