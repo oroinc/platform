@@ -47,7 +47,9 @@
 {% block oro_image_widget %}
     {% spaceless %}
         <div class="control-group" style="margin-bottom: 0">
-            {{ form_widget(form.file) }}
+            <div class="attachment-file">
+                {{ form_widget(form.file) }}
+            </div>
             {% if form_errors(form.file) %}
                 <div style="clear:both; float:left">
                     {{ form_errors(form.file) }}
