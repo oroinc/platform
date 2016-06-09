@@ -10,9 +10,11 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
     /** @var ScheduleManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $scheduleManager;
 
@@ -38,7 +40,6 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $this->scheduleClass = 'Oro\Bundle\CronBundle\Entity\Schedule';
         $this->objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
 
         $this->processCronScheduler = new ProcessTriggerCronScheduler(
             $this->scheduleManager,
@@ -83,6 +84,8 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
             ->method('createSchedule')
             ->with(HandleProcessTriggerCommand::NAME, $arguments, $cronExpression)
             ->willReturn($scheduleEntity);
+
+        $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
         $this->objectManager->expects($this->once())->method('persist')->with($scheduleEntity);
 
         $this->processCronScheduler->add($trigger);
@@ -95,10 +98,8 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveScheduleAndFlush()
     {
-        /** @var \Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockTrigger */
         $mockTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
-
-        /** @var \Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition|\PHPUnit_Framework_MockObject_MockObject */
         $mockProcessDefinition = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition');
         $mockProcessDefinition->expects($this->once())->method('getName')->willReturn('process_name');
 
@@ -124,6 +125,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
             ->with($foundMatchedSchedule)
             ->willReturn(true);
 
+        $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
         $this->objectManager->expects($this->once())->method('remove')->with($foundMatchedSchedule);
 
         $this->processCronScheduler->removeSchedule($mockTrigger);
@@ -135,6 +137,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testException()
     {
+        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockTrigger */
         $mockTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
         $mockTrigger->expects($this->exactly(1))->method('getCron')->willReturn(null);
         $this->setExpectedException(
@@ -153,5 +156,19 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('InvalidArgumentException');
         $this->processCronScheduler->add($trigger);
+    }
+
+    public function testUnmanageableEntityException()
+    {
+        $this->setValue($this->processCronScheduler, 'dirty', true);
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($this->scheduleClass)
+            ->willReturn(null);
+
+        $this->setExpectedException('InvalidArgumentException', 'Please provide manageable schedule entity class');
+
+        $this->processCronScheduler->flush();
     }
 }

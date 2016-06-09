@@ -51,7 +51,7 @@ class ItemsFetcherTest extends \PHPUnit_Framework_TestCase
         $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
             ->disableOriginalConstructor()->getMock();
         /** @var TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager */
-        $transitionManager = $this->getMockBuilder('\Oro\Bundle\WorkflowBundle\Model\TransitionManager')
+        $transitionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionManager')
             ->disableOriginalConstructor()->getMock();
         /** @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject $query */
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
@@ -107,7 +107,7 @@ class ItemsFetcherTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()->getMock();
         /** @var TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager */
-        $transitionManager = $this->getMockBuilder('\Oro\Bundle\WorkflowBundle\Model\TransitionManager')
+        $transitionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionManager')
             ->disableOriginalConstructor()->getMock();
 
         $this->workflowManager->expects($this->once())

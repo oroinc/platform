@@ -144,7 +144,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->processCronScheduler->expects($this->exactly($expectedSchedulesCount))->method('add');
 
-        if($dirty){
+        if ($dirty) {
             $this->assertManagerRegistryCalled($this->triggerEntityClass);
             $this->objectManager->expects($this->once())->method('flush');
         } else {

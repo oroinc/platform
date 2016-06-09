@@ -42,8 +42,6 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
      * @param ScheduleManager $scheduleManager
      * @param ManagerRegistry $registry
      * @param string $scheduleClass
-     *
-     * @throws \InvalidArgumentException
      */
     public function __construct(ScheduleManager $scheduleManager, ManagerRegistry $registry, $scheduleClass)
     {
@@ -79,6 +77,7 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
 
     /**
      * @param ProcessTrigger $trigger
+     * @throws \InvalidArgumentException
      */
     public function removeSchedule(ProcessTrigger $trigger)
     {

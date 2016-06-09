@@ -189,7 +189,7 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $trigger1Attributes
      * @param array $trigger2Attributes
-     * @param true $expected
+     * @param bool $expected
      *
      * @dataProvider testIsDefinitiveEqualData
      */
