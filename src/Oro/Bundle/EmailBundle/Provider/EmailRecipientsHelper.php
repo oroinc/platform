@@ -28,6 +28,7 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 class EmailRecipientsHelper
 {
     const ORGANIZATION_PROPERTY = 'organization';
+    const EMAIL_IDS_SEPARATOR   = ';';
 
      /** @var AclHelper */
     protected $aclHelper;
@@ -162,7 +163,7 @@ class EmailRecipientsHelper
         }
 
         return [
-            'id' => $recipient->getId(),
+            'id' => $this->prepareFormRecipientIds($recipient->getId()),
             'text' => $recipient->getName(),
             'data' => json_encode($data),
         ];
@@ -321,7 +322,7 @@ class EmailRecipientsHelper
         foreach ($result as $row) {
             $recipient = new CategorizedRecipient(
                 $row['email'],
-                sprintf('%s <%s>', $row['name'], $row['email']),
+                sprintf('"%s" <%s>', $row['name'], $row['email']),
                 new RecipientEntity(
                     $entityClass,
                     $row['entityId'],
@@ -347,4 +348,32 @@ class EmailRecipientsHelper
 
         return $this->propertyAccessor;
     }
+
+    public static function prepareFormRecipientIds($ids)
+    {
+        if (!is_array($ids) && is_string($ids)) {
+            return base64_encode($ids);
+        }
+
+        $array = array_map("base64_encode", $ids);
+
+        return implode(self::EMAIL_IDS_SEPARATOR, $array);
+    }
+
+    public static function extractFormRecipients($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        $array = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
+        $array = array_map(function ($arrayPart) {
+                $arrayPart = base64_decode($arrayPart, true) ? base64_decode($arrayPart, true) : $arrayPart;
+                return $arrayPart;
+            },
+            $array);
+
+        return $array;
+    }
+
 }
