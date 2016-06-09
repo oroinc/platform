@@ -109,17 +109,6 @@ class OwnerTree implements OwnerTreeInterface
      */
     protected $organizationUserIds;
 
-    /**
-     * An array to store plain business units tree - Adjacency List
-     *  key = index
-     *  value = array
-     *      id = business unit id
-     *      parentId = business unit owner id
-     *
-     * @var array
-     */
-    protected $businessUnitAdjacencyList;
-
     public function __construct()
     {
         $this->clear();
