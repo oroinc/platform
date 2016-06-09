@@ -2,10 +2,12 @@
 {% set hasImportProcessor = importProcessor is defined and importProcessor is not empty %}
 {% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
 {% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
+{% set hasExportPopupConfig = exportPopupConfig is defined %}
 {% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
 {% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
 {% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
 {% set importLabel = importLabel|default('oro.importexport.import.label'|trans) %}
+{% set exportLabel = exportPopupConfig.exportLabel|default('oro.importexport.export.label'|trans) %}
 
 {% if exportAllowed or importAllowed %}
     {% if options is not defined %}
@@ -28,10 +30,11 @@
     {% endif %}
 
     {% if exportAllowed %}
+        {% set exportRoute = hasExportPopupConfig ? 'oro_importexport_export_config' : 'oro_importexport_export_instant' %}
         <div class="btn-group">
             <a type="button"
                class="btn export-btn icons-holder-text no-hash"
-               href="{{ path('oro_importexport_export_instant', defaultRouteParams|merge({'processorAlias': exportProcessor})) }}">
+               href="{{ path(exportRoute, defaultRouteParams|merge({'processorAlias': exportProcessor, 'entity': entity_class})) }}">
                 <i class="icon-upload-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
@@ -106,11 +109,27 @@
             $('.export-btn').on('click', function(e) {
                 e.preventDefault();
 
-                var exportStartedMessage = exportHandler.startExportNotificationMessage();
-                $.getJSON(this.href, function(data) {
-                    exportStartedMessage.close();
-                    exportHandler.handleExportResponse(data);
-                });
+                {% if hasExportPopupConfig %}
+                    var widget = new DialogWidget({
+                        'url': this.href,
+                        'title': {{ exportTitle|default(exportLabel)|json_encode|raw }},
+                        'stateEnabled': false,
+                        'incrementalPosition': false,
+                        'dialogOptions': {
+                            'width': 650,
+                            'autoResize': true,
+                            'modal': true,
+                            'minHeight': 100
+                        }
+                    });
+                    widget.render();
+                {% else %}
+                    var exportStartedMessage = exportHandler.startExportNotificationMessage();
+                    $.getJSON(this.href, function(data) {
+                        exportStartedMessage.close();
+                        exportHandler.handleExportResponse(data);
+                    });
+                {% endif %}
             });
             {% endif %}
         });

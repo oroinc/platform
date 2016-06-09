@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
@@ -147,6 +148,42 @@ class ImportExportController extends Controller
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
             )
         );
+    }
+
+    /**
+     * @Route("/export/config", name="oro_importexport_export_config")
+     * @AclAncestor("oro_importexport_export")
+     * @Template
+     *
+     * @param Request $request
+     *
+     * @return array|Response
+     */
+    public function exportConfigAction(Request $request)
+    {
+        $entityName = $request->get('entity');
+
+        $exportForm = $this->createForm('oro_importexport_export', null, ['entityName' => $entityName]);
+
+        if ($request->isMethod('POST')) {
+            $exportForm->submit($request);
+
+            if ($exportForm->isValid()) {
+                /** @var ExportData $data */
+                $data = $exportForm->getData();
+
+                return $this->forward(
+                    'OroImportExportBundle:ImportExport:instantExport',
+                    ['processorAlias' => $data->getProcessorAlias()]
+                );
+            }
+        }
+
+        return [
+            'entityName' => $entityName,
+            'form' => $exportForm->createView(),
+            'options' => $this->getOptionsFromRequest()
+        ];
     }
 
     /**
