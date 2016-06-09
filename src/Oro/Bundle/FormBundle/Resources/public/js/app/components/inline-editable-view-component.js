@@ -118,7 +118,7 @@ define(function(require) {
             this.overlayOptions = options.overlay;
             this.widthIncrement = options.widthIncrement;
             this.messages = options.messages;
-            this.id = options.id;
+            this.eventChannelId = options.eventChannelId;
             this.inlineEditingOptions = options.metadata.inline_editing;
             var waitors = [];
             this.fieldName = options.fieldName;
@@ -293,7 +293,7 @@ define(function(require) {
                 model: this.model,
                 oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData)),
                 messages: this.messages,
-                id: this.id,
+                eventChannelId: this.eventChannelId,
                 updateData: modelUpdateData
             };
             this.updateModel(this.model, this.editorView, modelUpdateData);
@@ -371,7 +371,8 @@ define(function(require) {
                 }, this);
             }
             mediator.execute('showFlashMessage', 'success', this.messages.success);
-            mediator.trigger('inlineEditor:' + this.id + ':update', this.updateData);
+            console.log(this.eventChannelId);
+            mediator.trigger('inlineEditor:' + this.eventChannelId + ':update', this.updateData);
         },
 
         onSaveError: function(jqXHR) {
