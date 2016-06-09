@@ -179,7 +179,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
      * @param Attendee|null $attendee
      * @param string $type
      */
-    protected function setDefaultAttendeeType(Attendee $attendee = null, $type = Attendee::TYPE_OPTIONAL)
+    protected function setDefaultAttendeeType(Attendee $attendee = null, $type = Attendee::TYPE_REQUIRED)
     {
         if (!$attendee || $attendee->getType()) {
             return;

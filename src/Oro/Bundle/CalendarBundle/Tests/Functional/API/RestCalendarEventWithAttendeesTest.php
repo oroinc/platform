@@ -132,14 +132,14 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
                         'email'       => 'simple_user@example.com',
                         'status'      => 'none',
-                        'type'        => 'optional',
+                        'type'        => 'required',
                         'user_id'     => $user->getId()
                     ],
                     [
                         'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
                         'email'       => 'admin@example.com',
                         'status'      => 'accepted',
-                        'type'        => 'optional',
+                        'type'        => 'required',
                         'user_id'     => $adminUser->getId()
                     ],
                     [
@@ -147,7 +147,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'email'       => null,
                         'user_id'     => null,
                         'status'      => 'none',
-                        'type'        => 'optional',
+                        'type'        => 'required',
                     ],
                 ],
             ],
@@ -275,7 +275,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
                         'email'       => $adminUser->getEmail(),
                         'status'      => 'accepted',
-                        'type'        => 'optional',
+                        'type'        => 'required',
                         'user_id'     => $adminUser->getId()
                     ],
                 ],
@@ -355,7 +355,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                             'displayName' => 'John Doe',
                             'email'       => 'admin@example.com',
                             'status'      => 'accepted',
-                            'type'        => 'optional',
+                            'type'        => 'required',
                         ],
                     ],
                 ],
@@ -592,14 +592,14 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
                         'email'       => 'simple_user@example.com',
                         'status'      => 'none',
-                        'type'        => 'optional',
+                        'type'        => 'required',
                         'user_id'     => $user->getId()
                     ],
                     [
                         'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
                         'email'       => 'admin@example.com',
                         'status'      => 'accepted',
-                        'type'        => 'optional',
+                        'type'        => 'required',
                         'user_id'     => $adminUser->getId()
                     ],
                 ],
@@ -706,7 +706,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
                         'email'       => $user->getEmail(),
                         'status'      => 'none',
-                        'type'        => 'optional',
+                        'type'        => 'required',
                         'user_id'     => $user->getId()
                     ],
                 ],
