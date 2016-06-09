@@ -119,15 +119,19 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('apply')
             ->will($this->returnValue($query));
 
+        $searchQueryMock = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Query')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $searchResultMock = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubResult = new Result($searchQueryMock, [$searchResultMock]);
+
         $this->indexer->expects($this->once())
              ->method('simpleSearch')
-             ->will($this->returnValue(new Result($this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Query')
-                 ->disableOriginalConstructor()
-                 ->getMock(), [
-                 $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
-                 ->disableOriginalConstructor()
-                 ->getMock()
-             ])));
+             ->will($this->returnValue($stubResult));
 
         $this->emailRecipientsHelper->getRecipients($args, $userRepository, 'u', 'Oro\Bundle\UserBundle\Entity\User');
     }
