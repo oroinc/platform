@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -15,7 +17,6 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowManager
 {
@@ -454,7 +455,7 @@ class WorkflowManager
         $activeWorkflow = $this->getApplicableWorkflow($entity);
 
         return $activeWorkflow && $currentWorkflowItem &&
-        $currentWorkflowItem->getWorkflowName() !== $activeWorkflow->getName();
+            $currentWorkflowItem->getWorkflowName() !== $activeWorkflow->getName();
     }
 
     /**

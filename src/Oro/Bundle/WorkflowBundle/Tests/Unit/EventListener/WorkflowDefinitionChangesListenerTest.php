@@ -17,9 +17,6 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGener
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
 class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;

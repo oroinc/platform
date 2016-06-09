@@ -41,6 +41,7 @@ class ScheduledTransitionProcessName
 
     /**
      * @return string
+     * @throws \UnderflowException
      */
     public function getName()
     {
