@@ -139,14 +139,18 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testFlush($dirty, array $triggers, $expectedSchedulesCount)
     {
-        $this->setValue($this->processTriggersConfigurator, 'dirty', true);
+        $this->setValue($this->processTriggersConfigurator, 'dirty', $dirty);
         $this->setValue($this->processTriggersConfigurator, 'triggers', $triggers);
-
-        $this->assertManagerRegistryCalled($this->triggerEntityClass);
 
         $this->processCronScheduler->expects($this->exactly($expectedSchedulesCount))->method('add');
 
-        $this->objectManager->expects($this->once())->method('flush');
+        if($dirty){
+            $this->assertManagerRegistryCalled($this->triggerEntityClass);
+            $this->objectManager->expects($this->once())->method('flush');
+        } else {
+            $this->objectManager->expects($this->never())->method('flush');
+        }
+
 
         $this->processTriggersConfigurator->flush();
 
