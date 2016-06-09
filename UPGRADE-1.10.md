@@ -27,6 +27,9 @@ UPGRADE FROM 1.9 to 1.10
 - The constructor of the `Oro\Bundle\EntityBundle\Provider\AllEntityHierarchyProvider` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, EntityManagerBag $entityManagerBag)`. After: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, ManagerBagInterface $managerBag)`.
 - Method `getAllShortMetadata` was added to `Oro\Bundle\EntityBundle\ORM\DoctrineHelper`. Using of this method instead of the `getAllMetadata` method can give significant performance gain.
 
+####ImportExportBundle
+- ACL resource (capability) `oro_importexport` was removed. Please, use `oro_importexport_import` or `oro_importexport_export` instead.
+
 ####SecurityBundle
 - **IMPORTANT**: The behaviour of the [Access Decision Manager](http://symfony.com/doc/current/components/security/authorization.html#access-decision-manager) was changed. Now the `allowIfAllAbstainDecisions` flag is set to `true` by default. It means that an access to a resource is denied as soon as there is one voter denying access. The goal of this change is to grant access when all voters abstain.
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder` - removed all constants for masks and their groups.
@@ -93,6 +96,9 @@ UPGRADE FROM 1.9 to 1.10
 - Service `oro_workflow.configuration_pass.replace_property_path` is deprecated. Use `oro_action.configuration_pass.replace_property_path` instead.
 - The constructor of the `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` class was changed. Third argument `LoggerInterface` (@logger service) was added.
 - Added error logging in `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` at handle method.
+- Added parameter `RestrictionAssembler $restrictionAssembler` to constructor of `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler`
+- Added parameter `RestrictionManager $restrictionManager` to constructor of `Oro\Bundle\WorkflowBundle\Model\Workflow`
+- Added parameter `WorkflowPermissionRegistry $permissionRegistry` to constructor of `Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter`
 
 ####SearchBundle
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::setEntitiesConfigParameter` deprecated since 1.9. Will be removed after 1.11. Please use oro_search.provider.search_mapping service for mapping config instead.
@@ -109,7 +115,7 @@ UPGRADE FROM 1.9 to 1.10
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
 
 ####DataGridBundle
-- The class Oro\Bundle\DataGridBundle\Common\Object was renamed to DataObject
+- Moved and renamed class `Oro\Bundle\DataGridBundle\Common\Object` to `Oro\Component\Config\Common\ConfigObject`
 - Changed priority in next extensions:
     * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260
     * Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier from -251 to -261
@@ -134,3 +140,25 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 
 ####PlatformBundle
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
+
+####LayoutBundle:
+- Added possibility to create layout block types using only DI configuration, for details please check out documentation at
+ [What is layout?](./src/Oro/Bundle/LayoutBundle/Resources/doc/what_is_layout.md) section.
+- BlockType classes replaced with DI configuration for listed block types: `root`, `head`, `body`, `fieldset`, `list`, `listitem`, `text`, `button` and `button_group`.
+Corresponding block type classes was removed.
+- Renamed `setDefaultOptions` to `configureOptions` method at `Oro\Component\Layout\BlockTypeInterface\BlockTypeInterface` and `Oro\Component\Layout\BlockTypeInterface\BlockTypeExtensionInterface`.
+- Added default implementation of `buildView` and `finishView` methods to `Oro/Component/Layout/Block/Type/AbstractType`
+
+####EmbeddedFormBundle:
+- Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
+Classes `Oro/Bundle/EmbeddedFormBundle/Layout/Block/Type/EmbedFormSuccessType` and
+`Oro/Bundle/EmbeddedFormBundle/Layout/Block/Type/EmbedFormType` was removed.
+
+####ActionBundle:
+- Layout block types was replaced with DI only configuration for `abstract_configurable` block,
+class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was removed.
+
+####Layout Component:
+- `\Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface::prepare()` signature was changed from `prepare(array $source, VisitorCollection $visitorCollection);` to `prepare(Oro\Component\Layout\Loader\Generator\GeneratorData $data, VisitorCollection $visitorCollection);`
+- `@addTree` layout update action is `\Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension` now
+- Layout update `@setFormTheme` and `@setBlockTheme` actions can accept relative paths now

@@ -18,6 +18,7 @@ Our guide is divided into the following sections:
 * [Working with forms](#working-with-forms)
 * [Creating new block types](#creating-new-block-types)
 * [Wrapping up](#wrapping-up)
+* [Simplify block attribute configuration](#simplify-block-attribute-configuration)
 
 Getting started
 -----------------------
@@ -121,7 +122,7 @@ Customizing block rendering
 ---------------------------------
 
 As you have seen in the previous section we are using the `setBlockTheme` action in our layout update file. This is the block theme responsible for defining how layout blocks are rendered.
-Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file.
+Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file. Also you can use relative path for block theme like `default.html.twig`.
 
 ```twig
 {% block _page_container_widget %}
@@ -749,11 +750,10 @@ First, create a `LinkExtension` class in place it in: `Acme/Bundle/LayoutBundle/
 ```php
 namespace Acme\Bundle\LayoutBundle\Layout\Block\Extension;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\LinkType;
 
@@ -766,9 +766,9 @@ class LinkExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['image']);
+        $resolver->setDefined('image');
     }
 
     /**
@@ -858,7 +858,7 @@ class ContainerExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setOptional(['type']);
     }
@@ -1385,6 +1385,51 @@ Creating new block types
 -----------------------------------
 
 Since the existing layout block types are covering only basic scenarios, it is often required to create new ones.
+
+You can create custom block type by providing DI configuration for it. Configuration provides possibility to set name and name of a parent, and setup options of the block. See below examples.
+
+Simple block type:
+```yaml
+services:
+    acme_demo.block_type.datetime:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptions, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
+            - [setName, ['datetime']]
+        tags:
+             - { name: layout.block_type, alias: datetime }
+```
+
+`setOptions` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
+
+Container block type:
+```yaml
+services:
+    acme_demo.block_type.sidebar:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['sidebar']]
+        tags:
+             - { name: layout.block_type, alias: sidebar }
+```
+
+Block type inherited from "text" type:
+```yaml
+services:
+    acme_demo.block_type.title:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptions, [{level: {default: 1}}]]
+            - [setName, ['title']]
+            - [setParent, ['text']]
+        tags:
+             - { name: layout.block_type, alias: title }
+```
+
+Usually the definition of layout block types are located in `Resource\config\block_types.yml`, but you can use any file.
+
+If you want to create block type with custom properties mapping extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType` or implement `Oro\Component\Layout\BlockTypeInterface`.
+
 Let's see how this is done on the example of `ImageType` that will be responsible for rendering `<img>` elements.
 
 First, let's create the block type file itself and place it in the `Acme/Bundle/LayoutBundle/Layout/Block/Type` directory:
@@ -1403,7 +1448,7 @@ class ImageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolverInterface $resolver)
     {
         $resolver
             ->setRequired(['path'])
@@ -1946,3 +1991,15 @@ And the footer like this:
     </div>
 </div>
 ```
+
+Simplify block attribute configuration
+-------------
+For simplify block attribute configuration use twig function `layout_attr_merge(attr, default_attr)`:
+```twig
+{% set attr = layout_attr_merge(attr, {
+    required: 'required',
+    autofocus: true,
+    '~class': " input input_block input_md {{ class_prefix }}__form__input"
+}) %}
+```
+If you use prefix `~` value `attr` concatenate `default_attr` value with this prefix.

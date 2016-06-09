@@ -136,8 +136,12 @@ class Processor
             $message->getHeaders()->addTextHeader('References', $parentMessageId);
             $message->getHeaders()->addTextHeader('In-Reply-To', $parentMessageId);
         }
+        $addresses = $this->getAddresses($model->getFrom());
+        $address = $this->emailAddressHelper->extractPureEmailAddress($model->getFrom());
         $message->setDate($messageDate->getTimestamp());
-        $message->setFrom($this->getAddresses($model->getFrom()));
+        $message->setFrom($addresses);
+        $message->setReplyTo($addresses);
+        $message->setReturnPath($address);
         $message->setTo($this->getAddresses($model->getTo()));
         $message->setCc($this->getAddresses($model->getCc()));
         $message->setBcc($this->getAddresses($model->getBcc()));
@@ -150,7 +154,6 @@ class Processor
         $messageId = '<' . $message->generateId() . '>';
 
         if ($origin === null) {
-            $this->emailOriginHelper->setEmailModel($model);
             $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
         }
         $this->processSend($message, $origin);

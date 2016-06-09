@@ -1,0 +1,21 @@
+operations:
+    DELETE:
+        exclude_entities:
+            - Oro\Bundle\LocaleBundle\Entity\Localization
+        exclude_datagrids:
+            - oro-locale-localizations-grid
+
+    oro_locale_localization_delete:
+        extends: DELETE
+        for_all_entities: false
+        for_all_datagrids: false
+        replace:
+            - entities
+            - datagrids
+        entities:
+            - Oro\Bundle\LocaleBundle\Entity\Localization
+        datagrids:
+            - oro-locale-localizations-grid
+        frontend_options:
+            confirmation:
+                message: oro.locale.localization.delete_confirm

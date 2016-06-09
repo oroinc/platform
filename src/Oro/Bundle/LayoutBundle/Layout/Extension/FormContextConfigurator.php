@@ -35,7 +35,7 @@ class FormContextConfigurator implements ContextConfiguratorInterface
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()
-            ->setOptional(['form'])
+            ->setDefined(['form'])
             ->setAllowedTypes(['form' => ['null', 'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface']]);
 
         $form = $context->getOr('form');

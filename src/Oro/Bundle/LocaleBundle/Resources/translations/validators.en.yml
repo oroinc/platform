@@ -1,0 +1,6 @@
+oro.locale:
+    localization:
+        parent:
+            circular_reference: 'Circular Reference Found.'
+        titles:
+            blank: 'Localization Title should not be blank.'
