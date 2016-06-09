@@ -36,7 +36,7 @@ class RemoveManyToOneRelationQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return "Remove '{$this->associationName}' relation on '{$this->entityClass}'.";
+        return "Remove association '{$this->associationName}' on '{$this->entityClass}'.";
     }
 
     /**
