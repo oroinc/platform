@@ -87,7 +87,12 @@ class DatabaseHelper
             } else {
                 $serializationCriteria[$field] = $value;
             }
-            $where[] = sprintf('e.%s = :%s', $field, $field);
+            if (null !== $serializationCriteria[$field]) {
+                $where[] = sprintf('e.%s = :%s', $field, $field);
+            } else {
+                $where[] = sprintf('e.%s IS NULL', $field);
+                unset($criteria[$field]);
+            }
         }
 
         $storageKey = $this->getStorageKey($serializationCriteria);

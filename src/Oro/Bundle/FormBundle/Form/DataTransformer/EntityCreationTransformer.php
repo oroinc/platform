@@ -65,10 +65,12 @@ class EntityCreationTransformer extends EntityToIdTransformer
             // supported $value types:
             // json encoded array ['value' => $valueForPropertyOfNewEntity]
             // scalar types will be treated as ids
-            if (!is_scalar($value)) {
-                throw new UnexpectedTypeException($value, 'json encoded string or scalar value');
+            if (!is_scalar($value) && !is_array($value)) {
+                throw new UnexpectedTypeException($value, 'json encoded string, array or scalar value');
             }
-            $data = json_decode($value, true);
+            $data = is_scalar($value)
+                ? json_decode($value, true)
+                : $value;
             $data = is_array($data) ? $data : [$this->property => $value];
             $id = $this->propertyAccessor->getValue($data, $this->propertyPath);
 
