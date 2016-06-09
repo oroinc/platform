@@ -6,6 +6,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestrictionIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -277,5 +279,49 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         // resetting
         $this->workflowItem->setAclIdentities(array());
         $this->assertEmpty($this->workflowItem->getAclIdentities()->toArray());
+    }
+
+    public function testSetGetRestrictionIdentities()
+    {
+        $firstStep = new WorkflowStep();
+        $firstStep->setName('first_step');
+        $secondStep = new WorkflowStep();
+        $secondStep->setName('second_step');
+
+        $firstRestriction = new WorkflowRestriction();
+        $firstRestriction->setStep($firstStep)->setAttribute('first_attribute');
+        $secondRestriction = new WorkflowRestriction();
+        $secondRestriction->setStep($secondStep)->setAttribute('second_attribute');
+
+        $firstIdentity = new WorkflowRestrictionIdentity();
+        $firstIdentity->setRestriction($firstRestriction);
+        $alternativeFirstIdentity = new WorkflowRestrictionIdentity();
+        $alternativeFirstIdentity->setRestriction($firstRestriction);
+        $secondIdentity = new WorkflowRestrictionIdentity();
+        $secondIdentity->setRestriction($secondRestriction);
+
+        // default
+        $this->assertEmpty($this->workflowItem->getRestrictionIdentities()->toArray());
+
+        // adding
+        $this->workflowItem->setRestrictionIdentities([$firstIdentity]);
+        $this->assertCount(1, $this->workflowItem->getRestrictionIdentities());
+        $this->assertEquals($firstIdentity, $this->workflowItem->getRestrictionIdentities()->first());
+
+        // merging
+        $this->workflowItem->setRestrictionIdentities([$alternativeFirstIdentity, $secondIdentity]);
+        $this->assertCount(2, $this->workflowItem->getRestrictionIdentities());
+        $identities = array_values($this->workflowItem->getRestrictionIdentities()->toArray());
+        $this->assertEquals($firstIdentity, $identities[0]);
+        $this->assertEquals($secondIdentity, $identities[1]);
+
+        // removing
+        $this->workflowItem->setRestrictionIdentities([$secondIdentity]);
+        $this->assertCount(1, $this->workflowItem->getRestrictionIdentities());
+        $this->assertEquals($secondIdentity, $this->workflowItem->getRestrictionIdentities()->first());
+
+        // resetting
+        $this->workflowItem->setRestrictionIdentities([]);
+        $this->assertEmpty($this->workflowItem->getRestrictionIdentities()->toArray());
     }
 }

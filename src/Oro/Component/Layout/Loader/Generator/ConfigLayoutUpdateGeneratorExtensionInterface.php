@@ -7,10 +7,10 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 interface ConfigLayoutUpdateGeneratorExtensionInterface
 {
     /**
-     * Scans the given source and add appropriate visitor to the collection of visitors.
+     * Scans the given GeneratorData and add appropriate visitor to the collection of visitors.
      *
-     * @param array             $source
+     * @param GeneratorData $data
      * @param VisitorCollection $visitorCollection
      */
-    public function prepare(array $source, VisitorCollection $visitorCollection);
+    public function prepare(GeneratorData $data, VisitorCollection $visitorCollection);
 }
