@@ -140,7 +140,7 @@ class Processor
      *
      * @return EmailUser
      */
-    protected function createEmailUser(EmailModel $model, $messageDate, EmailOrigin $origin)
+    protected function createEmailUser(EmailModel $model, $messageDate, $origin)
     {
         $owner = null;
         $organization = null;
@@ -161,12 +161,13 @@ class Processor
             $owner,
             $organization
         );
-        $emailUser->setOrigin($origin);
-
-        if ($origin instanceof UserEmailOrigin) {
-            if ($origin->getMailbox() !== null) {
-                $emailUser->setOwner(null);
-                $emailUser->setMailboxOwner($origin->getMailbox());
+        if ($origin) {
+            $emailUser->setOrigin($origin);
+            if ($origin instanceof UserEmailOrigin) {
+                if ($origin->getMailbox() !== null) {
+                    $emailUser->setOwner(null);
+                    $emailUser->setMailboxOwner($origin->getMailbox());
+                }
             }
         }
 
