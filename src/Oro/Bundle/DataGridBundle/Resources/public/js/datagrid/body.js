@@ -1,9 +1,10 @@
 define([
     'underscore',
     'backgrid',
+    'chaplin',
     './row',
     '../pageable-collection'
-], function(_, Backgrid, Row, PageableCollection) {
+], function(_, Backgrid, Chaplin, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -18,9 +19,14 @@ define([
      * @class   orodatagrid.datagrid.Body
      * @extends Backgrid.Body
      */
-    Body = Backgrid.Body.extend({
+    Body = Chaplin.CollectionView.extend({
+
+        tagName: 'tbody',
+        autoRender: false,
         /** @property */
-        row: Row,
+        itemView: Row,
+        animationDuration: 0,
+        renderItems: true,
 
         /** @property {String} */
         rowClassName: undefined,
@@ -30,45 +36,16 @@ define([
             className: 'grid-body'
         },
 
+        listen: {
+            'backgrid:sort collection': 'sort'
+        },
+
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var opts = options || {};
-
-            if (!opts.row) {
-                opts.row = this.row;
-            }
-
-            if (opts.rowClassName) {
-                this.rowClassName = opts.rowClassName;
-            }
-
-            this.columns = options.columns;
-            this.filteredColumns = options.filteredColumns;
-
-            this.backgridInitialize(opts);
-        },
-
-        /**
-         * Create this function instead of original Body.__super__.initialize to customize options for subviews
-         *
-         * @param {Object} options
-         */
-        backgridInitialize: function(options) {
-            this.row = options.row || Row;
-            this.createRows();
-
-            this.emptyText = options.emptyText;
-            this._unshiftEmptyRowMayBe();
-
-            var collection = this.collection;
-            this.listenTo(collection, 'add', this.insertRow);
-            this.listenTo(collection, 'remove', this.removeRow);
-            this.listenTo(collection, 'sort', this.refresh);
-            this.listenTo(collection, 'reset', this.refresh);
-            this.listenTo(collection, 'backgrid:sort', this.sort);
-            this.listenTo(collection, 'backgrid:edited', this.moveToNextCell);
+            _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText']));
+            Body.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -78,66 +55,40 @@ define([
             if (this.disposed) {
                 return;
             }
-            _.each(this.rows, function(row) {
-                row.dispose();
-            });
-            delete this.rows;
             delete this.columns;
             delete this.filteredColumns;
 
             Body.__super__.dispose.call(this);
         },
 
-        createRows: function() {
-            this.rows = this.collection.map(function(model) {
-                var rowOptions = {
+        initItemView: function(model) {
+            if (this.itemView) {
+                return new this.itemView({
+                    autoRender: false,
+                    model: model,
                     collection: this.filteredColumns,
-                    columns: this.columns,
-                    model: model
-                };
-                this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
-                var row = new this.row(rowOptions);
-                this.attachListenerToSingleRow(row);
-                return row;
-            }, this);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        refresh: function() {
-            _.each(this.rows, function(row) {
-                // dispose in Chaplin's way, instead of Backbone's remove
-                row.dispose();
-            });
-            this.rows = [];
-            this.backgridRefresh();
-            return this;
+                    columns: this.columns
+                });
+            } else {
+                throw new Error('The CollectionView#itemView property ' + 'must be defined or the initItemView() must be overridden.');
+            }
         },
 
         /**
          * Create this function instead of original Body.__super__.refresh to customize options for subviews
          */
         backgridRefresh: function() {
-            this.createRows();
-            this._unshiftEmptyRowMayBe();
-
             this.render();
-
             this.collection.trigger('backgrid:refresh', this);
-
             return this;
         },
 
         /**
          * @inheritDoc
          */
-        insertRow: function(model, collection, options) {
-            Body.__super__.insertRow.apply(this, arguments);
-            var index = collection.indexOf(model);
-            if (index < this.rows.length) {
-                this.attachListenerToSingleRow(this.rows[index]);
-            }
+        insertView: function(model, view) {
+            Body.__super__.insertView.apply(this, arguments);
+            this.attachListenerToSingleRow(view);
         },
 
         /**
@@ -152,6 +103,18 @@ define([
             }, this);
         },
 
+        initFallback: function() {
+            if (!this.fallbackSelector && this.emptyText) {
+                var fallbackElement = new Backgrid.EmptyRow({
+                    emptyText: this.emptyText,
+                    columns: this.columns
+                }).render().el;
+                this.fallbackSelector = _.map(fallbackElement.classList, function(name) {return '.' + name}).join('');
+                this.$el.append(fallbackElement);
+            }
+            Body.__super__.initFallback.apply(this, arguments);
+        },
+
         /**
          * @inheritDoc
          */
@@ -161,6 +124,22 @@ define([
                 this.$('> *').addClass(this.rowClassName);
             }
             return this;
+        },
+
+        makeComparator: function (attr, order, func) {
+
+            return function (left, right) {
+                // extract the values from the models
+                var l = func(left, attr), r = func(right, attr), t;
+
+                // if descending order, swap left and right
+                if (order === 1) t = l, l = r, r = t;
+
+                // compare as usual
+                if (l === r) return 0;
+                else if (l < r) return -1;
+                return 1;
+            };
         },
 
         /**
