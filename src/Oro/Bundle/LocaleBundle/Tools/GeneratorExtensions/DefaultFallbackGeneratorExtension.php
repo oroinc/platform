@@ -76,7 +76,8 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
     protected function generateDefaultGetter($getterName, $fieldName, PhpClass $class)
     {
         $methodBody = [
-            '$values = $this->'. $fieldName . '->filter(function (\Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue $value) {',
+            '$values = $this->'. $fieldName .
+            '->filter(function (\Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue $value) {',
             '   return null === $value->getLocalization();',
             '});',
             'if ($values->count() > 1) {',
@@ -87,7 +88,8 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
             'return null;'
         ];
 
-        $method = $this->generateClassMethod($this->getDefaultGetterMethodName($getterName), implode("\n", $methodBody));
+        $methodName = $this->getDefaultGetterMethodName($getterName);
+        $method = $this->generateClassMethod($methodName, implode("\n", $methodBody));
         $class->setMethod($method);
     }
     public function getDefaultName()

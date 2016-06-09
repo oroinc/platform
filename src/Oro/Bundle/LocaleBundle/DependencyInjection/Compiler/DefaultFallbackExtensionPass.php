@@ -28,7 +28,7 @@ class DefaultFallbackExtensionPass implements CompilerPassInterface
     {
         $generator = $container->getDefinition(self::GENERATOR_EXTENSION_NAME);
 
-        if(!$this->classes) {
+        if (!$this->classes) {
             return;
         }
 

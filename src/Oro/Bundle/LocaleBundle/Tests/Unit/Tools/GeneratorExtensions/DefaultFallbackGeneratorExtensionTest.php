@@ -67,23 +67,29 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     public function testMethodGenerated()
     {
         $class = PhpClass::create('Test\Entity');
+        $fieldName = 'testFields';
         $schema = [
             'class' => 'Test\Entity'
         ];
 
         $this->extension->addMethodExtension('Test\Entity', [
-            'testField' => 'testFields'
+            'testField'=> $fieldName
         ]);
 
-        $expectedBody = '$values = $this->testFields->filter(function (\OroB2B\Bundle\FallbackBundle\Entity\LocalizedFallbackValue $value) {
-   return null === $value->getLocale();
-});
-if ($values->count() > 1) {
-   throw new \LogicException(\'There must be only one default localized fallback value\');
-} elseif ($values->count() === 1) {
-   return $values->first();
-}
-return null;';
+        $expectedBody = [
+            '$values = $this->'. $fieldName .
+            '->filter(function (\Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue $value) {',
+            '   return null === $value->getLocalization();',
+            '});',
+            'if ($values->count() > 1) {',
+            '   throw new \LogicException(\'There must be only one default localized fallback value\');',
+            '} elseif ($values->count() === 1) {',
+            '   return $values->first();',
+            '}',
+            'return null;'
+        ];
+
+        $expectedBody = implode("\n", $expectedBody);
 
         $this->extension->generate($schema, $class);
 
