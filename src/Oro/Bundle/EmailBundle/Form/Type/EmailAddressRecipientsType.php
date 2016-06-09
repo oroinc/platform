@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\EmailAddressRecipientsTransformer;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 class EmailAddressRecipientsType extends AbstractType
 {
@@ -74,7 +75,7 @@ class EmailAddressRecipientsType extends AbstractType
             'configs' => [
                 'allowClear'         => true,
                 'multiple'           => true,
-                'separator'          => Email::EMAIL_SEPARATOR,
+                'separator'          => EmailRecipientsHelper::EMAIL_IDS_SEPARATOR,
                 'route_name'         => 'oro_email_autocomplete_recipient',
                 'minimumInputLength' => $this->cm->get('oro_email.minimum_input_length'),
                 'per_page'           => 100,

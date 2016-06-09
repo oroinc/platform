@@ -22,7 +22,6 @@ class Email implements OrganizationAwareInterface
     const MAIL_TYPE_DIRECT  = 'direct';
     const MAIL_TYPE_REPLY   = 'reply';
     const MAIL_TYPE_FORWARD = 'forward';
-    const EMAIL_SEPARATOR   = ';';
 
     /** @var string */
     protected $gridName;

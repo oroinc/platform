@@ -577,7 +577,8 @@ class EmailController extends Controller
     {
         $query = $request->query->get('query');
         if ($request->query->get('search_by_id', false)) {
-            $emails = explode(EmailModel::EMAIL_SEPARATOR, $query);
+
+            $emails = $this->getEmailRecipientsHelper()->extractFormRecipients($query);
             $results = array_map(function ($email) {
                 $recipient = $this->getEmailRecipientsHelper()->createRecipientFromEmail($email);
                 if ($recipient) {
@@ -585,7 +586,7 @@ class EmailController extends Controller
                 }
 
                 return [
-                    'id'   => $email,
+                    'id'   => $this->getEmailRecipientsHelper()->prepareFormRecipientIds($email),
                     'text' => $email,
                 ];
             }, $emails);
