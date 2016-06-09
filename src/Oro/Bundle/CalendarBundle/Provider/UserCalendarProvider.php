@@ -234,6 +234,9 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 unset($item[$key]['calculatedEndTime']);
                 $occurrenceDates = $this->recurrenceModel->getOccurrences($recurrence, $start, $end);
                 $newStartDate = new \DateTime($item['start']);
+                $itemEndDate = new \DateTime($item['end']);
+                $duration = $itemEndDate->diff($newStartDate);
+                $timeZone = new \DateTimeZone('UTC');
                 foreach ($occurrenceDates as $occurrenceDate) {
                     $newItem = $item;
                     $newItem['recurrencePattern'] = $this->recurrenceModel->getTextValue($recurrence);
@@ -243,11 +246,17 @@ class UserCalendarProvider extends AbstractCalendarProvider
                         $occurrenceDate->format('d')
                     );
                     $newItem['start'] = $newStartDate->format('c');
-                    $endDate = new \DateTime($newItem['end'], new \DateTimeZone('UTC'));
-                    $endDate->setDate(
-                        $occurrenceDate->format('Y'),
-                        $occurrenceDate->format('m'),
-                        $occurrenceDate->format('d')
+                    $endDate = new \DateTime(
+                        sprintf(
+                            '+%s minute +%s hour +%s day +%s month +%s year %s',
+                            $duration->format('%i'),
+                            $duration->format('%h'),
+                            $duration->format('%d'),
+                            $duration->format('%m'),
+                            $duration->format('%y'),
+                            $newStartDate->format('c')
+                        ),
+                        $timeZone
                     );
                     $newItem['end'] = $endDate->format('c');
                     $newItem['removable'] = false;
