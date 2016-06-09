@@ -248,15 +248,18 @@ define(function(require) {
             var args = _.rest(arguments);
             if (command === 'create') {
                 args.unshift(this);
-                return InputWidgetManager.create.apply(InputWidgetManager, args);
+                InputWidgetManager.create.apply(InputWidgetManager, args);
+                return this;
             }
             if (command === 'seekAndCreate') {
                 args.unshift(this);
-                return InputWidgetManager.seekAndCreateWidgetsInContainer.apply(InputWidgetManager, args);
+                InputWidgetManager.seekAndCreateWidgetsInContainer.apply(InputWidgetManager, args);
+                return this;
             }
             if (command === 'seekAndDestroy') {
                 args.unshift(this);
-                return InputWidgetManager.seekAndDestroyWidgetsInContainer.apply(InputWidgetManager, args);
+                InputWidgetManager.seekAndDestroyWidgetsInContainer.apply(InputWidgetManager, args);
+                return this;
             }
 
             var response = null;
