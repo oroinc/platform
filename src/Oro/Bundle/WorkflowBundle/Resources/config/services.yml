@@ -217,15 +217,3 @@ services:
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
             - '%oro_workflow.workflow_item.entity.class%'
-
-    oro_workflow.process.process_trigger_repository:
-        class: Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository
-        factory: ['@doctrine', 'getRepository']
-        arguments:
-            - '%oro_workflow.process_trigger.entity.class%'
-
-    oro_workflow.transition_schedule_processes:
-        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcesses
-        arguments:
-            - "@doctrine"
-            - "%oro_workflow.process_definition.entity.class%"

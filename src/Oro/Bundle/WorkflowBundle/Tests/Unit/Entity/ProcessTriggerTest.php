@@ -203,6 +203,9 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @return array
+     */
     public function testIsDefinitiveEqualData()
     {
         return [
@@ -271,12 +274,24 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
     public function createProcessTriggerByAttributes(array $attributes)
     {
         $trigger = new ProcessTrigger();
-        $trigger->setEvent(isset($attributes['event']) ? $attributes['event'] : null);
-        $trigger->setField(isset($attributes['field']) ? $attributes['field'] : null);
-        $trigger->setCron(isset($attributes['cron']) ? $attributes['cron'] : null);
+
+        if (isset($attributes['event'])) {
+            $trigger->setEvent($attributes['event']);
+        }
+
+        if (isset($attributes['field'])) {
+            $trigger->setField($attributes['field']);
+        }
+
+        if (isset($attributes['cron'])) {
+            $trigger->setCron($attributes['cron']);
+        }
 
         if (isset($attributes['definition'])) {
-            $trigger->setDefinition((new ProcessDefinition())->setName($attributes['definition']));
+            $definition = new ProcessDefinition();
+            $definition->setName($attributes['definition']);
+
+            $trigger->setDefinition($definition);
         }
 
         return $trigger;

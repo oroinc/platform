@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository;
@@ -11,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionChangesListener;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
@@ -20,17 +24,22 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
+    const PROCESS_DEFINITION_CLASS_NAME = 'stdClass';
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessConfigurationGenerator */
     protected $generator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessConfigurator */
     protected $processConfigurator;
 
-    /** @var WorkflowDefinitionChangesListener */
-    protected $listener;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessDefinitionRepository */
     protected $processDefinitionRepository;
+
+    /** @var WorkflowDefinitionChangesListener */
+    protected $listener;
 
     protected function setUp()
     {
@@ -46,12 +55,27 @@ class WorkflowDefinitionChangesListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->processDefinitionRepository = $this
             ->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager $manager */
+        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->with(self::PROCESS_DEFINITION_CLASS_NAME)
+            ->willReturn($this->processDefinitionRepository);
+
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(self::PROCESS_DEFINITION_CLASS_NAME)
+            ->willReturn($manager);
 
         $this->listener = new WorkflowDefinitionChangesListener(
             $this->generator,
             $this->processConfigurator,
-            $this->processDefinitionRepository
+            $this->registry,
+            self::PROCESS_DEFINITION_CLASS_NAME
         );
     }
 

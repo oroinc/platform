@@ -51,11 +51,12 @@ services:
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: onClear }
 
-    oro_workflow.event_listener.workflow_definition_listener:
+    oro_workflow.event_listener.workflow_definition_changes_listener:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionChangesListener'
         arguments:
             - '@oro_workflow.transition_schedule.process_configuration_generator'
             - '@oro_workflow.process.configurator'
-            - '@oro_workflow.transition_schedule_processes'
+            - '@doctrine'
+            - '%oro_workflow.process_definition.entity.class%'
         tags:
             - { name: oro_workflow.changes.subscriber }

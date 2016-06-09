@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -10,11 +14,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator;
-
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName;
-use Oro\Component\DoctrineUtils\ORM\LikeQueryHelperTrait;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Oro\Component\DoctrineUtils\ORM\LikeQueryHelperTrait;
 
 /**
  * Provide logic for workflow scheduled transitions processes synchronization
@@ -26,11 +28,14 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     /** @var ProcessConfigurationGenerator */
     protected $generator;
 
-    /** @var \Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator */
+    /** @var ProcessConfigurator */
     protected $processConfigurator;
 
-    /** @var ProcessDefinitionRepository */
-    protected $processDefinitionRepository;
+    /** @var ManagerRegistry */
+    protected $registry;
+
+    /** @var string */
+    protected $processDefinitionClassName;
 
     /** @var array */
     private $generatedConfigurations = [];
@@ -38,16 +43,19 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
     /**
      * @param ProcessConfigurationGenerator $generator
      * @param ProcessConfigurator $processConfigurator
-     * @param ProcessDefinitionRepository $processDefinitionRepository
+     * @param ManagerRegistry $registry
+     * @param string $processDefinitionClassName
      */
     public function __construct(
         ProcessConfigurationGenerator $generator,
         ProcessConfigurator $processConfigurator,
-        ProcessDefinitionRepository $processDefinitionRepository
+        ManagerRegistry $registry,
+        $processDefinitionClassName
     ) {
         $this->generator = $generator;
         $this->processConfigurator = $processConfigurator;
-        $this->processDefinitionRepository = $processDefinitionRepository;
+        $this->registry = $registry;
+        $this->processDefinitionClassName = $processDefinitionClassName;
     }
 
     /**
@@ -170,7 +178,7 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
         );
 
         // stpn!_!_workflow!_name!_!_%  - escaped with ! like expression for all transitions
-        return $this->processDefinitionRepository->findLikeName(
+        return $this->getProcessDefinitionRepository()->findLikeName(
             $this->makeLikeParam($matchWorkflowRelated, '%s%%'),
             '!'
         );
@@ -190,5 +198,14 @@ class WorkflowDefinitionChangesListener implements EventSubscriberInterface
             WorkflowEvents::WORKFLOW_ACTIVATED => 'workflowActivated',
             WorkflowEvents::WORKFLOW_DEACTIVATED => 'workflowDeactivated'
         ];
+    }
+
+    /**
+     * @return ProcessDefinitionRepository
+     */
+    protected function getProcessDefinitionRepository()
+    {
+        return $this->registry->getManagerForClass($this->processDefinitionClassName)
+            ->getRepository($this->processDefinitionClassName);
     }
 }

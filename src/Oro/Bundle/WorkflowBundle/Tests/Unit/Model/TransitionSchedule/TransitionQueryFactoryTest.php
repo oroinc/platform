@@ -60,26 +60,11 @@ class TransitionQueryFactoryTest extends \PHPUnit_Framework_TestCase
             ->willReturn($queryBuilder);
 
         $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with('EntityClass')
-            ->willReturn($repository);
+        $em->expects($this->once())->method('getRepository')->with('EntityClass')->willReturn($repository);
 
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->with('EntityClass')
-            ->willReturn($em);
+        $this->registry->expects($this->once())->method('getManagerForClass')->with('EntityClass')->willReturn($em);
 
         $this->assertEquals($dqlString, $this->queryFactory->create($steps, 'EntityClass', $dqlFilter));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage At least one step, in which transition can be performed from, must be provided.
-     */
-    public function testNoStepsException()
-    {
-        $this->queryFactory->create([], 'EntityClass');
     }
 
     /**
