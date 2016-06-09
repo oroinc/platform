@@ -162,6 +162,14 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($qb));
         $qb
             ->expects($this->once())
+            ->method('addSelect')
+            ->will($this->returnValue($qb));
+        $qb
+            ->expects($this->once())
+            ->method('addOrderBy')
+            ->will($this->returnValue($qb));
+        $qb
+            ->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
         $query
