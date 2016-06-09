@@ -34,6 +34,13 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
             $event->getRecurrence()->getCalculatedEndTime()->format(DATE_RFC3339)
         );
 
+        $activityTargetEntities = $event->getActivityTargetEntities();
+        $this->assertCount(1, $activityTargetEntities);
+        $this->assertEquals(
+            $this->getReference('activity_target_one')->getId(),
+            reset($activityTargetEntities)->getId()
+        );
+
         return ['id' => $result['id'], 'recurrenceId' => $event->getRecurrence()->getId()];
     }
 
@@ -80,10 +87,17 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->findOneBy(['id' => $data['id']]);
+        $activityTargetEntities = $event->getActivityTargetEntities();
+        $this->assertCount(1, $activityTargetEntities);
+        $this->assertEquals(
+            $this->getReference('activity_target_one')->getId(),
+            reset($activityTargetEntities)->getId()
+        );
         $this->assertNull($event->getRecurrence());
         $recurrence = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:Recurrence')
             ->findOneBy(['id' => $data['recurrenceId']]);
         $this->assertNull($recurrence);
+
         $em = $this->getContainer()->get('doctrine')->getManager();
         $em->remove($event);
         $em->flush();
@@ -142,6 +156,12 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
             ->find($result['id']);
         $this->assertNotNull($exception);
         $this->assertEquals($data['id'], $exception->getRecurringEvent()->getId());
+        $activityTargetEntities = $exception->getActivityTargetEntities();
+        $this->assertCount(1, $activityTargetEntities);
+        $this->assertEquals(
+            $this->getReference('activity_target_one')->getId(),
+            reset($activityTargetEntities)->getId()
+        );
 
         return ['id' => $result['id'], 'recurringEventId' => $data['id']];
     }
@@ -193,6 +213,12 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->find($data['id']);
         $this->assertEquals(self::$recurringEventExceptionParameters['isCancelled'], $event->getIsCancelled());
+        $activityTargetEntities = $event->getActivityTargetEntities();
+        $this->assertCount(1, $activityTargetEntities);
+        $this->assertEquals(
+            $this->getReference('activity_target_one')->getId(),
+            reset($activityTargetEntities)->getId()
+        );
     }
 
     /**
