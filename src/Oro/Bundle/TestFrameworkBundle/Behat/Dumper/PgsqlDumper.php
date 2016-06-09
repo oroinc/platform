@@ -7,7 +7,7 @@ class PgsqlDumper extends AbstractDbDumper
     /**
      * {@inheritdoc}
      */
-    public function dumpDb()
+    public function dump()
     {
         $this->runProcess(sprintf(
             'PGPASSWORD="%s" pg_dump -h %s -U %s %s > %s/%4$s.sql',
@@ -22,7 +22,7 @@ class PgsqlDumper extends AbstractDbDumper
     /**
      * {@inheritdoc}
      */
-    public function restoreDb()
+    public function restore()
     {
         $this->runProcess(sprintf(
             'PGPASSWORD="%4$s" psql -c "drop database %s;" -h %s -U %s'.

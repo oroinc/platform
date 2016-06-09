@@ -104,15 +104,29 @@ define(function(require) {
         },
 
         getAvailableOptions: function(options) {
+            var results;
+            var restrictionExpectation;
             var choices = this.options.choices;
-            var result = [];
-            _.each(choices, function(text, id) {
-                result.push({
-                    id: id,
-                    text: text
+            var fieldRestrictions = _.result(this.options, 'fieldRestrictions');
+            if (fieldRestrictions) {
+                restrictionExpectation = _.result(fieldRestrictions, 'mode') === 'disallow';
+                results = _.map(choices, function(text, id) {
+                    var presentInRestriction = _.indexOf(fieldRestrictions.values, id) !== -1;
+                    return {
+                        id: id,
+                        text: text,
+                        disabled: presentInRestriction === restrictionExpectation
+                    };
                 });
-            });
-            return result;
+            } else {
+                results = _.map(choices, function(text, id) {
+                    return {
+                        id: id,
+                        text: text
+                    };
+                });
+            }
+            return results;
         },
 
         render: function() {

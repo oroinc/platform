@@ -294,8 +294,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, null, null, null))
+            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $restrictionManager, null, null, null))
             ->setMethods(null)
             ->getMock();
         $workflow->setName($workflowName);
@@ -304,9 +308,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $stepManager->expects($this->any())->method('hasStartStep')
             ->will($this->returnValue($withStartStep));
 
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $activeWorkflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $stepManager, null, null))
-            ->setMethods(array('start'))
+            ->setConstructorArgs([new EntityConnector(), $aclManager, $restrictionManager, $stepManager, null, null])
+            ->setMethods(['start'])
             ->getMock();
         $activeWorkflow->setName($activeWorkflowName);
         $activeWorkflow->setDefinition($workflowDefinition);
@@ -390,8 +398,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, null, null, null))
+            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $restrictionManager, null, null, null))
             ->setMethods(null)
             ->getMock();
 
@@ -933,8 +945,14 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array($entityConnector, $aclManager, null, $attributeManager, $transitionManager))
+            ->setConstructorArgs(
+                [$entityConnector, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+            )
             ->setMethods(
                 array(
                     'isTransitionAvailable',
@@ -1125,7 +1143,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 ->setMethods(array('resetWorkflowData'))
                 ->getMock();
         $workflowItemsRepository->expects($this->once())->method('resetWorkflowData')
-            ->with($entityClass, array($name));
+            ->with($entityClass);
 
         $this->registry->expects($this->once())
             ->method('getRepository')
