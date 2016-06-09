@@ -24,6 +24,8 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Result;
 
 class EmailRecipientsHelper
 {
@@ -65,6 +67,7 @@ class EmailRecipientsHelper
      * @param EmailOwnerProvider $emailOwnerProvider
      * @param Registry $registry
      * @param EmailAddressHelper $addressHelper
+     * @param Indexer $search
      */
     public function __construct(
         AclHelper $aclHelper,
@@ -74,7 +77,8 @@ class EmailRecipientsHelper
         TranslatorInterface $translator,
         EmailOwnerProvider $emailOwnerProvider,
         Registry $registry,
-        EmailAddressHelper $addressHelper
+        EmailAddressHelper $addressHelper,
+        Indexer $search
     ) {
         $this->aclHelper = $aclHelper;
         $this->dqlNameFormatter = $dqlNameFormatter;
@@ -84,6 +88,7 @@ class EmailRecipientsHelper
         $this->emailOwnerProvider = $emailOwnerProvider;
         $this->registry = $registry;
         $this->addressHelper = $addressHelper;
+        $this->search = $search;
     }
 
     /**
@@ -182,32 +187,31 @@ class EmailRecipientsHelper
         $alias,
         $entityClass
     ) {
-        $fullNameQueryPart = $this->dqlNameFormatter->getFormattedNameDQL($alias, $entityClass);
+        $searchRecipients = $this->search->simpleSearch(
+            $args->getQuery(),
+            0,
+            $args->getLimit(),
+            $this->search->getEntityAlias($entityClass)
+        );
 
-        $excludedEmailNames = $args->getExcludedEmailNamesForEntity($entityClass);
+        $recipients = [];
+        if (!$searchRecipients->isEmpty()) {
+            $fullNameQueryPart = $this->dqlNameFormatter->getFormattedNameDQL($alias, $entityClass);
+            $excludedEmailNames = $args->getExcludedEmailNamesForEntity($entityClass);
 
-        $primaryEmailsQb = $repository
-            ->getPrimaryEmailsQb($fullNameQueryPart, $excludedEmailNames, $args->getQuery())
-            ->setMaxResults($args->getLimit());
+            $primaryEmailsQb = $repository
+                ->getPrimaryEmailsQb($fullNameQueryPart, $excludedEmailNames)
+                ->setMaxResults($args->getLimit());
 
-        $primaryEmailsResult = $this->getRestrictedResult($primaryEmailsQb, $args);
-        $recipients = $this->recipientsFromResult($primaryEmailsResult, $entityClass);
-
-        $limit = $args->getLimit() - count($recipients);
-
-        if ($limit > 0) {
-            $excludedEmailNames = array_merge(
-                $excludedEmailNames,
-                array_map(function (Recipient $recipient) {
-                    return $recipient->getBasicNameWithOrganization();
-                }, $recipients)
+            $primaryEmailsQb->andWhere($primaryEmailsQb->expr()->in(sprintf('%s.id', $alias), ':entity_id_list'));
+            $primaryEmailsQb->setParameter(
+                'entity_id_list',
+                array_map(function (Result\Item $searchRecipient) {
+                    return $searchRecipient->getRecordId();
+                }, $searchRecipients->getElements())
             );
-            $secondaryEmailsQb = $repository
-                ->getSecondaryEmailsQb($fullNameQueryPart, $excludedEmailNames, $args->getQuery())
-                ->setMaxResults($limit);
-
-            $secondaryEmailsResult = $this->getRestrictedResult($secondaryEmailsQb, $args);
-            $recipients = array_merge($recipients, $this->recipientsFromResult($secondaryEmailsResult, $entityClass));
+            $primaryEmailsResult = $this->getRestrictedResult($primaryEmailsQb, $args);
+            $recipients = $this->recipientsFromResult($primaryEmailsResult, $entityClass);
         }
 
         return $recipients;
