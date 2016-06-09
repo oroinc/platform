@@ -251,7 +251,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
             }
 
             while ($triggerToDelete = array_shift($this->forRemove)) {
-                if($objectManager->contains($triggerToDelete)){
+                if ($objectManager->contains($triggerToDelete)) {
                     $objectManager->remove($triggerToDelete);
                 }
             }

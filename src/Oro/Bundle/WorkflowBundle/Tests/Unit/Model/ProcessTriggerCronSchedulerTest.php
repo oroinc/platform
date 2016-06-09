@@ -41,8 +41,6 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->scheduleClass = 'Oro\Bundle\CronBundle\Entity\Schedule';
         $this->objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
 
-        //$this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
-
         $this->processCronScheduler = new ProcessTriggerCronScheduler(
             $this->scheduleManager,
             $this->registry,
@@ -100,10 +98,8 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveScheduleAndFlush()
     {
-        /** @var \Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockTrigger */
         $mockTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
-
-        /** @var \Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition|\PHPUnit_Framework_MockObject_MockObject */
         $mockProcessDefinition = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition');
         $mockProcessDefinition->expects($this->once())->method('getName')->willReturn('process_name');
 
@@ -141,6 +137,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testException()
     {
+        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockTrigger */
         $mockTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
         $mockTrigger->expects($this->exactly(1))->method('getCron')->willReturn(null);
         $this->setExpectedException(
@@ -161,8 +158,9 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->processCronScheduler->add($trigger);
     }
 
-    public function testUnmanageableEntityException(){
-        $this->setValue($this->processCronScheduler,'dirty', true);
+    public function testUnmanageableEntityException()
+    {
+        $this->setValue($this->processCronScheduler, 'dirty', true);
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')

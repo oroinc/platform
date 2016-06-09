@@ -90,7 +90,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
         $processDefinitionToRemoveNotManaged = new ProcessDefinition();
 
         $this->setValue($this->processDefinitionsConfigurator, 'dirty', true);
-        $this->setValue($this->processDefinitionsConfigurator,'toPersist',[$processDefinitionToPersist]);
+        $this->setValue($this->processDefinitionsConfigurator, 'toPersist', [$processDefinitionToPersist]);
         $this->setValue(
             $this->processDefinitionsConfigurator,
             'toRemove',
