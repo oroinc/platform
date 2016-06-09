@@ -96,13 +96,8 @@ class WorkflowControllerTest extends WebTestCase
      */
     protected function refreshEntity(WorkflowAwareEntity $entity)
     {
-        $entity = $this->client
-            ->getContainer()
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity')
-            ->findOneBy([
-                'id' => $entity->getId()
-            ]);
+        $entity = $this->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity')
+            ->find($entity->getId());
 
         return $entity;
     }
