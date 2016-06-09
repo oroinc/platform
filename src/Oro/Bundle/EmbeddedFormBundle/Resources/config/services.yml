@@ -49,7 +49,7 @@ services:
     oro_embedded_form.layout.block_type.default_form:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptionsConfig, [{form: {default: null}, form: {default: null}}]]
+            - [setOptionsConfig, [{form: {default: null}, form_layout: {default: null}}]]
             - [setName, ['embed_form_legacy_form']]
         tags:
              - { name: layout.block_type, alias: embed_form_legacy_form }
