@@ -17,7 +17,7 @@ define(function(require) {
     });
 
     InputWidgetManager.addWidget('select2', {
-        selector: 'select',
+        selector: 'select,input',
         disableAutoCreate: true,
         Widget: Select2InputWidget
     });

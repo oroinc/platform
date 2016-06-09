@@ -216,7 +216,10 @@ define(function(require) {
             }
             var self = this;
             $container.find('[data-bound-input-widget]').each(function() {
-                self.getWidget($(this)).dispose();
+                var widget = self.getWidget($(this));
+                if (widget) {
+                    widget.dispose();
+                }
             });
             $container.data('attachedWidgetsCount', 0);
         }
