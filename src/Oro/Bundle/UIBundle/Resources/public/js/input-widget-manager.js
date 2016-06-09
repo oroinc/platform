@@ -130,6 +130,7 @@ define(function(require) {
          * @returns {AbstractInputWidget|Object}
          */
         createWidget: function($input, Widget, options, humanName) {
+            options = $.extend(true, {}, $input.data('input-widget-options') || {}, options || {});
             if (!options) {
                 options = {};
             }

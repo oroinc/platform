@@ -48,7 +48,11 @@
     {% spaceless %}
         <div class="control-group" style="margin-bottom: 0">
             <div class="attachment-file">
-                {{ form_widget(form.file) }}
+                {% set jsonParams = '{"initializeOptions":{"fileDefaultHtml":"' ~ "Attach file:"|trans  ~ '" ,"fileButtonHtml":"' ~ "Upload"|trans  ~ '"}}' %}
+                {{ form_widget(form.file,
+                    {'attr': {'data-input-widget-options': jsonParams }
+                    })
+                }}
             </div>
             {% if form_errors(form.file) %}
                 <div style="clear:both; float:left">
