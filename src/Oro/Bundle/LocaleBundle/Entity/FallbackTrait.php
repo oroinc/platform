@@ -32,7 +32,7 @@ trait FallbackTrait
         if ($value) {
             switch ($value->getFallback()) {
                 case FallbackType::PARENT_LOCALIZATION:
-                    $value = $this->getLocalizedFallbackValue($values, $localization->getParentLocale());
+                    $value = $this->getLocalizedFallbackValue($values, $localization->getParentLocalization());
                     break;
                 case FallbackType::SYSTEM:
                     $value = $this->getLocalizedFallbackValue($values);

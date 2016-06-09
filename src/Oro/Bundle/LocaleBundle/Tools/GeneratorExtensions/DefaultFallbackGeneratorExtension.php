@@ -76,8 +76,8 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
     protected function generateDefaultGetter($getterName, $fieldName, PhpClass $class)
     {
         $methodBody = [
-            '$values = $this->'. $fieldName . '->filter(function (\OroB2B\Bundle\FallbackBundle\Entity\LocalizedFallbackValue $value) {',
-            '   return null === $value->getLocale();',
+            '$values = $this->'. $fieldName . '->filter(function (\Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue $value) {',
+            '   return null === $value->getLocalization();',
             '});',
             'if ($values->count() > 1) {',
             '   throw new \LogicException(\'There must be only one default localized fallback value\');',
