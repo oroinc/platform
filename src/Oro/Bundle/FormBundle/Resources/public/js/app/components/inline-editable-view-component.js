@@ -371,7 +371,6 @@ define(function(require) {
                 }, this);
             }
             mediator.execute('showFlashMessage', 'success', this.messages.success);
-            console.log(this.eventChannelId);
             mediator.trigger('inlineEditor:' + this.eventChannelId + ':update', this.updateData);
         },
 
