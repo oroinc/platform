@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 use Symfony\Component\Validator\PropertyMetadataContainerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -83,7 +84,10 @@ class InlineEditColumnOptionsGuesser
         $rules = [];
         foreach ($metadata->getConstraints() as $constraint) {
             $reflectionClass = new \ReflectionClass($constraint);
-            $rules[$reflectionClass->getShortName()] = (array)$constraint;
+            $ruleKey = $reflectionClass->getNamespaceName() === substr(AbstractLoader::DEFAULT_NAMESPACE, 1, -1)
+                ? $reflectionClass->getShortName()
+                : $reflectionClass->getName();
+            $rules[$ruleKey] = (array)$constraint;
         }
 
         return $rules;
