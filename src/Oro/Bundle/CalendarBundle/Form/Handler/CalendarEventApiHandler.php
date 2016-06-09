@@ -129,7 +129,7 @@ class CalendarEventApiHandler
 
                 $type = $this->manager
                     ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE))
-                    ->find(Attendee::TYPE_OPTIONAL);
+                    ->find(Attendee::TYPE_REQUIRED);
                 $attendee->setType($type);
 
                 $event->addAttendee($attendee);
