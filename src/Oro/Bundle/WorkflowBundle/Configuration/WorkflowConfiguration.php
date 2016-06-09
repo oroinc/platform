@@ -17,6 +17,7 @@ class WorkflowConfiguration implements ConfigurationInterface
     const NODE_ATTRIBUTES = 'attributes';
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
+    const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -76,7 +77,8 @@ class WorkflowConfiguration implements ConfigurationInterface
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
-            ->append($this->getTransitionDefinitionsNode());
+            ->append($this->getTransitionDefinitionsNode())
+            ->append($this->getEntityRestrictionsNode());
 
         return $nodeBuilder;
     }
@@ -299,6 +301,43 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->end()
                     ->arrayNode('post_actions')
                         ->prototype('variable')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    protected function getEntityRestrictionsNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode    = $treeBuilder->root(self::NODE_ENTITY_RESTRICTIONS);
+        $rootNode
+            ->useAttributeAsKey('name')
+            ->requiresAtLeastOneElement()
+                ->prototype('array')
+                    ->children()
+                        ->scalarNode('name')
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->scalarNode('attribute')
+                            ->isRequired()
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->scalarNode('step')
+                        ->end()
+                        ->scalarNode('field')
+                        ->end()
+                        ->enumNode('mode')
+                            ->defaultValue('full')
+                            ->values(['full', 'disallow', 'allow'])
+                        ->end()
+                        ->arrayNode('values')
+                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end()

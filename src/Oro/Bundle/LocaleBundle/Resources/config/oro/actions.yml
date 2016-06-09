@@ -5,7 +5,7 @@ operations:
         exclude_datagrids:
             - oro-locale-localizations-grid
 
-    oro_locale_localization_delete1:
+    oro_locale_localization_delete:
         extends: DELETE
         for_all_entities: false
         for_all_datagrids: false

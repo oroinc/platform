@@ -47,7 +47,7 @@ services:
     oro_locale.form.type.quarter:
         class: '%oro_locale.form.type.quarter.class%'
         tags:
-            - { name: form.type, alias: "oro_formatting_select" }
+            - { name: form.type, alias: oro_quarter }
 
     oro_locale.form.type.fallback_property:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType'
