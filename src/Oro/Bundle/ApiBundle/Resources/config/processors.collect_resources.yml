@@ -49,5 +49,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActionsForDictionaries
         arguments:
             - '@oro_entity.dictionary_value_list_provider'
+            - ['delete', 'delete_list', 'create', 'update']
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -120 }

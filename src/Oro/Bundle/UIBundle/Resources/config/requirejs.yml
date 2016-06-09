@@ -66,6 +66,13 @@ config:
         'jquery.multiselect.filter':
             deps:
                 - 'jquery.multiselect'
+        'lightgallery':
+            deps:
+                - 'jquery'
+        'lightgallery.print':
+            deps:
+                - 'lightgallery'
+                - 'jquery'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
@@ -141,6 +148,8 @@ config:
         'cryptojs/hmac': 'bundles/oroui/lib/cryptojs/hmac-min.js'
         'cryptojs/sha256': 'bundles/oroui/lib/cryptojs/sha256-min.js'
         'cryptojs/pbkdf2': 'bundles/oroui/lib/cryptojs/pbkdf2-min.js'
+        'lightgallery': 'bundles/oroui/lib/lightgallery/js/lightgallery-all.js'
+        'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
@@ -167,6 +176,7 @@ config:
         'oroui/js/app/views/datepicker/datetimepicker-view': 'bundles/oroui/js/app/views/datepicker/datetimepicker-view.js'
         'oroui/js/app/views/datepicker/datepicker-view': 'bundles/oroui/js/app/views/datepicker/datepicker-view.js'
         'oroui/js/app/views/zoomable-area-view': 'bundles/oroui/js/app/views/zoomable-area-view.js'
+        'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
 
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'

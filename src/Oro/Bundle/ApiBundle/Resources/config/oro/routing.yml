@@ -1,5 +1,31 @@
-oro_rest_api_cget:
+oro_rest_api_cget_deprecated:
     path: /api/{entity}.{_format}
+    methods: [GET]
+    requirements:
+        entity: (?:(?!(soap|rest)$)[^/\.]+)
+        _format: json
+    defaults:
+        _controller: OroApiBundle:RestApi:cget
+        _format: json
+        _action: get_list
+    options:
+        group: rest_api_deprecated
+
+oro_rest_api_get_deprecated:
+    path: /api/{entity}/{id}.{_format}
+    methods: [GET]
+    requirements:
+        entity: (?:(?!(soap|rest)$)[^/\.]+)
+        _format: json
+    defaults:
+        _controller: OroApiBundle:RestApi:get
+        _format: json
+        _action: get
+    options:
+        group: rest_api_deprecated
+
+oro_rest_api_cget:
+    path: /api/{entity}
     methods: [GET]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
@@ -10,7 +36,7 @@ oro_rest_api_cget:
         group: rest_api
 
 oro_rest_api_get:
-    path: /api/{entity}/{id}.{_format}
+    path: /api/{entity}/{id}
     methods: [GET]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
@@ -21,7 +47,7 @@ oro_rest_api_get:
         group: rest_api
 
 oro_rest_api_delete:
-    path: /api/{entity}/{id}.{_format}
+    path: /api/{entity}/{id}
     methods: [DELETE]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
@@ -31,13 +57,35 @@ oro_rest_api_delete:
     options:
         group: rest_api
 
-oro_rest_api_delete_list:
-    path: /api/{entity}.{_format}
+oro_rest_api_cdelete:
+    path: /api/{entity}
     methods: [DELETE]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:deleteList
+        _controller: OroApiBundle:RestApi:cdelete
         _action: delete_list
+    options:
+        group: rest_api
+
+oro_rest_api_post:
+    path: /api/{entity}
+    methods: [POST]
+    requirements:
+        entity: (?:(?!(soap|rest)$)[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:post
+        _action: create
+    options:
+        group: rest_api
+
+oro_rest_api_patch:
+    path: /api/{entity}/{id}
+    methods: [PATCH]
+    requirements:
+        entity: (?:(?!(soap|rest)$)[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:patch
+        _action: update
     options:
         group: rest_api

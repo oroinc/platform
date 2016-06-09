@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\ValidateFilterValues;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 
@@ -18,7 +19,7 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
         $this->processor = new ValidateFilterValues();
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $this->context->setQuery(new \stdClass());
         $context = clone $this->context;
@@ -26,7 +27,7 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
         $this->assertEquals($context, $this->context);
     }
 
-    public function testProcessOnExistingFilterValues()
+    public function testProcess()
     {
         $filters       = $this->context->getFilters();
         $integerFilter = new ComparisonFilter('integer');
@@ -46,11 +47,7 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     * @expectedExceptionMessage At least one filter must be provided.
-     */
-    public function testProcessOnEmptyFilterValues()
+    public function testProcessWhenNoFilters()
     {
         $filters       = $this->context->getFilters();
         $integerFilter = new ComparisonFilter('integer');
@@ -68,5 +65,12 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
 
         $this->context->setFilterValues($filterValues);
         $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [
+                Error::createValidationError('filter constraint', 'At least one filter must be provided.')
+            ],
+            $this->context->getErrors()
+        );
     }
 }

@@ -12,8 +12,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  */
 class SetDeletedCountHeader implements ProcessorInterface
 {
-    const HEADER_NAME  = 'X-Include-Deleted-Count';
-    const HEADER_VALUE = 'deletedCount';
+    const RESPONSE_HEADER_NAME  = 'X-Include-Deleted-Count';
+    const REQUEST_HEADER_VALUE = 'deletedCount';
 
     /**
      * {@inheritdoc}
@@ -22,20 +22,20 @@ class SetDeletedCountHeader implements ProcessorInterface
     {
         /** @var DeleteListContext $context */
 
-        if ($context->getResponseHeaders()->has(self::HEADER_NAME)) {
+        if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
             // the deleted records count header is already set
             return;
         }
 
         $xInclude = $context->getRequestHeaders()->get(Context::INCLUDE_HEADER);
-        if (empty($xInclude) || !in_array(self::HEADER_VALUE, $xInclude, true)) {
+        if (empty($xInclude) || !in_array(self::REQUEST_HEADER_VALUE, $xInclude, true)) {
             // the deleted records count is not requested
             return;
         }
 
         $result = $context->getResult();
         if (null !== $result && is_array($result)) {
-            $context->getResponseHeaders()->set(self::HEADER_NAME, count($result));
+            $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, count($result));
         }
     }
 }

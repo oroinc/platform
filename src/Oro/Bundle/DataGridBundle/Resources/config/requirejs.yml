@@ -1,6 +1,6 @@
 config:
     shim:
-        'backgrid':
+        'orodatagrid/lib/backgrid/backgrid':
             deps:
                 - 'jquery'
                 - 'underscore'
@@ -8,7 +8,7 @@ config:
             exports: 'Backgrid'
     paths:
         'backbone-pageable-collection': 'bundles/orodatagrid/lib/backbone-pageable.js'
-        'backgrid': 'bundles/orodatagrid/lib/backgrid/backgrid.js'
+        'backgrid': 'bundles/orodatagrid/js/extend/backgrid.js'
 
         'orodatagrid/js/datagrid/action-launcher': 'bundles/orodatagrid/js/datagrid/action-launcher.js'
         'oro/datagrid/action/abstract-action': 'bundles/orodatagrid/js/datagrid/action/abstract-action.js'
@@ -85,4 +85,4 @@ build:
     paths:
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with
 #       files which does not support AMD. Backgrid is one of them, therefore it's excluded
-        'backgrid': 'empty:'
+        'orodatagrid/lib/backgrid/backgrid': 'empty:'

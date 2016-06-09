@@ -9,6 +9,9 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Add ACL restrictions to the Criteria object.
+ */
 class ProtectQueryByAcl implements ProcessorInterface
 {
     /** @var DoctrineHelper */
@@ -53,6 +56,12 @@ class ProtectQueryByAcl implements ProcessorInterface
             return;
         }
 
+        $criteria = $context->getCriteria();
+        if (null === $criteria) {
+            // the criteria object does not exist
+            return;
+        }
+
         $entityClass = $context->getClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
@@ -78,7 +87,7 @@ class ProtectQueryByAcl implements ProcessorInterface
         }
 
         if ($permission) {
-            $this->aclHelper->applyAclToCriteria($entityClass, $context->getCriteria(), $permission);
+            $this->aclHelper->applyAclToCriteria($entityClass, $criteria, $permission);
         }
     }
 }

@@ -17,7 +17,7 @@ interface ConfigExtraInterface
     public function getName();
 
     /**
-     * Makes modifications of the ConfigContext necessary to get required additional data.
+     * Makes modifications of the ConfigContext necessary to get required configuration data.
      *
      * @param ConfigContext $context
      */
@@ -31,7 +31,7 @@ interface ConfigExtraInterface
     public function isPropagable();
 
     /**
-     * Returns a string that should be added to a cache key used by by config providers.
+     * Returns a string that should be added to a cache key used by the config providers.
      *
      * @return string|null
      */

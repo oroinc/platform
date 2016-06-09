@@ -22,6 +22,7 @@ define([
      * @extends Backbone.View
      */
     SelectAllHeaderCell = Backbone.View.extend({
+        keepElement: false,
         /** @property */
         className: 'select-all-header-cell renderable',
 

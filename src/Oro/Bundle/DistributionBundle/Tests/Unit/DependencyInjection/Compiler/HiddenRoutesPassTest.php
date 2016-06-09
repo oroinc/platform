@@ -56,34 +56,6 @@ class HiddenRoutesPassTest extends \PHPUnit_Framework_TestCase
                     HiddenRoutesPass::MATCHER_DUMPER_CLASS_PARAM => 'OtherMatcherDumper'
                 ]
             ],
-            [
-                [
-                    HiddenRoutesPass::API_DOC_EXTRACTOR_CLASS_PARAM =>
-                        HiddenRoutesPass::EXPECTED_API_DOC_EXTRACTOR_CLASS
-                ],
-                [
-                    HiddenRoutesPass::API_DOC_EXTRACTOR_CLASS_PARAM =>
-                        HiddenRoutesPass::NEW_API_DOC_EXTRACTOR_CLASS
-                ]
-            ],
-            [
-                [
-                    HiddenRoutesPass::API_DOC_EXTRACTOR_CLASS_PARAM =>
-                        HiddenRoutesPass::EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS
-                ],
-                [
-                    HiddenRoutesPass::API_DOC_EXTRACTOR_CLASS_PARAM =>
-                        HiddenRoutesPass::NEW_CACHING_API_DOC_EXTRACTOR_CLASS
-                ]
-            ],
-            [
-                [
-                    HiddenRoutesPass::API_DOC_EXTRACTOR_CLASS_PARAM => 'OtherApiDocExtractor'
-                ],
-                [
-                    HiddenRoutesPass::API_DOC_EXTRACTOR_CLASS_PARAM => 'OtherApiDocExtractor'
-                ]
-            ],
         ];
     }
 }

@@ -1,2 +1,3 @@
 {% set attachment = record.getValue('att') %}
-{{ oro_file_view(attachment, 'file', attachment.file) }}
+{% set additional = oro_type_is_image(attachment.file.mimeType) ? {'galleryId' : 'grid-attachments'} : {} %}
+{{ oro_file_view(attachment, 'file', attachment.file, additional) }}

@@ -161,6 +161,7 @@ class ProcessorDecorator
                         ->defaultValue(false)
                     ->end()
                     ->integerNode('priority')->end()
+                    ->scalarNode('tooltip')->end()
                 ->end()
             ->end();
 

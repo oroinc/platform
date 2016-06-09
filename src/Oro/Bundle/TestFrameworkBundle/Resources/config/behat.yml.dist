@@ -1,0 +1,26 @@
+# behat.yml
+default: &default
+    extensions:
+        Behat\MinkExtension:
+            base_url: 'http://localhost.com/'
+            default_session: 'selenium2'
+            selenium2:
+                wd_host: "http://localhost:8643/wd/hub"
+        Behat\Symfony2Extension:
+            kernel:
+                env: 'prod'
+            context:
+                path_suffix: 'Tests/Behat/Features'
+                class_suffix: 'Tests\Behat\Context\FeatureContext'
+        Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension:
+            shared_contexts: ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext']
+    autoload:
+            - %paths.base%/../../../../../../../../app/bootstrap.php.cache
+    suites: []
+
+selenium2:
+    <<: *default
+    extensions:
+        Behat\MinkExtension:
+            selenium2:
+                wd_host: 'http://localhost:4444/wd/hub'

@@ -11,6 +11,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase
 
 class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $criteriaConnector;
+
     /** @var BuildSingleItemQuery */
     protected $processor;
 
@@ -18,15 +21,14 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
     {
         parent::setUp();
 
-        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+        $this->criteriaConnector = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\CriteriaConnector')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->context->setCriteria(new Criteria($resolver));
 
-        $this->processor = new BuildSingleItemQuery($this->doctrineHelper);
+        $this->processor = new BuildSingleItemQuery($this->doctrineHelper, $this->criteriaConnector);
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $qb = $this->getQueryBuilderMock();
 
@@ -34,6 +36,13 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         $this->assertSame($qb, $this->context->getQuery());
+    }
+
+    public function testProcessWhenCriteriaObjectDoesNotExist()
+    {
+        $this->processor->process($this->context);
+
+        $this->assertFalse($this->context->hasQuery());
     }
 
     public function testProcessForNotManageableEntity()
@@ -48,11 +57,20 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->assertNull($this->context->getQuery());
     }
 
-    public function testProcessOnSingleIdEntity()
+    public function testProcessForSingleIdEntity()
     {
         $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User';
         $id        = 12;
 
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $criteria = new Criteria($resolver);
+
+        $this->criteriaConnector->expects($this->once())
+            ->method('applyCriteria');
+
+        $this->context->setCriteria($criteria);
         $this->context->setClassName($className);
         $this->context->setId($id);
         $this->processor->process($this->context);
@@ -72,22 +90,32 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The entity identifier cannot be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" has single primary key.
      */
     // @codingStandardsIgnoreEnd
-    public function testProcessOnSingleIdEntityWithGivenArrayId()
+    public function testProcessForSingleIdEntityWithGivenArrayId()
     {
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context->setCriteria(new Criteria($resolver));
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->context->setId([2, 4]);
         $this->processor->process($this->context);
     }
 
-    public function testProcessOnCompositeIdEntity()
+    public function testProcessForCompositeIdEntity()
     {
         $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity';
         $id        = ['id' => 23, 'title' => 'test'];
 
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context->setCriteria(new Criteria($resolver));
         $this->context->setClassName($className);
         $this->context->setId($id);
         $this->processor->process($this->context);
@@ -112,12 +140,17 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The entity identifier must be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite primary key.
      */
     // @codingStandardsIgnoreEnd
-    public function testProcessOnCompositeIdEntityWithGivenScalarId()
+    public function testProcessForCompositeIdEntityWithGivenScalarId()
     {
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context->setCriteria(new Criteria($resolver));
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity');
         $this->context->setId(54);
         $this->processor->process($this->context);
@@ -125,12 +158,17 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The entity identifier array must have the key "title" because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite primary key.
      */
     // @codingStandardsIgnoreEnd
-    public function testProcessOnCompositeIdEntityWithGivenWrongId()
+    public function testProcessForCompositeIdEntityWithGivenWrongId()
     {
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context->setCriteria(new Criteria($resolver));
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity');
         $this->context->setId(['id' => 45]);
         $this->processor->process($this->context);

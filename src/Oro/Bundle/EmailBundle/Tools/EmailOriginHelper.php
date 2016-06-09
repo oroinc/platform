@@ -68,11 +68,6 @@ class EmailOriginHelper
                 ->findOneBy(['internalName' => $originName]);
         }
 
-        if ($this->isEmptyOrigin($origin)) {
-            $user   = $this->emailModel->getCampaignOwner();
-            $origin = $this->getPreferredOrigin($user, $organization, $enableUseUserEmailOrigin);
-        }
-
         return $origin;
     }
 

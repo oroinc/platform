@@ -20,31 +20,17 @@ abstract class StandaloneFilter implements FilterInterface
     /** @var string */
     protected $description;
 
-    /** @var mixed|null */
-    protected $defaultValue;
-
-    /** @var callable|null */
-    protected $defaultValueToStringConverter;
-
     /** @var string[] */
     protected $operators;
 
     /**
-     * @param string              $dataType
-     * @param string|null         $description
-     * @param mixed|callable|null $defaultValue
-     * @param callable|null       $defaultValueToStringConverter
+     * @param string      $dataType
+     * @param string|null $description
      */
-    public function __construct(
-        $dataType,
-        $description = null,
-        $defaultValue = null,
-        $defaultValueToStringConverter = null
-    ) {
+    public function __construct($dataType, $description = null)
+    {
         $this->dataType = $dataType;
         $this->description = $description;
-        $this->defaultValue = $defaultValue;
-        $this->defaultValueToStringConverter = $defaultValueToStringConverter;
         $this->operators = [self::EQ];
     }
 
@@ -108,56 +94,6 @@ abstract class StandaloneFilter implements FilterInterface
     public function setDescription($description)
     {
         $this->description = $description;
-    }
-
-    /**
-     * Gets the filter default value.
-     *
-     * @return mixed|null
-     */
-    public function getDefaultValue()
-    {
-        return is_callable($this->defaultValue)
-            ? call_user_func($this->defaultValue)
-            : $this->defaultValue;
-    }
-
-    /**
-     * Sets the filter default value.
-     *
-     * @param mixed|callable|null $defaultValue
-     */
-    public function setDefaultValue($defaultValue)
-    {
-        $this->defaultValue = $defaultValue;
-    }
-
-    /**
-     * Gets a string representation of the filter default value.
-     *
-     * @return string
-     */
-    public function getDefaultValueString()
-    {
-        if (null !== $this->defaultValueToStringConverter) {
-            return call_user_func($this->defaultValueToStringConverter, $this->getDefaultValue());
-        }
-
-        $value = $this->getDefaultValue();
-
-        return null !== $value
-            ? $value
-            : (string)$value;
-    }
-
-    /**
-     * Sets a function that should be used to convert the filter default value to a string.
-     *
-     * @param callable|null $converter
-     */
-    public function setDefaultValueToStringConverter($converter)
-    {
-        $this->defaultValueToStringConverter = $converter;
     }
 
     /**

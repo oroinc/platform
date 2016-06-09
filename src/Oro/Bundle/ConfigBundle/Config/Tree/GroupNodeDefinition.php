@@ -103,7 +103,9 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
         return array(
             $this->getName() => array_intersect_key(
                 $this->definition,
-                array_flip(array('title', 'priority', 'description', 'configurator', 'page_reload'))
+                array_flip(
+                    ['title', 'priority', 'description', 'configurator', 'page_reload', 'tooltip']
+                )
             )
         );
     }
@@ -115,6 +117,11 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
      */
     public function toViewData()
     {
-        return array_intersect_key($this->definition, array_flip(array('title', 'priority', 'description', 'icon')));
+        return array_intersect_key(
+            $this->definition,
+            array_flip(
+                ['title', 'priority', 'description', 'icon', 'tooltip']
+            )
+        );
     }
 }

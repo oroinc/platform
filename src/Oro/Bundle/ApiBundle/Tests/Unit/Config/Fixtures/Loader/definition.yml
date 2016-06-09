@@ -304,3 +304,73 @@ extra_sections:
         another_section:
             exclusion_policy: none
             extra: true
+
+entity_null_form_type:
+    config:
+        form_type: ~
+    expected: []
+
+entity_empty_form_type:
+    config:
+        form_type: ""
+    expected: []
+
+entity_form_type:
+    config:
+        form_type: integer
+    expected:
+        form_type: integer
+
+entity_null_form_options:
+    config:
+        form_options: ~
+    expected: []
+
+entity_empty_form_options:
+    config:
+        form_options: []
+    expected: []
+
+entity_form:
+    config:
+        form_type: integer
+        form_options:
+            option1: value1
+    expected:
+        form_type: integer
+        form_options:
+            option1: value1
+
+field_form:
+    config:
+        fields:
+            field1:
+                form_type: ~
+            field2:
+                form_type: ""
+            field3:
+                form_type: integer
+            field4:
+                form_type: integer
+                form_options: ~
+            field5:
+                form_type: integer
+                form_options: []
+            field6:
+                form_type: integer
+                form_options:
+                    option1: value1
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                form_type: integer
+            field4:
+                form_type: integer
+            field5:
+                form_type: integer
+            field6:
+                form_type: integer
+                form_options:
+                    option1: value1

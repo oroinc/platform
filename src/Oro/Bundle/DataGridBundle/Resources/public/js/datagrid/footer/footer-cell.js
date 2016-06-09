@@ -24,6 +24,8 @@ define([
             '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>'
         ),
 
+        keepElement: false,
+
         /**
          * Initialize.
          */
@@ -45,16 +47,6 @@ define([
                         }
                     }
                 });
-
-            if (this.column.editable()) {
-                this.$el.addClass('editable');
-            }
-            if (this.column.sortable()) {
-                this.$el.addClass('sortable');
-            }
-            if (this.column.renderable()) {
-                this.$el.addClass('renderable');
-            }
         },
 
         /**

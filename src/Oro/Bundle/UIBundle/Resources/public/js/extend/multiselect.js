@@ -6,6 +6,8 @@ define([
 ], function($, mask) {
     'use strict';
 
+    var oldRefresh = $.ech.multiselect.prototype.refresh;
+
     $.widget('orofilter.multiselect', $.ech.multiselect, {
 
         /**
@@ -13,6 +15,10 @@ define([
          * @override
          */
         open: function() {
+            if (!this.hasBeenOpened) {
+                this.hasBeenOpened = true;
+                this.refresh(true);
+            }
             this._superApply(arguments);
             mask.show().onhide($.proxy(this.close, this));
         },
@@ -34,6 +40,12 @@ define([
             this.position();
             if (isShown) {
                 this.menu.show();
+            }
+        },
+
+        refresh: function(init) {
+            if (this.hasBeenOpened) {
+                oldRefresh.call(this, init);
             }
         }
     });

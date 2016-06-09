@@ -8,6 +8,9 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     const TEST_NAME  = 'testNodeName';
     const TEST_LEVEL = 2;
 
+    /**
+     * @return GroupNodeDefinition
+     */
     protected static function getTestGroup()
     {
         $node1 = new GroupNodeDefinition('node1', array('priority' => 255), array());
@@ -77,6 +80,7 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('page_reload', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('icon', $result);
+        $this->assertArrayHasKey('tooltip', $result);
     }
 
     /**
@@ -94,6 +98,7 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('icon', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('page_reload', $result);
+        $this->assertArrayHasKey('tooltip', $result);
     }
 
     /**
@@ -109,7 +114,8 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
                 'description'  => 'some desc',
                 'icon'         => 'real icon',
                 'page_reload'  => true,
-                'some_another' => ''
+                'some_another' => '',
+                'tooltip'      => 'some tooltip'
             )
         );
 

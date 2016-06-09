@@ -68,7 +68,7 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
     {
         $result = [];
 
-        $operations = $this->operationManager->getOperations($datagridContext, false);
+        $operations = $this->operationManager->getOperations($datagridContext);
 
         foreach ($operations as $operationName => $action) {
             $operationName = strtolower($operationName);

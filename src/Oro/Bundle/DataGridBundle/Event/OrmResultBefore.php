@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Event;
 
-use Doctrine\ORM\Query;
+use Doctrine\ORM\AbstractQuery;
 
 use Symfony\Component\EventDispatcher\Event;
 
@@ -24,15 +24,15 @@ class OrmResultBefore extends Event implements GridEventInterface
     protected $datagrid;
 
     /**
-     * @var Query
+     * @var AbstractQuery
      */
     protected $query;
 
     /**
      * @param DatagridInterface $datagrid
-     * @param Query             $query
+     * @param AbstractQuery     $query
      */
-    public function __construct(DatagridInterface $datagrid, Query $query)
+    public function __construct(DatagridInterface $datagrid, AbstractQuery $query)
     {
         $this->datagrid = $datagrid;
         $this->query    = $query;
@@ -47,7 +47,7 @@ class OrmResultBefore extends Event implements GridEventInterface
     }
 
     /**
-     * @return Query
+     * @return AbstractQuery
      */
     public function getQuery()
     {

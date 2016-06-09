@@ -76,7 +76,7 @@
     <script type="text/template" id="email-attachment-item">
         <div class="attachment-item" style="border: none">
             <span data-id="<%= id %>" class="filename">
-                <i class="icon icon-file-alt"></i>
+                <i class="fa <%= icon %>"></i>
                 <span class="filename-label"><%= fileName %></span>
                 <i class="icon-remove"></i>
             </span>
@@ -118,7 +118,18 @@
     <script type="text/template" id="email-attachment-list-row-view">
         <div class="attachment-list-row <% if (!visible) { %>hide<% } %>">
             <input type="checkbox" class="checkbox" <% if (checked) { %>checked<% } %>>
-            <span><%= fileName %> (<%= fileSize %>, <%= modified %>)</span>
+            <a href="javascript:void(0);"
+                <% if (preview) { %>
+                    data-toggle="popover"
+                    data-content="<img src='<%= preview %>' width='110' class='img-rounded' alt='' >"
+                    data-placement="bottom"
+                    data-trigger="hover"
+                    data-noscroll="1"
+                <% } %>
+            >
+                <%= fileName %>
+            </a>
+            <span>(<%= fileSize %>, <%= modified %>)</span>
         </div>
     </script>
 
@@ -127,7 +138,8 @@
         {% set entityAttachmentArray = {
             'id': attachment.id,
             'type': attachment.type,
-            'fileName': attachment.fileName
+            'fileName': attachment.fileName,
+            'icon': attachment.icon
         } %}
         {% set entityAttachmentsArray = entityAttachmentsArray|merge([entityAttachmentArray]) %}
     {% endfor %}
@@ -139,7 +151,9 @@
             'type': attachment.type,
             'fileName': attachment.fileName,
             'fileSize': attachment.fileSize,
-            'modified': attachment.modified
+            'modified': attachment.modified,
+            'icon': attachment.icon,
+            'preview': attachment.preview
         } %}
         {% set attachmentsAvailableArray = attachmentsAvailableArray|merge([attachmentAvailableArray]) %}
     {% endfor %}
@@ -148,7 +162,8 @@
         containerId: id,
         inputName: full_name,
         entityAttachments: entityAttachmentsArray,
-        attachmentsAvailable: attachmentsAvailableArray
+        attachmentsAvailable: attachmentsAvailableArray,
+        fileIcons: oro_file_icons_config()
     }) %}
 
     <div data-page-component-module="oroemail/js/app/components/email-attachment-component"

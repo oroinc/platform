@@ -80,18 +80,34 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     protected function setupWsseNonceCache(ExtendedContainerBuilder $container)
     {
         $securityConfig = $container->getExtensionConfig('security');
-        if (isset($securityConfig[0]['firewalls']['wsse_secured'])
-            && !isset($securityConfig[0]['firewalls']['wsse_secured']['wsse']['nonce_cache_service_id'])
-        ) {
-            $securityConfig[0]['firewalls']['wsse_secured']['wsse']['nonce_cache_service_id'] =
-                self::DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID;
-            $container->setExtensionConfig('security', $securityConfig);
+        $hasSecurityConfigChanges = false;
+        $wsseLifetime = 0;
 
-            if (!$container->hasDefinition(self::DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID)) {
-                $wsseLifetime = 0;
-                if (isset($securityConfig[0]['firewalls']['wsse_secured']['wsse']['lifetime'])) {
-                    $wsseLifetime = $securityConfig[0]['firewalls']['wsse_secured']['wsse']['lifetime'];
+        if (isset($securityConfig[0]['firewalls'])) {
+            $securityFirewalls = $securityConfig[0]['firewalls'];
+            foreach ($securityFirewalls as $name => $config) {
+                if (!isset($config['wsse'])) {
+                    continue;
                 }
+                if (!isset($config['wsse']['nonce_cache_service_id'])) {
+                    $hasSecurityConfigChanges = true;
+                    $securityConfig[0]['firewalls'][$name]['wsse']['nonce_cache_service_id'] =
+                        self::DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID;
+                }
+                if (isset($config['wsse']['lifetime'])
+                    && (
+                        $wsseLifetime == 0
+                        || $wsseLifetime > $config['wsse']['lifetime']
+                    )
+                ) {
+                    $wsseLifetime = $config['wsse']['lifetime'];
+                }
+            }
+        }
+
+        if ($hasSecurityConfigChanges) {
+            $container->setExtensionConfig('security', $securityConfig);
+            if (!$container->hasDefinition(self::DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID)) {
                 $cacheServiceDef = new Definition(
                     self::DEFAULT_WSSE_NONCE_CACHE_CLASS,
                     [self::DEFAULT_WSSE_NONCE_CACHE_PATH]

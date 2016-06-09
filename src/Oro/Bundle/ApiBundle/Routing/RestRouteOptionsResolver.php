@@ -6,11 +6,9 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-
 use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -22,7 +20,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     const ENTITY_PLACEHOLDER = '{entity}';
     const ID_ATTRIBUTE       = 'id';
     const ID_PLACEHOLDER     = '{id}';
-    const FORMAT_ATTRIBUTE   = '_format';
 
     /** @var bool */
     protected $isApplicationInstalled;
@@ -36,12 +33,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var string[] */
-    protected $formats;
-
-    /** @var string[] */
-    protected $defaultFormat;
-
     /** @var RequestType */
     protected $requestType;
 
@@ -53,23 +44,17 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      * @param ResourcesLoader  $resourcesLoader
      * @param DoctrineHelper   $doctrineHelper
      * @param ValueNormalizer  $valueNormalizer
-     * @param string           $formats
-     * @param string           $defaultFormat
      */
     public function __construct(
         $isApplicationInstalled,
         ResourcesLoader $resourcesLoader,
         DoctrineHelper $doctrineHelper,
-        ValueNormalizer $valueNormalizer,
-        $formats,
-        $defaultFormat
+        ValueNormalizer $valueNormalizer
     ) {
         $this->isApplicationInstalled = !empty($isApplicationInstalled);
         $this->resourcesLoader        = $resourcesLoader;
         $this->doctrineHelper         = $doctrineHelper;
         $this->valueNormalizer        = $valueNormalizer;
-        $this->formats                = $formats;
-        $this->defaultFormat          = $defaultFormat;
         $this->requestType            = new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
@@ -78,13 +63,18 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if (!$this->isApplicationInstalled || $route->getOption('group') !== self::ROUTE_GROUP) {
+        if (!$this->isApplicationInstalled) {
+            return;
+        }
+        if ($route->getOption('group') === 'rest_api_deprecated') {
+            $routes->remove($routes->getName($route));
+            return;
+        }
+        if ($route->getOption('group') !== self::ROUTE_GROUP) {
             return;
         }
 
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
-            $this->setFormatAttribute($route);
-
             $entities = $this->getSupportedEntities();
             if (!empty($entities)) {
                 $this->adjustRoutes($route, $routes, $entities);
@@ -173,15 +163,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * @param Route $route
-     */
-    protected function setFormatAttribute(Route $route)
-    {
-        $route->setRequirement(self::FORMAT_ATTRIBUTE, $this->formats);
-        $route->setDefault(self::FORMAT_ATTRIBUTE, $this->defaultFormat);
-    }
-
-    /**
      * @param Route  $route
      * @param string $entityClass
      */
@@ -204,7 +185,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             }
             $route->setRequirement(
                 self::ID_ATTRIBUTE,
-                implode(RestRequest::ARRAY_DELIMITER, $requirements)
+                implode(',', $requirements)
             );
         }
     }

@@ -7,3 +7,4 @@ security:
 
     access_decision_manager:
         strategy: unanimous
+        allow_if_all_abstain: true

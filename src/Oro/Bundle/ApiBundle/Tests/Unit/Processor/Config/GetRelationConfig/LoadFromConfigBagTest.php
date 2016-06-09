@@ -18,14 +18,9 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     /** @var LoadFromConfigBag */
     protected $processor;
 
-    /** @var int */
-    protected $customizationProcessorCallIndex;
-
     protected function setUp()
     {
         parent::setUp();
-
-        $this->customizationProcessorCallIndex = 0;
 
         $this->entityHierarchyProvider = $this
             ->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');

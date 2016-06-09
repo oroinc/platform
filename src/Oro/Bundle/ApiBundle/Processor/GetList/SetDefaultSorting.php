@@ -9,7 +9,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -111,6 +110,6 @@ abstract class SetDefaultSorting implements ProcessorInterface
             }
         }
 
-        return implode(RestRequest::ARRAY_DELIMITER, $result);
+        return implode(',', $result);
     }
 }

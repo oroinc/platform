@@ -166,17 +166,21 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
     public function testSetDataTransformers()
     {
         $config = new EntityDefinitionFieldConfig();
+        $this->assertFalse($config->hasDataTransformers());
         $this->assertEquals([], $config->getDataTransformers());
 
         $config->setDataTransformers('service_id');
+        $this->assertTrue($config->hasDataTransformers());
         $this->assertEquals(['service_id'], $config->getDataTransformers());
         $this->assertEquals(['data_transformer' => ['service_id']], $config->toArray());
 
         $config->setDataTransformers(['service_id', ['class', 'method']]);
+        $this->assertTrue($config->hasDataTransformers());
         $this->assertEquals(['service_id', ['class', 'method']], $config->getDataTransformers());
         $this->assertEquals(['data_transformer' => ['service_id', ['class', 'method']]], $config->toArray());
 
         $config->setDataTransformers([]);
+        $this->assertFalse($config->hasDataTransformers());
         $this->assertEquals([], $config->getDataTransformers());
         $this->assertEquals([], $config->toArray());
     }

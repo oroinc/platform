@@ -37,6 +37,26 @@ interface EntityConfigInterface
     public function getField($fieldName);
 
     /**
+     * Finds a field by its name or property path.
+     * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
+     *
+     * @param string $fieldName
+     * @param bool   $findByPropertyPath
+     *
+     * @return FieldConfigInterface|null
+     */
+    public function findField($fieldName, $findByPropertyPath = false);
+
+    /**
+     * Finds the name of a field by its property path.
+     *
+     * @param string $propertyPath
+     *
+     * @return string|null
+     */
+    public function findFieldNameByPropertyPath($propertyPath);
+
+    /**
      * Gets the configuration of existing field or adds new field with a given name.
      *
      * @param string $fieldName

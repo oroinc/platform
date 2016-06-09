@@ -13,13 +13,15 @@ class GenuineSyncSchedulerTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->client->startTransaction();
+        $this->startTransaction();
     }
 
     protected function tearDown()
     {
-        $this->client->rollbackTransaction();
         parent::tearDown();
+        
+        self::$loadedFixtures = [];
+        $this->rollbackTransaction();
     }
 
     public function testCouldBeGetFromContainerAsService()

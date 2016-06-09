@@ -106,6 +106,11 @@ class TranslatableEntityType extends AbstractType
                 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
             );
 
+            // In case we use not standard Hydrator (not Query::HYDRATE_OBJECT)
+            // we should add this hint to load nested entities
+            // otherwise Doctrine will create partial object
+            $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
+
             $entities = $query->execute(null, TranslationWalker::HYDRATE_OBJECT_TRANSLATION);
 
             return new ObjectChoiceList($entities, $options['property'], array(), null, $idField);

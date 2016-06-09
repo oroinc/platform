@@ -8,6 +8,16 @@ use Symfony\Component\Routing\RouteCollection;
 class EnhancedRouteCollection extends RouteCollection
 {
     /**
+     * @param Route[] $routes
+     */
+    public function __construct(array $routes = [])
+    {
+        if (!empty($routes)) {
+            $this->setRoutes($routes);
+        }
+    }
+
+    /**
      * Adds a new route near the specified target route.
      * If the target route name is empty adds a new route to the beginning or end of the route collection.
      *

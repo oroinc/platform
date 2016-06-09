@@ -15,7 +15,7 @@ For some types of REST API requests you can get an additional information like t
 The following example shows how to get the total number of account:
 
 ```bash
-curl "http://orocrm.loc/app_dev.php/api/accounts.json?page=1&limit=2" -v --header "X-Include:totalCount" --header "X-WSSE:..."
+curl "http://orocrm.loc/app_dev.php/api/accounts?page=1&limit=2" -v --header "X-Include:totalCount" --header "X-WSSE:..."
 ```
 
 It will return
@@ -83,8 +83,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  */
 class SetDeletedCountHeader implements ProcessorInterface
 {
-    const HEADER_NAME  = 'X-Include-Deleted-Count';
-    const HEADER_VALUE = 'deletedCount';
+    const RESPONSE_HEADER_NAME = 'X-Include-Deleted-Count';
+    const REQUEST_HEADER_VALUE = 'deletedCount';
 
     /**
      * {@inheritdoc}
@@ -93,20 +93,20 @@ class SetDeletedCountHeader implements ProcessorInterface
     {
         /** @var DeleteListContext $context */
 
-        if ($context->getResponseHeaders()->has(self::HEADER_NAME)) {
+        if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
             // the deleted records count header is already set
             return;
         }
 
         $xInclude = $context->getRequestHeaders()->get(Context::INCLUDE_HEADER);
-        if (empty($xInclude) || !in_array(self::HEADER_VALUE, $xInclude, true)) {
+        if (empty($xInclude) || !in_array(self::REQUEST_HEADER_VALUE, $xInclude, true)) {
             // the deleted records count is not requested
             return;
         }
 
         $result = $context->getResult();
         if (null !== $result && is_array($result)) {
-            $context->getResponseHeaders()->set(self::HEADER_NAME, count($result));
+            $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, count($result));
         }
     }
 }
@@ -141,8 +141,10 @@ class RemoveDeletedCountHeader implements ProcessorInterface
     {
         /** @var DeleteListContext $context */
 
-        if ($context->hasErrors() && $context->getResponseHeaders()->has(SetDeletedCountHeader::HEADER_NAME)) {
-            $context->getResponseHeaders()->remove(SetDeletedCountHeader::HEADER_NAME);
+        if ($context->hasErrors()
+            && $context->getResponseHeaders()->has(SetDeletedCountHeader::RESPONSE_HEADER_NAME)
+        ) {
+            $context->getResponseHeaders()->remove(SetDeletedCountHeader::RESPONSE_HEADER_NAME);
         }
     }
 }

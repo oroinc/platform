@@ -6,10 +6,8 @@
 }
 
 .oro-datagrid {
+  // override default backgrid behaviour to show only .renderable cells
   .grid-cell {
-    display: none;
-  }
-  .grid-cell.renderable {
     display: table-cell;
   }
   .loader-mask {

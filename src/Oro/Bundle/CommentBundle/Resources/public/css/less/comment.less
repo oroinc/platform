@@ -144,6 +144,64 @@
   }
   .comment-attachments {
     margin: 0.5em 0 0 0;
+    .thumbnail {
+      width: 110px;
+      height: 80px;
+      padding:0;
+      text-align: center;
+      background: #eeeeee;
+      border-radius: 6px;
+      border:none;
+      @media only screen and (max-width: 500px) {
+        display: none; //hide thumbnails on mobile
+      }
+      .fa {
+        padding-top: 20px;
+        color: #fff;
+      }
+    }
+    .link-to-record {
+      padding-top: 10px;
+      .dropdown-toggle {
+        display: inline-block;
+        &:focus {
+          font-weight: normal;
+        }
+      }
+      .dropdown-menu {
+        white-space: nowrap;
+        padding: 5px 15px;
+        a {
+          span {
+            margin-left: 7px;
+            color: #777;
+          }
+          &:hover {
+            span {
+              color: #777;
+            }
+          }
+        }
+        .view-image {
+          display: none;
+        }
+        @media only screen and (max-width: 500px) {
+          a {
+            display: block;
+            text-align: left;
+          }
+          .view-image {
+            display: block;
+          }
+        }
+      }
+      .fa {
+        color: #444;
+        font-size: 15px;
+        margin-right: 1px;
+        margin-left: 0;
+      }
+    }
   }
 
   .attachment-icon.accordion-toggle {

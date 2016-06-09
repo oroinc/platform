@@ -4,18 +4,23 @@ namespace Oro\Bundle\ApiBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
 
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
+use FOS\RestBundle\View\ViewHandler;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
@@ -95,12 +100,55 @@ class RestApiController extends FOSRestController
      *
      * @return Response
      */
-    public function deleteListAction(Request $request)
+    public function cdeleteAction(Request $request)
     {
         $processor = $this->getProcessor($request);
         /** @var DeleteListContext $context */
         $context = $this->getContext($processor, $request);
         $context->setFilterValues(new RestFilterValueAccessor($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Update an entity
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(description="Update an entity", resource=true, views={"rest_plain", "rest_json_api"})
+     *
+     * @return Response
+     */
+    public function patchAction(Request $request)
+    {
+        $processor = $this->getProcessor($request);
+        /** @var UpdateContext $context */
+        $context = $this->getContext($processor, $request);
+        $context->setId($request->attributes->get('id'));
+        $context->setRequestData($request->request->all());
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Create an entity
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(description="Create an entity", resource=true, views={"rest_plain", "rest_json_api"})
+     *
+     * @return Response
+     */
+    public function postAction(Request $request)
+    {
+        $processor = $this->getProcessor($request);
+        /** @var CreateContext $context */
+        $context = $this->getContext($processor, $request);
+        $context->setRequestData($request->request->all());
 
         $processor->process($context);
 
@@ -144,19 +192,31 @@ class RestApiController extends FOSRestController
      */
     protected function buildResponse(Context $context)
     {
-        $result = $context->getResult();
+        $view = $this->view($context->getResult());
 
-        $view = $this->view($result);
-        $view->getSerializationContext()->setSerializeNull(true);
-
-        $statusCode = $context->getResponseStatusCode();
-        if (null !== $statusCode) {
-            $view->setStatusCode($statusCode);
-        }
+        $view->setStatusCode($context->getResponseStatusCode() ?: Response::HTTP_OK);
         foreach ($context->getResponseHeaders()->toArray() as $key => $value) {
             $view->setHeader($key, $value);
         }
 
-        return $this->handleView($view);
+        // use custom handler because the response data are already normalized
+        // and we do not need to additional processing of them
+        /** @var ViewHandler $handler */
+        $handler = $this->get('fos_rest.view_handler');
+        $handler->registerHandler(
+            'json',
+            function (ViewHandler $viewHandler, View $view, Request $request, $format) {
+                $response = $view->getResponse();
+                $encoder = new JsonEncode();
+                $response->setContent($encoder->encode($view->getData(), $format));
+                if (!$response->headers->has('Content-Type')) {
+                    $response->headers->set('Content-Type', $request->getMimeType($format));
+                }
+
+                return $response;
+            }
+        );
+
+        return $handler->handle($view);
     }
 }

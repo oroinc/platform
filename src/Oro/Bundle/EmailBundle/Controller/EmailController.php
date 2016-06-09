@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -283,7 +284,7 @@ class EmailController extends Controller
      * Get the given email body content
      *
      * @Route("/body/{id}", name="oro_email_body", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_body_view")
      */
     public function bodyAction(EmailBody $entity)
     {
@@ -294,7 +295,7 @@ class EmailController extends Controller
      * Get a response for download the given email attachment
      *
      * @Route("/attachment/{id}", name="oro_email_attachment", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_view")
+     * @AclAncestor("oro_email_email_attachment_view")
      */
     public function attachmentAction(EmailAttachment $entity)
     {
@@ -310,6 +311,92 @@ class EmailController extends Controller
         $response->setContent($content);
 
         return $response;
+    }
+
+    /**
+     * Get resized image url
+     *
+     * @Route("media/cache/email_attachment/resize/{id}/{width}/{height}",
+     *   name="oro_resize_email_attachment",
+     *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
+     * )
+     * @AclAncestor("oro_email_email_attachment_view")
+     *
+     * @param EmailAttachment $attachment
+     * @param int $width
+     * @param int $height
+     * @return Response
+     */
+    public function getResizedAttachmentImageAction(EmailAttachment $attachment, $width, $height)
+    {
+        $fileSystemMap = $this->get('knp_gaufrette.filesystem_map');
+        $fileSystem = $fileSystemMap->get('attachments');
+        $path = substr($this->getRequest()->getPathInfo(), 1);
+        if (!$fileSystem->has($path)) {
+            $filterName = 'attachment_' . $width . '_' . $height;
+            $this->get('liip_imagine.filter.configuration')->set(
+                $filterName,
+                [
+                    'filters' => [
+                        'thumbnail' => [
+                            'size' => [$width, $height]
+                        ]
+                    ]
+                ]
+            );
+            $content = ContentDecoder::decode(
+                $attachment->getContent()->getContent(),
+                $attachment->getContent()->getContentTransferEncoding()
+            );
+            $binary = $this->get('liip_imagine')->load($content);
+            $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
+            $fileSystem->write($path, $filteredBinary);
+        } else {
+            $filteredBinary = $fileSystem->read($path);
+        }
+
+        $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getContentType()));
+
+        return $response;
+    }
+
+    /**
+     * Get a zip with email attachments from the given email body
+     *
+     * @Route("/attachments/{id}", name="oro_email_body_attachments", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_body_view")
+     *
+     * @param EmailBody $entity
+     * @return BinaryFileResponse
+     */
+    public function downloadAttachmentsAction(EmailBody $entity)
+    {
+        $attachments = $entity->getAttachments();
+        if (count($attachments)) {
+            $zip = new \ZipArchive();
+            $zipName = 'attachments-' . time() . '.zip';
+            $zip->open($zipName, \ZipArchive::CREATE);
+            foreach ($attachments as $attachment) {
+                $content = ContentDecoder::decode(
+                    $attachment->getContent()->getContent(),
+                    $attachment->getContent()->getContentTransferEncoding()
+                );
+                $zip->addFromString($attachment->getFileName(), $content);
+            }
+            $zip->close();
+
+            $response = new BinaryFileResponse($zipName);
+            $response->headers->set('Content-Type', 'application/zip');
+            $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $zipName));
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+            $response->setPrivate();
+            $response->deleteFileAfterSend(true);
+
+            return $response;
+        }
+
+        return new Response('', Codes::HTTP_NOT_FOUND);
     }
 
     /**

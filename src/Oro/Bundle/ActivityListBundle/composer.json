@@ -5,7 +5,7 @@
     "keywords": ["BAP", "Activity", "Activity List"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "symfony/symfony": "2.7.*",
         "oro/ui-bundle": "dev-master",
         "oro/organization-bundle": "dev-master",
