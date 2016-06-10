@@ -352,5 +352,4 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
 
         return $origin;
     }
-
 }
