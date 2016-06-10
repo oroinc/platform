@@ -26,7 +26,7 @@ class TagImportManager
     /**
      * New imported tags which are not yet persisted are stored here to prevent creation tags with the same names
      *
-     * @var array @var array ['tag_name' => Tag]
+     * @var array of ['tag_name' => Tag]
      */
     protected $loadedTags = [];
     
