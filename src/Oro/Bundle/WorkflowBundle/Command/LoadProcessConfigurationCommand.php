@@ -56,9 +56,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
         );
 
         $processConfigurator = $this->getContainer()->get('oro_workflow.process.configurator');
-
         $processConfigurator->setLogger($this->createConsoleLogger($output));
-
         $processConfigurator->configureProcesses($processConfiguration);
         
         // update triggers cache

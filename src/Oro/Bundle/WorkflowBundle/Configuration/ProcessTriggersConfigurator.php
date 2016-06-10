@@ -17,10 +17,10 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler;
 class ProcessTriggersConfigurator implements LoggerAwareInterface
 {
     /** @var LoggerInterface */
-    protected $logger;
+    private $logger;
 
     /** @var bool */
-    protected $dirty = false;
+    private $dirty = false;
 
     /** @var ProcessConfigurationBuilder */
     private $configurationBuilder;

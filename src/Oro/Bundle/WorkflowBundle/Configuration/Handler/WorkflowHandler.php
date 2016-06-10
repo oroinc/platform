@@ -9,7 +9,7 @@ class WorkflowHandler extends AbstractHandler
     /**
      * @var array
      */
-    protected static $workflowKeys = array(
+    protected $workflowKeys = array(
         'name',
         'label',
         'entity',
@@ -69,6 +69,6 @@ class WorkflowHandler extends AbstractHandler
             unset($workflow['entity']);
         }
 
-        return $this->filterKeys($workflow, self::$workflowKeys);
+        return $this->filterKeys($workflow, $this->workflowKeys);
     }
 }

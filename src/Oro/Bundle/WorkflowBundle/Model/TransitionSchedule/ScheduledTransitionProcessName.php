@@ -8,19 +8,19 @@ class ScheduledTransitionProcessName
     const DELIMITER = '__';
 
     /** @var string */
-    private $workflow;
+    private $workflowName;
 
     /** @var string */
-    private $transition;
+    private $transitionName;
 
     /**
-     * @param string $workflow
-     * @param string $transition
+     * @param string $workflowName
+     * @param string $transitionName
      */
-    public function __construct($workflow, $transition)
+    public function __construct($workflowName, $transitionName)
     {
-        $this->workflow = (string)$workflow;
-        $this->transition = (string)$transition;
+        $this->workflow = (string)$workflowName;
+        $this->transition = (string)$transitionName;
     }
 
     /**
@@ -28,7 +28,7 @@ class ScheduledTransitionProcessName
      */
     public function getTransitionName()
     {
-        return $this->transition;
+        return $this->transitionName;
     }
 
     /**
@@ -36,7 +36,7 @@ class ScheduledTransitionProcessName
      */
     public function getWorkflowName()
     {
-        return $this->workflow;
+        return $this->workflowName;
     }
 
     /**
@@ -45,12 +45,12 @@ class ScheduledTransitionProcessName
      */
     public function getName()
     {
-        if (empty($this->transition) || empty($this->workflow)) {
+        if (empty($this->transitionName) || empty($this->workflowName)) {
             throw new \UnderflowException(
                 'Cannot build valid string representation of scheduled transition process name without all parts.'
             );
         }
 
-        return implode(self::DELIMITER, [self::IDENTITY_PREFIX, $this->workflow, $this->transition]);
+        return implode(self::DELIMITER, [self::IDENTITY_PREFIX, $this->workflowName, $this->transitionName]);
     }
 }

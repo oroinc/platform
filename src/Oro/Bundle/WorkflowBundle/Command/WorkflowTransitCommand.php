@@ -17,7 +17,7 @@ class WorkflowTransitCommand extends ContainerAwareCommand
     const NAME = 'oro:workflow:transit';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function configure()
     {
@@ -38,29 +38,28 @@ class WorkflowTransitCommand extends ContainerAwareCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $workflowItemId = $input->getOption('workflow-item');
         $transitionName = $input->getOption('transition');
 
-        if (!filter_var($workflowItemId, FILTER_VALIDATE_INT)) {
-            $e = new \RuntimeException('No Workflow Item identifier defined');
-            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-            throw $e;
-        }
+        try {
+            if (!filter_var($workflowItemId, FILTER_VALIDATE_INT)) {
+                throw new \RuntimeException('No Workflow Item identifier defined');
+            }
 
-        if (!$transitionName) {
-            $e = new \RuntimeException('No Transition name defined');
-            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-            throw $e;
-        }
+            if (!$transitionName) {
+                throw new \RuntimeException('No Transition name defined');
+            }
 
-        /** @var WorkflowItem $workflowItem */
-        $workflowItem = $this->getRepository()->find($workflowItemId);
-        if (!$workflowItem) {
-            $e = new \RuntimeException('Workflow Item not found');
+            /** @var WorkflowItem $workflowItem */
+            $workflowItem = $this->getRepository()->find($workflowItemId);
+            if (!$workflowItem) {
+                throw new \RuntimeException('Workflow Item not found');
+            }
+        } catch (\RuntimeException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             throw $e;
         }
@@ -99,7 +98,8 @@ class WorkflowTransitCommand extends ContainerAwareCommand
     {
         $className = $this->getContainer()->getParameter('oro_workflow.workflow_item.entity.class');
 
-        return $this->getContainer()->get('doctrine')
+        return $this->getContainer()
+            ->get('doctrine')
             ->getManagerForClass($className)
             ->getRepository($className);
     }

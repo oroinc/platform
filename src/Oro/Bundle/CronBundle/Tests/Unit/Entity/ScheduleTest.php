@@ -29,9 +29,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->object->getId());
 
         $testValue = 42;
-        $reflectionProperty = new \ReflectionProperty('Oro\Bundle\CronBundle\Entity\Schedule', 'id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->object, $testValue);
+        $this->setProperty($this->object, 'id', $testValue);
 
         $this->assertEquals($testValue, $this->object->getId());
     }
@@ -100,5 +98,25 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertAttributeEquals($attributes, 'arguments', $this->object);
         $this->assertAttributeEquals(md5(json_encode($attributes)), 'argumentsHash', $this->object);
+    }
+
+    public function testToString()
+    {
+        $testValue = 42;
+        $this->setProperty($this->object, 'id', $testValue);
+
+        $this->assertSame('42', (string)$this->object);
+    }
+
+    /**
+     * @param Schedule $object
+     * @param string $name
+     * @param mixed $value
+     */
+    protected function setProperty(Schedule $object, $name, $value)
+    {
+        $reflectionProperty = new \ReflectionProperty('Oro\Bundle\CronBundle\Entity\Schedule', $name);
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($object, $value);
     }
 }

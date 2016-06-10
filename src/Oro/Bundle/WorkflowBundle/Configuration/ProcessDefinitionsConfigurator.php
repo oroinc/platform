@@ -122,9 +122,10 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
                     $objectManager->remove($definitionToDelete);
                 }
             }
+            
             $objectManager->flush();
-            $this->logger->info('Process definitions configuration updates are stored into database');
             $this->dirty = false;
+            $this->logger->info('Process definitions configuration updates are stored into database');
         } else {
             $this->logger->info('No process definitions configuration updates detected. Nothing flushed into DB');
         }
@@ -144,11 +145,11 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
      */
     protected function getObjectManager()
     {
-        if ($this->objectManager) {
-            return $this->objectManager;
+        if (!$this->objectManager) {
+            $this->objectManager = $this->registry->getManagerForClass($this->definitionClass);
         }
 
-        return $this->objectManager = $this->registry->getManagerForClass($this->definitionClass);
+        return $this->objectManager ;
     }
 
     /**
