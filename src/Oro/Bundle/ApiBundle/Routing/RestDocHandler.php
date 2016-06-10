@@ -7,9 +7,7 @@ use Symfony\Component\Routing\Route;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra;
@@ -20,63 +18,18 @@ use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Provider\ResourceDocProviderInterface;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class RestDocHandler implements HandlerInterface
 {
     const JSON_API_VIEW = 'rest_json_api';
-
-    const ID_DESCRIPTION = 'The identifier of an entity';
-
-    protected $templates = [
-        'get'      => [
-            'description'          => 'Get {name}',
-            'fallback_description' => 'Get {class}',
-            'get_name_method'      => 'getEntityClassName',
-            'description_key'      => EntityDefinitionConfig::LABEL,
-            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
-        ],
-        'get_list' => [
-            'description'          => 'Get {name}',
-            'fallback_description' => 'Get a list of {class}',
-            'get_name_method'      => 'getEntityClassPluralName',
-            'description_key'      => EntityDefinitionConfig::PLURAL_LABEL,
-            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
-        ],
-        'delete' => [
-            'description'          => 'Delete {name}',
-            'fallback_description' => 'Delete {class}',
-            'get_name_method'      => 'getEntityClassName',
-            'description_key'      => EntityDefinitionConfig::LABEL,
-            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
-        ],
-        'delete_list' => [
-            'description'          => 'Delete {name}',
-            'fallback_description' => 'Delete a list of {class}',
-            'get_name_method'      => 'getEntityClassName',
-            'description_key'      => EntityDefinitionConfig::PLURAL_LABEL,
-            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
-        ],
-        'create' => [
-            'description'          => 'Create {name}',
-            'fallback_description' => 'Create {class}',
-            'get_name_method'      => 'getEntityClassName',
-            'description_key'      => EntityDefinitionConfig::LABEL,
-            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
-        ],
-        'update' => [
-            'description'          => 'Update {name}',
-            'fallback_description' => 'Update {class}',
-            'get_name_method'      => 'getEntityClassName',
-            'description_key'      => EntityDefinitionConfig::LABEL,
-            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
-        ],
-    ];
 
     /** @var RestDocViewDetector */
     protected $docViewDetector;
@@ -84,8 +37,8 @@ class RestDocHandler implements HandlerInterface
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
 
-    /** @var EntityClassNameProviderInterface */
-    protected $entityClassNameProvider;
+    /** @var ResourceDocProviderInterface */
+    protected $resourceDocProvider;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -97,24 +50,24 @@ class RestDocHandler implements HandlerInterface
     protected $requestType;
 
     /**
-     * @param RestDocViewDetector              $docViewDetector
-     * @param ActionProcessorBagInterface      $processorBag
-     * @param EntityClassNameProviderInterface $entityClassNameProvider
-     * @param DoctrineHelper                   $doctrineHelper
-     * @param ValueNormalizer                  $valueNormalizer
+     * @param RestDocViewDetector          $docViewDetector
+     * @param ActionProcessorBagInterface  $processorBag
+     * @param ResourceDocProviderInterface $resourceDocProvider
+     * @param DoctrineHelper               $doctrineHelper
+     * @param ValueNormalizer              $valueNormalizer
      */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
-        EntityClassNameProviderInterface $entityClassNameProvider,
+        ResourceDocProviderInterface $resourceDocProvider,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
-        $this->docViewDetector         = $docViewDetector;
-        $this->processorBag            = $processorBag;
-        $this->entityClassNameProvider = $entityClassNameProvider;
-        $this->doctrineHelper          = $doctrineHelper;
-        $this->valueNormalizer         = $valueNormalizer;
+        $this->docViewDetector = $docViewDetector;
+        $this->processorBag = $processorBag;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->valueNormalizer = $valueNormalizer;
+        $this->resourceDocProvider = $resourceDocProvider;
     }
 
     /**
@@ -133,12 +86,14 @@ class RestDocHandler implements HandlerInterface
         $entityType = $this->extractEntityTypeFromRoute($route);
         if ($entityType) {
             $entityClass = $this->getEntityClass($entityType);
-            $context = $this->getContext($action, $entityClass);
-            $statusCodes = $context->getConfig()->getStatusCodes();
-            $context->getConfig()->setStatusCodes();
+            $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
+
+            $actionContext = $this->getContext($action, $entityClass, $associationName);
+            $config = $actionContext->getConfig();
 
             $annotation->setSection($entityType);
-            $this->setDescription($annotation, $action, $context->getConfig()->toArray(), $entityClass);
+            $this->setDescription($annotation, $action, $actionContext);
+            $statusCodes = $config->getStatusCodes();
             if ($statusCodes) {
                 $this->setStatusCodes($annotation, $statusCodes);
             }
@@ -149,8 +104,9 @@ class RestDocHandler implements HandlerInterface
                     $route->getRequirement(RestRouteOptionsResolver::ID_ATTRIBUTE)
                 );
             }
-            if ($context->hasConfigExtra(FiltersConfigExtra::NAME) && method_exists($context, 'getFilters')) {
-                $this->addFilters($annotation, $context->getFilters(), $context->getMetadata());
+            $filters = $actionContext->getFilters();
+            if (!$filters->isEmpty()) {
+                $this->addFilters($annotation, $filters, $actionContext->getMetadata());
             }
         }
     }
@@ -196,12 +152,13 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param string $action
-     * @param string $entityClass
+     * @param string      $action
+     * @param string      $entityClass
+     * @param string|null $associationName
      *
      * @return Context
      */
-    protected function getContext($action, $entityClass)
+    protected function getContext($action, $entityClass, $associationName = null)
     {
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
@@ -211,7 +168,16 @@ class RestDocHandler implements HandlerInterface
         $context->addConfigExtra(new StatusCodesConfigExtra($action));
         $this->buildRequestType($context->getRequestType());
         $context->setLastGroup('initialize');
-        $context->setClassName($entityClass);
+        if ($associationName) {
+            /** @var SubresourceContext $context */
+            $context->setParentClassName($entityClass);
+            $context->setAssociationName($associationName);
+            $parentConfigExtras = $context->getParentConfigExtras();
+            $parentConfigExtras[] = new DescriptionsConfigExtra($action);
+            $context->setParentConfigExtras($parentConfigExtras);
+        } else {
+            $context->setClassName($entityClass);
+        }
 
         $processor->process($context);
 
@@ -219,47 +185,53 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param ApiDoc      $annotation
-     * @param string      $action
-     * @param array       $config
-     * @param string|null $entityClass
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @param ApiDoc  $annotation
+     * @param string  $action
+     * @param Context $actionContext
      */
-    protected function setDescription(ApiDoc $annotation, $action, array $config, $entityClass = null)
+    protected function setDescription(ApiDoc $annotation, $action, Context $actionContext)
     {
-        $templates  = $this->templates[$action];
-        $entityName = false;
-
-        // set description
-        $description = null;
-        if (!empty($config[$templates['description_key']])) {
-            $description = $config[$templates['description_key']];
-        }
-        if ($description) {
-            $description = strtr($templates['description'], ['{name}' => $description]);
-        } elseif ($entityClass) {
-            $entityName  = $this->entityClassNameProvider->{$templates['get_name_method']}($entityClass);
-            $description = $entityName
-                ? strtr($templates['description'], ['{name}' => $entityName])
-                : strtr($templates['fallback_description'], ['{class}' => $entityClass]);
+        $requestType = $this->getRequestType();
+        if ($actionContext instanceof SubresourceContext) {
+            $parentEntityClass = $actionContext->getParentClassName();
+            $associationName = $actionContext->getAssociationName();
+            $parentConfig = $actionContext->getParentConfig()->toArray();
+            $description = $this->resourceDocProvider->getSubresourceDescription(
+                $action,
+                Version::LATEST,
+                $requestType,
+                $parentConfig,
+                $parentEntityClass,
+                $associationName
+            );
+            $documentation = $this->resourceDocProvider->getSubresourceDocumentation(
+                $action,
+                Version::LATEST,
+                $requestType,
+                $parentConfig,
+                $parentEntityClass,
+                $associationName
+            );
+        } else {
+            $entityClass = $actionContext->getClassName();
+            $config = $actionContext->getConfig()->toArray();
+            $description = $this->resourceDocProvider->getResourceDescription(
+                $action,
+                Version::LATEST,
+                $requestType,
+                $config,
+                $entityClass
+            );
+            $documentation = $this->resourceDocProvider->getResourceDocumentation(
+                $action,
+                Version::LATEST,
+                $requestType,
+                $config,
+                $entityClass
+            );
         }
         if ($description) {
             $annotation->setDescription($description);
-        }
-
-        // set documentation
-        $documentation = null;
-        if (!empty($config[$templates['documentation_key']])) {
-            $documentation = $config[$templates['documentation_key']];
-        }
-        if (!$documentation && $entityClass) {
-            if (false === $entityName) {
-                $documentation = $this->entityClassNameProvider->{$templates['get_name_method']}($entityClass);
-            }
-            if ($entityName) {
-                $documentation = $entityName;
-            }
         }
         if ($documentation) {
             $annotation->setDocumentation($documentation);
@@ -298,7 +270,7 @@ class RestDocHandler implements HandlerInterface
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
                 'requirement' => $requirement,
-                'description' => self::ID_DESCRIPTION
+                'description' => $this->resourceDocProvider->getIdentifierDescription($this->getRequestType())
             ]
         );
     }

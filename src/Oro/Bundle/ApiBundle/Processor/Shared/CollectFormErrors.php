@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
+use Oro\Bundle\ApiBundle\Validator\Constraints\ConstraintWithStatusCodeInterface;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
@@ -25,7 +26,7 @@ class CollectFormErrors implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var $context FormContext */
+        /** @var FormContext $context */
 
         if (!$context->hasForm()) {
             // no form
@@ -52,7 +53,7 @@ class CollectFormErrors implements ProcessorInterface
             $context->addError($errorObject);
         }
 
-        // collect form childes errors
+        // collect form child errors
         /** @var FormInterface $child */
         foreach ($form as $child) {
             if (!$child->isValid()) {
@@ -129,6 +130,10 @@ class CollectFormErrors implements ProcessorInterface
     protected function createErrorObject(FormError $formError, $propertyPath = null)
     {
         $error = Error::createValidationError($this->getFormErrorTitle($formError), $formError->getMessage());
+        $statusCode = $this->getFormErrorStatusCode($formError);
+        if (null !== $statusCode) {
+            $error->setStatusCode($statusCode);
+        }
         if ($propertyPath) {
             $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
         }
@@ -156,6 +161,24 @@ class CollectFormErrors implements ProcessorInterface
 
         // undefined constraint type
         return Constraint::FORM;
+    }
+
+    /**
+     * @param FormError $formError
+     *
+     * @return int|null
+     */
+    protected function getFormErrorStatusCode(FormError $formError)
+    {
+        $cause = $formError->getCause();
+        if ($cause instanceof ConstraintViolation) {
+            $constraint = $cause->getConstraint();
+            if ($constraint instanceof ConstraintWithStatusCodeInterface) {
+                return $constraint->getStatusCode();
+            }
+        }
+
+        return null;
     }
 
     /**

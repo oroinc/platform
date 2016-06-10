@@ -146,7 +146,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new TypeGuess(
                 'oro_api_entity',
-                ['multiple' => false],
+                ['metadata' => $associationMetadata],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
@@ -168,7 +168,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new TypeGuess(
                 'oro_api_entity',
-                ['multiple' => true],
+                ['metadata' => $associationMetadata],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)

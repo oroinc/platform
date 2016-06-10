@@ -77,7 +77,6 @@ services:
 
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
-        public: false
         arguments:
             - '@oro_api.normalize_value.processor'
 
@@ -112,10 +111,17 @@ services:
             - '@oro_api.processor_bag'
             - customize_loaded_data
 
-    oro_api.resources_loader:
-        class: Oro\Bundle\ApiBundle\Provider\ResourcesLoader
+    oro_api.resources_provider:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesProvider
         arguments:
             - '@oro_api.collect_resources.processor'
+            - '@oro_api.resources_cache'
+
+    oro_api.subresources_provider:
+        class: Oro\Bundle\ApiBundle\Provider\SubresourcesProvider
+        arguments:
+            - '@oro_api.collect_subresources.processor'
+            - '@oro_api.resources_provider'
             - '@oro_api.resources_cache'
 
     oro_api.resources_cache:
@@ -299,12 +305,20 @@ services:
             - '@oro_api.exception_text_extractor'
         lazy: true
 
+    oro_api.json_api.relationship_error_completer:
+        class: Oro\Bundle\ApiBundle\Request\JsonApi\RelationshipErrorCompleter
+        public: false
+        arguments:
+            - '@oro_api.exception_text_extractor'
+        lazy: true
+
     oro_api.rest.routing_options_resolver:
         class: Oro\Bundle\ApiBundle\Routing\RestRouteOptionsResolver
         public: false
         arguments:
             - %installed%
-            - '@oro_api.resources_loader'
+            - '@oro_api.resources_provider'
+            - '@oro_api.subresources_provider'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
@@ -320,7 +334,7 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
-            - '@oro_entity.entity_class_name_provider'
+            - '@oro_api.resource_doc_provider'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
@@ -331,6 +345,13 @@ services:
         public: false
         arguments:
             - '@request_stack'
+
+    oro_api.resource_doc_provider:
+        class: Oro\Bundle\ApiBundle\Provider\ResourceDocProvider
+        public: false
+        arguments:
+            - '@oro_entity.entity_class_name_provider'
+            - '@oro_api.subresources_provider'
 
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory

@@ -9,14 +9,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Component\ChainProcessor\ProcessorBag;
-
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpConfigCommand extends AbstractDebugCommand
 {
@@ -90,19 +88,16 @@ class DumpConfigCommand extends AbstractDebugCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var EntityClassNameHelper $entityClassNameHelper */
-        $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
-
-        $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'), true);
         $requestType = $this->getRequestType($input);
+        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $requestType);
         // @todo: API version is not supported for now
-        //$version     = $input->getArgument('version');
+        //$version = $input->getArgument('version');
         $version = Version::LATEST;
         $extras = $this->getConfigExtras($input);
 
         /** @var ProcessorBag $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
-        $processorBag->addApplicableChecker(new RequestTypeApplicableChecker());
+        $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 
         switch ($input->getOption('section')) {
             case 'entities':

@@ -114,6 +114,31 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: update, requestType: rest, priority: -160 }
 
+    oro_api.get_config.complete_status_codes.get_subresource:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteGetSubresourceStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: get_subresource, requestType: rest, priority: -160 }
+
+    oro_api.get_config.complete_status_codes.get_relationship:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteGetRelationshipStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: get_relationship, requestType: rest, priority: -160 }
+
+    oro_api.get_config.complete_status_codes.update_relationship:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteUpdateRelationshipStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: update_relationship, requestType: rest, priority: -160 }
+
+    oro_api.get_config.complete_status_codes.add_relationship:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteAddRelationshipStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: add_relationship, requestType: rest, priority: -160 }
+
+    oro_api.get_config.complete_status_codes.delete_relationship:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteDeleteRelationshipStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: delete_relationship, requestType: rest, priority: -160 }
+
     oro_api.get_config.set_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities
         arguments:
@@ -205,8 +230,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeNotAccessibleRelations
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.resources_loader'
-            - '@oro_api.resources_cache'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: -60 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -60 }

@@ -43,8 +43,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_loader'
-            - '@oro_api.resources_cache'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: create, group: initialize, priority: 20 }
 
@@ -278,10 +277,10 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -100 }
 
-    oro_api.create.json_api.validate_result_schema:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
+    oro_api.create.json_api.validate_normalized_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultSchema
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -200 }
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -210 }
 
     oro_api.create.json_api.set_response_content_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType

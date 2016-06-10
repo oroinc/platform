@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 
@@ -11,11 +12,17 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     /** @var EntityToIdTransformer */
     protected $transformer;
 
+    /** @var AssociationMetadata */
+    protected $metadata;
+
     protected function setUp()
     {
         parent::setUp();
 
-        $this->transformer = new EntityToIdTransformer($this->doctrine);
+        $this->metadata = new AssociationMetadata();
+        $this->metadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+
+        $this->transformer = new EntityToIdTransformer($this->doctrine, $this->metadata);
     }
 
     public function testTransform()
@@ -95,6 +102,10 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     // @codingStandardsIgnoreEnd
     public function testReverseTransformWhenEntityWithCompositeKeyNotFound()
     {
+        $this->metadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity']
+        );
+
         $value = [
             'class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity',
             'id'    => ['id' => 123, 'title' => 'test']
@@ -144,12 +155,26 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $this->transformer->reverseTransform(['class' => 'Test\Class']);
     }
 
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The "Test\Class" class is not acceptable. Acceptable classes: Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testReverseTransformForNotAcceptableEntity()
+    {
+        $this->notManageableClassNames = ['Test\Class'];
+        $this->transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
+    }
+
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      * @expectedExceptionMessage The "Test\Class" class must be a managed Doctrine entity.
      */
     public function testReverseTransformForNotManageableEntity()
     {
+        $this->metadata->setAcceptableTargetClassNames(['Test\Class']);
+
         $this->notManageableClassNames = ['Test\Class'];
         $this->transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
     }

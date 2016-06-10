@@ -62,14 +62,17 @@ The main processor class: [CollectResourcesProcessor](../../Processor/CollectRes
 
 Existing worker processors: [processors.collect_resources.yml](../../Resources/config/processors.collect_resources.yml) or run `php app/console oro:api:debug collect_resources`.
 
-Also [ResourcesLoader](../../Provider/ResourcesLoader.php) was created to make usage of this action as easy as possible.
+Also [ResourcesProvider](../../Provider/ResourcesProvider.php) was created to make usage of this action as easy as possible.
 
 Example of usage:
 
 ```php
-/** @var ResourcesLoader $resourcesLoader */
-$resourcesLoader = $container->get('oro_api.resources_loader');
-$resources = $resourcesLoader->getResources($version, $requestType);
+/** @var ResourcesProvider $resourcesProvider */
+$resourcesProvider = $container->get('oro_api.resources_provider');
+// get all Data API resources
+$resources = $resourcesProvider->getResources($version, $requestType);
+// check whether an entity type is accessible through Data API
+$isAccessible = $resourcesProvider->isResourceAccessible($entityClass, $version, $requestType);
 ```
 
 get Action

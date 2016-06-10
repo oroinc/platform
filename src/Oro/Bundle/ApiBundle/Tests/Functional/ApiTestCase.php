@@ -50,10 +50,10 @@ abstract class ApiTestCase extends WebTestCase
     public function getEntities()
     {
         $this->initClient();
-        $entities        = [];
-        $container       = $this->getContainer();
-        $resourcesLoader = $container->get('oro_api.resources_loader');
-        $resources       = $resourcesLoader->getResources(Version::LATEST, $this->getRequestType());
+        $entities = [];
+        $container = $this->getContainer();
+        $resourcesProvider = $container->get('oro_api.resources_provider');
+        $resources = $resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
 

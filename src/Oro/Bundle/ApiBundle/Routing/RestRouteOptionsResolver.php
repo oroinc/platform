@@ -6,7 +6,8 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -15,17 +16,23 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP        = 'rest_api';
-    const ENTITY_ATTRIBUTE   = 'entity';
-    const ENTITY_PLACEHOLDER = '{entity}';
-    const ID_ATTRIBUTE       = 'id';
-    const ID_PLACEHOLDER     = '{id}';
+    const ROUTE_GROUP = 'rest_api';
+
+    const ENTITY_ATTRIBUTE        = 'entity';
+    const ENTITY_PLACEHOLDER      = '{entity}';
+    const ID_ATTRIBUTE            = 'id';
+    const ID_PLACEHOLDER          = '{id}';
+    const ASSOCIATION_ATTRIBUTE   = 'association';
+    const ASSOCIATION_PLACEHOLDER = '{association}';
 
     /** @var bool */
     protected $isApplicationInstalled;
 
-    /** @var ResourcesLoader */
-    protected $resourcesLoader;
+    /** @var ResourcesProvider */
+    protected $resourcesProvider;
+
+    /** @var SubresourcesProvider */
+    protected $subresourcesProvider;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -40,19 +47,22 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     private $supportedEntities;
 
     /**
-     * @param bool|string|null $isApplicationInstalled
-     * @param ResourcesLoader  $resourcesLoader
-     * @param DoctrineHelper   $doctrineHelper
-     * @param ValueNormalizer  $valueNormalizer
+     * @param bool|string|null     $isApplicationInstalled
+     * @param ResourcesProvider    $resourcesProvider
+     * @param SubresourcesProvider $subresourcesProvider
+     * @param DoctrineHelper       $doctrineHelper
+     * @param ValueNormalizer      $valueNormalizer
      */
     public function __construct(
         $isApplicationInstalled,
-        ResourcesLoader $resourcesLoader,
+        ResourcesProvider $resourcesProvider,
+        SubresourcesProvider $subresourcesProvider,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
         $this->isApplicationInstalled = !empty($isApplicationInstalled);
-        $this->resourcesLoader        = $resourcesLoader;
+        $this->resourcesProvider      = $resourcesProvider;
+        $this->subresourcesProvider   = $subresourcesProvider;
         $this->doctrineHelper         = $doctrineHelper;
         $this->valueNormalizer        = $valueNormalizer;
         $this->requestType            = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -91,7 +101,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     protected function getSupportedEntities()
     {
         if (null === $this->supportedEntities) {
-            $resources = $this->resourcesLoader->getResources(Version::LATEST, $this->requestType);
+            $resources = $this->resourcesProvider->getResources(Version::LATEST, $this->requestType);
 
             $this->supportedEntities = [];
             foreach ($resources as $resource) {
@@ -125,15 +135,93 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
         $action = $route->getDefault('_action');
         foreach ($entities as $entity) {
-            list($className, $entityType, $excludedActions) = $entity;
+            list($entityClass, $entityType, $excludedActions) = $entity;
 
-            // check if given action is excluded for the entity
-            if (in_array($action, $excludedActions, true)) {
+            if ($this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER)) {
+                $this->addSubresources($action, $entityType, $entityClass, $routeName, $route, $routes);
+            } elseif (!in_array($action, $excludedActions, true)) {
+                $this->addResource($entityType, $entityClass, $routeName, $route, $routes);
+            }
+        }
+    }
+
+    /**
+     * @param string                  $entityType
+     * @param string                  $entityClass
+     * @param string                  $routeName
+     * @param Route                   $route
+     * @param RouteCollectionAccessor $routes
+     */
+    protected function addResource(
+        $entityType,
+        $entityClass,
+        $routeName,
+        Route $route,
+        RouteCollectionAccessor $routes
+    ) {
+        $existingRoute = $routes->getByPath(
+            str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath()),
+            $route->getMethods()
+        );
+        if ($existingRoute) {
+            // move existing route before the current route
+            $existingRouteName = $routes->getName($existingRoute);
+            $routes->remove($existingRouteName);
+            $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+        } else {
+            // add an additional strict route based on the base route and current entity
+            $strictRoute = $routes->cloneRoute($route);
+            $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $entityType, $strictRoute->getPath()));
+            $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $entityType);
+            $requirements = $strictRoute->getRequirements();
+            unset($requirements[self::ENTITY_ATTRIBUTE]);
+            $strictRoute->setRequirements($requirements);
+            if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
+                $this->setIdRequirement($strictRoute, $entityClass);
+            }
+            $routes->insert(
+                $routes->generateRouteName($routeName),
+                $strictRoute,
+                $routeName,
+                true
+            );
+        }
+    }
+
+    /**
+     * @param string                  $action
+     * @param string                  $entityType
+     * @param string                  $entityClass
+     * @param string                  $routeName
+     * @param Route                   $route
+     * @param RouteCollectionAccessor $routes
+     */
+    protected function addSubresources(
+        $action,
+        $entityType,
+        $entityClass,
+        $routeName,
+        Route $route,
+        RouteCollectionAccessor $routes
+    ) {
+        $entitySubresources = $this->subresourcesProvider->getSubresources(
+            $entityClass,
+            Version::LATEST,
+            $this->requestType
+        );
+        $subresources = $entitySubresources->getSubresources();
+        if (empty($subresources)) {
+            return;
+        }
+
+        $entityRoutePath = str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath());
+        foreach ($subresources as $associationName => $subresource) {
+            if (in_array($action, $subresource->getExcludedActions(), true)) {
                 continue;
             }
 
             $existingRoute = $routes->getByPath(
-                str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath()),
+                str_replace(self::ASSOCIATION_PLACEHOLDER, $associationName, $entityRoutePath),
                 $route->getMethods()
             );
             if ($existingRoute) {
@@ -144,13 +232,21 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
-                $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $entityType, $strictRoute->getPath()));
+                $strictRoute->setPath(
+                    str_replace(
+                        self::ASSOCIATION_PLACEHOLDER,
+                        $associationName,
+                        str_replace(self::ENTITY_PLACEHOLDER, $entityType, $strictRoute->getPath())
+                    )
+                );
                 $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $entityType);
+                $strictRoute->setDefault(self::ASSOCIATION_ATTRIBUTE, $associationName);
                 $requirements = $strictRoute->getRequirements();
                 unset($requirements[self::ENTITY_ATTRIBUTE]);
+                unset($requirements[self::ASSOCIATION_ATTRIBUTE]);
                 $strictRoute->setRequirements($requirements);
                 if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
-                    $this->setIdRequirement($strictRoute, $className);
+                    $this->setIdRequirement($strictRoute, $entityClass);
                 }
                 $routes->insert(
                     $routes->generateRouteName($routeName),
