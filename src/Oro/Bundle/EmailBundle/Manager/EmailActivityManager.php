@@ -7,20 +7,10 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-//use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
-//use Oro\Bundle\ActivityBundle\Event\Events;
-//use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-//use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-//use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
-//use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
-//use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-//use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
