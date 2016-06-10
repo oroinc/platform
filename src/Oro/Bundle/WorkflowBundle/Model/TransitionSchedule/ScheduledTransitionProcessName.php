@@ -19,8 +19,8 @@ class ScheduledTransitionProcessName
      */
     public function __construct($workflowName, $transitionName)
     {
-        $this->workflow = (string)$workflowName;
-        $this->transition = (string)$transitionName;
+        $this->workflowName = (string)$workflowName;
+        $this->transitionName = (string)$transitionName;
     }
 
     /**
