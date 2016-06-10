@@ -82,13 +82,40 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->emailAddressHelper = new EmailAddressHelper();
 
-
         $this->emailOriginHelper = new EmailOriginHelper(
             $this->doctrineHelper,
             $this->securityFacadeLink,
             $this->emailOwnerProvider,
             $this->emailAddressHelper
         );
+    }
+
+    public function testGetEmailOriginFromSecurity()
+    {
+        $email = 'test';
+        $organization = null;
+        $originName = InternalEmailOrigin::BAP;
+        $enableUseUserEmailOrigin = true;
+        $expectedOrigin = new \stdClass();
+        $owner = new \stdClass();
+
+        $this->emailOwnerProvider->expects($this->once())
+            ->method('findEmailOwner')
+            ->willReturn($owner);
+        $entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityRepository->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($expectedOrigin);
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($entityRepository);
+
+        $origin =
+            $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName, $enableUseUserEmailOrigin);
+
+        $this->assertEquals($expectedOrigin, $origin);
     }
 
     /**
