@@ -20,7 +20,6 @@ class AutocompleteController extends Controller
 {
     /**
      * @param Request $request
-     * @param string $activity The type of the activity entity.
      *
      * @return JsonResponse
      * @throws HttpException

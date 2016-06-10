@@ -69,9 +69,9 @@ class EmailSendProcessor
     /**
      * Send notification to invitees if event was changed
      *
-     * @param CalendarEvent   $calendarEvent
-     * @param ArrayCollection $originalAttendees
-     * @param boolean         $notify
+     * @param CalendarEvent              $calendarEvent
+     * @param ArrayCollection|Attendee[] $originalAttendees
+     * @param boolean                    $notify
      *
      * @return boolean
      */
@@ -225,15 +225,15 @@ class EmailSendProcessor
     }
 
     /**
-     * @param Attendee|CalendarEvent $entity
-     * @param array                  $emails
-     * @param string                 $templateName
+     * @param CalendarEvent $entity
+     * @param array         $emails
+     * @param string        $templateName
      */
-    protected function addEmailNotification($entity, $emails, $templateName)
+    protected function addEmailNotification(CalendarEvent $entity, $emails, $templateName)
     {
         $emailNotification = new EmailNotification($this->em);
         $emailNotification->setEmails($emails);
-        $emailNotification->setEntity($entity);
+        $emailNotification->setCalendarEvent($entity);
         $emailNotification->setTemplateName($templateName);
         $this->emailNotifications[] = $emailNotification;
     }

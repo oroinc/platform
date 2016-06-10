@@ -12,7 +12,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\EventListener\CalendarUidSubscriber;
 use Oro\Bundle\CalendarBundle\Form\EventListener\ChildEventsSubscriber;
