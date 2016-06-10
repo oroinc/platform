@@ -289,9 +289,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      */
     protected function updateContextCounters($entity)
     {
-        $identifier  = $this->databaseHelper->getIdentifier($entity);
-        $entityUsage = $this->newEntitiesHelper->getEntityUsage($this->getEntityHashKey($entity));
-        if ($identifier || $entityUsage > 1) {
+        $identifier = $this->databaseHelper->getIdentifier($entity);
+        if ($identifier || $this->newEntitiesHelper->getEntityUsage($this->getEntityHashKey($entity)) > 1) {
             $this->context->incrementReplaceCount();
         } else {
             $this->context->incrementAddCount();
