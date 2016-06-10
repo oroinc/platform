@@ -5,8 +5,12 @@
     {% endif %}
     {% set valueContainerId = form.value.vars.id ~ '_container' %}
 
-    <div id="{{ valueContainerId }}"
-         class="controls control-subgroup{% if form.value.vars.errors|length > 0 %} validation-error{% endif %}">
+    {% set valueContainerClass = form.value.vars.attr.class|default('oro-clearfix controls control-subgroup') %}
+    {% if form.value.vars.errors|length > 0 %}
+        {% set valueContainerClass = valueContainerClass ~ ' validation-error' %}
+    {% endif %}
+
+    <div id="{{ valueContainerId }}" class="{{ valueContainerClass }}">
         {{ form_widget(form.value, additionalOptions) }}
         {{ form_errors(form.value) }}
     </div>
