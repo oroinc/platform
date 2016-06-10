@@ -23,6 +23,8 @@ class TagImportManager
     /** @var ArrayCollection[] */
     protected $pendingTags = [];
 
+    /** @var array */
+    protected $importedTags = [];
     /**
      * @param TagStorage $tagStorage
      * @param TaggableHelper $taggableHelper
@@ -43,17 +45,33 @@ class TagImportManager
      */
     public function denormalizeTags(array $data)
     {
-        if (empty($data[static::TAGS_FIELD]) || !array_key_exists('name', $data[static::TAGS_FIELD])) {
-            return;
+        $tags = $tagsToLoad = [];
+        if (isset($data[static::TAGS_FIELD]['name'])) {
+            $tagNames = explode(',', $data[static::TAGS_FIELD]['name']);
+            foreach ($tagNames as $tagName) {
+                $tagName = trim($tagName);
+                if (isset($this->importedTags[$tagName])) {
+                    $tags[] = $this->importedTags[$tagName];
+                } else {
+                    $tagsToLoad[] = $tagName;
+                }
+            }
+            if (!empty($tagsToLoad)) {
+                $loadedTags = $this->tagStorage->loadOrCreateTags($tagsToLoad);
+                foreach ($loadedTags as $loadedTag) {
+                    $this->importedTags[$loadedTag->getName()] = $loadedTag;
+                    $tags[] = $loadedTag;
+                }
+            }
+
         }
 
-        return $this->tagStorage->loadOrCreateTags(array_map(
-            'trim',
-            explode(
-                ',',
-                $data[static::TAGS_FIELD]['name']
-            )
-        ));
+        return $tags;
+    }
+
+    public function clearImportedTags()
+    {
+        $this->importedTags = [];
     }
 
     /**
