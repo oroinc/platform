@@ -126,7 +126,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
      */
     public function onFlush(OnFlushEventArgs $args)
     {
-        $this->getTagImportManager()->clearImportedTags();
+        $this->getTagImportManager()->clear();
         if (!$this->pendingTaggedObjects) {
             return;
         }

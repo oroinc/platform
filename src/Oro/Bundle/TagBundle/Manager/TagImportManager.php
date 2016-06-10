@@ -23,8 +23,13 @@ class TagImportManager
     /** @var ArrayCollection[] */
     protected $pendingTags = [];
 
-    /** @var array */
-    protected $importedTags = [];
+    /**
+     * New imported tags which are not yet persisted are stored here to prevent creation tags with the same names
+     *
+     * @var array @var array ['tag_name' => Tag]
+     */
+    protected $loadedTags = [];
+    
     /**
      * @param TagStorage $tagStorage
      * @param TaggableHelper $taggableHelper
@@ -50,8 +55,8 @@ class TagImportManager
             $tagNames = explode(',', $data[static::TAGS_FIELD]['name']);
             foreach ($tagNames as $tagName) {
                 $tagName = trim($tagName);
-                if (isset($this->importedTags[$tagName])) {
-                    $tags[] = $this->importedTags[$tagName];
+                if (isset($this->loadedTags[$tagName])) {
+                    $tags[] = $this->loadedTags[$tagName];
                 } else {
                     $tagsToLoad[] = $tagName;
                 }
@@ -59,7 +64,7 @@ class TagImportManager
             if (!empty($tagsToLoad)) {
                 $loadedTags = $this->tagStorage->loadOrCreateTags($tagsToLoad);
                 foreach ($loadedTags as $loadedTag) {
-                    $this->importedTags[$loadedTag->getName()] = $loadedTag;
+                    $this->loadedTags[$loadedTag->getName()] = $loadedTag;
                     $tags[] = $loadedTag;
                 }
             }
@@ -69,9 +74,9 @@ class TagImportManager
         return $tags;
     }
 
-    public function clearImportedTags()
+    public function clear()
     {
-        $this->importedTags = [];
+        $this->loadedTags = [];
     }
 
     /**
