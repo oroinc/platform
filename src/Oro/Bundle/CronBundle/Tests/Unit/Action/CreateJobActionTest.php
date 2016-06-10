@@ -15,9 +15,6 @@ use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 
 use Oro\Component\Action\Model\ContextAccessor;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
 class CreateJobActionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */

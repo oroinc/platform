@@ -123,7 +123,7 @@ class CreateJobAction extends AbstractAction
         $args = [];
         foreach ($this->options[self::OPTION_ARGUMENTS] as $key => $value) {
             $value = $this->contextAccessor->getValue($context, $value);
-            $args[] = $key . '=' . $value;
+            $args[] = sprintf('%s=%s', $key, $value);
         }
 
         if (false === $this->canAddTheJob($args)) {

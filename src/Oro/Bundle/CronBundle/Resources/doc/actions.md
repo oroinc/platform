@@ -30,7 +30,7 @@ The following example config demonstrates how to create new "Job" for command
    `oro:workflow:transit --workflow-item=15 --transition=test_transition`
 
 ```yml
-//oro/actions.yml
+#Resource/config/oro/actions.yml
 operations:
     orob2b_somebundle_someoperation:
         ...

@@ -54,7 +54,6 @@ class WorkflowDefinitionHandler
         WorkflowDefinition $workflowDefinition,
         WorkflowDefinition $newDefinition = null
     ) {
-
         $em = $this->getEntityManager();
         $created = false;
 
