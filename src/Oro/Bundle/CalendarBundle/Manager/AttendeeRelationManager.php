@@ -3,8 +3,10 @@
 namespace Oro\Bundle\CalendarBundle\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -16,14 +18,22 @@ class AttendeeRelationManager
     /** @var NameFormatter */
     protected $nameFormatter;
 
+    /** @var DQLNameFormatter */
+    protected $dqlNameFormatter;
+
     /**
      * @param ManagerRegistry $registry
      * @param NameFormatter   $nameFormatter
+     * @param DQLNameFormatter $dqlNameFormatter
      */
-    public function __construct(ManagerRegistry $registry, NameFormatter $nameFormatter)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        NameFormatter $nameFormatter,
+        DQLNameFormatter $dqlNameFormatter
+    ) {
         $this->registry = $registry;
         $this->nameFormatter = $nameFormatter;
+        $this->dqlNameFormatter = $dqlNameFormatter;
     }
 
     /**
@@ -51,6 +61,30 @@ class AttendeeRelationManager
     public function getRelatedEntity(Attendee $attendee)
     {
         return $attendee->getUser();
+    }
+
+    /**
+     * @param Attendee $attendee
+     *
+     * @return string
+     */
+    public function getRelatedDisplayName(Attendee $attendee)
+    {
+        return $attendee->getUser() ? $this->nameFormatter->format($attendee->getUser()) : $attendee->getDisplayName();
+    }
+
+    /**
+     * Adds fullName column with text representation of attendee into the result
+     *
+     * @param QueryBuilder $qb
+     */
+    public function addRelatedDisplayName(QueryBuilder $qb)
+    {
+        $userName = $this->dqlNameFormatter->getFormattedNameDQL('user', 'Oro\Bundle\UserBundle\Entity\User');
+
+        $qb
+            ->addSelect(sprintf('%s AS fullName', $userName))
+            ->leftJoin('attendee.user', 'user');
     }
 
     /**

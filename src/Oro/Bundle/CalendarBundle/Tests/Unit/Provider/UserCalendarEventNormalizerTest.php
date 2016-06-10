@@ -17,7 +17,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    protected $attendeeManager;
 
     /** @var UserCalendarEventNormalizer */
     protected $normalizer;
@@ -30,14 +30,14 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade  = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->attendeeManager = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->normalizer = new UserCalendarEventNormalizer(
             $this->reminderManager,
             $this->securityFacade,
-            $this->doctrineHelper
+            $this->attendeeManager
         );
     }
 
@@ -73,19 +73,11 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('applyReminders')
             ->with($expected, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
-        $attendeeRepository = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $attendeeRepository->expects($this->any())
+        $this->attendeeManager->expects($this->any())
             ->method('getAttendeeListsByCalendarEventIds')
             ->will($this->returnCallback(function ($calendarEventIds) use ($attendees) {
                 return array_intersect_key($attendees, array_flip($calendarEventIds));
             }));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityRepository')
-            ->with('OroCalendarBundle:Attendee')
-            ->will($this->returnValue($attendeeRepository));
 
         $result = $this->normalizer->getCalendarEvents($calendarId, $query);
         $this->assertEquals($expected, $result);

@@ -5,8 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\AbstractQuery;
 
-use Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 
 abstract class AbstractCalendarEventNormalizer
@@ -14,17 +13,17 @@ abstract class AbstractCalendarEventNormalizer
     /** @var ReminderManager */
     protected $reminderManager;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var AttendeeManager */
+    protected $attendeeManager;
 
     /**
      * @param ReminderManager $reminderManager
-     * @param DoctrineHelper $doctrineHelper
+     * @param AttendeeManager $attendeeManager
      */
-    public function __construct(ReminderManager $reminderManager, DoctrineHelper $doctrineHelper)
+    public function __construct(ReminderManager $reminderManager, AttendeeManager $attendeeManager)
     {
         $this->reminderManager = $reminderManager;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->attendeeManager = $attendeeManager;
     }
 
     /**
@@ -68,9 +67,7 @@ abstract class AbstractCalendarEventNormalizer
             $calendarEvents
         );
 
-        /** @var AttendeeRepository $attendeeRepository */
-        $attendeeRepository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Attendee');
-        $attendeeLists = $attendeeRepository->getAttendeeListsByCalendarEventIds($calendarEventIds);
+        $attendeeLists = $this->attendeeManager->getAttendeeListsByCalendarEventIds($calendarEventIds);
         foreach ($calendarEvents as $key => $calendarEvent) {
             $calendarEvents[$key]['attendees'] = $this->transformEntity($attendeeLists[$calendarEvent['id']]);
         }

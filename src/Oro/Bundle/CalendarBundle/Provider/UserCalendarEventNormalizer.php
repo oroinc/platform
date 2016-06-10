@@ -8,8 +8,8 @@ use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -25,14 +25,14 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     /**
      * @param ReminderManager $reminderManager
      * @param SecurityFacade  $securityFacade
-     * @param DoctrineHelper  $doctrineHelper
+     * @param AttendeeManager $attendeeManager
      */
     public function __construct(
         ReminderManager $reminderManager,
         SecurityFacade $securityFacade,
-        DoctrineHelper $doctrineHelper
+        AttendeeManager $attendeeManager
     ) {
-        parent::__construct($reminderManager, $doctrineHelper);
+        parent::__construct($reminderManager, $attendeeManager);
         $this->securityFacade = $securityFacade;
     }
 

@@ -85,6 +85,7 @@ class AttendeesToViewTransformer extends ContextsToViewTransformer
     protected function getResult($text, $object)
     {
         $result = parent::getResult($text, $object);
+        $result['text'] = $this->attendeeRelationManager->getRelatedDisplayName($object);
         $result['hidden'] = !$this->attendeeRelationManager->getRelatedEntity($object);
         $result['displayName'] = $object->getDisplayName();
         $result['email'] = $object->getEmail();

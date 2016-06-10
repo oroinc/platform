@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository;
 use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -78,5 +79,35 @@ class AttendeeManager
             },
             []
         );
+    }
+
+    /**
+     * @param array $calendarEventIds
+     *
+     * @return array
+     */
+    public function getAttendeeListsByCalendarEventIds(array $calendarEventIds)
+    {
+        if (!$calendarEventIds) {
+            return [];
+        }
+
+        /** @var AttendeeRepository $attendeeRepository */
+        $attendeeRepository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Attendee');
+        $qb = $attendeeRepository->createAttendeeListsQb($calendarEventIds);
+        $this->attendeeRelationManager->addRelatedDisplayName($qb);
+
+        $queryResult = $qb
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($queryResult as $row) {
+            $calendarEventId = $row['calendarEventId'];
+            unset($row['calendarEventId']);
+            $result[$calendarEventId][] = $row;
+        }
+
+        return $result += array_fill_keys($calendarEventIds, []);
     }
 }

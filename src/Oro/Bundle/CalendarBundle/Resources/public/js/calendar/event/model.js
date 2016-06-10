@@ -104,6 +104,7 @@ define([
                 ),
                 attrs || {}
             );
+            modelData.attendees = _.map(modelData.attendees, _.partial(_.omit, _, 'fullName'));
 
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);
