@@ -17,6 +17,7 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class EntityReader extends IteratorBasedReader
 {
@@ -28,6 +29,9 @@ class EntityReader extends IteratorBasedReader
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
+
+    /** @var AclHelper */
+    protected $aclHelper;
 
     /**
      * @param ContextRegistry           $contextRegistry
@@ -109,8 +113,9 @@ class EntityReader extends IteratorBasedReader
         }
 
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
+        $query = $this->applyAcl($queryBuilder);
 
-        $this->setSourceQueryBuilder($queryBuilder);
+        $this->setSourceQuery($query);
     }
 
     /**
@@ -119,6 +124,14 @@ class EntityReader extends IteratorBasedReader
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -157,5 +170,19 @@ class EntityReader extends IteratorBasedReader
 
                 return $event->getRows();
             });
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return Query
+     */
+    protected function applyAcl(QueryBuilder $queryBuilder)
+    {
+        if ($this->aclHelper) {
+            return $this->aclHelper->apply($queryBuilder);
+        }
+
+        return $queryBuilder->getQuery();
     }
 }
