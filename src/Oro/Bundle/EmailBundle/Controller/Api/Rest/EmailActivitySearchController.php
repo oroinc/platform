@@ -107,7 +107,11 @@ class EmailActivitySearchController extends RestGetController
         $data = $this->getManager()->getSearchResult($limit, $page, $filters);
         foreach ($data['result'] as &$item) {
             $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata($item['entity']);
-            $item['url_view'] = $this->get('router')->generate($metadata->routeView, ['id'=>$item['id']]);
+            if ($metadata) {
+                $item['url_view'] = $this->get('router')->generate($metadata->routeView, ['id'=>$item['id']]);
+            } else {
+                $item['url_view'] = '';
+            }
         }
 
         return $this->buildResponse($data['result'], self::ACTION_LIST, $data);

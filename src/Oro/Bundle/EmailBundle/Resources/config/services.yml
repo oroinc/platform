@@ -823,7 +823,7 @@ services:
         arguments:
             - %oro_email.email.entity.class%
             - '@doctrine.orm.entity_manager'
-            - '@oro_email.manager.activity_manager'
+            - '@oro_activity.manager'
             - '@security.token_storage'
 
     oro_email.manager.email_activity_search.api:
@@ -1053,16 +1053,9 @@ services:
             - '@oro_email.provider.emailowners.provider'
             - '@oro_email.email.manager'
 
-    oro_email.manager.activity_manager:
-        class: Oro\Bundle\EmailBundle\Manager\EmailActivityManager
+    oro_email.listener.activity.filter_target_classes:
+        class: Oro\Bundle\EmailBundle\EventListener\Activity\FilterTargetClasssesListener
         arguments:
-            - '@oro_entity.doctrine_helper'
-            - '@oro_entity.orm.entity_class_resolver'
-            - '@oro_entity_config.provider.activity'
-            - '@oro_entity_config.provider.grouping'
-            - '@oro_entity_config.provider.entity'
-            - '@oro_entity_config.provider.extend'
-            - '@oro_entity_extend.association_manager'
             - '@oro_entity_config.config_manager'
-        calls:
-            - [setEventDispatcher, ['@event_dispatcher']]
+        tags:
+            - { name: kernel.event_listener, event: oro_activity.filter_target_classes, method: onFilterTargetClasses }
