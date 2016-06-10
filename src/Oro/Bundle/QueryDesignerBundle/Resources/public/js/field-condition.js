@@ -189,7 +189,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
             if (this.filter && !this.filter.isEmptyValue()) {
                 value = {
-                    columnName: this.element.find('input.select').select2('val'),
+                    columnName: this.element.find('input.select').inputWidget('val'),
                     criterion: this._getFilterCriterion()
                 };
             } else {
