@@ -25,8 +25,8 @@
 {% endblock %}
 
 {% block oro_config_form_field_type_row %}
-    {% if form.vars.label is not defined or not form.vars.label %}
-        {{ form_row(form.value) }}
+    {% if form.vars.value_field_only %}
+        {{ form_row(form.value, {label: form.vars.label}) }}
     {% else %}
         {{ form_row(form) }}
     {% endif %}
