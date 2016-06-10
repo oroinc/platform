@@ -209,7 +209,7 @@ Now:
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
 
 
-####OroCalendarBundleCalendarEvent
+####CalendarBundle
 
 - `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::NOT_RESPONDED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_NONE`.
 - `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::TENTATIVELY_ACCEPTED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_TENTATIVE`.

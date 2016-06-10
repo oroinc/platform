@@ -34,7 +34,7 @@ class AttendeeSearchHandler extends ContextSearchHandler
      * @param ObjectMapper $mapper
      * @param EventDispatcherInterface $dispatcher
      * @param AttendeeRelationManager $attendeeRelationManager
-     * @param type $class
+     * @param string|null $class
      */
     public function __construct(
         TokenStorageInterface $token,

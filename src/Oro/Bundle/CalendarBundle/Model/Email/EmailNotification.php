@@ -3,24 +3,23 @@
 namespace Oro\Bundle\CalendarBundle\Model\Email;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class EmailNotification implements EmailNotificationInterface
 {
     const TEMPLATE_ENTITY = 'Oro\Bundle\EmailBundle\Entity\EmailTemplate';
+    const ENTITY_CLASS_NAME = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
 
     /** @var ObjectManager */
     protected $em;
 
-    /** @var Attendee|CalendarEvent */
-    protected $entity;
+    /** @var CalendarEvent */
+    protected $calendarEvent;
 
     /** @var string */
     protected $templateName;
@@ -38,20 +37,11 @@ class EmailNotification implements EmailNotificationInterface
     }
 
     /**
-     * @param Attendee|CalendarEvent $entity
+     * @param CalendarEvent $calendarEvent
      */
-    public function setEntity($entity)
+    public function setCalendarEvent(CalendarEvent $calendarEvent)
     {
-        if (!$entity instanceof CalendarEvent && !$entity instanceof Attendee) {
-            throw new \InvalidArgumentException(sprintf(
-                '$entity needs to be one of: %s, %s but %s given',
-                'Oro\Bundle\CalendarBundle\Entity\Attendee',
-                'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                ClassUtils::getClass($entity)
-            ));
-        }
-
-        $this->entity = $entity;
+        $this->calendarEvent = $calendarEvent;
     }
 
     /**
@@ -75,7 +65,7 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function getTemplate()
     {
-        return $this->loadTemplate(ClassUtils::getClass($this->entity), $this->templateName);
+        return $this->loadTemplate(static::ENTITY_CLASS_NAME, $this->templateName);
     }
 
     /**
@@ -88,7 +78,7 @@ class EmailNotification implements EmailNotificationInterface
 
     public function getEntity()
     {
-        return $this->entity;
+        return $this->calendarEvent;
     }
 
     /**
