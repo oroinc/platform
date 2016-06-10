@@ -68,9 +68,7 @@ class ConfigEntityGridController extends Controller
                 $configManager->persist($entityConfig);
                 $configManager->flush();
 
-                return $this->redirect(
-                    $this->generateUrl('oro_entityconfig_view', array('id' => $entity->getId()))
-                );
+                return $this->get('oro_ui.router')->redirect($entity);
             }
         }
 
@@ -149,10 +147,7 @@ class ConfigEntityGridController extends Controller
                     $this->get('translator')->trans('oro.entity_extend.controller.config_entity.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    ['route' => 'oro_entityconfig_update', 'parameters' => ['id' => $entityModel->getId()]],
-                    ['route' => 'oro_entityconfig_view', 'parameters' => ['id' => $entityModel->getId()]]
-                );
+                return $this->get('oro_ui.router')->redirect($entityModel);
             }
         }
 
