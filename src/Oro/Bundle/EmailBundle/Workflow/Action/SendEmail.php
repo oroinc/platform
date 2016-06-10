@@ -30,7 +30,6 @@ class SendEmail extends AbstractSendEmail
         EntityNameResolver $entityNameResolver
     ) {
         parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $entityNameResolver);
-
     }
 
     /**
