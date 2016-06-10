@@ -76,7 +76,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode(self::CONFIG_ENTITY_KEY)->end()
                 ->enumNode('behaviour')
                     ->values($this->behaviourConfigValues)
-                    ->defaultValue(self::BEHAVIOUR_ENABLE_ALL_VALUE)
+                    ->defaultValue(self::BEHAVIOUR_ENABLE_SELECTED)
                 ->end()
                 ->scalarNode('plugin')->end()
                 ->scalarNode('default_editors')->end()
