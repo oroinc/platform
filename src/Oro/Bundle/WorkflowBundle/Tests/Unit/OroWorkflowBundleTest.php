@@ -36,6 +36,14 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
+                    'Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddWorkflowValidationLoaderCompilerPass'
+                )
+            );
+
+        $containerBuilder->expects($this->at(3))
+            ->method('addCompilerPass')
+            ->with(
+                $this->isInstanceOf(
                     'Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass'
                 )
             );
