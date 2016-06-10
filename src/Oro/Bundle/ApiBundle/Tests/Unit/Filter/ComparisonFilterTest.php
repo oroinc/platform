@@ -63,7 +63,7 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsupported operator: "<>". Field: "fieldName".
+     * @expectedExceptionMessage Unsupported operator: "!=". Field: "fieldName".
      */
     public function testUnsupportedOperatorWhenOperatorsAreNotSpecified()
     {
@@ -83,7 +83,7 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
         $comparisonFilter->apply($criteria, new FilterValue('path', 'value', ComparisonFilter::EQ));
 
         $this->assertEquals(
-            new Criteria(new Comparison('fieldName', ComparisonFilter::EQ, 'value')),
+            new Criteria(new Comparison('fieldName', Comparison::EQ, 'value')),
             $criteria
         );
     }
@@ -100,7 +100,7 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
         $comparisonFilter->apply($criteria, new FilterValue('path', 'value', ComparisonFilter::EQ));
 
         $this->assertEquals(
-            new Criteria(new Comparison('fieldName', ComparisonFilter::EQ, 'value')),
+            new Criteria(new Comparison('fieldName', Comparison::EQ, 'value')),
             $criteria
         );
     }
@@ -124,7 +124,7 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($isArrayAllowed, $this->comparisonFilter->isArrayAllowed($filterValue->getOperator()));
         }
 
-        $this->assertEquals(['=', '<>', '<', '<=', '>', '>='], $this->comparisonFilter->getSupportedOperators());
+        $this->assertEquals(['=', '!=', '<', '<=', '>', '>='], $this->comparisonFilter->getSupportedOperators());
 
         $criteria = new Criteria();
         $this->comparisonFilter->apply($criteria, $filterValue);
@@ -141,41 +141,47 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
                 null, //filter
                 new Criteria() //expectation
             ],
+            'filter with default operator' => [
+                'fieldName',
+                true,
+                new FilterValue('path', 'value'),
+                new Criteria(new Comparison('fieldName', Comparison::EQ, 'value'))
+            ],
             'EQ filter' => [
                 'fieldName',
                 true,
                 new FilterValue('path', 'value', ComparisonFilter::EQ),
-                new Criteria(new Comparison('fieldName', ComparisonFilter::EQ, 'value'))
+                new Criteria(new Comparison('fieldName', Comparison::EQ, 'value'))
             ],
             'NEQ filter' => [
                 'fieldName',
                 true,
                 new FilterValue('path', 'value', ComparisonFilter::NEQ),
-                new Criteria(new Comparison('fieldName', ComparisonFilter::NEQ, 'value'))
+                new Criteria(new Comparison('fieldName', Comparison::NEQ, 'value'))
             ],
             'LT filter' => [
                 'fieldName',
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::LT),
-                new Criteria(new Comparison('fieldName', ComparisonFilter::LT, 'value'))
+                new Criteria(new Comparison('fieldName', Comparison::LT, 'value'))
             ],
             'LTE filter' => [
                 'fieldName',
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::LTE),
-                new Criteria(new Comparison('fieldName', ComparisonFilter::LTE, 'value'))
+                new Criteria(new Comparison('fieldName', Comparison::LTE, 'value'))
             ],
             'GT filter' => [
                 'fieldName',
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::GT),
-                new Criteria(new Comparison('fieldName', ComparisonFilter::GT, 'value'))
+                new Criteria(new Comparison('fieldName', Comparison::GT, 'value'))
             ],
             'GTE filter' => [
                 'fieldName',
                 false,
                 new FilterValue('path', 'value', ComparisonFilter::GTE),
-                new Criteria(new Comparison('fieldName', ComparisonFilter::GTE, 'value'))
+                new Criteria(new Comparison('fieldName', Comparison::GTE, 'value'))
             ]
         ];
     }

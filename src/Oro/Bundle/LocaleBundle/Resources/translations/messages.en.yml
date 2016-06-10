@@ -1,4 +1,63 @@
 oro.locale:
+    menu:
+        localization:
+            label: Localization
+        localizations:
+            label: Localizations
+
+    localization:
+        entity_label: 'Localization'
+        entity_plural_label: 'Localizations'
+        entity_description: 'Holds language code, formatting code and parent localization'
+
+        id.label: 'Id'
+        name.label: 'Name'
+        title.label: 'Title'
+        titles.label: 'Titles'
+        language_code.label: 'Language'
+        formatting_code.label: 'Formatting'
+        child_localizations.label: 'Child localizations'
+        parent_localization.label: 'Parent localization'
+
+        widgets:
+            localization_information: Localization Information
+
+        sections:
+            general: General
+
+        navigation:
+            view: 'Localization "%name%"'
+
+        localizedfallbackvalue:
+            entity_label: 'Localized fallback value'
+            entity_plural_label: 'Localized fallback values'
+            id.label: 'ID'
+            fallback.label: 'Fallback'
+            localization.label: 'Localization'
+            string.label: 'String value'
+            text.label: 'Text value'
+
+        form:
+            placeholder:
+                select_parent_localization: 'Please select parent localization...'
+                select_language: 'Please select language...'
+                select_formatting: 'Please select formatting...'
+
+    fallback:
+        type:
+            parent_localization: 'Parent Localization'
+            default: 'Default Value'
+
+        value:
+            default: 'Default Value'
+
+        use_fallback:
+            label: 'Use'
+
+    controller:
+        localization:
+            saved.message: 'Localization has been saved'
+
     date_format:
         day: "MMM d"
     address_format:

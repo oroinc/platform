@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConfigurationCompilerPass;
 
 class OroApiBundle extends Bundle
@@ -32,6 +33,10 @@ class OroApiBundle extends Bundle
                 'oro_api.simple_processor_factory',
                 'oro.api.processor'
             ),
+            PassConfig::TYPE_BEFORE_REMOVING
+        );
+        $container->addCompilerPass(
+            new ApiDocConfigurationCompilerPass(),
             PassConfig::TYPE_BEFORE_REMOVING
         );
     }

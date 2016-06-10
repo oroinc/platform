@@ -1,3 +1,8 @@
+# we should add application/vnd.api+json content type as "json" type to be able to recive processed JSON.API data from the Request
+fos_rest:
+    view:
+        mime_types: {'json': ['application/json', 'application/x-json', 'application/vnd.api+json']}
+
 nelmio_api_doc:
     motd:
         template: OroApiBundle::ApiDoc/motd.html.twig
@@ -19,19 +24,99 @@ oro_api:
         string: ~
         boolean: ~
         integer:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         bigint:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         unsignedInteger:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         decimal:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         float:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         entityAlias: ~
         entityPluralAlias: ~
+
+    form_types:
+        - form.type.form
+        - form.type.collection
+        - form.type.choice
+        - form.type.integer
+        - form.type.number
+        - form.type.money
+        - form.type.percent
+        - form.type.date
+        - form.type.time
+        - form.type.datetime
+        - form.type.timezone
+        - form.type.birthday
+        - form.type.text
+        - form.type.textarea
+        - form.type.email
+        - form.type.url
+        - form.type.password
+        - form.type.repeated
+        - form.type.entity
+
+    form_type_extensions:
+        - form.type_extension.form.http_foundation
+        - form.type_extension.form.validator
+        - form.type_extension.repeated.validator
+        - form.type_extension.form.data_collector
+
+    form_type_guessers:
+        - form.type_guesser.validator
+
+    form_type_guesses:
+        # default types
+        integer:
+            form_type: integer
+        smallint:
+            form_type: integer
+        bigint:
+            form_type: integer
+        boolean:
+            form_type: oro_api_boolean
+        decimal:
+            form_type: number
+        float:
+            form_type: number
+        date:
+            form_type: date
+            options:
+                widget: single_text
+                format: "yyyy-MM-dd" # HTML5
+        time:
+            form_type: time
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+                with_seconds: true
+                widget: single_text
+        datetime:
+            form_type: datetime
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+                with_seconds: true
+                widget: single_text
+                format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
+        datetimetz:
+            form_type: datetime
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+                with_seconds: true
+                widget: single_text
+                format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
+        text:
+            form_type: textarea
+        # custom types
+        percent:
+            form_type: percent
+        money:
+            form_type: money
 
     actions:
         get_list:
@@ -84,8 +169,10 @@ oro_api:
                     priority: -50
                 delete_data:
                     priority: -60
-                normalize_result:
+                finalize:
                     priority: -70
+                normalize_result:
+                    priority: -80
         delete_list:
             processing_groups:
                 initialize:
@@ -100,5 +187,49 @@ oro_api:
                     priority: -50
                 delete_data:
                     priority: -60
-                normalize_result:
+                finalize:
                     priority: -70
+                normalize_result:
+                    priority: -80
+        create:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+                normalize_input:
+                    priority: -30
+                load_data:
+                    priority: -40
+                transform_data:
+                    priority: -50
+                save_data:
+                    priority: -60
+                normalize_data:
+                    priority: -70
+                finalize:
+                    priority: -80
+                normalize_result:
+                    priority: -90
+        update:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+                normalize_input:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
+                transform_data:
+                    priority: -60
+                save_data:
+                    priority: -70
+                normalize_data:
+                    priority: -80
+                finalize:
+                    priority: -90
+                normalize_result:
+                    priority: -100

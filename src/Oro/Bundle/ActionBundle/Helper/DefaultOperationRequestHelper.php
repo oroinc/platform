@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class DefaultOperationRequestHelper
 {
     const DATAGRID_ROUTE = 'oro_datagrid_index';
+    const MASS_ACTION_ROUTE = 'oro_datagrid_mass_action';
 
     /** @var RequestStack */
     protected $requestStack;
@@ -35,7 +36,7 @@ class DefaultOperationRequestHelper
 
         $route = $request->get('_route');
 
-        if ($route === self::DATAGRID_ROUTE) {
+        if (in_array($route, [self::DATAGRID_ROUTE, self::MASS_ACTION_ROUTE], true)) {
             $params = $request->query->get($request->get('gridName'));
 
             if (isset($params['originalRoute'])) {

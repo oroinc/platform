@@ -48,6 +48,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider findEmailOriginDataProvider
      *
+     * @param bool                                               $expected
      * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $mailModelExpects
      * @param string                                             $emailOwner
      * @param bool                                               $enableUseUserEmailOrigin
@@ -56,6 +57,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
      * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $emailOriginsTimes
      */
     public function testFindEmailOrigin(
+        $expected,
         $mailModelExpects,
         $emailOwner,
         $enableUseUserEmailOrigin,
@@ -120,17 +122,16 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->emailModel
-            ->expects($mailModelExpects)
-            ->method('getCampaignOwner')
-            ->willReturn($campaignOwner);
-
         $this->emailOriginHelper->setEmailModel($this->emailModel);
 
         $origin = $this->emailOriginHelper
             ->findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin);
 
-        self::assertNotNull($origin);
+        if (!$expected) {
+            self::assertNull($origin);
+        } else {
+            self::assertInstanceOf($expected, $origin);
+        }
     }
 
     /**
@@ -140,6 +141,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             '1. EmailOwner as User with enableUseUserEmailOrigin and origin is not empty'            => [
+                'expected'                 => 'Oro\Bundle\ImapBundle\Entity\UserEmailOrigin',
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'user',
                 'enableUseUserEmailOrigin' => true,
@@ -149,6 +151,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
                 'exactly'                  => 1
             ],
             '2. EmailOwner as User with enableUseUserEmailOrigin and origin is empty'                => [
+                'expected'                 => 'Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin',
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'user',
                 'enableUseUserEmailOrigin' => true,
@@ -158,6 +161,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
                 'exactly'                  => 1
             ],
             '3. EmailOwner as User without enableUseUserEmailOrigin and origin is not empty'         => [
+                'expected'                 => 'Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin',
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'user',
                 'enableUseUserEmailOrigin' => false,
@@ -167,6 +171,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
                 'exactly'                  => 1
             ],
             '4. EmailOwner as User without enableUseUserEmailOrigin and origin is empty'             => [
+                'expected'                 => 'Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin',
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'user',
                 'enableUseUserEmailOrigin' => false,
@@ -176,6 +181,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
                 'exactly'                  => 1
             ],
             '5. EmailOwner as Mailbox origin is not empty and enableUseUserEmailOrigin is empty'     => [
+                'expected'                 => 'Doctrine\Common\Collections\ArrayCollection',
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'emailBox',
                 'enableUseUserEmailOrigin' => false,
@@ -185,6 +191,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
                 'exactly'                  => 0
             ],
             '6. EmailOwner as Mailbox origin is not empty and enableUseUserEmailOrigin is not empty' => [
+                'expected'                 => 'Doctrine\Common\Collections\ArrayCollection',
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'emailBox',
                 'enableUseUserEmailOrigin' => true,
@@ -194,6 +201,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
                 'exactly'                  => 0
             ],
             '7. EmailOwner as Mailbox origin is empty and enableUseUserEmailOrigin is empty'         => [
+                'expected'                 => null,
                 'mailModelExpects'         => self::once(),
                 'emailOwner'               => 'emailBox',
                 'enableUseUserEmailOrigin' => false,
@@ -203,6 +211,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
                 'exactly'                  => 1
             ],
             '8. EmailOwner as Mailbox origin is not empty and enableUseUserEmailOrigin is empty'     => [
+                'expected'                 => null,
                 'mailModelExpects'         => self::once(),
                 'emailOwner'               => 'emailBox',
                 'enableUseUserEmailOrigin' => true,

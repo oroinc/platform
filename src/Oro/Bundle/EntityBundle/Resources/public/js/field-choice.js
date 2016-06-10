@@ -102,7 +102,7 @@ define(function(require) {
                 }
             }, this.options.select2);
 
-            this.element.select2(select2Options);
+            this.element.inputWidget('create', 'select2', {initializeOptions: select2Options});
             instance = this.element.data('select2');
         },
 
@@ -162,7 +162,7 @@ define(function(require) {
         },
 
         setValue: function(value) {
-            this.element.select2('val', value, true);
+            this.element.inputWidget('val', value, true);
         },
 
         formatChoice: function(value, template) {

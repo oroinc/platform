@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
-use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
+use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\RegisterFilters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
@@ -26,7 +26,7 @@ class RegisterFiltersTest extends GetListProcessorTestCase
         $this->processor = new RegisterFilters($this->filterFactory);
     }
 
-    public function testProcessOnEmptyFiltersConfig()
+    public function testProcessWithEmptyFiltersConfig()
     {
         $filtersConfig = new FiltersConfig();
 
@@ -41,7 +41,7 @@ class RegisterFiltersTest extends GetListProcessorTestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Expected "all" exclusion policy for filters. Got: none.
      */
-    public function testProcessOnExcludedConfigFilters()
+    public function testProcessWithNotNormalizedFiltersConfig()
     {
         $filtersConfig = new FiltersConfig();
         $filtersConfig->setExcludeNone();
@@ -57,25 +57,24 @@ class RegisterFiltersTest extends GetListProcessorTestCase
     {
         $filtersConfig = new FiltersConfig();
         $filtersConfig->setExcludeAll();
-        $idConfig = new FilterFieldConfig();
-        $idConfig->setDataType('integer');
-        $idConfig->setDescription('idFieldDescription');
-        $idConfig->setExcluded(true);
-        $filtersConfig->addField('id', $idConfig);
-        $nameConfig = new FilterFieldConfig();
-        $nameConfig->setExcluded(true);
-        $nameConfig->setDefaultValue('test');
-        $nameConfig->setDataType('string');
-        $nameConfig->setArrayAllowed(true);
-        $nameConfig->setDescription('name field');
-        $filtersConfig->addField('name', $nameConfig);
+
+        $filter1Config = new FilterFieldConfig();
+        $filter1Config->setDataType('integer');
+        $filter1Config->setDescription('filter1 description');
+        $filtersConfig->addField('filter1', $filter1Config);
+
+        $filter2Config = new FilterFieldConfig();
+        $filter2Config->setDataType('string');
+        $filter2Config->setDescription('filter2 description');
+        $filter2Config->setArrayAllowed(true);
+        $filtersConfig->addField('filter2', $filter2Config);
 
         $this->filterFactory->expects($this->exactly(2))
             ->method('createFilter')
             ->willReturnMap(
                 [
                     ['integer', new ComparisonFilter('integer')],
-                    ['string', new FieldsFilter('string')],
+                    ['string', new SortFilter('string')],
                 ]
             );
 
@@ -84,17 +83,16 @@ class RegisterFiltersTest extends GetListProcessorTestCase
 
         $filters = $this->context->getFilters();
         $this->assertEquals(2, $filters->count());
-        /** @var ComparisonFilter $idFilter */
-        $idFilter = $filters->get('id');
-        $this->assertEquals('integer', $idFilter->getDataType());
-        $this->assertFalse($idFilter->isArrayAllowed());
-        $this->assertNull($idFilter->getDefaultValue());
-        $this->assertEquals('idFieldDescription', $idFilter->getDescription());
-        /** @var ComparisonFilter $nameFilter */
-        $nameFilter = $filters->get('name');
-        $this->assertEquals('string', $nameFilter->getDataType());
-        $this->assertTrue($nameFilter->isArrayAllowed());
-        $this->assertEquals('test', $nameFilter->getDefaultValue());
-        $this->assertEquals('name field', $nameFilter->getDescription());
+        /** @var ComparisonFilter $filter1 */
+        $filter1 = $filters->get('filter1');
+        $this->assertEquals('filter1', $filter1->getField());
+        $this->assertEquals($filter1Config->getDataType(), $filter1->getDataType());
+        $this->assertEquals($filter1->getDescription(), $filter1->getDescription());
+        $this->assertFalse($filter1->isArrayAllowed());
+        /** @var SortFilter $filter2 */
+        $filter2 = $filters->get('filter2');
+        $this->assertEquals($filter2Config->getDataType(), $filter2->getDataType());
+        $this->assertEquals($filter2->getDescription(), $filter2->getDescription());
+        $this->assertTrue($filter2->isArrayAllowed());
     }
 }

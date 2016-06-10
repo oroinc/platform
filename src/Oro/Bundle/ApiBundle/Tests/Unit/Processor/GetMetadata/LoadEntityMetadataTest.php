@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
@@ -45,7 +46,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $this->assertSame($metadata, $this->context->getResult());
     }
 
-    public function testProcessForNotConfigurableEntity()
+    public function testProcessForNotManageableEntity()
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -57,12 +58,15 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $this->assertNull($this->context->getResult());
     }
 
-    public function testProcessForConfigurableEntityWithoutConfig()
+    public function testProcessForManageableEntityWithoutConfig()
     {
         $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
 
         $classMetadata->expects($this->once())
             ->method('getFieldNames')
@@ -101,13 +105,16 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
         $expectedMetadata->setInheritedType(false);
         $expectedMetadata->setIdentifierFieldNames(['id']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
         $idField = new FieldMetadata();
         $idField->setName('id');
         $idField->setDataType('integer');
+        $idField->setIsNullable(false);
         $expectedMetadata->addField($idField);
         $nameField = new FieldMetadata();
         $nameField->setName('name');
         $nameField->setDataType('string');
+        $nameField->setIsNullable(false);
         $expectedMetadata->addField($nameField);
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
@@ -116,7 +123,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForConfigurableEntity()
+    public function testProcessForManageableEntityWithConfig()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -142,6 +149,9 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
 
         $classMetadata->expects($this->once())
             ->method('getFieldNames')
@@ -230,19 +240,23 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
         $expectedMetadata->setInheritedType(false);
         $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
         $field1 = new FieldMetadata();
         $field1->setName('field1');
         $field1->setDataType('integer');
+        $field1->setIsNullable(false);
         $expectedMetadata->addField($field1);
         $field3 = new FieldMetadata();
         $field3->setName('field3');
         $field3->setDataType('string');
+        $field3->setIsNullable(false);
         $expectedMetadata->addField($field3);
         $association1 = new AssociationMetadata();
         $association1->setTargetClassName('Test\Association1Target');
         $association1->setAcceptableTargetClassNames(['Test\Association1Target']);
         $association1->setName('association1');
         $association1->setDataType('integer');
+        $association1->setIsNullable(true);
         $association1->setIsCollection(false);
         $expectedMetadata->addAssociation($association1);
         $association3 = new AssociationMetadata();
@@ -250,9 +264,105 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $association3->setAcceptableTargetClassNames(['Test\Association3Target1', 'Test\Association3Target2']);
         $association3->setName('association3');
         $association3->setDataType('string');
+        $association3->setIsNullable(true);
         $association3->setIsCollection(true);
         $expectedMetadata->addAssociation($association3);
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function testProcessForManageableEntityWhenRenamedIdentifierField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'renamedId'       => [
+                    'property_path' => 'realId'
+                ],
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['realId']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['realId']);
+        $classMetadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('realId')
+            ->willReturn('integer');
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['renamedId']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+        $field1 = new FieldMetadata();
+        $field1->setName('renamedId');
+        $field1->setDataType('integer');
+        $field1->setIsNullable(false);
+        $expectedMetadata->addField($field1);
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The "Test\Class" entity does not have a configuration for the identifier field "anotherRealId".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessForManageableEntityWhenRenamedUnknownIdentifierField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'renamedId'       => [
+                    'property_path' => 'realId'
+                ],
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['anotherRealId']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
     }
 }

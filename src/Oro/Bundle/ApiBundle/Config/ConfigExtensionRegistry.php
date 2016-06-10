@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettings;
+use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettingsInterface;
+
 class ConfigExtensionRegistry
 {
     /** @var int */
@@ -60,40 +63,33 @@ class ConfigExtensionRegistry
     /**
      * Collects the configuration definition settings from all registered extensions.
      *
-     * @return array [extraSections, configureCallbacks, preProcessCallbacks, postProcessCallbacks]
+     * @return ConfigurationSettingsInterface
      */
     public function getConfigurationSettings()
     {
-        $extraSections        = [];
-        $configureCallbacks   = [];
-        $preProcessCallbacks  = [];
-        $postProcessCallbacks = [];
+        $settings = new ConfigurationSettings();
 
         $extensions = $this->getExtensions();
         foreach ($extensions as $extension) {
             $sections = $extension->getEntityConfigurationSections();
             foreach ($sections as $sectionName => $sectionConfiguration) {
-                $extraSections[$sectionName] = $sectionConfiguration;
+                $sectionConfiguration->setSettings($settings);
+                $settings->addExtraSection($sectionName, $sectionConfiguration);
             }
             $callbacks = $extension->getConfigureCallbacks();
             foreach ($callbacks as $section => $callback) {
-                $configureCallbacks[$section][] = $callback;
+                $settings->addConfigureCallback($section, $callback);
             }
             $callbacks = $extension->getPreProcessCallbacks();
             foreach ($callbacks as $section => $callback) {
-                $preProcessCallbacks[$section][] = $callback;
+                $settings->addPreProcessCallback($section, $callback);
             }
             $callbacks = $extension->getPostProcessCallbacks();
             foreach ($callbacks as $section => $callback) {
-                $postProcessCallbacks[$section][] = $callback;
+                $settings->addPostProcessCallback($section, $callback);
             }
         }
 
-        return [
-            $extraSections,
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-        ];
+        return $settings;
     }
 }

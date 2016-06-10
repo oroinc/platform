@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
-abstract class AbstractConfigurationSection
+abstract class AbstractConfigurationSection implements ConfigurationSectionInterface
 {
+    /** @var ConfigurationSettingsInterface */
+    protected $settings;
+
     /**
      * {@inheritdoc}
      */
@@ -15,36 +19,78 @@ abstract class AbstractConfigurationSection
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setSettings(ConfigurationSettingsInterface $settings)
+    {
+        $this->settings = $settings;
+    }
+
+    /**
      * @param NodeBuilder $node
-     * @param array       $callbacks
      * @param string      $section
      *
      * @return array
      */
-    protected function callConfigureCallbacks(NodeBuilder $node, array $callbacks, $section)
+    protected function callConfigureCallbacks(NodeBuilder $node, $section)
     {
-        if (isset($callbacks[$section])) {
-            foreach ($callbacks[$section] as $callback) {
-                call_user_func($callback, $node);
-            }
+        $callbacks = $this->settings->getConfigureCallbacks($section);
+        foreach ($callbacks as $callback) {
+            call_user_func($callback, $node);
         }
     }
 
     /**
-     * @param array|null $config
-     * @param array      $callbacks
-     * @param string     $section
-     *
-     * @return array
+     * @param ArrayNodeDefinition $node
+     * @param string              $sectionName
+     * @param callable|null       $customPreProcessCallback
      */
-    protected function callProcessConfigCallbacks($config, array $callbacks, $section)
-    {
-        if (isset($callbacks[$section])) {
-            foreach ($callbacks[$section] as $callback) {
-                $config = call_user_func($callback, $config);
-            }
-        }
+    protected function addPreProcessCallbacks(
+        ArrayNodeDefinition $node,
+        $sectionName,
+        $customPreProcessCallback = null
+    ) {
+        $node
+            ->beforeNormalization()
+            ->always(
+                function ($value) use ($sectionName, $customPreProcessCallback) {
+                    if (null !== $customPreProcessCallback) {
+                        $value = call_user_func($customPreProcessCallback, $value);
+                    }
+                    $callbacks = $this->settings->getPreProcessCallbacks($sectionName);
+                    foreach ($callbacks as $callback) {
+                        $value = call_user_func($callback, $value);
+                    }
 
-        return $config;
+                    return $value;
+                }
+            );
+    }
+
+    /**
+     * @param ArrayNodeDefinition $node
+     * @param string              $sectionName
+     * @param callable|null       $customPostProcessCallback
+     */
+    protected function addPostProcessCallbacks(
+        ArrayNodeDefinition $node,
+        $sectionName,
+        $customPostProcessCallback = null
+    ) {
+        $node
+            ->validate()
+            ->always(
+                function ($value) use ($sectionName, $customPostProcessCallback) {
+                    if (null !== $customPostProcessCallback) {
+                        $value = call_user_func($customPostProcessCallback, $value);
+                    }
+                    $callbacks = $this->settings->getPostProcessCallbacks($sectionName);
+                    foreach ($callbacks as $callback) {
+                        $value = call_user_func($callback, $value);
+                    }
+
+                    return $value;
+                }
+            );
     }
 }

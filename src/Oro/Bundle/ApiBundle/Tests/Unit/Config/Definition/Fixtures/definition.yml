@@ -475,3 +475,101 @@ extra_config:
                     key1: val1
         test_section:
             key1: val1
+
+entity_null_form_type:
+    config:
+        form_type: ~
+    expected: []
+
+entity_empty_form_type:
+    config:
+        form_type: ""
+    expected: []
+
+entity_form_type:
+    config:
+        form_type: integer
+    expected:
+        form_type: integer
+
+entity_null_form_options:
+    config:
+        form_options: ~
+    expected: []
+
+entity_empty_form_options:
+    config:
+        form_options: []
+    expected: []
+
+entity_form:
+    config:
+        form_type: integer
+        form_options:
+            option1: value1
+    expected:
+        form_type: integer
+        form_options:
+            option1: value1
+
+invalid_entity_form_type:
+    config:
+        form_type: []
+    expected: []
+    error: 'Invalid type for path "entity.form_type". Expected scalar, but got array.'
+
+invalid_entity_form_options:
+    config:
+        form_options: test
+    expected: []
+    error: 'Invalid type for path "entity.form_options". Expected array, but got string'
+
+field_form:
+    config:
+        fields:
+            field1:
+                form_type: ~
+            field2:
+                form_type: ""
+            field3:
+                form_type: integer
+            field4:
+                form_type: integer
+                form_options: ~
+            field5:
+                form_type: integer
+                form_options: []
+            field6:
+                form_type: integer
+                form_options:
+                    option1: value1
+    expected:
+        fields:
+            field1: []
+            field2: []
+            field3:
+                form_type: integer
+            field4:
+                form_type: integer
+            field5:
+                form_type: integer
+            field6:
+                form_type: integer
+                form_options:
+                    option1: value1
+
+invalid_field_form_type:
+    config:
+        fields:
+            field1:
+                form_type: []
+    expected: []
+    error: 'Invalid type for path "entity.fields.field1.form_type". Expected scalar, but got array.'
+
+invalid_field_form_options:
+    config:
+        fields:
+            field1:
+                form_options: test
+    expected: []
+    error: 'Invalid type for path "entity.fields.field1.form_options". Expected array, but got string'

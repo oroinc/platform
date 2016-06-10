@@ -21,8 +21,16 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'The request type. Use <comment>"any"</comment> to ignore the request type.',
-                [RequestType::REST, RequestType::JSON_API]
+                $this->getDefaultRequestType()
             );
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getDefaultRequestType()
+    {
+        return [RequestType::REST, RequestType::JSON_API];
     }
 
     /**

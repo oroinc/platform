@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class EntityConfiguration extends AbstractConfigurationSection
+class EntityConfiguration
 {
     /** @var string */
     protected $sectionName;
@@ -15,8 +15,8 @@ class EntityConfiguration extends AbstractConfigurationSection
     /** @var ConfigurationSectionInterface */
     protected $definitionSection;
 
-    /** @var ConfigurationSectionInterface[] */
-    protected $extraSections;
+    /** @var ConfigurationSettingsInterface */
+    protected $settings;
 
     /** @var int */
     protected $maxNestingLevel;
@@ -24,21 +24,40 @@ class EntityConfiguration extends AbstractConfigurationSection
     /**
      * @param string                              $sectionName
      * @param TargetEntityDefinitionConfiguration $definitionSection
-     * @param ConfigurationSectionInterface[]     $extraSections
+     * @param ConfigurationSettingsInterface      $settings
      * @param int                                 $maxNestingLevel
      */
     public function __construct(
         $sectionName,
         TargetEntityDefinitionConfiguration $definitionSection,
-        array $extraSections,
+        ConfigurationSettingsInterface $settings,
         $maxNestingLevel
     ) {
         $this->sectionName       = $sectionName;
         $this->definitionSection = $definitionSection;
-        $this->extraSections     = $extraSections;
+        $this->settings          = $settings;
         $this->maxNestingLevel   = $maxNestingLevel;
 
         $definitionSection->setParentSectionName($sectionName);
+
+        if ($this->maxNestingLevel > 0) {
+            $definitionSectionSettings = new DefinitionConfigurationSettings($settings);
+            $definitionSectionSettings->addAdditionalConfigureCallback(
+                $this->sectionName . '.entity.field',
+                function (NodeBuilder $fieldNode) {
+                    $targetEntityConfiguration = new self(
+                        $this->sectionName,
+                        new TargetEntityDefinitionConfiguration(),
+                        $this->settings,
+                        $this->maxNestingLevel - 1
+                    );
+                    $targetEntityConfiguration->configureEntity($fieldNode, $this->sectionName . '.entity.field');
+                }
+            );
+            $this->definitionSection->setSettings($definitionSectionSettings);
+        } else {
+            $this->definitionSection->setSettings($settings);
+        }
     }
 
     /**
@@ -55,63 +74,32 @@ class EntityConfiguration extends AbstractConfigurationSection
      * Builds the definition of an entity configuration.
      *
      * @param NodeBuilder $node
-     * @param array       $configureCallbacks
-     * @param array       $preProcessCallbacks
-     * @param array       $postProcessCallbacks
      * @param string      $currentSectionName
      */
-    public function configure(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks,
-        $currentSectionName = ''
-    ) {
+    public function configure(NodeBuilder $node, $currentSectionName = '')
+    {
         $node->booleanNode(ConfigUtil::INHERIT)->end();
-        $this->configureEntity(
-            $node,
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks,
-            $currentSectionName
-        );
+        $this->configureEntity($node, $currentSectionName);
     }
 
     /**
      * Builds the definition of an entity configuration.
      *
      * @param NodeBuilder $node
-     * @param array       $configureCallbacks
-     * @param array       $preProcessCallbacks
-     * @param array       $postProcessCallbacks
      * @param string      $currentSectionName
      */
-    protected function configureEntity(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks,
-        $currentSectionName = ''
-    ) {
-        $this->definitionSection->configure(
-            $node,
-            $this->getDefinitionConfigureCallbacks($configureCallbacks, $preProcessCallbacks, $postProcessCallbacks),
-            $preProcessCallbacks,
-            $postProcessCallbacks
-        );
+    protected function configureEntity(NodeBuilder $node, $currentSectionName)
+    {
+        $this->definitionSection->configure($node);
         $definitionSectionName = $this->definitionSection->getSectionName();
-        foreach ($this->extraSections as $name => $configuration) {
+        $extraSections = $this->settings->getExtraSections();
+        foreach ($extraSections as $name => $configuration) {
             // check if configuration can be added to the section
-            $sectionName = $currentSectionName ?:  $this->sectionName . '.' . $definitionSectionName;
+            $sectionName = $currentSectionName ?: $this->sectionName . '.' . $definitionSectionName;
             if (!$configuration->isApplicable($sectionName)) {
                 continue;
             }
-            $configuration->configure(
-                $node->arrayNode($name)->children(),
-                $configureCallbacks,
-                $preProcessCallbacks,
-                $postProcessCallbacks
-            );
+            $configuration->configure($node->arrayNode($name)->children());
         }
         /** @var ArrayNodeDefinition $parentSectionNode */
         $parentSectionNode = $node->end();
@@ -125,61 +113,14 @@ class EntityConfiguration extends AbstractConfigurationSection
     }
 
     /**
-     * @param array $configureCallbacks
-     * @param array $preProcessCallbacks
-     * @param array $postProcessCallbacks
-     *
-     * @return array
-     */
-    protected function getDefinitionConfigureCallbacks(
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
-        $definitionConfigureCallbacks = $configureCallbacks;
-        if ($this->maxNestingLevel > 0) {
-            $fieldSectionName        = $this->sectionName . '.entity.field';
-            $fieldConfigureCallbacks = isset($definitionConfigureCallbacks[$fieldSectionName])
-                ? $definitionConfigureCallbacks[$fieldSectionName]
-                : [];
-
-            $targetEntityConfiguration = new self(
-                $this->sectionName,
-                new TargetEntityDefinitionConfiguration(),
-                $this->extraSections,
-                $this->maxNestingLevel - 1
-            );
-
-            $fieldConfigureCallbacks[] = function (NodeBuilder $fieldNode) use (
-                $targetEntityConfiguration,
-                $configureCallbacks,
-                $preProcessCallbacks,
-                $postProcessCallbacks,
-                $fieldSectionName
-            ) {
-                $targetEntityConfiguration->configureEntity(
-                    $fieldNode,
-                    $configureCallbacks,
-                    $preProcessCallbacks,
-                    $postProcessCallbacks,
-                    $fieldSectionName
-                );
-            };
-
-            $definitionConfigureCallbacks[$fieldSectionName] = $fieldConfigureCallbacks;
-        }
-
-        return $definitionConfigureCallbacks;
-    }
-
-    /**
      * @param array $config
      *
      * @return array
      */
     protected function postProcessConfig(array $config)
     {
-        foreach ($this->extraSections as $name => $configuration) {
+        $extraSections = $this->settings->getExtraSections();
+        foreach ($extraSections as $name => $configuration) {
             if (empty($config[$name])) {
                 unset($config[$name]);
             }

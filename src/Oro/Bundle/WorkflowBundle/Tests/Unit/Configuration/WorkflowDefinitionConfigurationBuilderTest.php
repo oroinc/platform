@@ -81,7 +81,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
-            ->setMethods(array('getStepManager', 'getAttributeManager'))
+            ->setMethods(array('getStepManager', 'getAttributeManager', 'getRestrictions'))
             ->getMock();
         $workflow->expects($this->any())
             ->method('getStepManager')
@@ -89,7 +89,10 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $workflow->expects($this->any())
             ->method('getAttributeManager')
             ->will($this->returnValue($attributeManager));
-
+        $workflow->expects($this->any())
+            ->method('getRestrictions')
+            ->will($this->returnValue([]));
+        
         $workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
             ->disableOriginalConstructor()
             ->setMethods(array('assemble'))
@@ -122,8 +125,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             $actualAcl = array_shift($actualAcls);
             $this->assertEquals($expectedAcl['step'], $actualAcl->getStep()->getName());
             $this->assertEquals($expectedAcl['attribute'], $actualAcl->getAttribute());
-            $this->assertEquals($expectedAcl['permissions']['update'], $actualAcl->isUpdatable());
-            $this->assertEquals($expectedAcl['permissions']['delete'], $actualAcl->isDeletable());
+            $this->assertEquals($expectedAcl['permissions']['UPDATE'], $actualAcl->isUpdatable());
+            $this->assertEquals($expectedAcl['permissions']['DELETE'], $actualAcl->isDeletable());
         }
     }
 
@@ -200,12 +203,12 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     array(
                         'step' => 'first',
                         'attribute' => 'entity_attribute',
-                        'permissions' => array('update' => false, 'delete' => false),
+                        'permissions' => array('UPDATE' => false, 'DELETE' => false),
                     ),
                     array(
                         'step' => 'test_step',
                         'attribute' => 'entity_attribute',
-                        'permissions' => array('update' => true, 'delete' => false),
+                        'permissions' => array('UPDATE' => true, 'DELETE' => false),
                     ),
                 ),
             ),

@@ -122,6 +122,47 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testFindField()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $field1 = $config->addField('field1');
+        $field2 = $config->addField('field2');
+        $field2->setPropertyPath('realField2');
+        $field3 = $config->addField('field3');
+        $field3->setPropertyPath('field3');
+        $swapField1 = $config->addField('swapField');
+        $swapField1->setPropertyPath('realSwapField');
+        $swapField2 = $config->addField('realSwapField');
+        $swapField2->setPropertyPath('swapField');
+
+        $this->assertNull($config->findFieldNameByPropertyPath('unknown'));
+        $this->assertNull($config->findField('unknown'));
+        $this->assertNull($config->findField('unknown', true));
+
+        $this->assertSame('field1', $config->findFieldNameByPropertyPath('field1'));
+        $this->assertSame($field1, $config->findField('field1'));
+        $this->assertSame($field1, $config->findField('field1', true));
+
+        $this->assertNull($config->findFieldNameByPropertyPath('field2'));
+        $this->assertSame('field2', $config->findFieldNameByPropertyPath('realField2'));
+        $this->assertSame($field2, $config->findField('field2'));
+        $this->assertNull($config->findField('field2', true));
+        $this->assertNull($config->findField('realField2'));
+        $this->assertSame($field2, $config->findField('realField2', true));
+
+        $this->assertSame('field3', $config->findFieldNameByPropertyPath('field3'));
+        $this->assertSame($field3, $config->findField('field3'));
+        $this->assertSame($field3, $config->findField('field3', true));
+
+        $this->assertSame('realSwapField', $config->findFieldNameByPropertyPath('swapField'));
+        $this->assertSame('swapField', $config->findFieldNameByPropertyPath('realSwapField'));
+        $this->assertSame($swapField1, $config->findField('swapField'));
+        $this->assertSame($swapField2, $config->findField('swapField', true));
+        $this->assertSame($swapField2, $config->findField('realSwapField'));
+        $this->assertSame($swapField1, $config->findField('realSwapField', true));
+    }
+
     public function testGetOrAddField()
     {
         $config = new EntityDefinitionConfig();

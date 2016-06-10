@@ -273,9 +273,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $message = new \Swift_Message();
 
         $this->emailOriginHelper->expects(self::once())
-            ->method('setEmailModel');
-
-        $this->emailOriginHelper->expects(self::once())
             ->method('findEmailOrigin')
             ->will(self::returnValue($this->userEmailOrigin));
 

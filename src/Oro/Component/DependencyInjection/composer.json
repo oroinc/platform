@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "DIC", "DependencyInjection", "injection"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "symfony/dependency-injection": "~2.3"
     },
     "autoload": {

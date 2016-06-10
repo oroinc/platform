@@ -124,6 +124,18 @@ class WorkflowDefinition implements DomainObjectInterface
     protected $entityAcls;
 
     /**
+     * @var WorkflowRestriction[]|Collection
+     *
+     * @ORM\OneToMany(
+     *      targetEntity="WorkflowRestriction",
+     *      mappedBy="definition",
+     *      orphanRemoval=true,
+     *      cascade={"all"}
+     * )
+     */
+    protected $restrictions;
+
+    /**
      * @var \DateTime $created
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -158,6 +170,7 @@ class WorkflowDefinition implements DomainObjectInterface
     {
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
+        $this->restrictions = new ArrayCollection();
     }
 
     /**
@@ -441,6 +454,61 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     * @param WorkflowRestriction[]|ArrayCollection $restrictions
+     *
+     * @return WorkflowDefinition
+     */
+    public function setRestrictions($restrictions)
+    {
+        $newRestrictions = [];
+        foreach ($restrictions as $restriction) {
+            $newRestrictions[$restriction->getHashKey()] = $restriction;
+        }
+
+        $oldRestrictions = $this->restrictions;
+        foreach ($oldRestrictions as $old) {
+            $hashKey = $old->getHashKey();
+            if (isset($newRestrictions[$hashKey])) {
+                $old->setValues($newRestrictions[$hashKey]->getValues());
+                unset($newRestrictions[$hashKey]);
+            } else {
+                $this->restrictions->removeElement($old);
+            }
+        }
+
+        foreach ($newRestrictions as $newRestriction) {
+            $this->addRestriction($newRestriction);
+        }
+        
+        return $this;
+    }
+
+    /**
+     * @return Collection|WorkflowRestriction[]
+     */
+    public function getRestrictions()
+    {
+        return $this->restrictions;
+    }
+
+    /**
+     * @param WorkflowRestriction $restriction
+     *
+     * @return $this
+     */
+    public function addRestriction(WorkflowRestriction $restriction)
+    {
+        $restriction->setDefinition($this);
+        if ($restriction->getStep()) {
+            $restriction->setStep($this->getStepByName($restriction->getStep()->getName()));
+        }
+            
+        $this->restrictions->add($restriction);
+        
+        return $this;
+    }
+
+    /**
      * @param WorkflowEntityAcl $acl
      * @return WorkflowDefinition
      */
@@ -514,6 +582,7 @@ class WorkflowDefinition implements DomainObjectInterface
             ->setStartStep($definition->getStartStep())
             ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
             ->setEntityAcls($definition->getEntityAcls())
+            ->setRestrictions($definition->getRestrictions())
             ->setSystem($definition->isSystem());
 
         return $this;

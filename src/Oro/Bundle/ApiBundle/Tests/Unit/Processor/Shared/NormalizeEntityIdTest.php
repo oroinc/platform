@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId;
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
-class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
+class NormalizeEntityIdTest extends GetProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityIdTransformer;
@@ -15,6 +16,8 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->entityIdTransformer = $this->getMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
 
         $this->processor = new NormalizeEntityId($this->entityIdTransformer);
@@ -22,44 +25,49 @@ class NormalizeEntityIdTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWhenIdAlreadyNormalized()
     {
-        $context = $this->getContext();
-        $context->setClassName('Test\Class');
-        $context->setId(123);
+        $this->context->setClassName('Test\Class');
+        $this->context->setId(123);
 
         $this->entityIdTransformer->expects($this->never())
             ->method('reverseTransform');
 
-        $this->processor->process($context);
+        $this->processor->process($this->context);
     }
 
     public function testProcess()
     {
-        $context = $this->getContext();
-        $context->setClassName('Test\Class');
-        $context->setId('123');
+        $this->context->setClassName('Test\Class');
+        $this->context->setId('123');
 
         $this->entityIdTransformer->expects($this->once())
             ->method('reverseTransform')
-            ->with('Test\Class', '123')
+            ->with($this->context->getClassName(), $this->context->getId())
             ->willReturn(123);
 
-        $this->processor->process($context);
+        $this->processor->process($this->context);
 
-        $this->assertSame(123, $context->getId());
+        $this->assertSame(123, $this->context->getId());
     }
 
-    /**
-     * @return SingleItemContext
-     */
-    protected function getContext()
+    public function testProcessForInvalidId()
     {
-        $configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->context->setClassName('Test\Class');
+        $this->context->setId('123');
 
-        return new SingleItemContext($configProvider, $metadataProvider);
+        $this->entityIdTransformer->expects($this->once())
+            ->method('reverseTransform')
+            ->with($this->context->getClassName(), $this->context->getId())
+            ->willThrowException(new \Exception('some error'));
+
+        $this->processor->process($this->context);
+
+        $this->assertSame('123', $this->context->getId());
+        $this->assertEquals(
+            [
+                Error::createValidationError('entity identifier constraint')
+                    ->setInnerException(new \Exception('some error'))
+            ],
+            $this->context->getErrors()
+        );
     }
 }
