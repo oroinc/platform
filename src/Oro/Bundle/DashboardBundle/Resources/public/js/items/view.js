@@ -67,9 +67,11 @@ define([
             var $filterContainer = this.$('.controls');
             $filterContainer.prepend(select);
             this.itemSelect = $filterContainer.find('select');
-            this.itemSelect.select2({
-                allowClear: true,
-                placeholder: options.placeholder || null
+            this.itemSelect.inputWidget('create', 'select2', {
+                initializeOptions: {
+                    allowClear: true,
+                    placeholder: options.placeholder || null
+                }
             });
 
             items.on('change:show', function(model) {
@@ -133,12 +135,12 @@ define([
         },
 
         _onAddClick: function() {
-            var item  = this.itemSelect.select2('val');
+            var item  = this.itemSelect.inputWidget('val');
             var model = this.items.get(item);
 
             model.set('show', true);
 
-            this.itemSelect.select2('val', '').change();
+            this.itemSelect.inputWidget('val', '').change();
         },
 
         _onAddAllClick: function() {
@@ -146,11 +148,11 @@ define([
                 item.set('show', true);
             });
 
-            this.itemSelect.select2('val', '').change();
+            this.itemSelect.inputWidget('val', '').change();
         },
 
         _toggleButtons: function() {
-            if (this.itemSelect.select2('val')) {
+            if (this.itemSelect.inputWidget('val')) {
                 this.$('.add-button').removeClass('disabled');
             } else {
                 this.$('.add-button').addClass('disabled');

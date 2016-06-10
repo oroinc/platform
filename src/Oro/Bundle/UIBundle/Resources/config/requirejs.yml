@@ -213,6 +213,7 @@ config:
         'oroui/js/app/views/input-widget/abstract': 'bundles/oroui/js/app/views/input-widget/abstract.js'
         'oroui/js/app/views/input-widget/uniform-file': 'bundles/oroui/js/app/views/input-widget/uniform-file.js'
         'oroui/js/app/views/input-widget/uniform-select': 'bundles/oroui/js/app/views/input-widget/uniform-select.js'
+        'oroui/js/app/views/input-widget/select2': 'bundles/oroui/js/app/views/input-widget/select2.js'
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
 

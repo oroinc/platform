@@ -13,6 +13,7 @@ define(function(require) {
      *
      * Example of usage:
      *     InputWidgetManager.create($(':input'));//create widgets for inputs
+     *     InputWidgetManager.create($(':input'), 'uniform-select');//create only 'uniform-select' widgets for inputs
      *
      *     //add widget to InputWidgetManager
      *     InputWidgetManager.addWidget('uniform-select', {
@@ -25,6 +26,7 @@ define(function(require) {
      *     `selector` - required. Widget will be used only for inputs applicable to this selector
      *     `Widget` - required. InputWidget constructor
      *     `priority` - you can control the order of the widgets. For each input will be used first applicable widget.
+     *     `disableAutoCreate` - if true, widget will be created only when create method called with widgetKey specified
      *
      *     //or you can remove widget from InputWidgetManager
      *     InputWidgetManager.removeWidget('uniform-select')
@@ -45,6 +47,7 @@ define(function(require) {
                 key: key,
                 priority: 10,
                 selector: '',
+                disableAutoCreate: false,
                 Widget: null
             });
 
@@ -87,10 +90,17 @@ define(function(require) {
          * Walk by each input and create widget for applicable inputs without widget
          *
          * @param {jQuery} $inputs
+         * @param {String|null} widgetKey
+         * @param {Object|null} options
          */
-        create: function($inputs) {
+        create: function($inputs, widgetKey, options) {
             var self = this;
             var widgetsByPriority = this.getWidgetsByPriority();
+
+            if (options || widgetKey) {
+                //create new widget with options
+                $inputs.inputWidget('dispose');
+            }
 
             _.each($inputs, function(input) {
                 var $input = $(input);
@@ -100,8 +110,8 @@ define(function(require) {
 
                 for (var i = 0; i < widgetsByPriority.length; i++) {
                     var widget = widgetsByPriority[i];
-                    if (self.isApplicable($input, widget)) {
-                        self.createWidget($input, widget.Widget, {});
+                    if (self.isApplicable($input, widget, widgetKey)) {
+                        self.createWidget($input, widget.Widget, options || {});
                         break;
                     }
                 }
@@ -111,10 +121,15 @@ define(function(require) {
         /**
          * @param {jQuery} $input
          * @param {Object} widget
+         * @param {String|null} widgetKey
          * @returns {boolean}
          */
-        isApplicable: function($input, widget) {
-            if (this.noWidgetSelector && $input.is(this.noWidgetSelector)) {
+        isApplicable: function($input, widget, widgetKey) {
+            if (widgetKey && widget.key !== widgetKey) {
+                return false;
+            } else if (!widgetKey && widget.disableAutoCreate) {
+                return false;
+            } else if (this.noWidgetSelector && $input.is(this.noWidgetSelector)) {
                 return false;
             } else if (widget.selector && !$input.is(widget.selector)) {
                 return false;
@@ -126,19 +141,15 @@ define(function(require) {
          * @param {jQuery} $input
          * @param {AbstractInputWidget|Function} Widget
          * @param {Object} options
-         * @param {String} humanName - widget key (human name) assigned to this widget
-         * @returns {AbstractInputWidget|Object}
          */
-        createWidget: function($input, Widget, options, humanName) {
+        createWidget: function($input, Widget, options) {
             if (!options) {
                 options = {};
             }
-            options.$el = $input;
+            options.el = $input.get(0);
             var widget = new Widget(options);
             if (!widget.isInitialized()) {
                 widget.dispose();
-            } else {
-                $input.attr('data-bound-input-widget', humanName || 'no-name');
             }
         },
 
@@ -202,7 +213,10 @@ define(function(require) {
             }
             var self = this;
             $container.find('[data-bound-input-widget]').each(function() {
-                self.getWidget($(this)).dispose();
+                var widget = self.getWidget($(this));
+                if (widget) {
+                    widget.dispose();
+                }
             });
             $container.data('attachedWidgetsCount', 0);
         }
@@ -220,26 +234,33 @@ define(function(require) {
          *     $('#container').inputWidget('seekAndCreate'); //create widgets in container
          *     $('#container').inputWidget('seekAndDestroy'); //destroys widgets in container
          *     $(':input').inputWidget('refresh'); //update widget, for example after input value change
-         *     $(':input:first').inputWidget('getContainer'); //get widget root element
-         *     $(':input').inputWidget('setWidth', 100); //set widget width
+         *     $(':input:first').inputWidget('container'); //get widget root element
+         *     $(':input').inputWidget('width', 100); //set widget width
          *     $(':input').inputWidget('dispose'); //destroy widgets and dispose widget instance
          *
          * @param {String|null} command
          * @returns {mixed}
          */
         inputWidget: function(command) {
+            var args = _.rest(arguments);
             if (command === 'create') {
-                return InputWidgetManager.create(this);
+                args.unshift(this);
+                InputWidgetManager.create.apply(InputWidgetManager, args);
+                return this;
             }
             if (command === 'seekAndCreate') {
-                return InputWidgetManager.seekAndCreateWidgetsInContainer(this);
+                args.unshift(this);
+                InputWidgetManager.seekAndCreateWidgetsInContainer.apply(InputWidgetManager, args);
+                return this;
             }
             if (command === 'seekAndDestroy') {
-                return InputWidgetManager.seekAndDestroyWidgetsInContainer(this);
+                args.unshift(this);
+                InputWidgetManager.seekAndDestroyWidgetsInContainer.apply(InputWidgetManager, args);
+                return this;
             }
 
             var response = null;
-            var args = Array.prototype.slice.call(arguments, 1);
+            var overrideJqueryMethods = AbstractInputWidget.prototype.overrideJqueryMethods;
             this.each(function(i) {
                 var result = null;
                 var $input = $(this);
@@ -247,12 +268,14 @@ define(function(require) {
 
                 if (!command) {
                     result = widget;
-                } else if (widget) {
-                    if (!_.isFunction(widget[command])) {
+                } else if (!widget || !_.isFunction(widget[command])) {
+                    if (_.indexOf(overrideJqueryMethods, command) !== -1) {
+                        result = $input[command].apply($input, args);
+                    } else if (widget) {
                         InputWidgetManager.error('Input widget doesn\'t support command "%s"', command);
-                    } else {
-                        result = widget[command].apply(widget, args);
                     }
+                } else {
+                    result = widget[command].apply(widget, args);
                 }
 
                 if (i === 0) {
