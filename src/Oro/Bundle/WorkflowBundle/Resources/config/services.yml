@@ -5,12 +5,14 @@ parameters:
     oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.process_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
+    oro_workflow.process_trigger.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
     oro_workflow.process.process_factory.class: Oro\Bundle\WorkflowBundle\Model\ProcessFactory
     oro_workflow.process.process_handler.class: Oro\Bundle\WorkflowBundle\Model\ProcessHandler
     oro_workflow.process.schedule_policy.exclude_definitions.class: Oro\Bundle\WorkflowBundle\Model\ExcludeDefinitionsProcessSchedulePolicy
     oro_workflow.process.logger.class: Oro\Bundle\WorkflowBundle\Model\ProcessLogger
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+    oro_workflow.workflow_item.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
     oro_workflow.handler.transition_helper.class: Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper
     oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
@@ -74,6 +76,7 @@ services:
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.config_manager'
+            - '@oro_workflow.changes.event.dispatcher'
 
     oro_workflow.process.process_factory:
         class: %oro_workflow.process.process_factory.class%
@@ -142,7 +145,6 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
-
     oro_workflow.validation_loader:
         class: Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader
         public: false
@@ -156,3 +158,82 @@ services:
         arguments:
             - '@oro_workflow.manager'
             - '@oro_entity.doctrine_helper'
+
+    oro_workflow.changes.event.dispatcher:
+        class: Symfony\Component\EventDispatcher\EventDispatcher
+
+    oro_workflow.handler.workflow_definition:
+        class: Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler
+        arguments:
+            - '@oro_workflow.workflow_assembler'
+            - '@oro_workflow.changes.event.dispatcher'
+            - '@doctrine'
+            - '%oro_workflow.workflow_definition.entity.class%'
+
+    oro_workflow.process.cron_scheduler:
+        class: Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler
+        arguments:
+            - '@oro_cron.schedule_manager'
+            - '@doctrine'
+            - '%oro_cron.entity.schedule.class%'
+
+    oro_workflow.process.definitions_configurator:
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator
+        arguments:
+            - '@oro_workflow.configuration.builder.process_configuration'
+            - '@doctrine'
+            - '%oro_workflow.process_definition.entity.class%'
+
+    oro_workflow.process.triggers_configurator:
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator
+        arguments:
+            - '@oro_workflow.configuration.builder.process_configuration'
+            - '@oro_workflow.process.cron_scheduler'
+            - '@doctrine'
+            - '%oro_workflow.process_trigger.entity.class%'
+
+    oro_workflow.process.configurator:
+        class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator
+        public: true
+        arguments:
+            - '@doctrine'
+            - '@oro_workflow.process.definitions_configurator'
+            - '@oro_workflow.process.triggers_configurator'
+            - '%oro_workflow.process_definition.entity.class%'
+
+    oro_workflow.transition_schedule.query_factory:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory
+        public: false
+        arguments:
+            - '@doctrine'
+
+    oro_workflow.transition_schedule.items_fetcher:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher
+        public: true
+        arguments:
+            - '@oro_workflow.transition_schedule.query_factory'
+            - '@oro_workflow.manager'
+
+    oro_workflow.validator_expression.dql_expression_verifier:
+        class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier
+
+    oro_workflow.validator_expression.cron_expression_verifier:
+        class: Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier
+
+    oro_workflow.generator.trigger_schedule_options_verifier:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier
+        public: false
+        arguments:
+            - '@oro_workflow.workflow_assembler'
+            - '@oro_workflow.transition_schedule.query_factory'
+            - '@oro_workflow.entity_connector'
+        calls:
+            - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
+            - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]
+
+    oro_workflow.transition_schedule.process_configuration_generator:
+        class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator
+        public: false
+        arguments:
+            - '@oro_workflow.generator.trigger_schedule_options_verifier'
+            - '%oro_workflow.workflow_item.entity.class%'

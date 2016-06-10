@@ -348,6 +348,18 @@ Transition configuration has next options:
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
     will be shown when user clicks transition button.
+* **schedule**
+    These options can be used to configure the schedule for performing transition. This block can contain following sub-options:
+    - **cron** (*string*) - cron-definition for scheduling time for performing transition.
+    - **filter** (*string*) - "WHERE" part of DQL expression. This option used to filter entities that will be used in transition.
+    Following aliases are available:
+        - **e** - entity
+        - **wd** - WorkflowDefinition
+        - **wi** - WorkflowItem
+        - **ws** - WorkflowStep
+
+    Transition for entity can be performed by schedule, when entity is on the appropriate step and all defined conditions are met.
+
 * **transition_definition**
     *string*
     Name of associated transition definition.
@@ -366,6 +378,9 @@ workflows:
                                                             # when transition will be performed
 
                 transition_definition: connected_definition # A reference to Transition Definition configuration
+                schedule:
+                    cron: '0 * * * *'                       # try to perform transition every hour
+                    filter: "e.expired = 1"                 # transition by schedule will be executed only for entities that have field `expired` = true
                 frontend_options:
                     icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
                     class: 'btn-primary'                    # add css class "btn-primary" to transition button

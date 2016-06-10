@@ -110,7 +110,7 @@ class Schedule
 
     /**
      * @param array $arguments
-     * @return Schedule
+     * @return $this
      */
     public function setArguments(array $arguments)
     {
@@ -169,5 +169,13 @@ class Schedule
     public function __toString()
     {
         return (string)$this->getId();
+    }
+
+    /**
+     * @return string
+     */
+    public function getArgumentsHash()
+    {
+        return $this->argumentsHash;
     }
 }
