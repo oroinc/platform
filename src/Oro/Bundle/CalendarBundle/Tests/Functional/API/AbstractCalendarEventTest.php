@@ -27,7 +27,16 @@ abstract class AbstractCalendarEventTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures\LoadCalendarEventData']);
+        $this->loadFixtures([
+            'Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures\LoadCalendarEventData',
+            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadActivityTargets',
+        ]);
+
+        $targetOne = $this->getReference('activity_target_one');
+        self::$recurringEventParameters['contexts'] = json_encode([
+            'entityId' => $targetOne->getId(),
+            'entityClass' => get_class($targetOne),
+        ]);
     }
 
     public static function setUpBeforeClass()
