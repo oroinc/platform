@@ -86,7 +86,8 @@ define(function(require) {
         resolveOptions: function(options) {
             _.extend(this, options || {});
 
-            this.$el.data('inputWidget', this);
+            this.$el.data('inputWidget', this)
+                .attr('data-bound-input-widget', this.widgetFunctionName || 'no-name');
             if (!this.widgetFunction) {
                 this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
             }
@@ -108,7 +109,8 @@ define(function(require) {
 
             this.disposeWidget();
 
-            this.$el.removeData('inputWidget');
+            this.$el.removeData('inputWidget')
+                .removeAttr('data-bound-input-widget');
             delete this.$container;
 
             return AbstractInputWidget.__super__.dispose.apply(this, arguments);

@@ -141,17 +141,14 @@ define(function(require) {
          * @param {jQuery} $input
          * @param {AbstractInputWidget|Function} Widget
          * @param {Object} options
-         * @param {String} humanName - widget key (human name) assigned to this widget
          */
-        createWidget: function($input, Widget, options, humanName) {
+        createWidget: function($input, Widget, options) {
             if (!options) {
                 options = {};
             }
             options.el = $input.get(0);
             var widget = new Widget(options);
-            if (widget.isInitialized()) {
-                $input.attr('data-bound-input-widget', humanName || 'no-name');
-            } else {
+            if (!widget.isInitialized()) {
                 widget.dispose();
             }
         },
