@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -53,16 +54,13 @@ class AttendeeRepository extends EntityRepository
     /**
      * @param array $calendarEventIds
      *
-     * @return array
+     * @return QueryBuilder
      */
-    public function getAttendeeListsByCalendarEventIds(array $calendarEventIds)
+    public function createAttendeeListsQb(array $calendarEventIds)
     {
-        if (!$calendarEventIds) {
-            return [];
-        }
-
         $qb = $this->createQueryBuilder('attendee');
-        $queryResult = $qb
+
+        return $qb
             ->select('attendee.displayName, attendee.email, attendee.createdAt, attendee.updatedAt')
             ->addSelect('attendee_status.id as status, attendee_type.id as type')
             ->addSelect('event.id as calendarEventId')
@@ -70,17 +68,6 @@ class AttendeeRepository extends EntityRepository
             ->leftJoin('attendee.status', 'attendee_status')
             ->leftJoin('attendee.type', 'attendee_type')
             ->where($qb->expr()->in('event.id', ':calendar_event'))
-            ->setParameter('calendar_event', $calendarEventIds)
-            ->getQuery()
-            ->getArrayResult();
-
-        $result = [];
-        foreach ($queryResult as $row) {
-            $calendarEventId = $row['calendarEventId'];
-            unset($row['calendarEventId']);
-            $result[$calendarEventId][] = $row;
-        }
-
-        return $result += array_fill_keys($calendarEventIds, []);
+            ->setParameter('calendar_event', $calendarEventIds);
     }
 }

@@ -171,6 +171,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_locale.formatter.name'
+            - '@oro_locale.dql.formatter.name'
 
     oro_calendar.calendar_property_provider:
         class: %oro_calendar.calendar_property_provider.class%
@@ -217,21 +218,21 @@ services:
         arguments:
             - '@oro_reminder.entity.manager'
             - '@oro_security.security_facade'
-            - '@oro_entity.doctrine_helper'
+            - '@oro_calendar.attendee_manager'
 
     oro_calendar.calendar_event_normalizer.system:
         class: %oro_calendar.calendar_event_normalizer.system.class%
         arguments:
             - '@oro_reminder.entity.manager'
             - '@oro_security.security_facade'
-            - '@oro_entity.doctrine_helper'
+            - '@oro_calendar.attendee_manager'
 
     oro_calendar.calendar_event_normalizer.public:
         class: %oro_calendar.calendar_event_normalizer.public.class%
         arguments:
             - '@oro_reminder.entity.manager'
             - '@oro_security.security_facade'
-            - '@oro_entity.doctrine_helper'
+            - '@oro_calendar.attendee_manager'
 
     oro_calendar.autocomplete.user_calendar_handler:
         class: %oro_calendar.autocomplete.user_calendar_handler.class%

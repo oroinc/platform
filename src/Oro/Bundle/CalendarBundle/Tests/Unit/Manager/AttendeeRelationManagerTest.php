@@ -50,7 +50,11 @@ class AttendeeRelationManagerTest extends \PHPUnit_Framework_TestCase
                 return $person->getFullName();
             }));
 
-        $this->attendeeRelationManager = new AttendeeRelationManager($registry, $nameFormatter);
+        $dqlNameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->attendeeRelationManager = new AttendeeRelationManager($registry, $nameFormatter, $dqlNameFormatter);
     }
 
     public function testBindAttendees()
