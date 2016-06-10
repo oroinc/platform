@@ -66,7 +66,8 @@ class AttendeeSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->attendeeRelationManager = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager')
+        $this->attendeeRelationManager = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
