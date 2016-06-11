@@ -127,15 +127,3 @@
         </tbody>
     </table>
 {% endblock processors %}
-
-{% block graph %}
-    <h2>Graph</h2>
-
-<pre>
-{% for action in collector.actionTree -%}
-<b>{{ action.name }}</b> <span  style="background-color: #ffd;{% if action.time * 1000 > 15 %}color: #d44{% endif %}">{{ '%0.2f'|format(action.time * 1000) }}ms{% if action.time * 1000 > 5 %}/{{ '%0.1f'|format((action.time * 100) / collector.totalTime) }}%{% endif %}</span>
-{% if action.processors is defined %}{% for processor in action.processors %}
-    {{ processor.id }} <span  style="background-color: #ffd;{% if processor.time * 1000 > 5 %}color: #d44{% endif %}">{{ '%0.2f'|format(processor.time * 1000) }}ms{% if processor.time * 1000 > 1 %}/{{ '%0.1f'|format((processor.time * 100) / collector.totalTime) }}%{% endif %}</span>
-{% endfor %}{% endif %}{% endfor %}
-</pre>
-{% endblock graph %}
