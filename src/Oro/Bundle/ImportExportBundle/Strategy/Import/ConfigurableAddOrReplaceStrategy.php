@@ -100,7 +100,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         if (isset($this->cachedEntities[$oid])) {
             return $entity;
         }
-
+        $entityClass = ClassUtils::getClass($entity);
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $searchContext);
         if ($existingEntity) {
@@ -113,7 +113,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             // if can't find entity and new entity can't be persisted
             if (!$isPersistNew) {
                 if ($entityIsRelation) {
-                    $class         = $this->chainEntityClassNameProvider->getEntityClassName(ClassUtils::getClass($entity));
+                    $class         = $this->chainEntityClassNameProvider->getEntityClassName($entityClass);
                     $errorMessages = [$this->translator->trans(
                         'oro.importexport.import.errors.not_found_entity',
                         ['%entity_name%' => $class]
@@ -122,6 +122,24 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 }
 
                 return null;
+            } else {
+                /**
+                 * Save new entity to newEntitiesHelper storage by key constructed from identityValues
+                 * and this strategy context for reuse if there will be entity with the same identity values
+                 * it has not be created again but has be fetch from this storage
+                 */
+                $identityValues = $this->combineIdentityValues($entity, $entityClass, $searchContext);
+                if ($identityValues) {
+                    $newEntityKey   = sprintf('%s:%s', $entityClass, serialize($identityValues));
+                    $existingEntity = $this->newEntitiesHelper->getEntity($newEntityKey);
+                    if (null === $existingEntity) {
+                        $this->newEntitiesHelper->setEntity($newEntityKey, $entity);
+                        $this->newEntitiesHelper->incrementEntityUsage($this->getEntityHashKey($entity));
+                    } else {
+                        $this->newEntitiesHelper->incrementEntityUsage($this->getEntityHashKey($existingEntity));
+                    }
+                }
+
             }
 
             $this->databaseHelper->resetIdentifier($entity);
@@ -258,7 +276,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 }
             }
         }
-
     }
 
     /**
@@ -298,11 +315,31 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     }
 
     /**
-     * {@inheritdoc}
+     * @param object $entity
+     *
+     * @return string
      */
-    protected function findExistingEntityByIdentityFields($entity, array $searchContext = [])
+    protected function getEntityHashKey($entity)
     {
-        $entityName     = ClassUtils::getClass($entity);
+        $hashKey = self::STRATEGY_CONTEXT . spl_object_hash($entity);
+
+        return $hashKey;
+    }
+
+    /**
+     * Combines identity values for entity search
+     * from search context and not empty identity fields or required identity fields
+     * which could be null if configured.
+     * At least one not null and not empty value must be present for search
+     *
+     * @param       $entity
+     * @param       $entityName
+     * @param array $searchContext
+     *
+     * @return array|null
+     */
+    protected function combineIdentityValues($entity, $entityName, array $searchContext)
+    {
         $identityValues = $searchContext;
         $identityValues += $this->fieldHelper->getIdentityValues($entity);
         $notEmptyValues     = [];
@@ -316,45 +353,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 $nullRequiredValues[$fieldName] = null;
             }
         }
-        $existingEntity = null;
-        // if there are not empty identity values existing entity will be searched
-        // by these not empty values with required identity fields which have null value
-        // if existing entity will not be found in db currently processing will be stored to prevent duplicating
-        if (!empty($notEmptyValues)) {
-            $identityValues = array_merge($notEmptyValues, $nullRequiredValues);
-            $existingEntity = $this->findEntityByIdentityValues($entityName, $identityValues);
-            if (!$existingEntity) {
-                $newEntityKey   = sprintf('%s:%s', $entityName, serialize($identityValues));
-                $existingEntity = $this->newEntitiesHelper->getEntity($newEntityKey);
-                if (null === $existingEntity) {
-                    $this->newEntitiesHelper->setEntity($newEntityKey, $entity);
-                    $this->newEntitiesHelper->incrementEntityUsage($this->getEntityHashKey($entity));
-                } else {
-                    $this->newEntitiesHelper->incrementEntityUsage($this->getEntityHashKey($existingEntity));
-                }
-            }
-        }
 
-        return $existingEntity;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function findEntityByIdentityValues($entityName, array $identityValues)
-    {
-        return $this->databaseHelper->findOneBy($entityName, $identityValues);
-    }
-
-    /**
-     * @param object $entity
-     *
-     * @return string
-     */
-    protected function getEntityHashKey($entity)
-    {
-        $hashKey = self::STRATEGY_CONTEXT . spl_object_hash($entity);
-
-        return $hashKey;
+        return !empty($notEmptyValues)
+            ? array_merge($notEmptyValues, $nullRequiredValues)
+            : null;
     }
 }
