@@ -99,6 +99,8 @@ services:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
         public: false
         calls:
+            - [addExtension, ['@oro_layout.layout_update_generator.extension.theme_relative_path']]
+            - [addExtension, ['@oro_layout.layout_update_generator.extension.add_tree']]
             - [addExtension, ['@oro_layout.layout_update_generator.extension.config_conditions']]
 
     oro_layout.layout_update_generator.extension.config_conditions:
@@ -106,6 +108,14 @@ services:
         public: false
         arguments:
             - '@oro_layout.expression.assembler'
+
+    oro_layout.layout_update_generator.extension.add_tree:
+        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension
+        public: false
+
+    oro_layout.layout_update_generator.extension.theme_relative_path:
+        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ThemesRelativePathGeneratorExtension
+        public: false
 
     oro_layout.layout_update_generator.php:
         class:  Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator

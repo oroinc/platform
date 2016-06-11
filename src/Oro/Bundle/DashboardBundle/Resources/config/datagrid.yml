@@ -8,7 +8,7 @@ datagrid:
                     - dashboard.id
                     - dashboard.label
                     - owner.id as ownerId
-                    - CONCAT(owner.firstName, CONCAT(' ', owner.lastName)) as ownerName
+                    - CONCAT_WS(' ', owner.firstName, owner.lastName) as ownerName
                     - dashboard.createdAt
                     - dashboard.updatedAt
                 from:

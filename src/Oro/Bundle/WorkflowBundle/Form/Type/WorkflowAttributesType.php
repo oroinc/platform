@@ -226,15 +226,26 @@ class WorkflowAttributesType extends AbstractType
             $attributeOptions['options']['disabled'] = true;
         }
 
-        $contextAccessor = $this->contextAccessor;
-        array_walk_recursive(
-            $attributeOptions,
-            function (&$leaf) use ($options, $contextAccessor) {
-                $leaf = $contextAccessor->getValue($options['workflow_item'], $leaf);
-            }
-        );
+        return $this->resolveContextValue($options['workflow_item'], $attributeOptions);
+    }
 
-        return $attributeOptions;
+    /**
+     * This method is used instead of `array_walk_recursive`,
+     * because `array_walk_recursive` moves array pointer to the end. So `current` function returns false.
+     *
+     * @param $context
+     * @param mixed $option
+     * @return array|mixed
+     */
+    protected function resolveContextValue($context, $option)
+    {
+        if (is_array($option)) {
+            return array_map(function ($value) use ($context) {
+                return $this->resolveContextValue($context, $value);
+            }, $option);
+        } else {
+            return $this->contextAccessor->getValue($context, $option);
+        }
     }
 
     /**

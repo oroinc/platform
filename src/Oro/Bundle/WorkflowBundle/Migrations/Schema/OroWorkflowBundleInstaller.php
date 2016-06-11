@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_13\CreateEntityRestrictionsTable;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -17,7 +18,7 @@ class OroWorkflowBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_12';
+        return 'v1_13';
     }
 
     /**
@@ -45,6 +46,8 @@ class OroWorkflowBundleInstaller implements Installation
         $this->addOroWorkflowEntityAclIdentForeignKeys($schema);
         $this->addOroWorkflowDefinitionForeignKeys($schema);
         $this->addOroWorkflowStepForeignKeys($schema);
+        
+        CreateEntityRestrictionsTable::createOroWorkflowEntityRestrictionsTable($schema);
     }
 
     /**
