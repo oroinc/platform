@@ -327,7 +327,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     }
 
     /**
-     * Combines identity values for entity search
+     * Combines identity values for entity search on local new entities storage
+     * (which are not yet saved in db)
      * from search context and not empty identity fields or required identity fields
      * which could be null if configured.
      * At least one not null and not empty value must be present for search
@@ -347,7 +348,11 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         foreach ($identityValues as $fieldName => $value) {
             if (null !== $value) {
                 if ('' !== $value) {
-                    $notEmptyValues[$fieldName] = $value;
+                    if (is_object($value)) {
+                        $notEmptyValues[$fieldName] = $this->databaseHelper->getIdentifier($value);
+                    } else {
+                        $notEmptyValues[$fieldName] = $value;
+                    }
                 }
             } elseif ($this->fieldHelper->isRequiredIdentityField($entityName, $fieldName)) {
                 $nullRequiredValues[$fieldName] = null;

@@ -69,4 +69,10 @@ class NewEntitiesHelper
         $this->newEntities       = [];
         $this->newEntitiesUsages = [];
     }
+
+    public function onClear()
+    {
+        $this->newEntities       = [];
+        $this->newEntitiesUsages = [];
+    }
 }

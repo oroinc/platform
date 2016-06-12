@@ -38,4 +38,4 @@ services:
         class: Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper
         tags:
             - { name: doctrine.event_listener, event: onFlush }
-
+            - { name: doctrine.event_listener, event: onClear }
