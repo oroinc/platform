@@ -25,7 +25,7 @@ Once you configured everything you can start producing messages:
 /** @var Oro\Component\MessageQueue\Client\MessageProducer $messageProducer **/
 $messageProducer = $container->get('oro_message_queue.message_producer');
 
-$messageProducer->sendTo('aFooTopic', 'Something has happened');
+$messageProducer->send('aFooTopic', 'Something has happened');
 ```
 
 To consume messages you have to first create a message processor:
