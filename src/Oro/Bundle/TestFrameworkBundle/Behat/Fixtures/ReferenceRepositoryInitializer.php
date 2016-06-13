@@ -3,11 +3,12 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 use Doctrine\ORM\EntityManager;
+use Nelmio\Alice\Instances\Collection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class ReferenceRepository
+class ReferenceRepositoryInitializer
 {
     /**
      * @var EntityManager
@@ -15,30 +16,50 @@ class ReferenceRepository
     protected $em;
 
     /**
-     * @var array
+     * @var Collection
      */
-    public $references = [];
+    protected $referenceRepository = [];
 
     /**
      * @param Registry $registry
+     * @param Collection $referenceRepository
      */
-    public function __construct(Registry $registry)
+    public function __construct(Registry $registry, Collection $referenceRepository)
     {
         $this->em = $registry->getManager();
+        $this->referenceRepository = $referenceRepository;
     }
 
+    /**
+     * Load references to repository
+     */
     public function init()
     {
+        $this->referenceRepository->clear();
+
         $user = $this->getDefaultUser();
 
-        $this->references['admin'] = $user;
-        $this->references['organization'] = $user->getOrganization();
-        $this->references['business_unit'] = $user->getOwner();
+        $this->referenceRepository->set('admin', $user);
+        $this->referenceRepository->set('organization', $user->getOrganization());
+        $this->referenceRepository->set('business_unit', $user->getOwner());
+    }
+
+    public function refresh()
+    {
+        $references = $this->referenceRepository->toArray();
+        $this->referenceRepository->clear();
+
+        foreach ($references as $key => $object) {
+            $class = get_class($object);
+            $newReference = $this->em->getReference($class, $object->getId());
+
+            $this->referenceRepository->set($key, $newReference);
+        }
     }
 
     public function clear()
     {
-        $this->references = [];
+        $this->referenceRepository->clear();
     }
 
     /**
