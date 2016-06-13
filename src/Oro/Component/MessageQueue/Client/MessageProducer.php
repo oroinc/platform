@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 
-class MessageProducer implements TransportMessageProducer
+class MessageProducer
 {
     /**
      * @var TransportMessageProducer
@@ -28,11 +28,15 @@ class MessageProducer implements TransportMessageProducer
     }
 
     /**
+     * Sends a message to a topic channel.
+     * Body could be a string or array, in case of array it will be json encoded.
+     * For possible priority values @see MessagePriority constants
+     *
      * @param string $topic
      * @param string $body
-     * @param int $priority
+     * @param string $priority
      */
-    public function sendTo($topic, $body, $priority = MessagePriorityEnum::LOW)
+    public function send($topic, $body, $priority = MessagePriority::NORMAL)
     {
         $config = $this->driver->getConfig();
 
@@ -49,13 +53,13 @@ class MessageProducer implements TransportMessageProducer
         
         $queue = $this->driver->createQueue($config->getRouterQueueName());
         
-        $this->send($queue, $message);
+        $this->sendMessage($queue, $message);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function send(DestinationInterface $destination, MessageInterface $message)
+    protected function sendMessage(DestinationInterface $destination, MessageInterface $message)
     {
         if (false == $message->getProperty(Config::PARAMETER_TOPIC_NAME)) {
             throw new \LogicException(sprintf('Parameter "%s" is required.', Config::PARAMETER_TOPIC_NAME));

@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpMessage;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpQueue;
 use Oro\Component\MessageQueue\Transport\Amqp\AmqpSession;
@@ -38,16 +39,35 @@ class AmqpDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($message, $result);
     }
 
-    public function testShouldSetMessagePriority()
+    public function testThrowIfGivenPriorityNotSupported()
     {
         $message = new AmqpMessage();
 
         $session = $this->createSessionMock();
 
         $driver = new AmqpDriver($session, new Config('', '', '', '', ''));
-        $driver->setMessagePriority($message, $priority = 3);
 
-        $this->assertSame($priority, $message->getHeader('priority'));
+        $this->setExpectedException(
+            \InvalidArgumentException::class,
+            'Given priority could not be converted to transport\'s one. Got: notSupportedPriority'
+        );
+        $driver->setMessagePriority($message, $priority = 'notSupportedPriority');
+    }
+
+    /**
+     * @dataProvider providePriorities
+     */
+    public function testCorrectlyConvertClientsPriorityToTransportsPriority($clientPriority, $transportPriority)
+    {
+        $message = new AmqpMessage();
+
+        $session = $this->createSessionMock();
+
+        $driver = new AmqpDriver($session, new Config('', '', '', '', ''));
+
+        $driver->setMessagePriority($message, $clientPriority);
+
+        $this->assertSame($transportPriority, $message->getHeader('priority'));
     }
 
     public function testShouldCreateProducerInstance()
@@ -108,6 +128,17 @@ class AmqpDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($queue->isNoAck());
         $this->assertFalse($queue->isNoLocal());
         $this->assertEquals(['x-max-priority' => 5], $queue->getTable());
+    }
+
+    public function providePriorities()
+    {
+        return [
+            [MessagePriority::VERY_LOW, 0],
+            [MessagePriority::LOW, 1],
+            [MessagePriority::NORMAL, 2],
+            [MessagePriority::HIGH, 3],
+            [MessagePriority::VERY_HIGH, 4],
+        ];
     }
 
     /**

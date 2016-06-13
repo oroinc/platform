@@ -43,8 +43,23 @@ class AmqpDriver implements DriverInterface
      */
     public function setMessagePriority(MessageInterface $message, $priority)
     {
+        $map = [
+            MessagePriority::VERY_LOW => 0,
+            MessagePriority::LOW => 1,
+            MessagePriority::NORMAL => 2,
+            MessagePriority::HIGH => 3,
+            MessagePriority::VERY_HIGH => 4,
+        ];
+
+        if (false == array_key_exists($priority, $map)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Given priority could not be converted to transport\'s one. Got: %s',
+                $priority
+            ));
+        }
+
         $headers = $message->getHeaders();
-        $headers['priority'] = $priority;
+        $headers['priority'] = $map[$priority];
         $message->setHeaders($headers);
     }
 
