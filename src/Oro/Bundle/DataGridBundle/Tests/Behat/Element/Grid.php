@@ -53,6 +53,14 @@ class Grid extends Element
             /** @var NodeElement $row */
             $row = $rows[$i];
             $massActionCell = $row->find('css', '.grid-body-cell-massAction');
+
+            if (!$massActionCell) {
+                throw new ExpectationException(
+                    sprintf('No mass action checkbox found for "%s"', $row->getText()),
+                    $this->getSession()->getDriver()
+                );
+            }
+
             $massActionCell->click();
         }
     }
@@ -61,7 +69,7 @@ class Grid extends Element
      * @return NodeElement
      * @throws \Exception
      */
-    private function getMassActionButton()
+    public function getMassActionButton()
     {
         $massActionsButton = $this->findButton('Mass Actions');
         if (!$massActionsButton || !$massActionsButton->isVisible()) {
@@ -79,7 +87,7 @@ class Grid extends Element
      * @return NodeElement
      * @throws \Exception
      */
-    private function getMassActionLink($title)
+    public function getMassActionLink($title)
     {
         return $this->elementFactory->createElement('GridFloatingMenu')->findLink($title);
     }
@@ -118,23 +126,38 @@ class Grid extends Element
     public function clickActionLink($content, $action)
     {
         $row = $this->getRowByContent($content);
+        $link = $this->getActionLink($action, $row);
+        $link->click();
+    }
 
+    /**
+     * @param $action
+     * @param NodeElement $row
+     * @return NodeElement
+     * @throws ElementNotFoundException
+     */
+    public function getActionLink($action, NodeElement $row)
+    {
         if ($showMoreLink = $row->find('named', ['link', '...'])) {
             $showMoreLink->mouseOver();
-            $this->elementFactory
+            $link = $this->elementFactory
                 ->createElement('GridFloatingMenu')
-                ->find('named', ['link', ucfirst($action)])
-                ->click();
+                ->find('named', ['link', ucfirst($action)]);
         } else {
-            $row->find('named', ['link', $action])->click();
+            $link = $row->find('named', ['link', $action]);
         }
 
+        if (!$link) {
+            throw new ElementNotFoundException($this->getDriver(), 'link', 'id|title|alt|text', $action);
+        }
+
+        return $link;
     }
 
     /**
      * @return NodeElement[]
      */
-    private function getRows()
+    public function getRows()
     {
         return $this->findAll('css', 'tbody tr');
     }

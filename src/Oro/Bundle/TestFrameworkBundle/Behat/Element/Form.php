@@ -18,4 +18,9 @@ class Form extends Element
             $this->fillField($locator, $row[1]);
         }
     }
+
+    public function saveAndClose()
+    {
+        $this->pressButton('Save and Close');
+    }
 }

@@ -131,20 +131,4 @@ class OroMainContext extends MinkContext implements
     {
         $this->elementFactory->createElement('MainMenu')->openAndClick($path, $linkLocator);
     }
-
-    /**
-     * @Given /^the following ([\w ]+):?$/
-     */
-    public function theFollowing($name, TableNode $table)
-    {
-        $this->fixtureLoader->loadTable($name, $table);
-    }
-
-    /**
-     * @Given /^there (?:is|are) (\d+) ([\w ]+)$/
-     */
-    public function thereIs($numberOfEntities, $name)
-    {
-        $this->fixtureLoader->loadRandomEntities($name, $numberOfEntities);
-    }
 }
