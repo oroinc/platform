@@ -45,6 +45,7 @@ define([
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText']));
+            this.rows = this.subviews;
             Body.__super__.initialize.apply(this, arguments);
         },
 
@@ -130,14 +131,21 @@ define([
 
             return function (left, right) {
                 // extract the values from the models
-                var l = func(left, attr), r = func(right, attr), t;
-
+                var t;
+                var l = func(left, attr);
+                var r = func(right, attr);
                 // if descending order, swap left and right
-                if (order === 1) t = l, l = r, r = t;
-
+                if (order === 1) {
+                    t = l;
+                    l = r;
+                    r = t;
+                }
                 // compare as usual
-                if (l === r) return 0;
-                else if (l < r) return -1;
+                if (l === r) {
+                    return 0;
+                } else if (l < r) {
+                    return -1;
+                }
                 return 1;
             };
         },
