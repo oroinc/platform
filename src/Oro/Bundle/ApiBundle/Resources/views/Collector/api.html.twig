@@ -17,8 +17,8 @@
 {% block panel %}
     {{ block('stats') }}
     {{ block('actions') }}
+    {{ block('applicableCheckers') }}
     {{ block('processors') }}
-    {{ block('graph') }}
 
     <script type="text/javascript">//<![CDATA[
 
@@ -104,6 +104,29 @@
         </tbody>
     </table>
 {% endblock actions %}
+
+{% block applicableCheckers %}
+    <h2>Applicable Checkers</h2>
+
+    <table class="alt" id="applicableCheckersPlaceholder">
+        <thead>
+        <tr>
+            <th onclick="javascript:sortTable(this, 0, 'applicableCheckers')" style="cursor: pointer;">Time<span></span></th>
+            <th onclick="javascript:sortTable(this, 1, 'applicableCheckers')" style="cursor: pointer;">Used<span></span></th>
+            <th>Class</th>
+        </tr>
+        </thead>
+        <tbody id="applicableCheckers">
+        {% for i, applicableChecker in collector.applicableCheckers %}
+            <tr id="applicableCheckerNo-{{ i }}" class="{{ cycle(['odd', 'even'], i) }}">
+                <td>{{ '%0.2f'|format(applicableChecker.time * 1000) }}&nbsp;ms{% if applicableChecker.time * 1000 > 1 %} ({{ '%0.1f'|format((applicableChecker.time * 100) / collector.totalTime) }}%){% endif %}</td>
+                <td>{{ applicableChecker.count }} times</td>
+                <td>{{ applicableChecker.class }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock applicableCheckers %}
 
 {% block processors %}
     <h2>Processors</h2>

@@ -261,7 +261,7 @@ class ProcessorBag implements ProcessorBagInterface
      */
     protected function initializeProcessorApplicableChecker()
     {
-        $this->processorApplicableChecker = new ChainApplicableChecker();
+        $this->processorApplicableChecker = $this->createProcessorApplicableChecker();
         $this->registerApplicableChecker(new GroupRangeApplicableChecker());
         $this->registerApplicableChecker(new SkipGroupApplicableChecker());
         $matchApplicableChecker = new MatchApplicableChecker();
@@ -277,6 +277,14 @@ class ProcessorBag implements ProcessorBagInterface
                 $this->registerApplicableChecker($checker);
             }
         }
+    }
+
+    /**
+     * @return ChainApplicableChecker
+     */
+    protected function createProcessorApplicableChecker()
+    {
+        return new ChainApplicableChecker();
     }
 
     /**

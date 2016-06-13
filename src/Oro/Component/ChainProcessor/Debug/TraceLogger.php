@@ -24,6 +24,12 @@ class TraceLogger
     /** @var array */
     protected $unclassifiedProcessors = [];
 
+    /** @var array */
+    protected $applicableCheckers = [];
+
+    /** @var string */
+    protected $lastApplicableChecker;
+
     /**
      * @param string         $sectionName
      * @param Stopwatch|null $stopwatch
@@ -67,6 +73,24 @@ class TraceLogger
         }
 
         return $actions;
+    }
+
+    /**
+     * Gets all executed applicable checkers
+     *
+     * @return array
+     */
+    public function getApplicableCheckers()
+    {
+        $applicableCheckers = [];
+        foreach ($this->applicableCheckers as $className => $applicableChecker) {
+            $applicableCheckers[] = [
+                'class' => $className,
+                'time'  => $applicableChecker['time'],
+                'count' => $applicableChecker['count']
+            ];
+        }
+        return $applicableCheckers;
     }
 
     /**
@@ -139,6 +163,31 @@ class TraceLogger
         } else {
             $this->unclassifiedProcessors[] = $processor;
         }
+    }
+
+    /**
+     * Marks an applicable checker as started
+     *
+     * @param string $className The class name of an applicable checker
+     */
+    public function startApplicableChecker($className)
+    {
+        if (isset($this->applicableCheckers[$className])) {
+            $this->applicableCheckers[$className]['startTime'] = microtime(true);
+        } else {
+            $this->applicableCheckers[$className] = ['startTime' => microtime(true), 'time' => 0, 'count' => 0];
+        }
+        $this->lastApplicableChecker = $className;
+    }
+
+    /**
+     * Marks an applicable checker as stopped
+     */
+    public function stopApplicableChecker()
+    {
+        $this->applicableCheckers[$this->lastApplicableChecker]['time'] +=
+            microtime(true) - $this->applicableCheckers[$this->lastApplicableChecker]['startTime'];
+        $this->applicableCheckers[$this->lastApplicableChecker]['count'] += 1;
     }
 
     /**

@@ -34,7 +34,7 @@ class ChainApplicableChecker implements ApplicableCheckerInterface
     {
         $result = self::ABSTAIN;
         foreach ($this->checkers as $checker) {
-            $checkResult = $checker->isApplicable($context, $processorAttributes);
+            $checkResult = $this->executeChecker($checker, $context, $processorAttributes);
             if ($checkResult === self::NOT_APPLICABLE) {
                 $result = self::NOT_APPLICABLE;
                 break;
@@ -44,5 +44,20 @@ class ChainApplicableChecker implements ApplicableCheckerInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param ApplicableCheckerInterface $checker
+     * @param ContextInterface           $context
+     * @param array                      $processorAttributes
+     *
+     * @return int
+     */
+    protected function executeChecker(
+        ApplicableCheckerInterface $checker,
+        ContextInterface $context,
+        array $processorAttributes
+    ) {
+        return $checker->isApplicable($context, $processorAttributes);
     }
 }

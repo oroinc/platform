@@ -6,6 +6,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
@@ -47,6 +48,9 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');
+            $container->getDefinition('oro_api.processor_bag')
+                ->setClass('Oro\Component\ChainProcessor\Debug\TraceableProcessorBag')
+                ->addMethodCall('setTraceLogger', [new Reference('oro_api.profiler.logger')]);
             DependencyInjectionUtil::registerDebugService(
                 $container,
                 'oro_api.action_processor_bag',
