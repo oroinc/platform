@@ -87,8 +87,8 @@ UPGRADE FROM 1.9 to 1.10
 - Class `Oro\Bundle\WorkflowBundle\Model\ContextAccessor` marked as deprecated. Use `Oro\Component\Action\Model\ContextAccessor` instead.
 - Class `Oro\Bundle\WorkflowBundle\Model\Event\ExecuteActionEvent` marked as deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvent` instead.
 - Class `Oro\Bundle\WorkflowBundle\Model\Event\ExecuteActionEvents` marked as deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents` instead.
-- `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_BEFORE` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
-- `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_AFTER` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
+- Constant `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_BEFORE` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
+- Constant `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_AFTER` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
 - Service `oro_workflow.action_assembler` is deprecated. Use `oro_action.action_assembler` instead.
 - Service `oro_workflow.attribute_guesser` is deprecated. Use `oro_action.attribute_guesser` instead.
 - Service `oro_workflow.context_accessor` is deprecated. Use `oro_action.context_accessor` instead.
@@ -99,6 +99,17 @@ UPGRADE FROM 1.9 to 1.10
 - Added parameter `RestrictionAssembler $restrictionAssembler` to constructor of `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler`
 - Added parameter `RestrictionManager $restrictionManager` to constructor of `Oro\Bundle\WorkflowBundle\Model\Workflow`
 - Added parameter `WorkflowPermissionRegistry $permissionRegistry` to constructor of `Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter`
+- Added tags: `oro_workflow.changes.listener` and `oro_workflow.changes.subscriber` for `\Oro\Bundle\WorkflowBundle\Event\WorkflowEvents` event constants and separate dispatcher service `oro_workflow.changes.event.dispatcher`.
+- Added class `Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator` with corresponded service `oro_workflow.process.configurator` for single point of workflow processes configurations by configuration sets.
+- Added class `Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator` 
+    **IMPORTANT**: Configuration must provide full list of triggers for mentioned process definition. If list under definition key comes empty - triggers would be removed. See more in `\Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator::configureTriggers` doc-block.
+    **IMPORTANT**: Changing of process cron triggers configuration will not keep all old cron triggers in database. E.g. old triggers would be removed and new created.
+- Added class `Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler` (`oro_workflow.handler.workflow_definition` service) for single point of `WorkflowDefinition` entity management. 
+    All manipulations with `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity persistence should be provided through the handler. 
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` construction signature was changed: additional (fifth) argument `Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher` was added.
+ 
+####CronBundle
+- Added action `@create_job` for instance of `JMS\JobQueueBundle\Entity\Job` creation and persistence through actions (Class `Oro\Bundle\CronBundle\Action\CreateJobAction`).
 
 ####SearchBundle
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::setEntitiesConfigParameter` deprecated since 1.9. Will be removed after 1.11. Please use oro_search.provider.search_mapping service for mapping config instead.
