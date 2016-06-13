@@ -1394,7 +1394,7 @@ services:
     acme_demo.block_type.datetime:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptions, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
+            - [setOptionsConfig, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
             - [setName, ['datetime']]
         tags:
              - { name: layout.block_type, alias: datetime }
@@ -1419,7 +1419,7 @@ services:
     acme_demo.block_type.title:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptions, [{level: {default: 1}}]]
+            - [setOptionsConfig, [{level: {default: 1}}]]
             - [setName, ['title']]
             - [setParent, ['text']]
         tags:
@@ -1452,7 +1452,7 @@ class ImageType extends AbstractType
     {
         $resolver
             ->setRequired(['path'])
-            ->setOptional(['alt']);
+            ->setDefined(['alt']);
     }
 
     /**

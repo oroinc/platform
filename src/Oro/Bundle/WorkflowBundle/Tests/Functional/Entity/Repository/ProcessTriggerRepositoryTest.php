@@ -30,7 +30,7 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         $this->initClient();
 
         $doctrine = $this->getContainer()->get('doctrine');
-        $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities'));
+        $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities']);
 
         $this->entityManager = $doctrine->getManager();
         $this->repository = $doctrine->getRepository('OroWorkflowBundle:ProcessTrigger');
@@ -42,7 +42,7 @@ class ProcessTriggerRepositoryTest extends WebTestCase
             'OroWorkflowBundle:ProcessDefinition',
             LoadProcessEntities::FIRST_DEFINITION
         );
-        $trigger = $this->repository->findOneBy(array('definition' => $definition));
+        $trigger = $this->repository->findOneBy(['definition' => $definition]);
 
         // test equal (existing) trigger
         $equalTrigger = new ProcessTrigger();
@@ -101,7 +101,7 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         foreach ($triggers as $trigger) {
             $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', $trigger);
 
-            $definition     = $trigger->getDefinition();
+            $definition = $trigger->getDefinition();
             $executionOrder = $definition->getExecutionOrder();
 
             if ($previousOrder === null) {
@@ -134,5 +134,22 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         }
 
         return (int)$queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    public function testFindByDefinitionName()
+    {
+        $firstDefinitionTriggers = $this->repository->findByDefinitionName(LoadProcessEntities::FIRST_DEFINITION);
+
+        $this->assertCount(1, $firstDefinitionTriggers);
+        $this->assertContains($this->getReference(LoadProcessEntities::TRIGGER_UPDATE), $firstDefinitionTriggers);
+        $this->assertNotContains($this->getReference(LoadProcessEntities::TRIGGER_CREATE), $firstDefinitionTriggers);
+        $this->assertNotContains($this->getReference(LoadProcessEntities::TRIGGER_DISABLED), $firstDefinitionTriggers);
+
+        $firstDefinitionTriggers = $this->repository->findByDefinitionName(LoadProcessEntities::SECOND_DEFINITION);
+
+        $this->assertCount(3, $firstDefinitionTriggers);
+        $this->assertContains($this->getReference(LoadProcessEntities::TRIGGER_CREATE), $firstDefinitionTriggers);
+        $this->assertNotContains($this->getReference(LoadProcessEntities::TRIGGER_UPDATE), $firstDefinitionTriggers);
+        $this->assertNotContains($this->getReference(LoadProcessEntities::TRIGGER_DISABLED), $firstDefinitionTriggers);
     }
 }
