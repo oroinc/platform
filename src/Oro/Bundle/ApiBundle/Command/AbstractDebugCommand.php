@@ -88,6 +88,8 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
             return $value == (int)$value
                 ? (int)$value
                 : (float)$value;
+        } elseif (0 === strpos($value, '[') && substr($value, -1) === ']') {
+            return explode(',', substr($value, 1, -1));
         }
 
         return $value;

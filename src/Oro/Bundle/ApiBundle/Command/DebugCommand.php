@@ -38,7 +38,8 @@ class DebugCommand extends AbstractDebugCommand
                 'Shows processors which will be executed only when the context has'
                 . ' a given attribute with the specified value.'
                 . ' The name and value should be separated by the colon,'
-                . ' e.g.: <info>--attribute=collection:true</info>'
+                . ' e.g.: <info>--attribute=collection:true</info> for scalar value'
+                . ' or <info>--attribute=extra:[definition,filters]</info> for array value'
             );
         parent::configure();
     }
