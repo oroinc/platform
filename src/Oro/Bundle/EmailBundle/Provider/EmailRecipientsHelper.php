@@ -163,7 +163,7 @@ class EmailRecipientsHelper
         }
 
         return [
-            'id' => $this->prepareFormRecipientIds($recipient->getId()),
+            'id' => emailRecipientsHelper::prepareFormRecipientIds($recipient->getId()),
             'text' => $recipient->getName(),
             'data' => json_encode($data),
         ];
@@ -350,6 +350,8 @@ class EmailRecipientsHelper
     }
 
     /**
+     * Prepares base64 encoded emails to be used as ids in recipients form for select2 component.
+     *
      * @param  array|string $ids
      * @return string;
      */
@@ -365,23 +367,26 @@ class EmailRecipientsHelper
     }
 
     /**
+     * Extracts base64 encoded selected email values, that are used as ids in recipients form for select2 component.
+     *
      * @param  array|string $value
      * @return array;
      */
-    public static function extractFormRecipients($value)
+    public static function extractFormRecipientIds($value)
     {
         if (is_array($value)) {
             return $value;
         }
-
-        $array = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
-        $array = array_map(function ($arrayPart) {
-                $arrayPart = base64_decode($arrayPart, true) ? : $arrayPart;
-                return $arrayPart;
+        /*
+         * str_getcsv is used to cover the case if emails are pasted directly with ";" separator
+         * and it protects from ";" used  in full email address. (example: "Recipient Name; Name2" <myemail@domain.com>)
+         */
+        $idsEncoded = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
+        $idsDecoded = array_map(function ($idEncoded) {
+                return base64_decode($idEncoded, true) ? : $idEncoded;
             },
-            $array);
+            $idsEncoded);
 
-        return $array;
+        return $idsDecoded;
     }
-
 }
