@@ -46,7 +46,7 @@ class WorkflowItemRepository extends EntityRepository
      * @param WorkflowDefinition $definition
      * @return QueryBuilder
      */
-    public function getByDefinitionQueryBuilder(WorkflowDefinition $definition)
+    protected function getByDefinitionQueryBuilder(WorkflowDefinition $definition)
     {
         return $this->createQueryBuilder('workflowItem')
             ->select('workflowItem.id')
@@ -92,7 +92,7 @@ class WorkflowItemRepository extends EntityRepository
             ->orderBy('workflowItem.id');
 
         if ($excludedWorkflowNames) {
-            $queryBuilder->andWhere($queryBuilder->expr()->in('workflowDefinition.name', $excludedWorkflowNames));
+            $queryBuilder->andWhere($queryBuilder->expr()->notIn('workflowDefinition.name', $excludedWorkflowNames));
         }
 
         $iterator = new DeletionQueryResultIterator($queryBuilder);
@@ -110,12 +110,12 @@ class WorkflowItemRepository extends EntityRepository
             foreach ($iterator as $workflowItem) {
                 $workflowItemIds[] = $workflowItem['id'];
                 if (count($workflowItemIds) == $batchSize) {
-                    $this->clearWorkflowItems($entityClass, $workflowItemIds);
+                    $this->clearWorkflowItems($workflowItemIds);
                     $workflowItemIds = [];
                 }
             }
             if ($workflowItemIds) {
-                $this->clearWorkflowItems($entityClass, $workflowItemIds);
+                $this->clearWorkflowItems($workflowItemIds);
             }
             $entityManager->commit();
         } catch (\Exception $e) {
@@ -125,10 +125,9 @@ class WorkflowItemRepository extends EntityRepository
     }
 
     /**
-     * @param string $entityClass
      * @param array $workflowItemIds
      */
-    protected function clearWorkflowItems($entityClass, array $workflowItemIds)
+    protected function clearWorkflowItems(array $workflowItemIds)
     {
         if (empty($workflowItemIds)) {
             return;
