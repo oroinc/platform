@@ -3,11 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
- * {@inheritdoc}
+ * Transforms form value between array of full email addresses and string of base64 encoded full email addresses.
  */
 class EmailAddressRecipientsTransformer implements DataTransformerInterface
 {
@@ -20,9 +19,7 @@ class EmailAddressRecipientsTransformer implements DataTransformerInterface
             return $value;
         }
 
-        $string = EmailRecipientsHelper::prepareFormRecipientIds($value);
-
-        return $string;
+        return EmailRecipientsHelper::prepareFormRecipientIds($value);
     }
 
     /**
@@ -34,8 +31,6 @@ class EmailAddressRecipientsTransformer implements DataTransformerInterface
             return $value;
         }
 
-        $array = EmailRecipientsHelper::extractFormRecipients($value);
-
-        return $array;
+        return EmailRecipientsHelper::extractFormRecipientIds($value);
     }
 }
