@@ -167,7 +167,13 @@
                 data: gridData
             }
         } %}
-
+        {%  set capabilityOptions = {
+            data: capabilitiesData,
+            categories: categories
+        } %}
+        <div data-page-component-module="orouser/js/components/capability-set-component"
+             data-page-component-options="{{ capabilityOptions|json_encode }}">
+        </div>
         <div data-page-component-module="orodatagrid/js/app/components/datagrid-component"
              data-page-component-name="{{ _gridOptions.gridName }}"
              data-page-component-options="{{ _gridOptions|json_encode }}"
