@@ -53,6 +53,7 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
                 ->setWorkflowName($definition->getName())
                 ->setEntity($entity)
                 ->setEntityId($entity->getId())
+                ->setEntityClass('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity')
                 ->setCurrentStep($definition->getSteps()->first());
             $manager->persist($workflowItem);
 

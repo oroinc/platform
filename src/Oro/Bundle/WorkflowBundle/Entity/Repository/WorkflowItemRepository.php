@@ -14,7 +14,39 @@ class WorkflowItemRepository extends EntityRepository
     const DELETE_BATCH_SIZE = 1000;
 
     /**
-     * Get workflow item associated with entity.
+     * Returns all available workflow items for given entity id & entity class
+     *
+     * @param $entityClass
+     * @param $entityIdentifier
+     * @return array|WorkflowItem[]
+     */
+    public function findAllByEntityMetadata($entityClass, $entityIdentifier)
+    {
+        return $this->findBy([
+            'entityId' => $entityIdentifier,
+            'entityClass' => $entityClass,
+        ]);
+    }
+
+    /**
+     * Returns named workflow item by given entity id & entity class
+     *
+     * @param $entityClass
+     * @param $entityIdentifier
+     * @param $workflowName
+     * @return array|WorkflowItem[]
+     */
+    public function findOneByEntityMetadata($entityClass, $entityIdentifier, $workflowName)
+    {
+        return $this->findOneBy([
+            'entityId' => $entityIdentifier,
+            'entityClass' => $entityClass,
+            'workflowName' => $workflowName,
+        ]);
+    }
+
+    /**
+     * Returns all found workflow items associated with entity.
      *
      * @param string $entityClass
      * @param int $entityIdentifier
