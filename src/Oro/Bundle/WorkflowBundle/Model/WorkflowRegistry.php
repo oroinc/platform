@@ -112,6 +112,28 @@ class WorkflowRegistry
     }
 
     /**
+     * Get Active Workflow that is applicable to entity class
+     *
+     * @param string $entityClass
+     * @return Workflow|null
+     */
+    public function getActiveWorkflowsByEntityClass($entityClass)
+    {
+        $data = [];
+
+        if ($this->configProvider->hasConfig($entityClass)) {
+            $entityConfig = $this->configProvider->getConfig($entityClass);
+            $activeWorkflowNames = $entityConfig->get('active_workflows', false, []);
+
+            foreach ($activeWorkflowNames as $name) {
+                $data[] = $this->getWorkflow($name, false);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Check is there an active workflow for entity class
      *
      * @param string $entityClass
@@ -120,6 +142,17 @@ class WorkflowRegistry
     public function hasActiveWorkflowByEntityClass($entityClass)
     {
         return $this->getActiveWorkflowByEntityClass($entityClass) !== null;
+    }
+
+    /**
+     * Check is there an active workflow for entity class
+     *
+     * @param string $entityClass
+     * @return bool
+     */
+    public function hasActiveWorkflowsByEntityClass($entityClass)
+    {
+        return count($this->getActiveWorkflowsByEntityClass($entityClass)) > 0;
     }
 
     /**

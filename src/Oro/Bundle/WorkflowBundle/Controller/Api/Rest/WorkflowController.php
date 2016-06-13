@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -50,24 +51,25 @@ class WorkflowController extends FOSRestController
      *
      * @param string $workflowName
      * @param string $transitionName
+     * @param Request $request
      * @return Response
      */
-    public function startAction($workflowName, $transitionName)
+    public function startAction($workflowName, $transitionName, Request $request)
     {
         try {
             /** @var WorkflowManager $workflowManager */
             $workflowManager = $this->get('oro_workflow.manager');
 
-            $entityId = $this->getRequest()->get('entityId', 0);
-            $data = $this->getRequest()->get('data');
-            $dataArray = array();
+            $entityId = $request->get('entityId', 0);
+            $data = $request->get('data');
+            $dataArray = [];
             if ($data) {
                 $serializer = $this->get('oro_workflow.serializer.data.serializer');
                 $serializer->setWorkflowName($workflowName);
                 /** @var WorkflowData $data */
                 $data = $serializer->deserialize(
                     $data,
-                    'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
+                    WorkflowData::class,
                     'json'
                 );
                 $dataArray = $data->getValues();
@@ -245,7 +247,7 @@ class WorkflowController extends FOSRestController
     {
         $workflowManager = $this->get('oro_workflow.manager');
 
-        $workflowManager->resetWorkflowData($workflowDefinition);
+//        $workflowManager->resetWorkflowData($workflowDefinition);
         $workflowManager->activateWorkflow($workflowDefinition);
 
         return $this->handleView(
@@ -266,19 +268,22 @@ class WorkflowController extends FOSRestController
      * - HTTP_OK (204)
      *
      * @Rest\Get(
-     *      "/api/rest/{version}/workflow/deactivate/{entityClass}",
+     *      "/api/rest/{version}/workflow/deactivate/{workflowDefinition}",
      *      requirements={"version"="latest|v1"},
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Deactivate workflow", resource=true)
      * @AclAncestor("oro_workflow")
      *
-     * @param string $entityClass
+     * @param WorkflowDefinition $workflowDefinition
      * @return Response
      */
-    public function deactivateAction($entityClass)
+    public function deactivateAction(WorkflowDefinition $workflowDefinition)
     {
-        $this->get('oro_workflow.manager')->deactivateWorkflow($entityClass);
+        $workflowManager = $this->get('oro_workflow.manager');
+
+        $workflowManager->resetWorkflowData($workflowDefinition);
+        $workflowManager->deactivateWorkflow($workflowDefinition);
 
         return $this->handleView(
             $this->view(
