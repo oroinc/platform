@@ -4,15 +4,18 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -48,6 +51,11 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $configManager;
 
+    /**
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $eventDispatcher;
+
     protected function setUp()
     {
         $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
@@ -66,21 +74,27 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
+        
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->workflowManager = new WorkflowManager(
             $this->registry,
             $this->workflowRegistry,
             $this->doctrineHelper,
-            $this->configManager
+            $this->configManager,
+            $this->eventDispatcher
         );
     }
 
     protected function tearDown()
     {
-        unset($this->registry);
-        unset($this->workflowRegistry);
-        unset($this->doctrineHelper);
-        unset($this->workflowManager);
+        unset(
+            $this->registry,
+            $this->workflowRegistry,
+            $this->doctrineHelper,
+            $this->workflowManager,
+            $this->eventDispatcher
+        );
     }
 
     public function testGetStartTransitions()
@@ -280,8 +294,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, null, null, null))
+            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $restrictionManager, null, null, null))
             ->setMethods(null)
             ->getMock();
         $workflow->setName($workflowName);
@@ -290,9 +308,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $stepManager->expects($this->any())->method('hasStartStep')
             ->will($this->returnValue($withStartStep));
 
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $activeWorkflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $stepManager, null, null))
-            ->setMethods(array('start'))
+            ->setConstructorArgs([new EntityConnector(), $aclManager, $restrictionManager, $stepManager, null, null])
+            ->setMethods(['start'])
             ->getMock();
         $activeWorkflow->setName($activeWorkflowName);
         $activeWorkflow->setDefinition($workflowDefinition);
@@ -376,8 +398,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, null, null, null))
+            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $restrictionManager, null, null, null))
             ->setMethods(null)
             ->getMock();
 
@@ -919,8 +945,14 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array($entityConnector, $aclManager, null, $attributeManager, $transitionManager))
+            ->setConstructorArgs(
+                [$entityConnector, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+            )
             ->setMethods(
                 array(
                     'isTransitionAvailable',
@@ -987,6 +1019,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         if ($workflowIdentifier instanceof WorkflowDefinition) {
             $workflowName = $workflowIdentifier->getName();
             $entityClass = $workflowIdentifier->getRelatedEntity();
+            $workflowDefinition = $workflowIdentifier;
         } else {
             $workflowName = $workflowIdentifier;
             $entityClass = '\DateTime';
@@ -997,7 +1030,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->setMethods(null)
                 ->getMock();
-            $workflow->setName($workflowName);
+            $workflowDefinition->setName($workflowName);
             $workflow->setDefinition($workflowDefinition);
             $this->workflowRegistry->expects($this->once())->method('getWorkflow')->with($workflowIdentifier)
                 ->will($this->returnValue($workflow));
@@ -1019,15 +1052,33 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())->method('persist')->with($entityConfig);
         $this->configManager->expects($this->once())->method('flush');
 
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->equalTo(WorkflowEvents::WORKFLOW_ACTIVATED),
+                $this->logicalAnd(
+                    $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent'),
+                    $this->attributeEqualTo('definition', $workflowDefinition)
+                )
+            );
+
         $this->workflowManager->activateWorkflow($workflowIdentifier);
     }
 
     public function testDeactivateWorkflow()
     {
         $entityClass = '\DateTime';
+        $workflowMock = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $entityConfig->expects($this->once())->method('set')->with('active_workflow', null);
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowByEntityClass')
+            ->with($entityClass)
+            ->willReturn($workflowMock);
 
         $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -1041,6 +1092,18 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($workflowConfigProvider));
         $this->configManager->expects($this->once())->method('persist')->with($entityConfig);
         $this->configManager->expects($this->once())->method('flush');
+
+        $definition = new WorkflowDefinition();
+        $workflowMock->expects($this->once())->method('getDefinition')->willReturn($definition);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->equalTo(WorkflowEvents::WORKFLOW_DEACTIVATED),
+                $this->logicalAnd(
+                    $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent'),
+                    $this->attributeEqualTo('definition', $definition)
+                )
+            );
 
         $this->workflowManager->deactivateWorkflow($entityClass);
     }
@@ -1080,7 +1143,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 ->setMethods(array('resetWorkflowData'))
                 ->getMock();
         $workflowItemsRepository->expects($this->once())->method('resetWorkflowData')
-            ->with($entityClass, array($name));
+            ->with($entityClass);
 
         $this->registry->expects($this->once())
             ->method('getRepository')

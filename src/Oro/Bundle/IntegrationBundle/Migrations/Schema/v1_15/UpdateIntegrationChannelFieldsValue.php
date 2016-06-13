@@ -93,7 +93,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
     {
         $updateSql = '';
         $baseUpdateColumnTypeSql = 'ALTER TABLE oro_integration_channel ALTER COLUMN %s TYPE JSON USING %s::JSON;';
-        $baseUpdateColumnCommentSql = 'COMMENT ON COLUMN oro_integration_channel.%s IS \'(DC2Type:config_type)\';';
+        $baseUpdateColumnCommentSql = 'COMMENT ON COLUMN oro_integration_channel.%s IS \'(DC2Type:config_object)\';';
 
         foreach ($this->fields as $fieldName) {
             $updateSql .= sprintf($baseUpdateColumnTypeSql, $fieldName, $fieldName);
