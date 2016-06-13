@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -123,7 +125,7 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
     }
 
     /**
-     * @return \Doctrine\Common\Persistence\ObjectManager
+     * @return ObjectManager
      */
     protected function getObjectManager()
     {
@@ -154,7 +156,7 @@ class ProcessTriggerCronScheduler implements LoggerAwareInterface
     }
 
     /**
-     * @return \Doctrine\Common\Persistence\ObjectRepository
+     * @return ObjectRepository
      */
     protected function getRepository()
     {

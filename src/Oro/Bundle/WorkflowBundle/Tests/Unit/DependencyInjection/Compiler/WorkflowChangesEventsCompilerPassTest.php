@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass;
 
 class WorkflowChangesEventsCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Symfony\Component\DependencyInjection\ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $containerBuilderMock;
 
     /** @var WorkflowChangesEventsCompilerPass */

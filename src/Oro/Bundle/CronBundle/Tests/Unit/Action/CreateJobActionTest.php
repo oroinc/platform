@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Action;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use JMS\JobQueueBundle\Entity\Job;
@@ -23,7 +24,7 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
     /** @var JobManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $jobManager;
 
-    /** @var \Doctrine\Common\Persistence\ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $managerRegistry;
 
     /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
