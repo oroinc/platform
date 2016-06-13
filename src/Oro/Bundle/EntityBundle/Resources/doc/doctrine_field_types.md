@@ -33,3 +33,16 @@ You can use this field type like:
 This two data types are available in extend fields. You can create new fields with this types. Additionally in view pages, in grids and in edit pages this fields will be automatically formatted with currency or percent formatters.
 
 In grid, for percent data type will be automatically generated percent filter.
+
+**config_object** type that maps and converts `Oro\Component\Config\Common\ConfigObject` based on PHP’s JSON encoding functions. Values retrieved from the database are always converted to `Oro\Component\Config\Common\ConfigObject` or null if no data is present.
+
+You can use this field type like:
+
+```php
+    /**
+     * @var \Oro\Component\Config\Common\ConfigObject
+     *
+     * @ORM\Column(name="map_config", type="config_object")
+     */
+    protected $mapConfigField;
+```
