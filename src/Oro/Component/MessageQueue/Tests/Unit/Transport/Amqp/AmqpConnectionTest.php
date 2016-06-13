@@ -66,5 +66,4 @@ class AmqpConnectionTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMock(AMQPChannel::class, [], [], '', false);
     }
-
 }

@@ -16,5 +16,3 @@ class InvalidDestinationException extends Exception
         }
     }
 }
-
-

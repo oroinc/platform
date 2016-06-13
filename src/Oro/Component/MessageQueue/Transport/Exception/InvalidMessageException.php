@@ -16,5 +16,3 @@ class InvalidMessageException extends Exception
         }
     }
 }
-
-

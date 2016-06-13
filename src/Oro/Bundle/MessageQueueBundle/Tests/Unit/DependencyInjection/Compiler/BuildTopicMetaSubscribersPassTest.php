@@ -275,4 +275,3 @@ class BuildTopicMetaSubscribersPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
     }
 }
-
