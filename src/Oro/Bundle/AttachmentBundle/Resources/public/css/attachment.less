@@ -37,22 +37,32 @@
   div.uploader {
     border: none;
     float: none;
-  }
-
-  div.uploader span.action {
-    border: none;
-    background: none;
-    color: #006acc;
-    cursor: pointer;
-  }
-  div.uploader.active  span.action {
-    background: none;
-  }
-  div.uploader span.filename {
-    width: 85px;
+    input {
+      cursor: pointer;
+      width: 345px;
+    }
+    span.action {
+      border: none;
+      background: none;
+      color: #08c;
+      cursor: pointer;
+    }
+    .active  span.action {
+      background: none;
+    }
+    span.filename {
+      width: 85px;
+    }
+    .focus {
+      border: none;
+      box-shadow: none;
+    }
   }
   div.uploader.focus {
     border: none;
     box-shadow: none;
+    span.action {
+      color: #006acc;
+    }
   }
 }
