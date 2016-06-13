@@ -193,7 +193,6 @@ class ImportExportController extends Controller
      * @Template
      *
      * @param Request $request
-     *
      * @return array|Response
      */
     public function templateExportConfigAction(Request $request)
