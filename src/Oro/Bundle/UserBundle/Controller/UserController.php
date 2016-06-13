@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -11,10 +12,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
-
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -50,13 +49,7 @@ class UserController extends Controller
      */
     public function updateProfileAction()
     {
-        $entity = $this->getUser();
-        return $this->update(
-            $entity,
-            'oro_user_profile_update',
-            array('route' => 'oro_user_profile_view'),
-            'oro_user_profile_view'
-        );
+        return $this->update($this->getUser());
     }
 
     /**
@@ -137,13 +130,11 @@ class UserController extends Controller
     }
 
     /**
-     * @param User   $entity
-     * @param string $updateRoute
-     * @param array  $viewRoute
-     * @param string $cancelRoute
-     * @return mixed
+     * @param User  $entity
+     *
+     * @return RedirectResponse|array
      */
-    protected function update(User $entity, $updateRoute = '', $viewRoute = array(), $cancelRoute = 'oro_user_index')
+    protected function update(User $entity)
     {
         if ($this->get('oro_user.form.handler.user')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
@@ -151,33 +142,16 @@ class UserController extends Controller
                 $this->get('translator')->trans('oro.user.controller.user.message.saved')
             );
 
-            if (count($viewRoute)) {
-                $closeButtonRoute = $viewRoute;
-            } else {
-                $closeButtonRoute = array(
-                    'route' => 'oro_user_view',
-                    'parameters' => array('id' => $entity->getId())
-                );
-            }
-            return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_user_update', 'parameters' => ['id' => $entity->getId()]],
-                $closeButtonRoute,
-                $entity
-            );
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
-        return array(
-            'entity'        => $entity,
-            'form'          => $this->get('oro_user.form.user')->createView(),
-            'editRoute'     => $updateRoute,
-            'cancelRoute'   => $cancelRoute,
+        return [
+            'entity'       => $entity,
+            'form'         => $this->get('oro_user.form.user')->createView(),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete an owner and related entities or reassign related entities to another owner before
-            'allow_delete' =>
-                $this->getUser()->getId() !== $entity->getId() &&
-                $entity->getId() &&
-                !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
-        );
+            'allow_delete' => $this->isUserDeleteAllowed($entity)
+        ];
     }
 
     /**
@@ -187,17 +161,11 @@ class UserController extends Controller
      */
     protected function view(User $entity, $editRoute = '')
     {
-        $output = array(
-            'entity' => $entity,
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete an owner and related entities or reassign related entities to another owner before
-            'allow_delete' =>
-                $this->getUser()->getId() !== $entity->getId() &&
-                !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
-        );
-
+        // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+        // completely delete an owner and related entities or reassign related entities to another owner before
+        $output = ['entity' => $entity, 'allow_delete' => $this->isUserDeleteAllowed($entity)];
         if ($editRoute) {
-            $output = array_merge($output, array('editRoute' => $editRoute));
+            $output['editRoute'] = $editRoute;
         }
         return $output;
     }
@@ -250,5 +218,19 @@ class UserController extends Controller
         /** @var UsernamePasswordOrganizationToken $token */
         $token = $this->get('security.context')->getToken();
         return $token->getOrganizationContext();
+    }
+
+    /**
+     * @param User $entity
+     *
+     * @return bool
+     */
+    protected function isUserDeleteAllowed(User $entity)
+    {
+        $isDeleteAllowed = $entity->getId()
+            && $this->getUser()->getId() !== $entity->getId()
+            && !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity);
+
+        return $isDeleteAllowed;
     }
 }
