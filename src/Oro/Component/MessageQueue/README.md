@@ -83,7 +83,11 @@ use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 $connection = AmqpConnection::createFromConfig($config = []);
 
 $queueConsumer = new QueueConsumer($connection, new Extensions([]));
-$queueConsumer->consume('aQueue', new FooMessageProcessor());
+$queueConsumer->bind('aQueue', new FooMessageProcessor());
 
-$connection->close();
+try {
+    $queueConsumer->consume();
+} finally {
+    $queueConsumer->getConnection()->close();
+}
 ```
