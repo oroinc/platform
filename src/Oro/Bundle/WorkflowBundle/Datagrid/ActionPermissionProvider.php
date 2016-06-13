@@ -30,7 +30,7 @@ class ActionPermissionProvider
         $relatedEntity = $record->getValue('entityClass');
         if ($this->configProvider->hasConfig($relatedEntity)) {
             $config = $this->configProvider->getConfig($relatedEntity);
-            $isActiveWorkflow = $record->getValue('name') == $config->get('active_workflow');
+            $isActiveWorkflow = in_array($record->getValue('name'), $config->get('active_workflows', false, []), true);
         }
 
         $isSystem = $record->getValue('system');

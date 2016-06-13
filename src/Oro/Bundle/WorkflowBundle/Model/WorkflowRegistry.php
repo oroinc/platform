@@ -101,7 +101,7 @@ class WorkflowRegistry
     {
         if ($this->configProvider->hasConfig($entityClass)) {
             $entityConfig = $this->configProvider->getConfig($entityClass);
-            $activeWorkflowName = $entityConfig->get('active_workflow');
+            $activeWorkflowName = $entityConfig->get('active_workflows');
 
             if ($activeWorkflowName) {
                 return $this->getWorkflow($activeWorkflowName, false);

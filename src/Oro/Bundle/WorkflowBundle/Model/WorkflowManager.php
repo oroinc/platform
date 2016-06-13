@@ -388,16 +388,7 @@ class WorkflowManager
 
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
-        return $this->getWorkflowItemRepository()
-            ->createQueryBuilder('wi')
-            ->where(
-                'wi.entityClass = :entityClass',
-                'wi.entityId = :entityId'
-            )
-            ->setParameter('entityClass', $entityClass)
-            ->setParameter('entityId', (int)$entityIdentifier)
-            ->getQuery()
-            ->getResult();
+        return $this->getWorkflowItemRepository()->findAllByEntityMetadata($entityClass, $entityIdentifier);
     }
 
     /**
@@ -453,7 +444,7 @@ class WorkflowManager
         $definition = $workflowIdentifier instanceof WorkflowDefinition
             ? $workflowIdentifier
             : $this->getWorkflow($workflowIdentifier)->getDefinition();
-        $this->setActiveWorkflow($definition->getRelatedEntity(), null);
+        $this->setActiveWorkflow($definition->getRelatedEntity(), $definition->getName());
 
         if ($definition) {
             $this->eventDispatcher->dispatch(
@@ -481,11 +472,12 @@ class WorkflowManager
     protected function setActiveWorkflow($entityClass, $workflowName)
     {
         $entityConfig = $this->getEntityConfig($entityClass);
-        $entityConfig->set('active_workflow', $workflowName);
+        
         $entityConfig->set(
             'active_workflows',
             array_merge($entityConfig->get('active_workflows', false, []), [$workflowName])
         );
+        
         $this->persistEntityConfig($entityConfig);
     }
 
@@ -496,7 +488,6 @@ class WorkflowManager
     protected function setInactiveWorkflow($entityClass, $workflowName)
     {
         $entityConfig = $this->getEntityConfig($entityClass);
-        $entityConfig->set('active_workflow', null);
         $entityConfig->set(
             'active_workflows',
             array_diff($entityConfig->get('active_workflows', false, []), [$workflowName])
