@@ -26,8 +26,7 @@ formatting.
 LocalizedFallbackValue entity contains following fields:
 * `fallback` (string) - fallback type
 * `string` (string) - translation for short string
-* `text` (string) - translation for long string
-* `formattingCode` (string) - formatting code
+* `text` (string) - translation for long string (using if `string` is empty)
 * `localization` (Localization) - localization
 
 For retrieve translated value for the needed localization can be used
