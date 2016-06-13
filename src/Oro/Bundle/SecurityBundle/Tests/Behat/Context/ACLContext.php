@@ -87,14 +87,6 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
-    /**
-     * @Then only my records should be deleted
-     */
-    public function onlyMyRecordsShouldBeDeleted()
-    {
-        throw new PendingException();
-    }
-
     protected function loginAsAdmin()
     {
         $this->visitPath('/user/login');
