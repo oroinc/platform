@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationship;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 
 /**
@@ -20,5 +21,6 @@ class InitializeConfigExtras implements ProcessorInterface
         /** @var SubresourceContext $context */
 
         $context->addConfigExtra(new EntityDefinitionConfigExtra($context->getAction()));
+        $context->addConfigExtra(new FilterFieldsConfigExtra([$context->getClassName() => ['id']]));
     }
 }
