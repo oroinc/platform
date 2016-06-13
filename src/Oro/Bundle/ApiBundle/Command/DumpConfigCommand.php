@@ -89,7 +89,6 @@ class DumpConfigCommand extends AbstractDebugCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $requestType = $this->getRequestType($input);
-        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $requestType);
         // @todo: API version is not supported for now
         //$version = $input->getArgument('version');
         $version = Version::LATEST;
@@ -98,6 +97,8 @@ class DumpConfigCommand extends AbstractDebugCommand
         /** @var ProcessorBag $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
         $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
+
+        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $requestType);
 
         switch ($input->getOption('section')) {
             case 'entities':
