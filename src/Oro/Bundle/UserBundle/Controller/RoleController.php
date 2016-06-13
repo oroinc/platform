@@ -114,7 +114,28 @@ class RoleController extends Controller
                 $entity
             );
         }
-
+        $categories = [
+            'account_management' => [
+                'label' => 'Account Management',
+                'tab' => true
+            ],
+            'marketing' => [
+                'label' => 'Marketing',
+                'tab' => true
+            ],
+            'sales_data' => [
+                'label' => 'Sales Data',
+                'tab' => true
+            ],
+            'address' => [
+                'label' => 'Address',
+                'tab' => false
+            ],
+            'calendar' => [
+                'label' => 'Calendar',
+                'tab' => false
+            ]
+        ];
         // @todo: redevelop it as grid
         $form = $aclRoleHandler->createView();
         $translator = $this->get('translator');
@@ -160,11 +181,32 @@ class RoleController extends Controller
 
             $gridData[] = $item;
         }
+        $capabilitiesData = [];
+        foreach ($form->children['action']->children as $action_id => $child) {
+            $permissions = reset($child->children['permissions']->children)->vars['value'];
+            $capabilitiesData[] = [
+                'id' => $action_id,
+                'identityId' => $child->children['identity']->children['id']->vars['value'],
+                'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
+                'permissionName' => $permissions->getName(),
+                'accessLevel' => $permissions->getAccessLevel()
+            ];
+        }
+
+        foreach($gridData as $index => &$gridDataItem) {
+            $gridDataItem['group'] = ['account_management', 'marketing', 'sales_data', null][$index % 4];
+        }
+        foreach($capabilitiesData as $index => &$capabilitiesDataItem) {
+            $capabilitiesDataItem['group'] =
+                ['account_management', 'marketing', 'sales_data', 'address', 'calendar'][$index % 5];
+        }
 
         return array(
             'entity' => $entity,
             'form' => $form,
+            'categories' => $categories,
             'gridData' => $gridData,
+            'capabilitiesData' => $capabilitiesData,
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete a role and un-assign it from all users or reassign users to another role before
