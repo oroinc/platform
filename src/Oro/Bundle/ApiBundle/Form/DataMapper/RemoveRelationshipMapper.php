@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Form\DataMapper;
 
+use Doctrine\Common\Collections\Collection;
+
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -33,6 +35,7 @@ class RemoveRelationshipMapper extends AbstractRelationshipMapper
                 $data->{$methods[1]}($value);
             }
         } else {
+            /** @var Collection $dataValue */
             $dataValue = $this->propertyAccessor->getValue($data, $propertyPath);
             $formData = $formField->getData();
             foreach ($formData as $value) {

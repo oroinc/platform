@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Form\DataMapper;
 
+use Doctrine\Common\Collections\Collection;
+
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -33,10 +35,13 @@ class AppendRelationshipMapper extends AbstractRelationshipMapper
                 $data->{$methods[0]}($value);
             }
         } else {
+            /** @var Collection $dataValue */
             $dataValue = $this->propertyAccessor->getValue($data, $propertyPath);
             $formData = $formField->getData();
             foreach ($formData as $value) {
-                $dataValue->add($value);
+                if (!$dataValue->contains($value)) {
+                    $dataValue->add($value);
+                }
             }
         }
     }

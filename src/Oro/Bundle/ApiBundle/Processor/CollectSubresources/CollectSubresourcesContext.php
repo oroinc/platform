@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
 class CollectSubresourcesContext extends ApiContext
 {
     /** @var ApiResource[] [entity class => ApiResource, ... ] */
-    protected $resources;
+    protected $resources = [];
 
     public function __construct()
     {
