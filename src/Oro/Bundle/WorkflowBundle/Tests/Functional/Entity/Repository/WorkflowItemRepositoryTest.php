@@ -26,17 +26,19 @@ class WorkflowItemRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities'));
+        $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities']);
 
         $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroWorkflowBundle:WorkflowItem');
     }
 
     public function testFindAllByEntityMetadata()
     {
-
         $entityIds = $this->getEntityIdsByWorkflow();
         $entityId = reset($entityIds[LoadWorkflowDefinitions::NO_START_STEP]);
-        $this->assertInternalType('array', $this->repository->findAllByEntityMetadata(self::WORKFLOW_AWARE_ENTITY_CLASS, $entityId));
+        $this->assertInternalType(
+            'array',
+            $this->repository->findAllByEntityMetadata(self::WORKFLOW_AWARE_ENTITY_CLASS, $entityId)
+        );
     }
 
     public function testFindOneByEntityMetadata()
@@ -44,11 +46,19 @@ class WorkflowItemRepositoryTest extends WebTestCase
         $entityIds = $this->getEntityIdsByWorkflow();
         $entityId = reset($entityIds[LoadWorkflowDefinitions::NO_START_STEP]);
 
-        $this->assertNull($this->repository->findOneByEntityMetadata(self::WORKFLOW_AWARE_ENTITY_CLASS, $entityId, 'SOME_NON_EXISTING_WORKFLOW'));
+        $this->assertNull($this->repository->findOneByEntityMetadata(
+                self::WORKFLOW_AWARE_ENTITY_CLASS, $entityId,
+                'SOME_NON_EXISTING_WORKFLOW'
+            )
+        );
 
         $this->assertInstanceOf(
             'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
-            $this->repository->findOneByEntityMetadata(self::WORKFLOW_AWARE_ENTITY_CLASS, $entityId, LoadWorkflowDefinitions::NO_START_STEP)
+            $this->repository->findOneByEntityMetadata(
+                self::WORKFLOW_AWARE_ENTITY_CLASS,
+                $entityId,
+                LoadWorkflowDefinitions::NO_START_STEP
+            )
         );
     }
 
@@ -111,7 +121,6 @@ class WorkflowItemRepositoryTest extends WebTestCase
         $this->assertEntitiesHaveNoWorkflowData($emptyEntityIds['none']);
     }
 
-
     /**
      * @param array $entityIds
      */
@@ -149,7 +158,8 @@ class WorkflowItemRepositoryTest extends WebTestCase
         array $noneEntityIds = null,
         array $noStartStepEntityIds = null,
         array $withStartStepEntityIds = null
-    ) {
+    )
+    {
         if ($noneEntitiesCount > 0) {
             $actualAllEntities = $allEntityIds['none'];
             $this->assertCount($noneEntitiesCount, $actualAllEntities);
@@ -207,5 +217,4 @@ class WorkflowItemRepositoryTest extends WebTestCase
 
         return $ids;
     }
-
 }
