@@ -97,7 +97,7 @@ define(function(require) {
                 }, this)
             };
 
-            this.$startStepEl.select2(select2Options);
+            this.$startStepEl.inputWidget('create', 'select2', {initializeOptions: select2Options});
         },
 
         initEntityFieldsLoader: function() {
@@ -110,7 +110,7 @@ define(function(require) {
                 this.model.set('entity', this.$entitySelectEl.val());
             }, this));
             confirm.on('cancel', _.bind(function() {
-                this.$entitySelectEl.select2('val', this.model.get('entity'));
+                this.$entitySelectEl.inputWidget('val', this.model.get('entity'));
             }, this));
 
             this.$entitySelectEl.fieldsLoader({
@@ -168,7 +168,7 @@ define(function(require) {
         onStepRemove: function(step) {
             //Deselect start_step if it was removed
             if (this.$startStepEl.val() === step.get('name')) {
-                this.$startStepEl.select2('val', '');
+                this.$startStepEl.inputWidget('val', '');
             }
         },
 
