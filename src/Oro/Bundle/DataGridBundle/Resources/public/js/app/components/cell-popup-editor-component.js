@@ -443,10 +443,10 @@ define(function(require) {
             if (!this.options.cell.disposed && this.options.cell.$el) {
                 if (response) {
                     var routeParametersRenameMap = _.invert(this.options.cell.column.get('metadata').inline_editing.
-                        save_api_accessor.routeParametersRenameMap);
+                        save_api_accessor.route_parameters_rename_map);
                     _.each(response, function(item, i) {
                         var propName = routeParametersRenameMap.hasOwnProperty(i) ? routeParametersRenameMap[i] : i;
-                        if (this.options.cell.model.has(propName)) {
+                        if (this.options.cell.model.get(propName) !== void 0) {
                             this.options.cell.model.set(propName, item);
                         }
                     }, this);

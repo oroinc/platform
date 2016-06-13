@@ -737,6 +737,7 @@ services:
             - '@oro_email.email.owner.provider'
             - '@doctrine'
             - '@oro_email.email.address.helper'
+            - '@oro_search.index'
 
     oro_email.link.formatter.name:
         tags:

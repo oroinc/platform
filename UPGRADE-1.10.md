@@ -8,21 +8,21 @@ UPGRADE FROM 1.9 to 1.10
 - Oro\Bundle\TestFrameworkBundle\Test\Client::startTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
 - Oro\Bundle\TestFrameworkBundle\Test\Client::rollbackTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
 
-####EntityBundle:
+####EntityBundle
 - The implementation of `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` was changed. Now the loaded entity aliases is saved into a cache that gives significant performance gain. Also, from now, you can implement `Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface` to create aliases for any entities not only for ORM entities.
 
-####EntityConfigBundle:
+####EntityConfigBundle
 - Entity config class metadata now allows any `route*` options, that can be used for CRUD routes configuration - as well as already existing `routeName`, `routeView` and `routeCreate` options.
 
-####DashboardBundle:
+####DashboardBundle
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
 - Added new class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter`.
 
-####DataGridBundle:
+####DataGridBundle
 - Events `Oro\Bundle\DataGridBundle\Event\OrmResultBefore` second constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
 - Event `Oro\Bundle\DataGridBundle\Event\OrmResultAfter` third constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
 
-####EntityBundle:
+####EntityBundle
 - The constructor of the `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` class was changed. Before: `__construct(ManagerRegistry $doctrine, $debug)`. After: `__construct(DoctrineHelper $doctrineHelper, ManagerBagInterface $managerBag, $debug)`.
 - The constructor of the `Oro\Bundle\EntityBundle\Provider\AllEntityHierarchyProvider` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, EntityManagerBag $entityManagerBag)`. After: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, ManagerBagInterface $managerBag)`.
 - Method `getAllShortMetadata` was added to `Oro\Bundle\EntityBundle\ORM\DoctrineHelper`. Using of this method instead of the `getAllMetadata` method can give significant performance gain.
@@ -116,12 +116,54 @@ UPGRADE FROM 1.9 to 1.10
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::mergeConfig` deprecated since 1.9. Will be removed after 1.11.
 - `Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener` is no longer requires `Oro\Bundle\SearchBundle\Engine\FulltextIndexManager` as an first argument
 
-####FormBundle:
+####FormBundle
 - 'Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension' was renamed to 'Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension'
 - 'oro_form.extension.random_id' service was renamed to 'oro_form.extension.additional_attr'
 - Form field identifier - 'data-name' attribute generation added to 'AdditionalAttrExtension'
+- Method `Oro\Bundle\FormBundle\Model\UpdateHandler::handleUpdate` marked as deprecated. Use `Oro\Bundle\FormBundle\Model\UpdateHandler::update` instead.
+- In previous version client of methods `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` and `Oro\Bundle\FormBundle\Model\UpdateHandler::handleUpdate`
+was responsible to pass redirect data in arguments, for example:
+```
+    return $this->get('oro_ui.router')->redirectAfterSave(
+        ['route' => 'oro_calendar_event_update', 'parameters' => ['id' => $entity->getId()]],
+        ['route' => 'oro_calendar_event_view', 'parameters' => ['id' => $entity->getId()]]
+    );
+```
+```
+    return $this->get('oro_form.model.update_handler')->handleUpdate(
+        $trackingWebsite,
+        $this->createForm($this->getFormType(), $trackingWebsite),
+        function (TrackingWebsite $entity) {
+            return [
+                'route' => 'oro_tracking_website_update',
+                'parameters' => ['id' => $entity->getId()]
+            ];
+        },
+        function (TrackingWebsite $entity) {
+            return [
+                'route' => 'oro_tracking_website_view',
+                'parameters' => ['id' => $entity->getId()]
+            ];
+        },
+        $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
+    );
+```
+These routes were used to make redirect when user clicked on one of 2 buttons on UI rendered using 2 Twig macroses: saveAndCloseButton and saveAndStayButton.
+Now controller's action is not responsible to configure redirect data at all. 
+```
+    return $this->get('oro_ui.router')->redirect($entity);
+```
+```
+    return $this->get('oro_form.model.update_handler')->update(
+        $trackingWebsite,
+        $this->createForm($this->getFormType(), $trackingWebsite),
+        $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
+    );
+```
+Redirect data is now configured directly in the button rendered in Twig template using macroses: saveAndCloseButton, saveAndStayButton, saveAndNewButton and saveActionButton.
+See other related information in section `OroUIBundle` of this document.
 
-####TranslationBundle:
+####TranslationBundle
 - Added translation strategies to dynamically handle translation fallbacks
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
 
@@ -135,7 +177,7 @@ UPGRADE FROM 1.9 to 1.10
 - The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
 - The class Oro\Component\ConfigExpression\Condition\True was renamed to TrueCondition
 
-####UiBundle
+####UIBundle
 - Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) plugin by Sachin N.
 
 Gallery view for a group of `<a>` elements can be triggered by adding 'data-gallery' attribute with unique gallery id.
@@ -144,6 +186,37 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 <a href="sample1.jpg" data-gallery="unique-id"></a>
 <a href="sample2.jpg" data-gallery="unique-id"></a>
 ```
+
+- Method `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` marked as deprecated. Use method `Oro\Bundle\UIBundle\Route\Router::redirect` instead.
+- Use of Twig macroses `saveAndCloseButton` and `saveAndStayButton` was changed. In old version client was responsible to pass just a label of button.
+In this new version client responsible to specify route and parameters which will be used to make redirect if form will successfully saved.
+Before:
+```
+    {% set html = UI.saveAndCloseButton() %}
+    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+```
+Now:
+```
+    {% if resource_granted('oro_user_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_user_create'
+        }) %}
+    {% endif %}
+    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_user_update',
+            'params': {'id': '$id'}
+        }) %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+```
+- New macros `saveAndNewButton` was added and used on most of pages with forms. By clicking on this button user redirects to page with form where a new record could be created.
+
 
 ####EmailBundle
 - Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
