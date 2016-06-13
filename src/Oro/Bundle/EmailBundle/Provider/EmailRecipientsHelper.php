@@ -349,17 +349,25 @@ class EmailRecipientsHelper
         return $this->propertyAccessor;
     }
 
+    /**
+     * @param  array|string $ids
+     * @return string;
+     */
     public static function prepareFormRecipientIds($ids)
     {
-        if (!is_array($ids) && is_string($ids)) {
+        if (is_string($ids)) {
             return base64_encode($ids);
         }
 
-        $array = array_map("base64_encode", $ids);
+        $ids = array_map("base64_encode", $ids);
 
-        return implode(self::EMAIL_IDS_SEPARATOR, $array);
+        return implode(self::EMAIL_IDS_SEPARATOR, $ids);
     }
 
+    /**
+     * @param  array|string $value
+     * @return array;
+     */
     public static function extractFormRecipients($value)
     {
         if (is_array($value)) {
@@ -368,7 +376,7 @@ class EmailRecipientsHelper
 
         $array = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
         $array = array_map(function ($arrayPart) {
-                $arrayPart = base64_decode($arrayPart, true) ? base64_decode($arrayPart, true) : $arrayPart;
+                $arrayPart = base64_decode($arrayPart, true) ? : $arrayPart;
                 return $arrayPart;
             },
             $array);
