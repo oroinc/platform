@@ -3,11 +3,13 @@
 {% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
 {% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
 {% set hasExportPopupConfig = exportPopupConfig is defined %}
+{% set hasExportTemplatePopupConfig = exportTemplatePopupConfig is defined %}
 {% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
 {% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
 {% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
 {% set importLabel = importLabel|default('oro.importexport.import.label'|trans) %}
 {% set exportLabel = exportPopupConfig.exportLabel|default('oro.importexport.export.label'|trans) %}
+{% set exportTemplateLabel = hasExportTemplatePopupConfig.label|default('oro.importexport.export_template.label'|trans) %}
 
 {% if exportAllowed or importAllowed %}
     {% if options is not defined %}
@@ -49,10 +51,11 @@
                     <i class="icon-download-alt hide-text">{{ importLabel }}</i>{{ importLabel }}
                 </a>
                 {% if hasExportTemplateProcessor %}
+                    {% set exportTemplateRoute = hasExportTemplatePopupConfig ? 'oro_importexport_export_template_config' : 'oro_importexport_export_template' %}
                     <a type="button"
-                       class="btn icons-holder-text no-hash"
-                       target="_blank"
-                       href="{{ path('oro_importexport_export_template', defaultRouteParams|merge({'processorAlias': exportTemplateProcessor})) }}">
+                       class="btn template-btn icons-holder-text no-hash"
+                       {% if not hasExportTemplatePopupConfig %}target="_blank" {% endif %}
+                       href="{{ path(exportTemplateRoute, defaultRouteParams|merge({'processorAlias': exportTemplateProcessor, 'entity': entity_class})) }}">
                         <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
                     </a>
                 {% endif %}
@@ -103,6 +106,26 @@
                 });
                 {% endif %}
             });
+            {% endif %}
+
+            {% if hasExportTemplateProcessor and hasExportTemplatePopupConfig %}
+                $('.template-btn').on('click', function(e) {
+                    e.preventDefault();
+
+                    var widget = new DialogWidget({
+                        'url': this.href,
+                        'title': {{ exportTemplateLabel|default(exportLabel)|json_encode|raw }},
+                        'stateEnabled': false,
+                        'incrementalPosition': false,
+                        'dialogOptions': {
+                            'width': 650,
+                            'autoResize': true,
+                            'modal': true,
+                            'minHeight': 100
+                        }
+                    });
+                    widget.render();
+                });
             {% endif %}
 
             {% if hasExportProcessor %}

@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportTemplateData;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
@@ -176,6 +177,44 @@ class ImportExportController extends Controller
                     'OroImportExportBundle:ImportExport:instantExport',
                     ['processorAlias' => $data->getProcessorAlias()]
                 );
+            }
+        }
+
+        return [
+            'entityName' => $entityName,
+            'form' => $exportForm->createView(),
+            'options' => $this->getOptionsFromRequest()
+        ];
+    }
+
+    /**
+     * @Route("/export/template/config", name="oro_importexport_export_template_config")
+     * @AclAncestor("oro_importexport_export")
+     * @Template
+     *
+     * @param Request $request
+     *
+     * @return array|Response
+     */
+    public function templateExportConfigAction(Request $request)
+    {
+        $entityName = $request->get('entity');
+
+        $exportForm = $this->createForm('oro_importexport_export_template', null, ['entityName' => $entityName]);
+
+        if ($request->isMethod('POST')) {
+            $exportForm->submit($request);
+
+            if ($exportForm->isValid()) {
+                /** @var ExportTemplateData $data */
+                $data = $exportForm->getData();
+
+                $exportTemplateResponse = $this->forward(
+                    'OroImportExportBundle:ImportExport:templateExport',
+                    ['processorAlias' => $data->getProcessorAlias()]
+                );
+
+                return new JsonResponse(['url' => $exportTemplateResponse->getTargetUrl()]);
             }
         }
 

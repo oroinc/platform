@@ -7,6 +7,9 @@ oro:
         export:
             label: Export
 
+        export_template:
+            label: Export template
+
         entity_config:
             block_title:    "Import & Export"
             excluded.label: "Exclude Column"
