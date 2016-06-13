@@ -17,35 +17,33 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
  * {@inheritdoc}
- *
- * @author Bilal Amarni <bilal.amarni@gmail.com>
  */
 class EmailAddressRecipientsTransformer implements DataTransformerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function transform($array)
+    public function transform($value)
     {
-        if (!is_array($array)) {
-            return $array;
+        if (!is_array($value)) {
+            return $value;
         }
 
-        $array = EmailRecipientsHelper::prepareFormRecipientIds($array);
+        $string = EmailRecipientsHelper::prepareFormRecipientIds($value);
 
-        return $array;
+        return $string;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($string)
+    public function reverseTransform($value)
     {
-        if (is_array($string)) {
-            return $string;
+        if (is_array($value)) {
+            return $value;
         }
 
-        $array = EmailRecipientsHelper::extractFormRecipients($string);
+        $array = EmailRecipientsHelper::extractFormRecipients($value);
 
         return $array;
     }
