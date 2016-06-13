@@ -24,7 +24,7 @@ Stores translates of needed data for different localizations. Can be used for di
 formatting.
 
 LocalizedFallbackValue entity contains following fields:
-* `fallback` (string) - fallback string
+* `fallback` (string) - fallback type
 * `string` (string) - translation for short string
 * `text` (string) - translation for long string
 * `formattingCode` (string) - formatting code
