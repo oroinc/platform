@@ -835,7 +835,6 @@ services:
             - '@oro_activity.manager'
             - '@oro_search.index'
             - '@oro_entity.entity_name_resolver'
-            - '@oro_entity_config.config_manager'
 
     oro_email.manager.email_activity_suggestion.api:
         class: %oro_email.manager.email_activity_suggestion.api.class%
@@ -1052,10 +1051,3 @@ services:
             - '@oro_email.email.activity.manager'
             - '@oro_email.provider.emailowners.provider'
             - '@oro_email.email.manager'
-
-    oro_email.listener.activity.filter_target_classes:
-        class: Oro\Bundle\EmailBundle\EventListener\Activity\FilterTargetClasssesListener
-        arguments:
-            - '@oro_entity_config.config_manager'
-        tags:
-            - { name: kernel.event_listener, event: oro_activity.filter_target_classes, method: onFilterTargetClasses }

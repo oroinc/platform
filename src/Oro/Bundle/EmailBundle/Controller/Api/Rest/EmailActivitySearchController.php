@@ -58,12 +58,6 @@ class EmailActivitySearchController extends RestGetController
      *      nullable=true,
      *      description="An email address. One or several addresses separated by comma."
      * )
-     * @QueryParam(
-     *      name="skip_custom_entity",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Option to hide custom entities in the results. Available values  0 and 1. Defaults to 0."
-     * )
      *
      * @ApiDoc(
      *      description="Searches entities associated with the email activity.",
@@ -78,8 +72,7 @@ class EmailActivitySearchController extends RestGetController
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
         $filters = [
-            'search' => $this->getRequest()->get('search'),
-            'skip_custom_entity' => $this->getRequest()->get('skip_custom_entity')
+            'search' => $this->getRequest()->get('search')
         ];
 
         $from = $this->getRequest()->get('from', null);

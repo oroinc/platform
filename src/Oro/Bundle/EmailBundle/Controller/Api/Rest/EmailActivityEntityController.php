@@ -38,12 +38,6 @@ class EmailActivityEntityController extends RestGetController
      *      nullable=true,
      *      description="Number of items per page. Defaults to 10."
      * )
-     * @QueryParam(
-     *      name="skip_custom_entity",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Option to hide custom entities in the results. Available values  0 and 1. Defaults to 0."
-     * )
      *
      * @ApiDoc(
      *      description="Get entities associated with the email activity",
@@ -57,12 +51,9 @@ class EmailActivityEntityController extends RestGetController
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-        $filters = [
-            'skip_custom_entity' => (bool)$this->getRequest()->get('skip_custom_entity', 0),
-            'criteria' => $this->buildFilterCriteria(['id' => ['=', $id]])
-        ];
+        $criteria = $this->buildFilterCriteria(['id' => ['=', $id]]);
 
-        return $this->handleGetListRequest($page, $limit, $filters);
+        return $this->handleGetListRequest($page, $limit, $criteria);
     }
 
     /**
