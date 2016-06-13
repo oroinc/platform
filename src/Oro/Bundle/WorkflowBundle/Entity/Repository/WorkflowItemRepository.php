@@ -18,12 +18,11 @@ class WorkflowItemRepository extends EntityRepository
      *
      * @param string $entityClass
      * @param int $entityIdentifier
-     * @return WorkflowItem|null
+     * @return array|WorkflowItem[]
      */
     public function findByEntityMetadata($entityClass, $entityIdentifier)
     {
-        $qb = $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier);
-        return $qb->getQuery()->getOneOrNullResult();
+        return $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier)->getQuery()->getResult();
     }
 
     /**
@@ -61,6 +60,7 @@ class WorkflowItemRepository extends EntityRepository
      */
     public function getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition $definition)
     {
+        //TODO: refactor or remove this method in story for CRM improvements
         $queryBuilder = $this->getByDefinitionQueryBuilder($definition);
 
         return $this->getEntityManager()->createQueryBuilder()
@@ -77,7 +77,7 @@ class WorkflowItemRepository extends EntityRepository
      * @param int|null $batchSize
      * @throws \Exception
      */
-    public function resetWorkflowData($entityClass, $excludedWorkflowNames = array(), $batchSize = null)
+    public function resetWorkflowData($entityClass, $excludedWorkflowNames = [], $batchSize = null)
     {
         $entityManager = $this->getEntityManager();
         $batchSize = $batchSize ?: self::DELETE_BATCH_SIZE;
@@ -85,13 +85,14 @@ class WorkflowItemRepository extends EntityRepository
         // select entities for reset
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select('workflowItem.id')
-            ->from($entityClass, 'entity')
-            ->innerJoin('entity.workflowItem', 'workflowItem')
+            ->from('OroWorkflowBundle:WorkflowItem', 'workflowItem')
             ->innerJoin('workflowItem.definition', 'workflowDefinition')
+            ->where('workflowItem.entityClass = ?1')
+            ->setParameter(1, $entityClass)
             ->orderBy('workflowItem.id');
 
         if ($excludedWorkflowNames) {
-            $queryBuilder->andWhere($queryBuilder->expr()->notIn('workflowDefinition.name', $excludedWorkflowNames));
+            $queryBuilder->andWhere($queryBuilder->expr()->in('workflowDefinition.name', $excludedWorkflowNames));
         }
 
         $iterator = new DeletionQueryResultIterator($queryBuilder);
@@ -105,12 +106,12 @@ class WorkflowItemRepository extends EntityRepository
         $entityManager->beginTransaction();
         try {
             // iterate over workflow items
-            $workflowItemIds = array();
+            $workflowItemIds = [];
             foreach ($iterator as $workflowItem) {
                 $workflowItemIds[] = $workflowItem['id'];
                 if (count($workflowItemIds) == $batchSize) {
                     $this->clearWorkflowItems($entityClass, $workflowItemIds);
-                    $workflowItemIds = array();
+                    $workflowItemIds = [];
                 }
             }
             if ($workflowItemIds) {
@@ -136,15 +137,9 @@ class WorkflowItemRepository extends EntityRepository
         $expressionBuilder = $this->createQueryBuilder('workflowItem')->expr();
         $entityManager = $this->getEntityManager();
 
-        $updateCondition = $expressionBuilder->in('entity.workflowItem', $workflowItemIds);
-        $updateDql = "UPDATE {$entityClass} entity
-            SET entity.workflowItem = NULL, entity.workflowStep = NULL
-            WHERE {$updateCondition}";
-
         $deleteCondition = $expressionBuilder->in('workflowItem.id', $workflowItemIds);
         $deleteDql = "DELETE OroWorkflowBundle:WorkflowItem workflowItem WHERE {$deleteCondition}";
 
-        $entityManager->createQuery($updateDql)->execute();
         $entityManager->createQuery($deleteDql)->execute();
     }
 }
