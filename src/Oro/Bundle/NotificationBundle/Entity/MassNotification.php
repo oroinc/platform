@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * MassNotification
  *
  * @ORM\Table("oro_notification_mass_notif")
- * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\MassNotificationRepository")
+ * @ORM\Entity()
  * @Config(
  *      defaultValues={
  *          "security"={
@@ -22,7 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-class MassNotification implements LogNotificationInterface
+class MassNotification
 {
     const STATUS_FAILED  = 0;
     const STATUS_SUCCESS = 1;
@@ -224,31 +224,5 @@ class MassNotification implements LogNotificationInterface
         $this->status = $status;
 
         return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function updateFromSwiftMessage($message, $sentCount)
-    {
-        $dateScheduled = new \DateTime();
-        $dateScheduled->setTimestamp($message->getDate());
-
-        $this->setEmail($this->formatEmail($message->getTo()));
-        $this->setSender($this->formatEmail($message->getFrom()));
-        $this->setSubject($message->getSubject());
-        $this->setStatus($sentCount > 0 ? self::STATUS_SUCCESS : self::STATUS_FAILED);
-        $this->setScheduledAt($dateScheduled);
-        $this->setProcessedAt(new \DateTime());
-        $this->setBody($message->getBody());
-    }
-
-    /**
-     * @param array $email
-     * @return string
-     */
-    protected function formatEmail($email)
-    {
-        return current($email) . ' <' . key($email) . '>';
     }
 }

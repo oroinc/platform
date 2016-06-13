@@ -70,7 +70,7 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('status', 'integer', []);
         $table->addColumn('message', 'object', ['comment' => '(DC2Type:object)']);
-        $table->addColumn('log_entity_name', 'string', ['length' => 255]);
+        $table->addColumn('log_type', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['status'], 'notification_spool_status_idx', []);
     }

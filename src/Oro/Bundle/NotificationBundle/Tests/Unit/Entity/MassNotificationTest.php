@@ -52,24 +52,4 @@ class MassNotificationTest extends \PHPUnit_Framework_TestCase
             'status'      => ['status', 1, 1],
         ];
     }
-    
-    public function testUpdateFromSwiftMessage()
-    {
-        $date = new \DateTime('now');
-        $message = $this->getMock('Swift_Mime_Message');
-        $message->expects($this->once())->method('getTo')->will($this->returnValue(['to@test.com' => 'test']));
-        $message->expects($this->once())->method('getFrom')->will($this->returnValue(['from@test.com' => 'test']));
-        $message->expects($this->once())->method('getDate')->will($this->returnValue($date->getTimestamp()));
-        $message->expects($this->once())->method('getSubject')->will($this->returnValue('test subject'));
-        $message->expects($this->once())->method('getBody')->will($this->returnValue('test body'));
-        
-        $this->massNotification->updateFromSwiftMessage($message, 1);
-        
-        $this->assertEquals($this->massNotification->getEmail(), 'test <to@test.com>');
-        $this->assertEquals($this->massNotification->getSender(), 'test <from@test.com>');
-        $this->assertEquals($this->massNotification->getSubject(), 'test subject');
-        $this->assertEquals($this->massNotification->getBody(), 'test body');
-        $this->assertEquals($this->massNotification->getScheduledAt(), $date);
-        $this->assertEquals($this->massNotification->getStatus(), MassNotification::STATUS_SUCCESS);
-    }
 }

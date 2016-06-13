@@ -20,18 +20,18 @@ class MassNotification implements SenderAwareEmailNotificationInterface
     /**
      * @var array
      */
-    protected $resipients;
+    protected $recipients;
 
     /**
      * @var EmailNotificationInterface
      */
     protected $template;
 
-    public function __construct($senderName, $senderEmail, $resipients, $template)
+    public function __construct($senderName, $senderEmail, $recipients, $template)
     {
         $this->senderName = $senderName;
         $this->senderEmail = $senderEmail;
-        $this->resipients = $resipients;
+        $this->recipients = $recipients;
         $this->template = $template;
     }
 
@@ -56,7 +56,7 @@ class MassNotification implements SenderAwareEmailNotificationInterface
      */
     public function getRecipientEmails()
     {
-        return $this->resipients;
+        return $this->recipients;
     }
 
     /**

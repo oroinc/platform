@@ -147,17 +147,17 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     }
 
     /**
-     * Add entity class to log email sending
+     * Add log type to log email sending
      *
-     * @param string $className
+     * @param string $logType
      */
-    public function addLogEntity($className)
+    public function addLogType($logType)
     {
-        $tranport = $this->mailer->getTransport();
-        if ($tranport instanceof \Swift_Transport_SpoolTransport) {
-            $spool = $tranport->getSpool();
+        $transport = $this->mailer->getTransport();
+        if ($transport instanceof \Swift_Transport_SpoolTransport) {
+            $spool = $transport->getSpool();
             if ($spool instanceof DbSpool) {
-                $spool->setLogEntity($className);
+                $spool->setLogType($logType);
             }
         }
     }

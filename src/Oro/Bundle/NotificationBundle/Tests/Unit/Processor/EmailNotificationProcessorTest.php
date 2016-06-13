@@ -233,11 +233,11 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testAddLogEntity()
+    public function testAddLogType()
     {
         $spool = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool')
                     ->disableOriginalConstructor()->getMock();
-        $spool->expects($this->once())->method('setLogEntity')->with('Test Class');
+        $spool->expects($this->once())->method('setLogType')->with('test type');
         $tranport = $this->getMockBuilder('Swift_Transport_SpoolTransport')
                     ->disableOriginalConstructor()->getMock();
         $tranport->expects($this->once())->method('getSpool')->will(
@@ -246,7 +246,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->mailer->expects($this->once())->method('getTransport')->will(
             $this->returnValue($tranport)
         );
-        $this->processor->addLogEntity('Test Class');
+        $this->processor->addLogType('test type');
     }
 
     /**

@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
@@ -16,6 +15,8 @@ use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 class MassNotificationSender
 {
     const MAINTENANCE_VARIABLE = 'maintenance_message';
+
+    const NOTIFICATION_LOG_TYPE = 'mass';
 
     /**
      * @var EmailNotificationProcessor
@@ -76,19 +77,11 @@ class MassNotificationSender
         $senderEmail = $senderEmail ?: $this->cm->get('oro_notification.email_notification_sender_email');
 
         $recipients = $this->getRecipientEmails();
-        /** @var EmailTemplate $template */
-        $template = $this->cm->get('oro_notification.mass_notification_template');
-        $template = $this->em->getRepository('OroEmailBundle:EmailTemplate')->findByName($template);
-        if (!$template) {
-            $template = $this->initSimpleTemplate();
-        }
-        if ($subject) {
-            $template->setSubject($subject);
-        }
-        $this->em->detach($template);
+        $template = $this->getTemplate($subject);
+
         $massNotification = new MassNotification($senderName, $senderEmail, $recipients, $template);
 
-        $this->processor->addLogEntity('Oro\Bundle\NotificationBundle\Entity\MassNotification');
+        $this->processor->addLogType(self::NOTIFICATION_LOG_TYPE);
         $this->processor->setMessageLimit(0);
         $this->processor->process(null, [$massNotification], null, [self::MAINTENANCE_VARIABLE => $body]);
         //persist and flush sending job entity
@@ -100,17 +93,31 @@ class MassNotificationSender
     }
 
     /**
-     * Create simple txt template to send message in txt format
+     * Get template to use for notification
      *
+     * @param string $subject
      * @return EmailTemplate
      */
-    protected function initSimpleTemplate()
+    protected function getTemplate($subject)
     {
-        $template = new EmailTemplate();
-        $template->setContent(sprintf("{{ %s }}", self::MAINTENANCE_VARIABLE));
-        $template->setType('txt');
+        $template = $this->cm->get('oro_notification.mass_notification_template');
+        $template = $this->em->getRepository('OroEmailBundle:EmailTemplate')->findByName($template);
+        $templateModel = new EmailTemplate();
+        if ($template) {
+            /* convert template entity into template model */
+            $templateModel->setType($template->getType())
+                ->setContent($template->getContent())
+                ->setSubject($template->getSubject());
+        } else {
+            /* create simple txt template to send message in txt format */
+            $templateModel->setType('txt');
+            $templateModel->setContent(sprintf("{{ %s }}", self::MAINTENANCE_VARIABLE));
+        }
+        if ($subject) {
+            $templateModel->setSubject($subject);
+        }
 
-        return $template;
+        return $templateModel;
     }
 
     /**

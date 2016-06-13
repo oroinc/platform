@@ -15,6 +15,6 @@ class AddLogEntityColumn implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_notification_email_spool');
-        $table->addColumn('log_entity_name', 'string', ['length' => 255]);
+        $table->addColumn('log_type', 'string', ['length' => 255]);
     }
 }

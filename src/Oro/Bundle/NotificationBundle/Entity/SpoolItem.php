@@ -39,9 +39,9 @@ class SpoolItem
     /**
      * @var string
      *
-     * @ORM\Column(name="log_entity_name", type="string", length=255)
+     * @ORM\Column(name="log_type", type="string", length=255)
      */
-    private $logEntityName;
+    private $logType;
 
     /**
      * Get id
@@ -102,18 +102,18 @@ class SpoolItem
     /**
      * @return string
      */
-    public function getLogEntityName()
+    public function getLogType()
     {
-        return $this->logEntityName;
+        return $this->logType;
     }
 
     /**
-     * @param  string $logEntityName
+     * @param  string $logType
      * @return SpoolItem
      */
-    public function setLogEntityName($logEntityName)
+    public function setLogType($logType)
     {
-        $this->logEntityName = $logEntityName;
+        $this->logType = $logType;
 
         return $this;
     }
