@@ -18,6 +18,9 @@ class TraceLogger
     /** @var array */
     protected $actionStack = [];
 
+    /** @var string */
+    protected $lastActionIndex = -1;
+
     /** @var array */
     protected $processorStack = [];
 
@@ -103,6 +106,7 @@ class TraceLogger
         $startStopwatch = $this->stopwatch && empty($this->actionStack);
 
         $this->actionStack[] = ['name' => $actionName, 'time' => microtime(true), 'subtrahend' => 0];
+        $this->lastActionIndex++;
         if ($startStopwatch) {
             $this->stopwatch->start($this->getStopwatchName(), $this->sectionName);
         }
@@ -116,6 +120,7 @@ class TraceLogger
     public function stopAction(\Exception $exception = null)
     {
         $action = array_pop($this->actionStack);
+        $this->lastActionIndex--;
         $action['time'] = microtime(true) - $action['time'] - $action['subtrahend'];
         if (null !== $exception) {
             $action['exception'] = $exception->getMessage();
@@ -123,7 +128,7 @@ class TraceLogger
         unset($action['subtrahend']);
         $this->addSubtrahend($this->actionStack, $action['time']);
         $this->addSubtrahend($this->processorStack, $action['time']);
-        array_unshift($this->actions, $action);
+        $this->actions[] = $action;
         if (empty($this->actionStack) && $this->stopwatch) {
             $this->stopwatch->stop($this->getStopwatchName());
         }
@@ -154,12 +159,11 @@ class TraceLogger
         unset($processor['subtrahend']);
 
         if (!empty($this->actionStack)) {
-            $action = array_pop($this->actionStack);
-            if (!array_key_exists('processors', $action)) {
-                $action['processors'] = [];
+            if (!array_key_exists('processors', $this->actionStack[$this->lastActionIndex])) {
+                $this->actionStack[$this->lastActionIndex]['processors'] = [$processor];
+            } else {
+                $this->actionStack[$this->lastActionIndex]['processors'][] = $processor;
             }
-            array_unshift($action['processors'], $processor);
-            $this->actionStack[] = $action;
         } else {
             $this->unclassifiedProcessors[] = $processor;
         }
