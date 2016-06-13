@@ -997,13 +997,6 @@ services:
              - @oro_email.provider.emailowners.provider
              - @oro_entity.doctrine_helper
 
-    oro_email.command.association_manager:
-        class: Oro\Bundle\EmailBundle\Command\Manager\AssociationManager
-        arguments:
-            - '@oro_entity.doctrine_helper'
-            - '@oro_email.email.activity.manager'
-            - '@oro_email.provider.emailowners.provider'
-            - '@oro_email.email.manager'
     oro_email.listener.activity.filter_target_classes:
         class: Oro\Bundle\EmailBundle\EventListener\Activity\FilterTargetClasssesListener
         arguments:
