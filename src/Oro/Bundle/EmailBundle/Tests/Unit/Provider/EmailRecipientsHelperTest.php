@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
+use Oro\Bundle\SearchBundle\Query\Result;
 
 class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,6 +19,7 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
     protected $addressHelper;
 
     protected $emailRecipientsHelper;
+    protected $indexer;
 
     public function setUp()
     {
@@ -53,6 +55,10 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailRecipientsHelper = new EmailRecipientsHelper(
             $this->aclHelper,
             $this->dqlNameFormatter,
@@ -61,7 +67,8 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
             $this->translator,
             $this->emailOwnerProvider,
             $this->registry,
-            $this->addressHelper
+            $this->addressHelper,
+            $this->indexer
         );
     }
 
@@ -75,12 +82,23 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
             ->with('u', 'Oro\Bundle\UserBundle\Entity\User')
             ->will($this->returnValue('u.name'));
 
+        $expressionBuiled = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
+            ->disableOriginalConstructor()
+            ->setMethods(['in'])
+            ->getMock();
+
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $qb->expects($this->once())
             ->method('setMaxResults')
             ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('andWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('expr')
+            ->will($this->returnValue($expressionBuiled));
 
         $userRepository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
             ->disableOriginalConstructor()
@@ -100,6 +118,20 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
         $this->aclHelper->expects($this->once())
             ->method('apply')
             ->will($this->returnValue($query));
+
+        $searchQueryMock = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Query')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $searchResultMock = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubResult = new Result($searchQueryMock, [$searchResultMock]);
+
+        $this->indexer->expects($this->once())
+             ->method('simpleSearch')
+             ->will($this->returnValue($stubResult));
 
         $this->emailRecipientsHelper->getRecipients($args, $userRepository, 'u', 'Oro\Bundle\UserBundle\Entity\User');
     }
