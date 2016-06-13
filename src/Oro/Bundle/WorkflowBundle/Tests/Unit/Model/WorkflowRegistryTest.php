@@ -275,7 +275,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $config->expects($this->any())
             ->method('get')
-            ->with('active_workflow')
+            ->with('active_workflow') //todo now
             ->will($this->returnValue($workflowName));
 
         $configProvider->expects($this->any())
@@ -329,7 +329,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $config->expects($this->once())
             ->method('get')
-            ->with('active_workflow')
+            ->with('active_workflow') //todo now
             ->will($this->returnValue(null));
         $configProvider->expects($this->once())
             ->method('getConfig')
@@ -363,7 +363,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $config->expects($this->any())
             ->method('get')
-            ->with('active_workflow')
+            ->with('active_workflow') //todo now
             ->will($this->returnValue($workflowName));
         $configProvider->expects($this->any())
             ->method('getConfig')
