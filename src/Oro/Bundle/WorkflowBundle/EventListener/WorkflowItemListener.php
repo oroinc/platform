@@ -96,8 +96,17 @@ class WorkflowItemListener
             $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
             $workflowItem->setEntityId($entityId);
 
+            $entityClass = $this->doctrineHelper->getEntityClass($entity);
+            $workflowItem->setEntityClass($entityClass);
+
             $unitOfWork = $args->getEntityManager()->getUnitOfWork();
-            $unitOfWork->scheduleExtraUpdate($workflowItem, array('entityId' => array(null, $entityId)));
+            $unitOfWork->scheduleExtraUpdate(
+                $workflowItem,
+                [
+                    'entityId' => [null, $entityId],
+                    'entityClass' => [null, $entityClass]
+                ]
+            );
         }
     }
 

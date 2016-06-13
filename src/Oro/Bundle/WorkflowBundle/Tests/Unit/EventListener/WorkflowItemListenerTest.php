@@ -51,6 +51,7 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \stdClass();
         $entityId = 1;
+        $entityClass = 'stdClass';
 
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
@@ -61,10 +62,17 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($entity)
-            ->will($this->returnValue($entityId));
+            ->willReturn($entityId);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entity)
+            ->willReturn($entityClass);
         $workflowItem->expects($this->once())
             ->method('setEntityId')
             ->with($entityId);
+        $workflowItem->expects($this->once())
+            ->method('setEntityClass')
+            ->with($entityClass);
 
         $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
@@ -78,7 +86,7 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $uow->expects($this->once())
             ->method('scheduleExtraUpdate')
-            ->with($workflowItem, array('entityId' => array(null, $entityId)));
+            ->with($workflowItem, ['entityId' => [null, $entityId], 'entityClass' => [null, $entityClass]]);
 
         $em = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
