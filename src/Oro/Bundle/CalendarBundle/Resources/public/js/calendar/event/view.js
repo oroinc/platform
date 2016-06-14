@@ -265,7 +265,7 @@ define([
                                 input.on('select2-data-loaded', function() {
                                     self._hideMask();
                                 });
-                                input.val(_.last(modelData.id.match(/\d+/g)));
+                                input.val(self.model.originalId);
                             }
                         } else {
                             input.val(value);
