@@ -233,7 +233,6 @@ Now:
 
 ####CalendarBundle
 - The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
->>>>>>> master
 
 ####LayoutBundle:
 - Added possibility to create layout block types using only DI configuration, for details please check out documentation at
