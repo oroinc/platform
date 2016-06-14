@@ -23,11 +23,11 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var array */
-    protected $cachedEntities = [];
-
     /** @var NewEntitiesHelper */
     protected $newEntitiesHelper;
+
+    /** @var array */
+    protected $cachedEntities = [];
 
     /**
      * @param EventDispatcherInterface     $eventDispatcher

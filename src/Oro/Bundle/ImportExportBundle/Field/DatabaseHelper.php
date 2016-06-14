@@ -87,11 +87,11 @@ class DatabaseHelper
             } else {
                 $serializationCriteria[$field] = $value;
             }
-            if (null !== $serializationCriteria[$field]) {
-                $where[] = sprintf('e.%s = :%s', $field, $field);
-            } else {
+            if (null === $serializationCriteria[$field]) {
                 $where[] = sprintf('e.%s IS NULL', $field);
                 unset($criteria[$field]);
+            } else {
+                $where[] = sprintf('e.%s = :%s', $field, $field);
             }
         }
 
