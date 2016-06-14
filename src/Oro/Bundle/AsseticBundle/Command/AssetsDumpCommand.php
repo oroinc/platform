@@ -15,7 +15,7 @@ class AssetsDumpCommand extends AbstractCommand
     /**
      * {@inheritdoc}
      */
-    const ASSET_EXTENTIONS = [
+    public static $assetExtentions = [
         '.less',
         '.scss',
         '.js',
@@ -40,7 +40,7 @@ class AssetsDumpCommand extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $extName = $input->getArgument('name');
-        if (!in_array($extName, self::ASSET_EXTENTIONS, true)) {
+        if (!in_array($extName, self::$assetExtentions, true)) {
             $output->writeln('<error>No assetic extention identifier defined</error>');
             return;
         }
