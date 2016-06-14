@@ -160,12 +160,12 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
      *
      * No need to search LocalizedFallbackValue by identity fields in new entities storage
      */
-    protected function combineIdentityValues($entity, $entityName, array $searchContext)
+    protected function combineIdentityValues($entity, $entityClass, array $searchContext)
     {
-        if (is_a($entityName, $this->localizedFallbackValueClass, true)) {
+        if (is_a($entityClass, $this->localizedFallbackValueClass, true)) {
             return null;
         }
 
-        return parent::combineIdentityValues($entity, $entityName, $searchContext);
+        return parent::combineIdentityValues($entity, $entityClass, $searchContext);
     }
 }

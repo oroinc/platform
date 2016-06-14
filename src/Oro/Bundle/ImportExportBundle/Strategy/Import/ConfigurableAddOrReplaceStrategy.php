@@ -334,12 +334,12 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * At least one not null and not empty value must be present for search
      *
      * @param       $entity
-     * @param       $entityName
+     * @param       $entityClass
      * @param array $searchContext
      *
      * @return array|null
      */
-    protected function combineIdentityValues($entity, $entityName, array $searchContext)
+    protected function combineIdentityValues($entity, $entityClass, array $searchContext)
     {
         $identityValues = $searchContext;
         $identityValues += $this->fieldHelper->getIdentityValues($entity);
@@ -354,7 +354,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                         $notEmptyValues[$fieldName] = $value;
                     }
                 }
-            } elseif ($this->fieldHelper->isRequiredIdentityField($entityName, $fieldName)) {
+            } elseif ($this->fieldHelper->isRequiredIdentityField($entityClass, $fieldName)) {
                 $nullRequiredValues[$fieldName] = null;
             }
         }
