@@ -234,31 +234,42 @@ class WidgetController extends Controller
      */
     public function buttonsAction($entityClass, $entityId)
     {
-        $showResetButton = false;
-        $transitionsData = array();
+        $workflowsData = [];
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $entity          = $this->getEntityReference($entityClass, $entityId);
-        $workflowItem    = $workflowManager->getWorkflowItemByEntity($entity);
+        $entity = $this->getEntityReference($entityClass, $entityId);
 
-        if (!$workflowManager->isResetAllowed($entity)) {
-            if ($workflowItem) {
-                $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
-            } else {
-                $workflow = $workflowManager->getApplicableWorkflow($entity);
-                $transitionsData = $this->getAvailableStartTransitionsData($workflow, $entity);
-            }
-        } else {
-            $showResetButton = true;
+        $workflows = $workflowManager->getApplicableWorkflows($entity);
+        foreach ($workflows as $workflow) {
+            $workflowsData[$workflow->getName()] = [
+                'label' => $workflow->getLabel(),
+                'resetAllowed' => false,
+                'transitionsData' => $this->getAvailableStartTransitionsData($workflow, $entity),
+            ];
         }
 
-        return array(
-            'entity_id'       => $entityId,
-            'showResetButton' => $showResetButton,
-            'transitionsData' => $transitionsData,
-            'workflowItem'    => $workflowItem
-        );
+        $workflowItems = $workflowManager->getWorkflowItemsByEntity($entity);
+        foreach ($workflowItems as $workflowItem) {
+            $name = $workflowItem->getWorkflowName();
+
+            if ($workflowManager->isResetAllowed($entity, $workflowItem)) {
+                $workflowsData[$name]['resetAllowed'] = true;
+                $workflowsData[$name]['transitionsData'] = [];
+                $workflowsData[$name]['workflowItem'] = $workflowItem;
+
+                continue;
+            }
+
+            $transitionsDatas = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+            foreach ($transitionsDatas as $data) {
+                $workflowsData[$name]['transitionsData'][$name] = $data;
+            }
+        }
+        return [
+            'entity_id' => $entityId,
+            'workflowsData' => $workflowsData,
+        ];
     }
 
     /**
