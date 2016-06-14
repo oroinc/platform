@@ -22,6 +22,7 @@ define(function(require) {
     var localeSettings = require('orolocale/js/locale-settings');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
+    var persistentStorage = require('oroui/js/persistent-storage');
     require('jquery.fullcalendar');
 
     CalendarView = BaseView.extend({
@@ -46,7 +47,7 @@ define(function(require) {
         options: {
             timezone: localeSettings.getTimeZone(),
             eventsOptions: {
-                defaultView: 'month',
+                defaultView: 'agendaWeek',
                 allDayText: __('oro.calendar.control.all_day'),
                 buttonText: {
                     today: __('oro.calendar.control.today'),
@@ -73,7 +74,8 @@ define(function(require) {
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
-                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
+                recoverView: true
             },
             connectionsOptions: {
                 collection: null,
@@ -127,6 +129,23 @@ define(function(require) {
             // set options for new events
             this.options.newEventEditable = this.options.eventsOptions.editable;
             this.options.newEventRemovable = this.options.eventsOptions.removable;
+
+            if (this.options.eventsOptions.recoverView) {
+                // try to retrieve the last view for this calendar
+                var viewKey = this.getStorageKey('defaultView');
+                var dateKey = this.getStorageKey('defaultDate');
+
+                var defaultView = persistentStorage.getItem(viewKey);
+                var defaultDate = persistentStorage.getItem(dateKey);
+
+                if (defaultView) {
+                    this.options.eventsOptions.defaultView =  defaultView;
+                }
+
+                if (defaultDate && !isNaN(defaultDate)) {
+                    this.options.eventsOptions.defaultDate =  moment.unix(defaultDate);
+                }
+            }
 
             // subscribe to event collection events
             this.listenTo(this.collection, 'add', this.onEventAdded);
@@ -807,6 +826,18 @@ define(function(require) {
             var dayCol;
             var calendarElement = this.getCalendarElement();
             var currentView = calendarElement.fullCalendar('getView');
+            var currentDate = calendarElement.fullCalendar('getDate');
+            var viewKey = this.getStorageKey('defaultView');
+            var dateKey = this.getStorageKey('defaultDate');
+
+            if (this.options.eventsOptions.recoverView) {
+                persistentStorage.setItem(viewKey, currentView.name);
+
+                if (!isNaN(currentDate)) {
+                    persistentStorage.setItem(dateKey, currentDate.unix());
+                }
+            }
+
             // shown interval in calendar timezone
             var shownInterval = {
                 start: currentView.intervalStart.clone().utc(),
@@ -918,6 +949,12 @@ define(function(require) {
             }
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
+        },
+
+        getStorageKey: function(item) {
+            var calendarId = this.options.calendar;
+
+            return calendarId ? item + calendarId : '';
         }
     });
 

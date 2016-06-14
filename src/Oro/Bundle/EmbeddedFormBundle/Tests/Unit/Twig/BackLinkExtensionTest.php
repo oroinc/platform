@@ -73,6 +73,31 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function shouldReplacePlaceholderWithReloadLinkAndLinkText()
+    {
+        $text = uniqid('text');
+        $translatedText = uniqid('translatedText');
+        $originalString = 'Before link {back_link|' . $text . '} After link';
+        $expectedLink = '<a href="#" onclick="window.location.reload(true); return false;">'
+                        . $translatedText
+                        . '</a>';
+        $expectedString = 'Before link ' . $expectedLink . ' After link';
+
+        $router = $this->getMock('Symfony\Component\Routing\Router', [], [], '', false);
+
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface', [], [], '', false);
+        $translator->expects($this->once())
+                   ->method('trans')
+                   ->with($text)
+                   ->will($this->returnValue($translatedText));
+
+        $extension = $this->createBackLinkExtension($router, $translator);
+        $this->assertEquals(
+            $expectedString,
+            $extension->backLinkFilter($originalString, null)
+        );
+    }
+
     /**
      * @test
      */
