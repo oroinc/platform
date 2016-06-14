@@ -10,8 +10,8 @@ define(function(require) {
         widgetFunctionName: 'uniform',
 
         initializeOptions: {
-            fileDefaultHtml: __('Please select a file...'),
-            fileButtonHtml: __('Choose File')
+            fileDefaultHtml: __('Attach file:'),
+            fileButtonHtml: __('Upload')
         },
 
         refreshOptions: 'update',
@@ -21,30 +21,27 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        initialize: function(options) {
-            UniformFileInputWidget.__super__.initialize.apply(this, arguments);
+        initializeWidget: function() {
+            UniformFileInputWidget.__super__.initializeWidget.apply(this, arguments);
             if (this.$el.is('.error')) {
                 this.$el.removeClass('error');
-                this.$container.addClass('error');
+                this.container().addClass('error');
             }
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
+        disposeWidget: function() {
             this.$el.uniform.restore(this.$el);
-            UniformFileInputWidget.__super__.dispose.apply(this, arguments);
+            UniformFileInputWidget.__super__.disposeWidget.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
         findContainer: function() {
-            this.$container = this.$el.parent('.uploader');
+            return this.$el.parent('.uploader');
         }
     });
 

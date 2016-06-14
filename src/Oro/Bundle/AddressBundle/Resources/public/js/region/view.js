@@ -25,10 +25,10 @@ define([
          */
         initialize: function(options) {
             this.target = $(options.target);
+            this.targetLabel = $('label[for="' + this.target.attr('id') + '"]');
             this.$simpleEl = $(options.simpleEl);
 
             this.target.closest('.controls').append(this.$simpleEl);
-            this.targetWidget = this.target.inputWidget('getContainer');
             this.$simpleEl.attr('type', 'text');
 
             this.showSelect = options.showSelect;
@@ -37,7 +37,7 @@ define([
             this.template = _.template($('#region-chooser-template').html());
 
             this.displaySelect2(this.showSelect);
-            this.target.on('select2-init', _.bind(function() {
+            this.target.on('input-widget:init', _.bind(function() {
                 this.displaySelect2(this.showSelect);
             }, this));
 
@@ -54,9 +54,11 @@ define([
                 if (this.regionRequired) {
                     this.addRequiredFlag(this.$simpleEl);
                 }
-                this.target.parent().show();
+                this.target.inputWidget('show');
+                this.targetLabel.show();
             } else {
-                this.target.parent().hide();
+                this.target.inputWidget('hide');
+                this.targetLabel.hide();
                 if (this.regionRequired) {
                     this.removeRequiredFlag(this.$simpleEl);
                 }
@@ -115,9 +117,7 @@ define([
             if (this.collection.models.length > 0) {
                 this.target.show();
                 this.displaySelect2(true);
-                if (this.targetWidget) {
-                    this.targetWidget.show();
-                }
+                this.target.inputWidget('show');
 
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
@@ -129,9 +129,7 @@ define([
                 this.target.hide();
                 this.target.val('');
                 this.displaySelect2(false);
-                if (this.targetWidget) {
-                    this.targetWidget.hide();
-                }
+                this.target.inputWidget('hide');
                 this.$simpleEl.show();
             }
             this.$el.trigger('value:changed');
