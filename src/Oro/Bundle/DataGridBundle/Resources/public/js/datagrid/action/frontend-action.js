@@ -19,7 +19,9 @@ define([
          */
         execute: function() {
             mediator.trigger('datagrid:frontend:execute:' + this.datagrid.name, this);
-            this.$el.dropdown('toggle');
+            if (!this.disposed) {
+                this.$el.dropdown('toggle');
+            }
         }
     });
 

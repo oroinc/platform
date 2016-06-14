@@ -20,7 +20,9 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         parent::setUp();
 
         $this->metadata = new AssociationMetadata();
-        $this->metadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $this->metadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $this->transformer = new EntityToIdTransformer($this->doctrine, $this->metadata);
     }
