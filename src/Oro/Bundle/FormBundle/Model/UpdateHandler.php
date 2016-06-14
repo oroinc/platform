@@ -63,6 +63,8 @@ class UpdateHandler
     }
 
     /**
+     * @deprecated since 1.10 and will be removed after 1.12. Use update method instead
+     *
      * @param object $entity
      * @param FormInterface $form
      * @param array|callable $saveAndStayRoute
@@ -107,47 +109,66 @@ class UpdateHandler
     }
 
     /**
-     * @param object $entity
-     * @param FormInterface $form
-     * @param callable|null $resultCallback
-     * @return array
+     * Handles update action of controller used to create or update entity on separate page or widget dialog.
+     *
+     * @param object $data Data of form
+     * @param FormInterface $form Form instance
+     * @param string $saveMessage Message added to session flash bag in case if form will be saved successfully
+     *               and if form is not submitted from widget.
+     * @param null|callable $formHandler Callback to handle form, by default method saveForm used.
+     * @return array|RedirectResponse Returns an array
+     *                                  if form wasn't successfully submitted
+     *                                  or when request method is not PUT and POST,
+     *                                  or if form was submitted from widget dialog,
+     *                                returns RedirectResponse
+     *                                  if form was successfully submitted from create/update page
+     * @throws \InvalidArgumentException
      */
-    protected function getResult($entity, FormInterface $form, $resultCallback = null)
-    {
-        if (is_callable($resultCallback)) {
-            $result = call_user_func($resultCallback, $entity, $form, $this->request);
-        } else {
-            $result = array(
-                'form' => $form->createView()
-            );
+    public function update(
+        $data,
+        FormInterface $form,
+        $saveMessage,
+        $formHandler = null
+    ) {
+        if ($formHandler) {
+            if (is_object($formHandler) && method_exists($formHandler, 'process')) {
+                if ($formHandler->process($data)) {
+                    return $this->constructResponse($form, $data, $saveMessage);
+                }
+            } else {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Argument $formHandler should be an object with method "process", %s given.',
+                        is_object($formHandler) ? get_class($formHandler) : gettype($formHandler)
+                    )
+                );
+            }
+        } elseif ($this->saveForm($form, $data)) {
+            return $this->constructResponse($form, $data, $saveMessage);
         }
-        if (!array_key_exists('entity', $result)) {
-            $result['entity'] = $entity;
-        }
-        $result['isWidgetContext'] = (bool)$this->request->get('_wid', false);
 
-        return $result;
+        return $this->getResult($data, $form);
     }
 
     /**
      * @param FormInterface $form
-     * @param object $entity
+     * @param object $data
      * @return bool
      * @throws \Exception
      */
-    protected function saveForm(FormInterface $form, $entity)
+    protected function saveForm(FormInterface $form, $data)
     {
-        $event = new FormProcessEvent($form, $entity);
+        $event = new FormProcessEvent($form, $data);
         $this->eventDispatcher->dispatch(Events::BEFORE_FORM_DATA_SET, $event);
 
         if ($event->isFormProcessInterrupted()) {
             return false;
         }
 
-        $form->setData($entity);
+        $form->setData($data);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $event = new FormProcessEvent($form, $entity);
+            $event = new FormProcessEvent($form, $data);
             $this->eventDispatcher->dispatch(Events::BEFORE_FORM_SUBMIT, $event);
 
             if ($event->isFormProcessInterrupted()) {
@@ -157,18 +178,18 @@ class UpdateHandler
             $form->submit($this->request);
 
             if ($form->isValid()) {
-                $manager = $this->doctrineHelper->getEntityManager($entity);
+                $manager = $this->doctrineHelper->getEntityManager($data);
 
                 $manager->beginTransaction();
                 try {
-                    $manager->persist($entity);
-                    $this->eventDispatcher->dispatch(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $entity));
+                    $manager->persist($data);
+                    $this->eventDispatcher->dispatch(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $data));
                     $manager->flush();
-                    $this->eventDispatcher->dispatch(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $entity));
+                    $this->eventDispatcher->dispatch(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $data));
                     $manager->commit();
-                } catch (\Exception $e) {
+                } catch (\Exception $exception) {
                     $manager->rollback();
-                    throw $e;
+                    throw $exception;
                 }
 
                 return true;
@@ -179,6 +200,8 @@ class UpdateHandler
     }
 
     /**
+     * @deprecated since 1.10 and will be removed after 1.12
+     *
      * @param FormInterface $form
      * @param object $entity
      * @param array|callable $saveAndStayRoute
@@ -215,6 +238,51 @@ class UpdateHandler
 
             return $this->router->redirectAfterSave($saveAndStayRoute, $saveAndCloseRoute, $entity);
         }
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param object $entity
+     * @param string $saveMessage
+     * @param null $resultCallback
+     *
+     * @return array|RedirectResponse
+     */
+    protected function constructResponse(FormInterface $form, $entity, $saveMessage, $resultCallback = null)
+    {
+        if ($this->request->get('_wid')) {
+            $result = $this->getResult($entity, $form, $resultCallback);
+            $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+            return $result;
+        } else {
+            $this->session->getFlashBag()->add('success', $saveMessage);
+
+            return $this->router->redirect($entity);
+        }
+    }
+
+    /**
+     * @param object $entity
+     * @param FormInterface $form
+     * @param callable|null $resultCallback
+     * @return array
+     */
+    protected function getResult($entity, FormInterface $form, $resultCallback = null)
+    {
+        if (is_callable($resultCallback)) {
+            $result = call_user_func($resultCallback, $entity, $form, $this->request);
+        } else {
+            $result = array(
+                'form' => $form->createView()
+            );
+        }
+        if (!array_key_exists('entity', $result)) {
+            $result['entity'] = $entity;
+        }
+        $result['isWidgetContext'] = (bool)$this->request->get('_wid', false);
+
+        return $result;
     }
 
     /**
