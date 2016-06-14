@@ -1,0 +1,30 @@
+.role-capability {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #F1F1F1;
+  &:last-child {
+    border-bottom: none;
+  }
+  & &__items {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  & &__item {
+    display: inline-block;
+    width: 30%;
+    padding: 0 30px 10px 0;
+    label {
+      padding-left: 15px;
+      margin: 0;
+    }
+    input[type="checkbox"] {
+      margin: 0 0 0 -15px;
+    }
+  }
+  & &__select-all {
+    float: right;
+    &.disabled {
+      pointer-events: none;
+      color: #aaa;
+    }
+  }
+}

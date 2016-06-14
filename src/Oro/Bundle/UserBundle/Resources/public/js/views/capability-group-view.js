@@ -10,14 +10,16 @@ define(function(require) {
      * @export orouser/js/views/role-view
      */
     CapabilityGroupView = BaseCollectionView.extend({
+        animationDuration: 0,
+        className: 'role-capability',
         template: require('tpl!orouser/templates/capability-group.html'),
-        listSelector: '.capability-items',
+        listSelector: '[data-name="capability-items"]',
         itemView: CapabilityItemView,
         listen: {
             'change collection': 'onChange'
         },
         events: {
-            'click .select-all-capabilities': 'onSelectAll'
+            'click [data-name="capabilities-select-all"]': 'onSelectAll'
         },
         initialize: function(options) {
             this.model = options.model;
@@ -40,7 +42,8 @@ define(function(require) {
         },
 
         onChange: function() {
-            this.$('.select-all-capabilities').toggleClass('disabled', !this.collection.findWhere({'accessLevel': 0}));
+            this.$('[data-name="capabilities-select-all"]')
+                .toggleClass('disabled', !this.collection.findWhere({'accessLevel': 0}));
         }
 
     });
