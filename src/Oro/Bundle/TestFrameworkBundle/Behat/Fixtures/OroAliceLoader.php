@@ -3,12 +3,12 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 use Nelmio\Alice\Fixtures\Loader;
-use Nelmio\Alice\Instances\Collection;
+use Nelmio\Alice\Instances\Collection as AliceCollection;
 
 class OroAliceLoader extends Loader
 {
     /**
-     * @return Collection
+     * @return AliceCollection
      */
     public function getReferenceRepository()
     {

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 use Doctrine\ORM\EntityManager;
-use Nelmio\Alice\Instances\Collection;
+use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,15 +16,15 @@ class ReferenceRepositoryInitializer
     protected $em;
 
     /**
-     * @var Collection
+     * @var AliceCollection
      */
-    protected $referenceRepository = [];
+    protected $referenceRepository;
 
     /**
      * @param Registry $registry
-     * @param Collection $referenceRepository
+     * @param AliceCollection $referenceRepository
      */
-    public function __construct(Registry $registry, Collection $referenceRepository)
+    public function __construct(Registry $registry, AliceCollection $referenceRepository)
     {
         $this->em = $registry->getManager();
         $this->referenceRepository = $referenceRepository;
@@ -44,6 +44,10 @@ class ReferenceRepositoryInitializer
         $this->referenceRepository->set('business_unit', $user->getOwner());
     }
 
+    /**
+     * References must be refreshed after each kernel shutdown
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function refresh()
     {
         $references = $this->referenceRepository->toArray();
@@ -57,6 +61,9 @@ class ReferenceRepositoryInitializer
         }
     }
 
+    /**
+     * Remove all references from repository
+     */
     public function clear()
     {
         $this->referenceRepository->clear();
