@@ -30,8 +30,7 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerate($code)
     {
-        $data = new GeneratorData($code);
-        $data->setFilename('testfilename.php');
+        $data = new GeneratorData($code, 'testfilename.php');
 
         $this->assertSame(
 <<<CLASS
