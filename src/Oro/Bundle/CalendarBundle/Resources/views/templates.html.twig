@@ -39,11 +39,11 @@
                 <% } %>
 
                 <% var attendeesView = _.map(attendees, function (attendee) {
+                    var attendeeName = attendee.displayName;
                     if (attendee.fullName) {
-                        return attendee.fullName;
+                        attendeeName = attendee.fullName;
                     }
 
-                    var attendeeName = attendee.displayName;
                     if (attendee.email) {
                         attendeeName = attendeeName ? attendeeName + ' (' + attendee.email + ')' : attendee.email;
                     }

@@ -267,6 +267,8 @@ i.invitation-status.icon-question-sign {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-top: 4px;
+    padding-left: 5px;
 }
 
 .calendar-event-guests-widget:hover {
