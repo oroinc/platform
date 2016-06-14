@@ -20,7 +20,7 @@ class CollectFormErrors extends BaseCollectFormErrors
 
         parent::process($context);
 
-        // remove the association name from the begin of the property path of form errors
+        // remove the association name from the begin of the property path of error source
         if ($context->hasErrors()) {
             $associationName = $context->getAssociationName();
             $errors = $context->getErrors();
@@ -37,7 +37,7 @@ class CollectFormErrors extends BaseCollectFormErrors
                 if ($propertyPath === $associationName) {
                     $errorSource->setPropertyPath('');
                 } elseif (0 === strpos($propertyPath, $associationName . '.')) {
-                    $errorSource->setPropertyPath(substr($propertyPath, strlen($associationName)));
+                    $errorSource->setPropertyPath(substr($propertyPath, strlen($associationName) + 1));
                 }
             }
         }
