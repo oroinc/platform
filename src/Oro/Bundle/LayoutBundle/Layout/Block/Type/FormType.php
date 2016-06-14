@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\BlockBuilderInterface;
 
@@ -10,26 +11,32 @@ class FormType extends AbstractContainerType
     const NAME = 'form';
     const FIELD_SEPARATOR = '_';
 
-    public function __construct()
+    /**
+     * {@inheritDoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $this->options = [
-            'form_name'             => 'form',
-            'form'                  => null,
-            'form_action'           => null,
-            'form_route_name'       => null,
-            'form_route_parameters' => null,
-            'form_method'           => null,
-            'form_enctype'          => null,
-            'form_data'             => null,
-            'form_prefix'           => null,
-            'form_field_prefix'     => null,
-            'form_group_prefix'     => null,
-            'render_rest'           => null,
-            'preferred_fields'      => null,
-            'groups'                => null,
-            'split_to_fields'       => null,
-        ];
+        $resolver->setDefault('form_name', 'form');
+        $resolver->setDefined(
+            [
+                'form'                  => null,
+                'form_action'           => null,
+                'form_route_name'       => null,
+                'form_route_parameters' => null,
+                'form_method'           => null,
+                'form_enctype'          => null,
+                'form_data'             => null,
+                'form_prefix'           => null,
+                'form_field_prefix'     => null,
+                'form_group_prefix'     => null,
+                'render_rest'           => null,
+                'preferred_fields'      => null,
+                'groups'                => null,
+                'split_to_fields'       => null,
+            ]
+        );
     }
+
 
     /**
      * {@inheritdoc}
