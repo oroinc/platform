@@ -464,10 +464,7 @@ class WorkflowManager
      */
     public function resetWorkflowData(WorkflowDefinition $workflowDefinition)
     {
-        $this->getWorkflowItemRepository()->resetWorkflowData(
-            $workflowDefinition->getRelatedEntity(),
-            [$workflowDefinition->getName()]
-        );
+        $this->getWorkflowItemRepository()->resetWorkflowData($workflowDefinition);
     }
 
     /**

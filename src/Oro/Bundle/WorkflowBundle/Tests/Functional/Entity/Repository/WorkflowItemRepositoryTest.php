@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities;
@@ -99,8 +100,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
 
         // reset only WITH_START_STEP workflow data with more than one batch
         $this->repository->resetWorkflowData(
-            'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
-            [LoadWorkflowDefinitions::NO_START_STEP],
+            $this->getWorkflowDefinitionByName(LoadWorkflowDefinitions::WITH_START_STEP),
             LoadWorkflowAwareEntities::COUNT - 1
         );
 
@@ -119,8 +119,10 @@ class WorkflowItemRepositoryTest extends WebTestCase
             []
         );
 
-        // reset all workflow data
-        $this->repository->resetWorkflowData('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity');
+        // reset only NO_START_STEP workflow data with single execution
+        $this->repository->resetWorkflowData(
+            $this->getWorkflowDefinitionByName(LoadWorkflowDefinitions::NO_START_STEP)
+        );
 
         // assert state: both NO_START_STEP and WITH_START_STEP workflow entities were reset
         // - 40 entities without workflow items
@@ -164,7 +166,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
 
         $ids = ['none' => []];
         foreach ($entities as $entity) {
-            $workflowName = $entity['workflowName'] ?: 'none';
+            $workflowName = $entity['workflowName'] ? : 'none';
 
             $ids[$workflowName][] = $entity['entityId'];
         }
@@ -189,7 +191,8 @@ class WorkflowItemRepositoryTest extends WebTestCase
         array $noneEntityIds = null,
         array $noStartStepEntityIds = null,
         array $withStartStepEntityIds = null
-    ) {
+    )
+    {
         if ($noneEntitiesCount > 0) {
             $actualAllEntities = $allEntityIds['none'];
             $this->assertCount($noneEntitiesCount, $actualAllEntities);
@@ -221,5 +224,20 @@ class WorkflowItemRepositoryTest extends WebTestCase
         } else {
             $this->assertArrayNotHasKey(LoadWorkflowDefinitions::WITH_START_STEP, $allEntityIds);
         }
+    }
+
+    /**
+     * @param $workflowDefinitionName
+     * @return null|WorkflowDefinition
+     */
+    protected function getWorkflowDefinitionByName($workflowDefinitionName)
+    {
+        $registry = $this->getContainer()->get('doctrine');
+        $registry->getManager()->clear();
+
+        /** @var EntityRepository $repository */
+        $repository = $registry->getRepository('OroWorkflowBundle:WorkflowDefinition');
+
+        return $repository->findOneBy(['name' => $workflowDefinitionName]);
     }
 }
