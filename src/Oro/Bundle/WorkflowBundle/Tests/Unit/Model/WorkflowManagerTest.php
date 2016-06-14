@@ -1039,7 +1039,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $entityConfig->expects($this->once())->method('get')->with('active_workflows', false, [])
             ->willReturn(['other_wf']);
-        $entityConfig->expects($this->once())->method('set')->with('active_workflows', ['other_wf',$workflowName]);
+        $entityConfig->expects($this->once())->method('set')->with('active_workflows', ['other_wf', $workflowName]);
 
         $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -1067,30 +1067,24 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->workflowManager->activateWorkflow($workflowIdentifier);
     }
 
-    //todo now
     public function testDeactivateWorkflow()
     {
-        $entityClass = '\DateTime';
-        $workflowMock = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowDefinition = new WorkflowDefinition();
+        $workflowDefinition->setName('test_workflow');
+        $workflowDefinition->setRelatedEntity('stdObject');
 
         $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $entityConfig->expects($this->once())->method('get')->with('active_workflows', false, [])
-            ->willReturn(['some_wf']);
-        $entityConfig->expects($this->once())->method('get')->with('active_workflow', []);
-
-        $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflowByEntityClass')
-            ->with($entityClass)
-            ->willReturn($workflowMock);
+            ->willReturn(['some_wf', 'test_workflow']);
+        $entityConfig->expects($this->once())->method('set')->with('active_workflows', ['some_wf']);
 
         $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $workflowConfigProvider->expects($this->once())->method('hasConfig')->with($entityClass)
+
+        $workflowConfigProvider->expects($this->once())->method('hasConfig')->with('stdObject')
             ->will($this->returnValue(true));
-        $workflowConfigProvider->expects($this->once())->method('getConfig')->with($entityClass)
+        $workflowConfigProvider->expects($this->once())->method('getConfig')->with('stdObject')
             ->will($this->returnValue($entityConfig));
 
         $this->configManager->expects($this->once())->method('getProvider')->with('workflow')
@@ -1098,40 +1092,40 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())->method('persist')->with($entityConfig);
         $this->configManager->expects($this->once())->method('flush');
 
-        $definition = new WorkflowDefinition();
-        $workflowMock->expects($this->once())->method('getDefinition')->willReturn($definition);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 $this->equalTo(WorkflowEvents::WORKFLOW_DEACTIVATED),
                 $this->logicalAnd(
                     $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent'),
-                    $this->attributeEqualTo('definition', $definition)
+                    $this->attributeEqualTo('definition', $workflowDefinition)
                 )
             );
 
-        $this->workflowManager->deactivateWorkflow($entityClass);
+        $this->workflowManager->deactivateWorkflow($workflowDefinition);
     }
 
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Entity \DateTime is not configurable
+     * @expectedExceptionMessage Entity DateTime is not configurable
      */
     public function testNotConfigurableEntityException()
     {
-        $entityClass = '\DateTime';
+        $definition = new WorkflowDefinition();
+        $definition->setName('workflow');
+        $definition->setRelatedEntity('DateTime');
 
         $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $workflowConfigProvider->expects($this->once())->method('hasConfig')->with($entityClass)
+        $workflowConfigProvider->expects($this->once())->method('hasConfig')->with('DateTime')
             ->will($this->returnValue(false));
         $workflowConfigProvider->expects($this->never())->method('getConfig');
 
         $this->configManager->expects($this->once())->method('getProvider')->with('workflow')
             ->will($this->returnValue($workflowConfigProvider));
 
-        $this->workflowManager->deactivateWorkflow($entityClass);
+        $this->workflowManager->deactivateWorkflow($definition);
     }
 
     public function testResetWorkflowData()

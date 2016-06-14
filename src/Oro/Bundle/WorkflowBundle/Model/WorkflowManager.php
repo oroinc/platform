@@ -115,8 +115,7 @@ class WorkflowManager
         $entity,
         array $data = [],
         Collection $errors = null
-    )
-    {
+    ) {
         $workflow = $this->getWorkflow($workflow);
 
         return $workflow->isStartTransitionAvailable($transition, $entity, $data, $errors);
@@ -444,7 +443,13 @@ class WorkflowManager
         $definition = $workflowIdentifier instanceof WorkflowDefinition
             ? $workflowIdentifier
             : $this->getWorkflow($workflowIdentifier)->getDefinition();
-        $this->setActiveWorkflow($definition->getRelatedEntity(), $definition->getName());
+
+        $entityConfig = $this->getEntityConfig($definition->getRelatedEntity());
+        $entityConfig->set(
+            'active_workflows',
+            array_diff($entityConfig->get('active_workflows', false, []), [$definition->getName()])
+        );
+        $this->persistEntityConfig($entityConfig);
 
         if ($definition) {
             $this->eventDispatcher->dispatch(
@@ -472,26 +477,12 @@ class WorkflowManager
     protected function setActiveWorkflow($entityClass, $workflowName)
     {
         $entityConfig = $this->getEntityConfig($entityClass);
-        
+
         $entityConfig->set(
             'active_workflows',
             array_merge($entityConfig->get('active_workflows', false, []), [$workflowName])
         );
-        
-        $this->persistEntityConfig($entityConfig);
-    }
 
-    /**
-     * @param string $entityClass
-     * @param string|null $workflowName
-     */
-    protected function setInactiveWorkflow($entityClass, $workflowName)
-    {
-        $entityConfig = $this->getEntityConfig($entityClass);
-        $entityConfig->set(
-            'active_workflows',
-            array_diff($entityConfig->get('active_workflows', false, []), [$workflowName])
-        );
         $this->persistEntityConfig($entityConfig);
     }
 
