@@ -67,6 +67,7 @@ services:
         calls:
             - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
             - [setAclHelper,["@oro_security.acl_helper"]]
+            - [setWorkflowManager,["@oro_workflow.manager"]]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_workflow_replacement, acl_resource: oro_workflow_definition_view }
 

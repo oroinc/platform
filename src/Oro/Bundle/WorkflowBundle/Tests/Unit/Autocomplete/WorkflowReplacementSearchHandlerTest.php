@@ -9,6 +9,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,6 +24,9 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
     /** @var Query|\PHPUnit_Framework_MockObject_MockObject */
     protected $query;
+
+    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowManager;
 
     /** @var WorkflowReplacementSearchHandler */
     protected $searchHandler;
@@ -43,12 +48,17 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->entityRepository->expects($this->any())->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->queryBuilder->expects($this->any())->method('getQuery')->willReturn($this->query);
         $this->queryBuilder->expects($this->any())->method('expr')->willReturn(new Query\Expr());
 
-        $this->searchHandler = new WorkflowReplacementSearchHandler(self::TEST_ENTITY_CLASS, ['name']);
+        $this->searchHandler = new WorkflowReplacementSearchHandler(self::TEST_ENTITY_CLASS, ['label']);
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->getManagerRegistryMock());
+        $this->searchHandler->setWorkflowManager($this->workflowManager);
     }
 
     public function testSearchWithoutDelimiter()
@@ -62,21 +72,28 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSearchWithoutEntityAndWithoutSearchTerm()
+    public function testSearchWithoutEntityAndSearchTermAndFilterByWorkflowManager()
     {
         $this->queryBuilder->expects($this->once())->method('setFirstResult')->with(0)
             ->willReturn($this->queryBuilder);
         $this->queryBuilder->expects($this->once())->method('setMaxResults')->with(11)
             ->willReturn($this->queryBuilder);
 
+        $this->workflowManager->expects($this->any())
+            ->method('isActiveWorkflow')
+            ->willReturnCallback(function (WorkflowDefinition $definition) {
+                return $definition->getName() !== 'item2';
+            });
+
         $this->query->expects($this->once())->method('getResult')->willReturn([
-            ['id' => 'item1', 'name' => 'name1'],
+            $this->getDefinition('item1', 'label1'),
+            $this->getDefinition('item2', 'label2'),
         ]);
 
         $this->assertSame(
             [
                 'results' => [
-                    ['id' => 'item1', 'name' => 'name1'],
+                    ['name' => 'item1', 'label' => 'label1'],
                 ],
                 'more' => false
             ],
@@ -99,14 +116,16 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->with('search', '%item2%')
             ->willReturn($this->queryBuilder);
 
+        $this->workflowManager->expects($this->any())->method('isActiveWorkflow')->willReturn(true);
+
         $this->query->expects($this->once())->method('getResult')->willReturn([
-            ['id' => 'item2', 'name' => 'name2'],
+            $this->getDefinition('item2', 'label2'),
         ]);
 
         $this->assertSame(
             [
                 'results' => [
-                    ['id' => 'item2', 'name' => 'name2'],
+                    ['name' => 'item2', 'label' => 'label2'],
                 ],
                 'more' => false
             ],
@@ -122,26 +141,43 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())->method('andWhere')
-            ->with((new Query\Expr())->notIn('w.id', ':id'))
+            ->with((new Query\Expr())->notIn('w.name', ':id'))
             ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())->method('setParameter')
             ->with('id', 'entity1')
             ->willReturn($this->queryBuilder);
 
+        $this->workflowManager->expects($this->any())->method('isActiveWorkflow')->willReturn(true);
+
         $this->query->expects($this->once())->method('getResult')->willReturn([
-            ['id' => 'item3', 'name' => 'name3'],
+            $this->getDefinition('item3', 'label3'),
         ]);
 
         $this->assertSame(
             [
                 'results' => [
-                    ['id' => 'item3', 'name' => 'name3'],
+                    ['name' => 'item3', 'label' => 'label3'],
                 ],
                 'more' => false
             ],
             $this->searchHandler->search(';entity1', 2, 10)
         );
+    }
+
+    /**
+     * @param string $name
+     * @param string $label
+     * @return WorkflowDefinition
+     */
+    protected function getDefinition($name, $label)
+    {
+        $definition = new WorkflowDefinition();
+        $definition
+            ->setName($name)
+            ->setLabel($label);
+
+        return $definition;
     }
 
     /**
@@ -177,7 +213,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $metadata->expects($this->once())->method('getSingleIdentifierFieldName')->willReturn('id');
+        $metadata->expects($this->once())->method('getSingleIdentifierFieldName')->willReturn('name');
 
         $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()

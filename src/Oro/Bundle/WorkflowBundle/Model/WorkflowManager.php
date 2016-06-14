@@ -417,6 +417,21 @@ class WorkflowManager
     }
 
     /**
+     * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
+     */
+    public function isActiveWorkflow($workflowIdentifier)
+    {
+        $definition = $workflowIdentifier instanceof WorkflowDefinition
+            ? $workflowIdentifier
+            : $this->getWorkflow($workflowIdentifier)->getDefinition();
+
+        $entityConfig = $this->getEntityConfig($definition->getRelatedEntity());
+        $activeWorkflows = (array)$entityConfig->get('active_workflow');
+
+        return in_array($definition->getName(), $activeWorkflows, true);
+    }
+
+    /**
      * @param string $entityClass
      * @param string|null $workflowName
      */
