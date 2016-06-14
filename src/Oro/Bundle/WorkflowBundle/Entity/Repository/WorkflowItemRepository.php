@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -72,12 +73,12 @@ class WorkflowItemRepository extends EntityRepository
     }
 
     /**
-     * @param string $entityClass
-     * @param array $excludedWorkflowNames
+     * @param WorkflowDefinition $workflowDefinition
      * @param int|null $batchSize
+     *
      * @throws \Exception
      */
-    public function resetWorkflowData($entityClass, $excludedWorkflowNames = [], $batchSize = null)
+    public function resetWorkflowData(WorkflowDefinition $workflowDefinition, $batchSize = null)
     {
         $entityManager = $this->getEntityManager();
         $batchSize = $batchSize ?: self::DELETE_BATCH_SIZE;
@@ -86,14 +87,9 @@ class WorkflowItemRepository extends EntityRepository
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select('workflowItem.id')
             ->from('OroWorkflowBundle:WorkflowItem', 'workflowItem')
-            ->innerJoin('workflowItem.definition', 'workflowDefinition')
-            ->where('workflowItem.entityClass = ?1')
-            ->setParameter(1, $entityClass)
+            ->innerJoin('workflowItem.definition', 'workflowDefinition', Join::WITH, 'workflowDefinition.name = ?1')
+            ->setParameter(1, $workflowDefinition->getName())
             ->orderBy('workflowItem.id');
-
-        if ($excludedWorkflowNames) {
-            $queryBuilder->andWhere($queryBuilder->expr()->notIn('workflowDefinition.name', $excludedWorkflowNames));
-        }
 
         $iterator = new DeletionQueryResultIterator($queryBuilder);
         $iterator->setBufferSize($batchSize);
