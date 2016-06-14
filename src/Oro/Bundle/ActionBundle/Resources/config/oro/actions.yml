@@ -136,16 +136,22 @@ operations:
                 conditions:
                     '@and':
                         - '@not_blank': $.data
-                        - '@eq': [$.hasConfig, true]
+                        - '@eq': [$.requestRoute, 'oro_action_widget_form'] # display a form template ot dialog
                 actions:
-                    - '@call_service_method':
-                        service: oro_entity_config.helper.entity_config
-                        method: getRoutes
-                        method_parameters: [$.data, ['name']]
-                        attribute: $.routes
                     - '@clone_object':
                         target: $.data
                         attribute: $.clone
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@not_blank': $.data
+                        - '@eq': [$.requestRoute, null] # no form or dialogue
+                        - '@empty': $.clone
+                actions:
+                    - '@clone_entity':
+                        target: $.data
+                        attribute: $.clone
+                        flush: true
         preconditions:
             '@and':
                 - '@not_blank': $.data
@@ -157,16 +163,6 @@ operations:
             title: oro.action.clone_entity
         button_options:
             icon: icon-copy
-        attributes:
-            entity:
-                label: ' '
-                type: entity
-                options:
-                  class: '\stdClass'
-        form_options:
-            attribute_fields:
-                entity:
-                    form_type: form
 action_groups:
     DELETE:
         parameters:
