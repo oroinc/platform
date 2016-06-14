@@ -7,7 +7,7 @@
 
 {% block navButtons %}
     {% if resource_granted('oro_organization_update') %}
-        {% set html = UI.saveAndStayButton() %}
+        {% set html = UI.saveAndStayButton({'route': 'oro_organization_update_current'}) %}
         {{ UI.dropdownSaveButton({'html': html}) }}
     {% endif %}
 {% endblock navButtons %}
