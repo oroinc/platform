@@ -59,7 +59,7 @@ class JsonDecodeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             InvalidMessageException::class,
-            'The message content type is a json but the body is not valid json. Code: 4'
+            'The message content type is a json but the body is not valid json.'
         );
         $extension->onPreReceived($this->createContextStub($message));
     }
