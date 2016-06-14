@@ -108,7 +108,7 @@ class TagController extends Controller
                 $this->get('translator')->trans('oro.tag.controller.tag.saved.message')
             );
 
-            return $this->redirect($this->generateUrl('oro_tag_index'));
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         return array(

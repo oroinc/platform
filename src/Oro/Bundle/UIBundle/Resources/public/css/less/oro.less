@@ -2203,26 +2203,19 @@ textarea {
 
 div.uploader {
   height: 28px;
-  border: 1px solid #ccc;
   background-color: #fff;
-  float: left;
   line-height: 28px;
   -webkit-border-radius: 3px;
-  border-radius: 3px;
   white-space: nowrap;
 }
 
 div.uploader span.action {
   display: inline-block;
   height: 28px;
-  border-left: 1px solid #ccc;
   padding: 0 10px;
   overflow: hidden;
   cursor: pointer;
-  #gradient > .vertical(#ffffff, #e6e6e6);
-}
-div.uploader.active  span.action {
-  #gradient > .vertical(#e6e6e6, #ffffff);
+  color: #006acc;
 }
 div.uploader span.filename {
   padding: 0px 10px;
@@ -2231,7 +2224,6 @@ div.uploader span.filename {
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: default;
-  width: 202px;
 }
 
 div.uploader input {
@@ -2363,7 +2355,6 @@ input:focus:invalid:focus,
 textarea:focus:invalid:focus,
 select:focus:invalid:focus,
 div.selector.focus,
-div.uploader.focus,
 .select2-container-active .select2-choice,
 .select2-container-active .select2-choices
 {
@@ -2978,6 +2969,17 @@ span.validation-failed {
 
   .tab-pane {
     min-height: 104px;
+
+    .fill-tab {
+      border: 0;
+      box-shadow: none;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .alert {
+      margin: 5px;
+    }
   }
 }
 
