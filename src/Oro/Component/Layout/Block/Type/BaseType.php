@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Block\Type;
 
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
@@ -9,16 +10,19 @@ class BaseType extends AbstractType
 {
     const NAME = 'block';
 
-    public function __construct()
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $optionsResolver)
     {
-        $this->options = [
-            'vars' => null,
-            'attr' => null,
-            'label' => null,
-            'label_attr' => null,
-            'translation_domain' => null,
-            'class_prefix' => null,
-        ];
+        $optionsResolver->setDefined([
+            'vars',
+            'attr',
+            'label',
+            'label_attr',
+            'translation_domain',
+            'class_prefix',
+        ]);
     }
 
     /**

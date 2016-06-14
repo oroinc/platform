@@ -44,6 +44,8 @@ parameters:
     oro_entity_extend.dictionary_value_list_provider.enum.class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider
     oro_entity_extend.field_type_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider
 
+    validator.builder.factory.class: Oro\Bundle\EntityExtendBundle\Validator\Validation
+
 services:
     oro_entity_extend.entity.cache.warmer:
         public: true

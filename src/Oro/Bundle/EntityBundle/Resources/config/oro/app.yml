@@ -1,10 +1,11 @@
 doctrine:
     dbal:
         types:
-            percent: Oro\DBAL\Types\PercentType
-            money:   Oro\DBAL\Types\MoneyType
-            object:  Oro\DBAL\Types\ObjectType
-            array:   Oro\DBAL\Types\ArrayType
+            percent:      Oro\DBAL\Types\PercentType
+            money:        Oro\DBAL\Types\MoneyType
+            object:       Oro\DBAL\Types\ObjectType
+            array:        Oro\DBAL\Types\ArrayType
+            config_object:  Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType
 
     orm:
         dql:
@@ -29,4 +30,5 @@ doctrine:
                 pow:            Oro\ORM\Query\AST\Functions\Numeric\Pow
             string_functions:
                 group_concat:   Oro\ORM\Query\AST\Functions\String\GroupConcat
+                concat_ws:      Oro\ORM\Query\AST\Functions\String\ConcatWs
                 cast:           Oro\ORM\Query\AST\Functions\Cast

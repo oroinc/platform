@@ -127,6 +127,18 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     protected $aclIdentities;
 
     /**
+     * @var Collection|WorkflowRestrictionIdentity[]
+     *
+     * @ORM\OneToMany(
+     *  targetEntity="WorkflowRestrictionIdentity",
+     *  mappedBy="workflowItem",
+     *  cascade={"all"},
+     *  orphanRemoval=true
+     * )
+     */
+    protected $restrictionIdentities;
+
+    /**
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
@@ -196,6 +208,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
 
         $this->transitionRecords = new ArrayCollection();
         $this->aclIdentities = new ArrayCollection();
+        $this->restrictionIdentities = new ArrayCollection();
         $this->data = new WorkflowData();
         $this->result = new WorkflowResult();
     }
@@ -540,6 +553,62 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
 
         return null;
     }
+
+    /**
+     * @return Collection|WorkflowRestrictionIdentity[]
+     */
+    public function getRestrictionIdentities()
+    {
+        return $this->restrictionIdentities;
+    }
+
+    /**
+     * @param WorkflowRestrictionIdentity $restrictionIdentity
+     */
+    public function addRestrictionIdentity(WorkflowRestrictionIdentity $restrictionIdentity)
+    {
+        $restrictionIdentity->setWorkflowItem($this);
+
+        $this->restrictionIdentities->add($restrictionIdentity);
+    }
+
+    /**
+     * @param WorkflowRestrictionIdentity $restrictionIdentity
+     */
+    public function removeRestrictionIdentity(WorkflowRestrictionIdentity $restrictionIdentity)
+    {
+        $this->restrictionIdentities->removeElement($restrictionIdentity);
+    }
+
+    /**
+     * @param Collection|WorkflowRestrictionIdentity[] $restrictionIdentities
+     *
+     * @return $this
+     */
+    public function setRestrictionIdentities($restrictionIdentities)
+    {
+        $newRestrictionsIdentities = [];
+        foreach ($restrictionIdentities as $restrictionIdentity) {
+            $newRestrictionsIdentities[$restrictionIdentity->getRestriction()->getHashKey()] = $restrictionIdentity;
+        }
+
+        $oldRestrictionsIdentities = $this->restrictionIdentities;
+        foreach ($oldRestrictionsIdentities as $old) {
+            $hashKey = $old->getRestriction()->getHashKey();
+            if (isset($newRestrictionsIdentities[$hashKey])) {
+                unset($newRestrictionsIdentities[$hashKey]);
+            } else {
+                $this->restrictionIdentities->removeElement($old);
+            }
+        }
+
+        foreach ($newRestrictionsIdentities as $newRestrictionsIdentity) {
+            $this->addRestrictionIdentity($newRestrictionsIdentity);
+        }
+
+        return $this;
+    }
+
 
     /**
      * Get created date/time
