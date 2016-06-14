@@ -12,13 +12,14 @@ define(function(require) {
         template: require('tpl!orouser/templates/capability-item.html'),
         autoRender: true,
         listen: {
-            'change:accessLevel model': 'render'
+            'change:value model': 'render'
         },
         events: {
             'change [type=checkbox]': 'onChange'
         },
         onChange: function(e) {
-            this.model.set('accessLevel', e.currentTarget.checked ? 5 : 0);
+            var value = this.model.get(e.currentTarget.checked ? 'selected_value' : 'unselected_value');
+            this.model.set('value', value);
         }
     });
 

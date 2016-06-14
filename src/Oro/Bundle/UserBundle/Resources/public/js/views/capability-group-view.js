@@ -30,22 +30,27 @@ define(function(require) {
         getTemplateData: function() {
             var templateData = CapabilityGroupView.__super__.getTemplateData.apply(this, arguments);
             _.defaults(templateData, this.model.toJSON());
-            templateData.allSelected = this.collection.where({'accessLevel': 0}).length === 0;
+            templateData.allSelected = this.isAllSelected();
             return templateData;
         },
 
         onSelectAll: function(e) {
             e.preventDefault();
             this.collection.each(function(model) {
-                model.set('accessLevel', 5);
+                model.set('value', model.get('selected_value'));
             });
         },
 
         onChange: function() {
             this.$('[data-name="capabilities-select-all"]')
-                .toggleClass('disabled', !this.collection.findWhere({'accessLevel': 0}));
-        }
+                .toggleClass('disabled', this.isAllSelected());
+        },
 
+        isAllSelected: function() {
+            return !this.collection.find(function(model) {
+                return model.get('value') !== model.get('selected_value');
+            });
+        }
     });
 
     return CapabilityGroupView;

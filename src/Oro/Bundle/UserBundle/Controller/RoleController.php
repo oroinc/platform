@@ -191,7 +191,9 @@ class RoleController extends Controller
                 'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
                 'description' => $description ? $translator->trans($description) : '',
                 'permissionName' => $permissions->getName(),
-                'accessLevel' => $permissions->getAccessLevel()
+                'value' => $permissions->getAccessLevel(),
+                'selected_value' => 5,
+                'unselected_value' => 0
             ];
         }
 

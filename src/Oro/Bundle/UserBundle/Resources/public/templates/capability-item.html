@@ -1,2 +1,2 @@
 <label<% if (description) {%> title="<%= description %>"<% } %>
-    ><input type="checkbox" value="5"<% if (accessLevel > 0) { %> checked<% } %>>&nbsp;<%= label %></label>
+    ><input type="checkbox" value="<%= value %>"<% if (value === selected_value) { %> checked<% } %>>&nbsp;<%= label %></label>
