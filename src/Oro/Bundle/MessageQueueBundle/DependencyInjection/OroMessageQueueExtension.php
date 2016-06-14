@@ -32,6 +32,8 @@ class OroMessageQueueExtension extends Extension
                 throw new \LogicException('Amqp transport is not installed.');
             }
 
+            $loader->load('amqp.yml');
+
             $amqpConfig = $config['transport']['amqp'];
             $connection = new Definition(AmqpConnection::class, [$amqpConfig]);
             $connection->setFactory([AmqpConnection::class, 'createFromConfig']);

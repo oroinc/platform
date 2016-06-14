@@ -3,6 +3,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Component\Testing\ClassExtensionTrait;
+use OroPro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -53,6 +54,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAllowConfigureAmqpTransport()
     {
+        if (false == class_exists(AmqpConnection::class)) {
+            $this->markTestSkipped('Amqp lib is not installed');
+        }
+
         $configuration = new Configuration();
 
         $processor = new Processor();

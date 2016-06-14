@@ -17,12 +17,6 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
-    oro_message_queue.consumption.delay_redelivered_message_amqp_extension:
-        class: 'OroPro\Component\MessageQueue\Consumption\Extension\DelayRedeliveredMessageAmqpExtension'
-        public: false
-        tags:
-            - { name: 'oro_message_queue.consumption.extension' }
-
     oro_message_queue.consumption.docrine_ping_connection_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
         public: false
