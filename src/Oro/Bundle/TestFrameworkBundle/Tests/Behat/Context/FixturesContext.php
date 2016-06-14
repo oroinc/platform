@@ -63,11 +63,13 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
     }
 
     /**
+     * @codingStandardsIgnoreStart
      * Load extra user(s) with their|its own entities
      * It can be used for load random entities with specific owner
      * Example: And there are two users with their own 3 Tasks
      * Example: And there is user with its own Account
      * @Given /^there (?:are|is) (?P<userCount>(?:|one|two|\d+))(?:|\s)user(?: |s )with (?:their|its) own(?:|\s+)(?P<entitiesCount>(?:|\d+)) (?P<entity>(\D*))$/
+     * @codingStandardsIgnoreEnd
      */
     public function iHaveUsersWithTheirEntities($userCount, $entity, $entitiesCount)
     {
