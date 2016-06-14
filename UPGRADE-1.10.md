@@ -87,8 +87,8 @@ UPGRADE FROM 1.9 to 1.10
 - Class `Oro\Bundle\WorkflowBundle\Model\ContextAccessor` marked as deprecated. Use `Oro\Component\Action\Model\ContextAccessor` instead.
 - Class `Oro\Bundle\WorkflowBundle\Model\Event\ExecuteActionEvent` marked as deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvent` instead.
 - Class `Oro\Bundle\WorkflowBundle\Model\Event\ExecuteActionEvents` marked as deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents` instead.
-- `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_BEFORE` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
-- `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_AFTER` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
+- Constant `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_BEFORE` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
+- Constant `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_AFTER` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
 - Service `oro_workflow.action_assembler` is deprecated. Use `oro_action.action_assembler` instead.
 - Service `oro_workflow.attribute_guesser` is deprecated. Use `oro_action.attribute_guesser` instead.
 - Service `oro_workflow.context_accessor` is deprecated. Use `oro_action.context_accessor` instead.
@@ -99,6 +99,17 @@ UPGRADE FROM 1.9 to 1.10
 - Added parameter `RestrictionAssembler $restrictionAssembler` to constructor of `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler`
 - Added parameter `RestrictionManager $restrictionManager` to constructor of `Oro\Bundle\WorkflowBundle\Model\Workflow`
 - Added parameter `WorkflowPermissionRegistry $permissionRegistry` to constructor of `Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter`
+- Added tags: `oro_workflow.changes.listener` and `oro_workflow.changes.subscriber` for `\Oro\Bundle\WorkflowBundle\Event\WorkflowEvents` event constants and separate dispatcher service `oro_workflow.changes.event.dispatcher`.
+- Added class `Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator` with corresponded service `oro_workflow.process.configurator` for single point of workflow processes configurations by configuration sets.
+- Added class `Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator`
+    **IMPORTANT**: Configuration must provide full list of triggers for mentioned process definition. If list under definition key comes empty - triggers would be removed. See more in `\Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator::configureTriggers` doc-block.
+    **IMPORTANT**: Changing of process cron triggers configuration will not keep all old cron triggers in database. E.g. old triggers would be removed and new created.
+- Added class `Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler` (`oro_workflow.handler.workflow_definition` service) for single point of `WorkflowDefinition` entity management.
+    All manipulations with `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity persistence should be provided through the handler.
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` construction signature was changed: additional (fifth) argument `Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher` was added.
+
+####CronBundle
+- Added action `@create_job` for instance of `JMS\JobQueueBundle\Entity\Job` creation and persistence through actions (Class `Oro\Bundle\CronBundle\Action\CreateJobAction`).
 
 ####SearchBundle
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::setEntitiesConfigParameter` deprecated since 1.9. Will be removed after 1.11. Please use oro_search.provider.search_mapping service for mapping config instead.
@@ -143,11 +154,10 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 
 ####LayoutBundle:
 - Added possibility to create layout block types using only DI configuration, for details please check out documentation at
- [What is layout?](./src/Oro/Bundle/LayoutBundle/Resources/doc/what_is_layout.md) section.
+ [Creating new block types](./src/Oro/Bundle/LayoutBundle/Resources/doc/example.md) section.
 - BlockType classes replaced with DI configuration for listed block types: `root`, `head`, `body`, `fieldset`, `list`, `listitem`, `text`, `button` and `button_group`.
 Corresponding block type classes was removed.
 - Renamed `setDefaultOptions` to `configureOptions` method at `Oro\Component\Layout\BlockTypeInterface\BlockTypeInterface` and `Oro\Component\Layout\BlockTypeInterface\BlockTypeExtensionInterface`.
-- Added default implementation of `buildView` and `finishView` methods to `Oro/Component/Layout/Block/Type/AbstractType`
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
@@ -162,3 +172,6 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 - `\Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface::prepare()` signature was changed from `prepare(array $source, VisitorCollection $visitorCollection);` to `prepare(Oro\Component\Layout\Loader\Generator\GeneratorData $data, VisitorCollection $visitorCollection);`
 - `@addTree` layout update action is `\Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension` now
 - Layout update `@setFormTheme` and `@setBlockTheme` actions can accept relative paths now
+
+####NotificationBundle:
+- The constructor of the `Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool` class was changed. Before: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass)`. After: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass, EventDispatcherInterface $eventDispatcher)`.

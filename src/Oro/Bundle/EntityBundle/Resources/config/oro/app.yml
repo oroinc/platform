@@ -31,4 +31,5 @@ doctrine:
                 pow:            Oro\ORM\Query\AST\Functions\Numeric\Pow
             string_functions:
                 group_concat:   Oro\ORM\Query\AST\Functions\String\GroupConcat
+                concat_ws:      Oro\ORM\Query\AST\Functions\String\ConcatWs
                 cast:           Oro\ORM\Query\AST\Functions\Cast

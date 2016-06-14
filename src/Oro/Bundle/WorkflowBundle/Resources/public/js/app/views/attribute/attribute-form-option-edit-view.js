@@ -56,7 +56,7 @@ define(function(require) {
 
         resetForm: function() {
             this.editViewId = null;
-            this.entityFieldSelectEl.select2('val', '');
+            this.entityFieldSelectEl.inputWidget('val', '');
             this.form.get(0).reset();
             this.submitBtn.html('<i class="icon-plus"></i> ' + __('Add'));
             this.resetBtn.addClass('hide');
@@ -74,7 +74,7 @@ define(function(require) {
 
         editRow: function(data) {
             this.editViewId = data.view_id;
-            this.fieldSelectorEl.select2(
+            this.fieldSelectorEl.inputWidget(
                 'val',
                 this.options.workflow.getFieldIdByPropertyPath(data.property_path)
             );
