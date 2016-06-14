@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
-use Behat\Behat\Hook\Scope\AfterStepScope;
-use Behat\Behat\Hook\Scope\BeforeStepScope;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Doctrine\Common\Inflector\Inflector;
@@ -43,9 +40,13 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * @codingStandardsIgnoreStart
+     * Set access level for action for specified entity for admin user
+     * Example: Given my permissions on Delete Cases is set to System
      * @Given /^(?:|I )have "(?P<accessLevel>(?:[^"]|\\")*)" permissions for "(?P<action>(?:[^"]|\\")*)" "(?P<entity>(?:[^"]|\\")*)" entity$/
      * @Given /^my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) is set to (?P<accessLevel>(?:[^"]|\\")*)$/
      * @When /^(?:|I )set my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) to (?P<accessLevel>(?:[^"]|\\")*)$/
+     * @codingStandardsIgnoreEnd
      */
     public function iHavePermissionsForEntity($entity, $action, $accessLevel)
     {
@@ -66,7 +67,12 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * @codingStandardsIgnoreStart
+     * Set access level for several actions for specified entity for admin user
+     * Example: Given my permissions on View Accounts as User and on Delete as System
+     * Example: Given my permissions on View Cases as System and on Delete as User
      * @Given /^my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) as (?P<accessLevel1>(?:[^"]|\\")*) and on (?P<action2>(?:|View|Create|Edit|Delete|Assign|Share)) as (?P<accessLevel2>(?:[^"]|\\")*)$/
+     * @codingStandardsIgnoreEnd
      */
     public function iHaveSeveralPermissionsForEntity($entity, $action1, $accessLevel1, $action2, $accessLevel2)
     {

@@ -19,13 +19,12 @@ class UserRoleForm extends Form
         $entityRow = $this->getEntityRow($entity);
         $actionRow = $this->getActionRow($entityRow, $action);
         $actionRow->find('css', 'div.access_level_value a')->click();
-        /** ToDo: Move waitForAjax to driver */
+        /** todo: Move waitForAjax to driver. BAP-10843 */
         sleep(1);
         $levels = $this->getPage()->findAll('css', '#select2-drop ul.select2-results li div');
 
         /** @var NodeElement $level */
         foreach ($levels as $level) {
-
             if (false !== strpos($level->getText(), $accessLevel)) {
                 $level->mouseOver();
                 $level->click();

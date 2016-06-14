@@ -55,7 +55,6 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
      * Example: I have 3 accounts
      * @Given /^there (?:is|are) (\d+) ([\w ]+)$/
      * @Given /^I have (?P<numberOfEntities>(?:\d+)) (?P<name>(?:(?!from)(\D*)))$/
-     *
      */
     public function thereIs($numberOfEntities, $name)
     {
@@ -78,7 +77,6 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
         $users = $this->fixtureLoader->loadRandomEntities('user', $userCount);
         $entities = [];
 
-        /** @var User $user */
         foreach ($users as $referenceId => $user) {
             for ($i = 0; $i < $entitiesCount; $i++) {
                 $entities[] = $this->fixtureLoader->getObjectFromArray($entity, ['owner' => '@'.$referenceId]);
