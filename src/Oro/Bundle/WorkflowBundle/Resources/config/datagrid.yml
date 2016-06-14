@@ -163,7 +163,7 @@ datagrid:
             deactivate_link:
                 type:       url
                 route:      oro_api_workflow_deactivate
-                params:     [ entityClass ]
+                params:     [ workflowDefinition ]
         sorters:
             columns:
                 label:

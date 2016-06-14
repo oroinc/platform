@@ -113,6 +113,7 @@ class WorkflowControllerTest extends WebTestCase
         ];
     }
 
+    //todo fix in scope of BAP-10818
     public function testDeactivateAndActivateActions()
     {
         // set and assert active workflow
@@ -131,7 +132,7 @@ class WorkflowControllerTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_api_workflow_deactivate',
-                ['entityClass' => $this->entityClass]
+                ['workflowDefinition' => $this->entityClass]
             )
         );
 
