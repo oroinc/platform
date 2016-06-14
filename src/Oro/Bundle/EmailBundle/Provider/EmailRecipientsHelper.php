@@ -163,9 +163,9 @@ class EmailRecipientsHelper
         }
 
         return [
-            'id' => self::prepareFormRecipientIds($recipient->getId()),
-            'text' => $recipient->getName(),
-            'data' => json_encode($data),
+            'id'    => self::prepareFormRecipientIds($recipient->getId()),
+            'text'  => $recipient->getName(),
+            'data'  => json_encode($data),
         ];
     }
 
