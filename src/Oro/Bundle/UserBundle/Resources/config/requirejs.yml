@@ -7,3 +7,4 @@ config:
         'orouser/js/tools/acl-users-search-api-accessor': 'bundles/orouser/js/tools/acl-users-search-api-accessor.js'
         'orouser/js/datagrid/roles-datagrid-builder': 'orouser/js/datagrid/roles-datagrid-builder.js'
         'oro/datagrid/cell/action-permissions-cell': 'orouser/js/datagrid/cell/action-permissions-cell.js'
+        'oro/datagrid/action/role-permissions-action': 'orouser/js/datagrid/action/role-permissions-action.js'

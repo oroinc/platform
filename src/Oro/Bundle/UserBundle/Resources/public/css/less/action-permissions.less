@@ -27,4 +27,26 @@
     text-overflow: ellipsis;
     vertical-align: bottom;
   }
+  & &__dropdown-toggle {
+    &:focus {
+      font-weight: normal;
+    }
+  }
 }
+.role-permissions-action-launcher {
+  .launchers-list .launcher-item a&:hover,
+  .launchers-list .launcher-item a&:focus {
+    background: transparent !important;
+  }
+}
+.dropdown-menu__role-permissions-action {
+  .grid .action-cell & {
+    top: auto;
+    margin-top: 17px;
+    right: -10px;
+  }
+  .dropdown-menu-collection__list > li {
+    white-space: nowrap;
+  }
+}
+
