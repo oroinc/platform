@@ -22,7 +22,7 @@ services:
     oro_layout.block_type.root:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
-            - [setOptions, [{doctype: {default: ''}}]]
+            - [setOptionsConfig, [{doctype: {default: ''}}]]
             - [setName, ['root']]
         tags:
              - { name: layout.block_type, alias: root }
@@ -96,7 +96,7 @@ services:
     oro_layout.block_type.fieldset:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
-            - [setOptions, [{title: {default: ''}}]]
+            - [setOptionsConfig, [{title: {default: ''}}]]
             - [setName, ['fieldset']]
         tags:
              - { name: layout.block_type, alias: fieldset }
@@ -104,7 +104,7 @@ services:
     oro_layout.block_type.text:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptions, [{escape: {default: true}, text: {required: true}}]]
+            - [setOptionsConfig, [{escape: {default: true}, text: {required: true}}]]
             - [setName, ['text']]
         tags:
              - { name: layout.block_type, alias: text }
@@ -118,7 +118,7 @@ services:
         parent: oro_layout.block_type.abstract_configurable
         calls:
             -
-                - setOptions
+                - setOptionsConfig
                 -
                     -
                         type: {default: 'button'}
@@ -158,7 +158,7 @@ services:
     oro_layout.block_type.list_item:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
-            - [setOptions, [{own_template: {default: true}}]]
+            - [setOptionsConfig, [{own_template: {default: true}}]]
             - [setName, ['list_item']]
         tags:
              - { name: layout.block_type, alias: list_item }

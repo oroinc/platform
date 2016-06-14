@@ -1,0 +1,16 @@
+{% block _form_css_widget %}
+    {% set content = content|striptags %}
+    {{ block_widget(block, {'content': content}) }}
+{% endblock %}
+
+{% block embed_form_legacy_form_widget %}
+    {% if form_layout is not empty %}
+        {% include form_layout with {'form': form} %}
+    {% else %}
+        {{ form(form, {'attr': {'id': form.vars.id, 'name': form.vars.name, 'novalidate': 'novalidate' }}) }}
+    {% endif %}
+{% endblock %}
+
+{% block embed_form_success_widget %}
+    {{ message|default('oro.embeddedform.success_message.default'|trans)|back_link()|raw }}
+{% endblock %}

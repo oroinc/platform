@@ -963,6 +963,25 @@
     </ul>
 {% endmacro %}
 
+{%- macro renderTable(titles, rows, style) -%}
+     <table class="{{ style }}">
+     <thead>
+     <tr>
+    {%- for title in titles %}
+        <th>{{ title }}</th>
+    {% endfor -%}
+     </tr>
+     </thead>
+    {%- for row in rows %}
+        <tr>
+            {%- for element in row %}
+                <td>{{ element }}</td>
+            {% endfor -%}
+        </tr>
+    {% endfor -%}
+    </table>
+{% endmacro %}
+
 {%- macro entityViewLink(entity, label, route, permission) -%}
     {% if entity %}
         {% if route and resource_granted(permission|default('VIEW'), entity) %}

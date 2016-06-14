@@ -80,11 +80,11 @@ define(function(require) {
         reset: function() {
             DictionaryFilter.__super__.reset.apply(this, arguments);
             var select2element = this.$el.find(this.elementSelector);
-            var data = select2element.select2('data');
-            if (data.length) {
+            var data = select2element.inputWidget('data');
+            if (data) {
                 this.previousData = data;
             }
-            select2element.select2('data',  null);
+            select2element.inputWidget('data',  null);
         },
 
         /**
@@ -167,14 +167,14 @@ define(function(require) {
 
             select2element.removeClass('hide');
             select2element.attr('multiple', 'multiple');
-            select2element.select2(select2Config);
+            select2element.inputWidget('create', 'select2', {initializeOptions: select2Config});
             self.isInitSelect2 = true;
             if (this.templateTheme) {
                 select2element.on('change', function() {
                     self.applyValue();
                 });
             }
-            select2element.select2('data',  values);
+            select2element.inputWidget('data',  values);
 
             this._criteriaRenderd = true;
         },
@@ -281,7 +281,7 @@ define(function(require) {
         _readDOMValue: function() {
             var value;
             if (this.isInitSelect2) {
-                value = this.$el.find('.select-values-autocomplete').select2('val');
+                value = this.$el.find('.select-values-autocomplete').inputWidget('val');
             } else {
                 value = null;
             }
@@ -341,7 +341,7 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var data = this.$(this.elementSelector).select2('data');
+            var data = this.$(this.elementSelector).inputWidget('data');
             if (!data.length) {
                 data = this.previousData.length ? this.previousData : this.initialData;
             }
@@ -367,7 +367,7 @@ define(function(require) {
          * @inheritDoc
          */
         _hideCriteria: function() {
-            this.$el.find(this.elementSelector).select2('close');
+            this.$el.find(this.elementSelector).inputWidget('close');
             DictionaryFilter.__super__._hideCriteria.apply(this, arguments);
         }
     });

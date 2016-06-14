@@ -78,6 +78,13 @@ class EmbeddedForm extends ExtendEmbeddedForm
     protected $successMessage;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="allowed_domains", type="text", nullable=true)
+     */
+    protected $allowedDomains;
+
+    /**
      * @var \DateTime $created
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -183,6 +190,22 @@ class EmbeddedForm extends ExtendEmbeddedForm
     public function getSuccessMessage()
     {
         return $this->successMessage;
+    }
+
+    /**
+     * @param string $allowedDomains
+     */
+    public function setAllowedDomains($allowedDomains)
+    {
+        $this->allowedDomains = $allowedDomains;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAllowedDomains()
+    {
+        return $this->allowedDomains;
     }
 
     /**

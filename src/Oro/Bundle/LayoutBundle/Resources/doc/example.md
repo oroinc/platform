@@ -122,7 +122,7 @@ Customizing block rendering
 ---------------------------------
 
 As you have seen in the previous section we are using the `setBlockTheme` action in our layout update file. This is the block theme responsible for defining how layout blocks are rendered.
-Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file.
+Let's define some of the blocks in `Resources/views/layouts/first_theme/default.html.twig` file. Also you can use relative path for block theme like `default.html.twig`.
 
 ```twig
 {% block _page_container_widget %}
@@ -1180,8 +1180,8 @@ layout:
                     'searh_form:end': ~
 ```
 
-Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block)
-For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form.
+Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block).
+For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form. Also we can use only one block type `form` which will create three child block: `form_start`, `form_fields`, `form_end`.
 
 All that is left is to define the search autocomplete block in our block theme file we'll:
 ```twig
@@ -1394,7 +1394,7 @@ services:
     acme_demo.block_type.datetime:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptions, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
+            - [setOptionsConfig, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
             - [setName, ['datetime']]
         tags:
              - { name: layout.block_type, alias: datetime }
@@ -1419,7 +1419,7 @@ services:
     acme_demo.block_type.title:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptions, [{level: {default: 1}}]]
+            - [setOptionsConfig, [{level: {default: 1}}]]
             - [setName, ['title']]
             - [setParent, ['text']]
         tags:
@@ -1452,7 +1452,7 @@ class ImageType extends AbstractType
     {
         $resolver
             ->setRequired(['path'])
-            ->setOptional(['alt']);
+            ->setDefined(['alt']);
     }
 
     /**

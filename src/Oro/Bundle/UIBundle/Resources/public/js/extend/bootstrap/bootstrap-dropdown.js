@@ -90,6 +90,10 @@ define(function(require) {
                 display: 'block',
                 width: $dropdownMenu.outerWidth()
             });
+            var originalPosition = {
+                parent: $parent.offset(),
+                dropdownMenu: $dropdownMenu.offset()
+            };
             $placeholder = $('<div class="dropdown-menu__placeholder"/>');
             $dropdownMenu.data('related-toggle', $this);
             $placeholder.data('related-menu', $dropdownMenu);
@@ -105,7 +109,8 @@ define(function(require) {
 
             $this.data('related-data', {
                 $dropdownMenu: $dropdownMenu,
-                $placeholder: $placeholder
+                $placeholder: $placeholder,
+                originalPosition: originalPosition
             }).dropdown('updatePosition');
         } else if (!isActive && ($placeholder = $parent.find('.dropdown-menu__placeholder')).length) {
             $dropdownMenu = $placeholder.data('related-menu')
@@ -131,13 +136,12 @@ define(function(require) {
         }
         var $parent =  obj.$placeholder.parent();
         var $dropdownMenu = obj.$dropdownMenu;
-        var parentOffset = $parent.offset();
-        var parentHeight = $parent.outerHeight();
-        var parentWidth = $parent.outerWidth();
+        var dropdownMenuOriginalPosition = obj.originalPosition.dropdownMenu;
+        var parentOriginalPosition = obj.originalPosition.parent;
+        var parentPosition = $parent.offset();
         $dropdownMenu.css({
-            top: parentOffset.top + parentHeight,
-            left: parentOffset.left,
-            width: parentWidth
+            top: dropdownMenuOriginalPosition.top + parentPosition.top - parentOriginalPosition.top,
+            left: dropdownMenuOriginalPosition.left + parentPosition.left - parentOriginalPosition.left
         });
     };
 
