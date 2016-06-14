@@ -146,19 +146,6 @@ services:
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
 
-    oro_workflow.provider.virtual_relation.workflow_item:
-        class: Oro\Bundle\WorkflowBundle\Provider\WorkflowItemVirtualRelationProvider
-        arguments:
-            - "@oro_entity.doctrine_helper"
-        tags:
-            - { name: oro_entity.virtual_relation_provider, priority: 150 }
-
-    oro_workflow.provider.virtual_relation.workflow_step:
-        class: Oro\Bundle\WorkflowBundle\Provider\WorkflowStepVirtualRelationProvider
-        arguments:
-            - "@oro_entity.doctrine_helper"
-        tags:
-            - { name: oro_entity.virtual_relation_provider, priority: 160 }
     oro_workflow.validation_loader:
         class: Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader
         public: false
