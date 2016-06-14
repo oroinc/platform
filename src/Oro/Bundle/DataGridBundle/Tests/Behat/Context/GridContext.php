@@ -189,17 +189,9 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @return GridElement
-     */
-    private function getGrid()
-    {
-        return $this->elementFactory->createElement('Grid');
-    }
-
-    /**
      * @Then I shouldn't see :action action
      */
-    public function iShouldnTSeeDeleteAction($action)
+    public function iShouldNotSeeDeleteAction($action)
     {
         $grid = $this->getGrid();
         if ($grid->getMassActionLink($action)) {
@@ -208,5 +200,13 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
                 $this->getSession()->getDriver()
             );
         }
+    }
+
+    /**
+     * @return GridElement
+     */
+    private function getGrid()
+    {
+        return $this->elementFactory->createElement('Grid');
     }
 }

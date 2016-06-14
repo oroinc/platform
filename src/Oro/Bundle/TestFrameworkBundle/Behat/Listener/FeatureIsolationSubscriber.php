@@ -6,7 +6,6 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
-use Nelmio\Alice\Instances\Collection;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DumperInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer;
@@ -18,7 +17,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     /** @var DumperInterface[] */
     protected $dumpers;
 
-    /** @var Collection */
+    /** @var FixtureLoader */
     protected $fixtureLoader;
 
     /** @var KernelServiceFactory */

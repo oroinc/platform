@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker\Factory;
 use Faker\ORM\Doctrine\ColumnTypeGuesser;
-use Nelmio\Alice\Instances\Collection;
+use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -21,7 +21,7 @@ class EntitySupplement
     protected $registry;
 
     /**
-     * @var Collection
+     * @var AliceCollection
      */
     protected $referenceRepository;
 
@@ -48,12 +48,12 @@ class EntitySupplement
     /**
      * EntitySupplement constructor.
      * @param Registry $registry
-     * @param Collection $referenceRepository
+     * @param AliceCollection $referenceRepository
      * @param MetadataProviderInterface $metadataProvider
      */
     public function __construct(
         Registry $registry,
-        Collection $referenceRepository,
+        AliceCollection $referenceRepository,
         MetadataProviderInterface $metadataProvider
     ) {
         $this->registry = $registry;

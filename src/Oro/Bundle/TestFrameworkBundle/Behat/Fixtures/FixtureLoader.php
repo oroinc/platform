@@ -8,10 +8,6 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
 use Nelmio\Alice\Persister\Doctrine as AliceDoctrine;
 use Oro\Bundle\EntityBundle\ORM\Registry;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntitySupplement;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Yaml\Exception\ParseException;
 
 class FixtureLoader
 {
@@ -64,7 +60,7 @@ class FixtureLoader
     ) {
         $this->em = $registry->getManager();
         $this->persister = new AliceDoctrine($this->em);
-        $this->fallbackPath = str_replace('/', DIRECTORY_SEPARATOR, __DIR__ . '/../../Tests/Behat');
+        $this->fallbackPath = str_replace('/', DIRECTORY_SEPARATOR, __DIR__.'/../../Tests/Behat');
         $this->aliceLoader = $aliceLoader;
         $this->entityClassResolver = $entityClassResolver;
         $this->entitySupplement = $entitySupplement;
@@ -104,10 +100,10 @@ class FixtureLoader
     }
 
     /**
-     * @param string $entity
-     * @param array $aliceValues
-     * @param array $objectValues
-     * @return object
+     * @param string $entity Entity name of full namespace
+     * @param array $aliceValues Values in alice format, references, faker function can be used
+     * @param array $objectValues Object values in format ['property' => 'value']
+     * @return object Entity object instantiated and filled with values. All required values will filled by faker
      */
     public function getObjectFromArray($entity, array $aliceValues, array $objectValues = [])
     {
@@ -125,7 +121,7 @@ class FixtureLoader
     /**
      * @param string $entityName
      * @param integer $numberOfEntities
-     * @return array
+     * @return array Generated objects in format ['aliceReference' => object]
      */
     public function loadRandomEntities($entityName, $numberOfEntities)
     {
@@ -157,8 +153,8 @@ class FixtureLoader
     }
 
     /**
-     * @param $entityName
-     * @return string
+     * @param string $entityName Entity name in plural or single form, e.g. Tasks, Calendar Event etc.
+     * @return string Full namespace to class
      */
     public function getEntityClass($entityName)
     {
@@ -179,15 +175,6 @@ class FixtureLoader
     public function setSuite(Suite $suite)
     {
         $this->suite = $suite;
-    }
-
-    /**
-     * @param array $fixture
-     * @param array $parameters
-     */
-    protected static function compileTemplate(array &$fixture, array $parameters)
-    {
-        $fixture = array_merge($fixture, $parameters);
     }
 
     /**
