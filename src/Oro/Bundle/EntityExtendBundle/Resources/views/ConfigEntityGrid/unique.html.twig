@@ -4,7 +4,11 @@
 
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_entityconfig_view', {id: entity_id})) }}
-    {{ UI.saveAndCloseButton('Save'|trans) }}
+    {{ UI.saveAndCloseButton({
+        'label': 'Save'|trans,
+        'route': 'oro_entityconfig_view',
+        'params': {'id': entity_id}
+    }) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}

@@ -98,7 +98,12 @@
                             {% placeholder update_navButtons_after with {entity: entity} %}
 
                             {% if form.vars.method != 'GET' %}
-                                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
+                                <input
+                                        type="hidden"
+                                        name="input_action"
+                                        value="{{ constant('Oro\\Bundle\\UIBundle\\Route\\Router::ACTION_SAVE_CLOSE') }}"
+                                        data-form-id="{{ form.vars.id }}"
+                                />
                             {% endif %}
                         </div>
                         <div class="pull-right user-info-state">

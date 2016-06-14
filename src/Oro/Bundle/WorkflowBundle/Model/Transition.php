@@ -4,13 +4,16 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 
-use Oro\Component\Action\Action\ActionInterface;
-
+/**
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Transition
 {
     /**
@@ -92,6 +95,16 @@ class Transition
      * @var string
      */
     protected $dialogTemplate;
+
+    /**
+     * @var string
+     */
+    protected $scheduleCron;
+
+    /**
+     * @var string
+     */
+    protected $scheduleFilter;
 
     /**
      * Set label.
@@ -503,5 +516,51 @@ class Transition
     public function getDialogTemplate()
     {
         return $this->dialogTemplate;
+    }
+
+    /**
+     * @param string $cron
+     * @return $this
+     */
+    public function setScheduleCron($cron)
+    {
+        $this->scheduleCron = (string) $cron;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheduleCron()
+    {
+        return $this->scheduleCron;
+    }
+
+    /**
+     * @param string $dqlFilter
+     * @return $this
+     */
+    public function setScheduleFilter($dqlFilter)
+    {
+        $this->scheduleFilter = (string) $dqlFilter;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheduleFilter()
+    {
+        return $this->scheduleFilter;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->name;
     }
 }
