@@ -129,6 +129,7 @@ class WorkflowManager
      * @param WorkflowItem $workflowItem
      * @return WorkflowItem|null workflowItem for workflow definition with a start step, null otherwise
      * @throws \Exception
+     *
      */
     public function resetWorkflowItem(WorkflowItem $workflowItem)
     {
@@ -143,7 +144,7 @@ class WorkflowManager
             $this->getWorkflow($workflowItem)->resetWorkflowData($entity);
             $em->remove($workflowItem);
             $em->flush();
-
+            //todo fix in BAP-10808 or BAP-10809
             $activeWorkflow = $this->getApplicableWorkflow($entity);
             if ($activeWorkflow->getStepManager()->hasStartStep()) {
                 $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
@@ -325,10 +326,14 @@ class WorkflowManager
     /**
      * @param string $entityClass
      * @return null|Workflow
+     * @deprecated 
      */
     public function getApplicableWorkflowByEntityClass($entityClass)
     {
-        return $this->workflowRegistry->getActiveWorkflowByEntityClass($entityClass);
+        throw new \RuntimeException(
+            'No single workflow supported for an entity. ' .
+            'See \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflowsByEntityClass'
+        );
     }
 
     /**
@@ -343,6 +348,7 @@ class WorkflowManager
     /**
      * @param string $entityClass
      * @return bool
+     * @deprecated
      */
     public function hasApplicableWorkflowByEntityClass($entityClass)
     {

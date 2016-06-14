@@ -30,12 +30,12 @@ class WorkflowRegistry
     /**
      * @var Workflow[]
      */
-    protected $workflowByName = array();
+    protected $workflowByName = [];
 
     /**
-     * @param ManagerRegistry   $managerRegistry
+     * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
-     * @param ConfigProvider    $configProvider
+     * @param ConfigProvider $configProvider
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -95,20 +95,12 @@ class WorkflowRegistry
      * Get Active Workflow that is applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow|null
+     * @return Workflow[]
+     * @deprecated
      */
     public function getActiveWorkflowByEntityClass($entityClass)
     {
-        if ($this->configProvider->hasConfig($entityClass)) {
-            $entityConfig = $this->configProvider->getConfig($entityClass);
-            $activeWorkflowName = $entityConfig->get('active_workflows');
-
-            if ($activeWorkflowName) {
-                return $this->getWorkflow($activeWorkflowName, false);
-            }
-        }
-
-        return null;
+        throw new \RuntimeException('TODO Refactor an remove usage of method. Entity has many workflows now.');
     }
 
     /**
@@ -119,18 +111,19 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
-        $data = [];
-
         if ($this->configProvider->hasConfig($entityClass)) {
             $entityConfig = $this->configProvider->getConfig($entityClass);
-            $activeWorkflowNames = $entityConfig->get('active_workflows', false, []);
+            $activeWorkflows = $entityConfig->get('active_workflows', false, []);
 
-            foreach ($activeWorkflowNames as $name) {
-                $data[] = $this->getWorkflow($name, false);
-            }
+            return array_map(
+                function ($activeWorkflowName) {
+                    return $this->getWorkflow($activeWorkflowName, false);
+                },
+                $activeWorkflows
+            );
         }
 
-        return $data;
+        return [];
     }
 
     /**
