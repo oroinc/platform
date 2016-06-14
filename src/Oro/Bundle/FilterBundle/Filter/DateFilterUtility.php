@@ -70,8 +70,8 @@ class DateFilterUtility
         $data = [
             'date_start'          => $data['value']['start'],
             'date_end'            => $data['value']['end'],
-            'date_start_original' => $data['value']['start_original'],
-            'date_end_original'   => $data['value']['end_original'],
+            'date_start_original' => isset($data['value']['start_original']) ? $data['value']['start_original']: null,
+            'date_end_original'   => isset($data['value']['end_original']) ? $data['value']['end_original'] : null,
             'type'                => $data['type'],
             'part'                => isset($data['part']) ? $data['part'] : DateModifierInterface::PART_VALUE,
             'field'               => $field

@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
-use \Datetime;
-
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-
-use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 
 class FilterDateRangeConverter extends ConfigValueConverterAbstract
 {
@@ -28,6 +26,15 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
 
     /** @var DateHelper */
     protected $dateHelper;
+
+    /** @var array */
+    protected static $valueTypesStartVarsMap = [
+        AbstractDateFilterType::TYPE_TODAY        => DateModifierInterface::VAR_TODAY,
+        AbstractDateFilterType::TYPE_THIS_WEEK    => DateModifierInterface::VAR_SOW,
+        AbstractDateFilterType::TYPE_THIS_MONTH   => DateModifierInterface::VAR_SOM,
+        AbstractDateFilterType::TYPE_THIS_QUARTER => DateModifierInterface::VAR_SOQ,
+        AbstractDateFilterType::TYPE_THIS_YEAR    => DateModifierInterface::VAR_SOY,
+    ];
 
     /**
      * @param DateTimeFormatter   $formatter
@@ -52,31 +59,43 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
      */
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
-        if (is_null($value)
-            || ($value['value']['start'] === null && $value['value']['end'] === null)
-        ) {
+        $start = $end = $part = $type = $valueType = null;
+        $part  = DateModifierInterface::PART_VALUE;
+        if (in_array($value['type'], AbstractDateFilterType::$valueTypes)) {
+            $valueType = $value['type'];
+            if (array_key_exists($value['type'], static::$valueTypesStartVarsMap)) {
+                $start = sprintf('{{%s}}', static::$valueTypesStartVarsMap[$value['type']]);
+                $type  = AbstractDateFilterType::TYPE_MORE_THAN;
+            } elseif ($value['type'] === AbstractDateFilterType::TYPE_ALL_TIME) {
+                $part = DateModifierInterface::PART_ALL_TIME;
+            }
+        } elseif (empty($value['value']['start']) && empty($value['value']['end'])) {
             list($start, $end) = $this->dateHelper->getDateTimeInterval('P1M');
-
-            $type  = AbstractDateFilterType::TYPE_BETWEEN;
+            $type = AbstractDateFilterType::TYPE_BETWEEN;
         } else {
-            list($startValue, $endValue, $type) = $this->getPeriodValues($value);
-
-            $start = $startValue instanceof DateTime ? $startValue : $this->dateCompiler->compile($startValue);
-            $end = $endValue instanceof DateTime ? $endValue : $this->dateCompiler->compile($endValue);
+            list($start, $end, $type) = $this->getPeriodValues($value);
+            $start = $start instanceof \DateTime ? $start : $this->dateCompiler->compile($start);
+            $end   = $end instanceof \DateTime ? $end : $this->dateCompiler->compile($end);
             //Swap start and end dates if end date is behind start date
-            if ($start > $end) {
-                $e = $end;
-                $end = $start;
+            if ($end && $start > $end) {
+                $e     = $end;
+                $end   = $start;
                 $start = $e;
             }
-            $start->setTime(0, 0, 0);
-            $end->setTime(23, 59, 59);
+            if ($end) {
+                $end->setTime(23, 59, 59);
+            }
+            if ($start) {
+                $start->setTime(0, 0, 0);
+            }
         }
 
         return [
-            'start' => $start,
-            'end'   => $end,
-            'type'  => $type
+            'start'      => $start,
+            'end'        => $end,
+            'type'       => $type,
+            'value_type' => $valueType,
+            'part'       => $part,
         ];
     }
 
@@ -85,30 +104,40 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
      */
     public function getViewValue($value)
     {
-        switch ($value['type']) {
-            case AbstractDateFilterType::TYPE_MORE_THAN:
-                return sprintf(
-                    '%s %s',
-                    $this->translator->trans('oro.filter.form.label_date_type_more_than'),
-                    $this->formatter->formatDate($value['start'])
-                );
-            case AbstractDateFilterType::TYPE_LESS_THAN:
-                return sprintf(
-                    '%s %s',
-                    $this->translator->trans('oro.filter.form.label_date_type_less_than'),
-                    $this->formatter->formatDate($value['end'])
-                );
-        }
+        $start = $value['start'] instanceof \DateTime
+            ? $value['start']
+            : $this->dateCompiler->compile($value['start']);
 
-        return sprintf(
-            '%s - %s',
-            $this->formatter->formatDate($value['start']),
-            $this->formatter->formatDate($value['end'])
-        );
+        $end   = $value['end'] instanceof \DateTime
+            ? $value['end']
+            : $this->dateCompiler->compile($value['end']);
+
+        if ($value['part'] === DateModifierInterface::PART_ALL_TIME) {
+            return $this->translator->trans('oro.dashboard.widget.filter.date_range.all_time');
+        } elseif ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN) {
+            return sprintf(
+                '%s %s',
+                $this->translator->trans('oro.filter.form.label_date_type_more_than'),
+                $this->formatter->formatDate($start)
+            );
+        } elseif ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN) {
+            return sprintf(
+                '%s %s',
+                $this->translator->trans('oro.filter.form.label_date_type_less_than'),
+                $this->formatter->formatDate($end)
+            );
+        } else {
+            return sprintf(
+                '%s - %s',
+                $this->formatter->formatDate($start),
+                $this->formatter->formatDate($end)
+            );
+        }
     }
 
     /**
      * @param array $value
+     *
      * @return array
      */
     protected function getPeriodValues($value)
@@ -120,14 +149,14 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         if ($type === AbstractDateFilterType::TYPE_LESS_THAN
             || ($type === AbstractDateFilterType::TYPE_BETWEEN && $startValue === null)
         ) {
-            $startValue = new DateTime(self::MIN_DATE, new \DateTimeZone('UTC'));
+            $startValue = new \DateTime(self::MIN_DATE, new \DateTimeZone('UTC'));
             $type       = AbstractDateFilterType::TYPE_LESS_THAN;
         }
 
         if ($type === AbstractDateFilterType::TYPE_MORE_THAN
             || ($type === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
         ) {
-            $endValue = new DateTime('now', new \DateTimeZone('UTC'));
+            $endValue = new \DateTime('now', new \DateTimeZone('UTC'));
             $type     = AbstractDateFilterType::TYPE_MORE_THAN;
         }
 
