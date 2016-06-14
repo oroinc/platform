@@ -124,6 +124,8 @@ operations:
 
     CLONE:
         extends: CRUD_ACTION
+        replace:
+            - preconditions
         order: 30
         groups:
             - view_navButtons
@@ -146,6 +148,7 @@ operations:
                         attribute: $.clone
         preconditions:
             '@and':
+                - '@not_blank': $.data
                 - '@or':
                     - '@not_blank': $.routes[name]
                     - '@not_blank': $.gridName

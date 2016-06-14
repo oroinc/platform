@@ -30,6 +30,7 @@
 %}
 
 {% block navButtons %}
+    {{ parent() }}
     {% if resource_granted('oro_workflow') %}
         {% if isActive %}
             {% set idButton = entity.name ~ '-workflow-deactivate-btn' %}
@@ -113,7 +114,6 @@
             }) }}
         {% endif %}
     {% endif %}
-    {{ parent() }}
 {% endblock navButtons %}
 
 {% block stats %}

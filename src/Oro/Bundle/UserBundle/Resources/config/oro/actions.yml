@@ -9,7 +9,8 @@ operations:
         datagrids:
             - roles-grid
         routes:
-            - oro_user_role_view
+            - oro_user_role_index
+            - oro_user_role_update
         acl_resource: [CREATE, entity:Oro\Bundle\UserBundle\Entity\Role]
         preactions:
             - '@trans':
