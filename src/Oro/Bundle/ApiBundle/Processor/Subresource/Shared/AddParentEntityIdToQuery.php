@@ -28,17 +28,14 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             // a query does not exist or it is not supported type
             return;
         }
+
         $rootAlias = QueryUtils::getSingleRootAlias($query, false);
         if (!$rootAlias) {
             // only queries with one root entity is supported
             return;
         }
-        $associationName = $this->getAssociationName($context);
-        if (!$associationName) {
-            // it is strange, but the association name cannot be recognized
-            return;
-        }
 
+        $associationName = $this->getAssociationName($context);
         if ($context->isCollection()) {
             $query->innerJoin(
                 $context->getParentClassName(),
@@ -67,12 +64,10 @@ class AddParentEntityIdToQuery implements ProcessorInterface
     protected function getAssociationName(SubresourceContext $context)
     {
         $associationName = $context->getAssociationName();
-        $associationField = $context->getParentConfig()->getField($associationName);
-        if (!$associationField) {
-            // it is strange, but the parent entity does not have the requested association
-            return null;
-        }
+        $propertyPath = $context->getParentConfig()
+            ->getField($associationName)
+            ->getPropertyPath();
 
-        return $associationField->getPropertyPath() ?: $associationName;
+        return $propertyPath ?: $associationName;
     }
 }

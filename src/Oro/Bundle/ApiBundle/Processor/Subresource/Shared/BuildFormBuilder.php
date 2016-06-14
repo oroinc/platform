@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 
 /**
- * Builds the form builder based on the parent entity metadata and configuration
+ * Builds the form builder based on the parent entity configuration
  * and sets it to the Context.
  */
 class BuildFormBuilder implements ProcessorInterface

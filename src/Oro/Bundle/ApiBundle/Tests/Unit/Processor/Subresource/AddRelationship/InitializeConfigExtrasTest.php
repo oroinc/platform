@@ -1,16 +1,14 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\AddRelationship;
 
-use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
-use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\GetList\InitializeConfigExtras;
+use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\InitializeConfigExtras;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 
-class InitializeConfigExtrasTest extends GetListProcessorTestCase
+class InitializeConfigExtrasTest extends ChangeRelationshipProcessorTestCase
 {
     /** @var InitializeConfigExtras */
     protected $processor;
@@ -24,8 +22,6 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
 
     public function testProcess()
     {
-        $this->context->setConfigExtras([]);
-
         $existingExtra = new TestConfigExtra('test');
         $this->context->addConfigExtra($existingExtra);
 
@@ -36,10 +32,7 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
             [
                 new TestConfigExtra('test'),
                 new EntityDefinitionConfigExtra($this->context->getAction()),
-                new CustomizeLoadedDataConfigExtra(),
-                new DataTransformersConfigExtra(),
-                new FiltersConfigExtra(),
-                new SortersConfigExtra()
+                new FilterIdentifierFieldsConfigExtra()
             ],
             $this->context->getConfigExtras()
         );

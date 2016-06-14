@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 
 /**
- * Makes sure that the relationship is represented a collection valued association.
+ * Makes sure that the relationship is represented "to-many" association.
  */
 class ValidateIsCollection implements ProcessorInterface
 {
