@@ -57,7 +57,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
      * @param string $className
      * @param array $fields
      */
-    public function addMethodExtension($className, array $fields)
+    public function addDefaultMethodFields($className, array $fields)
     {
         if (isset($this->methodExtensions[$className])) {
             $this->methodExtensions[$className] = array_merge($this->methodExtensions[$className], $fields);
@@ -92,20 +92,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
         $method = $this->generateClassMethod($methodName, implode("\n", $methodBody));
         $class->setMethod($method);
     }
-    public function getDefaultName()
-    {
-        $names = $this->names->filter(function (LocalizedFallbackValue $name) {
-            return null === $name->getLocale();
-        });
 
-        if ($names->count() > 1) {
-            throw new \LogicException('There must be only one default name');
-        } elseif ($names->count() === 1) {
-            return $names->first();
-        }
-
-        return null;
-    }
     /**
      * Generate the default getter method name for the given field name
      *

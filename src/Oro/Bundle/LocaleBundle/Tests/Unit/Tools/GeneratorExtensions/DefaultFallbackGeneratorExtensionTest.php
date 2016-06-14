@@ -22,7 +22,7 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             $this->extension->supports([])
         );
 
-        $this->extension->addMethodExtension('testClass', []);
+        $this->extension->addDefaultMethodFields('testClass', []);
         $this->assertTrue(
             $this->extension->supports([
                 'class' => 'testClass'
@@ -55,7 +55,7 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             'class' => 'Test\Entity'
         ];
 
-        $this->extension->addMethodExtension('Test\Entity', [
+        $this->extension->addDefaultMethodFields('Test\Entity', [
             'testField'
         ]);
 
@@ -72,7 +72,7 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             'class' => 'Test\Entity'
         ];
 
-        $this->extension->addMethodExtension('Test\Entity', [
+        $this->extension->addDefaultMethodFields('Test\Entity', [
             'testField'=> $fieldName
         ]);
 

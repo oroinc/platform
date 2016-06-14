@@ -26,14 +26,18 @@ class DefaultFallbackExtensionPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $generator = $container->getDefinition(self::GENERATOR_EXTENSION_NAME);
-
         if (!$this->classes) {
             return;
         }
 
+        if (!$container->hasDefinition(self::GENERATOR_EXTENSION_NAME)) {
+            return;
+        }
+
+        $generator = $container->getDefinition(self::GENERATOR_EXTENSION_NAME);
+
         foreach ($this->classes as $class => $fields) {
-            $generator->addMethodCall('addMethodExtension', [$class, $fields]);
+            $generator->addMethodCall('addDefaultMethodFields', [$class, $fields]);
         }
     }
 }
