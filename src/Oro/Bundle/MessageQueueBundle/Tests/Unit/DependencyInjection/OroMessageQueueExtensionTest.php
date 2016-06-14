@@ -61,6 +61,10 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldUseAmqpTransportAsDefault()
     {
+        if (false == class_exists(AmqpConnection::class)) {
+            $this->markTestSkipped('Amqp lib is not installed');
+        }
+
         $container = new ContainerBuilder();
 
         $extension = new OroMessageQueueExtension();
