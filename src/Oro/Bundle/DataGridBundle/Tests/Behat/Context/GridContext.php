@@ -203,7 +203,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     {
         $grid = $this->getGrid();
         if ($grid->getMassActionLink($action)) {
-            throw new ExpectationException(sprintf('%s mass action should not be accassable', $action), $this->getSession()->getDriver());
+            throw new ExpectationException(
+                sprintf('%s mass action should not be accassable', $action),
+                $this->getSession()->getDriver()
+            );
         }
     }
 }

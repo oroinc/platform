@@ -131,17 +131,13 @@ class FixtureLoader
     {
         $className = $this->getEntityClass($entityName);
         $entities = [];
-//$admin = $this->em->getRepository('OroUserBundle:User')->find(1);
+
         for ($i = 0; $i < $numberOfEntities; $i++) {
             $id = uniqid('alice_', true);
             $entities[$id] = $entity = new $className;
             $this->aliceLoader->getReferenceRepository()->set($id, $entity);
 
             $this->entitySupplement->completeRequired($entity);
-//$user = $this->em->getReference(get_class($this->aliceLoader->getReferenceRepository()->get('user-1')), $this->aliceLoader->getReferenceRepository()->get('user-1')->getId());
-//$entity->setOwner($user);
-//$entity->setSubject(uniqid());
-
 
             $this->em->persist($entity);
         }
