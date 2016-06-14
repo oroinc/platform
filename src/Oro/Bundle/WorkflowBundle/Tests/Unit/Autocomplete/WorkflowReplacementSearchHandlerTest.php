@@ -72,22 +72,17 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSearchWithoutEntityAndSearchTermAndFilterByWorkflowManager()
+    public function testSearchWithoutEntityAndSearchTerm()
     {
         $this->queryBuilder->expects($this->once())->method('setFirstResult')->with(0)
             ->willReturn($this->queryBuilder);
         $this->queryBuilder->expects($this->once())->method('setMaxResults')->with(11)
             ->willReturn($this->queryBuilder);
 
-        $this->workflowManager->expects($this->any())
-            ->method('isActiveWorkflow')
-            ->willReturnCallback(function (WorkflowDefinition $definition) {
-                return $definition->getName() !== 'item2';
-            });
+        $this->workflowManager->expects($this->any())->method('isActiveWorkflow')->willReturn(true);
 
         $this->query->expects($this->once())->method('getResult')->willReturn([
             $this->getDefinition('item1', 'label1'),
-            $this->getDefinition('item2', 'label2'),
         ]);
 
         $this->assertSame(
@@ -162,6 +157,35 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
                 'more' => false
             ],
             $this->searchHandler->search(';entity1', 2, 10)
+        );
+    }
+
+    public function testSearchFilterByIsActiveWorkflow()
+    {
+        $this->queryBuilder->expects($this->once())->method('setFirstResult')->with(0)
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())->method('setMaxResults')->with(11)
+            ->willReturn($this->queryBuilder);
+
+        $this->workflowManager->expects($this->any())
+            ->method('isActiveWorkflow')
+            ->willReturnCallback(function (WorkflowDefinition $definition) {
+                return $definition->getName() !== 'item4';
+            });
+
+        $this->query->expects($this->once())->method('getResult')->willReturn([
+            $this->getDefinition('item4', 'label4'),
+            $this->getDefinition('item5', 'label5'),
+        ]);
+
+        $this->assertSame(
+            [
+                'results' => [
+                    ['name' => 'item5', 'label' => 'label5'],
+                ],
+                'more' => false
+            ],
+            $this->searchHandler->search(';', 1, 10)
         );
     }
 
