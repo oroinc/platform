@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Model;
+namespace Oro\Bundle\LayoutBundle\Model;
 
 class ThemeImageType
 {

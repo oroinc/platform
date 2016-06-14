@@ -2,9 +2,9 @@
 
 namespace LayoutBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
-use Oro\Component\Layout\Extension\Theme\Model\ThemeImageType;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
 class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider;
 
+use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
-use Oro\Component\Layout\Extension\Theme\Model\ThemeImageType;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
 class ImageTypeProvider
