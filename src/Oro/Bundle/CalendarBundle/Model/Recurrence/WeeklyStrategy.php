@@ -90,7 +90,13 @@ class WeeklyStrategy extends AbstractStrategy
     {
         $interval = $recurrence->getInterval();
         $days = [];
-        foreach ($recurrence->getDayOfWeek() as $day) {
+        $dayOfWeek = $recurrence->getDayOfWeek();
+
+        if ($this->getDayOfWeekRelativeValue($dayOfWeek) == 'weekday') {
+            return $this->getFullRecurrencePattern($recurrence, 'oro.calendar.recurrence.patterns.weekday', 0, []);
+        }
+
+        foreach ($dayOfWeek as $day) {
             $days[] = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
         }
 
