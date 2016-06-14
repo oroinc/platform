@@ -17,7 +17,7 @@ class OroNotificationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -29,6 +29,7 @@ class OroNotificationBundleInstaller implements Installation
         $this->createOroNotificationEmailNotifTable($schema);
         $this->createOroNotificationEmailSpoolTable($schema);
         $this->createOroNotificationEventTable($schema);
+        $this->createOroNotificationMassNotifTable($schema);
         $this->createOroNotificationRecipGroupTable($schema);
         $this->createOroNotificationRecipListTable($schema);
         $this->createOroNotificationRecipUserTable($schema);
@@ -69,6 +70,7 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('status', 'integer', []);
         $table->addColumn('message', 'object', ['comment' => '(DC2Type:object)']);
+        $table->addColumn('log_type', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['status'], 'notification_spool_status_idx', []);
     }
@@ -86,6 +88,25 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'UNIQ_2E2482DF5E237E06');
+    }
+
+    /**
+     * Create oro_notification_mass_notif table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroNotificationMassNotifTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_notification_mass_notif');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('email', 'string', ['length' => 255]);
+        $table->addColumn('sender', 'string', ['length' => 255]);
+        $table->addColumn('subject', 'string', ['length' => 255]);
+        $table->addColumn('body', 'text', ['notnull' => false]);
+        $table->addColumn('scheduledAt', 'datetime', []);
+        $table->addColumn('processedAt', 'datetime', []);
+        $table->addColumn('status', 'integer', []);
+        $table->setPrimaryKey(['id']);
     }
 
     /**

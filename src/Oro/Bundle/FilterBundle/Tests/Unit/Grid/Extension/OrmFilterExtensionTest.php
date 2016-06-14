@@ -4,6 +4,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Grid\Extension;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 
@@ -174,7 +175,7 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
                         PagerInterface::DISABLED_PARAM => true
                     ]
                 ],
-                false
+                ['value' => 'filter-value']
             ],
             'default_filter_no_parameters_new_grid'       => [
                 [
@@ -192,6 +193,28 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 [],
+                ['value' => 'filter-value']
+            ],
+            'default_filter_no_parameters_grid_with_default_view'  => [
+                [
+                    'filters' => [
+                        'columns' => [
+                            'filter' => [
+                                'type' => 'string'
+                            ],
+                        ],
+                        'default' => [
+                            'filter' => [
+                                'value' => 'filter-value'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    ParameterBag::ADDITIONAL_PARAMETERS => [
+                        GridViewsExtension::VIEWS_PARAM_KEY => GridViewsExtension::DEFAULT_VIEW_ID
+                    ]
+                ],
                 ['value' => 'filter-value']
             ],
             'parametrized_without_default_filters'        => [

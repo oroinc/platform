@@ -63,10 +63,6 @@ class LocalizationControllerTest extends WebTestCase
 
         $html = $crawler->html();
         $this->assertContains('Localization has been saved', $html);
-        $this->assertContains(self::NAME, $html);
-        $this->assertContains(self::DEFAULT_TITLE, $html);
-        $this->assertContains($this->getLanguageFormatter()->format(self::LANGUAGE_CODE), $html);
-        $this->assertContains($this->getFormattingFormatter()->format(self::FORMATTING_CODE), $html);
     }
 
     /**
@@ -81,6 +77,13 @@ class LocalizationControllerTest extends WebTestCase
 
         $id = $localization->getId();
         $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_update', ['id' => $id]));
+
+        $html = $crawler->html();
+        
+        $this->assertContains(self::NAME, $html);
+        $this->assertContains(self::DEFAULT_TITLE, $html);
+        $this->assertContains($this->getLanguageFormatter()->format(self::LANGUAGE_CODE), $html);
+        $this->assertContains($this->getFormattingFormatter()->format(self::FORMATTING_CODE), $html);
 
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
