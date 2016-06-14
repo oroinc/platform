@@ -163,7 +163,7 @@ class EmailRecipientsHelper
         }
 
         return [
-            'id' => EmailRecipientsHelper::prepareFormRecipientIds($recipient->getId()),
+            'id' => self::prepareFormRecipientIds($recipient->getId()),
             'text' => $recipient->getName(),
             'data' => json_encode($data),
         ];
