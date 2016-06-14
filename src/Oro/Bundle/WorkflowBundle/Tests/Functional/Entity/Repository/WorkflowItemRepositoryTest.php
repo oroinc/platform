@@ -28,7 +28,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
 
         $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroWorkflowBundle:WorkflowItem');
     }
-    
+
     public function testFindByEntityMetadata()
     {
         /** @var WorkflowAwareEntity $entity */
@@ -43,6 +43,41 @@ class WorkflowItemRepositoryTest extends WebTestCase
         );
 
         $this->assertEquals([$item], $actual);
+    }
+
+    public function testFindAllByEntityMetadata()
+    {
+        $entityIds = $this->getEntityIdsByWorkflow();
+        $entityId = reset($entityIds[LoadWorkflowDefinitions::NO_START_STEP]);
+        $this->assertInternalType(
+            'array',
+            $this->repository->findAllByEntityMetadata(
+                'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
+                $entityId
+            )
+        );
+    }
+
+    public function testFindOneByEntityMetadata()
+    {
+        $entityIds = $this->getEntityIdsByWorkflow();
+        $entityId = reset($entityIds[LoadWorkflowDefinitions::NO_START_STEP]);
+
+        $this->assertNull($this->repository->findOneByEntityMetadata(
+            'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
+            $entityId,
+            'SOME_NON_EXISTING_WORKFLOW'
+        )
+        );
+
+        $this->assertInstanceOf(
+            'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
+            $this->repository->findOneByEntityMetadata(
+                'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
+                $entityId,
+                LoadWorkflowDefinitions::NO_START_STEP
+            )
+        );
     }
 
     public function testResetWorkflowData()
