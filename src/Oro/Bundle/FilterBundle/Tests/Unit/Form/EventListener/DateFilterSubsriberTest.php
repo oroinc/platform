@@ -4,25 +4,29 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\EventListener;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
 use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
-
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DateFilterSubscriber */
     protected $subscriber;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $compiler;
+    /** @var DateFilterModifier|\PHPUnit_Framework_MockObject_MockObject */
+    protected $modifier;
 
     protected function setUp()
     {
+        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->setMethods(array('getTimezone'))
@@ -31,10 +35,15 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getTimezone')
             ->will($this->returnValue('Europe/Moscow'));
 
+        /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject $translatorMock */
         $translatorMock = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        /** @var DateModifierProvider|\PHPUnit_Framework_MockObject_MockObject $providerMock */
         $providerMock   = $this->getMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
-        $this->compiler   = new Compiler(new Lexer($translatorMock, $providerMock), new Parser($localeSettings));
-        $this->subscriber = new DateFilterSubscriber($this->compiler);
+
+        $this->modifier   = new DateFilterModifier(
+            new Compiler(new Lexer($translatorMock, $providerMock), new Parser($localeSettings))
+        );
+        $this->subscriber = new DateFilterSubscriber($this->modifier);
     }
 
     public function testSubscribedEvents()

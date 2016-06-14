@@ -148,7 +148,8 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
                 [
                     'start' => $start,
                     'end' => $end,
-                    'type' => AbstractDateFilterType::TYPE_BETWEEN
+                    'type' => AbstractDateFilterType::TYPE_BETWEEN,
+                    'part' => null
                 ]
             )
         );

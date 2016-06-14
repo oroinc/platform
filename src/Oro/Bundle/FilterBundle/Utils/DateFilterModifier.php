@@ -36,25 +36,26 @@ class DateFilterModifier
      *
      * @param array $data
      *
+     * @param array $valueKeys
+     *
      * @return array
      */
-    public function modify(array $data)
+    public function modify(array $data, array $valueKeys = ['start', 'end'])
     {
         $data     = $this->modifyDateForEqualType($data);
         $data     = $this->modifyPartByVariable($data);
-        $dateKeys = ['start', 'end'];
         // compile expressions
-        $data         = $this->mapValues($dateKeys, $data, $this->getCompileClosure());
+        $data         = $this->mapValues($valueKeys, $data, $this->getCompileClosure());
         $data['part'] = isset($data['part']) ? $data['part'] : null;
 
         // change value type depending on date part
         if (array_key_exists($data['part'], static::$partFormatsMap)) {
             $format = static::$partFormatsMap[$data['part']];
-            $data   = $this->mapValues($dateKeys, $data, $this->getDatePartAccessorClosure($format));
+            $data   = $this->mapValues($valueKeys, $data, $this->getDatePartAccessorClosure($format));
         } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
-            $data = $this->mapValues($dateKeys, $data, $this->getQuarterMapValuesClosure());
+            $data = $this->mapValues($valueKeys, $data, $this->getQuarterMapValuesClosure());
         } else {
-            $data = $this->mapValues($dateKeys, $data, $this->getValueMapValuesClosure());
+            $data = $this->mapValues($valueKeys, $data, $this->getValueMapValuesClosure());
         }
 
         return $data;

@@ -68,7 +68,8 @@ class DateFilterSubscriber implements EventSubscriberInterface
             // in case when DateTimeFilter already process and parent subscription is not necessary
             return;
         }
-        $data = $this->dateFilterModifier->modify($data);
+        $children = array_keys($form->get('value')->all());
+        $data = $this->dateFilterModifier->modify($data, $children);
         // replace value form children to needed sub forms in case when part is selected
         if (array_key_exists($data['part'], static::$partChoicesMap)) {
             $min = static::$partChoicesMap[$data['part']][0];
