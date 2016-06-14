@@ -148,6 +148,11 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setPostAction($postAction);
         }
 
+        if (!empty($options['schedule'])) {
+            $transition->setScheduleCron($this->getOption($options['schedule'], 'cron', null));
+            $transition->setScheduleFilter($this->getOption($options['schedule'], 'filter', null));
+        }
+
         return $transition;
     }
 

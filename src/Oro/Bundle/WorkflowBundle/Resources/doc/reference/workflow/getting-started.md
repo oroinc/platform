@@ -9,6 +9,7 @@ Table of Contents
  - [Workflow Fields](#workflow-fields)
  - [Activation State](#activation-state)
  - [Configuration](#configuration)
+ - [Console commands](#console-commands)
 
 What is Workflow?
 -----------------
@@ -314,3 +315,26 @@ Following diagram shows this logic in graphical representation.
 Oro/Bundle/UserBundle/Resources/config/workflow.yml, reload definitions using console command
 ``app/console oro:workflow:definitions:load`` and activate it from UI -
 after that you can go to User view page and test it.
+
+Console commands
+----------------
+
+WorkflowBundle provides following console commands to work with workflows.
+
+#### oro:workflow:definitions:load
+
+This command loads workflow's configurations from *.yml configuration files to the database. It used
+during application installation and update processes. Command has two optional options:
+
+- **--directories** - specifies directories used to find configuration files (multiple values allowed);
+- **--workflows** - specifies names of the workflows that should be loaded (multiple values allowed).
+
+**Note:** You must execute this command every time when workflow configurations were changed at "*.yml" files.
+
+#### oro:workflow:transit
+
+This command perform transition with specified name for WorkflowItem with specified ID. It used for performing scheduled
+transitions. Command has two required option:
+
+- **--workflow-item** - identifier of WorkflowItem.
+- **--transition** - name of Transition.
