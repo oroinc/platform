@@ -90,7 +90,7 @@ class Router
                 /**
                  * Avoids of BC break
                  */
-                return $this->redirect($entity);
+                $routeData = $saveAndCloseRoute;
         }
 
         if (!isset($routeData['route'])) {

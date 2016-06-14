@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
 class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
@@ -162,6 +163,44 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         // resetting
         $this->workflowDefinition->setEntityAcls(array());
         $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
+    }
+
+    public function testSetGetEntityRestrictions()
+    {
+        $firstStep = new WorkflowStep();
+        $firstStep->setName('first_step');
+        $secondStep = new WorkflowStep();
+        $secondStep->setName('second_step');
+        $this->workflowDefinition->setSteps([$firstStep, $secondStep]);
+
+        $firstRestriction = new WorkflowRestriction();
+        $firstRestriction->setStep($firstStep)->setAttribute('first_attribute');
+        $secondRestriction = new WorkflowRestriction();
+        $secondRestriction->setStep($secondStep)->setAttribute('second_attribute');
+
+        // default
+        $this->assertEmpty($this->workflowDefinition->getRestrictions()->toArray());
+
+        // adding
+        $this->workflowDefinition->setRestrictions([$firstRestriction]);
+        $this->assertCount(1, $this->workflowDefinition->getRestrictions());
+        $this->assertEquals($firstRestriction, $this->workflowDefinition->getRestrictions()->first());
+
+        // merging
+        $this->workflowDefinition->setRestrictions([$firstRestriction, $secondRestriction]);
+        $this->assertCount(2, $this->workflowDefinition->getRestrictions());
+        $restrictions = array_values($this->workflowDefinition->getRestrictions()->toArray());
+        $this->assertEquals($firstRestriction, $restrictions[0]);
+        $this->assertEquals($secondRestriction, $restrictions[1]);
+
+        // removing
+        $this->workflowDefinition->setRestrictions([$secondRestriction]);
+        $this->assertCount(1, $this->workflowDefinition->getRestrictions());
+        $this->assertEquals($secondRestriction, $this->workflowDefinition->getRestrictions()->first());
+
+        // resetting
+        $this->workflowDefinition->setRestrictions([]);
+        $this->assertEmpty($this->workflowDefinition->getRestrictions()->toArray());
     }
 
     /**

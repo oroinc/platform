@@ -75,6 +75,10 @@ return array(
                         )
                     )
                 ),
+                'schedule' => [
+                    'cron' => '1 * * * *',
+                    'filter' => "e.field < DATE_ADD(NOW(), 1, 'day')"
+                ]
             )
         ),
         'transition_definitions' => array(
@@ -105,6 +109,7 @@ return array(
                 )
             )
         ),
+        'entity_restrictions' => array()
     ),
     'second_workflow' => array(
         'label' => 'Second Workflow',
@@ -153,5 +158,6 @@ return array(
         'is_system' => false,
         'entity_attribute' => 'entity',
         'steps_display_ordered' => false,
+        'entity_restrictions' => array()
     )
 );
