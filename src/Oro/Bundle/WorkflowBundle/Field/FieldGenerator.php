@@ -53,6 +53,7 @@ class FieldGenerator
      */
     public function generateWorkflowFields($entityClass)
     {
+        return;
         if ($this->entityConnector->isWorkflowAware($entityClass)) {
             return;
         }

@@ -33,33 +33,39 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
         }
     }
 
+    /**
+     * @param ObjectManager $manager
+     * @param WorkflowDefinition $definition
+     */
     protected function generateEntities(ObjectManager $manager, WorkflowDefinition $definition)
     {
         // load entities
         /** @var WorkflowAwareEntity[] $entities */
-        $entities = array();
+        $entities = [];
         for ($i = 1; $i <= self::COUNT; $i++) {
             $entity = new WorkflowAwareEntity();
             $entity->setName($definition->getName() . '_entity_' . $i);
-            $entities[] = $entity;
+            $entities[$i] = $entity;
             $manager->persist($entity);
+            
+            $this->setReference('workflow_aware_entity.' . $i, $entity);
         }
         $manager->flush();
 
         // create workflow item manually (to make it faster)
-        foreach ($entities as $entity) {
+        foreach ($entities as $i => $entity) {
             $workflowItem = new WorkflowItem();
             $workflowItem->setDefinition($definition)
                 ->setWorkflowName($definition->getName())
                 ->setEntity($entity)
                 ->setEntityId($entity->getId())
-                ->setEntityClass('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity')
+                ->setEntityClass($definition->getRelatedEntity())
                 ->setCurrentStep($definition->getSteps()->first());
             $manager->persist($workflowItem);
 
-            $entity->setWorkflowItem($workflowItem)
-                ->setWorkflowStep($workflowItem->getCurrentStep());
+            $this->setReference('workflow_item.' . $i, $workflowItem);
         }
+
         $manager->flush();
     }
 
@@ -68,6 +74,6 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
      */
     public function getDependencies()
     {
-        return array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions');
+        return ['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions'];
     }
 }
