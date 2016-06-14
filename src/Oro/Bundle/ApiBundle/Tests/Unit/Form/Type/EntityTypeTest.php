@@ -31,7 +31,9 @@ class EntityTypeTest extends OrmRelatedTestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
-        $associationMetadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $associationMetadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -59,7 +61,9 @@ class EntityTypeTest extends OrmRelatedTestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
-        $associationMetadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $associationMetadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -104,7 +108,9 @@ class EntityTypeTest extends OrmRelatedTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
-        $associationMetadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $associationMetadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -139,7 +145,9 @@ class EntityTypeTest extends OrmRelatedTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
-        $associationMetadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $associationMetadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -154,7 +162,9 @@ class EntityTypeTest extends OrmRelatedTestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
-        $associationMetadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $associationMetadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -169,7 +179,9 @@ class EntityTypeTest extends OrmRelatedTestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
-        $associationMetadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $associationMetadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -186,7 +198,9 @@ class EntityTypeTest extends OrmRelatedTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
-        $associationMetadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $associationMetadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -203,7 +217,9 @@ class EntityTypeTest extends OrmRelatedTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
-        $associationMetadata->setAcceptableTargetClassNames(['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']);
+        $associationMetadata->setAcceptableTargetClassNames(
+            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
+        );
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
