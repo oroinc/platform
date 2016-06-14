@@ -147,7 +147,7 @@ class RoleController extends Controller
             $identity = $child->children['identity'];
             $item = [
                 'entity' => $translator->trans($identity->children['name']->vars['value']),
-                'entityId' => $identity->children['id']->vars['value'],
+                'identity' => $identity->children['id']->vars['value'],
                 'permissions' => []
             ];
             // all data transformation are taken from form type blocks

@@ -128,6 +128,8 @@ Single workflow configuration has next properties:
     Contains configuration for Transitions
 * **transition_definitions**
     Contains configuration for Transition Definitions
+* **entity_restrictions**
+    Contains configuration for Workflow Restrictions
 
 Example
 -------
@@ -147,6 +149,8 @@ workflows:                                                    # Root elements
         transitions:                                          # configuration for Transitions
                                                               # ...
         transition_definitions:                               # configuration for Transition Definitions
+                                                              # ...
+        entity_restrictions:                                  # configuration for Restrictions
                                                               # ...
 ```
 
@@ -257,7 +261,7 @@ Summarizing all above, step has next configuration:
     *boolean*
     If true than step will be counted as workflow final step.
 * **entity_acl**
-    Defines an ACL for the workflow related entity when workflow is in this step.
+    Defines an ACL for an entity related to the specified attribute when workflow is in this step.
     * **update**
         *boolean*
         Can entity be updated. Default value is true.
@@ -280,6 +284,10 @@ workflows:
                 allowed_transitions: # list of allowed transitions from this step
                     - connected
                     - not_answered
+                entity_acl:
+                    owner:
+                        update: false
+                        delete: false
              start_conversation:
                 label: 'Call Phone Conversation'
                 allowed_transitions:
@@ -300,6 +308,9 @@ Transition configuration has next options:
 * **unique name**
     *string*
     A transition must have unique name in scope of Workflow. Step configuration references transitions by this value.
+* **label**
+    *string*
+    Label of transition, will to be shown in UI.
 * **step_to**
     *string*
     Next step name. This is a reference to step that will be set to Workflow Item after transition is performed.
@@ -344,6 +355,18 @@ Transition configuration has next options:
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
     will be shown when user clicks transition button.
+* **schedule**
+    These options can be used to configure the schedule for performing transition. This block can contain following sub-options:
+    - **cron** (*string*) - cron-definition for scheduling time for performing transition.
+    - **filter** (*string*) - "WHERE" part of DQL expression. This option used to filter entities that will be used in transition.
+    Following aliases are available:
+        - **e** - entity
+        - **wd** - WorkflowDefinition
+        - **wi** - WorkflowItem
+        - **ws** - WorkflowStep
+
+    Transition for entity can be performed by schedule, when entity is on the appropriate step and all defined conditions are met.
+
 * **transition_definition**
     *string*
     Name of associated transition definition.
@@ -362,6 +385,9 @@ workflows:
                                                             # when transition will be performed
 
                 transition_definition: connected_definition # A reference to Transition Definition configuration
+                schedule:
+                    cron: '0 * * * *'                       # try to perform transition every hour
+                    filter: "e.expired = 1"                 # transition by schedule will be executed only for entities that have field `expired` = true
                 frontend_options:
                     icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
                     class: 'btn-primary'                    # add css class "btn-primary" to transition button
@@ -439,6 +465,68 @@ workflows:
                             comment: $conversation_comment
                             successful: $conversation_successful
                             call: $phone_call
+```
+
+Entity Restrictions Configuration
+=================================
+
+Entity Restrictions add validation rules for configured attributes fields. They do not permit to edit these fields on the attributes' edit or create form,
+on the attributes' grids via inline editing,  via API or performing an import.
+Single entity restriction can be described with next configuration:
+
+* **unique name**
+    *string*
+    A restriction must have unique name in scope of Workflow.
+* **attribute**
+    *string*
+    This is reference to workflow attribute (attribute must be of type 'entity').
+* **field**
+    *string*
+    Field name of attribute class for which restriction will be applied. 
+* **mode**
+    *enum*
+    Restriction mode. Allowed values for this option are 'full', 'disallow', 'allow'. Default value is 'full'
+     - 'full' mode means that field will be completely disabled for editing. This is default value for this option.
+     - 'disallow' mode do not permit to fill field with values listed in 'values' option.
+     - 'allow' mode do not permit to fill field with values except listed in 'values' option.
+* **values**
+    *array*
+    Optional list of field values which will be used for restriction with 'allow' and 'disallow' modes. 
+* **step**
+    *string*
+    This is reference to workflow step. Restriction will be applied only When workflow is in this step.
+    If no step is provided restriction will be applied for attribute creation.
+
+Example
+-------
+
+```
+workflows:
+    opportunity_flow:
+        # ...
+        entity_restrictions:
+            opportunity_status_creation:           # unique restriction name in scope of this Workflow 
+                attribute: opportunity             # attribute's reference links to attribute(attribute must be of type 'entity') 
+                field: status                      # field name of attribute class
+                mode: disallow                     # restriction mode (default is 'full')
+                values:                            # disallowed values for this field
+                    - 'won'                  
+                    - 'lost'
+            opportunity_close_reason_creation:
+                attribute: opportunity
+                field: closeReason
+            opportunity_status_open:
+                attribute: opportunity
+                field: status
+                step: open                        # restriction will be applied only When workflow is in this step.
+                mode: disallow
+                values:
+                    - 'won'
+                    - 'lost'
+            opportunity_close_reason_open:
+                attribute: opportunity
+                field: closeReason
+                step: open
 ```
 
 Conditions Configuration

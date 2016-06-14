@@ -1114,7 +1114,7 @@ define(function(require) {
          */
         findCellByIndex: function(modelI, columnI) {
             try {
-                return _.findWhere(this.body.rows[modelI].subviews, {
+                return _.findWhere(this.body.subviews[modelI].subviews, {
                     column: this.columns.at(columnI)
                 });
             } catch (e) {

@@ -20,4 +20,5 @@ rm -rf web/css/*
   * Upgrade platform
 ```bash
 php app/console oro:platform:update --env=prod --force
+```
 
