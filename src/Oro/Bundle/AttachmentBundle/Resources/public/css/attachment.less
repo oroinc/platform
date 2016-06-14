@@ -1,3 +1,5 @@
+@import "oroui/css/less/mixins";
+
 .oro_attachment_file{
   border: none;
   padding: 5px 5px 0 5px;
@@ -42,12 +44,12 @@
       width: 345px;
     }
     input:hover ~ span.action {
-      color: #006acc;
+      color: @linkColorHover;
     }
     span.action {
       border: none;
       background: none;
-      color: #08c;
+      color: @linkColor;
       cursor: pointer;
     }
     .active  span.action {
@@ -65,7 +67,7 @@
     border: none;
     box-shadow: none;
     span.action {
-      color: #006acc;
+      color: @linkColor;
     }
   }
 }
