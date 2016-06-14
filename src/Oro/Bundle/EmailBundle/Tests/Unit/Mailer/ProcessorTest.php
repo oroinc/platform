@@ -309,6 +309,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         };
     }
 
+    /**
+    * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+    */
     public function messageDataProvider()
     {
         return [
