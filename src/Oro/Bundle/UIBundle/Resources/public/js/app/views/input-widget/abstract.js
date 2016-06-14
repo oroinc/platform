@@ -40,33 +40,40 @@ define(function(require) {
 
         refreshOnChange: false,
 
+        overrideJqueryMethods: ['val', 'hide', 'show', 'focus', 'width'],
+
         /**
          * @inheritDoc
          */
         initialize: function(options) {
             this.resolveOptions(options);
+            this.initializeWidget();
 
+            if (this.isInitialized()) {
+                this.container().addClass(this.containerClass);
+            }
+
+            this.$el.trigger('input-widget:init');
+        },
+
+        initializeWidget: function() {
             if (this.initializeOptions) {
                 this.widgetFunction(this.initializeOptions);
             } else {
                 this.widgetFunction();
-            }
-
-            if (this.isInitialized()) {
-                this.findContainer();
-                this.getContainer().addClass(this.containerClass);
             }
         },
 
         delegateEvents: function() {
             AbstractInputWidget.__super__.delegateEvents.apply(this, arguments);
             if (this.refreshOnChange) {
-                this.$el.on('change' + this.eventNamespace(), _.bind(this.refresh, this));
+                this._addEvent('change', _.bind(this.refresh, this));
             }
         },
 
         /**
          * Implement this method in child class if widget can not be initialized for some reason
+         *
          * @returns {boolean}
          */
         isInitialized: function() {
@@ -79,7 +86,8 @@ define(function(require) {
         resolveOptions: function(options) {
             _.extend(this, options || {});
 
-            this.$el.data('inputWidget', this);
+            this.$el.data('inputWidget', this)
+                .attr('data-bound-input-widget', this.widgetFunctionName || 'no-name');
             if (!this.widgetFunction) {
                 this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
             }
@@ -99,28 +107,40 @@ define(function(require) {
                 return;
             }
 
-            if (this.destroyOptions) {
-                this.widgetFunction(this.destroyOptions);
-            }
+            this.disposeWidget();
 
-            this.$el.removeData('inputWidget');
+            this.$el.removeData('inputWidget')
+                .removeAttr('data-bound-input-widget');
             delete this.$container;
 
             return AbstractInputWidget.__super__.dispose.apply(this, arguments);
         },
 
+        disposeWidget: function() {
+            if (this.destroyOptions) {
+                this.widgetFunction(this.destroyOptions);
+            }
+        },
+
         /**
          * Find widget root element
          */
-        findContainer: function() {},
+        findContainer: function() {
+            throw Error('"findContainer" method have to be defined in the child view');
+        },
 
         /**
          * Get widget root element
          *
          * @returns {jQuery}
          */
-        getContainer: function() {
-            return this.$container;
+        container: function() {
+            return this.$container || (this.$container = this.findContainer());
+        },
+
+        applyWidgetFunction: function(command, args) {
+            Array.prototype.unshift.call(args, command);
+            return this.widgetFunction.apply(this, args);
         },
 
         /**
@@ -128,10 +148,8 @@ define(function(require) {
          *
          * @param {mixed} width
          */
-        setWidth: function(width) {
-            if (this.getContainer()) {
-                this.getContainer().width(width);
-            }
+        width: function(width) {
+            this.container().width(width);
         },
 
         /**
@@ -140,7 +158,22 @@ define(function(require) {
         refresh: function() {
             if (this.refreshOptions) {
                 this.widgetFunction(this.refreshOptions);
+            } else {
+                this.disposeWidget();
+                this.initializeWidget();
             }
+        },
+
+        hide: function() {
+            this.container().hide();
+        },
+
+        show: function() {
+            this.container().show();
+        },
+
+        _addEvent: function(eventName, callback) {
+            this.$el.on(eventName + this.eventNamespace(), callback);
         }
     });
 

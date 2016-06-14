@@ -10,12 +10,29 @@ oro:
 
         back_link_default_text: Back
         get_code:               Get code
+        tabs:
+            iframe:
+                label:          Iframe code
+            inline:
+                label:          Inline code
+                description: >
+                    Note: Using this method of embedding will interfere with your site's CSS.
+                    You might need to change the form CSS.<br />
+                    You should also check the Allowed Domains section and add all known domains
+                    that are hosting your form.
         no_types_available:     The embedded form cannot be created as no form types are available.
 
         success_message:
             label: Success message
             default: Form has been submitted successfully
             description: This message will appear after submitting the form.<br />Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.
+
+        allowed_domains:
+            label: Allowed Domains
+            default: '*'
+            description: >
+                Allowed cross origin domains where the form can be embedded.
+                Supports wildcard e.g. *.example.com
 
         controller:
             saved_message: Form has been saved successfully
