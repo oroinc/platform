@@ -24,8 +24,8 @@ class FixEmailTemplates extends ParametrizedMigrationQuery
     public function execute(LoggerInterface $logger)
     {
         // find duplicated calendars
-        $sql = 'SELECT * FROM oro_email_template
-            WHERE content LIKE "%calendar_date_range%" ORDER BY id';
+        $sql = "SELECT * FROM oro_email_template
+            WHERE content LIKE '%calendar_date_range%' ORDER BY id";
         $this->logQuery($logger, $sql);
         $templates = $this->connection->fetchAll($sql);
 
