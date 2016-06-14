@@ -10,8 +10,8 @@ define(function(require) {
         widgetFunctionName: 'uniform',
 
         initializeOptions: {
-            fileDefaultHtml: __('Attach file:'),
-            fileButtonHtml: __('Upload')
+            fileDefaultHtml: __('Please select a file...'),
+            fileButtonHtml: __('Choose File')
         },
 
         refreshOptions: 'update',
