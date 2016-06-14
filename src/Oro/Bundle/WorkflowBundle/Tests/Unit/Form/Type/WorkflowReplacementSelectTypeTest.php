@@ -6,12 +6,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class WorkflowReplacementSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
-    use EntityTrait;
-
     /** @var WorkflowReplacementSelectType */
     protected $formType;
 
@@ -48,6 +45,9 @@ class WorkflowReplacementSelectTypeTest extends \PHPUnit_Framework_TestCase
                     $this->assertArrayHasKey('autocomplete_alias', $options);
                     $this->assertEquals('oro_workflow_replacement', $options['autocomplete_alias']);
 
+                    $this->assertArrayHasKey('workflow', $options);
+                    $this->assertNull($options['workflow']);
+
                     $this->assertArrayHasKey('configs', $options);
                     $this->assertEquals(
                         [
@@ -67,24 +67,20 @@ class WorkflowReplacementSelectTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider buildViewDataProvider
      *
-     * @param object|null $parentData
-     * @param int|null $expectedParentId
+     * @param string|null $workflow
+     * @param int|null $expectedId
      */
-    public function testBuildView($parentData, $expectedParentId)
+    public function testBuildView($workflow, $expectedId)
     {
-        $parentForm = $this->getMock('Symfony\Component\Form\FormInterface');
-        $parentForm->expects($this->once())->method('getData')->willReturn($parentData);
-
         $form = $this->getMock('Symfony\Component\Form\FormInterface');
-        $form->expects($this->once())->method('getParent')->willReturn($parentForm);
 
         $formView = new FormView();
 
-        $this->formType->buildView($formView, $form, []);
+        $this->formType->buildView($formView, $form, ['workflow' => $workflow]);
 
         $this->assertArrayHasKey('configs', $formView->vars);
         $this->assertArrayHasKey('entityId', $formView->vars['configs']);
-        $this->assertEquals($expectedParentId, $formView->vars['configs']['entityId']);
+        $this->assertEquals($expectedId, $formView->vars['configs']['entityId']);
     }
 
     /**
@@ -93,15 +89,13 @@ class WorkflowReplacementSelectTypeTest extends \PHPUnit_Framework_TestCase
     public function buildViewDataProvider()
     {
         return [
-            'without entity' => [
-                'parentData' => null,
-                'expectedParentId' => null,
+            'without workflow' => [
+                'workflow' => null,
+                'expectedId' => null,
             ],
-            'with entity' => [
-                'parentData' => $this->getEntity('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition', [
-                    'name' => 'definition1',
-                ]),
-                'expectedParentId' => 'definition1',
+            'with workflow' => [
+                'workflow' => 'definition1',
+                'expectedId' => 'definition1',
             ],
         ];
     }

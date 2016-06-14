@@ -7,8 +7,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-
 class WorkflowReplacementSelectType extends AbstractType
 {
     const NAME = 'oro_workflow_replacement_select';
@@ -20,6 +18,7 @@ class WorkflowReplacementSelectType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                'workflow' => null,
                 'autocomplete_alias' => 'oro_workflow_replacement',
                 'configs' => [
                     'multiple' => true,
@@ -35,10 +34,7 @@ class WorkflowReplacementSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        /* @var $data WorkflowDefinition */
-        $parentData = $form->getParent()->getData();
-
-        $view->vars['configs']['entityId'] = $parentData instanceof WorkflowDefinition ? $parentData->getName() : null;
+        $view->vars['configs']['entityId'] = $options['workflow'];
     }
 
     /**
