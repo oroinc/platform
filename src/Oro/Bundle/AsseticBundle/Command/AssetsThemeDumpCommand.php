@@ -32,7 +32,10 @@ class AssetsThemeDumpCommand extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $themeName = $input->getArgument('name');
-
+        if (!$themeName) {
+            $output->writeln('<error>No theme name identifier defined</error>');
+            return;
+        }
         $needle = LayoutResource::RESOURCE_ALIAS.'_'.$themeName.'_';
         foreach ($this->am->getNames() as $name) {
             if (strpos($name, $needle) !== false) {

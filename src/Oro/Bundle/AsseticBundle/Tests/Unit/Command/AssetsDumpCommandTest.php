@@ -7,7 +7,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 use Oro\Bundle\AsseticBundle\Command\AssetsDumpCommand;
 
-class AssetDumpCommandTest extends \PHPUnit_Framework_TestCase
+class AssetsDumpCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var AssetsDumpCommand
@@ -47,7 +47,6 @@ class AssetDumpCommandTest extends \PHPUnit_Framework_TestCase
             ->willReturnMap([
                 ['name', $name]
             ]);
-
 
         $this->command->execute($input, $output);
     }

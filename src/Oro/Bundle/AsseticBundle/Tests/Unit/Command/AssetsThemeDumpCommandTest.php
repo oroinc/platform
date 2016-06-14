@@ -7,7 +7,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 use Oro\Bundle\AsseticBundle\Command\AssetsThemeDumpCommand;
 
-class AssetThemeDumpCommandTest extends \PHPUnit_Framework_TestCase
+class AssetsThemeDumpCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var AssetsThemeDumpCommand
@@ -48,7 +48,6 @@ class AssetThemeDumpCommandTest extends \PHPUnit_Framework_TestCase
                 ['name', $name]
             ]);
 
-
         $this->command->execute($input, $output);
     }
 
@@ -67,7 +66,7 @@ class AssetThemeDumpCommandTest extends \PHPUnit_Framework_TestCase
                 'name' => 'default'
             ],
             'invalid name' => [
-                'name' => '4test'
+                'name' => 'sometest'
             ],
         ];
     }
