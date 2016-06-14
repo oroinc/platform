@@ -54,6 +54,22 @@ services:
         tags:
             - { name: form.type, alias: oro_workflow_select }
 
+    oro_workflow.form.type.workflow_replacement_select:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType'
+        tags:
+            - { name: form.type, alias: oro_workflow_replacement_select }
+
+    oro_wofkflow.form.autocomplete.wofkflow_replacement.search_handler:
+        class: 'Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler'
+        arguments:
+            - '%oro_workflow.workflow_definition.entity.class%'
+            - ['label']
+        calls:
+            - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
+            - [setAclHelper,["@oro_security.acl_helper"]]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: oro_workflow_replacement, acl_resource: oro_workflow_definition_view }
+
     oro_workflow.form.type.workflow_definition:
         class: %oro_workflow.form.type.workflow_definition.class%
         tags:

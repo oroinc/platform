@@ -18,5 +18,6 @@ config:
 
         'oroworkflow/js/app/components/workflow-editor-component':  'bundles/oroworkflow/js/app/components/workflow-editor-component.js'
         'oro/datagrid/action/workflow-activate-action':             'bundles/oroworkflow/js/datagrid/action/workflow-activate-action.js'
+        'oro/select2-workflow-replacement-component':               'bundles/oroworkflow/js/app/components/select2-workflow-replacement-component.js'
     appmodules:
         - 'oroworkflow/js/app/modules/workflow-steps-module'

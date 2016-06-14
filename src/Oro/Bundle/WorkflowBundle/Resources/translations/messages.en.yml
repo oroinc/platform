@@ -202,6 +202,9 @@ oro:
                 activate: Activate
                 deactivate: Deactivate
 
+            placeholder:
+                select_replacement: Select Replacement
+
         workflowitem:
             entity_label:             Workflow Item
             entity_plural_label:      Workflow Items
