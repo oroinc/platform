@@ -232,26 +232,7 @@ define(function(require) {
             if (!columnMetadata || !cell.column.get('renderable')) {
                 return false;
             }
-            var editable;
-            var enableConfigValue = columnMetadata.inline_editing && columnMetadata.inline_editing.enable;
-            // validateUrlParameters
-            switch (this.options.metadata.inline_editing.behaviour) {
-                case 'enable_all':
-                    if (enableConfigValue !== false) {
-                        editable = (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
-                            (columnMetadata.type || gridViewsBuilder.DEFAULT_COLUMN_TYPE) in
-                                this.options.metadata.inline_editing.default_editors;
-                    } else {
-                        editable = false;
-                    }
-                    break;
-                case 'enable_selected':
-                    editable = enableConfigValue === true;
-                    break;
-                default:
-                    throw new Error('Unknown behaviour');
-            }
-            return editable ?
+            return columnMetadata.inline_editing && columnMetadata.inline_editing.enable ?
                 this.getCellEditorOptions(cell)
                     .save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
                 false;

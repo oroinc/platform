@@ -84,7 +84,6 @@ class InlineEditingExtension extends AbstractExtension
         $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
         $blackList = $configuration->getBlackList();
         $behaviour = $config->offsetGetByPath(Configuration::BEHAVIOUR_CONFIG_PATH);
-        $enableInlineEditing = $behaviour === Configuration::BEHAVIOUR_ENABLE_ALL_VALUE;
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
@@ -92,7 +91,7 @@ class InlineEditingExtension extends AbstractExtension
                     $columnName,
                     $configItems['entity_name'],
                     $column,
-                    $enableInlineEditing
+                    $behaviour
                 );
 
                 // frontend type key must not be replaced with default value

@@ -44,17 +44,32 @@ class InlineEditColumnOptionsGuesser
      * @param string $columnName
      * @param string $entityName
      * @param array $column
-     * @param bool $enableInlineEditing
+     * @param string $behaviour
      *
      * @return array
      */
-    public function getColumnOptions($columnName, $entityName, $column, $enableInlineEditing)
+    public function getColumnOptions($columnName, $entityName, $column, $behaviour)
     {
         /** @var ValidatorInterface $validatorMetadata */
         $validatorMetadata = $this->validator->getMetadataFor($entityName);
+        $isEnabledInline =
+            isset($column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY]) &&
+            $column[Configuration::BASE_CONFIG_KEY][Configuration::CONFIG_ENABLE_KEY] === true;
+
+        if ($behaviour === Configuration::BEHAVIOUR_ENABLE_ALL_VALUE ||
+            ($behaviour === Configuration::BEHAVIOUR_ENABLE_SELECTED && $isEnabledInline)) {
+            $isEnabledInlineWithBehaviour = true;
+        } else {
+            $isEnabledInlineWithBehaviour = false;
+        }
 
         foreach ($this->guessers as $guesser) {
-            $options = $guesser->guessColumnOptions($columnName, $entityName, $column, $enableInlineEditing);
+            $options = $guesser->guessColumnOptions(
+                $columnName,
+                $entityName,
+                $column,
+                $isEnabledInlineWithBehaviour
+            );
 
             if (!empty($options)) {
                 if ($validatorMetadata->hasPropertyMetadata($columnName)) {

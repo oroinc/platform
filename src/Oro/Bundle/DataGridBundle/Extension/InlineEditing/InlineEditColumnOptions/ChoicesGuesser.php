@@ -38,7 +38,7 @@ class ChoicesGuesser implements GuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column, $enableInlineEditing = false)
+    public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);
         $metadata = $entityManager->getClassMetadata($entityName);
@@ -48,7 +48,7 @@ class ChoicesGuesser implements GuesserInterface
         if (!$this->isConfiguredAccessor($column) && $metadata->hasAssociation($columnName)) {
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
-                if ($enableInlineEditing) {
+                if ($isEnabledInline) {
                     $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
                 }
                 $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::SELECT;
