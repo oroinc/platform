@@ -52,7 +52,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
     /** @var EmailOriginHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $emailOriginHelper;
-    
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
