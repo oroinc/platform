@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 use Oro\Bundle\SearchBundle\Async\ReindexEntityMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -122,7 +122,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducer::class, [], [], '', false);
+        return $this->getMock(MessageProducerInterface::class, [], [], '', false);
     }
 
     /**

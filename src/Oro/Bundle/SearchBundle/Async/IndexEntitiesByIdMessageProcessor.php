@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Async;
 
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
 class IndexEntitiesByIdMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
-     * @var MessageProducer
+     * @var MessageProducerInterface
      */
     protected $producer;
 
@@ -21,10 +21,10 @@ class IndexEntitiesByIdMessageProcessor implements MessageProcessorInterface, To
     protected $logger;
 
     /**
-     * @param MessageProducer $producer
-     * @param LoggerInterface $logger
+     * @param MessageProducerInterface $producer
+     * @param LoggerInterface          $logger
      */
-    public function __construct(MessageProducer $producer, LoggerInterface $logger)
+    public function __construct(MessageProducerInterface $producer, LoggerInterface $logger)
     {
         $this->producer = $producer;
         $this->logger = $logger;

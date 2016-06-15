@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Async;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Query\Mode;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -18,15 +18,15 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
     protected $indexer;
 
     /**
-     * @var MessageProducer
+     * @var MessageProducerInterface
      */
     protected $producer;
 
     /**
-     * @param IndexerInterface $indexer
-     * @param MessageProducer  $producer
+     * @param IndexerInterface         $indexer
+     * @param MessageProducerInterface $producer
      */
-    public function __construct(IndexerInterface $indexer, MessageProducer $producer)
+    public function __construct(IndexerInterface $indexer, MessageProducerInterface $producer)
     {
         $this->indexer = $indexer;
         $this->producer = $producer;

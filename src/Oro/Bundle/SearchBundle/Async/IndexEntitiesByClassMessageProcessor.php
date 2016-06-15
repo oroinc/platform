@@ -5,7 +5,7 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -23,7 +23,7 @@ class IndexEntitiesByClassMessageProcessor implements MessageProcessorInterface,
     protected $doctrine;
 
     /**
-     * @var MessageProducer
+     * @var MessageProducerInterface
      */
     protected $producer;
 
@@ -33,12 +33,15 @@ class IndexEntitiesByClassMessageProcessor implements MessageProcessorInterface,
     protected $logger;
 
     /**
-     * @param RegistryInterface $doctrine
-     * @param MessageProducer   $producer
-     * @param LoggerInterface   $logger
+     * @param RegistryInterface        $doctrine
+     * @param MessageProducerInterface $producer
+     * @param LoggerInterface          $logger
      */
-    public function __construct(RegistryInterface $doctrine, MessageProducer $producer, LoggerInterface $logger)
-    {
+    public function __construct(
+        RegistryInterface $doctrine,
+        MessageProducerInterface $producer,
+        LoggerInterface $logger
+    ) {
         $this->doctrine = $doctrine;
         $this->producer = $producer;
         $this->logger = $logger;
@@ -77,7 +80,7 @@ class IndexEntitiesByClassMessageProcessor implements MessageProcessorInterface,
         foreach ($iterator as $record) {
             $itemsCount++;
 
-            $this->producer->send(Topics::INDEX_ENTITY, [
+            $this->producer->sendTo(Topics::INDEX_ENTITY, [
                 'class' => $class,
                 'id' => $record[$identifierFieldName],
             ]);

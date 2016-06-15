@@ -3,7 +3,7 @@ namespace Oro\Bundle\SearchBundle\Async;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class Indexer implements IndexerInterface
 {
@@ -13,15 +13,15 @@ class Indexer implements IndexerInterface
     protected $doctrineHelper;
 
     /**
-     * @var MessageProducer
+     * @var MessageProducerInterface
      */
     protected $producer;
 
     /**
-     * @param MessageProducer $producer
-     * @param DoctrineHelper  $doctrineHelper
+     * @param MessageProducerInterface $producer
+     * @param DoctrineHelper           $doctrineHelper
      */
-    public function __construct(MessageProducer $producer, DoctrineHelper $doctrineHelper)
+    public function __construct(MessageProducerInterface $producer, DoctrineHelper $doctrineHelper)
     {
         $this->producer = $producer;
         $this->doctrineHelper = $doctrineHelper;

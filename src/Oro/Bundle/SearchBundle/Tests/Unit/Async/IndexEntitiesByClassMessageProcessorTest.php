@@ -4,9 +4,8 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 use Doctrine\ORM\Query;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByClassMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -59,11 +58,11 @@ class IndexEntitiesByClassMessageProcessorTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducer
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
      */
     protected function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducer::class, [], [], '', false);
+        return $this->getMock(MessageProducerInterface::class, [], [], '', false);
     }
 
     /**
