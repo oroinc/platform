@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 
+use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use OroPro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroMessageQueueExtension extends Extension
@@ -58,6 +60,19 @@ class OroMessageQueueExtension extends Extension
                 $config['client']['router_destination'],
                 $config['client']['default_destination'],
             ]);
+
+            if ($container->getParameter('kernel.debug')) {
+                $container->setDefinition(
+                    'oro_message_queue.client.internal_message_producer',
+                    $container->getDefinition('oro_message_queue.client.message_producer')
+                );
+
+                $traceableMessageProducer = new Definition(TraceableMessageProducer::class, [
+                    new Reference('oro_message_queue.client.internal_message_producer')
+                ]);
+
+                $container->setDefinition('oro_message_queue.client.message_producer', $traceableMessageProducer);
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 
-class MessageProducer
+class MessageProducer implements MessageProducerInterface
 {
     /**
      * @var TransportMessageProducer
@@ -28,13 +28,7 @@ class MessageProducer
     }
 
     /**
-     * Sends a message to a topic channel.
-     * Body could be a string or array, in case of array it will be json encoded.
-     * For possible priority values @see MessagePriority constants
-     *
-     * @param string $topic
-     * @param string $body
-     * @param string $priority
+     * {@inheritdoc}
      */
     public function send($topic, $body, $priority = MessagePriority::NORMAL)
     {

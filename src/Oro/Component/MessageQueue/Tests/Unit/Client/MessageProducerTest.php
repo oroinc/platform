@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Transport\DestinationInterface;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
@@ -10,10 +10,17 @@ use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverInterface;
-use Oro\Component\MessageQueue\Transport\QueueInterface;
+use Oro\Component\Testing\ClassExtensionTrait;
 
 class MessageProducerTest extends \PHPUnit_Framework_TestCase
 {
+    use ClassExtensionTrait;
+
+    public function testShouldImplementMessageProducerInterface()
+    {
+        $this->assertClassImplements(MessageProducerInterface::class, MessageProducer::class);
+    }
+
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new MessageProducer($this->createTransportMessageProducer(), $this->createDriverStub());

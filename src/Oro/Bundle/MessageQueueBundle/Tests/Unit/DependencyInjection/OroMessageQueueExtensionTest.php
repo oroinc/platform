@@ -2,6 +2,8 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
+use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use OroPro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
@@ -123,5 +125,62 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             new Alias('oro_message_queue.transport.null.connection'),
             $container->getAlias('oro_message_queue.transport.connection')
         );
+    }
+
+    public function testShouldLoadClientServicesWhenEnabled()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $extension = new OroMessageQueueExtension();
+
+        $extension->load([[
+            'client' => null,
+            'transport' => [
+                'default' => 'null',
+                'null' => true
+            ]
+        ]], $container);
+
+        $this->assertTrue($container->hasDefinition('oro_message_queue.client.config'));
+        $this->assertTrue($container->hasDefinition('oro_message_queue.client.message_producer'));
+    }
+
+    public function testShouldUseMessageProducerIfDebugFalse()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $extension = new OroMessageQueueExtension();
+
+        $extension->load([[
+            'client' => null,
+            'transport' => [
+                'default' => 'null',
+                'null' => true
+            ]
+        ]], $container);
+
+        $messageProducer = $container->getDefinition('oro_message_queue.client.message_producer');
+        $this->assertEquals(MessageProducer::class, $messageProducer->getClass());
+    }
+
+    public function testShouldUseTraceableMessageProducerIfDebugTrue()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+
+        $extension = new OroMessageQueueExtension();
+
+        $extension->load([[
+            'client' => null,
+            'transport' => [
+                'default' => 'null',
+                'null' => true
+            ]
+        ]], $container);
+
+        $messageProducer = $container->getDefinition('oro_message_queue.client.message_producer');
+        $this->assertEquals(TraceableMessageProducer::class, $messageProducer->getClass());
     }
 }
