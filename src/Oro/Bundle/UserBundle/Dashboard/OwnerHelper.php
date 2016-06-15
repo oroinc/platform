@@ -116,7 +116,13 @@ class OwnerHelper
             ->join('u.businessUnits', 'bu');
         QueryUtils::applyOptimizedIn($qb, 'bu.id', $businessUnitIds);
 
-        return array_map('current', $qb->getQuery()->getResult());
+        $result = array_map('current', $qb->getQuery()->getResult());
+
+        if (empty($result)) {
+            $result = [0];
+        }
+
+        return $result;
     }
 
     /**
@@ -136,6 +142,11 @@ class OwnerHelper
             ->join('u.roles', 'r');
         QueryUtils::applyOptimizedIn($qb, 'r.id', $roleIds);
 
-        return array_map('current', $qb->getQuery()->getResult());
+        $result = array_map('current', $qb->getQuery()->getResult());
+        if (empty($result)) {
+            $result = [0];
+        }
+
+        return $result;
     }
 }
