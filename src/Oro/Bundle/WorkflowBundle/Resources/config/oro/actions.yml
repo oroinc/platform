@@ -70,3 +70,26 @@ operations:
             attribute_fields:
                 entity:
                     form_type: form
+action_groups:
+    oro_workflow_transition_process_schedule:
+        parameters:
+            workflowName:
+                type: string
+            transitionName:
+                type: string
+        actions:
+            - '@call_service_method':
+                service: oro_workflow.transition_schedule.items_fetcher
+                method: fetchWorkflowItemsIds
+                method_parameters: [$.workflowName, $.transitionName]
+                attribute: $.workflowItemIds
+            - '@foreach':
+                array: $.workflowItemIds
+                value: $.id
+                actions:
+                    - '@create_job':
+                        command: 'oro:workflow:transit'
+                        allow_duplicates: true
+                        arguments:
+                            '--workflow-item': $.id
+                            '--transition': $.transitionName

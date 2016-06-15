@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
