@@ -309,6 +309,7 @@ class WorkflowManager
     /**
      * @param object $entity
      * @return Workflow
+     * @deprecated
      */
     public function getApplicableWorkflow($entity)
     {
@@ -372,6 +373,7 @@ class WorkflowManager
     /**
      * @param object $entity
      * @return WorkflowItem|null
+     * @deprecated
      */
     public function getWorkflowItemByEntity($entity)
     {
@@ -383,6 +385,25 @@ class WorkflowManager
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
         return $this->getWorkflowItemRepository()->findByEntityMetadata($entityClass, $entityIdentifier);
+    }
+
+    /**
+     * @param object $entity
+     * @param string $workflowName
+     * @return null|WorkflowItem
+     */
+    public function getWorkflowItem($entity, $workflowName)
+    {
+        $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        if (false === filter_var($entityIdentifier, FILTER_VALIDATE_INT)) {
+            return null;
+        }
+
+        return $this->getWorkflowItemRepository()->findOneByEntityMetadata(
+            $this->doctrineHelper->getEntityClass($entity),
+            $entityIdentifier,
+            $workflowName
+        );
     }
 
     /**
@@ -480,6 +501,7 @@ class WorkflowManager
 
     /**
      * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
+     * @return bool
      */
     public function isActiveWorkflow($workflowIdentifier)
     {
