@@ -10,6 +10,13 @@ use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\Action\Model\ContextAccessor;
 
+/**
+ * Creates a managed entity clone
+ *
+ * Class CloneEntity
+ * @package Oro\Component\Action\Action
+ *
+ */
 class CloneEntity extends CloneObject
 {
     const OPTION_KEY_FLUSH = 'flush';
