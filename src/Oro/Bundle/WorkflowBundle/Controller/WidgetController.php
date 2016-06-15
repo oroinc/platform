@@ -40,7 +40,6 @@ class WidgetController extends Controller
         $entity = $this->getEntityReference($entityClass, $entityId);
 
         /** @var WorkflowManager $workflowManager */
-        /* @var $workflowManager WorkflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
 
         $stepsData = [];
@@ -50,7 +49,6 @@ class WidgetController extends Controller
             $name = $workflowItem->getWorkflowName();
 
             if ($workflowManager->isResetAllowed($entity, $workflowItem)) {
-
                 continue;
             }
 
