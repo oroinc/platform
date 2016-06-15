@@ -45,7 +45,7 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = $message->getProperty('json_body');
+        $body = $message->getLocalProperty('json_body');
 
         if (empty($body['class'])) {
             $this->logger->error(sprintf(

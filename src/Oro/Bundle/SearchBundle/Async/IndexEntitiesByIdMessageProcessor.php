@@ -35,7 +35,7 @@ class IndexEntitiesByIdMessageProcessor implements MessageProcessorInterface, To
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $entities = $message->getProperty('json_body');
+        $entities = $message->getLocalProperty('json_body');
 
         if (false == is_array($entities)) {
             $this->logger->error(sprintf(

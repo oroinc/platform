@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Async\Indexer;
 use Oro\Bundle\SearchBundle\Async\Topics;
@@ -78,7 +79,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
         $expectedMessage = [
             [
-                'class' => 'stdClass',
+                'class' => 'entity-name',
                 'id' => 'identity'
             ]
         ];
@@ -93,9 +94,15 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $doctrineHelper = $this->createDoctrineHelperMock();
         $doctrineHelper
             ->expects($this->once())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
             ->will($this->returnValue('identity'))
+        ;
+        $doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($this->identicalTo($entity))
+            ->will($this->returnValue(new ClassMetadata('entity-name')))
         ;
 
         $indexer = new Indexer($producer, $doctrineHelper);
@@ -110,7 +117,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
         $expectedMessage = [
             [
-                'class' => 'stdClass',
+                'class' => 'entity-name',
                 'id' => 'identity'
             ]
         ];
@@ -125,9 +132,15 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $doctrineHelper = $this->createDoctrineHelperMock();
         $doctrineHelper
             ->expects($this->once())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entities[0]))
             ->will($this->returnValue('identity'))
+        ;
+        $doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($this->identicalTo($entities[0]))
+            ->will($this->returnValue(new ClassMetadata('entity-name')))
         ;
 
         $indexer = new Indexer($producer, $doctrineHelper);
@@ -142,7 +155,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
         $expectedMessage = [
             [
-                'class' => 'stdClass',
+                'class' => 'entity-name',
                 'id' => 'identity'
             ]
         ];
@@ -157,9 +170,15 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $doctrineHelper = $this->createDoctrineHelperMock();
         $doctrineHelper
             ->expects($this->once())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
             ->will($this->returnValue('identity'))
+        ;
+        $doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($this->identicalTo($entity))
+            ->will($this->returnValue(new ClassMetadata('entity-name')))
         ;
 
         $indexer = new Indexer($producer, $doctrineHelper);
@@ -174,7 +193,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
         $expectedMessage = [
             [
-                'class' => 'stdClass',
+                'class' => 'entity-name',
                 'id' => 'identity'
             ]
         ];
@@ -189,10 +208,17 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $doctrineHelper = $this->createDoctrineHelperMock();
         $doctrineHelper
             ->expects($this->once())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entities[0]))
             ->will($this->returnValue('identity'))
         ;
+        $doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($this->identicalTo($entities[0]))
+            ->will($this->returnValue(new ClassMetadata('entity-name')))
+        ;
+
 
         $indexer = new Indexer($producer, $doctrineHelper);
         $result = $indexer->delete($entities);

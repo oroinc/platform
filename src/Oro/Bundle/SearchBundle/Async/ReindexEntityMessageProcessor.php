@@ -37,7 +37,7 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $classes = $message->getProperty('json_body');
+        $classes = $message->getLocalProperty('json_body');
 
         if (false == $classes) {
             $this->indexer->resetIndex();

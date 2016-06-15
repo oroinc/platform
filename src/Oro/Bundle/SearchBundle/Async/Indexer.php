@@ -85,8 +85,8 @@ class Indexer implements IndexerInterface
         $body = [];
         foreach ($entities as $entity) {
             $body[] = [
-                'class' => get_class($entity),
-                'id' => $this->doctrineHelper->getEntityIdentifier($entity),
+                'class' => $this->doctrineHelper->getEntityMetadata($entity)->getName(),
+                'id' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
             ];
         }
 

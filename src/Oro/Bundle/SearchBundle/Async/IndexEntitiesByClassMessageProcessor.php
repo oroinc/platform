@@ -80,7 +80,7 @@ class IndexEntitiesByClassMessageProcessor implements MessageProcessorInterface,
         foreach ($iterator as $record) {
             $itemsCount++;
 
-            $this->producer->sendTo(Topics::INDEX_ENTITY, [
+            $this->producer->send(Topics::INDEX_ENTITY, [
                 'class' => $class,
                 'id' => $record[$identifierFieldName],
             ]);

@@ -74,7 +74,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setProperties([
+        $message->setLocalProperties([
             'json_body' => 'class-name',
         ]);
 
@@ -107,7 +107,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setProperties([
+        $message->setLocalProperties([
             'json_body' => ['class-name'],
         ]);
 

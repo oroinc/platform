@@ -46,7 +46,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setProperties([
+        $message->setLocalProperties([
             'json_body' => [
                 'key' => 'value',
             ]
@@ -72,7 +72,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setProperties([
+        $message->setLocalProperties([
             'json_body' => [
                 'class' => 'class-name',
             ]
@@ -102,7 +102,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setProperties([
+        $message->setLocalProperties([
             'json_body' => [
                 'class' => 'class-name',
                 'id' => 'id',
@@ -156,7 +156,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setProperties([
+        $message->setLocalProperties([
             'json_body' => [
                 'class' => 'class-name',
                 'id' => 'id',
@@ -216,7 +216,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setProperties([
+        $message->setLocalProperties([
             'json_body' => [
                 'class' => 'class-name',
                 'id' => 'id',
