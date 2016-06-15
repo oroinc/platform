@@ -7,27 +7,13 @@ use Behat\MinkExtension\Context\RawMinkContext;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\WaitingDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm;
 
 class ACLContext extends RawMinkContext implements OroElementFactoryAware
 {
-    use WaitingDictionary;
-
-    /**
-     * @var OroElementFactory
-     */
-    protected $elementFactory;
-
-    /**
-     * @param OroElementFactory $elementFactory
-     *
-     * @return null
-     */
-    public function setElementFactory(OroElementFactory $elementFactory)
-    {
-        $this->elementFactory = $elementFactory;
-    }
+    use WaitingDictionary, ElementFactoryDictionary;
 
     /**
      * @Given /^I am logged in under (?P<organization>(\D*)) organization$/

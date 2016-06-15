@@ -97,6 +97,12 @@ To look the all available feature steps:
 bin/behat -dl -s OroUserBundle
 ```
 
+or view steps with full description and examples: 
+
+```bash
+bin/behat -di -s OroUserBundle
+```
+
 Every bundle has its own test suite and can be run separately:
 
  ```bash
@@ -108,8 +114,8 @@ During initialization, Extension will create test suite with bundle name if any 
 Thus, if bundle has no Features directory - no test suite would be crated for it.
 
 If you need some specific feature steps for your bundle you should create ```Tests/Behat/Context/FeatureContext``` class.
-Instead of ```OroMainContext``` FeatureContext will be used for bundle test suite.
-Perhaps FeatureContext may be extended from OroMainContext for reload some feature steps.
+This context will added to suite with other common contexts.
+The full list of common context configured in behat configuration file under ```shared_contexts``` of ```OroTestFrameworkExtension``` definition
 
 #### Page elements
 

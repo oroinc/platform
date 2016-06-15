@@ -8,28 +8,16 @@ use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
 class GridContext extends RawMinkContext implements OroElementFactoryAware
 {
+    use ElementFactoryDictionary;
+
     /**
      * @var int
      */
     protected $gridRecordsNumber;
-
-    /**
-     * @var OroElementFactory
-     */
-    protected $elementFactory;
-
-    /**
-     * @param OroElementFactory $elementFactory
-     *
-     * @return null
-     */
-    public function setElementFactory(OroElementFactory $elementFactory)
-    {
-        $this->elementFactory = $elementFactory;
-    }
 
     /**
      * @When I don't select any record from Grid
@@ -122,14 +110,6 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function thereIsNoRecordsInGrid()
     {
         $this->getGrid()->assertNoRecords();
-    }
-
-    /**
-     * @Then I shouldn't see :arg1 link from mass action dropdown
-     */
-    public function iShouldnTSeeLinkFromMassActionDropdown($arg1)
-    {
-        throw new PendingException();
     }
 
     /**

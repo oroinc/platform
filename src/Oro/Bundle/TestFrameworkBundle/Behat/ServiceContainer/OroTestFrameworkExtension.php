@@ -228,7 +228,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function getSuiteContexts(SymfonyBundleSuite $bundleSuite, array $commonContexts)
     {
         $suiteContexts = array_filter($bundleSuite->getSetting('contexts'), 'class_exists');
-        $suiteContexts = count($suiteContexts) ? $suiteContexts : $commonContexts;
+        $suiteContexts = array_merge($suiteContexts, $commonContexts);
 
         return $suiteContexts;
     }

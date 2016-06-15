@@ -24,12 +24,7 @@ class OroMainContext extends MinkContext implements
     OroElementFactoryAware,
     KernelAwareContext
 {
-    use KernelDictionary, WaitingDictionary;
-
-    /**
-     * @var OroElementFactory
-     */
-    protected $elementFactory;
+    use KernelDictionary, WaitingDictionary, ElementFactoryDictionary;
 
     /** @BeforeStep */
     public function beforeStep(BeforeStepScope $scope)
@@ -74,14 +69,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setElementFactory(OroElementFactory $elementFactory)
-    {
-        $this->elementFactory = $elementFactory;
-    }
-
-    /**
      * @Then I should see :title flash message
      */
     public function iShouldSeeFlashMessage($title)
@@ -121,7 +108,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iFillFormWith($formName, TableNode $table)
     {
-        $this->elementFactory->createElement($formName)->fill($table);
+        $this->createElement($formName)->fill($table);
     }
 
     /**
@@ -129,6 +116,16 @@ class OroMainContext extends MinkContext implements
      */
     public function iOpenTheMenuAndClick($path, $linkLocator)
     {
-        $this->elementFactory->createElement('MainMenu')->openAndClick($path, $linkLocator);
+        $this->createElement('MainMenu')->openAndClick($path, $linkLocator);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function selectOption($select, $option)
+    {
+        $select = $this->fixStepArgument($select);
+        $option = $this->fixStepArgument($option);
+        $this->createElement('OroForm')->selectFieldOption($select, $option);
     }
 }
