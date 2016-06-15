@@ -327,7 +327,7 @@ class Processor
     }
 
     /**
-     * @deprecated since 1.10. Use {@see Oro\Bundle\EmailBundle\Tools\EmailOriginHelper} instead
+     * @deprecated since 1.9. Use {@see Oro\Bundle\EmailBundle\Tools\EmailOriginHelper} instead
      *
      * @param string                $email
      * @param OrganizationInterface $organization
