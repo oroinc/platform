@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Entity;
 use DateTime;
 
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class AuditTest extends \PHPUnit_Framework_TestCase
@@ -42,7 +43,7 @@ class AuditTest extends \PHPUnit_Framework_TestCase
     public function testCreateFieldShouldAddNewFieldToAudit()
     {
         $audit = new Audit();
-        $audit->createField('field', 'integer', 1, 0);
+        $audit->addField(new AuditField('field', 'integer', 1, 0));
 
         $this->assertCount(1, $audit->getFields());
         $field = $audit->getFields()->first();
@@ -57,10 +58,10 @@ class AuditTest extends \PHPUnit_Framework_TestCase
         $newDate = new DateTime();
 
         $audit = new Audit();
-        $audit->createField('field', 'integer', 1, 0);
-        $audit->createField('field2', 'string', 'new_', '_old');
-        $audit->createField('field3', 'date', $newDate, $oldDate);
-        $audit->createField('field4', 'datetime', $newDate, $oldDate);
+        $audit->addField(new AuditField('field', 'integer', 1, 0));
+        $audit->addField(new AuditField('field2', 'string', 'new_', '_old'));
+        $audit->addField(new AuditField('field3', 'date', $newDate, $oldDate));
+        $audit->addField(new AuditField('field4', 'datetime', $newDate, $oldDate));
 
         $this->assertEquals(
             [
@@ -95,5 +96,24 @@ class AuditTest extends \PHPUnit_Framework_TestCase
             ],
             $audit->getData()
         );
+    }
+
+    public function testShouldSetNowAsLoggedAtIfNotPassed()
+    {
+        $audit = new Audit();
+        $audit->setLoggedAt();
+
+        $this->assertGreaterThan(new \DateTime('now - 10 seconds'), $audit->getLoggedAt());
+        $this->assertLessThan(new \DateTime('now + 10 seconds'), $audit->getLoggedAt());
+    }
+
+    public function testShouldSetPassedLoggedAtDate()
+    {
+        $loggedAt = new \DateTime('2012-11-10 01:02:03+0000');
+
+        $audit = new Audit();
+        $audit->setLoggedAt($loggedAt);
+
+        $this->assertSame($loggedAt, $audit->getLoggedAt());
     }
 }

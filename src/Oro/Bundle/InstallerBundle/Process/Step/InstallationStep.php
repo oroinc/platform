@@ -24,8 +24,7 @@ class InstallationStep extends AbstractStep
                     array(
                         '--fixtures-type' => 'demo',
                         '--disabled-listeners' => array(
-                            'oro_dataaudit.listener.entity_listener',
-                            'oro_dataaudit.listener.deprecated_audit_data_listener'
+                            'oro_dataaudit.listener.send_changed_entities_to_message_queue'
                         )
                     )
                 );

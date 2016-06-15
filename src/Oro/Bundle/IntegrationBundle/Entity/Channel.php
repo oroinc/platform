@@ -9,7 +9,6 @@ use Oro\Component\Config\Common\ConfigObject;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -44,7 +43,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          }
  *      }
  * )
- * @Oro\Loggable()
  */
 class Channel
 {
@@ -70,7 +68,6 @@ class Channel
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @Oro\Versioned()
      */
     protected $name;
 
@@ -78,7 +75,6 @@ class Channel
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=255)
-     * @Oro\Versioned()
      */
     protected $type;
 
@@ -94,7 +90,6 @@ class Channel
     /**
      * @var []
      * @ORM\Column(name="connectors", type="array")
-     * @Oro\Versioned()
      */
     protected $connectors;
 
@@ -116,7 +111,6 @@ class Channel
      * @var boolean
     *
     * @ORM\Column(name="enabled", type="boolean", nullable=true)
-    * @Oro\Versioned()
     */
     protected $enabled;
 
@@ -140,7 +134,6 @@ class Channel
      *      onDelete="SET NULL",
      *      nullable=true
      * )
-     * @Oro\Versioned()
      */
     protected $defaultUserOwner;
 
@@ -153,7 +146,6 @@ class Channel
      *      onDelete="SET NULL",
      *      nullable=true
      * )
-     * @Oro\Versioned()
      */
     protected $defaultBusinessUnitOwner;
 
@@ -161,7 +153,6 @@ class Channel
      * @var Organization
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     * @Oro\Versioned()
      */
     protected $organization;
 

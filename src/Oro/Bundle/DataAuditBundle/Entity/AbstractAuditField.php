@@ -19,7 +19,8 @@ abstract class AbstractAuditField
     use DateTimeFieldType;
     use ArrayFieldTypeTrait;
     use ObjectFieldTypeTrait;
-
+    use CollectionTypeTrait;
+    
     /**
      * @var int
      *
@@ -59,15 +60,13 @@ abstract class AbstractAuditField
     protected $dataType;
 
     /**
-     * @param AbstractAudit $audit
      * @param string $field
      * @param string $dataType
      * @param mixed $newValue
      * @param mixed $oldValue
      */
-    public function __construct(AbstractAudit $audit, $field, $dataType, $newValue, $oldValue)
+    public function __construct($field, $dataType, $newValue, $oldValue)
     {
-        $this->audit = $audit;
         $this->field = $field;
         $this->dataType = AuditFieldTypeRegistry::getAuditType($dataType);
 
@@ -97,6 +96,14 @@ abstract class AbstractAuditField
     public function getAudit()
     {
         return $this->audit;
+    }
+
+    /**
+     * @param AbstractAudit $audit
+     */
+    public function setAudit(AbstractAudit $audit)
+    {
+        $this->audit = $audit;
     }
 
     /**

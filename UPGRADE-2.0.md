@@ -30,3 +30,11 @@ UPGRADE FROM 1.10 to 2.0
     * `joinWorkflowItem` - to easily join workflowItem to an entity with QueryBuilder
     * `joinWorkflowStep` - to easily join workflowStep to an entity with QueryBuilder trough specified workflowItem alias
     * `addDatagridQuery` - for datagrid listeners to join workflow fields (especially workflowStatus)
+
+####DataAuditBundle
+- LoggableManager was removed. Some logic moved to SendChangedEntitiesToMessageQueueListener class and some backend processors.
+- EntityListener was removed. Similar logic could be found in SendChangedEntitiesToMessageQueueListener class.
+- KernelListener was removed.
+- AnnotationDriver was removed.
+- ExtendMetadataFactory was removed.
+- Loggable and Versioned annotations were removed. Use entity config auditable option instead.
