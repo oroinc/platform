@@ -40,8 +40,9 @@ class DateValueFormatterTest extends \PHPUnit_Framework_TestCase
         $this->datetimeFormatter
             ->expects($this->once())
             ->method('formatDate')
-            ->with($parameter);
-        $this->formatter->format($parameter);
+            ->with($parameter)
+            ->will($this->returnValue('01 Jan 2016'));
+        $this->assertEquals('01 Jan 2016', $this->formatter->format($parameter));
     }
 
     public function testGetSupportedTypes()
@@ -59,7 +60,8 @@ class DateValueFormatterTest extends \PHPUnit_Framework_TestCase
         $this->translator
             ->expects($this->once())
             ->method('trans')
-            ->with('oro.locale.formatter.datetime.default');
-        $this->formatter->getDefaultValue();
+            ->with('oro.locale.formatter.datetime.default')
+            ->will($this->returnValue('F y, j'));
+        $this->assertEquals('F y, j', $this->formatter->getDefaultValue());
     }
 }
