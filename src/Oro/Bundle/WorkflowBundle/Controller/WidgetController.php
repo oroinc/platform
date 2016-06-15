@@ -261,11 +261,9 @@ class WidgetController extends Controller
                 continue;
             }
 
-            $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
-            foreach ($transitionsData as $data) {
-                $workflowsData[$name]['transitionsData'][$name] = $data;
-            }
+            $workflowsData[$name]['transitionsData'] = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
         }
+
         return [
             'entity_id' => $entityId,
             'workflowsData' => $workflowsData,
@@ -290,7 +288,7 @@ class WidgetController extends Controller
                 $errors = new ArrayCollection();
                 $isAllowed = $workflowManager->isTransitionAvailable($workflowItem, $transition, $errors);
                 if ($isAllowed || !$transition->isUnavailableHidden()) {
-                    $transitionsData[] = array(
+                    $transitionsData[$transition->getName()] = array(
                         'workflow' => $workflowManager->getWorkflow($workflowItem),
                         'workflowItem' => $workflowItem,
                         'transition' => $transition,
@@ -312,7 +310,7 @@ class WidgetController extends Controller
      */
     protected function getAvailableStartTransitionsData(Workflow $workflow, $entity)
     {
-        $transitionsData = array();
+        $transitionsData = [];
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
 
@@ -322,7 +320,7 @@ class WidgetController extends Controller
             if (!$transition->isHidden()) {
                 $transitionData = $this->getStartTransitionData($workflow, $transition, $entity);
                 if ($transitionData !== null) {
-                    $transitionsData[] = $transitionData;
+                    $transitionsData[$transition->getName()] = $transitionData;
                 }
             }
         }
@@ -333,7 +331,7 @@ class WidgetController extends Controller
             if ($defaultStartTransition) {
                 $startTransitionData = $this->getStartTransitionData($workflow, $defaultStartTransition, $entity);
                 if ($startTransitionData !== null) {
-                    $transitionsData[] = $startTransitionData;
+                    $transitionsData[$defaultStartTransition->getName()] = $startTransitionData;
                 }
             }
         }
