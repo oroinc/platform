@@ -178,7 +178,8 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
                     '"Recipient2 Name, Name2" <recipient2@example.com>'
                 ],
 
-                base64_encode('"Recipient1 Name; Name2" <recipient1@example.com>').';'.base64_encode('"Recipient2 Name, Name2" <recipient2@example.com>')
+                base64_encode('"Recipient1 Name; Name2" <recipient1@example.com>') . ';'
+                . base64_encode('"Recipient2 Name, Name2" <recipient2@example.com>')
             ]
         ];
     }
@@ -195,7 +196,8 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                base64_encode('"Recipient1 Name; Name2" <recipient1@example.com>').';'.base64_encode('"Recipient2 Name, Name2" <recipient2@example.com>'),
+                base64_encode('"Recipient1 Name; Name2" <recipient1@example.com>') . ';'
+                . base64_encode('"Recipient2 Name, Name2" <recipient2@example.com>'),
                 [
                     '"Recipient1 Name; Name2" <recipient1@example.com>',
                     '"Recipient2 Name, Name2" <recipient2@example.com>'
