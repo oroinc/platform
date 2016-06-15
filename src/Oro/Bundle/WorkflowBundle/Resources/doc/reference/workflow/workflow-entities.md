@@ -71,7 +71,7 @@ transition;
 for specified WorkflowItem and optionally returns list of errors or/and fire exception;
 * **transit(WorkflowItem, Transition)** - performs transit for specified WorkflowItem by name of transition or
 transition instance;
-* **resetWorkflowData()** - perform reset workflow item data for the specific entity;
+* **resetWorkflowData()** - perform reset workflow item data for the specific workflow;
 * **createWorkflowItem(Entity, array data)** - create WorkflowItem instance for the specific entity and initialize it
 with passed data;
 * **getAttributesMapping()** - Get attribute names mapped to property paths if any have;
@@ -309,9 +309,8 @@ Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository
 definition parameters;
 * **getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition)** - returns instance of QueryBuilder for related Entity
 and herewith updated workflow step by input WorkflowDefinition start step;
-* **resetWorkflowData(entityClass, excludedWorkflowNames, batchSize)** - perform reset workflow items data for all Entities,
-which related with current workflow. Optional you can control the size of batch, which will be reseted in the single query.
-Also you can excluded some groups of entities from list on resetting, specifying the names of workflows, which would be excluded;
+* **resetWorkflowData(WorkflowDefinition, batchSize)** - perform reset workflow items data for given definition.
+Optional you can control the size of batch, which will be reseted in the single query.
 
 Workflow Step
 -------------
@@ -405,8 +404,7 @@ workflow itself;
 * **activateWorkflow(workflowIdentifier)** - perform activation workflow by workflow name, Workflow instance,
 WorkflowItem instance or WorkflowDefinition instance;
 * **deactivateWorkflow(entityClass)** - perform deactivation workflow by entity class;
-* **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for all Entities, which related with
-input workflow definition;
+* **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for given workflow definition;
 * **isResetAllowed(entity)** - check that entity workflow item is equal to the active workflow item;
 
 Workflow Data
