@@ -129,7 +129,6 @@ class WorkflowManager
      * @param WorkflowItem $workflowItem
      * @return WorkflowItem|null workflowItem for workflow definition with a start step, null otherwise
      * @throws \Exception
-     *
      */
     public function resetWorkflowItem(WorkflowItem $workflowItem)
     {
@@ -141,13 +140,19 @@ class WorkflowManager
         $em->beginTransaction();
 
         try {
+            $currentWorkflowName = $workflowItem->getWorkflowName();
             $this->getWorkflow($workflowItem)->resetWorkflowData($entity);
             $em->remove($workflowItem);
             $em->flush();
             //todo fix in BAP-10808 or BAP-10809
-            $activeWorkflow = $this->getApplicableWorkflow($entity);
-            if ($activeWorkflow->getStepManager()->hasStartStep()) {
-                $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
+            $activeWorkflows = $this->getApplicableWorkflows($entity);
+            foreach ($activeWorkflows as $activeWorkflow) {
+                if ($activeWorkflow->getName() === $currentWorkflowName) {
+                    if ($activeWorkflow->getStepManager()->hasStartStep()) {
+                        $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
+                    }
+                    break;
+                }
             }
 
             $em->commit();
@@ -326,7 +331,7 @@ class WorkflowManager
     /**
      * @param string $entityClass
      * @return null|Workflow
-     * @deprecated 
+     * @deprecated use getApplicableWorkflowsByEntityClass
      */
     public function getApplicableWorkflowByEntityClass($entityClass)
     {
@@ -474,6 +479,21 @@ class WorkflowManager
     }
 
     /**
+     * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
+     */
+    public function isActiveWorkflow($workflowIdentifier)
+    {
+        $definition = $workflowIdentifier instanceof WorkflowDefinition
+            ? $workflowIdentifier
+            : $this->getWorkflow($workflowIdentifier)->getDefinition();
+
+        $entityConfig = $this->getEntityConfig($definition->getRelatedEntity());
+        $activeWorkflows = (array)$entityConfig->get('active_workflow');
+
+        return in_array($definition->getName(), $activeWorkflows, true);
+    }
+
+    /**
      * @param string $entityClass
      * @param string|null $workflowName
      */
@@ -508,20 +528,26 @@ class WorkflowManager
      * Check that entity workflow item is equal to the active workflow item.
      *
      * @param object $entity
+     * @param WorkflowItem $currentWorkflowItem
      * @return bool
      */
     public function isResetAllowed($entity, WorkflowItem $currentWorkflowItem)
     {
         $activeWorkflows = $this->getApplicableWorkflows($entity);
-        $activeWorkflows = array_filter(
-            $activeWorkflows,
-            function (Workflow $activeWorkflow) use ($currentWorkflowItem) {
-                return $activeWorkflow->getName() === $currentWorkflowItem->getWorkflowName();
-            }
-        );
 
-        return $activeWorkflows && $currentWorkflowItem &&
-        $currentWorkflowItem->getWorkflowName() !== $activeWorkflows[0]->getName();
+        if (!count($activeWorkflows)) {
+            return false;
+        }
+
+        if ($currentWorkflowItem) {
+            foreach ($activeWorkflows as $activeWorkflow) {
+                if ($activeWorkflow->getName() === $currentWorkflowItem->getWorkflowName()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
