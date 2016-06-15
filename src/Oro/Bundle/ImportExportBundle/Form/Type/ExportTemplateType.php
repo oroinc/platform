@@ -8,11 +8,13 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportTemplateData;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class ExportTemplateType extends AbstractType
 {
     const NAME = 'oro_importexport_export_template';
+    const CHILD_PROCESSOR_ALIAS = 'processorAlias';
 
     /**
      * @var ProcessorRegistry
@@ -36,7 +38,7 @@ class ExportTemplateType extends AbstractType
         $processorChoices = $this->getExportProcessorsChoices($options['entityName']);
 
         $builder->add(
-            'processorAlias',
+            self::CHILD_PROCESSOR_ALIAS,
             'choice',
             array(
                 'choices' => $processorChoices,
@@ -46,8 +48,8 @@ class ExportTemplateType extends AbstractType
         );
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
-            if ($form->has('processorAlias')) {
-                $processorAlias = $form->get('processorAlias')->getData();
+            if ($form->has(self::CHILD_PROCESSOR_ALIAS)) {
+                $processorAlias = $form->get(self::CHILD_PROCESSOR_ALIAS)->getData();
                 $form->getData()->setProcessorAlias($processorAlias);
             }
         });
@@ -87,7 +89,7 @@ class ExportTemplateType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'Oro\Bundle\ImportExportBundle\Form\Model\ExportTemplateData',
+                'data_class' => ExportTemplateData::class,
             )
         );
         $resolver->setRequired(array('entityName'));
