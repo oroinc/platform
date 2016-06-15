@@ -10,14 +10,16 @@ define(function(require) {
      * @export orouser/js/views/role-view
      */
     CapabilityGroupView = BaseCollectionView.extend({
+        animationDuration: 0,
+        className: 'role-capability',
         template: require('tpl!orouser/templates/capability-group.html'),
-        listSelector: '.capability-items',
+        listSelector: '[data-name="capability-items"]',
         itemView: CapabilityItemView,
         listen: {
             'change collection': 'onChange'
         },
         events: {
-            'click .select-all-capabilities': 'onSelectAll'
+            'click [data-name="capabilities-select-all"]': 'onSelectAll'
         },
         initialize: function(options) {
             this.model = options.model;
@@ -28,21 +30,27 @@ define(function(require) {
         getTemplateData: function() {
             var templateData = CapabilityGroupView.__super__.getTemplateData.apply(this, arguments);
             _.defaults(templateData, this.model.toJSON());
-            templateData.allSelected = this.collection.where({'accessLevel': 0}).length === 0;
+            templateData.allSelected = this.isAllSelected();
             return templateData;
         },
 
         onSelectAll: function(e) {
             e.preventDefault();
             this.collection.each(function(model) {
-                model.set('accessLevel', 5);
+                model.set('accessLevel', model.get('selected_value'));
             });
         },
 
         onChange: function() {
-            this.$('.select-all-capabilities').toggleClass('disabled', !this.collection.findWhere({'accessLevel': 0}));
-        }
+            this.$('[data-name="capabilities-select-all"]')
+                .toggleClass('disabled', this.isAllSelected());
+        },
 
+        isAllSelected: function() {
+            return !this.collection.find(function(model) {
+                return model.get('accessLevel') !== model.get('selected_value');
+            });
+        }
     });
 
     return CapabilityGroupView;

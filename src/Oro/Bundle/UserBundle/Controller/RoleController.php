@@ -184,12 +184,16 @@ class RoleController extends Controller
         $capabilitiesData = [];
         foreach ($form->children['action']->children as $action_id => $child) {
             $permissions = reset($child->children['permissions']->children)->vars['value'];
+            $description = $child->vars['value']->getDescription();
             $capabilitiesData[] = [
                 'id' => $action_id,
                 'identityId' => $child->children['identity']->children['id']->vars['value'],
                 'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
+                'description' => $description ? $translator->trans($description) : '',
                 'permissionName' => $permissions->getName(),
-                'accessLevel' => $permissions->getAccessLevel()
+                'accessLevel' => $permissions->getAccessLevel(),
+                'selected_value' => 5,
+                'unselected_value' => 0
             ];
         }
 

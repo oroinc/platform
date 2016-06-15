@@ -21,7 +21,7 @@ define(function(require) {
         },
 
         /**
-         * @type {AccessLevelsCollection?}
+         * @type {AccessLevelsCollection}
          */
         accessLevels: null,
 
@@ -64,6 +64,9 @@ define(function(require) {
                     keysMap: {
                         id: 'value',
                         text: 'value_text'
+                    },
+                    attributes: {
+                        'data-options': '{"html": true}'
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);

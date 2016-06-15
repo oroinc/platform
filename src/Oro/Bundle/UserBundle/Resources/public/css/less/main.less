@@ -1,4 +1,5 @@
 @import "action-permissions";
+@import "role-capabilities";
 
 .api-block #btn-apigen {
   display: inline;
@@ -6,29 +7,7 @@
   vertical-align: baseline;
   padding: 4px 12px;
 }
-.select-all-capabilities.disabled {
-  pointer-events: none;
-  color: #aaa;
-}
-.role-tabs {
-  .oro-tabs {
-    border-bottom: 1px solid #ddd;
-  }
-  .permissions-grid {
-    margin: 0 -20px;
-  }
-  .capability-set h5 {
-    display: none;
-  }
-  &.multi-group {
-    .capability-set-title {
-      display: none;
-    }
-    .capability-set h5 {
-      display: block;
-    }
-  }
-}
+
 form.change-password-form span.icon-eye-close, form.change-password-form span.icon-eye-open {
   padding-left: 5px;
 }

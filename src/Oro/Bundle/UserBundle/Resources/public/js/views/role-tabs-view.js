@@ -23,7 +23,7 @@ define(function(require) {
                         item.set('active', false);
                     }
                 });
-                this.$(' > :first').toggleClass('multi-group', Boolean(model.get('multi')));
+                this.$(' > :first').toggleClass('role-tabs__multi-group', Boolean(model.get('multi')));
             }
         }
     });

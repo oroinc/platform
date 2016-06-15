@@ -1,3 +1,3 @@
-<div title="<%= label %>">
-    <label><input type="checkbox" value="5" <% if (accessLevel > 0) { %>checked<% } %>> <%= label %></label>
-</div>
+<label<% if (description) {%> title="<%= description %>"<% } %>>
+<input type="checkbox" value="<%= selected_value %>"<% if (accessLevel === selected_value) { %> checked<% } %>>
+    &nbsp;<%= label %></label>

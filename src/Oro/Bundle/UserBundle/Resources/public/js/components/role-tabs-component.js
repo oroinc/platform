@@ -47,7 +47,7 @@ define(function(require) {
                 return new BaseModel({group: key, label: label, items: new BaseCollection(group)});
             });
             this.capabilityView = new BaseCollectionView({
-                el: this.view.$('.capability-set'),
+                el: this.view.$('[data-name="capability-set"]'),
                 autoRender: true,
                 animationDuration: 0,
                 collection: new BaseCollection(capabilityGroups),
@@ -61,7 +61,7 @@ define(function(require) {
         },
         initPermissionGrid: function(options) {
             this.permissionsGridComponent = new DatagridComponent(_.extend(options.gridOptions, {
-                _sourceElement: this.view.$('.permissions-grid').get(0)
+                _sourceElement: this.view.$('[data-name="permissions-grid"]').get(0)
             }));
             this.permissionsGridComponent.built.then(_.bind(function(gridView) {
                 gridView.body.filter(this.filterer.bind(this));

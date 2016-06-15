@@ -10,7 +10,7 @@ define(function(require) {
      * @export orouser/js/views/role-view
      */
     CapabilityItemView = BaseView.extend({
-        className: 'security-row row-fluid',
+        className: 'role-capability__item',
         template: require('tpl!orouser/templates/capability-item.html'),
         autoRender: true,
         listen: {
@@ -25,7 +25,8 @@ define(function(require) {
             this.render();
         },
         onChange: function(e) {
-            this.model.set('accessLevel', e.currentTarget.checked ? 5 : 0);
+            var value = this.model.get(e.currentTarget.checked ? 'selected_value' : 'unselected_value');
+            this.model.set('accessLevel', value);
         }
     });
 
