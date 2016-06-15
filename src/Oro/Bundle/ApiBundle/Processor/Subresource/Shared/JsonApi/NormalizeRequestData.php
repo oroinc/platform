@@ -49,10 +49,8 @@ class NormalizeRequestData implements ProcessorInterface
         $this->context = $context;
         try {
             $context->setRequestData($this->normalizeData($context->getRequestData()));
+        } finally {
             $this->context = null;
-        } catch (\Exception $e) {
-            $this->context = null;
-            throw $e;
         }
     }
 
@@ -63,32 +61,25 @@ class NormalizeRequestData implements ProcessorInterface
      */
     protected function normalizeData(array $data)
     {
-        $associationData = [];
         $associationName = $this->context->getAssociationName();
         $dataPointer = $this->buildPointer('', JsonApiDoc::DATA);
         if ($this->context->isCollection()) {
+            $associationData = [];
             foreach ($data[JsonApiDoc::DATA] as $key => $value) {
-                $pointer = $this->buildPointer($dataPointer, $key);
-                $targetEntityClass = $this->normalizeEntityClass(
-                    $this->buildPointer($pointer, JsonApiDoc::TYPE),
-                    $value[JsonApiDoc::TYPE]
-                );
                 $associationData[] = $this->normalizeRelationId(
-                    $this->buildPointer($pointer, JsonApiDoc::ID),
-                    $targetEntityClass,
+                    $this->buildPointer($dataPointer, $key),
+                    $value[JsonApiDoc::TYPE],
                     $value[JsonApiDoc::ID]
                 );
             }
         } elseif (null !== $data[JsonApiDoc::DATA]) {
-            $targetEntityClass = $this->normalizeEntityClass(
-                $this->buildPointer($dataPointer, JsonApiDoc::TYPE),
-                $data[JsonApiDoc::DATA][JsonApiDoc::TYPE]
-            );
             $associationData = $this->normalizeRelationId(
                 $dataPointer,
-                $targetEntityClass,
+                $data[JsonApiDoc::DATA][JsonApiDoc::TYPE],
                 $data[JsonApiDoc::DATA][JsonApiDoc::ID]
             );
+        } else {
+            $associationData = null;
         }
 
         return [$associationName => $associationData];
@@ -96,16 +87,28 @@ class NormalizeRequestData implements ProcessorInterface
 
     /**
      * @param string $pointer
-     * @param string $entityClass
+     * @param string $entityType
      * @param mixed  $entityId
      *
      * @return array ['class' => entity class, 'id' => entity id]
      */
-    protected function normalizeRelationId($pointer, $entityClass, $entityId)
+    protected function normalizeRelationId($pointer, $entityType, $entityId)
     {
+        $entityClass = $this->normalizeEntityClass(
+            $this->buildPointer($pointer, JsonApiDoc::TYPE),
+            $entityType
+        );
+        if ($entityClass) {
+            $entityId = $this->normalizeEntityId(
+                $this->buildPointer($pointer, JsonApiDoc::ID),
+                $entityClass,
+                $entityId
+            );
+        }
+
         return [
-            'class' => $entityClass,
-            'id'    => $this->normalizeEntityId($pointer, $entityClass, $entityId)
+            'class' => $entityClass ?: $entityType,
+            'id'    => $entityId
         ];
     }
 
@@ -134,7 +137,7 @@ class NormalizeRequestData implements ProcessorInterface
      * @param string $pointer
      * @param string $entityType
      *
-     * @return string
+     * @return string|null
      */
     protected function normalizeEntityClass($pointer, $entityType)
     {
@@ -151,7 +154,7 @@ class NormalizeRequestData implements ProcessorInterface
             $this->context->addError($error);
         }
 
-        return $entityType;
+        return null;
     }
 
     /**

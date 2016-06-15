@@ -172,10 +172,10 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                     ->setSource(ErrorSource::createByPropertyPath('toOneRelation')),
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
-                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation/0')),
+                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation.0')),
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
-                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation/1')),
+                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation.1')),
             ],
             $this->context->getErrors()
         );

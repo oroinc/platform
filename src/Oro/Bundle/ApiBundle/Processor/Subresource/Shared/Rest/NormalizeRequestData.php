@@ -39,10 +39,8 @@ class NormalizeRequestData implements ProcessorInterface
         $this->context = $context;
         try {
             $context->setRequestData($this->normalizeData($context->getRequestData()));
+        } finally {
             $this->context = null;
-        } catch (\Exception $e) {
-            $this->context = null;
-            throw $e;
         }
     }
 
@@ -53,26 +51,32 @@ class NormalizeRequestData implements ProcessorInterface
      */
     protected function normalizeData(array $data)
     {
-        $associationData = [];
+        $associationValue = reset($data);
+
         $associationName = $this->context->getAssociationName();
         $associationMetadata = $this->context->getParentMetadata()->getAssociation($associationName);
         if (null !== $associationMetadata) {
             $targetEntityClass = $associationMetadata->getTargetClassName();
             if ($this->context->isCollection()) {
-                foreach ($data as $key => $value) {
+                $associationData = [];
+                foreach ($associationValue as $key => $value) {
                     $associationData[] = $this->normalizeRelationId(
-                        $associationName . '/' . $key,
+                        $associationName . '.' . $key,
                         $targetEntityClass,
                         $value
                     );
                 }
-            } else {
+            } elseif (null !== $associationValue) {
                 $associationData = $this->normalizeRelationId(
                     $associationName,
                     $targetEntityClass,
-                    $data
+                    $associationValue
                 );
+            } else {
+                $associationData = null;
             }
+        } else {
+            $associationData = $associationValue;
         }
 
         return [$associationName => $associationData];
