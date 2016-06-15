@@ -167,17 +167,13 @@
                 data: gridData
             }
         } %}
-        {%  set capabilityOptions = {
-            data: capabilitiesData,
+        {%  set tabsOptions = {
+            capabilitiesData: capabilitiesData,
+            gridOptions: _gridOptions,
             categories: categories
         } %}
-        <div data-page-component-module="orouser/js/components/capability-set-component"
-             data-page-component-options="{{ capabilityOptions|json_encode }}">
-        </div>
-        <div data-page-component-module="orodatagrid/js/app/components/datagrid-component"
-             data-page-component-name="{{ _gridOptions.gridName }}"
-             data-page-component-options="{{ _gridOptions|json_encode }}"
-             class="inner-grid">
+        <div data-page-component-module="orouser/js/components/role-tabs-component"
+             data-page-component-options="{{ tabsOptions|json_encode }}">
         </div>
     {% endset %}
 
@@ -187,22 +183,7 @@
             {
                 'title': '',
                 'useSpan': false,
-                'data': [
-                    rolePermissionsGrid,
-                    form_widget(form.children['entity']),
-                    form_widget(form.children['action'])
-                ]
-            }
-        ]
-    }]) %}
-
-    {% set dataBlocks = dataBlocks|merge([{
-        'title' : 'oro.user.entity_plural_label'|trans,
-        'subblocks': [
-            {
-                'title' : null,
-                'useSpan': false,
-                'data' : [dataGrid.renderGrid(gridName, {role_id: entityId}, { cssClass: 'inner-grid' })]
+                'data': [rolePermissionsGrid]
             }
         ]
     }]) %}

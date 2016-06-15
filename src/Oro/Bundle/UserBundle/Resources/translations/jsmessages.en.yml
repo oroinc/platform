@@ -9,3 +9,9 @@ oro:
         change_password:
             flash:
                 success: The password has been changed
+    role:
+        tabs:
+            all.label: All
+            system_capabilities.label: System Capabilities
+        capability_block:
+            label: Capabilities

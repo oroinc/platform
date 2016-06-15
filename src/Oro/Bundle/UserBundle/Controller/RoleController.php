@@ -117,23 +117,23 @@ class RoleController extends Controller
         $categories = [
             'account_management' => [
                 'label' => 'Account Management',
-                'tab' => true
+                'system' => false
             ],
             'marketing' => [
                 'label' => 'Marketing',
-                'tab' => true
+                'system' => false
             ],
             'sales_data' => [
                 'label' => 'Sales Data',
-                'tab' => true
+                'system' => false
             ],
             'address' => [
                 'label' => 'Address',
-                'tab' => false
+                'system' => true
             ],
             'calendar' => [
                 'label' => 'Calendar',
-                'tab' => false
+                'system' => true
             ]
         ];
         // @todo: redevelop it as grid
