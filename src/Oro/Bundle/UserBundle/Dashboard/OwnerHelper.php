@@ -27,7 +27,7 @@ class OwnerHelper
     /**
      * @param WidgetOptionBag $widgetOptions
      *
-     * @return array
+     * @return int[]
      */
     public function getOwnerIds(WidgetOptionBag $widgetOptions)
     {
@@ -51,7 +51,7 @@ class OwnerHelper
     /**
      * @param WidgetOptionBag $widgetOptions
      *
-     * @return array
+     * @return int[]
      */
     protected function getUsersIds(WidgetOptionBag $widgetOptions)
     {
@@ -61,7 +61,7 @@ class OwnerHelper
     /**
      * @param WidgetOptionBag $widgetOptions
      *
-     * @return array
+     * @return int[]
      */
     protected function getRoleIds(WidgetOptionBag $widgetOptions)
     {
@@ -71,7 +71,7 @@ class OwnerHelper
     /**
      * @param WidgetOptionBag $widgetOptions
      *
-     * @return array
+     * @return int[]
      */
     protected function getBusinessUnitsIds(WidgetOptionBag $widgetOptions)
     {

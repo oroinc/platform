@@ -62,11 +62,7 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
     }
 
     /**
-     * Set data-title attribute to element to show selected value
-     *
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {

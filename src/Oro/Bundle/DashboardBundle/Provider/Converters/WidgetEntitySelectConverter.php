@@ -33,7 +33,7 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
      * @param EntityNameResolver $entityNameResolver
      * @param DoctrineHelper     $doctrineHelper
      * @param EntityManager      $entityManager
-     * @param                    $entityClass
+     * @param string             $entityClass
      */
     public function __construct(
         AclHelper $aclHelper,
@@ -43,10 +43,10 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
         $entityClass
     ) {
         $this->aclHelper          = $aclHelper;
-        $this->entityManager      = $entityManager;
-        $this->entityClass        = $entityClass;
         $this->entityNameResolver = $entityNameResolver;
         $this->doctrineHelper     = $doctrineHelper;
+        $this->entityManager      = $entityManager;
+        $this->entityClass        = $entityClass;
     }
 
     /**
