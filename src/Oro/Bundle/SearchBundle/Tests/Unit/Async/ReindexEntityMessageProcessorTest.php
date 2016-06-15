@@ -39,7 +39,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::INDEX_ENTITIES_BY_CLASS, 'class-name')
         ;
 
@@ -69,7 +69,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::INDEX_ENTITIES_BY_CLASS, 'class-name')
         ;
 
@@ -102,7 +102,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::INDEX_ENTITIES_BY_CLASS, 'class-name')
         ;
 

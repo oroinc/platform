@@ -66,7 +66,7 @@ class Indexer implements IndexerInterface
     {
         $classes = is_array($class) ? $class : [$class];
 
-        $this->producer->sendTo(Topics::REINDEX_ENTITIES, $classes);
+        $this->producer->send(Topics::REINDEX_ENTITIES, $classes);
     }
 
     /**
@@ -90,7 +90,7 @@ class Indexer implements IndexerInterface
             ];
         }
 
-        $this->producer->sendTo(Topics::INDEX_ENTITIES_BY_ID, $body);
+        $this->producer->send(Topics::INDEX_ENTITIES_BY_ID, $body);
 
         return true;
     }

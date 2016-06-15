@@ -31,7 +31,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->never())
-            ->method('sendTo')
+            ->method('send')
         ;
 
         $logger = $this->createLoggerMock();
@@ -55,7 +55,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->never())
-            ->method('sendTo')
+            ->method('send')
         ;
 
         $logger = $this->createLoggerMock();
@@ -84,7 +84,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->never())
-            ->method('sendTo')
+            ->method('send')
         ;
 
         $logger = $this->createLoggerMock();
@@ -115,7 +115,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::INDEX_ENTITY, ['class' => 'class-name', 'id' => 'id'])
         ;
 

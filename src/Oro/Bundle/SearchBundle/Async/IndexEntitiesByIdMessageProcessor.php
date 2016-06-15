@@ -65,7 +65,7 @@ class IndexEntitiesByIdMessageProcessor implements MessageProcessorInterface, To
                 continue;
             }
 
-            $this->producer->sendTo(Topics::INDEX_ENTITY, $entity);
+            $this->producer->send(Topics::INDEX_ENTITY, $entity);
         }
 
         return self::ACK;

@@ -37,7 +37,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->never())
-            ->method('sendTo')
+            ->method('send')
         ;
 
         $doctrineHelper = $this->createDoctrineHelperMock();
@@ -57,7 +57,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->never())
-            ->method('sendTo')
+            ->method('send')
         ;
 
         $doctrineHelper = $this->createDoctrineHelperMock();
@@ -86,7 +86,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::INDEX_ENTITIES_BY_ID, $this->identicalTo($expectedMessage))
         ;
 
@@ -118,7 +118,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::INDEX_ENTITIES_BY_ID, $this->identicalTo($expectedMessage))
         ;
 
@@ -150,7 +150,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::INDEX_ENTITIES_BY_ID, $this->identicalTo($expectedMessage))
         ;
 
@@ -182,7 +182,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::INDEX_ENTITIES_BY_ID, $this->identicalTo($expectedMessage))
         ;
 
@@ -209,7 +209,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::REINDEX_ENTITIES, $this->identicalTo($expectedMessage))
         ;
 
@@ -226,7 +226,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->once())
-            ->method('sendTo')
+            ->method('send')
             ->with(Topics::REINDEX_ENTITIES, $this->identicalTo($expectedMessage))
         ;
 
