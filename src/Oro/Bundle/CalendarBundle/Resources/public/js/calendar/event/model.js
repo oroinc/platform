@@ -104,7 +104,11 @@ define([
                 ),
                 attrs || {}
             );
-            modelData.attendees = _.map(modelData.attendees, _.partial(_.omit, _, 'fullName'));
+            _.each(modelData.attendees, function (attendee) {
+                delete attendee.fullName;
+                delete attendee.createdAt;
+                delete attendee.updatedAt;
+            });
 
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);
