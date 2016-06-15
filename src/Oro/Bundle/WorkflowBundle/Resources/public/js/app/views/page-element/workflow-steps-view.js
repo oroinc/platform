@@ -12,18 +12,25 @@ define(function(require) {
         },
         getTemplateData: function() {
             var data = WokflowStepsView.__super__.getTemplateData.call(this);
-            if (!data.steps || !data.steps.length) {
+
+            if (!data.stepsData) {
                 return data;
             }
-            // calculated processed flag
-            var processed = true;
-            for (var i = 0; i < data.steps.length; i++) {
-                var step = data.steps[i];
-                if (step.name === data.currentStep.name) {
-                    processed = false;
+
+            for (var s in data.stepsData) {
+                var stepsData = data.stepsData[s];
+
+                // calculated processed flag
+                var processed = true;
+                for (var i = 0; i < stepsData.steps.length; i++) {
+                    var step = stepsData.steps[i];
+                    if (step.name === stepsData.currentStep.name) {
+                        processed = false;
+                    }
+                    step.processed = processed;
                 }
-                step.processed = processed;
             }
+
             return data;
         },
         render: function() {
@@ -33,7 +40,7 @@ define(function(require) {
         },
         updateContainerWidth: function() {
             var $container = this.$el;
-            var $list = this.$('.workflow-step-list');
+            var $list = this.$('.workflow-step');
             $container.width(10000);
             $list.css({float: 'left'});
             $container.width($list.width() + 1/* floating pixel calculation compensation */);
