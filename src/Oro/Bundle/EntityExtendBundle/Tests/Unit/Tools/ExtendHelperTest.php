@@ -106,11 +106,6 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         return [
             ['test', 'test'],
             ['Test', 'test'],
-            ['tēstà', 'testa'],
-            ['pièce de résistance', 'piece_de_resistance'],
-            ['Smörgåsbord', 'smorgasbord'],
-            ['Тест', 'test'],
-            ['Тестовые Буквы йёЙЁ', 'testovye_bukvy_jeje'],
             ['test123', 'test123'],
             ['test 123', 'test_123'],
             [' test 123 ', 'test_123'],
