@@ -132,6 +132,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'router_processor' => null,
                 'router_destination' => 'default',
                 'default_destination' => 'default',
+                'traceable_producer' => false
             ],
         ], $config);
     }

@@ -130,7 +130,6 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldLoadClientServicesWhenEnabled()
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
 
         $extension = new OroMessageQueueExtension();
 
@@ -146,7 +145,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->hasDefinition('oro_message_queue.client.message_producer'));
     }
 
-    public function testShouldUseMessageProducerIfDebugFalse()
+    public function testShouldUseMessageProducerByDefault()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -165,7 +164,28 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(MessageProducer::class, $messageProducer->getClass());
     }
 
-    public function testShouldUseTraceableMessageProducerIfDebugTrue()
+    public function testShouldUseMessageProducerIfTraceableProducerOptionSetToFalseExplicitly()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $extension = new OroMessageQueueExtension();
+
+        $extension->load([[
+            'client' => [
+                'traceable_producer' => false
+            ],
+            'transport' => [
+                'default' => 'null',
+                'null' => true
+            ]
+        ]], $container);
+
+        $messageProducer = $container->getDefinition('oro_message_queue.client.message_producer');
+        $this->assertEquals(MessageProducer::class, $messageProducer->getClass());
+    }
+
+    public function testShouldUseTraceableMessageProducerIfTraceableProducerOptionSetToTrueExplicitly()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
@@ -173,7 +193,9 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new OroMessageQueueExtension();
 
         $extension->load([[
-            'client' => null,
+            'client' => [
+                'traceable_producer' => true
+            ],
             'transport' => [
                 'default' => 'null',
                 'null' => true

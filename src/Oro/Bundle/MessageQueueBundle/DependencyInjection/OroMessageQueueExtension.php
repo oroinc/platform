@@ -61,7 +61,7 @@ class OroMessageQueueExtension extends Extension
                 $config['client']['default_destination'],
             ]);
 
-            if ($container->getParameter('kernel.debug')) {
+            if (false == empty($config['client']['traceable_producer'])) {
                 $container->setDefinition(
                     'oro_message_queue.client.internal_message_producer',
                     $container->getDefinition('oro_message_queue.client.message_producer')
