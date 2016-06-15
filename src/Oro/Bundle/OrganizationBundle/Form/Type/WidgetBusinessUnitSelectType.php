@@ -16,7 +16,7 @@ class WidgetBusinessUnitSelectType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'autocomplete_alias' => 'widget_business_units',
+                'autocomplete_alias' => 'business_units',
                 'configs'            => [
                     'multiple'    => true,
                     'width'       => '400px',

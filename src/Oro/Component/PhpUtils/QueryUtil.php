@@ -33,6 +33,6 @@ class QueryUtil
      */
     public static function generateParameterName($prefix)
     {
-      return QueryUtils::generateParameterName($prefix);
+        return QueryUtils::generateParameterName($prefix);
     }
 }
