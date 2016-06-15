@@ -2,19 +2,52 @@
 
 namespace Oro\Bundle\OrganizationBundle\Autocomplete;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
-
-use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
-use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class BusinessUnitSearchHandler extends SearchHandler
 {
-    
+    /** @var  Registry */
+    protected $doctrine;
+
+    public function __construct($entityName, array $properties, Registry $doctrine)
+    {
+        parent::__construct($entityName, $properties);
+        $this->doctrine = $doctrine;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertItem($item)
+    {
+        $result = parent::convertItem($item);
+
+        $businnesUnit = $this->doctrine->getManager()->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->find($result[$this->idFieldName]);
+
+        $result['path'] = $this->getPath($businnesUnit, []);
+
+        return $result;
+    }
+
+    /**
+     * @param BusinessUnit $businessUnit
+     * @param $path
+     *
+     * @return mixed
+     */
+    protected function getPath($businessUnit, $path)
+    {
+        $path[] = $businessUnit->getName();
+
+        $owner = $businessUnit->getOwner();
+        if ($owner) {
+            $path = $this->getPath($owner, $path);
+        }
+
+        return $path;
+    }
 }
