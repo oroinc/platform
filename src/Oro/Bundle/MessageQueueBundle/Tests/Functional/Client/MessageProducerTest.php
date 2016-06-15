@@ -2,7 +2,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Client;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class MessageProducerTest extends WebTestCase
 {
@@ -15,7 +15,7 @@ class MessageProducerTest extends WebTestCase
     {
         $messageProducer = $this->getContainer()->get('oro_message_queue.client.message_producer');
 
-        $this->assertInstanceOf(MessageProducer::class, $messageProducer);
+        $this->assertInstanceOf(MessageProducerInterface::class, $messageProducer);
     }
 
     public function testCouldBeGetFromContainerAsShortenAlias()
