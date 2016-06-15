@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Duration field type
- * Accepts JIRA style (##h ##m ##s) and column style (##:##:##) duration encodings.
+ * Accepts numeric values (seconds), JIRA style (##h ##m ##s) and column style (##:##:##) duration encodings.
  *
  * @see DurationToStringTransformer for more details
  */
@@ -20,8 +20,9 @@ class OroDurationType extends AbstractType
 {
     const NAME = 'oro_duration';
 
-
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer(new DurationToStringTransformer());
@@ -54,7 +55,7 @@ class OroDurationType extends AbstractType
             '/^' .
             '(?:(?:(\d+(?:\.\d)?)?)h(?:[\s]*|$))?' .
             '(?:(?:(\d+(?:\.\d)?)?)m(?:[\s]*|$))?' .
-            '(?:(?:(\d+(?:\.\d)?)?)s)?' .
+            '(?:(?:(\d+(?:\.\d)?)?)s?)?' .
             '$/i';
         $regexColumnFormat =
             '/^' .
