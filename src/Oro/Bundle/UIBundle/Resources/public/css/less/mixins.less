@@ -98,11 +98,14 @@
 }
 
 .horizontal-icon-menu () {
-  .dropdown-menu.pull-right {
+  .dropdown-menu {
     padding: 0;
     right: 33px;
     left: auto;
     top: -10px;
+    > li {
+      display: table-cell;
+    }
     .nav.launchers-list {
       padding: 0;
       > li:first-child > a{
