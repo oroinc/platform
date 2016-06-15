@@ -50,6 +50,8 @@ class FieldGenerator
     /**
      * @param string $entityClass
      * @throws WorkflowException
+     *
+     * @deprecated
      */
     public function generateWorkflowFields($entityClass)
     {
