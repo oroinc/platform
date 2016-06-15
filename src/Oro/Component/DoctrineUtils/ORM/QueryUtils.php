@@ -13,6 +13,9 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class QueryUtils
 {
     const IN         = 'in';
