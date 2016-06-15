@@ -30,11 +30,7 @@ parameters:
     oro_dashboard.form.type.widget_items.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsType
     oro_dashboard.form.type.widget_item.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemType
     oro_dashboard.event_listener.widget_items_form_subscriber.class: Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber
-    oro_dashboard.form.type.widget_user_multiselect.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetUserMultiselect
-    oro_dashboard.widget_config_value.widget_user_multiselect.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetUserMultiselectConverter
     oro_dashboard.form.type.widget_date.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType
-    oro_dashboard.form.type.widget_business_unit_select.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetBusinessUnitSelect
-    oro_dashboard.widget_config_value.widget_business_unit_select.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetBusinessUnitSelectConverter
 
     # BigNumber
     oro_dashboard.provider.big_number.processor.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
@@ -138,6 +134,16 @@ services:
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItemsByItemsChoice }
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItems }
 
+    oro_dashboard.type.widget_jqueryselect2_hidden:
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_form.autocomplete.search_registry'
+            - '@oro_entity_config.provider.form'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: form.type, alias: oro_widget_entity_jqueryselect2_hidden }
+
     oro_dashboard.form.type.widget_date_range:
         class: %oro_dashboard.form.type.widget_date_range.class%
         arguments:
@@ -226,41 +232,10 @@ services:
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_items_choice" }
 
-    oro_dashboard.form.type.widget_user_multiselect:
-        class: %oro_dashboard.form.type.widget_user_multiselect.class%
-        arguments:
-            - '@doctrine.orm.entity_manager'
-        tags:
-            - { name: form.type, alias: "oro_type_widget_user_multiselect" }
-
-    oro_dashboard.widget_config_value.widget_user_multiselect.converter:
-        class: %oro_dashboard.widget_config_value.widget_user_multiselect.converter.class%
-        arguments:
-            - '@doctrine.orm.entity_manager'
-        tags:
-            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_user_multiselect" }
-
     oro_dashboard.form.type.widget_date:
         class: %oro_dashboard.form.type.widget_date.class%
         tags:
             - { name: form.type, alias: "oro_type_widget_date" }
-
-    oro_dashboard.form.type.widget_business_unit_select:
-        class: %oro_dashboard.form.type.widget_business_unit_select.class%
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - %oro_organization.business_unit.entity.class%
-        tags:
-            - { name: form.type, alias: "oro_type_widget_business_unit_select" }
-
-    oro_dashboard.widget_config_value.widget_business_unit_select.converter:
-        class: %oro_dashboard.widget_config_value.widget_business_unit_select.converter.class%
-        arguments:
-            - "@=service('doctrine.orm.entity_manager').getRepository(parameter('oro_organization.business_unit.entity.class'))"
-            - '@oro_security.security_facade'
-            - '@oro_organization.provider.busines_unit_acl'
-        tags:
-            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_business_unit_select" }
 
     # BigNumber
     oro_dashboard.provider.big_number.processor:

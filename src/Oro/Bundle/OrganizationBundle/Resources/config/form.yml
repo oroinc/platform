@@ -170,3 +170,12 @@ services:
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: organization, acl_resource: oro_organization_view }
+
+    oro_organization.autocomplete.widget_business_unit.search_handler:
+        class: Oro\Bundle\OrganizationBundle\Autocomplete\WidgetBusinessUnitSearchHandler
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_organization.business_unit.entity.class%
+            - ['name']
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: widget_business_units }
