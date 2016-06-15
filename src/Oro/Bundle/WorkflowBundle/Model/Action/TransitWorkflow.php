@@ -30,6 +30,11 @@ class TransitWorkflow extends ComponentAbstractAction
     protected $transition;
 
     /**
+     * @var string
+     */
+    protected $workflow;
+
+    /**
      * @var array
      */
     protected $data = [];
@@ -51,7 +56,8 @@ class TransitWorkflow extends ComponentAbstractAction
     {
         $entity = $this->contextAccessor->getValue($context, $this->entity);
         $transition = $this->contextAccessor->getValue($context, $this->transition);
-        $workflowItem = $this->workflowManager->getWorkflowItemByEntity($entity);
+        $workflow = $this->contextAccessor->getValue($context, $this->workflow);
+        $workflowItem = $this->workflowManager->getWorkflowItem($entity, $workflow);
         if (!$workflowItem) {
             throw new ActionException(
                 sprintf(
@@ -80,6 +86,7 @@ class TransitWorkflow extends ComponentAbstractAction
         } else {
             throw new InvalidParameterException('Option "entity" is required.');
         }
+        
         if (isset($options['transition'])) {
             $this->transition = $options['transition'];
         } elseif (isset($options[1])) {
@@ -88,10 +95,18 @@ class TransitWorkflow extends ComponentAbstractAction
             throw new InvalidParameterException('Option "transition" is required.');
         }
 
+        if(isset($options['workflow'])) {
+            $this->workflow = $options['workflow'];
+        } elseif (isset($options[2])) {
+            $this->workflow = $options[2];
+        } else {
+            throw new InvalidParameterException('Option "workflow" is required.'); //todo update doc
+        }
+
         if (isset($options['data'])) {
             $this->data = $options['data'];
-        } elseif (isset($options[2])) {
-            $this->data = $options[2];
+        } elseif (isset($options[3])) {
+            $this->data = $options[3];
         }
     }
 
