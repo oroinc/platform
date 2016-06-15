@@ -100,6 +100,14 @@ services:
         tags:
              - { name: layout.block_type, alias: form_field }
 
+    oro_layout.block_type.form_errors:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{form: {required: true}}]]
+            - [setName, ['form_errors']]
+        tags:
+             - { name: layout.block_type, alias: form_errors }
+
     oro_layout.block_type.fieldset:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
