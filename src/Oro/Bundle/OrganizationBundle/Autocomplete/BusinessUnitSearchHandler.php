@@ -28,7 +28,7 @@ class BusinessUnitSearchHandler extends SearchHandler
         $businnesUnit = $this->doctrine->getManager()->getRepository('OroOrganizationBundle:BusinessUnit')
             ->find($result[$this->idFieldName]);
 
-        $result['path'] = $this->getPath($businnesUnit, []);
+        $result['treePath'] = $this->getPath($businnesUnit, []);
 
         return $result;
     }
@@ -41,7 +41,7 @@ class BusinessUnitSearchHandler extends SearchHandler
      */
     protected function getPath($businessUnit, $path)
     {
-        $path[] = $businessUnit->getName();
+        $path[] = ['name'=> $businessUnit->getName()];
 
         $owner = $businessUnit->getOwner();
         if ($owner) {
