@@ -71,7 +71,6 @@ class GetRestJsonApiTest extends ApiTestCase
             // test "delete" request
             if (!in_array('delete', $excludedActions, true)) {
                 $this->checkDeleteRequest($entityAlias, $id, $excludedActions);
-
             }
         }
     }

@@ -37,7 +37,7 @@
     {% endblock stats %}
 
     {% set formDetails %}
-    <div class="widget-content">
+        <div class="widget-content">
             <div class="row-fluid form-horizontal">
                 <div class="responsive-block">
                     {{ ui.renderProperty('oro.embeddedform.title.label'|trans, entity.title) }}
@@ -53,6 +53,7 @@
                     </div>
 
                     {{ ui.renderProperty('oro.embeddedform.success_message.label'|trans, entity.successMessage) }}
+                    {{ ui.renderHtmlProperty('oro.embeddedform.allowed_domains.label'|trans, entity.allowedDomains|nl2br|escape) }}
                 </div>
             </div>
         </div>
@@ -67,8 +68,9 @@
     </div>
     {% endset %}
 
-    {% set getCode %}
-    <textarea name="" id="" cols="60" rows="10" style="width: 800px; height: 300px;">
+    {% set getCodeIframe %}
+        <textarea id="oro_embeddedform_iframe" cols="60" rows="10" class="fill-tab" style="height: 300px">
+{%- autoescape %}
 <div id="embedded-form-container-{{ entity.id }}"></div>
 <script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
 <script type="text/javascript">
@@ -82,8 +84,44 @@
         }
     });
 </script>
+{% endautoescape -%}
         </textarea>
     {% endset %}
+
+    {% set getCodeInline %}
+        <div class="alert alert-warning">{{ 'oro.embeddedform.tabs.inline.description'|trans|raw }}</div>
+        <textarea id="oro_embeddedform_inline" cols="60" rows="10" class="fill-tab" style="height: 300px">
+{%- autoescape %}
+<div id="embedded-form-container-{{ entity.id }}"></div>
+<script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
+<script type="text/javascript">
+    new ORO.EmbedForm({
+        container: 'embedded-form-container-{{ entity.id }}',
+        xhr: {
+            url: "{{ url('oro_embedded_form_submit', {'id': entity.id, 'inline': true}) }}"
+        }
+    });
+</script>
+{% endautoescape -%}
+        </textarea>
+    {% endset %}
+
+    {% set getCodeTabs = [
+        {
+            'alias': 'oro_embeddedform_iframe',
+            'widgetType': 'block',
+            'label': 'oro.embeddedform.tabs.iframe.label'|trans,
+            'url': '#oro_embeddedform_iframe',
+            'content': getCodeIframe
+        },
+        {
+            'alias': 'oro_embeddedform_inline',
+            'widgetType': 'block',
+            'label': 'oro.embeddedform.tabs.inline.label'|trans,
+            'url': '#oro_embeddedform_inline',
+            'content': getCodeInline
+        }
+    ] %}
 
     {% set informationWidget %}
         {{ oro_widget_render({
@@ -111,7 +149,7 @@
         'title': 'Get code'|trans,
         'subblocks': [{
             'title': 'Code'|trans,
-            'data': [getCode]
+            'data': [tabPanel(getCodeTabs)]
         }]
     }]
     %}
