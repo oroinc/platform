@@ -243,6 +243,7 @@ services:
         arguments:
             - '@oro_dashboard.provider.big_number.formatter'
             - '@oro_dashboard.provider.big_number.date_helper'
+            - '@oro_user.dashboard.owner_helper'
 
     oro_dashboard.provider.big_number.formatter:
         class: %oro_dashboard.provider.big_number.formatter.class%
