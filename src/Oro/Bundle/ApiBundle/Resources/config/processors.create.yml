@@ -179,8 +179,8 @@ services:
     # save_data
     #
 
-    oro_api.create.save_orm_entity:
-        class: Oro\Bundle\ApiBundle\Processor\Create\SaveOrmEntity
+    oro_api.create.save_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Create\SaveEntity
         arguments:
             - '@oro_api.doctrine_helper'
         tags:

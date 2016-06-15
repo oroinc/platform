@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Saves all changes of ORM entity to the database.
+ * Saves all changes of the parent ORM entity to the database.
  */
 class SaveParentEntity implements ProcessorInterface
 {

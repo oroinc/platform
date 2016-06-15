@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 /**
  * Saves all changes of ORM entity to the database.
  */
-class SaveOrmEntity implements ProcessorInterface
+class SaveEntity implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;

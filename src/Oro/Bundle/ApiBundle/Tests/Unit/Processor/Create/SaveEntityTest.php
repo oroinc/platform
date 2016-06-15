@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
-use Oro\Bundle\ApiBundle\Processor\Create\SaveOrmEntity;
+use Oro\Bundle\ApiBundle\Processor\Create\SaveEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
-class SaveOrmEntityTest extends FormProcessorTestCase
+class SaveEntityTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var SaveOrmEntity */
+    /** @var SaveEntity */
     protected $processor;
 
     protected function setUp()
@@ -21,7 +21,7 @@ class SaveOrmEntityTest extends FormProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new SaveOrmEntity($this->doctrineHelper);
+        $this->processor = new SaveEntity($this->doctrineHelper);
     }
 
     public function testProcessWhenNoEntity()

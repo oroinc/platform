@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 /**
  * Saves new ORM entity to the database and save its identifier into the Context.
  */
-class SaveOrmEntity implements ProcessorInterface
+class SaveEntity implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
