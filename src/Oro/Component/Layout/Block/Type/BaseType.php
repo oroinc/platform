@@ -2,8 +2,7 @@
 
 namespace Oro\Component\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
@@ -14,26 +13,16 @@ class BaseType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver)
     {
-        $resolver->setOptional(
-            [
-                'vars',
-                'attr',
-                'label',
-                'label_attr',
-                'translation_domain',
-                'class_prefix'
-            ]
-        );
-        $resolver->setAllowedTypes(
-            [
-                'vars'       => 'array',
-                'attr'       => 'array',
-                'label_attr' => 'array',
-                'class_prefix' => 'string'
-            ]
-        );
+        $optionsResolver->setDefined([
+            'vars',
+            'attr',
+            'label',
+            'label_attr',
+            'translation_domain',
+            'class_prefix',
+        ]);
     }
 
     /**

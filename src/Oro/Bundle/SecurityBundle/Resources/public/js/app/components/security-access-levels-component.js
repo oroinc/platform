@@ -39,12 +39,14 @@ define(function(require) {
                 var permissionName = $field.siblings('input').val();
                 var oid = $field.attr(self.options.objectIdentityAttribute);
                 var url = routing.generate(self.options.accessLevelRoute, {oid: oid.replace(/\\/g, '_')});
-                $input.select2({
-                    initSelection: function(element, callback) {
-                        callback({id: $input.val(), text: $input.data('valueText')});
-                    },
-                    query: _.bind(self._select2Query, self, url),
-                    minimumResultsForSearch: -1
+                $input.inputWidget('create', 'select2', {
+                    initializeOptions: {
+                        initSelection: function(element, callback) {
+                            callback({id: $input.val(), text: $input.data('valueText')});
+                        },
+                        query: _.bind(self._select2Query, self, url),
+                        minimumResultsForSearch: -1
+                    }
                 }).on('change.' + self.cid, function(e) {
                     mediator.trigger('securityAccessLevelsComponent:link:click', {
                         accessLevel: e.val,
@@ -84,7 +86,7 @@ define(function(require) {
 
             if (this.element) {
                 this.element.find(this.options.accessLevelFieldSelector).each(function() {
-                    $(this).find('input').off('change.' + this.cid).select2('destroy');
+                    $(this).find('input').off('change.' + this.cid).inputWidget('dispose');
                 });
             }
 

@@ -85,9 +85,20 @@ class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
                 'executionRoute' => 'execution_route',
                 'expected' => 'test_route',
             ],
-            'exists route name with datagrid' => [
+            'exists route name with datagrid route' => [
                 'masterRequest' => new Request([
                     '_route' => DefaultOperationRequestHelper::DATAGRID_ROUTE,
+                    'gridName' => 'test-grid',
+                    'test-grid' => [
+                        'originalRoute' => 'test_original_route'
+                    ]
+                ]),
+                'executionRoute' => 'test_route',
+                'expected' => 'test_original_route',
+            ],
+            'exists route name with mass action route' => [
+                'masterRequest' => new Request([
+                    '_route' => DefaultOperationRequestHelper::MASS_ACTION_ROUTE,
                     'gridName' => 'test-grid',
                     'test-grid' => [
                         'originalRoute' => 'test_original_route'

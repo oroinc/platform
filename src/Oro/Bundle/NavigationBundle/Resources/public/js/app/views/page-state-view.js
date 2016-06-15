@@ -332,14 +332,10 @@ define([
                 // collect select2 selected data
                 items = $(el).find('.select2[type=hidden], .select2[type=select]');
                 _.each(items, function(item) {
-                    var selectedData;
                     var $item = $(item);
+                    var selectedData = $item.inputWidget('data');
                     var itemData = {name: item.name, value: $item.val()};
 
-                    if ($item.data('select2')) {
-                        // select2 is already initialized
-                        selectedData = $item.select2('data');
-                    }
                     if (!_.isEmpty(selectedData) && $.isPlainObject(selectedData)) {
                         itemData.selectedData = [selectedData];
                     }

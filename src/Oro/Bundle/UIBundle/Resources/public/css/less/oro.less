@@ -1256,7 +1256,6 @@ footer {
 .status-enabled,
 .status-unknown {
   margin-left: 5px;
-  margin-top:-4px;
   text-shadow:none;
   padding:3px 10px 3px 5px;
   [class^='icon-']:before {
@@ -1314,6 +1313,9 @@ footer {
 }
 .launchers-dropdown-menu {
   min-width: 35px;
+  &.detach .nav {
+    margin: 0;
+  }
 }
 .launchers-list {
   &.nav > li:first-child > a {
@@ -2976,6 +2978,17 @@ span.validation-failed {
 
   .tab-pane {
     min-height: 104px;
+
+    .fill-tab {
+      border: 0;
+      box-shadow: none;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .alert {
+      margin: 5px;
+    }
   }
 }
 
