@@ -40,10 +40,8 @@ class ValidateRequestData implements ProcessorInterface
                     $this->validatePrimarySingleItemDataObject($data, $pointer);
                 }
             }
+        } finally {
             $this->context = null;
-        } catch (\Exception $e) {
-            $this->context = null;
-            throw $e;
         }
     }
 
@@ -73,7 +71,7 @@ class ValidateRequestData implements ProcessorInterface
      */
     protected function validatePrimaryCollectionDataObject($data, $pointer)
     {
-        if (!is_array($data)) {
+        if (!is_array($data) || ArrayUtil::isAssoc($data)) {
             $this->addError(
                 $pointer,
                 'The list of resource identifier objects should be an array'
@@ -83,7 +81,7 @@ class ValidateRequestData implements ProcessorInterface
         }
 
         foreach ($data as $key => $value) {
-            if (!is_array($data)) {
+            if (!is_array($value)) {
                 $this->addError(
                     $this->buildPointer($pointer, $key),
                     'The resource identifier object should be an object'
@@ -138,8 +136,8 @@ class ValidateRequestData implements ProcessorInterface
             return;
         }
 
-        $this->validateRequired($data, JsonApiDoc::ID, $pointer);
-        $this->validateRequired($data, JsonApiDoc::TYPE, $pointer);
+        $this->validateRequiredStringProperty($data, JsonApiDoc::ID, $pointer);
+        $this->validateRequiredStringProperty($data, JsonApiDoc::TYPE, $pointer);
     }
 
     /**
@@ -147,12 +145,22 @@ class ValidateRequestData implements ProcessorInterface
      * @param string $property
      * @param string $pointer
      */
-    protected function validateRequired(array $data, $property, $pointer)
+    protected function validateRequiredStringProperty(array $data, $property, $pointer)
     {
         if (!array_key_exists($property, $data)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 sprintf('The \'%s\' property is required', $property)
+            );
+        } elseif (!is_string($data[$property]) && null !== $data[$property]) {
+            $this->addError(
+                $this->buildPointer($pointer, $property),
+                sprintf('The \'%s\' property should be a string', $property)
+            );
+        } elseif ('' === $data[$property] || null === $data[$property]) {
+            $this->addError(
+                $this->buildPointer($pointer, $property),
+                sprintf('The \'%s\' property should not be empty', $property)
             );
         }
     }
