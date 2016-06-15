@@ -1,4 +1,4 @@
-+define(function (require) {
+define(function (require) {
     'use strict';
 
     var __ = require('orotranslation/js/translator');
