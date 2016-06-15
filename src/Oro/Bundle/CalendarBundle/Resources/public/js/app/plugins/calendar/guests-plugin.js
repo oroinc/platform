@@ -45,14 +45,14 @@ define(function(require) {
          */
         hasLoadedGuestEvents: function(parentEventModel) {
             var result = false;
-            var guests = parentEventModel.get('attendees');
-            guests = _.isNull(guests) ? [] : guests;
+            var attendees = parentEventModel.get('attendees');
+            attendees = _.isNull(attendees) ? [] : attendees;
             if (parentEventModel.hasChanged('attendees') && !_.isEmpty(parentEventModel.previous('attendees'))) {
-                guests = _.union(guests, parentEventModel.previous('attendees'));
+                attendees = _.union(attendees, parentEventModel.previous('attendees'));
             }
-            if (!_.isEmpty(guests)) {
+            if (!_.isEmpty(attendees)) {
                 result = Boolean(this.main.getConnectionCollection().find(function(connection) {
-                    return -1 !== guests.indexOf(connection.get('userId'));
+                    return -1 !== attendees.indexOf(connection.get('userId'));
                 }, this));
             }
             return result;
