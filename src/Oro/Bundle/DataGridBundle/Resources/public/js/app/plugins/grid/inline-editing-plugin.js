@@ -8,7 +8,6 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var CellIterator = require('../../../datagrid/cell-iterator');
-    var gridViewsBuilder = require('../../../inline-editing/builder');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var Modal = require('oroui/js/modal');
     var SplitEventList = require('./inline-editing-plugin/split-event-list');
