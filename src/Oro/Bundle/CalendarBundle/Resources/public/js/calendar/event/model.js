@@ -104,7 +104,7 @@ define([
                 ),
                 attrs || {}
             );
-            _.each(modelData.attendees, function (attendee) {
+            _.each(modelData.attendees, function(attendee) {
                 delete attendee.fullName;
                 delete attendee.createdAt;
                 delete attendee.updatedAt;
