@@ -52,7 +52,7 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function configure()
     {
@@ -67,7 +67,7 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

@@ -4,8 +4,11 @@ namespace Oro\Bundle\NotificationBundle\Provider\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
+use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 
 class DbSpool extends \Swift_ConfigurableSpool
 {
@@ -30,15 +33,31 @@ class DbSpool extends \Swift_ConfigurableSpool
     protected $entityClass;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
+     * @var string
+     */
+    protected $logType;
+
+    /**
      * @param EntityManager $em
      * @param EntityPool $entityPool
      * @param string $entityClass
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(EntityManager $em, EntityPool $entityPool, $entityClass)
-    {
+    public function __construct(
+        EntityManager $em,
+        EntityPool $entityPool,
+        $entityClass,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->em = $em;
         $this->entityPool = $entityPool;
         $this->entityClass = $entityClass;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -74,6 +93,7 @@ class DbSpool extends \Swift_ConfigurableSpool
         $mailObject = new $this->entityClass;
         $mailObject->setMessage($message);
         $mailObject->setStatus(self::STATUS_READY);
+        $mailObject->setLogType($this->logType);
 
         $this->entityPool->addPersistEntity($mailObject);
 
@@ -97,7 +117,7 @@ class DbSpool extends \Swift_ConfigurableSpool
             return 0;
         }
 
-        $failedRecipients = (array) $failedRecipients;
+        $failedRecipients = (array)$failedRecipients;
         $count = 0;
         $time = time();
         /** @var SpoolItem $email */
@@ -105,8 +125,12 @@ class DbSpool extends \Swift_ConfigurableSpool
             $email->setStatus(self::STATUS_PROCESSING);
             $this->em->persist($email);
             $this->em->flush($email);
-
-            $count += $transport->send($email->getMessage(), $failedRecipients);
+            $sentCount = $transport->send($email->getMessage(), $failedRecipients);
+            $count += $sentCount;
+            $this->eventDispatcher->dispatch(
+                NotificationSentEvent::NAME,
+                new NotificationSentEvent($email, $sentCount)
+            );
             $this->em->remove($email);
             $this->em->flush($email);
 
@@ -116,5 +140,13 @@ class DbSpool extends \Swift_ConfigurableSpool
         }
 
         return $count;
+    }
+
+    /**
+     * @param string $logType
+     */
+    public function setLogType($logType)
+    {
+        $this->logType = $logType;
     }
 }
