@@ -1,7 +1,8 @@
 define([
     'oro/datagrid/action/model-action',
-    'oroworkflow/js/activation-handler'
-], function(ModelAction, ActivationHandler) {
+    'oroworkflow/js/activation-handler',
+    'oroui/js/messenger'
+], function(ModelAction, ActivationHandler, messenger) {
     'use strict';
 
     var WorkflowActivateAction;
@@ -17,18 +18,18 @@ define([
         execute: function() {
             var datagrid = this.datagrid;
 
-            this.on('activation_start', function() {
-                datagrid.showLoading();
-            });
-            this.on('activation_success', function() {
+            this.on('activation_success', function(response) {
+                messenger.notificationFlashMessage('success', response.message);
+
+                if (response.deactivatedMessage) {
+                    messenger.notificationFlashMessage('info', response.deactivatedMessage);
+                }
+
                 datagrid.hideLoading();
                 datagrid.collection.fetch({reset: true});
             });
-            this.on('activation_error', function(xhr) {
-                datagrid.hideLoading();
-            });
 
-            ActivationHandler.call(this, this.getLink());
+            ActivationHandler.call(this, this.getLink(), this.model.get('name'));
         }
     });
 

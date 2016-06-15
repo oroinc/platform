@@ -25,6 +25,7 @@ class WorkflowReplacementSelectType extends AbstractType
                     'component' => 'workflow-replacement',
                     'placeholder' => 'oro.workflow.workflowdefinition.placeholder.select_replacement',
                 ],
+                'label' => 'oro.workflow.workflowdefinition.entity_plural_label'
             ]
         );
     }
