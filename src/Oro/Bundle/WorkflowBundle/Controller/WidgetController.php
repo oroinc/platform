@@ -255,14 +255,14 @@ class WidgetController extends Controller
 
             if ($workflowManager->isResetAllowed($entity, $workflowItem)) {
                 $workflowsData[$name]['resetAllowed'] = true;
-                $workflowsData[$name]['transitionsData'] = [];
                 $workflowsData[$name]['workflowItem'] = $workflowItem;
+                $workflowsData[$name]['transitionsData'] = [];
 
                 continue;
             }
 
-            $transitionsDatas = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
-            foreach ($transitionsDatas as $data) {
+            $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+            foreach ($transitionsData as $data) {
                 $workflowsData[$name]['transitionsData'][$name] = $data;
             }
         }
