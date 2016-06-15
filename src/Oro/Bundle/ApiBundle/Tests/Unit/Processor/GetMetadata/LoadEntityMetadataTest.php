@@ -353,30 +353,32 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The "Test\Class" entity does not have a configuration for the identifier field "anotherRealId".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testProcessForManageableEntityWhenRenamedUnknownIdentifierField()
+    public function testProcessForManageableEntityWhenNoConfigurationForIdentifierField()
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => [
-                'renamedId'       => [
-                    'property_path' => 'realId'
-                ],
+            'fields' => [
+                'someField' => null
             ]
         ];
 
         $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
-            ->willReturn(['anotherRealId']);
+            ->willReturn(['id']);
         $classMetadata->expects($this->once())
             ->method('usesIdGenerator')
             ->willReturn(true);
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'someField']);
+        $classMetadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('someField')
+            ->willReturn('integer');
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -389,5 +391,16 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
 
         $this->context->setConfig($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['id']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+        $expectedMetadata->addField($this->createFieldMetadata('someField', 'integer'));
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 }
