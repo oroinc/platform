@@ -322,6 +322,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             $result[0]['attendees'][1]['createdAt'],
             $result[0]['attendees'][1]['updatedAt']
         );
+        $adminUser = $this->getAdminUser();
 
         $this->assertEquals(
             [
@@ -346,6 +347,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                             'status'      => 'tentative',
                             'type'        => 'organizer',
                             'fullName'    => '',
+                            'userId'      => null
                         ],
                         [
                             'displayName' => 'John Doe',
@@ -353,6 +355,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                             'status'      => 'accepted',
                             'type'        => 'required',
                             'fullName'    => 'John Doe ',
+                            'userId'      => $adminUser->getId()
                         ],
                     ],
                 ],
