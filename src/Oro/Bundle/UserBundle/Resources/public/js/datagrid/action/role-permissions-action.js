@@ -14,7 +14,7 @@ define(function(require) {
 
         initialize: function(options) {
             this.permissions = options.model.get('permissions');
-            RolePermissionsActionLauncher.__super__.initialize.call(this, options);
+            RolePermissionsAction.__super__.initialize.call(this, options);
         },
 
         dispose: function() {
@@ -22,7 +22,7 @@ define(function(require) {
                 return;
             }
             delete this.permissions;
-            RolePermissionsActionLauncher.__super__.dispose.call(this);
+            RolePermissionsAction.__super__.dispose.call(this);
         },
 
         createLauncher: function(options) {
