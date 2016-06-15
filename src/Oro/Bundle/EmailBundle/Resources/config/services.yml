@@ -43,7 +43,7 @@ parameters:
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
     oro_email.email_websocket.processor.class:    Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor
     oro_email.placeholder.send_email.filter.class: Oro\Bundle\EmailBundle\Placeholder\SendEmailPlaceholderFilter
-    oro_email.mailer.email_origin_helper.class:    Oro\Bundle\EmailBundle\Tools\EmailOriginHelper
+    oro_email.tools.email_origin_helper.class:    Oro\Bundle\EmailBundle\Tools\EmailOriginHelper
 
     oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -513,12 +513,10 @@ services:
             - '@oro_email.direct_mailer'
             - '@oro_email.email.address.helper'
             - '@oro_email.email.entity.builder='
-            - '@oro_email.email.owner.provider'
             - '@oro_email.email.activity.manager'
-            - '@oro_security.security_facade.link'
             - '@event_dispatcher'
             - '@oro_security.encoder.mcrypt'
-            - '@oro_email.mailer.email_origin_helper'
+            - '@oro_email.tools.email_origin_helper'
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
@@ -999,10 +997,13 @@ services:
         arguments:
             - '@oro_activity.manager'
 
-    oro_email.mailer.email_origin_helper:
-        class: %oro_email.mailer.email_origin_helper.class%
+    oro_email.tools.email_origin_helper:
+        class: %oro_email.tools.email_origin_helper.class%
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_security.security_facade.link'
+            - '@oro_email.email.owner.provider'
+            - '@oro_email.email.address.helper'
 
     oro_email.listener.search_aliases_listener:
         class: %oro_email.listener.search_aliases_listener.class%

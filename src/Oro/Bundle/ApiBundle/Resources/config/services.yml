@@ -30,6 +30,23 @@ services:
         arguments:
             - '@service_container'
 
+    oro_api.criteria_connector:
+        class: Oro\Bundle\ApiBundle\Util\CriteriaConnector
+        public: false
+        arguments:
+            - '@oro_api.criteria_normalizer'
+            - '@oro_api.criteria_placeholders_resolver'
+
+    oro_api.criteria_normalizer:
+        class: Oro\Bundle\ApiBundle\Util\CriteriaNormalizer
+        public: false
+        arguments:
+            - '@oro_api.criteria_placeholders_resolver'
+
+    oro_api.criteria_placeholders_resolver:
+        class: Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver
+        public: false
+
     oro_api.doctrine_helper:
         class: Oro\Bundle\ApiBundle\Util\DoctrineHelper
         public: false
@@ -208,11 +225,13 @@ services:
             - '@doctrine'
 
     oro_api.entity_serializer.query_factory:
-        class: Oro\Component\EntitySerializer\QueryFactory
+        class: Oro\Bundle\ApiBundle\Util\AclProtectedQueryFactory
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
             - '@oro_entity.query_hint_resolver'
+        calls:
+            - [setAclHelper, ['@oro_security.acl_helper']]
 
     oro_api.entity_serializer.field_accessor:
         class: Oro\Component\EntitySerializer\FieldAccessor

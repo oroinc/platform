@@ -60,14 +60,14 @@ class IntegrationController extends FOSRestController
         $objectManager = $this->getManager()->getObjectManager();
         $objectManager->persist($integration);
         $objectManager->flush();
-        
+
         $this->getSyncScheduler()->schedule($integration);
 
         return $this->handleView(
             $this->view(
                 [
                     'message'    => $this->get('translator')->trans('oro.integration.notification.channel.activated'),
-                    'success' => true,
+                    'successful' => true,
                 ],
                 Codes::HTTP_OK
             )
@@ -113,7 +113,7 @@ class IntegrationController extends FOSRestController
             $this->view(
                 [
                     'message'    => $this->get('translator')->trans('oro.integration.notification.channel.deactivated'),
-                    'success' => true,
+                    'successful' => true,
                 ],
                 Codes::HTTP_OK
             )
