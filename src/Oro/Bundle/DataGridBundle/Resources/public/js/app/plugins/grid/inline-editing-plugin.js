@@ -232,6 +232,13 @@ define(function(require) {
             if (!columnMetadata || !cell.column.get('renderable')) {
                 return false;
             }
+            var fieldName = cell.column.get('name');
+            var fullRestriction = _.find(cell.model.get('entity_restrictions'), function(restriction) {
+                return restriction.field === fieldName && restriction.mode === 'full';
+            });
+            if (fullRestriction) {
+                return false;
+            }
             return columnMetadata.inline_editing && columnMetadata.inline_editing.enable ?
                 this.getCellEditorOptions(cell)
                     .save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
