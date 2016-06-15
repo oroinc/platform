@@ -21,6 +21,8 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
+    const COUNT = 9;
+
     /**
      * @var ContainerInterface
      */
