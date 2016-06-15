@@ -3,6 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
@@ -14,8 +17,7 @@ use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -32,12 +34,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     protected $workflowManager;
 
     /**
-     * @var \Doctrine\Common\Persistence\ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $registry;
 
     /**
-     * @var \Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $workflowRegistry;
 
@@ -517,6 +519,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->workflowManager->massStartWorkflow($source);
     }
 
+    /**
+     * @return array
+     */
     public function massStartDataProvider()
     {
         $firstEntity = new \DateTime('2012-12-12');
@@ -965,6 +970,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         return $workflow;
     }
 
+    /**
+     * @return array
+     */
     public function trueFalseDataProvider()
     {
         return [
@@ -989,6 +997,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($result, $this->workflowManager->hasApplicableWorkflowByEntityClass($entityClass));
     }
 
+    /**
+     * @return array
+     */
     public function activateWorkflowDataProvider()
     {
         $workflowDefinition = new WorkflowDefinition();

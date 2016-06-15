@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
 
 class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
      */
     protected $configProvider;
 
@@ -34,6 +35,9 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
+    /**
+     * @return array
+     */
     public function getWorkflowDefinitionPermissionsDataProvider()
     {
         $systemDefinition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
@@ -110,6 +114,9 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
+    /**
+     * @return array
+     */
     public function getWorkflowDefinitionActivationDataProvider()
     {
 

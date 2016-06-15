@@ -129,7 +129,6 @@ class WorkflowManager
      * @param WorkflowItem $workflowItem
      * @return WorkflowItem|null workflowItem for workflow definition with a start step, null otherwise
      * @throws \Exception
-     *
      */
     public function resetWorkflowItem(WorkflowItem $workflowItem)
     {
@@ -148,7 +147,7 @@ class WorkflowManager
             //todo fix in BAP-10808 or BAP-10809
             $activeWorkflows = $this->getApplicableWorkflows($entity);
             foreach ($activeWorkflows as $activeWorkflow) {
-                if (($activeWorkflow->getName() === $currentWorkflowName)) {
+                if ($activeWorkflow->getName() === $currentWorkflowName) {
                     if ($activeWorkflow->getStepManager()->hasStartStep()) {
                         $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
                     }
@@ -536,11 +535,11 @@ class WorkflowManager
     {
         $activeWorkflows = $this->getApplicableWorkflows($entity);
 
-        if(!count($activeWorkflows)){
+        if (!count($activeWorkflows)) {
             return false;
         }
 
-        if (count($activeWorkflows) && $currentWorkflowItem) {
+        if ($currentWorkflowItem) {
             foreach ($activeWorkflows as $activeWorkflow) {
                 if ($activeWorkflow->getName() === $currentWorkflowItem->getWorkflowName()) {
                     return false;
