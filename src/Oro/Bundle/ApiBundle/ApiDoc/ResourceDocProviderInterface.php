@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\ApiBundle\Provider;
+namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 

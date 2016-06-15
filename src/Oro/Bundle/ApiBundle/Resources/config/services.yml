@@ -312,8 +312,8 @@ services:
             - '@oro_api.exception_text_extractor'
         lazy: true
 
-    oro_api.rest.routing_options_resolver:
-        class: Oro\Bundle\ApiBundle\Routing\RestRouteOptionsResolver
+    oro_api.rest.routing_options_resolver.json_api:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver
         public: false
         arguments:
             - %installed%
@@ -322,14 +322,14 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: routing.options_resolver.api_doc, priority: -255 }
+            - { name: oro_api.routing_options_resolver, priority: -255 }
 
-    oro_api.routing_options_resolver.api_doc:
+    oro_api.rest.routing_options_resolver:
         class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
         public: false
 
     oro_api.rest.doc_handler:
-        class: Oro\Bundle\ApiBundle\Routing\RestDocHandler
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler
         public: false
         arguments:
             - '@oro_api.rest.doc_view_detector'
@@ -341,13 +341,13 @@ services:
             - { name: nelmio_api_doc.extractor.handler }
 
     oro_api.rest.doc_view_detector:
-        class: Oro\Bundle\ApiBundle\Routing\RestDocViewDetector
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
         public: false
         arguments:
             - '@request_stack'
 
     oro_api.resource_doc_provider:
-        class: Oro\Bundle\ApiBundle\Provider\ResourceDocProvider
+        class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
         public: false
         arguments:
             - '@oro_entity.entity_class_name_provider'

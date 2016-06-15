@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Routing;
+namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Symfony\Component\Routing\Route;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Provider;
+namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig as EntityConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig as FieldConfig;

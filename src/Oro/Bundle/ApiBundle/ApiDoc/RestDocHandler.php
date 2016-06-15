@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Routing;
+namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Symfony\Component\Routing\Route;
 
@@ -19,7 +19,6 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
-use Oro\Bundle\ApiBundle\Provider\ResourceDocProviderInterface;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;

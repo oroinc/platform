@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Routing\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor as BaseExtractor;
 

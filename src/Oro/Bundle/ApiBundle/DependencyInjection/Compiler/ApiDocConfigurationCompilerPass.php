@@ -12,12 +12,12 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
     const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
     const EXPECTED_API_DOC_EXTRACTOR_CLASS          = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
     const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS  = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
-    const NEW_API_DOC_EXTRACTOR_CLASS               = 'Oro\Component\Routing\ApiDoc\ApiDocExtractor';
-    const NEW_CACHING_API_DOC_EXTRACTOR_CLASS       = 'Oro\Component\Routing\ApiDoc\CachingApiDocExtractor';
-    const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.routing_options_resolver.api_doc';
+    const NEW_API_DOC_EXTRACTOR_CLASS               = 'Oro\Bundle\ApiBundle\ApiDoc\ApiDocExtractor';
+    const NEW_CACHING_API_DOC_EXTRACTOR_CLASS       = 'Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor';
+    const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.rest.routing_options_resolver';
     const ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE  =
         'Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface';
-    const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'routing.options_resolver.api_doc';
+    const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro_api.routing_options_resolver';
 
     /**
      * {@inheritdoc}
