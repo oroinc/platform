@@ -34,7 +34,7 @@ class EntityController extends FOSRestController
     {
         $statusCode = Codes::HTTP_OK;
         /** @var EntityWithFieldsProvider $provider */
-        $provider = $this->get('oro_entity.entity_provider');
+        $provider = $this->get('oro_entity.entity_field_list_provider');
         try {
             $result = $provider->getFields();
         } catch (InvalidEntityException $ex) {
