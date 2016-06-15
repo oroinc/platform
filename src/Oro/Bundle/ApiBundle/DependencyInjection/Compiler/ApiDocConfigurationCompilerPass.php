@@ -2,20 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ApiDocConfigurationCompilerPass implements CompilerPassInterface
 {
-    const API_DOC_EXTRACTOR_SERVICE                = 'nelmio_api_doc.extractor.api_doc_extractor';
-    const EXPECTED_API_DOC_EXTRACTOR_CLASS         = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
-    const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
-    const NEW_API_DOC_EXTRACTOR_CLASS              = 'Oro\Component\Routing\ApiDoc\ApiDocExtractor';
-    const NEW_CACHING_API_DOC_EXTRACTOR_CLASS      = 'Oro\Component\Routing\ApiDoc\CachingApiDocExtractor';
-    const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE = 'oro_api.routing_options_resolver.api_doc';
-    const ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE =
+    const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
+    const EXPECTED_API_DOC_EXTRACTOR_CLASS          = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
+    const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS  = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
+    const NEW_API_DOC_EXTRACTOR_CLASS               = 'Oro\Component\Routing\ApiDoc\ApiDocExtractor';
+    const NEW_CACHING_API_DOC_EXTRACTOR_CLASS       = 'Oro\Component\Routing\ApiDoc\CachingApiDocExtractor';
+    const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.routing_options_resolver.api_doc';
+    const ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE  =
         'Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface';
+    const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'routing.options_resolver.api_doc';
 
     /**
      * {@inheritdoc}
@@ -42,6 +44,13 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
                 [new Reference(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)]
             );
         }
+
+        DependencyInjectionUtil::registerTaggedServices(
+            $container,
+            self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE,
+            self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
+            'addResolver'
+        );
     }
 
     /**
