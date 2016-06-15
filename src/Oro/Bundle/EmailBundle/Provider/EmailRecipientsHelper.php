@@ -383,9 +383,8 @@ class EmailRecipientsHelper
          */
         $idsEncoded = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
         $idsDecoded = array_map(function ($idEncoded) {
-                return base64_decode($idEncoded, true) ? : $idEncoded;
-            },
-            $idsEncoded);
+            return base64_decode($idEncoded, true) ? : $idEncoded;
+        }, $idsEncoded);
 
         return $idsDecoded;
     }
