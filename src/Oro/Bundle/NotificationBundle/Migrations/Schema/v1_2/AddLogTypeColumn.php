@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ReminderBundle\Migrations\Schema\v1_2;
+namespace Oro\Bundle\NotificationBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class AddLogEntityColumn implements Migration
+class AddLogTypeColumn implements Migration
 {
     /**
      * {@inheritdoc}
