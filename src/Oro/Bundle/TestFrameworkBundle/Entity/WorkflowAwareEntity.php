@@ -5,14 +5,17 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareInterface;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareTrait;
 
 /**
  * @ORM\Table(name="test_workflow_aware_entity")
  * @ORM\Entity
  * @Config
  */
-class WorkflowAwareEntity implements TestFrameworkEntityInterface
+class WorkflowAwareEntity implements TestFrameworkEntityInterface, WorkflowAwareInterface
 {
+    use WorkflowAwareTrait;
     /**
      * @var integer $id
      *
