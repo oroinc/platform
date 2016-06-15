@@ -47,7 +47,17 @@
 {% block oro_image_widget %}
     {% spaceless %}
         <div class="control-group" style="margin-bottom: 0">
-            {{ form_widget(form.file) }}
+            {%  if form.vars.name == 'attachment'  %}
+                <div class="attachment-file">
+                    {% set jsonParams = '{"initializeOptions":{"fileDefaultHtml":"' ~ "Attach file:"|trans  ~ '" ,"fileButtonHtml":"' ~ "Upload"|trans  ~ '"}}' %}
+                    {{ form_widget(form.file,
+                        {'attr': {'data-input-widget-options': jsonParams }
+                        })
+                    }}
+                </div>
+            {%  else %}
+                {{ form_widget(form.file) }}
+            {% endif %}
             {% if form_errors(form.file) %}
                 <div style="clear:both; float:left">
                     {{ form_errors(form.file) }}
