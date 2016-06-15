@@ -15,7 +15,6 @@ datagrid:
                     - parent.id as parentId
                     - owner.id as ownerId
                     - COUNT(children.id) as childrenCount
-                    - CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE origin.id as originId
                     - (CASE WHEN (recurrence.id IS NULL) THEN false ELSE true END) as is_recurrent
                 from:
                     - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
@@ -25,8 +24,6 @@ datagrid:
                         - { join:  %oro_calendar.calendar_event.entity.class%, alias: children, conditionType: WITH, condition: 'children.parent = event' }
                         - { join: event.relatedAttendee, alias: ra }
                         - { join: ra.status, alias: status }
-                        - { join: event.origin, alias: origin }
-                        - { join: parent.origin, alias: parentOrigin }
                         - { join: event.recurrence, alias: recurrence }
                     inner:
                         - { join: event.calendar, alias: calendar }

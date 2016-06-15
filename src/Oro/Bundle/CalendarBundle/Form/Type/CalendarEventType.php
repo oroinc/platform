@@ -143,28 +143,6 @@ class CalendarEventType extends AbstractType
                 }
             }
         }, 10);
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-            $calendarEvent = $event->getData();
-            if (!$calendarEvent) {
-                return;
-            }
-
-            $this->setDefaultOrigin($calendarEvent);
-        }, 10);
-    }
-
-    /**
-     * @param CalendarEvent $event
-     */
-    protected function setDefaultOrigin(CalendarEvent $event)
-    {
-        if (!$event->getOrigin()) {
-            $calendarEventServer = $this->registry
-                ->getRepository(ExtendHelper::buildEnumValueClassName(CalendarEvent::ORIGIN_ENUM_CODE))
-                ->find(CalendarEvent::ORIGIN_SERVER);
-
-            $event->setOrigin($calendarEventServer);
-        }
     }
 
     /**

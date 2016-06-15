@@ -211,9 +211,7 @@ class CalendarEventHandler
      */
     protected function checkPermission(CalendarEvent $entity)
     {
-        if ($entity->getParent() !== null
-            || ($entity->getOrigin() && $entity->getOrigin()->getId() === CalendarEvent::ORIGIN_EXTERNAL)
-        ) {
+        if ($entity->getParent() !== null) {
             throw new AccessDeniedException();
         }
     }

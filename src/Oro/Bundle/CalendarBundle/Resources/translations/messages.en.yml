@@ -118,7 +118,6 @@ oro:
             invitation_status.label: Invitation status
             attendees.label: Guests
             related_attendee.label: Related Attendee
-            origin.label: Origin
 
             recurrence.label:      Recurrence
             recurrence.exception.label: Part of Recurrence

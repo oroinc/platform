@@ -35,7 +35,6 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValueMap([
                 ['Extend\Entity\EV_Ce_Attendee_Status', null, $repository],
                 ['Extend\Entity\EV_Ce_Attendee_Type', null, $repository],
-                ['Extend\Entity\EV_Ce_Attendee_Origin', null, $repository],
             ]));
 
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
