@@ -40,38 +40,45 @@ class WidgetController extends Controller
         $entity = $this->getEntityReference($entityClass, $entityId);
 
         /** @var WorkflowManager $workflowManager */
+        /* @var $workflowManager WorkflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $workflowItem    = $workflowManager->getWorkflowItemByEntity($entity);
 
-        $steps = array();
-        $currentStep = null;
-        if ($workflowItem) {
-            $workflow = $workflowManager->getWorkflow($workflowItem);
+        $stepsData = [];
 
+        $workflowItems = $workflowManager->getWorkflowItemsByEntity($entity);
+        foreach ($workflowItems as $workflowItem) {
+            $name = $workflowItem->getWorkflowName();
+
+            if ($workflowManager->isResetAllowed($entity, $workflowItem)) {
+
+                continue;
+            }
+
+            $workflow = $workflowManager->getWorkflow($name);
             if ($workflow->getDefinition()->isStepsDisplayOrdered()) {
                 $steps = $workflow->getStepManager()->getOrderedSteps();
             } else {
                 $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
             }
 
-            $currentStep = $workflowItem->getCurrentStep();
+            $steps = $steps->map(function ($step) {
+                return [
+                    'name' => $step->getName(),
+                    'label' => $step->getLabel()
+                ];
+            });
+
+            $stepsData[$name]['workflow'] = $workflow->getLabel();
+            $stepsData[$name]['steps'] = $steps->toArray();
+            $stepsData[$name]['currentStep'] = [
+                'name' => $workflowItem->getCurrentStep()->getName(),
+            ];
         }
 
-        $steps = $steps->map(function ($step) {
-            return array(
-                'name' => $step->getName(),
-                'label' => $step->getLabel()
-            );
-        });
+        return [
+            'stepsData' => $stepsData,
+        ];
 
-        $steps = $steps->toArray();
-
-        return array(
-            'steps' => $steps,
-            'currentStep' => array(
-                'name' => $currentStep->getName()
-            )
-        );
     }
 
     /**

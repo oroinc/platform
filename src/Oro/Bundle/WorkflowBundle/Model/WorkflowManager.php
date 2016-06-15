@@ -387,6 +387,15 @@ class WorkflowManager
 
     /**
      * @param object $entity
+     * @return bool
+     */
+    public function hasWorkflowItemsByEntity($entity)
+    {
+        return count($this->getWorkflowItemsByEntity($entity)) > 0;
+    }
+
+    /**
+     * @param object $entity
      * @return Workflow[]
      */
     public function getWorkflowItemsByEntity($entity)

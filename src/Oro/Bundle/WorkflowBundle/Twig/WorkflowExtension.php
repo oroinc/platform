@@ -30,6 +30,7 @@ class WorkflowExtension extends \Twig_Extension
             new \Twig_SimpleFunction('has_workflow_item', array($this, 'hasWorkflowItem')),
             new \Twig_SimpleFunction('is_workflow_reset_allowed', array($this, 'isResetAllowed')),
             new \Twig_SimpleFunction('has_workflows', [$this->workflowManager, 'hasApplicableWorkflowsByEntityClass']),
+            new \Twig_SimpleFunction('has_workflow_items', [$this->workflowManager, 'hasWorkflowItemsByEntity']),
         );
     }
 
