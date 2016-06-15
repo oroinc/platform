@@ -39,7 +39,7 @@ class SpoolItem
     /**
      * @var string
      *
-     * @ORM\Column(name="log_type", type="string", length=255)
+     * @ORM\Column(name="log_type", type="string", length=255, nullable=true)
      */
     private $logType;
 
