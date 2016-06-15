@@ -3,7 +3,6 @@ define(function(require) {
 
     var $ = require('oroui/js/items-manager/editor');
     var Backbone = require('backbone');
-    require('oroui/js/app/modules/input-widgets');
 
     describe('oroui/js/items-manager/editor', function() {
         var $el;
