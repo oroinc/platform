@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
-use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\BaseType;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
@@ -69,6 +69,6 @@ class FormTypeTest extends BlockTypeTestCase
     {
         $type = $this->getBlockType(FormType::NAME);
 
-        $this->assertSame(ContainerType::NAME, $type->getParent());
+        $this->assertSame(BaseType::NAME, $type->getParent());
     }
 }

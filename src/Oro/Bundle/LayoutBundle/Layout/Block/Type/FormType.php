@@ -3,10 +3,10 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
-use Oro\Component\Layout\Block\Type\AbstractContainerType;
+use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockBuilderInterface;
 
-class FormType extends AbstractContainerType
+class FormType extends AbstractType
 {
     const NAME = 'form';
     const FIELD_SEPARATOR = '_';
