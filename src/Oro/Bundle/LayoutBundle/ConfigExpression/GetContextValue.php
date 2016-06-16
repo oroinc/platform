@@ -62,6 +62,11 @@ class GetContextValue extends AbstractFunction
         $count = count($options);
         if ($count >= 1 && $count <= 2) {
             $this->value = reset($options);
+            if(!is_string($this->value)) {
+                throw new Exception\InvalidArgumentException(
+                    sprintf('The first option should be a string, but %s given.', gettype($this->value))
+                );
+            }
             if ($count > 1) {
                 $this->default = next($options);
                 $this->hasDefault = true;
@@ -85,7 +90,7 @@ class GetContextValue extends AbstractFunction
 
             return null !== $value
                 ? $value
-                : $this->resolveValue($context, $this->createPropertyPath($this->default));
+                : $this->resolveValue($context, $this->default);
         }
 
         return $this->resolveValue($context, $this->createPropertyPath($this->value));
