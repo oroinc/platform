@@ -34,22 +34,6 @@ class DumpApiDocConsoleCommandListener
     /**
      * @param ConsoleCommandEvent $event
      */
-    public function onConsoleCommandConfigure(ConsoleCommandEvent $event)
-    {
-        $command = $event->getCommand();
-        if ('help' === $command->getName()) {
-            $innerCommand = $this->getHelpInnerCommand($command, $event->getInput());
-            if ($innerCommand && $this->isApiDocDumpCommand($innerCommand)) {
-                $this->ensureViewOptionDefined($innerCommand);
-            }
-        } elseif ($this->isApiDocDumpCommand($command)) {
-            $this->ensureViewOptionDefined($command);
-        }
-    }
-
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
         $command = $event->getCommand();
