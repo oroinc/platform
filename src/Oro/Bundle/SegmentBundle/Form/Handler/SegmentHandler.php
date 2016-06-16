@@ -5,8 +5,9 @@ namespace Oro\Bundle\SegmentBundle\Form\Handler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentHandler
@@ -22,20 +23,31 @@ class SegmentHandler
     protected $request;
 
     /**
-     * @var ObjectManager
+     * @var ManagerRegistry
      */
-    protected $manager;
+    protected $managerRegistry;
+
+    /**
+     * @var StaticSegmentManager
+     */
+    protected $staticSegmentManager;
 
     /**
      * @param FormInterface $form
-     * @param Request       $request
-     * @param ObjectManager $manager
+     * @param Request $request
+     * @param ManagerRegistry $managerRegistry
+     * @param StaticSegmentManager $staticSegmentManager
      */
-    public function __construct(FormInterface $form, Request $request, ObjectManager $manager)
-    {
-        $this->form    = $form;
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        ManagerRegistry $managerRegistry,
+        StaticSegmentManager $staticSegmentManager
+    ) {
+        $this->form = $form;
         $this->request = $request;
-        $this->manager = $manager;
+        $this->managerRegistry = $managerRegistry;
+        $this->staticSegmentManager = $staticSegmentManager;
     }
 
     /**
@@ -53,6 +65,7 @@ class SegmentHandler
 
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);
+
                 return true;
             }
         }
@@ -61,13 +74,20 @@ class SegmentHandler
     }
 
     /**
-     * "Success" form handler
-     *
      * @param Segment $entity
      */
     protected function onSuccess(Segment $entity)
     {
-        $this->manager->persist($entity);
-        $this->manager->flush();
+        $entityManager = $this->managerRegistry->getManager();
+
+        $isNewEntity = is_null($entity->getId());
+        if ($isNewEntity) {
+            $entityManager->persist($entity);
+        }
+        $entityManager->flush();
+
+        if ($isNewEntity && $entity->isStaticType()) {
+            $this->staticSegmentManager->run($entity);
+        }
     }
 }

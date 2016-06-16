@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
  * @dbIsolation
@@ -52,14 +54,16 @@ class ControllersTest extends WebTestCase
     public function testCreate()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_entityextend_entity_create'));
-        $form = $crawler->selectButton('Save')->form();
+        $saveButton = $crawler->selectButton('Save');
+
+        $form = $saveButton->form();
         $form['oro_entity_config_type[model][className]'] = 'testExtendedEntity';
         $form['oro_entity_config_type[entity][label]'] = 'test entity label';
         $form['oro_entity_config_type[entity][plural_label]'] = 'test entity plural label';
         $form['oro_entity_config_type[entity][description]'] = 'test entity description';
 
         $this->client->followRedirects(true);
-        $crawler = $this->client->submit($form);
+        $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Entity saved", $crawler->html());
@@ -123,11 +127,16 @@ class ControllersTest extends WebTestCase
                 'GET',
                 $this->getUrl("oro_entityextend_field_create", array('id' => $id))
             );
-            $form = $crawler->selectButton('Continue')->form();
+            $continueButton = $crawler->selectButton('Continue');
+            $form = $continueButton->form();
             $form["oro_entity_extend_field_type[fieldName]"] = "name" . strtolower($type);
             $form["oro_entity_extend_field_type[type]"] = $type;
             $this->client->followRedirects(true);
-            $crawler = $this->client->submit($form);
+            $crawler = $this->client
+                ->submit(
+                    $form,
+                    [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]
+                );
             $result = $this->client->getResponse();
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
             $form = $crawler->selectButton('Save and Close')->form();
@@ -153,19 +162,22 @@ class ControllersTest extends WebTestCase
                 'GET',
                 $this->getUrl("oro_entityextend_field_create", array('id' => $id))
             );
-            $form = $crawler->selectButton('Continue')->form();
+            $continueButton = $crawler->selectButton('Continue');
+            $form = $continueButton->form();
             $form["oro_entity_extend_field_type[fieldName]"] = "name" . strtolower($type);
             $form["oro_entity_extend_field_type[type]"] = $type;
             $this->client->followRedirects(true);
-            $crawler = $this->client->submit($form);
+            $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]);
             $result = $this->client->getResponse();
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
-            $form = $crawler->selectButton('Save and Close')->form();
+
+            $saveButton = $crawler->selectButton('Save and Close');
+            $form = $saveButton->form();
 
             $this->$method($form);
 
             $this->client->followRedirects(true);
-            $crawler = $this->client->submit($form);
+            $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
             $result = $this->client->getResponse();
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
             $this->assertContains('Field saved', $result->getContent());
