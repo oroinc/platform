@@ -21,6 +21,11 @@ class WorkflowItemVirtualRelationProviderTest extends AbstractVirtualRelationPro
         );
     }
 
+    public function testGetRelationName()
+    {
+        $this->assertEquals(WorkflowItemVirtualRelationProvider::RELATION_NAME, $this->provider->getRelationName());
+    }
+
     /**
      * @param string $className
      * @param string $fieldName

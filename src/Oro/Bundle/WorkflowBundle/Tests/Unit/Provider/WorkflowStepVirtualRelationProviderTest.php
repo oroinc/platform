@@ -20,6 +20,11 @@ class WorkflowStepVirtualRelationProviderTest extends AbstractVirtualRelationPro
         );
     }
 
+    public function testGetRelationName()
+    {
+        $this->assertEquals(WorkflowStepVirtualRelationProvider::RELATION_NAME, $this->provider->getRelationName());
+    }
+
     /**
      * {@inheritdoc}
      */
