@@ -69,8 +69,8 @@ define(function(require) {
                     },
                     collection: accessLevels,
                     keysMap: {
-                        id: 'value',
-                        text: 'value_text'
+                        id: 'access_level',
+                        text: 'access_level_label'
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);

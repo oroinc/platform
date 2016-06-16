@@ -1,22 +1,3 @@
-.role-tabs {
-  .oro-tabs {
-    border-bottom: 1px solid #ddd;
-  }
-  .permissions-grid {
-    margin: 0 -20px;
-  }
-  .role-capability h5 {
-    display: none;
-  }
-  &__multi-group {
-    .capability-set-title {
-      display: none;
-    }
-    .role-capability h5 {
-      display: block;
-    }
-  }
-}
 .role-capability {
   padding-bottom: 10px;
   border-bottom: 1px solid #F1F1F1;
@@ -45,6 +26,18 @@
     &.disabled {
       pointer-events: none;
       color: #aaa;
+    }
+  }
+  & &__group-common-title {
+    display: none;
+    .role-capabilities_single-group & {
+      display: inline;
+    }
+  }
+  & &__group-own-title {
+    display: inline;
+    .role-capabilities_single-group & {
+      display: none;
     }
   }
 }

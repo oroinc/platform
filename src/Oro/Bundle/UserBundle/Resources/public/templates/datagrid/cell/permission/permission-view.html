@@ -1,4 +1,4 @@
-<div class="action-permissions__item-wrapper<% if (isValueChanged) {%> action-permissions__item-wrapper_changed<% } %>">
+<div class="action-permissions__item-wrapper<% if (isAccessLevelChanged) {%> action-permissions__item-wrapper_changed<% } %>">
     <span class="action-permissions__label"
           title="<%- label %>"><%- label %></span>
     -
@@ -8,5 +8,5 @@
        data-target="<%= dropdownTarget %>"
        data-name="accessLevel"
        data-permission-id="<%= id %>"
-       title="<%- value_text %>"><%- value_text %></a>
+       title="<%- access_level_label %>"><%- access_level_label %></a>
 </div>

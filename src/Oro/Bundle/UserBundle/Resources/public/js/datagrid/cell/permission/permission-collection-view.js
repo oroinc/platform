@@ -17,7 +17,7 @@ define(function(require) {
 
         onPermissionChange: function(model) {
             mediator.trigger('securityAccessLevelsComponent:link:click', {
-                accessLevel: model.get('value'),
+                accessLevel: model.get('access_level'),
                 identityId: model.get('identity'),
                 permissionName: model.get('name')
             });

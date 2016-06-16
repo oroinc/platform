@@ -5,14 +5,16 @@ define(function(require) {
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
-    /**
-     * @export orouser/js/views/role-view
-     */
     TabItemView = BaseView.extend({
         tagName: 'li',
-        className: 'tab',
-        template: require('tpl!orouser/templates/tab-item.html'),
-        autoRender: true,
+        className: function() {
+            var classes = [];
+            if (this.model.get('active')) {
+                classes.push('active');
+            }
+            return classes.join(' ');
+        },
+        template: _.template('<a href="#"><%= label %></a>'),
         listen: {
             'change:active model': 'updateState'
         },

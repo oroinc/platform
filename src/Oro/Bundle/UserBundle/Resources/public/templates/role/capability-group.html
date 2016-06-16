@@ -1,4 +1,7 @@
 <a href="#" data-name="capabilities-select-all" class="role-capability__select-all<% if (allSelected) { %> disabled<% } %>"
     ><%=_.__('oro.role.capability_block.select_all')%></a>
-<h5><%= label %></h5>
+<h5>
+    <span class="role-capability__group-own-title"><%= label %></span>
+    <span class="role-capability__group-common-title"><%=_.__('oro.role.capability_block.label')%></span>
+</h5>
 <div data-name="capability-items" class="role-capability__items"></div>

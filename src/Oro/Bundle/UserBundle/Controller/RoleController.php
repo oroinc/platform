@@ -115,27 +115,30 @@ class RoleController extends Controller
             );
         }
         $categories = [
-            'account_management' => [
-                'label' => 'Account Management',
-                'system' => false
+            [
+                'id' => 'account_management',
+                'label' => 'Account Management'
             ],
-            'marketing' => [
-                'label' => 'Marketing',
-                'system' => false
+            [
+                'id' => 'marketing',
+                'label' => 'Marketing'
             ],
-            'sales_data' => [
-                'label' => 'Sales Data',
-                'system' => false
+            [
+                'id' => 'sales_data',
+                'label' => 'Sales Data'
             ],
-            'address' => [
-                'label' => 'Address',
-                'system' => true
+            [
+                'id' => 'address',
+                'label' => 'Address'
             ],
-            'calendar' => [
-                'label' => 'Calendar',
-                'system' => true
+            [
+                'id' => 'calendar',
+                'label' => 'Calendar'
             ]
         ];
+        
+        $tabs = ['account_management', 'marketing', 'sales_data'];
+        
         // @todo: redevelop it as grid
         $form = $aclRoleHandler->createView();
         $translator = $this->get('translator');
@@ -148,6 +151,7 @@ class RoleController extends Controller
             $item = [
                 'entity' => $translator->trans($identity->children['name']->vars['value']),
                 'identity' => $identity->children['id']->vars['value'],
+                'group' => ['account_management', 'marketing', 'sales_data', null][count($gridData) % 4],
                 'permissions' => []
             ];
             // all data transformation are taken from form type blocks
@@ -171,8 +175,8 @@ class RoleController extends Controller
                             'description' => $permissionDescription,
                             'full_name' => $accessLevelVars['full_name'],
                             'identity' => $accessLevelVars['identity'],
-                            'value' => $accessLevelVars['value'],
-                            'value_text' => $valueText
+                            'access_level' => $accessLevelVars['value'],
+                            'access_level_label' => $valueText
                         ];
                         break;
                     }
@@ -181,36 +185,45 @@ class RoleController extends Controller
 
             $gridData[] = $item;
         }
+
         $capabilitiesData = [];
-        foreach ($form->children['action']->children as $action_id => $child) {
-            $permissions = reset($child->children['permissions']->children)->vars['value'];
-            $description = $child->vars['value']->getDescription();
+        foreach ($categories as $category) {
             $capabilitiesData[] = [
-                'id' => $action_id,
-                'identityId' => $child->children['identity']->children['id']->vars['value'],
-                'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
-                'description' => $description ? $translator->trans($description) : '',
-                'permissionName' => $permissions->getName(),
-                'accessLevel' => $permissions->getAccessLevel(),
-                'selected_value' => 5,
-                'unselected_value' => 0
+                'group' => $category['id'],
+                'label' => $category['label'],
+                'items' => []
             ];
         }
 
-        foreach($gridData as $index => &$gridDataItem) {
-            $gridDataItem['group'] = ['account_management', 'marketing', 'sales_data', null][$index % 4];
-        }
-        foreach($capabilitiesData as $index => &$capabilitiesDataItem) {
-            $capabilitiesDataItem['group'] =
-                ['account_management', 'marketing', 'sales_data', 'address', 'calendar'][$index % 5];
+        $index = 0;
+        foreach ($form->children['action']->children as $action_id => $child) {
+            $permission = reset($child->children['permissions']->children)->vars['value'];
+            $description = $child->vars['value']->getDescription();
+            $capabilitiesData[$index++ % count($categories)]['items'][] = [
+                'id' => $action_id,
+                'identity' => $child->children['identity']->children['id']->vars['value'],
+                'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
+                'description' => $description ? $translator->trans($description) : '',
+                'name' => $permission->getName(),
+                'access_level' => $permission->getAccessLevel(),
+                'selected_access_level' => 5,
+                'unselected_access_level' => 0
+            ];
         }
 
         return array(
             'entity' => $entity,
             'form' => $form,
-            'categories' => $categories,
+            'tabsOptions' => [
+                'data' => array_filter($categories, function ($category) use ($tabs) {
+                    return in_array($category['id'], $tabs);
+                })
+            ],
             'gridData' => $gridData,
-            'capabilitiesData' => $capabilitiesData,
+            'capabilitySetOptions' => [
+                'data' => $capabilitiesData,
+                'tabIds' => $tabs
+            ],
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete a role and un-assign it from all users or reassign users to another role before

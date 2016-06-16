@@ -14,7 +14,7 @@ define(function(require) {
             'shown.bs.dropdown': 'onDropdownOpen'
         },
         listen: {
-            'change:value model': 'render'
+            'change:access_level model': 'render'
         },
         id: function() {
             return 'ActionPermissionsCell-' + this.cid;
@@ -41,7 +41,7 @@ define(function(require) {
         getTemplateData: function() {
             var data = PermissionView.__super__.getTemplateData.call(this);
             data.dropdownTarget = '#' + _.result(this, 'id');
-            data.isValueChanged = this.model.isValueChanged();
+            data.isAccessLevelChanged = this.model.isAccessLevelChanged();
             return data;
         },
 
@@ -62,8 +62,8 @@ define(function(require) {
                 dropdown = new DropdownMenuCollectionView({
                     collection: this.accessLevels,
                     keysMap: {
-                        id: 'value',
-                        text: 'value_text'
+                        id: 'access_level',
+                        text: 'access_level_label'
                     },
                     attributes: {
                         'data-options': '{"html": true}'

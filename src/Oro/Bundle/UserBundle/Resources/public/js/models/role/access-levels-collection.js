@@ -12,7 +12,7 @@ define(function(require) {
 
         parse: function(resp, options) {
             return _.map(_.pairs(resp), function(item) {
-                return {value: item[0], value_text: item[1]};
+                return {access_level: item[0], access_level_label: item[1]};
             });
         }
     });

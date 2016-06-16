@@ -6,5 +6,7 @@ config:
         'orouser/js/views/role-view': 'bundles/orouser/js/views/role-view.js'
         'orouser/js/tools/acl-users-search-api-accessor': 'bundles/orouser/js/tools/acl-users-search-api-accessor.js'
         'orouser/js/datagrid/roles-datagrid-builder': 'orouser/js/datagrid/roles-datagrid-builder.js'
+        'orouser/js/components/role/entity-category-tabs-component': 'orouser/js/components/role/entity-category-tabs-component.js'
+        'orouser/js/components/role/capability-set-component': 'orouser/js/components/role/capability-set-component.js'
         'oro/datagrid/cell/action-permissions-cell': 'orouser/js/datagrid/cell/action-permissions-cell.js'
         'oro/datagrid/action/role-permissions-action': 'orouser/js/datagrid/action/role-permissions-action.js'

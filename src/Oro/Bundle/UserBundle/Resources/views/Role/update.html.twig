@@ -172,14 +172,20 @@
                 data: gridData
             }
         } %}
-        {%  set tabsOptions = {
-            capabilitiesData: capabilitiesData,
-            gridOptions: _gridOptions,
-            categories: categories
-        } %}
-        <div data-page-component-module="orouser/js/components/role-tabs-component"
-             data-page-component-options="{{ tabsOptions|json_encode }}">
+
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/entity-category-tabs-component',
+            options: tabsOptions
+        }) }}></div>
+        <div data-page-component-module="orodatagrid/js/app/components/datagrid-component"
+             data-page-component-name="{{ _gridOptions.gridName }}"
+             data-page-component-options="{{ _gridOptions|json_encode }}"
+             class="inner-permissions-grid">
         </div>
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/capability-set-component',
+            options: capabilitySetOptions
+        }) }}></div>
     {% endset %}
 
     {% set dataBlocks = dataBlocks|merge([{
@@ -188,7 +194,20 @@
             {
                 'title': '',
                 'useSpan': false,
-                'data': [rolePermissionsGrid]
+                'data': [
+                    rolePermissionsGrid
+                ]
+            }
+        ]
+    }]) %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'oro.user.entity_plural_label'|trans,
+        'subblocks': [
+            {
+                'title' : null,
+                'useSpan': false,
+                'data' : [dataGrid.renderGrid(gridName, {role_id: entityId}, { cssClass: 'inner-grid' })]
             }
         ]
     }]) %}

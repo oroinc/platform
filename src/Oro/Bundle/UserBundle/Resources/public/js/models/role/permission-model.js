@@ -5,15 +5,15 @@ define(function(require) {
     var BaseModel = require('oroui/js/app/models/base/model');
 
     PermissionModel = BaseModel.extend({
-        _originalValue: null,
+        _initialAccessLevel: null,
 
         initialize: function() {
-            this._originalValue = this.get('value');
+            this._initialAccessLevel = this.get('access_level');
             PermissionModel.__super__.initialize.apply(this, arguments);
         },
 
-        isValueChanged: function() {
-            return this._originalValue !== this.get('value');
+        isAccessLevelChanged: function() {
+            return this._initialAccessLevel !== this.get('access_level');
         }
     });
 

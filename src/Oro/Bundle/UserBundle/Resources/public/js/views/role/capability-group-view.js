@@ -4,7 +4,7 @@ define(function(require) {
     var CapabilityGroupView;
     var _ = require('underscore');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var CapabilityItemView = require('orouser/js/views/capability-item-view');
+    var CapabilityItemView = require('orouser/js/views/role/capability-item-view');
 
     /**
      * @export orouser/js/views/role-view
@@ -12,7 +12,7 @@ define(function(require) {
     CapabilityGroupView = BaseCollectionView.extend({
         animationDuration: 0,
         className: 'role-capability',
-        template: require('tpl!orouser/templates/capability-group.html'),
+        template: require('tpl!orouser/templates/role/capability-group.html'),
         listSelector: '[data-name="capability-items"]',
         itemView: CapabilityItemView,
         listen: {
@@ -37,7 +37,7 @@ define(function(require) {
         onSelectAll: function(e) {
             e.preventDefault();
             this.collection.each(function(model) {
-                model.set('accessLevel', model.get('selected_value'));
+                model.set('access_level', model.get('selected_access_level'));
             });
         },
 
@@ -48,7 +48,7 @@ define(function(require) {
 
         isAllSelected: function() {
             return !this.collection.find(function(model) {
-                return model.get('accessLevel') !== model.get('selected_value');
+                return model.get('access_level') !== model.get('selected_access_level');
             });
         }
     });
