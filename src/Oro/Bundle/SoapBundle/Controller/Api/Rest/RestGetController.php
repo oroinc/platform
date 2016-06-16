@@ -179,7 +179,6 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                     $this->transformEntityField($field, $value);
                     $result[$field] = $value;
                 }
-                $result = $this->addRouteView($result);
             } elseif ($entity instanceof SearchResultItem) {
                 return [
                     'id'     => $entity->getRecordId(),
@@ -400,22 +399,5 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     protected function buildNotFoundResponse()
     {
         return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
-    }
-
-    /**
-     * @param $result
-     * @return mixed
-     */
-    protected function addRouteView($result)
-    {
-        $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata($result['entity']);
-        if ($metadata && $metadata->hasRoute()) {
-            $result['url_view'] =
-                $this->get('router')->generate($metadata->getRoute(), ['id' => $result['id']]);
-        } else {
-            $result['url_view'] = '';
-        }
-        
-        return $result;
     }
 }
