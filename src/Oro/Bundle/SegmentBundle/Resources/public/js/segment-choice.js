@@ -105,15 +105,15 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
             this.element
                 .data('entity', entity)
                 .data('data', segmentData);
-            this.element.select2(this.options.select2);
+            this.element.inputWidget('create', 'select2', {initializeOptions: this.options.select2});
         },
 
         setValue: function(value) {
-            this.element.select2('val', value, true);
+            this.element.inputWidget('val', value, true);
         },
 
         setSelectedData: function(data) {
-            this.element.select2('data', data);
+            this.element.inputWidget('data', data);
         }
     });
 

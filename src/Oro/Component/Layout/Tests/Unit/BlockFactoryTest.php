@@ -2,10 +2,8 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataAccessor;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
@@ -240,10 +238,10 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('getExtendedType')
             ->will($this->returnValue('header'));
         $headerBlockTypeExtension->expects($this->once())
-            ->method('setDefaultOptions')
+            ->method('configureOptions')
             ->will(
                 $this->returnCallback(
-                    function (OptionsResolverInterface $resolver) {
+                    function (OptionsResolver $resolver) {
                         $resolver->setDefaults(
                             [
                                 'test_option_1' => '',

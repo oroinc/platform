@@ -1,9 +1,3 @@
-oro_importexport:
-    label: oro.importexport.action.general
-    type: action
-    group_name: ""
-    bindings: ~
-
 oro_importexport_import:
     label: oro.importexport.action.import
     type: action

@@ -9,3 +9,70 @@
         })|raw }}
     </div>
 {%- endblock %}
+
+{% block oro_locale_fallback_value_widget %}
+    <table>
+        {% if form.vars.group_fallback_fields %}
+            <tr>
+                <td nowrap="true" class="fallback-item-use-fallback">
+                    {{ form_widget(form.use_fallback) }} {{ form.use_fallback.vars.label|trans }}
+                </td>
+                <td class="fallback-item-fallback">
+                    {{ form_widget(form.fallback, {'attr': {'class': 'fallback'}}) }}
+                </td>
+            </tr>
+        {% endif %}
+        <tr>
+            <td
+                    class="fallback-item-value {% if form.vars.group_fallback_fields %}fallback-item-value-top{% endif %}"
+                    {% if form.vars.group_fallback_fields %}colspan="2"{% endif %}
+                    >
+                {{ form_widget(form.value) }}
+            </td>
+            {% if not form.vars.group_fallback_fields %}
+                <td nowrap="true" class="fallback-item-use-fallback">
+                    {{ form_widget(form.use_fallback) }} {{ form.use_fallback.vars.label|trans }}
+                </td>
+                <td class="fallback-item-fallback">
+                    {{ form_widget(form.fallback, {'attr': {'class': 'fallback'}}) }}
+                </td>
+            {% endif %}
+        </tr>
+    </table>
+
+    {{ form_errors(form.value) }}
+    {{ form_errors(form.fallback) }}
+{% endblock %}
+
+{% block oro_locale_localized_property_widget %}
+    <table class="fallback-container"
+            data-page-component-module="oroui/js/app/components/view-component"
+            data-page-component-options="{{ {view: 'orolocale/js/app/views/fallback-view'}|json_encode }}"
+            data-layout="separate"
+            >
+        <tr class="fallback-item">
+            <td class="fallback-item-label">{{ form.default.vars.label|trans }}</td>
+            <td class="fallback-item-value">
+                {{ form_widget(form.default) }}
+                {{ form_errors(form.default) }}
+            </td>
+            <td class="fallback-status"></td>
+        </tr>
+        {% for localization in form.localizations %}
+            <tr class="fallback-item" style="display: none;">
+                <td class="fallback-item-label {% if localization.vars.group_fallback_fields %}fallback-item-top{% endif %}">{{ localization.vars.label|trans }}</td>
+                <td {% if localization.vars.group_fallback_fields %}class="fallback-item-top"{% endif %} colspan="2">
+                    {{ form_widget(localization) }}
+                    {{ form_errors(localization) }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block oro_locale_localized_fallback_value_collection_widget %}
+    {{ form_widget(form.values) }}
+    {{ form_errors(form.values) }}
+    {{ form_widget(form.ids) }}
+    {{ form_errors(form.ids) }}
+{% endblock %}

@@ -36,6 +36,12 @@ class SpoolItem
      */
     private $message;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="log_type", type="string", length=255)
+     */
+    private $logType;
 
     /**
      * Get id
@@ -91,5 +97,24 @@ class SpoolItem
     public function getMessage()
     {
         return $this->message;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogType()
+    {
+        return $this->logType;
+    }
+
+    /**
+     * @param  string $logType
+     * @return SpoolItem
+     */
+    public function setLogType($logType)
+    {
+        $this->logType = $logType;
+
+        return $this;
     }
 }

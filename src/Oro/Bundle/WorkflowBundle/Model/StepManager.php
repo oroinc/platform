@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class StepManager
 {
     /**
-     * @var Collection
+     * @var Collection|Step[]
      */
     protected $steps;
 
@@ -42,14 +42,24 @@ class StepManager
      */
     public function setSteps($steps)
     {
-        $data = array();
+        $this->steps = new ArrayCollection();
+
         if ($steps) {
             foreach ($steps as $step) {
-                $data[$step->getName()] = $step;
+                $this->addStep($step);
             }
-            unset($steps);
         }
-        $this->steps = new ArrayCollection($data);
+
+        return $this;
+    }
+
+    /**
+     * @param Step $step
+     * @return $this
+     */
+    private function addStep(Step $step)
+    {
+        $this->steps->set($step->getName(), $step);
 
         return $this;
     }
@@ -70,13 +80,26 @@ class StepManager
     public function getOrderedSteps()
     {
         $steps = $this->steps->toArray();
+        
         usort(
             $steps,
             function (Step $stepOne, Step $stepTwo) {
                 return ($stepOne->getOrder() >= $stepTwo->getOrder()) ? 1 : -1;
             }
         );
+
         return new ArrayCollection($steps);
+    }
+
+    /**
+     * @param string $transitionName
+     * @return Collection|Step[]
+     */
+    public function getRelatedTransitionSteps($transitionName)
+    {
+        return $this->steps->filter(function (Step $step) use ($transitionName) {
+            return in_array($transitionName, $step->getAllowedTransitions(), true);
+        });
     }
 
     /**
@@ -108,6 +131,7 @@ class StepManager
     public function hasStartStep()
     {
         $startStep = $this->getStartStep();
+
         return !empty($startStep);
     }
 }
