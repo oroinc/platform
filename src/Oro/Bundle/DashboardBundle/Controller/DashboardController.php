@@ -186,23 +186,7 @@ class DashboardController extends Controller
                     $this->get('translator')->trans('oro.dashboard.saved_message')
                 );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    [
-                        'route'      => 'oro_dashboard_update',
-                        'parameters' => [
-                            'id'                      => $dashboardModel->getId(),
-                            '_enableContentProviders' => 'mainMenu'
-                        ]
-                    ],
-                    [
-                        'route'      => 'oro_dashboard_view',
-                        'parameters' => [
-                            'id'                      => $dashboardModel->getId(),
-                            'change_dashboard'        => true,
-                            '_enableContentProviders' => 'mainMenu'
-                        ]
-                    ]
-                );
+                return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
             }
         }
 
