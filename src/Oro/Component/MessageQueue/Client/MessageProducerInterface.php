@@ -9,8 +9,8 @@ interface MessageProducerInterface
      * For possible priority values @see MessagePriority constants
      *
      * @param string $topic
-     * @param string $body
+     * @param string|array $message
      * @param string $priority
      */
-    public function send($topic, $body, $priority = MessagePriority::NORMAL);
+    public function send($topic, $message, $priority = MessagePriority::NORMAL);
 }

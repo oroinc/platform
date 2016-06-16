@@ -30,24 +30,24 @@ class MessageProducer implements MessageProducerInterface
     /**
      * {@inheritdoc}
      */
-    public function send($topic, $body, $priority = MessagePriority::NORMAL)
+    public function send($topic, $message, $priority = MessagePriority::NORMAL)
     {
         $config = $this->driver->getConfig();
 
-        $message = $this->driver->createMessage();
-        $this->driver->setMessagePriority($message, $priority);
+        $transportMessage = $this->driver->createMessage();
+        $this->driver->setMessagePriority($transportMessage, $priority);
 
-        $message->setBody($body);
+        $transportMessage->setBody($message);
 
-        $properties = $message->getProperties();
+        $properties = $transportMessage->getProperties();
         $properties[Config::PARAMETER_TOPIC_NAME] = $topic;
         $properties[Config::PARAMETER_PROCESSOR_NAME] = $config->getRouterMessageProcessorName();
         $properties[Config::PARAMETER_QUEUE_NAME] = $config->getRouterQueueName();
-        $message->setProperties($properties);
+        $transportMessage->setProperties($properties);
         
         $queue = $this->driver->createQueue($config->getRouterQueueName());
         
-        $this->sendMessage($queue, $message);
+        $this->sendMessage($queue, $transportMessage);
     }
 
     /**
