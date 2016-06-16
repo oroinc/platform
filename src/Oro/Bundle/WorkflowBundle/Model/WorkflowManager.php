@@ -397,6 +397,7 @@ class WorkflowManager
     /**
      * @param object $entity
      * @return Workflow[]
+     * @return WorkflowItem[]
      */
     public function getWorkflowItemsByEntity($entity)
     {
