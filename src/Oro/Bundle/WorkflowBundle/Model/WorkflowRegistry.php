@@ -41,7 +41,8 @@ class WorkflowRegistry
         ManagerRegistry $managerRegistry,
         WorkflowAssembler $workflowAssembler,
         ConfigProvider $configProvider
-    ) {
+    )
+    {
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;
         $this->configProvider = $configProvider;
@@ -103,14 +104,14 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowByEntityClass($entityClass, $workflowName)
     {
-        if(!$workflowName){
+        if (!$workflowName) {
             throw new \BadMethodCallException('Workflow name must be defined');
         }
 
         $workflows = $this->getActiveWorkflowsByEntityClass($entityClass);
 
-        foreach($workflows as $workflow){
-            if($workflowName === $workflow->getName()){
+        foreach ($workflows as $workflow) {
+            if ($workflowName === $workflow->getName()) {
                 return $workflow;
             }
         }
