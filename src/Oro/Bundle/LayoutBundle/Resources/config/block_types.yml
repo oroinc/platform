@@ -9,6 +9,18 @@ services:
         calls:
             - [setParent, ['container']]
 
+    oro_layout.block_type.extension.abstract_configurable:
+        abstract: true
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigurableTypeExtension
+        calls:
+            - [setExtendedType, ['block']]
+
+    oro_layout.block_type.extension.abstract_configurable_container:
+        abstract: true
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setExtendedType, ['container']]
+
     oro_layout.block_type.base:
         class: Oro\Component\Layout\Block\Type\BaseType
         tags:
@@ -157,3 +169,29 @@ services:
             - [setName, ['list_item']]
         tags:
              - { name: layout.block_type, alias: list_item }
+
+    oro_layout.block_type_extension.class_attribute:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension
+        arguments:
+            - '@oro_layout.expression.encoder_registry'
+        tags:
+            - { name: layout.block_type_extension, alias: block, priority: 260 }
+
+    oro_layout.block_type_extension.option_value_bag:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension
+        tags:
+            - { name: layout.block_type_extension, alias: block, priority: 270 }
+
+    oro_layout.block_type.extension.visible:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{visible: {default: true}}]]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type.extension.hidden:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{hidden: {default: false}}]]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
