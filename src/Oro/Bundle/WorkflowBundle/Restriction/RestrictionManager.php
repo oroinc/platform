@@ -81,7 +81,7 @@ class RestrictionManager
      */
     public function getRestrictionsByClassAndIdentifiers($entityClass, array $identifiers = [])
     {
-        if (!$this->doctrineHelper->isManageableEntity($entityClass) || empty($identifiers)) {
+        if (!$this->doctrineHelper->isManageableEntity($entityClass) || count($identifiers) === 0) {
             return [];
         }
         $this->loadClassRestrictions($entityClass);
@@ -190,9 +190,9 @@ class RestrictionManager
     }
 
     /**
-     * @param WorkflowRestriction[] $restrictions
+     * @param array[] $restrictions raw WorkflowRestriction array
      *
-     * @return WorkflowRestriction[]
+     * @return array[]
      */
     protected function filterByActiveWorkflows(array $restrictions)
     {
@@ -222,24 +222,23 @@ class RestrictionManager
      */
     protected function loadClassRestrictions($entityClass)
     {
-        if (!isset($this->restrictions[$entityClass])) {
+        if (!array_key_exists($entityClass, $this->restrictions[$entityClass])) {
             $classRestrictions = $this->getRestrictionRepository()->getClassRestrictions($entityClass);
             foreach ($classRestrictions as $classRestriction) {
                 $workflowName = $classRestriction['workflowName'];
                 if (!isset($this->workflows[$entityClass][$workflowName])) {
-                    $workflow = $this->workflowManager
-                        ->getApplicableWorkflowByEntityClass(
+                    $workflows = $this->workflowManager
+                        ->getApplicableWorkflowsByEntityClass(
                             $classRestriction['relatedEntity']
                         );
-                    if (null !== $workflow) {
-                        if ($workflow->getName() === $workflowName) {
-                            $this->workflows[$entityClass][$workflowName] = ['is_active' => true];
-                        } else {
-                            $this->workflows[$entityClass][$workflowName] = ['is_active' => false];
-                            $this->workflows[$entityClass][$workflow->getName()] = ['is_active' => true];
-                        }
+
+                    $this->workflows[$entityClass][$workflowName] = ['is_active' => false];
+
+                    foreach ($workflows as $workflow){
+                        $this->workflows[$entityClass][$workflow->getName()] = ['is_active' => true];
                     }
                 }
+
                 if (!empty($this->workflows[$entityClass][$workflowName]['is_active'])) {
                     $this->activeRestrictions[] = $classRestriction['id'];
                 }

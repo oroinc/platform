@@ -308,18 +308,6 @@ class WorkflowManager
 
     /**
      * @param object $entity
-     * @return Workflow
-     * @deprecated
-     */
-    public function getApplicableWorkflow($entity)
-    {
-        return $this->getApplicableWorkflowByEntityClass(
-            $this->doctrineHelper->getEntityClass($entity)
-        );
-    }
-
-    /**
-     * @param object $entity
      * @return Workflow[]
      */
     public function getApplicableWorkflows($entity)
@@ -344,7 +332,7 @@ class WorkflowManager
 
     /**
      * @param string $entityClass
-     * @return null|Workflow
+     * @return Workflow[]
      */
     public function getApplicableWorkflowsByEntityClass($entityClass)
     {
@@ -417,7 +405,7 @@ class WorkflowManager
     
     /**
      * @param object $entity
-     * @return Workflow[]
+     * @return WorkflowItem[]
      */
     public function getWorkflowItemsByEntity($entity)
     {

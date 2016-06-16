@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener;
 
-class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
+class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -175,16 +175,16 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function preRemoveDataProvider()
     {
-        return array(
-            'not aware entity' => array(),
-            'aware entity without workflow item' => array(
+        return [
+            'not aware entity' => [],
+            'aware entity without workflow item' => [
                 'isAware' => true,
-            ),
-            'aware entity with workflow item' => array(
+            ],
+            'aware entity with workflow item' => [
                 'isAware' => true,
                 'hasWorkflowItem' => true,
-            ),
-        );
+            ],
+        ];
     }
 
     public function testScheduleStartWorkflowForNewEntityNoWorkflow()
@@ -198,7 +198,7 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getEntity')
             ->will($this->returnValue($entity));
         $this->workflowManager->expects($this->atLeastOnce())
-            ->method('getApplicableWorkflow')
+            ->method('getApplicableWorkflows')
             ->with($entity);
 
         $this->listener->postPersist($event);
@@ -228,9 +228,9 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($stepManager));
 
         $this->workflowManager->expects($this->atLeastOnce())
-            ->method('getApplicableWorkflow')
+            ->method('getApplicableWorkflows')
             ->with($entity)
-            ->will($this->returnValue($workflow));
+            ->will($this->returnValue([$workflow]));
 
         $this->listener->postPersist($event);
         $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
@@ -243,40 +243,40 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
 
         list($event, $workflow) = $this->prepareEventForWorkflow($entity);
         $this->workflowManager->expects($this->at(0))
-            ->method('getApplicableWorkflow')
+            ->method('getApplicableWorkflows')
             ->with($entity)
-            ->will($this->returnValue($workflow));
+            ->will($this->returnValue([$workflow]));
 
         list($childEvent, $childWorkflow) = $this->prepareEventForWorkflow($childEntity);
         $this->workflowManager->expects($this->at(2))
-            ->method('getApplicableWorkflow')
+            ->method('getApplicableWorkflows')
             ->with($childEntity)
-            ->will($this->returnValue($childWorkflow));
+            ->will($this->returnValue([$childWorkflow]));
 
         $this->listener->postPersist($event);
 
-        $expectedSchedule = array(
-            0 => array(
-                array(
+        $expectedSchedule = [
+            0 => [
+                [
                     'entity' => $entity,
                     'workflow' => $workflow
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertAttributeEquals(0, 'deepLevel', $this->listener);
         $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->listener);
 
         $startChildWorkflow = function () use ($childEvent, $childEntity, $childWorkflow) {
             $this->listener->postPersist($childEvent);
 
-            $expectedSchedule = array(
-                1 => array(
-                    array(
+            $expectedSchedule = [
+                1 => [
+                    [
                         'entity' => $childEntity,
                         'workflow' => $childWorkflow
-                    ),
-                ),
-            );
+                    ],
+                ],
+            ];
             $this->assertAttributeEquals(1, 'deepLevel', $this->listener);
             $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->listener);
 
@@ -288,11 +288,11 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowManager->expects($this->at(0))
             ->method('massStartWorkflow')
-            ->with(array(array('workflow' => $workflow, 'entity' => $entity)))
+            ->with([['workflow' => $workflow, 'entity' => $entity]])
             ->will($this->returnCallback($startChildWorkflow));
         $this->workflowManager->expects($this->at(1))
             ->method('massStartWorkflow')
-            ->with(array(array('workflow' => $childWorkflow, 'entity' => $childEntity)));
+            ->with([['workflow' => $childWorkflow, 'entity' => $childEntity]]);
 
         $this->listener->postFlush();
 
@@ -324,6 +324,6 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getStepManager')
             ->will($this->returnValue($stepManager));
 
-        return array($event, $workflow);
+        return [$event, $workflow];
     }
 }

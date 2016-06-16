@@ -69,13 +69,17 @@ class WorkflowItemListener
     protected function scheduleStartWorkflowForNewEntity(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        $activeWorkflow = $this->workflowManager->getApplicableWorkflow($entity);
-
-        if ($activeWorkflow && $activeWorkflow->getStepManager()->hasStartStep()) {
-            $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = array(
-                'entity' => $entity,
-                'workflow' => $activeWorkflow
-            );
+        $activeWorkflows = $this->workflowManager->getApplicableWorkflows($entity);
+    
+        if($activeWorkflows) {
+            foreach ($activeWorkflows as $activeWorkflow) {
+                if ($activeWorkflow->getStepManager()->hasStartStep()) {
+                    $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = array(
+                        'entity' => $entity,
+                        'workflow' => $activeWorkflow
+                    );
+                }
+            }
         }
     }
 
