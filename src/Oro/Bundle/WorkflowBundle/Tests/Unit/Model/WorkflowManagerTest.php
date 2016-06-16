@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -44,6 +45,11 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     protected $workflowRegistry;
 
     /**
+     * @var WorkflowItemRepository|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $workflowItemRepository;
+
+    /**
      * @var \Oro\Bundle\EntityBundle\ORM\DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $doctrineHelper;
@@ -66,6 +72,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
 
         $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->workflowItemRepository = $this->getMockBuilder(
+            'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -97,6 +109,67 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $this->workflowManager,
             $this->eventDispatcher
         );
+    }
+
+    public function testHasWorkflowItemsByEntityAndNoEntityIdentifier()
+    {
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')->willReturn(null);
+
+        $this->registry->expects($this->never())
+            ->method('getRepository');
+
+        $this->assertFalse($this->workflowManager->hasWorkflowItemsByEntity(new \stdClass()));
+    }
+
+    public function testHasWorkflowItemsByEntityAndNoWorkflows()
+    {
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with(new \stdClass())
+            ->willReturn(1);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with(new \stdClass())
+            ->willReturn('stdClass');
+
+        $this->registry->expects($this->once())
+            ->method('getRepository')
+            ->with('OroWorkflowBundle:WorkflowItem')
+            ->willReturn($this->workflowItemRepository);
+
+        $this->workflowItemRepository->expects($this->once())
+            ->method('findAllByEntityMetadata')
+            ->with('stdClass', 1)
+            ->willReturn([]);
+
+        $this->assertFalse($this->workflowManager->hasWorkflowItemsByEntity(new \stdClass()));
+    }
+
+    public function testHasWorkflowItemsByEntity()
+    {
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with(new \stdClass())
+            ->willReturn(1);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with(new \stdClass())
+            ->willReturn('stdClass');
+
+        $this->registry->expects($this->once())
+            ->method('getRepository')
+            ->with('OroWorkflowBundle:WorkflowItem')
+            ->willReturn($this->workflowItemRepository);
+
+        $this->workflowItemRepository->expects($this->once())
+            ->method('findAllByEntityMetadata')
+            ->with('stdClass', 1)
+            ->willReturn([new WorkflowItem()]);
+
+        $this->assertTrue($this->workflowManager->hasWorkflowItemsByEntity(new \stdClass()));
     }
 
     public function testGetStartTransitions()

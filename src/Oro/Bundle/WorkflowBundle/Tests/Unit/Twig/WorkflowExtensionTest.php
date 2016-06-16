@@ -29,7 +29,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertCount(5, $functions);
+        $this->assertCount(6, $functions);
 
         $expectedFunctions = array(
             'has_workflow',
@@ -37,6 +37,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             'has_workflow_item',
             'is_workflow_reset_allowed',
             'has_workflows',
+            'has_workflow_items',
         );
 
         /** @var \Twig_SimpleFunction $function */
