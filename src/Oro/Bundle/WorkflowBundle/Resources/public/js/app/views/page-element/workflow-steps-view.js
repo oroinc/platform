@@ -18,11 +18,11 @@ define(function(require) {
                 return data;
             }
 
-            _.each(data.stepsData, function(stepsData) {
+            _.each(data.stepsData, function(stepData) {
                 // calculated processed flag
                 var processed = true;
-                _.each(stepsData.steps, function(step) {
-                    if (step.name === stepsData.currentStep.name) {
+                _.each(stepData.steps, function(step) {
+                    if (step.name === stepData.currentStep.name) {
                         processed = false;
                     }
                     step.processed = processed;
