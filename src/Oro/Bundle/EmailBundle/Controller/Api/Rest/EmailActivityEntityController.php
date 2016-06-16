@@ -9,6 +9,8 @@ use FOS\RestBundle\Controller\Annotations\Get;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Doctrine\ORM\Proxy\Proxy;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -61,7 +63,7 @@ class EmailActivityEntityController extends RestGetController
             'skip_custom_entity' => (bool)$this->getRequest()->get('skip_custom_entity', 0),
             'criteria' => $this->buildFilterCriteria(['id' => ['=', $id]])
         ];
-        
+
         return $this->handleGetListRequest($page, $limit, $filters);
     }
 
@@ -71,5 +73,39 @@ class EmailActivityEntityController extends RestGetController
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email_activity_entity.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPreparedItem($entity, $resultFields = [])
+    {
+        if ($entity instanceof Proxy && !$entity->__isInitialized()) {
+            $entity->__load();
+        }
+        $result = parent::getPreparedItem($entity, $resultFields);
+        if ($entity && is_array($entity)) {
+            $result = $this->addRouteView($result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $result
+     *
+     * @return mixed
+     */
+    protected function addRouteView($result)
+    {
+        $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata($result['entity']);
+        if ($metadata && $metadata->hasRoute()) {
+            $result['url_view'] =
+                $this->get('router')->generate($metadata->getRoute(), ['id' => $result['id']]);
+        } else {
+            $result['url_view'] = '';
+        }
+
+        return $result;
     }
 }
