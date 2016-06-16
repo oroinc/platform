@@ -183,6 +183,8 @@ define([
                 };
                 if (deleteUrl) {
                     options.url = deleteUrl;
+                } else {
+                    options.url = this.model.url() + '?send_notification=true';
                 }
                 this.model.destroy(options);
             } catch (err) {

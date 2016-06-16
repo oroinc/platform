@@ -7,10 +7,6 @@ use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
-/**
- * @method AbstractEnumValue getOrigin
- * @method CalendarEvent setOrigin(AbstractEnumValue $value)
- */
 class ExtendCalendarEvent implements ActivityInterface
 {
     use ExtendActivity;

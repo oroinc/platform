@@ -343,8 +343,7 @@ define(function(require) {
                         calendarAlias: 'user',
                         calendar: this.options.calendar,
                         editable: this.options.newEventEditable,
-                        removable: this.options.newEventRemovable,
-                        origin: 'server'
+                        removable: this.options.newEventRemovable
                     });
                     eventModel = new EventModel(attrs);
                     this.getEventView(eventModel).render();

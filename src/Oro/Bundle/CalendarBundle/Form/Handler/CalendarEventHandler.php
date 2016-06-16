@@ -140,8 +140,8 @@ class CalendarEventHandler
                 }
 
                 $notifyInvitedUsers = $this->form->has('notifyInvitedUsers')
-                    ? $this->form->get('notifyInvitedUsers')->getData()
-                    : new ArrayCollection();
+                    ? $this->form->get('notifyInvitedUsers')->getData() === 'true'
+                    : false;
                 
                 $this->onSuccess(
                     $entity,
@@ -211,9 +211,7 @@ class CalendarEventHandler
      */
     protected function checkPermission(CalendarEvent $entity)
     {
-        if ($entity->getParent() !== null
-            || ($entity->getOrigin() && $entity->getOrigin()->getId() === CalendarEvent::ORIGIN_EXTERNAL)
-        ) {
+        if ($entity->getParent() !== null) {
             throw new AccessDeniedException();
         }
     }

@@ -89,11 +89,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     const STATUS_ACCEPTED  = 'accepted';
     const STATUS_DECLINED  = 'declined';
 
-    const ORIGIN_ENUM_CODE = 'calendar_event_origin';
-    const ORIGIN_CLIENT    = 'client';
-    const ORIGIN_SERVER    = 'server';
-    const ORIGIN_EXTERNAL  = 'external';
-
     protected $availableStatuses = [
         CalendarEvent::STATUS_ACCEPTED,
         CalendarEvent::STATUS_TENTATIVE,
