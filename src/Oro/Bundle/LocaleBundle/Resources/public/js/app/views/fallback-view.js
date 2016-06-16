@@ -290,7 +290,7 @@ define(function(require) {
          * @param {Boolean} enable
          */
         enableDisableFallback: function($fallback, enable) {
-            var $fallbackContainer = $fallback.inputWidget('getContainer');
+            var $fallbackContainer = $fallback.inputWidget('container');
 
             if (enable) {
                 $fallback.removeAttr('disabled');
@@ -446,7 +446,7 @@ define(function(require) {
          */
         fixFallbackWidth: function() {
             var $fallback = this.$el.find(this.options.selectors.itemFallback).find('select');
-            $fallback.inputWidget('setWidth', this.options.fallbackWidth);
+            $fallback.inputWidget('width', this.options.fallbackWidth);
         },
 
         /**

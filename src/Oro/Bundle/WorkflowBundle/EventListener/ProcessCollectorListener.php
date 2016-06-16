@@ -231,7 +231,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
                 $oldValue = $args->getOldValue($field);
                 $newValue = $args->getNewValue($field);
 
-                if ($newValue != $oldValue) {
+                if (!$this->isEqual($newValue, $oldValue)) {
                     $this->scheduleProcess($trigger, $entity, $changeSet, $oldValue, $newValue);
                 }
             }
@@ -449,5 +449,27 @@ class ProcessCollectorListener implements OptionalListenerInterface
         }
 
         $this->scheduledProcesses[$entityClass][] = array('trigger' => $trigger, 'data' => $data);
+    }
+
+    /**
+     * @param mixed $first
+     * @param mixed $second
+     * @return bool
+     */
+    protected function isEqual($first, $second)
+    {
+        if (is_object($first) && is_object($second) &&
+            $this->doctrineHelper->isManageableEntity($first) &&
+            $this->doctrineHelper->isManageableEntity($second)
+        ) {
+            $firstClass = $this->doctrineHelper->getEntityClass($first);
+            $secondClass = $this->doctrineHelper->getEntityClass($second);
+            $firstIdentifier = $this->doctrineHelper->getEntityIdentifier($first);
+            $secondIdentifier = $this->doctrineHelper->getEntityIdentifier($second);
+
+            return $firstClass == $secondClass && $firstIdentifier == $secondIdentifier;
+        }
+
+        return $first == $second;
     }
 }

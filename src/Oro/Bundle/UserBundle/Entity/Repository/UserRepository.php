@@ -72,7 +72,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
                     sprintf('TRIM(CONCAT(%s, \' <\', u.email, \'>|\', o.name))', $fullNameQueryPart),
                     ':excluded_emails'
                 ))
-                ->setParameter('excluded_emails', $excludedEmailNames);
+                ->setParameter('excluded_emails', array_values($excludedEmailNames));
         }
 
         return $qb;
@@ -108,7 +108,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
                     sprintf('TRIM(CONCAT(%s, \' <\', e.email, \'>|\', o.name))', $fullNameQueryPart),
                     ':excluded_emails'
                 ))
-                ->setParameter('excluded_emails', $excludedEmailNames);
+                ->setParameter('excluded_emails', array_values($excludedEmailNames));
         }
 
         return $qb;

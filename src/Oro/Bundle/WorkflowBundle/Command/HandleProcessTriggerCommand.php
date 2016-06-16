@@ -18,7 +18,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
     const NAME = 'oro:process:handle-trigger';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function configure()
     {
@@ -39,7 +39,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

@@ -6,11 +6,12 @@ workflows:
             open:
                 label: 'Open'
                 order: 10
+                allowed_transitions: ['start_transition']
         transition_definitions:
             start_transiotion_definition: ~
         transitions:
             start_transition:
-                label: 'Start transiotion'
+                label: 'Start transition'
                 step_to: open
                 is_start: true
                 transition_definition: start_transiotion_definition
@@ -23,10 +24,14 @@ workflows:
            open:
                label: 'Open'
                order: 10
+               allowed_transitions: ['start_transition']
         transition_definitions:
            start_transiotion_definition: ~
         transitions:
            start_transition:
-               label: 'Start transiotion'
+               label: 'Start transition'
                step_to: open
                transition_definition: start_transiotion_definition
+               schedule:
+                   cron: '* * * * *'
+                   filter: 'e.id = 7'
