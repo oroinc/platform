@@ -90,10 +90,10 @@ class EmailActivityEntityController extends RestGetController
     {
         $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata($result['entity']);
         if ($metadata && $metadata->hasRoute()) {
-            $result['url_view'] =
+            $result['urlView'] =
                 $this->get('router')->generate($metadata->getRoute(), ['id' => $result['id']]);
         } else {
-            $result['url_view'] = '';
+            $result['urlView'] = '';
         }
 
         return $result;
