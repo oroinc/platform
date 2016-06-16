@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -85,13 +86,22 @@ class WidgetDateRangeType extends AbstractType
                 'required'         => false,
                 'compile_date'     => false,
                 'field_type'       => WidgetDateRangeValueType::NAME,
-                'operator_choices' => $this->getOperatorChoices(),
+                'operator_choices' => [],
+                'value_types'      => false,
+                'all_time_value'   => true,
                 'widget_options'   => [
                     'showTime'       => false,
                     'showTimepicker' => false
                 ]
             ]
         );
+        
+        $resolver->setNormalizers([
+            'operator_choices' =>
+            function(Options $options) {
+                return $this->getOperatorChoices($options);
+            }
+        ]);
     }
 
     /**
@@ -113,29 +123,44 @@ class WidgetDateRangeType extends AbstractType
     }
 
     /**
+     * @param Options $options
+     *
      * @return array
+     *
      */
-    protected function getOperatorChoices()
+    protected function getOperatorChoices(Options $options)
     {
-        return [
-            AbstractDateFilterType::TYPE_TODAY
-            => $this->translator->trans('oro.dashboard.widget.filter.date_range.today'),
-            AbstractDateFilterType::TYPE_THIS_WEEK
-            => $this->translator->trans('oro.dashboard.widget.filter.date_range.this_week'),
-            AbstractDateFilterType::TYPE_THIS_MONTH
-            => $this->translator->trans('oro.dashboard.widget.filter.date_range.this_month'),
-            AbstractDateFilterType::TYPE_THIS_QUARTER
-            => $this->translator->trans('oro.dashboard.widget.filter.date_range.this_quarter'),
-            AbstractDateFilterType::TYPE_THIS_YEAR
-            => $this->translator->trans('oro.dashboard.widget.filter.date_range.this_year'),
-            AbstractDateFilterType::TYPE_ALL_TIME
-            => $this->translator->trans('oro.dashboard.widget.filter.date_range.all_time'),
-            AbstractDateFilterType::TYPE_BETWEEN
-            => $this->translator->trans('oro.filter.form.label_date_type_between'),
-            AbstractDateFilterType::TYPE_MORE_THAN
-            => $this->translator->trans('oro.filter.form.label_date_type_more_than'),
-            AbstractDateFilterType::TYPE_LESS_THAN
-            => $this->translator->trans('oro.filter.form.label_date_type_less_than')
-        ];
+        $choices = [];
+        if ($options['value_types']) {
+            $choices = [
+                AbstractDateFilterType::TYPE_TODAY
+                => $this->translator->trans('oro.dashboard.widget.filter.date_range.today'),
+                AbstractDateFilterType::TYPE_THIS_WEEK
+                => $this->translator->trans('oro.dashboard.widget.filter.date_range.this_week'),
+                AbstractDateFilterType::TYPE_THIS_MONTH
+                => $this->translator->trans('oro.dashboard.widget.filter.date_range.this_month'),
+                AbstractDateFilterType::TYPE_THIS_QUARTER
+                => $this->translator->trans('oro.dashboard.widget.filter.date_range.this_quarter'),
+                AbstractDateFilterType::TYPE_THIS_YEAR
+                => $this->translator->trans('oro.dashboard.widget.filter.date_range.this_year'),
+            ];
+            if ($options['all_time_value']) {
+                $choices += [
+                    AbstractDateFilterType::TYPE_ALL_TIME
+                    => $this->translator->trans('oro.dashboard.widget.filter.date_range.all_time'),
+                ];
+            }
+        }
+        
+        return
+            $choices +
+            [
+                AbstractDateFilterType::TYPE_BETWEEN
+                => $this->translator->trans('oro.filter.form.label_date_type_between'),
+                AbstractDateFilterType::TYPE_MORE_THAN
+                => $this->translator->trans('oro.filter.form.label_date_type_more_than'),
+                AbstractDateFilterType::TYPE_LESS_THAN
+                => $this->translator->trans('oro.filter.form.label_date_type_less_than')
+            ];
     }
 }
