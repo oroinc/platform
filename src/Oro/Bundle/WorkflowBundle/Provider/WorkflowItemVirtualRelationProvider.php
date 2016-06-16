@@ -11,7 +11,7 @@ class WorkflowItemVirtualRelationProvider extends AbstractVirtualRelationProvide
     /**
      * {@inheritdoc}
      */
-    public function getRelationName()
+    protected function getRelationName()
     {
         return self::RELATION_NAME;
     }

@@ -28,7 +28,7 @@ abstract class AbstractVirtualRelationProvider implements VirtualRelationProvide
     /**
      * @return string
      */
-    abstract public function getRelationName();
+    abstract protected function getRelationName();
 
     /**
      * @param string $className

@@ -21,20 +21,13 @@ class WorkflowItemVirtualRelationProviderTest extends AbstractVirtualRelationPro
         );
     }
 
-    public function testGetRelationName()
-    {
-        $this->assertEquals(WorkflowItemVirtualRelationProvider::RELATION_NAME, $this->provider->getRelationName());
-    }
-
     /**
-     * @param string $className
-     * @param string $fieldName
-     * @return array
+     * {@inheritdoc}
      */
     protected function getVirtualRelations($className, $fieldName)
     {
         return [
-            $this->provider->getRelationName() => [
+            $this->getRelationName() => [
                 'label' => 'oro.workflow.workflowitem.entity_label',
                 'relation_type' => 'OneToMany',
                 'related_entity_name' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
@@ -44,9 +37,7 @@ class WorkflowItemVirtualRelationProviderTest extends AbstractVirtualRelationPro
     }
 
     /**
-     * @param string $className
-     * @param string $fieldName
-     * @return array
+     * {@inheritdoc}
      */
     protected function getVirtualRelationsQuery($className, $fieldName)
     {
@@ -55,18 +46,26 @@ class WorkflowItemVirtualRelationProviderTest extends AbstractVirtualRelationPro
                 'left' => [
                     [
                         'join' => 'OroWorkflowBundle:WorkflowItem',
-                        'alias' => $this->provider->getRelationName(),
+                        'alias' => $this->getRelationName(),
                         'conditionType' => Join::WITH,
                         'condition' => sprintf(
                             'entity.%s = %s.entityId AND %s.entityClass = \'%s\'',
                             $fieldName,
-                            $this->provider->getRelationName(),
-                            $this->provider->getRelationName(),
+                            $this->getRelationName(),
+                            $this->getRelationName(),
                             $className
                         )
                     ]
                 ]
             ]
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRelationName()
+    {
+        return WorkflowItemVirtualRelationProvider::RELATION_NAME;
     }
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Provider\AbstractVirtualRelationProvider;
 
 abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +15,7 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var WorkflowItemVirtualRelationProvider */
+    /** @var AbstractVirtualRelationProvider */
     protected $provider;
 
     /**
@@ -32,6 +33,11 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
     abstract protected function getVirtualRelationsQuery($className, $fieldName);
 
     /**
+     * @return string
+     */
+    abstract protected function getRelationName();
+
+    /**
      * {@inheritdoc}
      */
     public function setUp()
@@ -46,7 +52,6 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
     }
 
     // testIsVirtualRelation
-
     public function testIsVirtualRelationAndUnknownRelationFieldName()
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
@@ -63,7 +68,7 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
             ->method('hasApplicableWorkflowsByEntityClass')->willReturn(false);
 
         $this->assertFalse(
-            $this->provider->isVirtualRelation('stdClass', $this->provider->getRelationName())
+            $this->provider->isVirtualRelation('stdClass', $this->getRelationName())
         );
     }
 
@@ -76,13 +81,10 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
             ->with('stdClass')
             ->willReturn(true);
 
-        $this->assertTrue(
-            $this->provider->isVirtualRelation('stdClass', $this->provider->getRelationName())
-        );
+        $this->assertTrue($this->provider->isVirtualRelation('stdClass', $this->getRelationName()));
     }
 
     // testGetVirtualRelations
-
     public function testGetVirtualRelationsAndNoApplicableWorkflows()
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
@@ -107,12 +109,11 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
 
         $this->assertEquals(
             $this->getVirtualRelations('stdClass', 'id'),
-            $this->provider->getVirtualRelations('stdClass', 'id')
+            $this->provider->getVirtualRelations('stdClass')
         );
     }
 
     // testGetVirtualRelationsQuery
-
     public function testGetVirtualRelationQueryAndNoApplicableWorkflows()
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
@@ -144,14 +145,13 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
 
         $this->assertEquals(
             $this->getVirtualRelationsQuery('stdClass', 'id'),
-            $this->provider->getVirtualRelationQuery('stdClass', $this->provider->getRelationName())
+            $this->provider->getVirtualRelationQuery('stdClass', $this->getRelationName())
         );
     }
 
     // testGetTargetJoinAlias
-
     public function testGetTargetJoinAlias()
     {
-        $this->assertEquals($this->provider->getRelationName(), $this->provider->getTargetJoinAlias('', ''));
+        $this->assertEquals($this->getRelationName(), $this->provider->getTargetJoinAlias('', ''));
     }
 }

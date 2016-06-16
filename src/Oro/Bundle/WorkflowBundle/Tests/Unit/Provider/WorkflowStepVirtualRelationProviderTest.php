@@ -20,18 +20,13 @@ class WorkflowStepVirtualRelationProviderTest extends AbstractVirtualRelationPro
         );
     }
 
-    public function testGetRelationName()
-    {
-        $this->assertEquals(WorkflowStepVirtualRelationProvider::RELATION_NAME, $this->provider->getRelationName());
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function getVirtualRelations($className, $fieldName)
     {
         return [
-            $this->provider->getRelationName() => [
+            $this->getRelationName() => [
                 'label' => 'oro.workflow.workflowstep.entity_label',
                 'relation_type' => 'OneToMany',
                 'related_entity_name' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep',
@@ -50,10 +45,18 @@ class WorkflowStepVirtualRelationProviderTest extends AbstractVirtualRelationPro
                 'left' => [
                     [
                         'join' => sprintf('%s.currentStep', WorkflowItemVirtualRelationProvider::RELATION_NAME),
-                        'alias' => $this->provider->getRelationName(),
+                        'alias' => $this->getRelationName(),
                     ]
                 ]
             ]
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRelationName()
+    {
+        return WorkflowStepVirtualRelationProvider::RELATION_NAME;
     }
 }
