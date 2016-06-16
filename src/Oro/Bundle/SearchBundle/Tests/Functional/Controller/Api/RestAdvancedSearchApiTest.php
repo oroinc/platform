@@ -2,18 +2,25 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
+use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- * @dbReindex
- */
 class RestAdvancedSearchApiTest extends WebTestCase
 {
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
+        parent::setUp();
+
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->startTransaction();
+        $this->loadFixtures([LoadSearchItemData::class]);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->rollbackTransaction();
     }
 
     /**

@@ -2,12 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- * @dbReindex
- */
 class SearchControllerTest extends WebTestCase
 {
     /**
@@ -17,8 +14,18 @@ class SearchControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
+        parent::setUp();
+
+        $this->initClient([], $this->generateBasicAuthHeader(), true);
+        $this->startTransaction();
+        $this->loadFixtures([LoadSearchItemData::class]);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->rollbackTransaction();
     }
 
     /**

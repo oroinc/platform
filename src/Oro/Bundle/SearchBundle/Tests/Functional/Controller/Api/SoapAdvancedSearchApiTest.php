@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
+use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
- * @dbIsolation
- * @dbReindex
  */
 class SoapAdvancedSearchApiTest extends WebTestCase
 {
@@ -18,9 +17,19 @@ class SoapAdvancedSearchApiTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        parent::setUp();
+
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->initSoapClient();
-        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
+        $this->startTransaction();
+        $this->loadFixtures([LoadSearchItemData::class]);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->rollbackTransaction();
     }
 
     /**
