@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor as BaseExtractor;
 
 use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
 
-class CachingApiDocExtractor extends BaseExtractor implements RouteOptionsResolverAwareInterface
+class CachingApiDocExtractor extends BaseExtractor implements
+    RouteOptionsResolverAwareInterface,
+    RestDocViewDetectorAwareInterface
 {
     use ApiDocExtractorTrait;
 
@@ -25,5 +28,21 @@ class CachingApiDocExtractor extends BaseExtractor implements RouteOptionsResolv
         }
 
         return $this->routes;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all($view = ApiDoc::DEFAULT_VIEW)
+    {
+        if ($this->docViewDetector) {
+            $detectedView = $this->docViewDetector->getView();
+            if ($detectedView) {
+                $view = $detectedView;
+            }
+        }
+
+        return parent::all($view);
     }
 }

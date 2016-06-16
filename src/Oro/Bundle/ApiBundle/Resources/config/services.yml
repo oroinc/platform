@@ -312,27 +312,30 @@ services:
             - '@oro_api.exception_text_extractor'
         lazy: true
 
-    oro_api.rest.routing_options_resolver.json_api:
+    oro_api.rest.routing_options_resolver.default:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver
         public: false
         arguments:
             - %installed%
+            - '@oro_api.rest.request_type_provider'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro_api.routing_options_resolver, priority: -255 }
+            - { name: oro_api.routing_options_resolver }
 
     oro_api.rest.routing_options_resolver:
-        class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver
         public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
 
     oro_api.rest.doc_handler:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler
         public: false
         arguments:
-            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.rest.request_type_provider'
             - '@oro_api.action_processor_bag'
             - '@oro_api.resource_doc_provider'
             - '@oro_api.doctrine_helper'
@@ -345,6 +348,19 @@ services:
         public: false
         arguments:
             - '@request_stack'
+
+    oro_api.rest.request_type_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+
+    oro_api.listener.dump_api_doc_console_command_listener:
+        class: Oro\Bundle\ApiBundle\EventListener\DumpApiDocConsoleCommandListener
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
 
     oro_api.resource_doc_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider

@@ -28,6 +28,9 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var bool */
     protected $isApplicationInstalled;
 
+    /** @var RequestTypeProviderInterface */
+    protected $requestTypeProvider;
+
     /** @var ResourcesProvider */
     protected $resourcesProvider;
 
@@ -41,31 +44,33 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     protected $valueNormalizer;
 
     /** @var RequestType */
-    protected $requestType;
+    private $requestType;
 
     /** @var array */
     private $supportedEntities;
 
     /**
-     * @param bool|string|null     $isApplicationInstalled
-     * @param ResourcesProvider    $resourcesProvider
-     * @param SubresourcesProvider $subresourcesProvider
-     * @param DoctrineHelper       $doctrineHelper
-     * @param ValueNormalizer      $valueNormalizer
+     * @param bool|string|null             $isApplicationInstalled
+     * @param RequestTypeProviderInterface $requestTypeProvider
+     * @param ResourcesProvider            $resourcesProvider
+     * @param SubresourcesProvider         $subresourcesProvider
+     * @param DoctrineHelper               $doctrineHelper
+     * @param ValueNormalizer              $valueNormalizer
      */
     public function __construct(
         $isApplicationInstalled,
+        RequestTypeProviderInterface $requestTypeProvider,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
         $this->isApplicationInstalled = !empty($isApplicationInstalled);
-        $this->resourcesProvider      = $resourcesProvider;
-        $this->subresourcesProvider   = $subresourcesProvider;
-        $this->doctrineHelper         = $doctrineHelper;
-        $this->valueNormalizer        = $valueNormalizer;
-        $this->requestType            = new RequestType([RequestType::REST, RequestType::JSON_API]);
+        $this->requestTypeProvider = $requestTypeProvider;
+        $this->resourcesProvider = $resourcesProvider;
+        $this->subresourcesProvider = $subresourcesProvider;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -73,7 +78,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if (!$this->isApplicationInstalled) {
+        if (!$this->isApplicationInstalled || $this->getRequestType()->isEmpty()) {
             return;
         }
         if ($route->getOption('group') === 'rest_api_deprecated') {
@@ -96,12 +101,24 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
+     * @return RequestType
+     */
+    protected function getRequestType()
+    {
+        if (null === $this->requestType) {
+            $this->requestType = $this->requestTypeProvider->getRequestType() ?: new RequestType([]);
+        }
+
+        return $this->requestType;
+    }
+
+    /**
      * @return array [[entity class, entity type, [excluded action, ...]], ...]
      */
     protected function getSupportedEntities()
     {
         if (null === $this->supportedEntities) {
-            $resources = $this->resourcesProvider->getResources(Version::LATEST, $this->requestType);
+            $resources = $this->resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
 
             $this->supportedEntities = [];
             foreach ($resources as $resource) {
@@ -109,7 +126,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 $entityType = $this->valueNormalizer->normalizeValue(
                     $className,
                     DataType::ENTITY_TYPE,
-                    $this->requestType
+                    $this->getRequestType()
                 );
                 if (!empty($entityType)) {
                     $this->supportedEntities[] = [
@@ -207,7 +224,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         $entitySubresources = $this->subresourcesProvider->getSubresources(
             $entityClass,
             Version::LATEST,
-            $this->requestType
+            $this->getRequestType()
         );
         $subresources = $entitySubresources->getSubresources();
         if (empty($subresources)) {
@@ -293,7 +310,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function getIdFieldRequirement($fieldType)
     {
-        $result = $this->valueNormalizer->getRequirement($fieldType, $this->requestType);
+        $result = $this->valueNormalizer->getRequirement($fieldType, $this->getRequestType());
 
         if (ValueNormalizer::DEFAULT_REQUIREMENT === $result) {
             $result = '[^\.]+';

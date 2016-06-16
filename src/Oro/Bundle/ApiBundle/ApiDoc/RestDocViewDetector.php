@@ -6,10 +6,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RestDocViewDetector
 {
-    const DEFAULT_VIEW = 'rest_json_api';
-
     /** @var RequestStack */
     protected $requestStack;
+
+    /** @var string|null */
+    protected $view;
 
     /**
      * @param RequestStack $requestStack
@@ -24,13 +25,21 @@ class RestDocViewDetector
      */
     public function getView()
     {
-        $view = self::DEFAULT_VIEW;
-
-        $request = $this->requestStack->getMasterRequest();
-        if (null !== $request && $request->attributes->has('view')) {
-            $view = $request->attributes->get('view');
+        if (null === $this->view) {
+            $request = $this->requestStack->getMasterRequest();
+            $this->view = null !== $request && $request->attributes->has('view')
+                ? $request->attributes->get('view')
+                : '';
         }
 
-        return $view;
+        return $this->view;
+    }
+
+    /**
+     * @param string|null $view
+     */
+    public function setView($view = null)
+    {
+        $this->view = $view;
     }
 }
