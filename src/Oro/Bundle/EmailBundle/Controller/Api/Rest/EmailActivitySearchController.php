@@ -58,6 +58,12 @@ class EmailActivitySearchController extends RestGetController
      *      nullable=true,
      *      description="An email address. One or several addresses separated by comma."
      * )
+     * @QueryParam(
+     *      name="skip_custom_entity",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Option to hide custom entities in the results. Available values  0 and 1. Defaults to 0."
+     * )
      *
      * @ApiDoc(
      *      description="Searches entities associated with the email activity.",
@@ -72,7 +78,8 @@ class EmailActivitySearchController extends RestGetController
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
         $filters = [
-            'search' => $this->getRequest()->get('search')
+            'search' => $this->getRequest()->get('search'),
+            'skip_custom_entity' => $this->getRequest()->get('skip_custom_entity')
         ];
 
         $from = $this->getRequest()->get('from', null);
@@ -98,6 +105,14 @@ class EmailActivitySearchController extends RestGetController
         }
 
         $data = $this->getManager()->getSearchResult($limit, $page, $filters);
+        foreach ($data['result'] as &$item) {
+            $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata($item['entity']);
+            if ($metadata) {
+                $item['urlView'] = $this->get('router')->generate($metadata->getRoute(), ['id' => $item['id']]);
+            } else {
+                $item['urlView'] = '';
+            }
+        }
 
         return $this->buildResponse($data['result'], self::ACTION_LIST, $data);
     }
