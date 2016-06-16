@@ -143,6 +143,7 @@ services:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@doctrine'
+            - '@router'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: choice-tree }
 
