@@ -113,9 +113,10 @@ class EntityReader extends IteratorBasedReader
         }
 
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
-        $query = $this->applyAcl($queryBuilder);
 
-        $this->setSourceQuery($query);
+        $this->applyAcl($queryBuilder);
+
+        $this->setSourceQueryBuilder($queryBuilder);
     }
 
     /**
@@ -175,7 +176,7 @@ class EntityReader extends IteratorBasedReader
     /**
      * @param QueryBuilder $queryBuilder
      *
-     * @return Query
+     * @return QueryBuilder
      */
     protected function applyAcl(QueryBuilder $queryBuilder)
     {
@@ -183,6 +184,6 @@ class EntityReader extends IteratorBasedReader
             return $this->aclHelper->apply($queryBuilder);
         }
 
-        return $queryBuilder->getQuery();
+        return $queryBuilder;
     }
 }

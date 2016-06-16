@@ -232,6 +232,13 @@ define(function(require) {
             if (!columnMetadata || !cell.column.get('renderable')) {
                 return false;
             }
+            var fieldName = cell.column.get('name');
+            var fullRestriction = _.find(cell.model.get('entity_restrictions'), function(restriction) {
+                return restriction.field === fieldName && restriction.mode === 'full';
+            });
+            if (fullRestriction) {
+                return false;
+            }
             var editable;
             var enableConfigValue = columnMetadata.inline_editing && columnMetadata.inline_editing.enable;
             // validateUrlParameters
@@ -251,6 +258,7 @@ define(function(require) {
                 default:
                     throw new Error('Unknown behaviour');
             }
+
             return editable ?
                 this.getCellEditorOptions(cell)
                     .save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
@@ -263,6 +271,10 @@ define(function(require) {
                 var columnMetadata = cell.column.get('metadata');
                 cellEditorOptions = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
                 var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
+                var fieldName = cell.column.get('name');
+                var fieldRestrictions = _.find(cell.model.get('entity_restrictions'), function(restriction) {
+                    return restriction.field === fieldName;
+                });
 
                 if (!cellEditorOptions.component_options) {
                     cellEditorOptions.component_options = {};
@@ -292,8 +304,13 @@ define(function(require) {
                     validationRules: validationRules
                 });
 
+                if (fieldRestrictions) {
+                    cellEditorOptions.viewOptions.fieldRestrictions = fieldRestrictions;
+                }
+
                 cell.column.set('cellEditorOptions', cellEditorOptions);
             }
+
             return cellEditorOptions;
         },
 

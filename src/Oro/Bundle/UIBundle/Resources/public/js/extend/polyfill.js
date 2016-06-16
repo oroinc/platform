@@ -46,4 +46,3 @@ define(function() {
     // jscs:enable
     /* jshint ignore:end */
 });
-

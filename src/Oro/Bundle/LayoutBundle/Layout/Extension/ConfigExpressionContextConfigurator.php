@@ -19,7 +19,7 @@ class ConfigExpressionContextConfigurator implements ContextConfiguratorInterfac
                     'expressions_evaluate_deferred' => false
                 ]
             )
-            ->setOptional(['expressions_encoding'])
+            ->setDefined(['expressions_encoding'])
             ->setAllowedTypes(
                 [
                     'expressions_evaluate' => 'bool',

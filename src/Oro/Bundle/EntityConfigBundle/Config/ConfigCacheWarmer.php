@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * IMPORTANT: A performance of this class is very crucial. Double check a performance during a refactoring.
@@ -246,8 +247,14 @@ class ConfigCacheWarmer
 
     protected function loadVirtualFields()
     {
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+
         $entities = $this->cache->getEntities();
         foreach ($entities as $className => $entityData) {
+            if ($extendConfigProvider->getConfig($className)->is('state', ExtendScope::STATE_NEW)) {
+                continue;
+            }
+
             $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
             if (!empty($virtualFields)) {
                 foreach ($virtualFields as $fieldName) {

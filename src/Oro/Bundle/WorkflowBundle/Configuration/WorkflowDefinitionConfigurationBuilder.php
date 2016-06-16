@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -83,6 +84,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
 
         $this->setEntityAcls($workflowDefinition, $workflow);
+        $this->setEntityRestrictions($workflowDefinition, $workflow);
 
         $this->fieldGenerator->generateWorkflowFields($workflowDefinition->getRelatedEntity());
 
@@ -141,6 +143,30 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     }
 
     /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @param Workflow           $workflow
+     */
+    protected function setEntityRestrictions(WorkflowDefinition $workflowDefinition, Workflow $workflow)
+    {
+        $restrictions = $workflow->getRestrictions();
+        $workflowDefinition->getConfiguration();
+        $workflowRestrictions = [];
+        foreach ($restrictions as $restriction) {
+            $workflowRestriction = new WorkflowRestriction();
+            $workflowRestriction
+                ->setField($restriction->getField())
+                ->setAttribute($restriction->getAttribute())
+                ->setEntityClass($restriction->getEntity())
+                ->setMode($restriction->getMode())
+                ->setValues($restriction->getValues())
+                ->setStep($workflowDefinition->getStepByName($restriction->getStep()));
+
+            $workflowRestrictions[] = $workflowRestriction;
+        }
+        $workflowDefinition->setRestrictions($workflowRestrictions);
+    }
+
+    /**
      * @param array $configuration
      * @return array
      */
@@ -151,6 +177,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             WorkflowConfiguration::NODE_ATTRIBUTES,
             WorkflowConfiguration::NODE_TRANSITIONS,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
+            WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS
         );
 
         return array_intersect_key($configuration, array_flip($configurationKeys));

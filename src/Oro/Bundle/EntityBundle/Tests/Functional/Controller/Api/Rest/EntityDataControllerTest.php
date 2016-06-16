@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
+use Oro\Component\Testing\ResponseExtension;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use FOS\RestBundle\Util\Codes;
@@ -14,9 +16,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EntityDataControllerTest extends WebTestCase
 {
+    use ResponseExtension;
+
     public function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->loadFixtures([
             'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadUserData',
             'Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadRoleData',
@@ -24,128 +28,138 @@ class EntityDataControllerTest extends WebTestCase
         ]);
     }
 
-    /**
-     * @param string $className
-     * @param string $field
-     * @param mixed $value
-     * @param mixed $expected
-     * @param int $responseCode
-     *
-     * @dataProvider setDataProvider
-     */
-    public function testFieldPatch($className, $field, $value, $expected, $responseCode)
+    public function testShouldNotAllowUpdateEntityDataIfBlocked()
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $classNameSafe = $this->getContainer()
-            ->get('oro_entity.entity_class_name_helper')->getUrlSafeClassName($className);
-        $id = $user->getId();
-        $fieldName = $field;
-        $content = sprintf('{"%s":"%s"}', $fieldName, $value);
-        $this->client->request(
-            'PATCH',
-            $this->getUrl('oro_api_patch_entity_data', [
-                'className' => $classNameSafe,
-                'id' => $id
-            ]),
-            [],
-            [],
-            [],
-            $content
+
+        $this->sendPatch('/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(), '{"id": 1}');
+
+        $this->assertLastResponseStatus(Codes::HTTP_FORBIDDEN);
+        $this->assertLastResponseContentTypeJson();
+    }
+
+    public function testShouldReturnNotFoundIfSuchEntityNotExist()
+    {
+        $this->sendPatch('/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_NotExist/10', '{"id": 1}');
+
+        $this->assertLastResponseStatus(Codes::HTTP_INTERNAL_SERVER_ERROR);
+        $this->assertLastResponseContentTypeJson();
+    }
+
+    public function testShouldCorrectlyUpdateStringEntityField()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+
+        $this->sendPatch(
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
+            '{"firstName": "Test1"}'
         );
 
-        $this->assertEquals($responseCode, $this->client->getResponse()->getStatusCode());
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
 
-        if ($responseCode === Codes::HTTP_NO_CONTENT) {
-            $this->getContainer()->get('doctrine')->getManager()->clear();
-            $repository = $this->getContainer()->get('doctrine')->getRepository($className);
-            $object = $repository->find($id);
-            $accessor = PropertyAccess::createPropertyAccessor();
-            $this->assertEquals($expected, $accessor->getValue($object, $fieldName));
-        }
-        if ($responseCode === Codes::HTTP_BAD_REQUEST) {
-            $response = $this->getJsonResponseContent(
-                $this->client->getResponse(),
-                $this->client->getResponse()->getStatusCode()
-            );
-            $this->assertEquals('Validation Failed', $response['message']);
-        }
+        $this->refreshEntity($user);
+        $this->assertEquals('Test1', $user->getFirstName());
     }
 
-    /**
-     * @return array
-     */
-    public function setDataProvider()
+    public function testShouldCorrectlyUpdateIntEntityField()
     {
-        $zone = new \DateTimeZone('UTC');
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
 
-        return [
-            'id blocked' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'id',
-                1,
-                1,
-                Codes::HTTP_FORBIDDEN
-            ],
-            'not found' => [
-                'Oro\Bundle\UserBundle\Entity\Test',
-                'id',
-                1,
-                1,
-                Codes::HTTP_INTERNAL_SERVER_ERROR
-            ],
-            'string' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'firstName',
-                'Test1',
-                'Test1',
-                Codes::HTTP_NO_CONTENT
-            ],
-            'integer' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'loginCount',
-                10,
-                10,
-                Codes::HTTP_NO_CONTENT
-            ],
-            'boolean' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'enabled',
-                false,
-                false,
-                Codes::HTTP_NO_CONTENT
-            ],
-            'date' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'birthday',
-                '2000-05-05T00:00:00+0000',
-                new \DateTime('2000-05-05', $zone),
-                Codes::HTTP_NO_CONTENT
-            ],
-            'datetime' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'lastLogin',
-                '2000-05-05T01:05:05+0000',
-                new \DateTime('2000-05-05 01:05:05', $zone),
-                Codes::HTTP_NO_CONTENT
-            ],
-            'email' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'email',
-                'test',
-                'simple_user@example.com',
-                Codes::HTTP_BAD_REQUEST
-            ],
-            'username' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'username',
-                '',
-                'test',
-                Codes::HTTP_BAD_REQUEST
-            ]
-        ];
+        $this->sendPatch(
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
+            '{"loginCount": 10}'
+        );
+
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+
+        $this->refreshEntity($user);
+        $this->assertEquals(10, $user->getLoginCount());
     }
 
+    public function testShouldCorrectlyUpdateBooleanEntityField()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+
+        $this->sendPatch(
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
+            '{"enabled": false}'
+        );
+
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+
+        $this->refreshEntity($user);
+        $this->assertFalse($user->isEnabled());
+    }
+
+    public function testShouldCorrectlyUpdateDateEntityField()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+
+        $this->sendPatch(
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
+            '{"birthday": "2000-05-05T00:00:00+0000"}'
+        );
+
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+
+        $this->refreshEntity($user);
+        $this->assertEquals(new \DateTime('2000-05-05T00:00:00+0000'), $user->getBirthday());
+    }
+
+    public function testShouldCorrectlyUpdateDateTimeEntityField()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+
+        $this->sendPatch(
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
+            '{"lastLogin":"2000-05-05T01:05:05+0000"}'
+        );
+
+        $this->assertLastResponseStatus(Codes::HTTP_NO_CONTENT);
+
+        $this->refreshEntity($user);
+        $this->assertEquals(new \DateTime('2000-05-05T01:05:05+0000'), $user->getLastLogin());
+    }
+
+    public function testShouldNotAllowChangeEntityFieldValueIfNotValid()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+
+        $this->sendPatch(
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
+            '{"email": "test"}'
+        );
+
+        $this->assertLastResponseStatus(Codes::HTTP_BAD_REQUEST);
+        $this->assertLastResponseContentTypeJson();
+
+        $content = $this->getLastResponseJsonContent();
+        $this->assertEquals('Validation Failed', $content['message']);
+    }
+
+    public function testShouldNotAllowChangeEntityFieldValueIfNotValidBecauseNewValueIsEmpty()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+
+        $this->sendPatch(
+            '/api/rest/latest/entity_data/Oro_Bundle_UserBundle_Entity_User/'.$user->getId(),
+            '{"username": ""}'
+        );
+
+        $this->assertLastResponseStatus(Codes::HTTP_BAD_REQUEST);
+        $this->assertLastResponseContentTypeJson();
+
+        $content = $this->getLastResponseJsonContent();
+        $this->assertEquals('Validation Failed', $content['message']);
+    }
 
     /**
      * @param string $className
@@ -209,6 +223,27 @@ class EntityDataControllerTest extends WebTestCase
             );
             $this->assertEquals('Validation Failed', $response['message']);
         }
+    }
+
+    /**
+     * @param string $url
+     * @param string $content
+     */
+    protected function sendPatch($url, $content)
+    {
+        $this->client->request('PATCH', $url, [], [], [], $content);
+    }
+
+    /**
+     * @param object $entity
+     */
+    protected function refreshEntity($entity)
+    {
+        /** @var RegistryInterface $registry */
+        $registry = $this->getContainer()->get('doctrine');
+
+        $registry->getManager()->clear();
+        $registry->getManager()->find(get_class($entity), $entity->getId());
     }
 
     /**
