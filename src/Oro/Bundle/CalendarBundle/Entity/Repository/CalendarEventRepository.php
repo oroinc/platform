@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
@@ -226,7 +227,13 @@ class CalendarEventRepository extends EntityRepository
     protected function addRecurrenceData(QueryBuilder $queryBuilder)
     {
         $key = Recurrence::STRING_KEY;
-        $queryBuilder->leftJoin('e.recurrence', 'r')
+        $queryBuilder
+            ->leftJoin(
+                'OroCalendarBundle:Recurrence',
+                'r',
+                Join::WITH,
+                '(parent.id IS NOT NULL AND parent.recurrence = r.id) OR (parent.id IS NULL AND e.recurrence = r.id)'
+            )
             ->addSelect(
                 "r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
                 . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
