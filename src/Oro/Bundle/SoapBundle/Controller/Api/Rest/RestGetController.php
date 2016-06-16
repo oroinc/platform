@@ -178,21 +178,13 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                 foreach ($entity as $field => $value) {
                     $this->transformEntityField($field, $value);
                     $result[$field] = $value;
-
                 }
-                $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata($result['entity']);
-                if ($metadata) {
-                    $result['url_view'] = $this->get('router')->generate($metadata->routeView, ['id'=>$result['id']]);
-                } else {
-                    $result['url_view'] = '';
-                }
+                $result = $this->addRouteView($result);
             } elseif ($entity instanceof SearchResultItem) {
-                $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata(get_class($entity));
                 return [
                     'id'     => $entity->getRecordId(),
                     'entity' => $entity->getEntityName(),
-                    'title'  => $entity->getRecordTitle(),
-                    'url_view' => $this->get('router')->generate($metadata, ['id'=>$entity->getRecordId()])
+                    'title'  => $entity->getRecordTitle()
                 ];
             } else {
                 /** @var UnitOfWork $uow */
@@ -408,5 +400,22 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     protected function buildNotFoundResponse()
     {
         return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * @param $result
+     * @return mixed
+     */
+    protected function addRouteView($result)
+    {
+        $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata($result['entity']);
+        if ($metadata && $metadata->hasRoute()) {
+            $result['url_view'] =
+                $this->get('router')->generate($metadata->getRoute(), ['id' => $result['id']]);
+        } else {
+            $result['url_view'] = '';
+        }
+        
+        return $result;
     }
 }
