@@ -44,10 +44,6 @@ services:
         public: false
         class: Oro\Component\ConfigExpression\ContextAccessor
 
-    oro_layout.expression.pass.property_path:
-        public: false
-        class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
-
     oro_layout.expression.factory:
         class: Oro\Component\ConfigExpression\ExpressionFactory
         arguments:
@@ -59,8 +55,6 @@ services:
         class: Oro\Component\ConfigExpression\ExpressionAssembler
         arguments:
             - '@oro_layout.expression.factory'
-        calls:
-            - [addConfigurationPass, ['@oro_layout.expression.pass.property_path']]
 
     oro_layout.text.helper:
         class: Oro\Component\Layout\Templating\TextHelper
@@ -164,13 +158,6 @@ services:
         arguments:
             - '@oro_layout.expression.assembler'
             - '@oro_layout.expression.encoder_registry'
-
-    oro_layout.config_expression.asset:
-        class: Oro\Bundle\LayoutBundle\ConfigExpression\Asset
-        arguments:
-            - '@assets.packages'
-        tags:
-            - { name: oro_layout.expression, alias: asset }
 
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper

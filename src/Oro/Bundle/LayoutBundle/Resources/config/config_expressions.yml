@@ -88,6 +88,7 @@ services:
         tags:
             - { name: oro_layout.expression, alias: lte|le|less_or_equal }
 
+
     #
     # Functions
     #
@@ -111,3 +112,15 @@ services:
         class: Oro\Component\ConfigExpression\Func\Join
         tags:
             - { name: oro_layout.expression, alias: join }
+
+    oro_layout.config_expression.asset:
+        class: Oro\Bundle\LayoutBundle\ConfigExpression\Asset
+        arguments:
+            - '@assets.packages'
+        tags:
+            - { name: oro_layout.expression, alias: asset }
+
+    oro_layout.config_expression.context:
+        class: Oro\Bundle\LayoutBundle\ConfigExpression\GetContextValue
+        tags:
+            - { name: oro_layout.expression, alias: context }
