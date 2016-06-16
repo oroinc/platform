@@ -77,10 +77,6 @@ class EmailActivityEntityController extends RestGetController
         $result = parent::getPreparedItem($entity, $resultFields);
         if ($entity) {
             if (is_array($entity)) {
-                foreach ($entity as $field => $value) {
-                    $this->transformEntityField($field, $value);
-                    $result[$field] = $value;
-                }
                 $result = $this->addRouteView($result);
             }
         }
