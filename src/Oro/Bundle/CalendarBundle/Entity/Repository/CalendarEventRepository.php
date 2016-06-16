@@ -273,4 +273,37 @@ class CalendarEventRepository extends EntityRepository
 
         return $this;
     }
+
+    /**
+     * @param array $calendarEventIds
+     *
+     * @return array Map with structure "parentId => [parentId, childId, ...]"
+     * where value is array of items from $calendarEventIds
+     */
+    public function getParentEventIds(array $calendarEventIds)
+    {
+        if (!$calendarEventIds) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('event');
+
+        $queryResult = $qb
+            ->select('event.id AS parent, children.id AS child')
+            ->join('event.childEvents', 'children')
+            ->where($qb->expr()->in('children.id', $calendarEventIds))
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($calendarEventIds as $id) {
+            $result[$id][] = $id;
+        }
+
+        foreach ($queryResult as $row) {
+            $result[$row['parent']][] = $row['child'];
+        }
+
+        return $result;
+    }
 }
