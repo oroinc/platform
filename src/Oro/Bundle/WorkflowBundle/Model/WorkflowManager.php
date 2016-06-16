@@ -308,12 +308,15 @@ class WorkflowManager
 
     /**
      * @param object $entity
+     * @param $workflowName
+     *
      * @return Workflow
      */
-    public function getApplicableWorkflow($entity)
+    public function getApplicableWorkflow($entity,$workflowName)
     {
         return $this->getApplicableWorkflowByEntityClass(
-            $this->doctrineHelper->getEntityClass($entity)
+            $this->doctrineHelper->getEntityClass($entity),
+            $workflowName
         );
     }
 
@@ -330,15 +333,13 @@ class WorkflowManager
 
     /**
      * @param string $entityClass
+     * @param $workflowName
+     *
      * @return null|Workflow
-     * @deprecated use getApplicableWorkflowsByEntityClass
      */
-    public function getApplicableWorkflowByEntityClass($entityClass)
+    public function getApplicableWorkflowByEntityClass($entityClass, $workflowName)
     {
-        throw new \RuntimeException(
-            'No single workflow supported for an entity. ' .
-            'See \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflowsByEntityClass'
-        );
+        return $this->workflowRegistry->getActiveWorkflowByEntityClass($entityClass, $workflowName);
     }
 
     /**
@@ -352,12 +353,13 @@ class WorkflowManager
 
     /**
      * @param string $entityClass
+     * @param string $workflowName
+     *
      * @return bool
-     * @deprecated
      */
-    public function hasApplicableWorkflowByEntityClass($entityClass)
+    public function hasApplicableWorkflowByEntityClass($entityClass, $workflowName)
     {
-        return $this->workflowRegistry->hasActiveWorkflowByEntityClass($entityClass);
+        return $this->workflowRegistry->hasActiveWorkflowByEntityClass($entityClass, $workflowName);
     }
 
     /**
