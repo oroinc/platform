@@ -38,14 +38,19 @@ class DateFilterModifier
      *
      * @param array $valueKeys
      *
+     * @param bool  $compile
+     *
      * @return array
      */
-    public function modify(array $data, array $valueKeys = ['start', 'end'])
+    public function modify(array $data, array $valueKeys = ['start', 'end'], $compile = true)
     {
         $data     = $this->modifyDateForEqualType($data);
         $data     = $this->modifyPartByVariable($data);
         // compile expressions
-        $data         = $this->mapValues($valueKeys, $data, $this->getCompileClosure());
+        if ($compile) {
+            $data = $this->mapValues($valueKeys, $data, $this->getCompileClosure());    
+        }
+        
         $data['part'] = isset($data['part']) ? $data['part'] : null;
 
         // change value type depending on date part
@@ -54,7 +59,7 @@ class DateFilterModifier
             $data   = $this->mapValues($valueKeys, $data, $this->getDatePartAccessorClosure($format));
         } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
             $data = $this->mapValues($valueKeys, $data, $this->getQuarterMapValuesClosure());
-        } else {
+        } elseif ($compile) {
             $data = $this->mapValues($valueKeys, $data, $this->getValueMapValuesClosure());
         }
 

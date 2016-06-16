@@ -284,3 +284,9 @@ services:
     oro_dashboard.filter.date_range:
         class: Oro\Bundle\DashboardBundle\Filter\DateRangeFilter
         parent: oro_filter.date_range_filter
+
+    oro_dashboard.filter.date_filter_processor:
+        class: Oro\Bundle\DashboardBundle\Filter\DateFilterProcessor
+        arguments:
+            - '@oro_dashboard.filter.date_range'
+            - '@oro_filter.utils.date_filter_modifier'
