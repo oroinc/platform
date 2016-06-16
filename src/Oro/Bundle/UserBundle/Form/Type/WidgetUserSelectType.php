@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class WidgetUserSelectType extends AbstractType
+use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
+use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
+
+class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
 {
     const NAME = 'oro_type_widget_user_select';
 
@@ -15,25 +17,50 @@ class WidgetUserSelectType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'autocomplete_alias' => 'users',
+                'autocomplete_alias' => 'widget_owner_users',
                 'configs'            => [
                     'multiple'                => true,
                     'width'                   => '400px',
                     'placeholder'             => 'oro.user.form.choose_user',
                     'allowClear'              => true,
-                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/Widget/result.html.twig',
+                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/Widget/selection.html.twig',
                 ]
             ]
         );
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $entityClass
+     * @param array  $ids
+     *
+     * @return array
      */
-    public function getParent()
+    protected function getEntitiesByIdentifiers($entityClass, array $ids)
     {
-        return 'oro_widget_entity_jqueryselect2_hidden';
+        $ids = array_filter($ids);
+        if (empty($ids)) {
+            return [];
+        }
+
+        $key = array_search(OwnerHelper::CURRENT_USER, $ids);
+        if ($key !== false) {
+            unset($ids[$key]);
+        }
+
+        $result        = [];
+        $identityField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass);
+        if ($ids) {
+            $result = $this->entityManager->getRepository($entityClass)->findBy([$identityField => $ids]);
+        }
+
+        if ($key !== false) {
+            $result[] = [
+                $identityField => OwnerHelper::CURRENT_USER
+            ];
+        }
+
+        return $result;
     }
 
     /**

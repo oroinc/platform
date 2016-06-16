@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Dashboard;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
@@ -13,15 +15,23 @@ class OwnerHelper
     /** @var RegistryInterface */
     protected $registry;
 
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
+
+    const CURRENT_USER          = 'current_user';
+    const CURRENT_BUSINESS_UNIT = 'current_business_unit';
+
     /** @var array */
     protected $ownerIds;
 
     /**
-     * @param RegistryInterface $registry
+     * @param RegistryInterface     $registry
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(RegistryInterface $registry, TokenStorageInterface $tokenStorage)
     {
-        $this->registry = $registry;
+        $this->registry     = $registry;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -42,11 +52,42 @@ class OwnerHelper
             $roleIds = $this->getRoleIds($widgetOptions);
             $array   = array_unique(array_merge($this->getUserOwnerIdsByRoles($roleIds), $array));
 
+            $array = $this->replaceCurrentValues($array);
+
             $this->ownerIds[$key] = $array;
         }
 
         return $this->ownerIds[$key];
     }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    public function replaceCurrentValues(array $array)
+    {
+        $key = array_search(static::CURRENT_USER, $array);
+        if ($key !== false) {
+            $array[$key] = $this->getCurrentUser()->getId();
+        }
+
+        $key = array_search(static::CURRENT_BUSINESS_UNIT, $array);
+        if ($key !== false) {
+            $array[$key] = $this->getCurrentUser()->getOwner()->getId();
+        }
+
+        return $array;
+    }
+
+    /**
+     * @return User
+     */
+    protected function getCurrentUser()
+    {
+        return $this->tokenStorage->getToken()->getUser();
+    }
+
 
     /**
      * @param WidgetOptionBag $widgetOptions
@@ -88,13 +129,6 @@ class OwnerHelper
     {
         $owners = (array)$widgetOptions->get('owners', []);
         $ids    = array_key_exists($config, $owners) ? (array)$owners[$config] : [];
-
-        array_walk(
-            $ids,
-            function (&$val) {
-                $val = (int)$val;
-            }
-        );
 
         return array_filter($ids);
     }

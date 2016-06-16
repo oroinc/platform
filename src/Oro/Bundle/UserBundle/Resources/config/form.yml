@@ -273,6 +273,11 @@ services:
 
     oro_user.form.type.widget_user_multiselect:
         class: Oro\Bundle\UserBundle\Form\Type\WidgetUserSelectType
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_form.autocomplete.search_registry'
+            - '@oro_entity_config.provider.form'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: 'oro_type_widget_user_select' }
 
@@ -282,8 +287,9 @@ services:
             - { name: form.type, alias: 'oro_type_widget_role_select' }
 
     oro_user.widget_config_value.widget_user_multiselect.converter:
-        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter
+        class: Oro\Bundle\UserBundle\Dashboard\Converters\WidgetUserSelectConverter
         arguments:
+            - '@oro_user.dashboard.owner_helper'
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'

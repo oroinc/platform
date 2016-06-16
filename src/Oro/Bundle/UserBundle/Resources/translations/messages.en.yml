@@ -192,3 +192,4 @@ oro:
             owners: Owners
             all_owners: All owners
             business_unit: Business Unit
+            current_user: Current User

@@ -81,11 +81,12 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
                 $ids = [$form->getData()];
             }
             $items = $this->getEntitiesByIdentifiers($options['entity_class'], $ids);
-
+            $identityField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($options['entity_class']);
             $ids = [];
             foreach ($items as $item) {
-                $result[] = $converter->convertItem($item);
-                $ids[] = $this->doctrineHelper->getSingleEntityIdentifier($item);
+                $item     = $converter->convertItem($item);
+                $result[] = $item;
+                $ids[]    = $item[$identityField];
             }
 
             $vars['value'] = implode(',', $ids);
