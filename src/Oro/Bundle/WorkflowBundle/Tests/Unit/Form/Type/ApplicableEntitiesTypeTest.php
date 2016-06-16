@@ -7,19 +7,15 @@ use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 
 class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $configManager;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $entityConnector;
 
     /**
      * @var ApplicableEntitiesType
@@ -32,17 +28,12 @@ class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formType = new ApplicableEntitiesType($this->configManager, $this->entityConnector);
+        $this->formType = new ApplicableEntitiesType($this->configManager);
     }
 
     protected function tearDown()
     {
         unset($this->configManager);
-        unset($this->entityConnector);
         unset($this->formType);
     }
 
@@ -59,20 +50,9 @@ class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     public function testChoiceNormalizer()
     {
         // source data
-        $workflowAwareClass = 'WorkflowAwareClass';
         $extendedClass = 'ExtendedClass';
         $notExtendedClass = 'NotExtendedClass';
         $notConfigurableClass = 'NotConfigurableClass';
-
-        // asserts
-        $this->entityConnector->expects($this->any())->method('isWorkflowAware')
-            ->will(
-                $this->returnCallback(
-                    function ($class) use ($workflowAwareClass) {
-                        return $class === $workflowAwareClass;
-                    }
-                )
-            );
 
         $extendedEntityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $extendedEntityConfig->expects($this->any())->method('is')->with('is_extend')
@@ -86,7 +66,6 @@ class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $hasConfigMap = array(
-            array($workflowAwareClass, null, false),
             array($extendedClass, null, true),
             array($notExtendedClass, null, true),
             array($notConfigurableClass, null, false),
@@ -105,13 +84,11 @@ class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
         // test
         $inputChoices = array(
-            $workflowAwareClass => Inflector::tableize($workflowAwareClass),
             $extendedClass => Inflector::tableize($extendedClass),
             $notExtendedClass => Inflector::tableize($notExtendedClass),
             $notConfigurableClass => Inflector::tableize($notConfigurableClass)
         );
         $expectedChoices = array(
-            $workflowAwareClass => Inflector::tableize($workflowAwareClass),
             $extendedClass => Inflector::tableize($extendedClass)
         );
 
