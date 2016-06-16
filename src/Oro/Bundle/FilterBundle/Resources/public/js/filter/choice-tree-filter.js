@@ -3,83 +3,10 @@ define(function(require) {
 
     var ChoiceTreeFilter;
     var _ = require('underscore');
-    var TextFilter = require('oro/filter/choice-filter');
-    var $ = require('jquery');
+    var TextFilter = require('oro/filter/text-filter');
     var tools = require('oroui/js/tools');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-
-    var availableModes = {
-        all: 'all',
-        selected: 'selected'
-    };
-
-    var searchEngine = {
-        findChild: function(item, items) {
-            var self = this;
-            var responce = [];
-
-            _.each(items, function(value) {
-                if (value.owner_id === item.value.id) {
-                    responce.push({
-                        value: value,
-                        children: []
-                    });
-                }
-            });
-
-            if (responce.length > 0) {
-                $.each(responce, function(key, value) {
-                    responce[key].children = self.findChild(value, items);
-                });
-            }
-
-            return responce;
-        },
-        _calculateChain: function(response, items) {
-            var self = this;
-            _.each(response, function(value, key) {
-                var chain = [];
-                chain = self.findChainToRoot(chain, value, items);
-                response[key].value.chain = chain;
-            });
-
-            return response;
-        },
-        findChainToRoot: function(chain, value, items) {
-            var self = this;
-            var parent;
-            _.each(items, function(item) {
-                if (value.value.owner_id && item.id === value.value.owner_id) {
-                    parent = {
-                        value: item,
-                        children: []
-                    };
-                }
-            });
-
-            if (parent) {
-                chain.push(parent.value.id);
-                self.findChainToRoot(chain, parent, items);
-            }
-
-            return chain;
-        },
-        searchItems: function(searchQuery, items) {
-            searchQuery = searchQuery.toLowerCase();
-            var response = [];
-            _.each(items, function(value) {
-                var result = value.name.toLowerCase().indexOf(searchQuery);
-                if (result >= 0) {
-                    response.push({
-                        value: value,
-                        children: []
-                    });
-                }
-            });
-
-            return response;
-        }
-    };
+    var Select2TreeAutocompleteComponent = require('oroform/js/app/components/select2-tree-autocomplete-component');
 
     /**
      * Number filter: formats value as a number
@@ -91,27 +18,18 @@ define(function(require) {
     ChoiceTreeFilter = TextFilter.extend({
         templateSelector: '#choice-tree-template',
 
-        mode: availableModes.all,
+        select2component: null,
 
         events: {
-            'keyup input': '_onReadCriteriaInputKey',
-            'keydown [type="text"]': '_preventEnterProcessing',
-            'keyup input[name="search"]': '_onChangeSearchQuery',
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
-            'click .choice-value': '_onClickChoiceValue',
-            'change input[type="checkbox"]': '_onChangeBusinessUnit',
-            'click .button-all': '_onClickButtonAll',
-            'click .button-selected': '_onClickButtonSelected'
         },
 
         emptyValue: {
             type: 1,
-            value: 'All'
+            value: ''
         },
-
-        searchEngine: searchEngine,
 
         checkedItems: {},
 
@@ -144,60 +62,39 @@ define(function(require) {
             }
             return result;
         },
-
+        _showCriteria: function() {
+            if (!this.select2component) {
+                this._initSelect2Component();
+            }
+            ChoiceTreeFilter.__super__._showCriteria.apply(this, arguments);
+        },
         /**
          * @inheritDoc
          */
-        _renderCriteria: function() {
+        _initSelect2Component: function() {
             if (!this.loadedMetadata) {
                 return;
             }
-
-            var value = _.extend({}, this.emptyValue, this.value);
-            var searchQuery = this.SearchQuery ? this.SearchQuery : undefined;
-            var selectedChoiceLabel = '';
-
-            if (!_.isEmpty(this.choices)) {
-                var foundChoice = _.find(this.choices, function(choice) {
-                    return (choice.value === value.type);
-                });
-
-                if (foundChoice) {
-                    selectedChoiceLabel = foundChoice.label;
+            var options = {
+                _sourceElement: this.$(this.criteriaValueSelectors.value),
+                configs: {
+                    "allowClear": true,
+                    "minimumInputLength": 0,
+                    "multiple": true
                 }
             }
-
-            var $filter = $(this.template({
-                name: this.name,
-                choices: this.choices,
-                selectedChoice: value.type,
-                selectedChoiceLabel: selectedChoiceLabel,
-                value: value.value
-            }));
-
-            var list = this._getListTemplate(this.data, searchQuery);
-            $filter.find('.list').html(list);
-
-            this._appendFilter($filter);
-            this._updateDOMValue();
-            this._initCheckedItems();
-
-            this._criteriaRenderd = true;
-        },
-
-        _initCheckedItems: function() {
-            var self = this;
-            var value = this.getValue();
-            var temp;
-            if (value.value.length > 0) {
-                temp = value.value.split(',');
-
-                _.each(temp, function(value) {
-                    if (value !== 'All') {
-                        self.checkedItems[value] = true;
-                    }
+            if (this.data) {
+                options.configs.data = {
+                    results: this.data,
+                    text: 'name'
+                };
+            } else if (this.autocomplete_url) {
+                options.url = this.autocomplete_url;
+                _.extend(options.configs, {
+                    autocomplete_alias: this.autocomplete_alias
                 });
             }
+            this.select2component = new Select2TreeAutocompleteComponent(options)
         },
 
         _getListTemplate: function(items, searchQuery) {
@@ -435,51 +332,8 @@ define(function(require) {
 
         reset: function() {
             ChoiceTreeFilter.__super__.reset.apply(this, arguments);
+            this.$(this.criteriaValueSelectors.value).trigger('change');
             this._hideCriteria();
-            this.checkedItems = {};
-            this.$el.find('input[name="search"]').val('');
-            this.$el.find('input:checked').removeAttr('checked');
-            this.$el.find('label').removeClass('search-result');
-        },
-
-        _onChangeSearchQuery: function(event) {
-            var searchQuery = $(event.target).val();
-            var list = this._getListTemplate(this.data, searchQuery);
-            this.$el.find('.list').html(list);
-        },
-
-        _onChangeMode: function() {
-            this.$el.find('.buttons span').removeClass('active');
-            this.$el.find('.button' + this.mode).addClass('active');
-
-            var searchQuery = this.$el.find('[name="search"]').val();
-
-            var list = this._getListTemplate(this.data, searchQuery);
-            this.$el.find('.list').html(list);
-        },
-
-        _onClickButtonAll: function(event) {
-            if (this.mode !== availableModes.all) {
-                this.mode = availableModes.all;
-                this.$el.find('.buttons span').removeClass('active');
-
-                this._onChangeMode();
-                $(event.target).addClass('active');
-            }
-        },
-
-        _onClickButtonSelected: function(event) {
-            event.stopImmediatePropagation();
-            if (this.mode !== availableModes.selected) {
-                this.$el.find('.buttons span').removeClass('active');
-                this.mode = availableModes.selected;
-                this._onChangeMode();
-                $(event.target).addClass('active');
-            }
-        },
-
-        _focusCriteria: function() {
-            this.$el.find('.list').find('input:first').focus();
         }
     });
 
