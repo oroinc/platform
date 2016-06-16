@@ -66,10 +66,12 @@ class WidgetController extends Controller
                 ];
             });
 
-            $stepsData[$name]['workflow'] = $workflow->getLabel();
-            $stepsData[$name]['steps'] = $steps->toArray();
-            $stepsData[$name]['currentStep'] = [
-                'name' => $workflowItem->getCurrentStep()->getName(),
+            $stepsData[$name] = [
+                'workflow' => $workflow->getLabel(),
+                'steps' => $steps->toArray(),
+                'currentStep' => [
+                    'name' => $workflowItem->getCurrentStep()->getName(),
+                ],
             ];
         }
 

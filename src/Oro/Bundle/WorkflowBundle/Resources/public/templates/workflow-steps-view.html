@@ -1,6 +1,6 @@
 <% if (typeof stepsData !== 'undefined') { %>
     <% for (var s in stepsData) { %>
-        <div class="workflow-step">
+        <div class="workflow-step-container">
             <% var steps = stepsData[s].steps %>
             <% var currentStep = stepsData[s].currentStep %>
             <span class="workflow-step-name"><%= stepsData[s].workflow %></span>

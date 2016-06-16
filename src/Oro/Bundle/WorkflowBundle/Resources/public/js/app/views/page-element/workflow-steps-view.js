@@ -40,7 +40,7 @@ define(function(require) {
         },
         updateContainerWidth: function() {
             var $container = this.$el;
-            var $list = this.$('.workflow-step');
+            var $list = this.$('.workflow-step-container');
             $container.width(10000);
             $list.css({float: 'left'});
             $container.width($list.width() + 1/* floating pixel calculation compensation */);
