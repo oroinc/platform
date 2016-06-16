@@ -12,10 +12,6 @@ use Oro\Component\Action\Model\ContextAccessor;
 
 /**
  * Creates a managed entity clone
- *
- * Class CloneEntity
- * @package Oro\Component\Action\Action
- *
  */
 class CloneEntity extends CloneObject
 {

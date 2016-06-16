@@ -8,9 +8,6 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 
 /**
  * Creates a cloned object
- *
- * Class CloneObject
- * @package Oro\Component\Action\Action
  */
 class CloneObject extends AbstractAction
 {

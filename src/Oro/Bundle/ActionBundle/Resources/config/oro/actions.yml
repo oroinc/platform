@@ -132,6 +132,10 @@ operations:
             - update_navButtons
             - datagridRowAction
         preactions:
+            - '@call_service_method':
+                service: oro_action.helper.default_operation_request
+                method: isExecutionRouteRequest
+                attribute: $.isExecutionRequest
             - '@tree':
                 conditions:
                     '@and':
@@ -145,7 +149,7 @@ operations:
                 conditions:
                     '@and':
                         - '@not_blank': $.data
-                        - '@eq': [$.requestRoute, null] # no form or dialogue
+                        - '@eq': [$.isExecutionRequest, true] # no form or dialogue
                         - '@empty': $.clone
                 actions:
                     - '@clone_entity':
