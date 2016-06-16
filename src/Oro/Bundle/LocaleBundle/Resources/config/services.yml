@@ -33,6 +33,8 @@ parameters:
     oro_locale.formatter.datetime.class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
     oro_locale.formatter.date.class: Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter
 
+    oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
+
 services:
     oro_locale.cache:
             parent: oro.cache.abstract
@@ -293,3 +295,8 @@ services:
             - '@oro_config.manager'
             - '@oro_locale.formatter.language_code'
             - '@oro_locale.formatter.formatting_code'
+
+    oro_locale.entity_generator.extension:
+        class: %oro_locale.entity_generator.extension.class%
+        tags:
+            - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
