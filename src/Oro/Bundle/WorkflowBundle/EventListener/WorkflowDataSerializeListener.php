@@ -128,6 +128,7 @@ class WorkflowDataSerializeListener
 
         // Set related entity
         $relatedEntity = $this->doctrineHelper->getEntityReference(
+            //TODO: Seems now we must use $workflowItem->getEntityClass(),
             $workflowItem->getDefinition()->getRelatedEntity(),
             $workflowItem->getEntityId()
         );

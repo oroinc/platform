@@ -46,9 +46,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createWorkflow()
     {
-        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -57,7 +54,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new Workflow($entityConnector, $aclManager, $restrictionManager);
+        return new Workflow($aclManager, $restrictionManager);
     }
 
     /**
