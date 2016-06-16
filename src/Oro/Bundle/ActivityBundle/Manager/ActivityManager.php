@@ -11,6 +11,7 @@ use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
 use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Event\FilterTargetClassesEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
@@ -324,6 +325,11 @@ class ActivityManager
         if (empty($targets)) {
             return null;
         }
+
+        $event = new FilterTargetClassesEvent($filters, $targets);
+        $this->eventDispatcher->dispatch(FilterTargetClassesEvent::EVENT_NAME, $event);
+        $targets = $event->getTargetClasses();
+        $filters = $event->getFilters();
 
         return $this->associationManager->getMultiAssociationsQueryBuilder(
             $activityClassName,
