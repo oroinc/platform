@@ -232,7 +232,9 @@ class EmailControllerTest extends WebTestCase
         $this->assertEquals(1, $crawler->filter('div.widget-content input[name=\'oro_email_email[cc]\']')->count());
         $this->assertEquals(
             1,
-            $crawler->filter('div.widget-content input[value=\'' . base64_encode($email->getFromName()) . '\']')->count()
+            $crawler->filter('div.widget-content input[value=\''
+                . base64_encode($email->getFromName())
+                . '\']')->count()
         );
         $cc = $email->getCc()->first()->getEmailAddress()->getEmail();
         $this->assertEquals(
@@ -258,7 +260,9 @@ class EmailControllerTest extends WebTestCase
         $this->assertEquals(1, $crawler->filter('div.widget-content input[name=\'oro_email_email[cc]\']')->count());
         $this->assertEquals(
             1,
-            $crawler->filter('div.widget-content input[value=\'' . base64_encode($email->getFromName()) . '\']')->count()
+            $crawler->filter('div.widget-content input[value=\''
+                . base64_encode($email->getFromName())
+                . '\']')->count()
         );
         $cc = $email->getCc()->first()->getEmailAddress()->getEmail();
         $this->assertEquals(
