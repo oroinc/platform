@@ -45,14 +45,18 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
 
         $result = [];
         foreach ($resolver->getAll() as $className => $entityAlias) {
-            $config = $entityConfigManager->getEntityConfig('extend', $className);
-            
+            $customEntity = false;
+            if ($entityConfigManager->hasConfig($className)) {
+                $config = $entityConfigManager->getEntityConfig('extend', $className);
+                $customEntity = $config->get('owner') !== 'System';
+            }
+
             $result[] = [
                 'entity'      => $className,
                 'alias'       => $entityAlias->getAlias(),
                 'pluralAlias' => $entityAlias->getPluralAlias(),
                 'urlSafeName' => $entityClassNameHelper->getUrlSafeClassName($className),
-                'costomEnaity' => $config->get('owner') !== 'System'
+                'costomEnaity' => $customEntity
             ];
         }
 
