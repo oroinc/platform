@@ -6,7 +6,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 
 /**
  * Connects related entities with workflow entities
@@ -16,31 +15,38 @@ class EntityConnector
     /**
      * @param object|WorkflowAwareInterface $entity
      * @param WorkflowItem $workflowItem
+     *
+     * @throws WorkflowException
      */
     public function setWorkflowItem($entity, WorkflowItem $workflowItem = null)
     {
         if ($entity instanceof WorkflowAwareInterface) {
             $entity->setWorkflowItem($workflowItem);
         } else {
-            $this->setProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_ITEM, $workflowItem);
+            throw new WorkflowException('Can\'t set property "workflowItem" to entity');
         }
     }
 
     /**
      * @param object|WorkflowAwareInterface $entity
      * @param WorkflowStep $workflowStep
+     *
+     * @throws WorkflowException
      */
     public function setWorkflowStep($entity, WorkflowStep $workflowStep = null)
     {
         if ($entity instanceof WorkflowAwareInterface) {
             $entity->setWorkflowStep($workflowStep);
         } else {
-            $this->setProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_STEP, $workflowStep);
+            throw new WorkflowException('Can\'t set property "workflowStep" to entity');
         }
     }
 
     /**
      * @param object|WorkflowAwareInterface $entity
+     *
+     * @throws WorkflowException
+     *
      * @return WorkflowItem
      */
     public function getWorkflowItem($entity)
@@ -49,11 +55,14 @@ class EntityConnector
             return $entity->getWorkflowItem();
         }
 
-        return $this->getProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_ITEM);
+        throw new WorkflowException('Can\'t get property "workflowItem" from entity');
     }
 
     /**
      * @param object|WorkflowAwareInterface $entity
+     *
+     * @throws WorkflowException
+     *
      * @return WorkflowStep
      */
     public function getWorkflowStep($entity)
@@ -62,7 +71,7 @@ class EntityConnector
             return $entity->getWorkflowStep();
         }
 
-        return $this->getProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_STEP);
+        throw new WorkflowException('Can\'t get property "workflowStep" from entity');
     }
 
     /**
@@ -125,12 +134,7 @@ class EntityConnector
      */
     public function isWorkflowAware($entityOrClass)
     {
-        return is_a($entityOrClass, 'Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareInterface', true)
-            || ($this->getGetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_ITEM)
-                && $this->getSetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_ITEM)
-                && $this->getGetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_STEP)
-                && $this->getSetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_STEP)
-            );
+        return is_a($entityOrClass, 'Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareInterface', true);
     }
 
     /**
