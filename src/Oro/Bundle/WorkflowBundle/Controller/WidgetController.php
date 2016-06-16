@@ -17,6 +17,7 @@ use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -34,6 +35,10 @@ class WidgetController extends Controller
      * @Route("/steps/{entityClass}/{entityId}", name="oro_workflow_widget_steps")
      * @Template
      * @AclAncestor("oro_workflow")
+     *
+     * @param string $entityClass
+     * @param int $entityId
+     * @return array
      */
     public function stepsAction($entityClass, $entityId)
     {
@@ -59,7 +64,7 @@ class WidgetController extends Controller
                 $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
             }
 
-            $steps = $steps->map(function ($step) {
+            $steps = $steps->map(function (Step $step) {
                 return [
                     'name' => $step->getName(),
                     'label' => $step->getLabel()
@@ -238,6 +243,10 @@ class WidgetController extends Controller
      * @Route("/buttons/{entityClass}/{entityId}", name="oro_workflow_widget_buttons")
      * @Template
      * @AclAncestor("oro_workflow")
+     *
+     * @param string $entityClass
+     * @param int $entityId
+     * @return array
      */
     public function buttonsAction($entityClass, $entityId)
     {
