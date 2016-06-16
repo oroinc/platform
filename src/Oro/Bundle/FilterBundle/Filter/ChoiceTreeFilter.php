@@ -5,30 +5,36 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType;
 
 class ChoiceTreeFilter extends AbstractFilter
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
+    /** @var RouterInterface */
+    protected $router;
+    
     /**
-     * Constructor
+     * ChoiceTreeFilter constructor.
      *
      * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
+     * @param FilterUtility $util
+     * @param ManagerRegistry $registry
+     * @param RouterInterface $router
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
+        RouterInterface $router
     ) {
         parent::__construct($factory, $util);
         $this->registry = $registry;
+        $this->router = $router;
     }
 
     /**
@@ -47,7 +53,13 @@ class ChoiceTreeFilter extends AbstractFilter
         $metadata = parent::getMetadata();
         $metadata[FilterUtility::TYPE_KEY] = 'choice-tree';
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
-        $metadata['data'] = isset($options['data']) ? $options['data'] : [];
+        $metadata['data'] = isset($options['data']) ? $options['data'] : false;
+        $metadata['autocomplete_alias'] = $this->getOr('autocomplete_alias') ?
+            $this->getOr('autocomplete_alias') : false;
+        $routeName = $this->getOr('autocomplete_url') ?
+            $this->getOr('autocomplete_url') : 'oro_form_autocomplete_search';
+        $metadata['autocomplete_url'] = $this->router->generate($routeName);
+
         return $metadata;
     }
 
