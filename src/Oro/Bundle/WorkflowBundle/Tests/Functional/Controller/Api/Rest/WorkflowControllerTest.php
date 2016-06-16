@@ -220,11 +220,11 @@ class WorkflowControllerTest extends WebTestCase
     protected function assertActiveWorkflow($entityClass, $workflowName)
     {
         if ($workflowName) {
-            $activeWorkflow = $this->getWorkflowManager()->getApplicableWorkflowByEntityClass($entityClass);
-            $this->assertNotEmpty($activeWorkflow);
-            $this->assertEquals($workflowName, $activeWorkflow->getName());
+            $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflowsByEntityClass($entityClass);
+            $this->assertNotEmpty($activeWorkflows);
+            $this->assertContains($workflowName, $activeWorkflows);
         } else {
-            $this->assertNull($this->getWorkflowManager()->getApplicableWorkflowByEntityClass($entityClass));
+            $this->assertEmpty($this->getWorkflowManager()->getApplicableWorkflowsByEntityClass($entityClass));
         }
     }
 
