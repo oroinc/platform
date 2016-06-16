@@ -184,6 +184,9 @@ class RoleController extends Controller
             ];
         }
 
+        $gridDatasource = $this->get('oro_user.datagrid.datasource.repository');
+        $gridDatasource->setResults($gridData);
+        
         return array(
             'entity' => $entity,
             'form' => $form,

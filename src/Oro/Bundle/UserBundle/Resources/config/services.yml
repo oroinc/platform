@@ -36,6 +36,7 @@ parameters:
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
     oro_user.provider.filter.user_choice_tree.class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
     oro_user.provider.category_provider.class:    Oro\Bundle\UserBundle\Provider\CategoryProvider
+    oro_user.datagrid.datasource.repository.class: Oro\Bundle\UserBundle\Datagrid\RepositoryDatasource
 
     oro_user.token.factory.wsse.class:            Oro\Bundle\UserBundle\Security\WsseTokenFactory
 
@@ -315,6 +316,13 @@ services:
 
     oro_user.provider.category_provider:
         class: %oro_user.provider.category_provider.class%
+
+    oro_user.datagrid.datasource.repository:
+        class: %oro_user.datagrid.datasource.repository.class%
+        arguments:
+            - '@oro_datagrid.event.dispatcher'
+        tags:
+            - { name: oro_datagrid.datasource, type: repository }
 
     # Validator
     oro_user.validator.user_custom_grid_field_validator:
