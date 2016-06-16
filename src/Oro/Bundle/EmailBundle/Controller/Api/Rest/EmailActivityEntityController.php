@@ -75,11 +75,10 @@ class EmailActivityEntityController extends RestGetController
             $entity->__load();
         }
         $result = parent::getPreparedItem($entity, $resultFields);
-        if ($entity) {
-            if (is_array($entity)) {
-                $result = $this->addRouteView($result);
-            }
+        if ($entity && is_array($entity)) {
+            $result = $this->addRouteView($result);
         }
+
         return $result;
     }
 
