@@ -19,6 +19,9 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  * @ORM\Table(name="oro_grid_view")
  * @Config(
  *      defaultValues={
+ *          "entity"={
+ *              "category"="Data Grid"
+ *          },
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",

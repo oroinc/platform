@@ -24,6 +24,9 @@ use Oro\Bundle\UserBundle\Model\ExtendGroup;
  * @Config(
  *      routeName="oro_user_group_index",
  *      defaultValues={
+ *          "entity"={
+ *              "category"="User"
+ *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",

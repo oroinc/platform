@@ -17,6 +17,9 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
+ *          "entity"={
+ *              "category"="User"
+ *          },
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""

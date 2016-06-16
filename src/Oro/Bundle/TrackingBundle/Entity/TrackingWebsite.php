@@ -19,7 +19,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *  routeView="oro_tracking_website_view",
  *  defaultValues={
  *      "entity"={
- *          "icon"="icon-external-link"
+ *          "icon"="icon-external-link",
+ *          "category"="Tracking"
  *      },
  *      "security"={
  *          "type"="ACL"

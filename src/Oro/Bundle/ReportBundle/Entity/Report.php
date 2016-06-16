@@ -17,6 +17,9 @@ use Oro\Bundle\ReportBundle\Model\ExtendReport;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
+ *          "entity"={
+ *              "category"="Report"
+ *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",

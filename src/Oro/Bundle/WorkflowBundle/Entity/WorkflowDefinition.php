@@ -20,7 +20,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      routeView="oro_workflow_definition_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-exchange"
+ *              "icon"="icon-exchange",
+ *              "category"="Workflow"
  *          },
  *          "security"={
  *              "type"="ACL",

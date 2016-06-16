@@ -20,6 +20,9 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  * @Config(
  *      routeName="oro_segment_index",
  *      defaultValues={
+ *          "entity"={
+ *              "category"="Segment"
+ *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",

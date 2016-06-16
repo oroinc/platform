@@ -22,7 +22,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-file"
+ *              "icon"="icon-file",
+ *              "category"="Attachment"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

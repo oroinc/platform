@@ -34,7 +34,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "activity_support"="true"
  *          },
  *          "entity"={
- *              "icon"="icon-building"
+ *              "icon"="icon-building",
+ *              "category"="Organization"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",

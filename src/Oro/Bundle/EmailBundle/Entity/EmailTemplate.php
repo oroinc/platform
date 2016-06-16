@@ -29,6 +29,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation")
  * @Config(
  *      defaultValues={
+ *          "entity"={
+ *              "category"="Email"
+ *          },
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",

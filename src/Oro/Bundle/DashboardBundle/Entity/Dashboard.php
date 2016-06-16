@@ -19,6 +19,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\HasLifecycleCallbacks
  * @Config(
  *      defaultValues={
+ *          "entity"={
+ *              "category"="Dashboard"
+ *          },
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
