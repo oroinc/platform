@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 
 class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -238,7 +237,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'join' => array(
                                 'left' => array(
                                     array(
-                                        'join' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                        'join' => self::ALIAS . '.' . WorkflowStepColumnListener::PROPERTY_WORKFLOW_STEP,
                                         'alias' => WorkflowStepColumnListener::WORKFLOW_STEP_ALIAS,
                                     )
                                 ),
@@ -305,7 +304,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'left' => array(
                                     array('join' => self::ALIAS . '.c', 'alias' => 'c'),
                                     array(
-                                        'join' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                        'join' => self::ALIAS . '.' . WorkflowStepColumnListener::PROPERTY_WORKFLOW_STEP,
                                         'alias' => WorkflowStepColumnListener::WORKFLOW_STEP_ALIAS,
                                     )
                                 ),
@@ -327,7 +326,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'leftJoinField' => array('data_name' => 'c.leftJoinField'),
                             WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN => array(
                                 'type' => 'entity',
-                                'data_name' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                'data_name' => self::ALIAS . '.' . WorkflowStepColumnListener::PROPERTY_WORKFLOW_STEP,
                                 'options' => array(
                                     'field_type' => 'oro_workflow_step_select',
                                     'field_options' => array('workflow_entity_class' => self::ENTITY_FULL_NAME)
@@ -384,7 +383,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'join' => array(
                                 'inner' => array(
                                     array(
-                                        'join' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                        'join' => self::ALIAS . '.' . WorkflowStepColumnListener::PROPERTY_WORKFLOW_STEP,
                                         'alias' => 'workflowStep',
                                     )
                                 ),
@@ -402,7 +401,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'rootField' => array('data_name' => self::ALIAS . '.rootField'),
                             WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN => array(
                                 'type' => 'entity',
-                                'data_name' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                'data_name' => self::ALIAS . '.' . WorkflowStepColumnListener::PROPERTY_WORKFLOW_STEP,
                                 'options' => array(
                                     'field_type' => 'oro_workflow_step_select',
                                     'field_options' => array('workflow_entity_class' => self::ENTITY_FULL_NAME)
@@ -430,7 +429,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'join' => array(
                                 'inner' => array(
                                     array(
-                                        'join' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                        'join' => self::ALIAS . '.' . WorkflowStepColumnListener::PROPERTY_WORKFLOW_STEP,
                                         'alias' => 'workflowStep',
                                     )
                                 ),
