@@ -45,10 +45,10 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
 
         $result = [];
         foreach ($resolver->getAll() as $className => $entityAlias) {
-            $customEntity = false;
+            $isCustomEntity = false;
             if ($entityConfigManager->hasConfig($className)) {
                 $config = $entityConfigManager->getEntityConfig('extend', $className);
-                $customEntity = $config->get('owner') !== 'System';
+                $isCustomEntity = $config->get('owner') !== 'System';
             }
 
             $result[] = [
@@ -56,7 +56,7 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
                 'alias'       => $entityAlias->getAlias(),
                 'pluralAlias' => $entityAlias->getPluralAlias(),
                 'urlSafeName' => $entityClassNameHelper->getUrlSafeClassName($className),
-                'customEntity' => $customEntity
+                'isCustomEntity' => $isCustomEntity
             ];
         }
 
