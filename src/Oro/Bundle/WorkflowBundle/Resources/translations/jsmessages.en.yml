@@ -4,7 +4,8 @@ oro:
         activated: "Workflow activated"
         deactivated_list: "Deactivated workflows: "
         workflowdefinition:
-            activate: "Activate"
+            activate: 'Activate workflow "{{ label }}"'
+            deactivate: 'Deactivate workflow "{{ label }}"'
 
 "Gray button": "Gray button"
 "Navy blue button": "Navy blue button"

@@ -8,6 +8,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var Error = require('oroui/js/error');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var widgetManager = require('oroui/js/widget-manager');
@@ -45,11 +46,11 @@ define(function(require) {
                         mediator.trigger('widget_success:' + widget.getAlias());
                         mediator.trigger('widget_success:' + widget.getWid());
 
-                        var response = {'message': __('oro.workflow.activated')};
+                        var response = {message: __('oro.workflow.activated')};
 
                         if (!_.isEmpty(self.options.deactivated)) {
                             response = _.extend(response, {
-                                'deactivatedMessage': __('oro.workflow.deactivated_list') + self.options.deactivated
+                                deactivatedMessage: __('oro.workflow.deactivated_list') + self.options.deactivated
                             });
                         }
 
@@ -67,7 +68,7 @@ define(function(require) {
             var self = this;
 
             $.ajax({
-                url: routing.generate('oro_api_workflow_activate', {'workflowDefinition': this.options.workflow}),
+                url: routing.generate('oro_api_workflow_activate', {workflowDefinition: this.options.workflow}),
                 type: 'GET',
                 success: function() {
                     var $form = self.options._sourceElement.find(self.options.selectors.form);

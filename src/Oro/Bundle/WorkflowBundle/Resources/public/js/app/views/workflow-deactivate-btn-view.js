@@ -21,6 +21,9 @@ define(function(require) {
             }
         },
 
+        /**
+         * @property {jQuery.Element}
+         */
         $el: null,
 
         /**
