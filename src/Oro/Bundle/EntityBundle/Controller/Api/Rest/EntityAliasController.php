@@ -56,7 +56,7 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
                 'alias'       => $entityAlias->getAlias(),
                 'pluralAlias' => $entityAlias->getPluralAlias(),
                 'urlSafeName' => $entityClassNameHelper->getUrlSafeClassName($className),
-                'costomEnaity' => $customEntity
+                'customEntity' => $customEntity
             ];
         }
 
