@@ -37,7 +37,9 @@ class LinkProperty extends UrlProperty
             $label = $record->getValue($this->getOr(self::DATA_NAME_KEY) ?: $this->get(self::NAME_KEY));
             
             // if the foreign object doesn't exist there is no link possible
-            if (!$label) return ""; 
+            if (!$label) {
+                return "";
+            }
         } catch (\LogicException $e) {
         }
 
