@@ -35,6 +35,7 @@ parameters:
 
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
     oro_user.provider.filter.user_choice_tree.class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
+    oro_user.provider.category_provider.class:    Oro\Bundle\UserBundle\Provider\CategoryProvider
 
     oro_user.token.factory.wsse.class:            Oro\Bundle\UserBundle\Security\WsseTokenFactory
 
@@ -311,6 +312,9 @@ services:
             - '@doctrine'
             - '@oro_security.acl_helper'
             - '@oro_locale.dql.formatter.name'
+
+    oro_user.provider.category_provider:
+        class: %oro_user.provider.category_provider.class%
 
     # Validator
     oro_user.validator.user_custom_grid_field_validator:

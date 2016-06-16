@@ -110,31 +110,8 @@ class RoleController extends Controller
 
             return $this->get('oro_ui.router')->redirect($entity);
         }
-        $categories = [
-            [
-                'id' => 'account_management',
-                'label' => 'Account Management'
-            ],
-            [
-                'id' => 'marketing',
-                'label' => 'Marketing'
-            ],
-            [
-                'id' => 'sales_data',
-                'label' => 'Sales Data'
-            ],
-            [
-                'id' => 'address',
-                'label' => 'Address'
-            ],
-            [
-                'id' => 'calendar',
-                'label' => 'Calendar'
-            ]
-        ];
         
-        $tabs = ['account_management', 'marketing', 'sales_data'];
-        
+        $categories = $this->get('oro_user.provider.category_provider')->getList();
         // @todo: redevelop it as grid
         $form = $aclRoleHandler->createView();
         $translator = $this->get('translator');
