@@ -22,6 +22,8 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
     const ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE  =
         'Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface';
     const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro_api.routing_options_resolver';
+    const REQUEST_TYPE_PROVIDER_SERVICE             = 'oro_api.rest.request_type_provider';
+    const REQUEST_TYPE_PROVIDER_TAG                 = 'oro_api.request_type_provider';
 
     /**
      * {@inheritdoc}
@@ -56,6 +58,7 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
         }
 
         $this->registerRoutingOptionsResolvers($container);
+        $this->registerRequestTypeProviders($container);
     }
 
     /**
@@ -94,6 +97,19 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
                 $chainServiceDef->addMethodCall('addResolver', $service);
             }
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function registerRequestTypeProviders(ContainerBuilder $container)
+    {
+        DependencyInjectionUtil::registerTaggedServices(
+            $container,
+            self::REQUEST_TYPE_PROVIDER_SERVICE,
+            self::REQUEST_TYPE_PROVIDER_TAG,
+            'addProvider'
+        );
     }
 
     /**

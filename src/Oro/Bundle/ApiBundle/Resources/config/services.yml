@@ -350,10 +350,16 @@ services:
             - '@request_stack'
 
     oro_api.rest.request_type_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ChainRequestTypeProvider
+        public: false
+
+    oro_api.rest.request_type_provider.default:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider
         public: false
         arguments:
             - '@oro_api.rest.doc_view_detector'
+        tags:
+            - { name: oro_api.request_type_provider }
 
     oro_api.listener.dump_api_doc_console_command_listener:
         class: Oro\Bundle\ApiBundle\EventListener\DumpApiDocConsoleCommandListener
