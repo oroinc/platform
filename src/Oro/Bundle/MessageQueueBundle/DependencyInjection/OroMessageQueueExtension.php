@@ -3,7 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
-use OroPro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
+use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
