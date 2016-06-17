@@ -33,66 +33,49 @@
     {% if resource_granted('oro_workflow') %}
         {% if isActive %}
             {% set idButton = entity.name ~ '-workflow-deactivate-btn' %}
-            {{ UI.button({
-                'aCss':  'no-hash btn-danger',
-                'iCss':  'icon-remove',
-                'id':    idButton,
-                'label': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
-                'path':  path('oro_api_workflow_deactivate', {'workflowDefinition': entity}),
-                'title': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
-            }) }}
-            <script type="text/javascript">
-                require(['jquery', 'oroui/js/mediator', 'oroui/js/error'],
-                function($, mediator, Error) {
-                    $('#{{ idButton }}').on('click', function(e) {
-                        e.preventDefault();
-                        var el = $(this);
-                        $.ajax({
-                            url: el.prop('href'),
-                            type: 'GET',
-                            success: function(response) {
-                                if (response.message) {
-                                    mediator.once('page:afterChange', function() {
-                                        mediator.execute('showFlashMessage', 'success', response.message);
-                                    });
-                                }
-                                mediator.execute('refreshPage');
-                            },
-                            error: function(xhr, textStatus, error) {
-                                Error.handle({}, xhr, {enforce: true});
-                            }
-                        })
-                    });
-                });
-            </script>
+
+            <span
+                data-page-component-module="oroui/js/app/components/view-component"
+                data-page-component-options="{{ {
+                    view: 'oroworkflow/js/app/views/workflow-deactivate-btn-view',
+                    selectors: {
+                        button: '#' ~ idButton
+                    }
+                }|json_encode }}">
+
+                {{ UI.button({
+                    'aCss':  'no-hash btn-danger',
+                    'iCss':  'icon-remove',
+                    'id':    idButton,
+                    'label': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
+                    'path':  path('oro_api_workflow_deactivate', {'workflowDefinition': entity.name}),
+                    'title': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
+                }) }}
+            </span>
         {% else %}
             {% set idButton = entity.name ~ '-workflow-activate-btn' %}
-            {{ UI.button({
-                'aCss':  'no-hash btn-success',
-                'iCss':  'icon-ok',
-                'id':    idButton,
-                'label': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
-                'path':  path('oro_api_workflow_activate', {'workflowDefinition': entity.name}),
-                'title': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
-            }) }}
-            <script type="text/javascript">
-                require(['jquery', 'oroworkflow/js/activation-handler', 'oroui/js/mediator'],
-                function($, activationHandler, mediator) {
-                    $('#{{ idButton }}').on('click', function(e) {
-                        e.preventDefault();
-                        var el = $(this);
-                        el.on('activation_success', function(e, response) {
-                            if (response.message) {
-                                mediator.once('page:afterChange', function() {
-                                    mediator.execute('showFlashMessage', 'success', response.message);
-                                });
-                            }
-                            mediator.execute('refreshPage');
-                        });
-                        activationHandler.call(el, el.prop('href'), true);
-                    });
-                });
-            </script>
+
+            <span
+                data-page-component-module="oroui/js/app/components/view-component"
+                data-page-component-options="{{ {
+                    view: 'oroworkflow/js/app/views/workflow-activate-btn-view',
+                    selectors: {
+                        button: '#' ~ idButton
+                    }
+                }|json_encode }}">
+
+                {{ UI.button({
+                    'aCss': 'no-hash btn-success',
+                    'iCss': 'icon-ok',
+                    'id': idButton,
+                    'label': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
+                    'path': path('oro_api_workflow_activate', {'workflowDefinition': entity.name}),
+                    'title': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
+                    'data': {
+                        'name': entity.name
+                    }
+                }) }}
+            </span>
         {% endif %}
     {% endif %}
 

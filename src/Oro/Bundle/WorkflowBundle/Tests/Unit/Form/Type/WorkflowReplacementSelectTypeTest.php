@@ -57,6 +57,9 @@ class WorkflowReplacementSelectTypeTest extends \PHPUnit_Framework_TestCase
                         ],
                         $options['configs']
                     );
+
+                    $this->assertArrayHasKey('label', $options);
+                    $this->assertEquals('oro.workflow.workflowdefinition.entity_plural_label', $options['label']);
                 }
             );
 
