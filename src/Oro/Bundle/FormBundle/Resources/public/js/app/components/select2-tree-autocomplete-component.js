@@ -1,6 +1,7 @@
 define(function (require) {
     'use strict';
 
+    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var Select2TreeAutocompleteComponent;
     var Select2AutocompleteView = require('oroform/js/app/views/select2-autocomplete-view');
@@ -12,8 +13,8 @@ define(function (require) {
             config = Select2TreeAutocompleteComponent.__super__.preConfig.apply(this, arguments);
 
             var propName = config.renderedPropertyName || 'name';
-            config.result_template = config.result_template || this.makeItemTemplate(propName, false);
-            config.selection_template = config.selection_template || this.makeItemTemplate(propName, true);
+            config.result_template = config.result_template || this.makeItemTemplate(propName, true);
+            config.selection_template = config.selection_template || this.makeItemTemplate(propName, false);
             config.className = 'select2-tree-autocomplete';
             config.onAfterInit = function (select2Instance) {
                 var oldPositionDropdown = select2Instance.positionDropdown;
@@ -27,22 +28,23 @@ define(function (require) {
         },
 
         makeItemTemplate: function(propName, forSelection) {
-            var labelTpl = '_.escape(currentItem[propName])';
-            if (forSelection) {
-                labelTpl = 'highlight(' + labelTpl + ')';
-            }
 
-            var templateHeader =
-                '<% var propName = "' + propName + '";' +
-                'function getLabel(currentItem){return ' + labelTpl + '} %>';
+            var template = require('tpl!oroform/templates/select2-tree-autocomplete-result.html');
 
-            var templateBody = require('text!oroform/templates/select2-tree-autocomplete-result.html');
+            var mixData = {
+                newKey: 'oro.form.new',
+                getLabel: function(item, highlight) {
+                    var label = _.escape(item[propName]);
+                    if (forSelection) {
+                        label = highlight(label);
+                    }
+                    return label;
+                }
+            };
 
-            var templateFooter =
-                '<% if (id === null) { %>' +
-                '<span class="select2__result-entry-info"> (' + __('oro.form.new') + ') </span><% } %>';
-
-            return templateHeader + templateBody + templateFooter;
+            return function(data) {
+                return template(_.extend(Object.create(data), mixData));
+            };
         }
     });
 
