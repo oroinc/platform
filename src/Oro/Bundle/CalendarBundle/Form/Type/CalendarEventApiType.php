@@ -187,7 +187,6 @@ class CalendarEventApiType extends CalendarEventType
                 'data_class'           => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
                 'intention'            => 'calendar_event',
                 'csrf_protection'      => false,
-                'cascade_validation'   => true,
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
             )
         );
