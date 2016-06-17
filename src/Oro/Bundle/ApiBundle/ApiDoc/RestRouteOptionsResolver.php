@@ -44,10 +44,10 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     protected $valueNormalizer;
 
     /** @var RequestType */
-    private $requestType;
+    protected $requestType;
 
     /** @var array */
-    private $supportedEntities;
+    protected $supportedEntities;
 
     /**
      * @param bool|string|null             $isApplicationInstalled

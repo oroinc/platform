@@ -44,7 +44,7 @@ class RestDocHandler implements HandlerInterface
     protected $valueNormalizer;
 
     /** @var RequestType */
-    private $requestType;
+    protected $requestType;
 
     /**
      * @param RequestTypeProviderInterface $requestTypeProvider
