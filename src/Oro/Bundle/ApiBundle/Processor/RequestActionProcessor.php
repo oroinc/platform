@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
-use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -21,13 +21,13 @@ class RequestActionProcessor extends ActionProcessor
     protected $metadataProvider;
 
     /**
-     * @param ProcessorBag     $processorBag
-     * @param string           $action
-     * @param ConfigProvider   $configProvider
-     * @param MetadataProvider $metadataProvider
+     * @param ProcessorBagInterface $processorBag
+     * @param string                $action
+     * @param ConfigProvider        $configProvider
+     * @param MetadataProvider      $metadataProvider
      */
     public function __construct(
-        ProcessorBag $processorBag,
+        ProcessorBagInterface $processorBag,
         $action,
         ConfigProvider $configProvider,
         MetadataProvider $metadataProvider

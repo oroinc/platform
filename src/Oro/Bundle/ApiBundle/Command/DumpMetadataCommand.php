@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -59,7 +59,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
         $version = Version::LATEST;
         $action = $input->getOption('action');
 
-        /** @var ProcessorBag $processorBag */
+        /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
         $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 

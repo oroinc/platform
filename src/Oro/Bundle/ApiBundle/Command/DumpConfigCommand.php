@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
@@ -94,7 +94,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         $version = Version::LATEST;
         $extras = $this->getConfigExtras($input);
 
-        /** @var ProcessorBag $processorBag */
+        /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
         $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 

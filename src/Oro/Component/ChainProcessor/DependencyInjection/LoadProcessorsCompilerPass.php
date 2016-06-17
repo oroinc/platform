@@ -41,11 +41,13 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->processorBagServiceId)) {
+        if (!$container->hasDefinition($this->processorBagServiceId)
+            && !$container->hasAlias($this->processorBagServiceId)
+        ) {
             return;
         }
 
-        $processorBagServiceDef = $container->getDefinition($this->processorBagServiceId);
+        $processorBagServiceDef = $container->findDefinition($this->processorBagServiceId);
         $this->registerProcessors($container, $processorBagServiceDef);
         if ($this->processorApplicableCheckerTagName) {
             $this->registerApplicableCheckers($container, $processorBagServiceDef);

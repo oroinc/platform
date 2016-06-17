@@ -12,6 +12,16 @@ services:
         arguments:
             - '@oro_api.processor_factory'
             - %kernel.debug%
+            - '@oro_api.processor_applicable_checker_factory'
+            - '@oro_api.processor_iterator_factory'
+
+    oro_api.processor_iterator_factory:
+        class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIteratorFactory
+        public: false
+
+    oro_api.processor_applicable_checker_factory:
+        class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory
+        public: false
 
     oro_api.processor_factory:
         class: Oro\Component\ChainProcessor\ChainProcessorFactory
