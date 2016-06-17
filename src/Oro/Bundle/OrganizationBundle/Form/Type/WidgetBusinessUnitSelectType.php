@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
@@ -11,26 +10,6 @@ use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
 class WidgetBusinessUnitSelectType extends WidgetEntityJquerySelect2HiddenType
 {
     const NAME = 'oro_type_widget_business_unit_select';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        parent::configureOptions($resolver);
-
-        $resolver->setDefaults(
-            [
-                'autocomplete_alias' => 'widget_owner_business_units',
-                'configs'            => [
-                    'multiple'    => true,
-                    'width'       => '400px',
-                    'placeholder' => 'oro.dashboard.form.choose_business_unit',
-                    'allowClear'  => true,
-                ]
-            ]
-        );
-    }
 
     /**
      * {@inheritdoc}

@@ -9,6 +9,7 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
 class WidgetUserSearchHandler extends UserSearchHandler
 {
+    /** @var TranslatorInterface */
     protected $translator;
 
     /**

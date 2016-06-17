@@ -10,6 +10,7 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
 class WidgetBusinessUnitSearchHandler extends SearchHandler
 {
+    /** @var TranslatorInterface */
     protected $translator;
 
     /**
