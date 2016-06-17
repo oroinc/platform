@@ -49,7 +49,6 @@ class CalendarConnectionControllerTest extends WebTestCase
             'end'             => '2016-05-04T11:29:46+00:00',
             'allDay'          => true,
             'backgroundColor' => '#FF0000',
-            'origin'          => 'client',
             'attendees'       => [
                 [
                     'email'       => $adminUser->getEmail(),
@@ -109,7 +108,6 @@ class CalendarConnectionControllerTest extends WebTestCase
                 'start'            => '2016-05-04T11:29:46+00:00',
                 'end'              => '2016-05-04T11:29:46+00:00',
                 'allDay'           => true,
-                'origin'           => 'client',
                 'notifiable'       => false,
                 'calendarAlias'    => 'user',
                 'attendees'        => [
@@ -119,6 +117,7 @@ class CalendarConnectionControllerTest extends WebTestCase
                         'email'       => $user->getEmail(),
                         'status'      => 'none',
                         'type'        => 'required',
+                        'userId'      => $user->getId(),
                     ],
                     [
                         'displayName' => $admin->getFullName(),
@@ -126,6 +125,7 @@ class CalendarConnectionControllerTest extends WebTestCase
                         'email'       => $admin->getEmail(),
                         'status'      => 'accepted',
                         'type'        => 'required',
+                        'userId'      => $admin->getId(),
                     ]
                 ],
                 'recurrence' => [
@@ -190,7 +190,6 @@ class CalendarConnectionControllerTest extends WebTestCase
             'start'            => '2016-05-04T11:29:46+00:00',
             'end'              => '2016-05-04T11:29:46+00:00',
             'allDay'           => true,
-            'origin'           => 'client',
             'notifiable'       => false,
             'calendarAlias'    => 'user',
             'attendees'        => [
@@ -200,6 +199,7 @@ class CalendarConnectionControllerTest extends WebTestCase
                     'email'       => $user->getEmail(),
                     'status'      => 'none',
                     'type'        => 'required',
+                    'userId'      => $user->getId(),
                 ],
                 [
                     'displayName' => $admin->getFullName(),
@@ -207,6 +207,7 @@ class CalendarConnectionControllerTest extends WebTestCase
                     'email'       => $admin->getEmail(),
                     'status'      => 'accepted',
                     'type'        => 'required',
+                    'userId'      => $admin->getId(),
                 ]
             ],
             'recurrence' => [
@@ -249,7 +250,6 @@ class CalendarConnectionControllerTest extends WebTestCase
                 'start'            => null,
                 'end'              => null,
                 'allDay'           => null,
-                'origin'           => null,
                 'attendees'        => null,
                 'notifiable'       => null,
                 'calendarAlias'    => null,
