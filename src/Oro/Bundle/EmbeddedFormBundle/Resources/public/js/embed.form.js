@@ -2,6 +2,8 @@
 var ORO = (function(ORO) {
     'use strict';
 
+    var console = window.console;
+
     var IframeEmbeddedForm = function(container, options) {
         this.container = document.getElementById(container);
         this.options = options || {};
@@ -59,7 +61,9 @@ var ORO = (function(ORO) {
                 method: 'GET',
                 success: this.renderForm,
                 error: function(xhr, statusText) {
-                    console.error(statusText);
+                    if (console) {
+                        console.error(statusText);
+                    }
                 }
             });
         },
@@ -80,10 +84,12 @@ var ORO = (function(ORO) {
                 data: new FormData(e.target),
                 success: this.renderForm,
                 error: function(xhr, statusText) {
-                    console.error(statusText);
+                    if (console) {
+                        console.error(statusText);
+                    }
                 }
             });
-        },
+        }
     };
 
     ORO.EmbedForm = function(options) {
