@@ -49,7 +49,6 @@ class DateFormatExtension extends \Twig_Extension
      * @param \DateTime|null    $startDate
      * @param \DateTime|null    $endDate
      * @param bool              $skipTime
-     * @param string|null       $dateTimeFormat
      * @param string|int|null   $dateType \IntlDateFormatter constant or it's string name
      * @param string|int|null   $timeType \IntlDateFormatter constant or it's string name
      * @param string|null       $locale
@@ -61,7 +60,6 @@ class DateFormatExtension extends \Twig_Extension
         \DateTime $startDate = null,
         \DateTime $endDate = null,
         $skipTime = false,
-        $dateTimeFormat = null,
         $dateType = null,
         $timeType = null,
         $locale = null,
@@ -106,8 +104,8 @@ class DateFormatExtension extends \Twig_Extension
 
         return sprintf(
             '%s - %s',
-            $this->formatter->format($startDate, $dateTimeFormat, $locale, $timeZone),
-            $this->formatter->format($endDate, $dateTimeFormat, $locale, $timeZone)
+            $this->formatter->format($startDate, $dateType, $timeType, $locale, $timeZone),
+            $this->formatter->format($endDate, $dateType, $timeType, $locale, $timeZone)
         );
     }
 
