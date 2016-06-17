@@ -201,7 +201,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @When /^([\w\s]*) field should be with ([\w\s]*) value$/
+     * @When /^([\w\s]*) field should have ([\w\s]*) value$/
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
