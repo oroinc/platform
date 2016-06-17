@@ -59,7 +59,7 @@ class MessageQueueCollector extends DataCollector
             MessagePriority::HIGH => 'high',
             MessagePriority::VERY_HIGH => 'very high',
         ];
-        
+
         return isset($map[$priority]) ? $map[$priority] : $priority;
     }
 
@@ -73,8 +73,10 @@ class MessageQueueCollector extends DataCollector
         if (is_scalar($message)) {
             return $message;
         }
-        
-        return json_encode($message, JSON_PRETTY_PRINT);
+
+        return htmlspecialchars(
+            json_encode($message, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
     }
 
     /**

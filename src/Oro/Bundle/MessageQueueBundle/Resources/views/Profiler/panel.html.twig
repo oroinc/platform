@@ -1,18 +1,7 @@
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
-    {% set icon %}
-        <span class="sf-toolbar-status">Message Queue</span>
-    {% endset %}
-
-    {% set text %}
-        <div class="sf-toolbar-info-piece">
-            <b>Sent messages:</b>
-            <span>{{ collector.traces|length }}</span>
-        </div>
-    {% endset %}
-
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
 {% endblock %}
 
 {% block menu %}
@@ -38,7 +27,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ sentMessage.topic }}</td>
                     <td><pre>{{ collector.prettyPrintMessage(sentMessage.message)|raw }}</pre></td>
-                    <td><span title="{{ trace.priority }}">{{ collector.prettyPrintPriority(sentMessage.priority) }}</span></td>
+                    <td><span title="{{ sentMessage.priority }}">{{ collector.prettyPrintPriority(sentMessage.priority) }}</span></td>
                 </tr>
             {% endfor %}
         </tbody>
