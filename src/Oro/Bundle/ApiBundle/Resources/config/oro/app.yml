@@ -35,8 +35,6 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
-        entityAlias: ~
-        entityPluralAlias: ~
 
     form_types:
         - form.type.form

@@ -59,20 +59,6 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: entityType, priority: -10 }
 
-    oro_api.normalize_value.entity_alias:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityAlias
-        arguments:
-            - '@oro_entity.entity_alias_resolver'
-        tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: entityAlias, priority: -10 }
-
-    oro_api.normalize_value.entity_plural_alias:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityPluralAlias
-        arguments:
-            - '@oro_entity.entity_alias_resolver'
-        tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: entityPluralAlias, priority: -10 }
-
     #
     # REST API processors
     #
