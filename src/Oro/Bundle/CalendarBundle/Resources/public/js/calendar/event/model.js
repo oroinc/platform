@@ -57,10 +57,7 @@ define([
             url = Backbone.Model.prototype.url.call(this, arguments);
             this.id = id;
 
-            /* send_notification parameter is here to notify attendees about change.
-             * Usually when api is used, side using api makes the notification (e.g. outlook)
-             */
-            return url + '?send_notification=true';
+            return url;
         },
 
         save: function(key, val, options) {
@@ -104,11 +101,10 @@ define([
                 ),
                 attrs || {}
             );
-            _.each(modelData.attendees, function(attendee) {
-                delete attendee.fullName;
-                delete attendee.createdAt;
-                delete attendee.updatedAt;
-            });
+            modelData.attendees = _.map(
+                modelData.attendees,
+                _.partial(_.pick, _, 'displayName', 'email', 'status', 'type')
+            );
 
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);

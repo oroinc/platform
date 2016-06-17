@@ -27,15 +27,12 @@ class ActionPermissionProvider
     public function getInvitationPermissions(ResultRecordInterface $record)
     {
         /** @var User $user */
-        $user = $this->securityFacade->getLoggedUser();
+        $user             = $this->securityFacade->getLoggedUser();
         $invitationStatus = $record->getValue('invitationStatus');
-        $parentId = $record->getValue('parentId');
-        $ownerId = $record->getValue('ownerId');
-        $childrenCount = $record->getValue('childrenCount');
-        $origin = $record->getValue('originId');
-
-        $isEditable = (!$invitationStatus || ($invitationStatus && !$parentId))
-            && $origin !== CalendarEvent::ORIGIN_EXTERNAL;
+        $parentId         = $record->getValue('parentId');
+        $ownerId          = $record->getValue('ownerId');
+        $childrenCount    = $record->getValue('childrenCount');
+        $isEditable       = (!$invitationStatus || ($invitationStatus && !$parentId));
 
         return [
             'accept'      => $this->isAvailableResponseButton(

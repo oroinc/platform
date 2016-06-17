@@ -173,19 +173,5 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
             ['id'],
             ['onDelete' => 'CASCADE']
         );
-
-        $this->extendExtension->addEnumField(
-            $schema,
-            $table,
-            'origin',
-            CalendarEvent::ORIGIN_ENUM_CODE,
-            false,
-            false,
-            [
-                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
-                'view'   => ['is_displayable' => false],
-                'form'   => ['is_enabled' => false],
-            ]
-        );
     }
 }

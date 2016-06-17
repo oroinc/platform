@@ -56,7 +56,6 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
 
         /** Enum generation **/
         $this->addAttendeeEnums($schema);
-        $this->addCalendarEventEnums($schema);
     }
 
     /**
@@ -129,28 +128,6 @@ class OroCalendarBundleInstaller implements Installation, ExtendExtensionAwareIn
             false,
             [
                 'extend' => ['owner' => ExtendScope::OWNER_CUSTOM]
-            ]
-        );
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    protected function addCalendarEventEnums(Schema $schema)
-    {
-        $table = $schema->getTable('oro_calendar_event');
-
-        $this->extendExtension->addEnumField(
-            $schema,
-            $table,
-            'origin',
-            CalendarEvent::ORIGIN_ENUM_CODE,
-            false,
-            false,
-            [
-                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
-                'view'   => ['is_displayable' => false],
-                'form'   => ['is_enabled' => false],
             ]
         );
     }

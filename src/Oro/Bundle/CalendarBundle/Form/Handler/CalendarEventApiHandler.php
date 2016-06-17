@@ -153,7 +153,7 @@ class CalendarEventApiHandler
         $this->manager->persist($entity);
         $this->manager->flush();
 
-        if ($this->request->query->get('send_notification', false)) {
+        if ($notify) {
             if ($new) {
                 $this->emailSendProcessor->sendInviteNotification($entity);
             } else {

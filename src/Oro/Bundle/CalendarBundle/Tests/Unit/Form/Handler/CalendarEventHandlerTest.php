@@ -69,8 +69,6 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->entity  = new CalendarEvent();
-        $origin        = new TestEnumValue(CalendarEvent::ORIGIN_SERVER, CalendarEvent::ORIGIN_SERVER);
-        $this->entity->setOrigin($origin);
 
         $this->handler = new CalendarEventHandler(
             $this->form,
@@ -97,17 +95,6 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->handler->process($this->entity)
         );
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
-    public function testProcessWithException()
-    {
-        $origin = new TestEnumValue(CalendarEvent::ORIGIN_EXTERNAL, CalendarEvent::ORIGIN_EXTERNAL);
-        $this->entity->setOrigin($origin);
-
-        $this->handler->process($this->entity);
     }
 
     /**

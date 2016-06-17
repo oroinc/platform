@@ -126,7 +126,6 @@ class CalendarEventApiType extends CalendarEventType
                     'model_timezone' => 'UTC',
                 ]
             )
-            ->add('origin')
             ->add(
                 'recurrence',
                 'oro_calendar_event_recurrence',
