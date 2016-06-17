@@ -1,4 +1,6 @@
-<% if (treePath.length > 3) { %>
+<% if (typeof treePath === 'undefined') { %>
+    <%= name %>
+<% } else if (treePath.length > 3) { %>
    <%= getLabel(treePath[0], highlight) %>
    <span class="select2-tree-result-item-divider">/</span>
    <span class="select2-tree-result-item-more-path" title="<%  for (var i = 1; i < treePath.length - 1; i++) { %><%= getLabel(treePath[i], highlight) %><% if (i !== treePath.length - 2) { %> / <% } %><% } %>">...</span>
