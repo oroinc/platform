@@ -320,7 +320,10 @@ services:
     oro_user.datagrid.datasource.repository:
         class: %oro_user.datagrid.datasource.repository.class%
         arguments:
-            - '@oro_datagrid.event.dispatcher'
+            - '@translator'
+            - '@oro_security.acl.privilege_repository'
+            - '@oro_security.acl.permission_manager'
+            - "@oro_security.acl.manager"
         tags:
             - { name: oro_datagrid.datasource, type: repository }
 
