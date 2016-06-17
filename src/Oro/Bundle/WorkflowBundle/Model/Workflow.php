@@ -4,8 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\ActionBundle\Model\AttributeManager as BaseAttributeManager;
+
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -22,11 +24,6 @@ class Workflow
      * @var string
      */
     protected $name;
-
-    /**
-     * @var EntityConnector
-     */
-    protected $entityConnector;
 
     /**
      * @var AclManager
@@ -74,7 +71,6 @@ class Workflow
     protected $restrictions;
 
     /**
-     * @param EntityConnector                            $entityConnector
      * @param AclManager                                 $aclManager
      * @param RestrictionManager $restrictionManager
      * @param StepManager|null                           $stepManager
@@ -82,14 +78,12 @@ class Workflow
      * @param TransitionManager|null                     $transitionManager
      */
     public function __construct(
-        EntityConnector $entityConnector,
         AclManager $aclManager,
         RestrictionManager $restrictionManager,
         StepManager $stepManager = null,
         BaseAttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
     ) {
-        $this->entityConnector         = $entityConnector;
         $this->aclManager              = $aclManager;
         $this->restrictionManager      = $restrictionManager;
         $this->stepManager             = $stepManager ? $stepManager : new StepManager();
@@ -292,23 +286,9 @@ class Workflow
         $transition->transit($workflowItem);
         $workflowItem->addTransitionRecord($transitionRecord);
 
-        $entity = $workflowItem->getEntity();
-        $this->entityConnector->setWorkflowItem($entity, $workflowItem);
-        $this->entityConnector->setWorkflowStep($entity, $workflowItem->getCurrentStep());
-
         $this->aclManager->updateAclIdentities($workflowItem);
         $this->restrictionManager->updateEntityRestrictions($workflowItem);
 
-    }
-
-    /**
-     * Reset workflow item data.
-     *
-     * @param $entity
-     */
-    public function resetWorkflowData($entity)
-    {
-        $this->entityConnector->resetWorkflowData($entity);
     }
 
     /**
@@ -326,6 +306,9 @@ class Workflow
         $workflowItem = new WorkflowItem();
         $workflowItem
             ->setWorkflowName($this->getName())
+            ->setEntityClass(ClassUtils::getClass($entity))
+            // TODO: replace with getSingleIdentifierValue
+            ->setEntityId($entity->getId())
             ->setEntity($entity);
 
         if (array_key_exists($entityAttributeName, $data)) {

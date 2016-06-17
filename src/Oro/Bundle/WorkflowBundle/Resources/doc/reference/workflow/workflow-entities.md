@@ -473,16 +473,6 @@ Context is used in action and conditions and thereby it's usually an instance of
 This class is a simple helper that encapsulates logic of accessing properties of context using
 Symfony\Component\PropertyAccess\PropertyAccessor.
 
-Entity Connector
-----------------
-
-**Class:**
-Oro\Bundle\WorkflowBundle\Model\EntityConnector
-
-**Description:**
-Provides methods to get and set Workflow Item and Workflow Step to the specific entity. Also can define
-whether entity or class has properties to store Workflow Item and Workflow Step.
-
 ACL Manager
 -----------
 
@@ -492,7 +482,7 @@ Oro\Bundle\WorkflowBundle\Acl\AclManager
 **Description:**
 Additional service that process ACL for workflow definitions and calculate Acl Identity entities for specified
 Workflow Item.
-k
+
 Workflow Entity Voter
 ---------------------
 

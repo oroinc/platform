@@ -7,7 +7,6 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowItemListener
@@ -16,11 +15,6 @@ class WorkflowItemListener
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
-
-    /**
-     * @var EntityConnector
-     */
-    protected $entityConnector;
 
     /**
      * @var WorkflowManager
@@ -39,16 +33,13 @@ class WorkflowItemListener
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param EntityConnector $entityConnector
      * @param WorkflowManager $workflowManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityConnector $entityConnector,
         WorkflowManager $workflowManager
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->entityConnector = $entityConnector;
         $this->workflowManager = $workflowManager;
     }
 
@@ -131,17 +122,16 @@ class WorkflowItemListener
     }
 
     /**
-     * Remove related workflow item
+     * Remove related workflow items
      *
      * @param LifecycleEventArgs $args
      */
     public function preRemove(LifecycleEventArgs $args)
     {
-        $entity = $args->getEntity();
-        if ($this->entityConnector->isWorkflowAware($entity)) {
-            $workflowItem = $this->entityConnector->getWorkflowItem($entity);
-            if ($workflowItem) {
-                $args->getEntityManager()->remove($workflowItem);
+        if ($workflowItems = $this->workflowManager->getWorkflowItemsByEntity($args->getEntity())) {
+            $em = $args->getEntityManager();
+            foreach ($workflowItems as $workflowItem) {
+                $em->remove($workflowItem);
             }
         }
     }

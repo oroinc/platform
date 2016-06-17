@@ -5,6 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
+/**
+ * @deprecated since 1.10
+ * todo: remove after BAP-10823
+ */
 trait WorkflowAwareTrait
 {
     /**

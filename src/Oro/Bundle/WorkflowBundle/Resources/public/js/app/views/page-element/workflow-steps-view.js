@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var WokflowStepsView;
+    var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
     WokflowStepsView = BaseView.extend({
@@ -17,19 +18,16 @@ define(function(require) {
                 return data;
             }
 
-            for (var s in data.stepsData) {
-                var stepsData = data.stepsData[s];
-
+            _.each(data.stepsData, function(stepData) {
                 // calculated processed flag
                 var processed = true;
-                for (var i = 0; i < stepsData.steps.length; i++) {
-                    var step = stepsData.steps[i];
-                    if (step.name === stepsData.currentStep.name) {
+                _.each(stepData.steps, function(step) {
+                    if (step.name === stepData.currentStep.name) {
                         processed = false;
                     }
                     step.processed = processed;
-                }
-            }
+                });
+            });
 
             return data;
         },
@@ -40,7 +38,7 @@ define(function(require) {
         },
         updateContainerWidth: function() {
             var $container = this.$el;
-            var $list = this.$('.workflow-step');
+            var $list = this.$('.workflow-step-container');
             $container.width(10000);
             $list.css({float: 'left'});
             $container.width($list.width() + 1/* floating pixel calculation compensation */);

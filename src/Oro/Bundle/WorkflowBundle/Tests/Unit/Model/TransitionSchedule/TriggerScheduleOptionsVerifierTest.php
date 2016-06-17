@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier;
@@ -24,9 +23,6 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
     /** @var  TransitionQueryFactory|\PHPUnit_Framework_MockObject_MockObject */
     protected $queryFactory;
 
-    /** @var  EntityConnector|\PHPUnit_Framework_MockObject_MockObject */
-    protected $entityConnector;
-
     protected function setUp()
     {
         $this->workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
@@ -41,12 +37,9 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityConnector = $this->getMock('Oro\Bundle\WorkflowBundle\Model\EntityConnector');
-
         $this->verifier = new TriggerScheduleOptionsVerifier(
             $this->workflowAssembler,
-            $this->queryFactory,
-            $this->entityConnector
+            $this->queryFactory
         );
     }
 
@@ -71,11 +64,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
         $this->verifier->verify([], $this->workflowDefinition, 'transition_name');
     }
 
-    /**
-     * @dataProvider prepareFilterExpressionDataProvider
-     * @param bool $isEntityWorkflowAware
-     */
-    public function testPrepareFilterExpression($isEntityWorkflowAware)
+    public function testPrepareFilterExpression()
     {
         $step = new Step();
         $step->setName('step1');
@@ -83,7 +72,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
         $stepsManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\StepManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $stepsManager->expects($this->exactly((int) $isEntityWorkflowAware))
+        $stepsManager->expects($this->once())
             ->method('getRelatedTransitionSteps')
             ->with('transitionName')
             ->willReturn([$step]);
@@ -91,7 +80,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
             ->getMock();
-        $workflow->expects($this->exactly((int) $isEntityWorkflowAware))
+        $workflow->expects($this->once())
             ->method('getStepManager')
             ->willReturn($stepsManager);
 
@@ -107,7 +96,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $this->queryFactory->expects($this->exactly((int) $isEntityWorkflowAware))
+        $this->queryFactory->expects($this->once())
             ->method('create')
             ->with(['step1'], 'EntityClass', 'filterDQL')
             ->willReturn($query);
@@ -116,26 +105,9 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
         $expressionVerifier = $this->getMock(
             'Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface'
         );
-        $expressionVerifier->expects($this->exactly((int) $isEntityWorkflowAware))->method('verify')->with($query);
-
-        $this->entityConnector->expects($this->once())->method('isWorkflowAware')->willReturn($isEntityWorkflowAware);
+        $expressionVerifier->expects($this->once())->method('verify')->with($query);
 
         $this->verifier->addOptionVerifier('filter', $expressionVerifier);
         $this->verifier->verify(['cron' => '', 'filter' => 'filterDQL'], $this->workflowDefinition, 'transitionName');
-    }
-
-    /**
-     * @return array
-     */
-    public function prepareFilterExpressionDataProvider()
-    {
-        return [
-            'workflow aware' => [
-                'isEntityWorkflowAware' => true,
-            ],
-            'not workflow aware' => [
-                'isEntityWorkflowAware' => false,
-            ],
-        ];
     }
 }

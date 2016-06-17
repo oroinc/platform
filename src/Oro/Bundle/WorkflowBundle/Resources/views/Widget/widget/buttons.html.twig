@@ -2,7 +2,7 @@
 
 <div class="widget-content">
     {% for workflowName, workflow in workflowsData %}
-        {% if workflow.transitionsData|length or workflow.resetAllowed and workflow.workflowItem %}
+        {% if workflow.transitionsData|length or workflow.resetAllowed %}
             {% set blockId = 'entity-transitions-container-' ~ random() %}
             <div class="btn-group" id="{{ blockId }}">
                 {% for data in workflow.transitionsData %}
