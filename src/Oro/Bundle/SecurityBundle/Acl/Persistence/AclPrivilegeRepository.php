@@ -115,6 +115,7 @@ class AclPrivilegeRepository
                     $name = self::ROOT_PRIVILEGE_NAME;
                     $group = '';
                     $description = '';
+                    $category = '';
                 } else {
                     /** @var AclClassInfo $class */
                     $class = $classes[$oid->getType()];
@@ -124,6 +125,7 @@ class AclPrivilegeRepository
                     }
                     $group = $class->getGroup();
                     $description = $class->getDescription();
+                    $category = $class->getCategory();
                 }
 
                 $privilege = new AclPrivilege();
@@ -136,7 +138,8 @@ class AclPrivilegeRepository
                     )
                     ->setGroup($group)
                     ->setExtensionKey($extensionKey)
-                    ->setDescription($description);
+                    ->setDescription($description)
+                    ->setCategory($category);
 
                 $this->addPermissions($sid, $privilege, $oid, $acls, $extension, $rootAcl);
 

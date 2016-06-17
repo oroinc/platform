@@ -3,3 +3,4 @@ oro_jobs:
     type: action
     group_name: ""
     bindings: ~
+    category: "cron"

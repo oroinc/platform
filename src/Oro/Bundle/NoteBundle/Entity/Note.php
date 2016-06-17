@@ -23,7 +23,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-comment-alt",
- *              "category"="Note"
+ *              "category"="note"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

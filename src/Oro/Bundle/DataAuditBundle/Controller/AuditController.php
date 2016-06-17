@@ -40,7 +40,8 @@ class AuditController extends Controller
      *      id="oro_dataaudit_history",
      *      type="action",
      *      label="oro.dataaudit.acl.action.history.label",
-     *      group_name=""
+     *      group_name="",
+     *      category="data_audit"
      * )
      */
     public function historyAction($entity, $id)

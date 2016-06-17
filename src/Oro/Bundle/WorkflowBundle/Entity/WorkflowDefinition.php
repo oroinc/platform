@@ -21,7 +21,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-exchange",
- *              "category"="Workflow"
+ *              "category"="workflow"
  *          },
  *          "security"={
  *              "type"="ACL",

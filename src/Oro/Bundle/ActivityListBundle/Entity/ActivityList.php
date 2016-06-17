@@ -29,7 +29,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-align-justify",
- *              "category"="Activity List"
+ *              "category"="activity_list"
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",

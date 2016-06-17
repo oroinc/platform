@@ -20,7 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "category"="Dashboard"
+ *              "category"="dashboard"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

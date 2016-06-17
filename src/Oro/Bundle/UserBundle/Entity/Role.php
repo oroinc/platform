@@ -18,7 +18,7 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "category"="User"
+ *              "category"="user"
  *          },
  *          "security"={
  *              "type"="ACL",

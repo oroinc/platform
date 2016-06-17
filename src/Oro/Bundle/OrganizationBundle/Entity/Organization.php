@@ -26,7 +26,7 @@ use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "category"="Organization"
+ *              "category"="organization"
  *          },
  *          "security"={
  *              "type"="ACL",

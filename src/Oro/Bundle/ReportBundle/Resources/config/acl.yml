@@ -3,3 +3,4 @@ oro_report_view_sql:
     type: action
     group_name: ""
     bindings: ~
+    category: "report"

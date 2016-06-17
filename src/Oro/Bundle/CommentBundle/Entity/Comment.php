@@ -15,7 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-comments",
- *              "category"="Comment"
+ *              "category"="comment"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

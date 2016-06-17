@@ -30,7 +30,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "category"="Email"
+ *              "category"="email"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

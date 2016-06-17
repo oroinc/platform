@@ -3,3 +3,4 @@ password_management:
     description: oro.user.action.password_management.description
     type: action
     group_name: ""
+    category: "user"

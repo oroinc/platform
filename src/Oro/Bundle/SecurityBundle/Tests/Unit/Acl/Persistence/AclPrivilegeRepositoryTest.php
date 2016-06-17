@@ -170,11 +170,13 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
         $class1->expects($this->once())->method('getGroup')->will($this->returnValue('SomeGroup'));
         $class1->expects($this->once())->method('getLabel')->will($this->returnValue('Class 1'));
         $class1->expects($this->once())->method('getDescription')->will($this->returnValue('Desc 1'));
+        $class1->expects($this->once())->method('getCategory')->will($this->returnValue('Category 1'));
         $class2 = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo');
         $class2->expects($this->once())->method('getClassName')->will($this->returnValue($classes[1]));
         $class2->expects($this->once())->method('getGroup')->will($this->returnValue('SomeGroup'));
         $class2->expects($this->once())->method('getLabel')->will($this->returnValue('Class 2'));
         $class2->expects($this->once())->method('getDescription')->will($this->returnValue('Desc 2'));
+        $class2->expects($this->once())->method('getCategory')->will($this->returnValue('Category 2'));
 
         $rootOid = new ObjectIdentity($extensionKey, ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $rootAcl = $this->getMock('Symfony\Component\Security\Acl\Model\AclInterface');
@@ -326,11 +328,13 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Class 1', $result[1]->getIdentity()->getName());
         $this->assertEquals('SomeGroup', $result[1]->getGroup());
         $this->assertEquals('Desc 1', $result[1]->getDescription());
+        $this->assertEquals('Category 1', $result[1]->getCategory());
         $this->assertEquals($extensionKey, $result[1]->getExtensionKey());
         $this->assertEquals('test:Acme\Class2', $result[2]->getIdentity()->getId());
         $this->assertEquals('Class 2', $result[2]->getIdentity()->getName());
         $this->assertEquals('SomeGroup', $result[2]->getGroup());
         $this->assertEquals('Desc 2', $result[2]->getDescription());
+        $this->assertEquals('Category 2', $result[2]->getCategory());
         $this->assertEquals($extensionKey, $result[2]->getExtensionKey());
 
         $this->assertEquals(3, $result[0]->getPermissionCount());

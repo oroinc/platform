@@ -22,7 +22,8 @@ class ConfigurationController extends Controller
      *      id="oro_config_system",
      *      type="action",
      *      label="oro.config.acl.action.general.label",
-     *      group_name=""
+     *      group_name="",
+     *      category="config"
      * )
      */
     public function systemAction($activeGroup = null, $activeSubGroup = null)

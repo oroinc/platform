@@ -32,7 +32,8 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  *      id="oro_entityconfig_manage",
  *      label="oro.entity_config.action.manage",
  *      type="action",
- *      group_name=""
+ *      group_name="",
+ *      category="entity_config"
  * )
  */
 class ConfigController extends Controller

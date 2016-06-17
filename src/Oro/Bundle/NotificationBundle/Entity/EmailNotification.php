@@ -16,7 +16,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "category"="Notification"
+ *              "category"="notification"
  *          },
  *          "security"={
  *              "type"="ACL",

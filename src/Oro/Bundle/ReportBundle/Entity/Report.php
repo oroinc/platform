@@ -18,7 +18,7 @@ use Oro\Bundle\ReportBundle\Model\ExtendReport;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "category"="Report"
+ *              "category"="report"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
