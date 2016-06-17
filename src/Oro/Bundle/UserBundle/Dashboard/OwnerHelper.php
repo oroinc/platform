@@ -67,12 +67,12 @@ class OwnerHelper
      */
     public function replaceCurrentValues(array $array)
     {
-        $key = array_search(static::CURRENT_USER, $array);
+        $key = array_search(static::CURRENT_USER, $array, true);
         if ($key !== false) {
             $array[$key] = $this->getCurrentUser()->getId();
         }
 
-        $key = array_search(static::CURRENT_BUSINESS_UNIT, $array);
+        $key = array_search(static::CURRENT_BUSINESS_UNIT, $array, true);
         if ($key !== false) {
             $array[$key] = $this->getCurrentUser()->getOwner()->getId();
         }
