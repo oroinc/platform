@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
+use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
@@ -264,5 +267,29 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $this->assertTrue($this->fieldMetadata->isCollection());
+    }
+
+    public function testOneToManySouldBeCloned()
+    {
+        $fieldMetadata = $this->getFieldMetadata([], [
+            'type' => ClassMetadataInfo::ONE_TO_MANY,
+            'orphanRemoval' => true,
+            'targetEntity' => 'Foo\\Entity',
+        ]);
+
+        $this->assertTrue($fieldMetadata->shouldBeCloned());
+    }
+
+    /**
+     * @param array $options
+     * @param array $doctrineOptions
+     *
+     * @return FieldMetadata
+     */
+    protected function getFieldMetadata(array $options, array $doctrineOptions)
+    {
+        $doctrineMetadata = new DoctrineMetadata($doctrineOptions);
+
+        return new FieldMetadata($options, $doctrineMetadata);
     }
 }

@@ -102,4 +102,12 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->doctrineMetadata->isTypeEqual($expectedType));
         $this->assertFalse($this->doctrineMetadata->isTypeEqual(ClassMetadataInfo::ONE_TO_ONE));
     }
+
+    public function testOrphanRemoval()
+    {
+        $this->assertFalse($this->doctrineMetadata->isOrphanRemoval());
+
+        $this->doctrineMetadata->set('orphanRemoval', true);
+        $this->assertTrue($this->doctrineMetadata->isOrphanRemoval());
+    }
 }

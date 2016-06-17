@@ -84,4 +84,14 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
     {
         return $this->get('fieldName', true);
     }
+
+    /**
+     * Checks if association has orphan removal enabled
+     *
+     * @return bool
+     */
+    public function isOrphanRemoval()
+    {
+        return $this->is('orphanRemoval');
+    }
 }
