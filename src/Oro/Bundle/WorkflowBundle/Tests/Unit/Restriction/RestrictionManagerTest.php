@@ -58,7 +58,7 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->once())->method('getName')->willReturn('test_workflow');
 
         $this->workflowManager->expects($this->once())
-            ->method('getApplicableWorkflowsByEntityClass')
+            ->method('getApplicableWorkflows')
             ->with('DateTime')
             ->willReturn([$workflow]);
 

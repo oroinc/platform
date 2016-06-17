@@ -89,7 +89,7 @@ class WorkflowStepColumnListener
         }
 
         // whether entity has active workflow and entity should render workflow step field
-        $isShowWorkflowStep = $this->workflowManager->hasApplicableWorkflowByEntityClass($rootEntity)
+        $isShowWorkflowStep = $this->workflowManager->hasApplicableWorkflowsByEntityClass($rootEntity)
             && $this->isShowWorkflowStep($rootEntity);
 
         // check whether grid contains workflow step column

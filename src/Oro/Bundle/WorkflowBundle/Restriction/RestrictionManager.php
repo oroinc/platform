@@ -226,7 +226,7 @@ class RestrictionManager
             foreach ($classRestrictions as $classRestriction) {
                 $workflowName = $classRestriction['workflowName'];
                 if (!isset($this->workflows[$entityClass][$workflowName])) {
-                    $workflows = $this->workflowManager->getApplicableWorkflowsByEntityClass(
+                    $workflows = $this->workflowManager->getApplicableWorkflows(
                         $classRestriction['relatedEntity']
                     );
 

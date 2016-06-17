@@ -65,13 +65,18 @@ services:
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-activate }
 
+    oro_workflow.manager.system_config:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@oro_workflow.changes.event.dispatcher'
+
     oro_workflow.manager:
         class: %oro_workflow.manager.class%
         arguments:
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.config_manager'
-            - '@oro_workflow.changes.event.dispatcher'
+            - '@oro_workflow.manager.system_config'
 
     oro_workflow.process.process_factory:
         class: %oro_workflow.process.process_factory.class%
