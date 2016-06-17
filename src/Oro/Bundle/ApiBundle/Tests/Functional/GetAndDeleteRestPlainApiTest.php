@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 /**
  * @dbIsolation
  */
-class GetRestPlainApiTest extends ApiTestCase
+class GetAndDeleteRestPlainApiTest extends ApiTestCase
 {
     /**
      * {@inheritdoc}
