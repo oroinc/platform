@@ -173,9 +173,6 @@ class WorkflowDefinition implements DomainObjectInterface
         $this->restrictions = new ArrayCollection();
     }
 
-    /**
-     *
-     */
     public function __clone()
     {
         if ($this->name) {
