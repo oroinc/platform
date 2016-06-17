@@ -55,7 +55,15 @@ class DateFilterUtility
             return false;
         }
 
-        $data['value'] = array_merge(['start' => null, 'end' => null], $data['value']);
+        $data['value'] = array_merge(
+            [
+                'start' => null,
+                'end' => null,
+                'start_original' => null,
+                'end_original' => null
+            ],
+            $data['value']
+        );
         $data['type']  = isset($data['type']) ? $data['type'] : DateRangeFilterType::TYPE_BETWEEN;
 
         // values will not be used, so just unset them
