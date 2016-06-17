@@ -5,7 +5,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial j.{id, command, args, state, runtime, memoryUsageReal, priority, createdAt}
+                    - partial j.{id, command, args, state, runtime, memoryUsageReal, priority, createdAt, startedAt, closedAt}
                 from:
                     - { table: JMSJobQueueBundle:Job , alias: j }
                 where:

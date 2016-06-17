@@ -135,6 +135,26 @@ class ChainExclusionProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
     }
 
+    public function testIsIgnoredFieldCache()
+    {
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->providers[0]
+            ->expects($this->once())
+            ->method('isIgnoredField')
+            ->with($this->identicalTo($metadata), 'fieldName')
+            ->willReturn(true);
+        $this->providers[1]
+            ->expects($this->never())
+            ->method('isIgnoredField');
+
+        $this->assertTrue($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
+        // test that the result is stored in the local cache
+        $this->assertTrue($this->chainProvider->isIgnoredField($metadata, 'fieldName'));
+    }
+
     public function testIsIgnoredRelationByLowPriorityProvider()
     {
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
@@ -191,5 +211,25 @@ class ChainExclusionProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
 
         $this->assertFalse($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
+    }
+
+    public function testIsIgnoredRelationCache()
+    {
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->providers[0]
+            ->expects($this->once())
+            ->method('isIgnoredRelation')
+            ->with($this->identicalTo($metadata), 'associationName')
+            ->willReturn(true);
+        $this->providers[1]
+            ->expects($this->never())
+            ->method('isIgnoredRelation');
+
+        $this->assertTrue($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
+        // test that the result is stored in the local cache
+        $this->assertTrue($this->chainProvider->isIgnoredRelation($metadata, 'associationName'));
     }
 }

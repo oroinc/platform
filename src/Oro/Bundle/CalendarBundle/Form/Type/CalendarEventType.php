@@ -59,7 +59,7 @@ class CalendarEventType extends AbstractType
             )
             ->add(
                 'description',
-                'oro_resizeable_rich_text',
+                'textarea',
                 [
                     'required' => false,
                     'label'    => 'oro.calendar.calendarevent.description.label'
