@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository;
 use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
 use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\Attendee;
@@ -13,6 +15,12 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CalendarEventRepository */
+    protected $calendarEventRepository;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AttendeeRepository */
+    protected $attendeeRepository;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|AttendeeRelationManager */
     protected $attendeeRelationManager;
 
@@ -21,6 +29,16 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->calendarEventRepository = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->attendeeRepository = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -29,6 +47,12 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function ($entity) {
                 return $entity->getId();
             }));
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->will($this->returnValueMap([
+                ['OroCalendarBundle:CalendarEvent', $this->calendarEventRepository],
+                ['OroCalendarBundle:Attendee', $this->attendeeRepository],
+            ]));
 
         $this->attendeeRelationManager = $this
             ->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager')
@@ -48,18 +72,10 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadAttendeesByCalendarEventId()
     {
-        $entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityRepository->expects($this->once())
+        $this->attendeeRepository->expects($this->once())
             ->method('findBy')
             ->with(['calendarEvent' => 1])
             ->will($this->returnValue(new Attendee(1)));
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepository')
-            ->with('OroCalendarBundle:Attendee')
-            ->will($this->returnValue($entityRepository));
 
         $this->attendeeManager->loadAttendeesByCalendarEventId(1);
     }
@@ -83,5 +99,77 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->attendeeManager->createAttendeeExclusions($attendees);
         $this->assertEquals([$key => $val], $result);
+    }
+
+    /**
+     * @dataProvider getAttendeeListsByCalendarEventIdsDataProvider
+     */
+    public function testGetAttendeeListsByCalendarEventIds(
+        array $calendarEventIds,
+        array $parentToChildren,
+        array $queryResult,
+        array $expectedResult
+    ) {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->setMethods(['getQuery', 'getArrayResult'])
+            ->getMock();
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('getArrayResult')
+            ->will($this->returnValue($queryResult));
+
+        $this->calendarEventRepository->expects($this->once())
+            ->method('getParentEventIds')
+            ->with($calendarEventIds)
+            ->will($this->returnValue($parentToChildren));
+
+        $this->attendeeRepository->expects($this->once())
+            ->method('createAttendeeListsQb')
+            ->with(array_keys($parentToChildren))
+            ->will($this->returnValue($qb));
+
+        $this->attendeeRelationManager->expects($this->once())
+            ->method('addRelatedDisplayName')
+            ->with($qb);
+
+        $result = $this->attendeeManager->getAttendeeListsByCalendarEventIds($calendarEventIds);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function getAttendeeListsByCalendarEventIdsDataProvider()
+    {
+        return [
+            [
+                [1, 2, 3],
+                [
+                    1 => [1],
+                    4 => [2, 3],
+                ],
+                [
+                    [
+                        'calendarEventId' => 1,
+                        'email' => 'first@example.com',
+                    ],
+                    [
+                        'calendarEventId' => 4,
+                        'email' => 'fourth@example.com',
+                    ]
+                ],
+                [
+                    1 => [
+                        ['email' => 'first@example.com'],
+                    ],
+                    2 => [
+                        ['email' => 'fourth@example.com'],
+                    ],
+                    3 => [
+                        ['email' => 'fourth@example.com'],
+                    ],
+                ],
+            ],
+        ];
     }
 }

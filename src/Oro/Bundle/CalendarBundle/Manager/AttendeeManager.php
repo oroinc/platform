@@ -7,6 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository;
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -92,9 +93,13 @@ class AttendeeManager
             return [];
         }
 
+        /** @var CalendarEventRepository $calendarEventRepository */
+        $calendarEventRepository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $parentToChildren = $calendarEventRepository->getParentEventIds($calendarEventIds);
+
         /** @var AttendeeRepository $attendeeRepository */
         $attendeeRepository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Attendee');
-        $qb = $attendeeRepository->createAttendeeListsQb($calendarEventIds);
+        $qb = $attendeeRepository->createAttendeeListsQb(array_keys($parentToChildren));
         $this->attendeeRelationManager->addRelatedUserInfo($qb);
 
         $queryResult = $qb
@@ -103,9 +108,11 @@ class AttendeeManager
 
         $result = [];
         foreach ($queryResult as $row) {
-            $calendarEventId = $row['calendarEventId'];
+            $parentCalendarEventId = $row['calendarEventId'];
             unset($row['calendarEventId']);
-            $result[$calendarEventId][] = $row;
+            foreach ($parentToChildren[$parentCalendarEventId] as $childId) {
+                $result[$childId][] = $row;
+            }
         }
 
         return $result += array_fill_keys($calendarEventIds, []);
