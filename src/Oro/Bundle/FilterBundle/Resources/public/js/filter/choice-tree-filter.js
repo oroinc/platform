@@ -78,11 +78,11 @@ define(function(require) {
             var options = {
                 _sourceElement: this.$(this.criteriaValueSelectors.value),
                 configs: {
-                    "allowClear": true,
-                    "minimumInputLength": 0,
-                    "multiple": true
+                    allowClear: true,
+                    minimumInputLength: 0,
+                    multiple: true
                 }
-            }
+            };
             if (this.data) {
                 options.configs.data = {
                     results: this.data,

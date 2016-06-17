@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var _ = require('underscore');
@@ -16,9 +16,9 @@ define(function (require) {
             config.result_template = config.result_template || this.makeItemTemplate(propName, true);
             config.selection_template = config.selection_template || this.makeItemTemplate(propName, false);
             config.className = 'select2-tree-autocomplete';
-            config.onAfterInit = function (select2Instance) {
+            config.onAfterInit = function(select2Instance) {
                 var oldPositionDropdown = select2Instance.positionDropdown;
-                select2Instance.positionDropdown = function () {
+                select2Instance.positionDropdown = function() {
                     this.container.addClass('hide-all-tree-related-ui');
                     oldPositionDropdown.apply(this, arguments);
                     this.container.removeClass('hide-all-tree-related-ui');
