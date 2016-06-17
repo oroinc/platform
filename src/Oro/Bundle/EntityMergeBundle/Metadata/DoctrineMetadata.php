@@ -23,7 +23,7 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
      */
     public function isAssociation()
     {
-        return $this->has('targetEntity') && ($this->has('joinColumns') || $this->has('joinTable'));
+        return $this->has('targetEntity');
     }
 
     /**
