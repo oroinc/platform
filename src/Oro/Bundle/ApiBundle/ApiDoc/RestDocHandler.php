@@ -214,7 +214,6 @@ class RestDocHandler implements HandlerInterface
             );
         } else {
             $entityClass = $actionContext->getClassName();
-            $c1 = $actionContext->getConfig();
             $config = $actionContext->getConfig()->toArray();
             $description = $this->resourceDocProvider->getResourceDescription(
                 $action,
