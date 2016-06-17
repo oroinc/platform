@@ -2,14 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
-
 /**
  * @dbIsolation
  */
-class GetRestJsonApiWithRenamedFieldsTest extends ApiTestCase
+class GetRestJsonApiWithRenamedFieldsTest extends RestJsonApiTestCase
 {
     const PRODUCT_ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestProduct';
 
@@ -18,25 +14,9 @@ class GetRestJsonApiWithRenamedFieldsTest extends ApiTestCase
      */
     protected function setUp()
     {
-        $this->initClient(
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
-        );
-
         parent::setUp();
 
         $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadRenamedFieldsTestData']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getRequestType()
-    {
-        return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -57,20 +37,6 @@ class GetRestJsonApiWithRenamedFieldsTest extends ApiTestCase
         unset($data);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return string
-     */
-    protected function getEntityAlias($entityClass)
-    {
-        return $this->valueNormalizer->normalizeValue(
-            $entityClass,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
-        );
-    }
-
     public function testFilteringByRenamedIdentityField()
     {
         $params = [
@@ -80,22 +46,15 @@ class GetRestJsonApiWithRenamedFieldsTest extends ApiTestCase
 
         $this->updateProductExpectedData($expected);
 
-        $entityAlias = $this->getEntityAlias(self::PRODUCT_ENTITY_CLASS);
+        $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);
 
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias]),
-            $params,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
+            $params
         );
 
-        $response = $this->client->getResponse();
-
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
+        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
         $this->assertEquals($expected, json_decode($response->getContent(), true));
     }
 
@@ -108,22 +67,15 @@ class GetRestJsonApiWithRenamedFieldsTest extends ApiTestCase
 
         $this->updateProductExpectedData($expected);
 
-        $entityAlias = $this->getEntityAlias(self::PRODUCT_ENTITY_CLASS);
+        $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);
 
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias]),
-            $params,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
+            $params
         );
 
-        $response = $this->client->getResponse();
-
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
+        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
         $this->assertEquals($expected, json_decode($response->getContent(), true));
     }
 
@@ -136,22 +88,15 @@ class GetRestJsonApiWithRenamedFieldsTest extends ApiTestCase
 
         $this->updateProductExpectedData($expected);
 
-        $entityAlias = $this->getEntityAlias(self::PRODUCT_ENTITY_CLASS);
+        $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);
 
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias]),
-            $params,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
+            $params
         );
 
-        $response = $this->client->getResponse();
-
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
+        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
         $this->assertEquals($expected, json_decode($response->getContent(), true));
     }
 
@@ -165,22 +110,15 @@ class GetRestJsonApiWithRenamedFieldsTest extends ApiTestCase
     {
         $this->updateProductExpectedData($expected);
 
-        $entityAlias = $this->getEntityAlias(self::PRODUCT_ENTITY_CLASS);
+        $entityType = $this->getEntityType(self::PRODUCT_ENTITY_CLASS);
 
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias]),
-            $params,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
+            $params
         );
 
-        $response = $this->client->getResponse();
-
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
+        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
         $this->assertEquals($expected, json_decode($response->getContent(), true));
     }
 

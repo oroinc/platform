@@ -2,38 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-
 /**
  * @dbIsolation
  */
-class GetAndDeleteRestJsonApiTest extends ApiTestCase
+class GetAndDeleteRestJsonApiTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->initClient(
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
-        );
-
-        parent::setUp();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getRequestType()
-    {
-        return new RequestType([RequestType::REST, RequestType::JSON_API]);
-    }
-
     /**
      * @param string   $entityClass
      * @param string[] $excludedActions
@@ -42,35 +15,24 @@ class GetAndDeleteRestJsonApiTest extends ApiTestCase
      */
     public function testRestRequests($entityClass, $excludedActions)
     {
-        $entityAlias = $this->valueNormalizer->normalizeValue(
-            $entityClass,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
-        );
+        $entityType = $this->getEntityType($entityClass);
 
         // test "get list" request
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1]),
-            [],
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1])
         );
-        $response = $this->client->getResponse();
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
+        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
 
         $id = $this->getGetEntityId($this->jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
             if (!in_array('get', $excludedActions, true)) {
-                $this->checkGetRequest($entityAlias, $id, 200);
+                $this->checkGetRequest($entityType, $id, 200);
             }
             // test "delete" request
             if (!in_array('delete', $excludedActions, true)) {
-                $this->checkDeleteRequest($entityAlias, $id, $excludedActions);
+                $this->checkDeleteRequest($entityType, $id, $excludedActions);
             }
         }
     }
@@ -87,43 +49,26 @@ class GetAndDeleteRestJsonApiTest extends ApiTestCase
             return;
         }
 
-        $entityAlias = $this->valueNormalizer->normalizeValue(
-            $entityClass,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
-        );
-        $this->client->request(
+        $entityType = $this->getEntityType($entityClass);
+
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1]),
-            [],
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1])
         );
-        $response = $this->client->getResponse();
         if ($response->getStatusCode() === 200) {
             $id = [];
             $content = $this->jsonToArray($response->getContent());
-            if (count($content['data'])) {
+            if (!empty($content['data'])) {
                 foreach ($content['data'] as $item) {
                     $id[] = $item['id'];
                 }
-                $this->client->request(
+                $response = $this->request(
                     'DELETE',
                     $this->getUrl(
                         'oro_rest_api_cdelete',
-                        ['entity' => $entityAlias, 'filter[id]' => implode(',', $id)]
-                    ),
-                    [],
-                    [],
-                    array_replace(
-                        $this->generateWsseAuthHeader(),
-                        ['CONTENT_TYPE' => 'application/vnd.api+json']
+                        ['entity' => $entityType, 'filter[id]' => implode(',', $id)]
                     )
                 );
-                $response = $this->client->getResponse();
                 if ($response->getStatusCode() !== 204) {
                     // process delete errors
                     $data = $this->jsonToArray($response->getContent());
@@ -131,30 +76,23 @@ class GetAndDeleteRestJsonApiTest extends ApiTestCase
                     $this->assertEquals($data['errors'][0]['title'], 'forbidden exception');
                 } elseif (!in_array('get', $excludedActions, true)) {
                     // check if entity was really deleted
-                    $this->checkGetRequest($entityAlias, $id[0], 404);
+                    $this->checkGetRequest($entityType, $id[0], 404);
                 }
             }
         }
     }
 
     /**
-     * @param string   $entityAlias
+     * @param string   $entityType
      * @param mixed    $id
      * @param string[] $excludedActions
      */
-    protected function checkDeleteRequest($entityAlias, $id, $excludedActions)
+    protected function checkDeleteRequest($entityType, $id, $excludedActions)
     {
-        $this->client->request(
+        $response = $this->request(
             'DELETE',
-            $this->getUrl('oro_rest_api_delete', ['entity' => $entityAlias, 'id' => $id]),
-            [],
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_delete', ['entity' => $entityType, 'id' => $id])
         );
-        $response = $this->client->getResponse();
         if ($response->getStatusCode() !== 204) {
             // process delete errors
             $data = $this->jsonToArray($response->getContent());
@@ -162,28 +100,22 @@ class GetAndDeleteRestJsonApiTest extends ApiTestCase
             $this->assertEquals($data['errors'][0]['title'], 'forbidden exception');
         } elseif (!in_array('get', $excludedActions, true)) {
             // check if entity was really deleted
-            $this->checkGetRequest($entityAlias, $id, 404);
+            $this->checkGetRequest($entityType, $id, 404);
         }
     }
 
     /**
-     * @param string  $entityAlias
+     * @param string  $entityType
      * @param mixed   $id
      * @param integer $expectedStatus
      */
-    protected function checkGetRequest($entityAlias, $id, $expectedStatus)
+    protected function checkGetRequest($entityType, $id, $expectedStatus)
     {
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id]),
-            [],
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => $id])
         );
-        $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), $expectedStatus, $entityAlias, 'get');
+        $this->assertApiResponseStatusCodeEquals($response, $expectedStatus, $entityType, 'get');
     }
 
     /**

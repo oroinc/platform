@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Parser;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -32,6 +33,8 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function setUp()
     {
+        $this->initClient([], $this->getRequestParameters());
+
         /** @var ContainerInterface $container */
         $container = $this->getContainer();
 
@@ -40,9 +43,31 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @return array
+     */
+    protected function getRequestParameters()
+    {
+        return $this->generateWsseAuthHeader();
+    }
+
+    /**
      * @return RequestType
      */
     abstract protected function getRequestType();
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string
+     */
+    protected function getEntityType($entityClass)
+    {
+        return $this->valueNormalizer->normalizeValue(
+            $entityClass,
+            DataType::ENTITY_TYPE,
+            $this->getRequestType()
+        );
+    }
 
     /**
      * @return array [entity class => [entity class, [excluded action, ...]], ...]
