@@ -24,9 +24,15 @@
 
     {{ UI.cancelButton(path('oro_locale_localization_index')) }}
     {% if entity.id and resource_granted('oro_locale_localization_update') or resource_granted('oro_locale_localization_create') %}
-        {% set html = UI.saveAndStayButton() %}
+        {% set html = UI.saveAndStayButton({
+            'route': 'oro_locale_localization_update',
+            'params': {'id': '$id'}
+        }) %}
         {% if resource_granted('oro_locale_localization_view') %}
-            {% set html = html ~ UI.saveAndCloseButton() %}
+            {% set html = html ~ UI.saveAndCloseButton({
+                'route': 'oro_locale_localization_view',
+                'params': {'id': '$id'}
+            }) %}
         {% endif %}
 
         {{ UI.dropdownSaveButton({'html': html}) }}

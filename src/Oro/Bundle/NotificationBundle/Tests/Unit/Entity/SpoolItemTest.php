@@ -42,4 +42,12 @@ class SpoolItemTest extends \PHPUnit_Framework_TestCase
         $this->entity->setMessage($message);
         $this->assertEquals($message, $this->entity->getMessage());
     }
+
+    public function testSetterGetterLogType()
+    {
+        // empty from construct
+        $this->assertNull($this->entity->getLogType());
+        $this->entity->setLogType('log type');
+        $this->assertEquals('log type', $this->entity->getLogType());
+    }
 }

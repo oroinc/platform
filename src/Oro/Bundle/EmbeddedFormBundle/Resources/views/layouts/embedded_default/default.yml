@@ -42,3 +42,7 @@ layout:
                     content: ~
         - '@setBlockTheme':
             themes: 'OroEmbeddedFormBundle:layouts:embedded_default/form.html.twig'
+    conditions:
+        '@eq':
+            - false
+            - $context.embedded_form_inline

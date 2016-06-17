@@ -1,10 +1,11 @@
 define([
     'underscore',
-    'backgrid',
+    'backbone',
     'chaplin',
+    'backgrid',
     './row',
     '../pageable-collection'
-], function(_, Backgrid, Chaplin, Row, PageableCollection) {
+], function(_, Backbone, Chaplin, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
