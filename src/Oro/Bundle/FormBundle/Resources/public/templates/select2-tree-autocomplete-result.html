@@ -1,14 +1,17 @@
 <% if (treePath.length > 3) { %>
-   <%= getLabel(treePath[0]) %>
+   <%= getLabel(treePath[0], highlight) %>
    <span class="select2-tree-result-item-divider">/</span>
-   <span class="select2-tree-result-item-more-path" title="<%  for (var i = 1; i < treePath.length - 1; i++) { %><%= getLabel(treePath[i]) %><% if (i !== treePath.length - 2) { %> / <% } %><% } %>">...</span>
+   <span class="select2-tree-result-item-more-path" title="<%  for (var i = 1; i < treePath.length - 1; i++) { %><%= getLabel(treePath[i], highlight) %><% if (i !== treePath.length - 2) { %> / <% } %><% } %>">...</span>
    <span class="select2-tree-result-item-divider">/</span>
-   <%= getLabel(treePath[treePath.length - 1]) %>
+   <%= getLabel(treePath[treePath.length - 1], highlight) %>
 <% } else { %>
    <%  for (var i = 0; i < treePath.length; i++) { %>
-       <%= getLabel(treePath[i]) %>
+       <%= getLabel(treePath[i], highlight) %>
        <% if (i !== treePath.length - 1) { %>
            <span class="select2-tree-result-item-divider">/</span>
        <% } %>
    <% } %>
+<% } %>
+<% if (id === null) { %>
+    <span class="select2__result-entry-info"><%= _.__(newKey) %></span>
 <% } %>
