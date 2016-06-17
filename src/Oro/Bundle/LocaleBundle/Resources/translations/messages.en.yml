@@ -28,20 +28,20 @@ oro.locale:
         navigation:
             view: 'Localization "%name%"'
 
-        localizedfallbackvalue:
-            entity_label: 'Localized fallback value'
-            entity_plural_label: 'Localized fallback values'
-            id.label: 'ID'
-            fallback.label: 'Fallback'
-            localization.label: 'Localization'
-            string.label: 'String value'
-            text.label: 'Text value'
-
         form:
             placeholder:
                 select_parent_localization: 'Please select parent localization...'
                 select_language: 'Please select language...'
                 select_formatting: 'Please select formatting...'
+
+    localizedfallbackvalue:
+        entity_label: 'Localized fallback value'
+        entity_plural_label: 'Localized fallback values'
+        id.label: 'ID'
+        fallback.label: 'Fallback'
+        localization.label: 'Localization'
+        string.label: 'String value'
+        text.label: 'Text value'
 
     fallback:
         type:
