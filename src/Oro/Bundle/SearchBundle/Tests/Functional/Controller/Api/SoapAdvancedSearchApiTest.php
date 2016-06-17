@@ -3,13 +3,17 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\SearchExtensionTrait;
 
 /**
  * @outputBuffering enabled
  */
 class SoapAdvancedSearchApiTest extends WebTestCase
 {
+    use SearchExtensionTrait;
+
     /** Default value for offset and max_records */
     const DEFAULT_VALUE = 0;
 
@@ -23,6 +27,7 @@ class SoapAdvancedSearchApiTest extends WebTestCase
         $this->initSoapClient();
         $this->startTransaction();
         $this->loadFixtures([LoadSearchItemData::class], true);
+        $this->getSearchIndexer()->reindex(Item::class);
     }
 
     protected function tearDown()

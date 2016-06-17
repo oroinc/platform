@@ -116,11 +116,11 @@ abstract class BaseDriver
      */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:Item');
         $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDecimal');
         $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexText');
         $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexInteger');
         $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDatetime');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:Item');
     }
 
     /**
@@ -134,9 +134,7 @@ abstract class BaseDriver
     {
         /** @var ClassMetadata $metadata */
         $metadata = $this->em->getClassMetadata($entityName);
-        // @todo
         $query    = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
-        $query    = 'DELETE FROM ' . $metadata->getTableName();
         $connection->executeUpdate($query);
     }
 

@@ -6,7 +6,6 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -19,47 +18,14 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  *
  * Execute with "php app/console doctrine:fixtures:load"
  */
-class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface
 {
     const COUNT = 9;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
-    {
-        $this->loadItems($manager);
-
-        $this->getSearchIndexer()->reindex();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrder()
-    {
-        return 4;
-    }
-
-    /**
-     * Load items
-     *
-     * @param ObjectManager $manager
-     */
-    public function loadItems($manager)
     {
         for ($ind = 1; $ind <= self::COUNT; $ind++) {
             //create item
@@ -96,10 +62,10 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
     }
 
     /**
-     * @return \Oro\Bundle\SearchBundle\Engine\OrmIndexer
+     * {@inheritdoc}
      */
-    protected function getSearchIndexer()
+    public function getOrder()
     {
-        return $this->container->get('oro_search.search.engine.indexer');
+        return 4;
     }
 }

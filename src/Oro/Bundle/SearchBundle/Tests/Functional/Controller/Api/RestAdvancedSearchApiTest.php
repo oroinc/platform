@@ -3,10 +3,14 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\SearchExtensionTrait;
 
 class RestAdvancedSearchApiTest extends WebTestCase
 {
+    use SearchExtensionTrait;
+
     protected function setUp()
     {
         parent::setUp();
@@ -14,6 +18,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->startTransaction();
         $this->loadFixtures([LoadSearchItemData::class], true);
+        $this->getSearchIndexer()->reindex(Item::class);
     }
 
     protected function tearDown()
