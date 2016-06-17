@@ -172,6 +172,11 @@ services:
         tags:
             - { name: oro_layout.expression, alias: asset }
 
+    oro_layout.provider.image_type:
+        class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
+        arguments:
+            - @oro_layout.theme_manager
+
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:
