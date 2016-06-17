@@ -131,20 +131,20 @@ class RoleController extends Controller
             $oid = $identity->children['id']->vars['value'];
             $item = [
                 'entity' => $translator->trans($identity->children['name']->vars['value']),
-                'identity' => $oid,
-                'group' => null,
+                'identity' => $identity->children['id']->vars['value'],
+                'group' => ['account_management', 'marketing', 'sales_data', null][count($gridData) % 4],
                 'permissions' => []
             ];
-            if (strpos($oid, 'entity:') === 0) {
-                $entityClass = substr($oid, 7);
-                if ($entityClass !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-                    $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
-                    $config = $configEntityManager->getConfig($entityClass);
-                    if ($config->has('category')) {
-                        $item['group'] = $config->get('category');
-                    }
-                }
-            }
+//            if (strpos($oid, 'entity:') === 0) {
+//                $entityClass = substr($oid, 7);
+//                if ($entityClass !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+//                    $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
+//                    $config = $configEntityManager->getConfig($entityClass);
+//                    if ($config->has('category')) {
+//                        $item['group'] = $config->get('category');
+//                    }
+//                }
+//            }
 
             // all data transformation are taken from form type blocks
             foreach ($child->vars['privileges_config']['permissions'] as $field) {
@@ -180,18 +180,18 @@ class RoleController extends Controller
 
         $capabilitiesData = [];
         foreach ($categories as $category) {
-            $capabilitiesData[$category['id']] = [
+            $capabilitiesData[] = [
                 'group' => $category['id'],
                 'label' => $category['label'],
                 'items' => []
             ];
         }
 
+        $index = 0;
         foreach ($form->children['action']->children as $action_id => $child) {
             $permission = reset($child->children['permissions']->children)->vars['value'];
             $description = $child->vars['value']->getDescription();
-            $category = $child->vars['value']->getCategory();
-            $capabilitiesData[$category]['items'][] = [
+            $capabilitiesData[$index++ % count($categories)]['items'][] = [
                 'id' => $action_id,
                 'identity' => $child->children['identity']->children['id']->vars['value'],
                 'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
