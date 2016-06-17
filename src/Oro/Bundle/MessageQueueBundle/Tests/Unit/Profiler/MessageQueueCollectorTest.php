@@ -74,13 +74,14 @@ class MessageQueueCollectorTest extends \PHPUnit_Framework_TestCase
         $collector = new MessageQueueCollector($this->createMessageProducerMock());
 
         $this->assertEquals('foo', $collector->prettyPrintMessage('foo'));
+        $this->assertEquals('&lt;p&gt;', $collector->prettyPrintMessage('<p>'));
     }
 
     public function testShouldPrettyPrintArrayMessage()
     {
         $collector = new MessageQueueCollector($this->createMessageProducerMock());
 
-        $expected = "[\n    \"foo\",\n    \"bar\"\n]";
+        $expected = "[\n    &quot;foo&quot;,\n    &quot;bar&quot;\n]";
 
         $this->assertEquals($expected, $collector->prettyPrintMessage(['foo', 'bar']));
     }

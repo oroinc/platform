@@ -71,7 +71,7 @@ class MessageQueueCollector extends DataCollector
     public function prettyPrintMessage($message)
     {
         if (is_scalar($message)) {
-            return $message;
+            return htmlspecialchars($message);
         }
 
         return htmlspecialchars(
