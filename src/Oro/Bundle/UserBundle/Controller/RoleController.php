@@ -216,7 +216,7 @@ class RoleController extends Controller
             ],
             'gridData' => $gridData,
             'capabilitySetOptions' => [
-                'data' => $capabilitiesData,
+                'data' => array_values($capabilitiesData),
                 'tabIds' => $tabs
             ],
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
