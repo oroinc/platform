@@ -2,55 +2,78 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Autocomplete;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+
 use Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitSearchHandler;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class BusinessUnitSearchHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCheckCorrectWork()
+    /** @var \PHPUnit_Framework_MockObject_MockObject|BusinessUnitSearchHandler */
+    protected $businessUnitSearchHandler;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager */
+    protected $manager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectRepository */
+    protected $repository;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|Registry */
+    protected $doctrine;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadataFactory */
+    protected $classMetadataFactory;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadata */
+    protected $classMetadata;
+
+    public function setUp()
     {
-        $manager = self::getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $this->manager = self::getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()->getMock();
 
-        $doctrine = self::getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+        $this->doctrine = self::getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()->getMock();
 
-        $repository = self::getMockBuilder('\Doctrine\Common\Persistence\ObjectRepository')
+        $this->repository = self::getMockBuilder('\Doctrine\Common\Persistence\ObjectRepository')
             ->disableOriginalConstructor()->getMock();
 
-        $classMetadataFactory = self::getMockBuilder('\Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
+        $this->classMetadataFactory = self::getMockBuilder('\Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()->getMock();
 
-        $classMetadata = self::getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
+        $this->classMetadata = self::getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()->getMock();
-        $classMetadata->expects(self::once())->method('getSingleIdentifierFieldName')->willReturn('id');
 
-        $classMetadataFactory->expects(self::once())->method('getMetadataFor')->willReturn($classMetadata);
-
-        $manager->expects(self::any())->method('getRepository')->willReturn($repository);
-        $manager->expects(self::once())->method('getMetadataFactory')->willReturn($classMetadataFactory);
-        $doctrine->expects(self::once())->method('getManager')->willReturn($manager);
-
-
-        $businessUnit = new BusinessUnit();
-        $businessUnit->setName('BU_1');
-        $businessUnit1 = new BusinessUnit();
-        $businessUnit1->setName('BU_1_1');
-
-        $businessUnit1->setOwner($businessUnit);
-
-        $repository->expects(self::any())->method('find')->willReturn($businessUnit1);
-        $businessUnitSearchHandler = new BusinessUnitSearchHandler('', [], $doctrine);
-
-        $item=[];
-
-        $businessUnitSearchHandler->initDoctrinePropertiesByEntityManager($manager);
-        $rsponse = $businessUnitSearchHandler->convertItem($item);
-
-
-        self::assertEquals($this->getExpectedData(), $rsponse);
+        $this->businessUnitSearchHandler = new BusinessUnitSearchHandler('', [], $this->doctrine);
     }
 
+    public function testCheckCorrectWork()
+    {
+        $businessUnit = $this->getBusinessUnit();
+
+        $this->repository->expects(self::any())->method('find')->willReturn($businessUnit);
+        $this->classMetadata->expects(self::once())->method('getSingleIdentifierFieldName')->willReturn('id');
+
+        $this->classMetadataFactory->expects(self::once())->method('getMetadataFor')->willReturn($this->classMetadata);
+
+        $this->manager->expects(self::any())->method('getRepository')->willReturn($this->repository);
+        $this->manager->expects(self::once())->method('getMetadataFactory')->willReturn($this->classMetadataFactory);
+        $this->doctrine->expects(self::once())->method('getManager')->willReturn($this->manager);
+
+        $item=[];
+        $this->businessUnitSearchHandler->initDoctrinePropertiesByEntityManager($this->manager);
+        $response = $this->businessUnitSearchHandler->convertItem($item);
+
+        self::assertEquals($this->getExpectedData(), $response);
+    }
+
+    /**
+     * @return array
+     */
     protected function getExpectedData()
     {
         return [
@@ -64,5 +87,19 @@ class BusinessUnitSearchHandlerTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
+    }
+
+    /**
+     * @return BusinessUnit
+     */
+    protected function getBusinessUnit()
+    {
+        $businessUnit = new BusinessUnit();
+        $businessUnit->setName('BU_1');
+        $businessUnit1 = new BusinessUnit();
+        $businessUnit1->setName('BU_1_1');
+        $businessUnit1->setOwner($businessUnit);
+
+        return $businessUnit1;
     }
 }
