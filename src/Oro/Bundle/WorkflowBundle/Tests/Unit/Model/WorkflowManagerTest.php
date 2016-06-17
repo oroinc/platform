@@ -253,7 +253,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowItem()
     {
         $entity = new EntitySub(42);
-        
+
         $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($entity)->willReturn(42);
@@ -276,24 +276,14 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with(EntitySub::class, 42, 'test_workflow')->willReturn('workflowItemInstance');
 
         $this->workflowManager->getWorkflowItem($entity, 'test_workflow');
-        
-        
     }
 
-    /**
-     * @param boolean $withStartStep
-     * @dataProvider resetWorkflowItemProvider
-     */
-    public function testResetWorkflowItem($withStartStep)
+    public function testResetWorkflowItemWithStartStep()
     {
         $workflowName = self::TEST_WORKFLOW_NAME;
         $activeWorkflowName = self::TEST_WORKFLOW_NAME;// . '_active';
         $workflowItem = $this->createWorkflowItem();
-        $entity = new WorkflowAwareEntity();
-        $workflowStep = new WorkflowStep();
-
-        $entity->setWorkflowItem($workflowItem);
-        $entity->setWorkflowStep($workflowStep);
+        $entity = new EntitySub(42);
 
         $workflowItem->setEntity($entity);
 
@@ -309,7 +299,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
             ->disableOriginalConstructor()
             ->getMock();
-
+        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs([new EntityConnector(), $aclManager, $restrictionManager, null, null, null])
             ->setMethods(null)
@@ -318,33 +308,29 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
         $stepManager->expects($this->any())->method('hasStartStep')
-            ->will($this->returnValue($withStartStep));
+            ->will($this->returnValue(true));
 
         $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $activeWorkflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $activeWorkflow */
+        $activeWorkflow = $this->getMockBuilder(Workflow::class)
             ->setConstructorArgs([new EntityConnector(), $aclManager, $restrictionManager, $stepManager, null, null])
             ->setMethods(['start'])
             ->getMock();
 
         $activeWorkflow->setName($activeWorkflowName);
         $activeWorkflow->setDefinition($workflowDefinition);
-        if ($withStartStep) {
-            $workflowDefinition->setName($activeWorkflowName);
-            $workflowItemActive = $this->createWorkflowItem($activeWorkflowName);
-            $workflowItemActive->setEntity($entity);
-            $workflowItemActive->setDefinition($workflowDefinition);
+        $workflowDefinition->setName($activeWorkflowName);
+        $workflowItemActive = $this->createWorkflowItem($activeWorkflowName);
+        $workflowItemActive->setEntity($entity);
+        $workflowItemActive->setDefinition($workflowDefinition);
 
-            $activeWorkflow->expects($this->once())
-                ->method('start')
-                ->with($entity, [], null)
-                ->will($this->returnValue($workflowItemActive));
-        } else {
-            $activeWorkflow->expects($this->never())
-                ->method('start');
-        }
+        $activeWorkflow->expects($this->once())
+            ->method('start')
+            ->with($entity, [], null)
+            ->will($this->returnValue($workflowItemActive));
 
         $this->workflowRegistry->expects($this->any())
             ->method('getWorkflow')
@@ -364,43 +350,20 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->expects($this->at(0))
             ->method('getEntityManagerForClass')
             ->will($this->returnValue($entityManager));
+        $entityManager->expects($this->at(0))->method('beginTransaction');
+
+        $this->doctrineHelper->expects($this->at(1))
+            ->method('getEntityManagerForClass')
+            ->will($this->returnValue($entityManager));
         $entityManager->expects($this->once())->method('beginTransaction');
-
-
-        if ($withStartStep) {
-            $this->doctrineHelper->expects($this->at(1))
-                ->method('getEntityManagerForClass')
-                ->will($this->returnValue($entityManager));
-            $entityManager->expects($this->once())->method('beginTransaction');
-            $entityManager->expects($this->once())->method('persist');
-            $entityManager->expects($this->once())->method('flush');
-            $entityManager->expects($this->once())->method('commit');
-        } else {
-            $this->doctrineHelper->expects($this->never())
-                ->method('getEntityManagerForClass');
-        }
+        $entityManager->expects($this->once())->method('persist');
+        $entityManager->expects($this->once())->method('flush');
+        $entityManager->expects($this->once())->method('commit');
 
         $activeWorkflowItem = $this->workflowManager->resetWorkflowItem($workflowItem);
-        if ($withStartStep) {
-            $this->assertNotNull($activeWorkflowItem);
-            $this->assertEquals($activeWorkflowName, $activeWorkflowItem->getDefinition()->getName());
-        } else {
-            $this->assertNull($activeWorkflowItem);
-        }
 
-        $this->assertNull($entity->getWorkflowStep());
-        $this->assertNull($entity->getWorkflowItem());
-    }
-
-    /**
-     * @return array
-     */
-    public function resetWorkflowItemProvider()
-    {
-        return [
-            'with start step' => [true],
-            'without start step' => [false]
-        ];
+        $this->assertNotNull($activeWorkflowItem);
+        $this->assertEquals($activeWorkflowName, $activeWorkflowItem->getDefinition()->getName());
     }
 
     /**

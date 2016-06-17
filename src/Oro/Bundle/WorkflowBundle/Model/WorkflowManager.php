@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntitySub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowManager
@@ -173,13 +174,16 @@ class WorkflowManager
     {
         $workflow = $this->getWorkflow($workflow);
 
-        return $this->inTransaction(function (EntityManager $em) use ($workflow, $entity, $transition, $data) {
-            $workflowItem = $workflow->start($entity, $data, $transition);
-            $em->persist($workflowItem);
-            $em->flush();
+        return $this->inTransaction(
+            function (EntityManager $em) use ($workflow, $entity, $transition, $data) {
+                $workflowItem = $workflow->start($entity, $data, $transition);
+                $em->persist($workflowItem);
+                $em->flush();
 
-            return $workflowItem;
-        }, WorkflowItem::class);
+                return $workflowItem;
+            },
+            WorkflowItem::class
+        );
     }
 
     /**
@@ -233,18 +237,15 @@ class WorkflowManager
     public function transit(WorkflowItem $workflowItem, $transition)
     {
         $workflow = $this->getWorkflow($workflowItem);
-        /** @var EntityManager $em */
-        $em = $this->doctrineHelper->getEntityManagerForClass(WorkflowItem::class);
-        $em->beginTransaction();
-        try {
-            $workflow->transit($workflowItem, $transition);
-            $workflowItem->setUpdated(); // transition might not change workflow item
-            $em->flush();
-            $em->commit();
-        } catch (\Exception $e) {
-            $em->rollback();
-            throw $e;
-        }
+
+        $this->inTransaction(
+            function (EntityManager $em) use ($workflow, $workflowItem, $transition) {
+                $workflow->transit($workflowItem, $transition);
+                $workflowItem->setUpdated(); // transition might not change workflow item
+                $em->flush();
+            },
+            WorkflowItem::class
+        );
     }
 
     /**
