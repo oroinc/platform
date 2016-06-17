@@ -45,6 +45,15 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * @Then /^(?:|I )check ([\w\s]*) and ([\w\s]*) in grid$/
+     */
+    public function checkTwoRecordsInGrid($record1, $record2)
+    {
+        $this->getGrid()->checkRecord($record1);
+        $this->getGrid()->checkRecord($record2);
+    }
+
+    /**
      * @When /^(?:|I )check first (?P<number>(?:[^"]|\\")*) records in grid$/
      * @When select few records
      */
@@ -129,11 +138,19 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @Given /^(?:|I )click (?P<action>(?:[^"]|\\")*) (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click (?P<action>(?:|edit|delete|view|!on)) (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickActionInRow($content, $action)
     {
         $this->getGrid()->clickActionLink($content, $action);
+    }
+
+    /**
+     * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid$/
+     */
+    public function clickOnRow($content)
+    {
+        $this->getGrid()->getRowByContent($content)->click();
     }
 
     /**

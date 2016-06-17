@@ -52,17 +52,18 @@ class Grid extends Element
         for ($i = 0; $i < $number; $i++) {
             /** @var NodeElement $row */
             $row = $rows[$i];
-            $massActionCell = $row->find('css', '.grid-body-cell-massAction');
-
-            if (!$massActionCell) {
-                throw new ExpectationException(
-                    sprintf('No mass action checkbox found for "%s"', $row->getText()),
-                    $this->getSession()->getDriver()
-                );
-            }
-
-            $massActionCell->click();
+            $this->checkRowCheckbox($row);
         }
+    }
+
+    /**
+     * @param string $content
+     * @throws ExpectationException
+     */
+    public function checkRecord($content)
+    {
+        $row = $this->getRowByContent($content);
+        $this->checkRowCheckbox($row);
     }
 
     /**
@@ -167,7 +168,7 @@ class Grid extends Element
      * @return NodeElement
      * @throws ExpectationException
      */
-    protected function getRowByContent($content)
+    public function getRowByContent($content)
     {
         $rows = $this->getRows();
 
@@ -178,5 +179,23 @@ class Grid extends Element
         }
 
         throw new ExpectationException('Grid has no records', $this->session->getDriver());
+    }
+
+    /**
+     * @param NodeElement $row
+     * @throws ExpectationException
+     */
+    protected function checkRowCheckbox(NodeElement $row)
+    {
+        $rowCheckbox = $row->find('css', '[type="checkbox"]');
+
+        if (!$rowCheckbox) {
+            throw new ExpectationException(
+                sprintf('No mass action checkbox found for "%s"', $row->getText()),
+                $this->getDriver()
+            );
+        }
+
+        $rowCheckbox->click();
     }
 }
