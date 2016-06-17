@@ -64,15 +64,17 @@ define([
         },
 
         initItemView: function(model) {
-            if (this.itemView) {
-                return new this.itemView({
+            Row = this.row || this.itemView;
+            if (Row) {
+                return new Row({
                     autoRender: false,
                     model: model,
                     collection: this.filteredColumns,
                     columns: this.columns
                 });
             } else {
-                throw new Error('The CollectionView#itemView property ' + 'must be defined or the initItemView() must be overridden.');
+                throw new Error('The one of Body#row or Body#itemView properties ' +
+                    'must be defined or the initItemView() must be overridden.');
             }
         },
 
@@ -111,7 +113,7 @@ define([
                     emptyText: this.emptyText,
                     columns: this.columns
                 }).render().el;
-                this.fallbackSelector = _.map(fallbackElement.classList, function(name) {return '.' + name}).join('');
+                this.fallbackSelector = _.map(fallbackElement.classList, function(name) {return '.' + name;}).join('');
                 this.$el.append(fallbackElement);
             }
             Body.__super__.initFallback.apply(this, arguments);
@@ -128,9 +130,9 @@ define([
             return this;
         },
 
-        makeComparator: function (attr, order, func) {
+        makeComparator: function(attr, order, func) {
 
-            return function (left, right) {
+            return function(left, right) {
                 // extract the values from the models
                 var t;
                 var l = func(left, attr);
