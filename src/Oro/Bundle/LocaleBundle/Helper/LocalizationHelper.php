@@ -49,7 +49,7 @@ class LocalizationHelper
                 return $localization->getLanguageCode() === 'en';
             }
         );
-        
+
         return $withEnglish ? reset($withEnglish) : reset($items);
     }
 
