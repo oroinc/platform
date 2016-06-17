@@ -100,3 +100,13 @@ services:
             - '@oro_message_queue.client.meta.destination_meta_registry'
         tags:
             - { name: 'console.command' }
+
+    oro_message_queue.profiler.message_queue_collector:
+        class: 'Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector'
+        public: false
+        arguments: ['@oro_message_queue.message_producer']
+        tags:
+            -
+              name: 'data_collector'
+              template: 'OroMessageQueueBundle:Profiler:panel.html.twig'
+              id: 'oro.message_queue'

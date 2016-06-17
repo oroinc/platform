@@ -45,10 +45,8 @@ class TraceableMessageProducerTest extends \PHPUnit_Framework_TestCase
         $messageProducer->send('aFooTopic', 'aFooBody', 'aFooPriority');
 
         $this->assertEquals([
-            'aFooTopic' => [
-                ['message' => 'aFooBody', 'priority' => 'aFooPriority'],
-                ['message' => 'aFooBody', 'priority' => 'aFooPriority'],
-            ]
+                ['topic'=> 'aFooTopic', 'message' => 'aFooBody', 'priority' => 'aFooPriority'],
+                ['topic'=> 'aFooTopic', 'message' => 'aFooBody', 'priority' => 'aFooPriority'],
         ], $messageProducer->getTraces());
     }
 
@@ -60,12 +58,8 @@ class TraceableMessageProducerTest extends \PHPUnit_Framework_TestCase
         $messageProducer->send('aBarTopic', 'aBarBody', 'aBarPriority');
 
         $this->assertEquals([
-            'aFooTopic' => [
-                ['message' => 'aFooBody', 'priority' => 'aFooPriority'],
-            ],
-            'aBarTopic' => [
-                ['message' => 'aBarBody', 'priority' => 'aBarPriority'],
-            ]
+            ['topic'=> 'aFooTopic', 'message' => 'aFooBody', 'priority' => 'aFooPriority'],
+            ['topic' => 'aBarTopic', 'message' => 'aBarBody', 'priority' => 'aBarPriority'],
         ], $messageProducer->getTraces());
     }
 

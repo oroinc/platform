@@ -45,4 +45,3 @@ services:
             - '@oro_message_queue.consumption.queue_consumer'
         tags:
             - { name: 'console.command' }
-
