@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -111,22 +113,39 @@ class RoleController extends Controller
             return $this->get('oro_ui.router')->redirect($entity);
         }
         
-        $categories = $this->get('oro_user.provider.category_provider')->getList();
+        $categoriesList = $this->get('oro_user.provider.category_provider')->getList();
+        $categories = array_values($categoriesList);
+        $tabs = array_filter(array_map(function($category) {
+            return $category['tab'] ? $category['id'] : null;
+        }, $categoriesList));
         // @todo: redevelop it as grid
         $form = $aclRoleHandler->createView();
         $translator = $this->get('translator');
         $permissionManager = $this->get('oro_security.acl.permission_manager');
-
+        /** @var ConfigProvider $configEntityManager */
+        $configEntityManager = $this->get('oro_entity_config.provider.entity');
         $form->children['entity']->children;
         $gridData = [];
         foreach ($form->children['entity']->children as $child) {
             $identity = $child->children['identity'];
+            $oid = $identity->children['id']->vars['value'];
             $item = [
                 'entity' => $translator->trans($identity->children['name']->vars['value']),
-                'identity' => $identity->children['id']->vars['value'],
-                'group' => ['account_management', 'marketing', 'sales_data', null][count($gridData) % 4],
+                'identity' => $oid,
+                'group' => null,
                 'permissions' => []
             ];
+            if (strpos($oid, 'entity:') === 0) {
+                $entityClass = substr($oid, 7);
+                if ($entityClass !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+                    $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
+                    $config = $configEntityManager->getConfig($entityClass);
+                    if ($config->has('category')) {
+                        $item['group'] = $config->get('category');
+                    }
+                }
+            }
+
             // all data transformation are taken from form type blocks
             foreach ($child->vars['privileges_config']['permissions'] as $field) {
                 foreach ($child->children['permissions']->children as $permission) {
@@ -161,18 +180,18 @@ class RoleController extends Controller
 
         $capabilitiesData = [];
         foreach ($categories as $category) {
-            $capabilitiesData[] = [
+            $capabilitiesData[$category['id']] = [
                 'group' => $category['id'],
                 'label' => $category['label'],
                 'items' => []
             ];
         }
 
-        $index = 0;
         foreach ($form->children['action']->children as $action_id => $child) {
             $permission = reset($child->children['permissions']->children)->vars['value'];
             $description = $child->vars['value']->getDescription();
-            $capabilitiesData[$index++ % count($categories)]['items'][] = [
+            $category = $child->vars['value']->getCategory();
+            $capabilitiesData[$category]['items'][] = [
                 'id' => $action_id,
                 'identity' => $child->children['identity']->children['id']->vars['value'],
                 'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
