@@ -21,8 +21,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
     {
         return [
             new PreloadedExtension(
-                [],
-                ['block' => [new VisibleExtension()]]
+                []
             )
         ];
     }
