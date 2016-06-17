@@ -195,3 +195,10 @@ services:
             - [setOptionsConfig, [{hidden: {default: false}}]]
         tags:
             - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type.extension.attr_renderer:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{attr_renderer: ~}]]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
