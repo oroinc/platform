@@ -49,14 +49,11 @@ class Form extends Element
      */
     protected function fillAsInput(NodeElement $element, $value)
     {
-        $type = $element->getAttribute('type');
         if ($element->hasClass('select2-offscreen')) {
             $this->setSelect2Input($element, $value);
-        } elseif ('text' === $type) {
+        } else {
             $element->setValue(null);
             $element->setValue($value);
-        } else {
-            throw new PendingException(sprintf('Type "%s" input is not implemented yet', $type));
         }
     }
 
