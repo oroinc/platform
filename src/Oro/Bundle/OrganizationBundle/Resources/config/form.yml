@@ -176,12 +176,18 @@ services:
     #
     oro_organization.form.type.widget_business_unit_select:
         class: Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_form.autocomplete.search_registry'
+            - '@oro_entity_config.provider.form'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: 'oro_type_widget_business_unit_select' }
 
     oro_organization.widget_config_value.widget_business_unit_multiselect.converter:
-        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter
+        class: Oro\Bundle\OrganizationBundle\Dashboard\Converters\WidgetBusinessUnitSelectConverter
         arguments:
+            - '@oro_user.dashboard.owner_helper'
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'

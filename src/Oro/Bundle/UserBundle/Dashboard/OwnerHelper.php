@@ -144,6 +144,8 @@ class OwnerHelper
             return [];
         }
 
+        $businessUnitIds = $this->replaceCurrentValues($businessUnitIds);
+
         $qb = $this->registry->getRepository('OroUserBundle:User')
             ->createQueryBuilder('u')
             ->select('DISTINCT(u.id)')

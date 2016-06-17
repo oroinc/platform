@@ -23,7 +23,8 @@ oro:
                 delete: Delete
             owner: Owner Business Unit
             has_business_unit: Has business unit
-
+        dashboard:
+            current_business_unit: Current Business Unit
     organization:
         entity_label:         Organization
         entity_plural_label:  Organizations
