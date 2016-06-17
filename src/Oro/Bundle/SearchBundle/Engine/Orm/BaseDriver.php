@@ -135,6 +135,7 @@ abstract class BaseDriver
         /** @var ClassMetadata $metadata */
         $metadata = $this->em->getClassMetadata($entityName);
         $query    = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
+        $query    = 'DELETE FROM ' . $metadata->getTableName();
         $connection->executeUpdate($query);
     }
 

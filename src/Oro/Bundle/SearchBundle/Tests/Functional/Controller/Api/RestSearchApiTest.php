@@ -15,7 +15,7 @@ class RestSearchApiTest extends WebTestCase
 
         $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->startTransaction();
-        $this->loadFixtures([LoadSearchItemData::class]);
+        $this->loadFixtures([LoadSearchItemData::class], true);
     }
 
     protected function tearDown()

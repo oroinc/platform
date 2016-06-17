@@ -18,7 +18,7 @@ class SearchControllerTest extends WebTestCase
 
         $this->initClient([], $this->generateBasicAuthHeader(), true);
         $this->startTransaction();
-        $this->loadFixtures([LoadSearchItemData::class]);
+        $this->loadFixtures([LoadSearchItemData::class], true);
     }
 
     protected function tearDown()
