@@ -15,37 +15,34 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        initialize: function(options) {
-            UniformSelectInputWidget.__super__.initialize.apply(this, arguments);
+        initializeWidget: function() {
+            UniformSelectInputWidget.__super__.initializeWidget.apply(this, arguments);
             if (this.$el.is('.error:not([multiple])')) {
                 this.$el.removeClass('error');
-                this.$container.addClass('error');
+                this.container().addClass('error');
             }
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
+        disposeWidget: function() {
             this.$el.uniform.restore(this.$el);
-            UniformSelectInputWidget.__super__.dispose.apply(this, arguments);
+            UniformSelectInputWidget.__super__.disposeWidget.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
         findContainer: function() {
-            this.$container = this.$el.parent('.selector');
+            return this.$el.parent('.selector');
         },
 
         /**
          * @inheritDoc
          */
-        setWidth: function(width) {
-            UniformSelectInputWidget.__super__.setWidth.apply(this, arguments);
+        width: function(width) {
+            UniformSelectInputWidget.__super__.width.apply(this, arguments);
             this.$container.find('span').width(width);
         },
 

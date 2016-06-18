@@ -6,7 +6,7 @@ datagrid:
             query:
                 select:
                     - event.id
-                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT(owner.firstName, ' ',owner.lastName) END, '') AS name
+                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT_WS(' ', owner.firstName, owner.lastName) END, '') AS name
                     - event.title
                     - event.start
                     - event.end
@@ -482,7 +482,7 @@ datagrid:
             query:
                 select:
                     - event.id
-                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT(owner.firstName, ' ',owner.lastName) END, '') AS name
+                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT_WS(' ', owner.firstName, owner.lastName) END, '') AS name
                     - event.title
                     - event.start
                     - event.end

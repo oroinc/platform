@@ -13,10 +13,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     protected $valueNormalizer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourcesLoader;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourcesCache;
+    protected $resourcesProvider;
 
     /** @var NormalizeEntityClass */
     protected $processor;
@@ -28,17 +25,13 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->resourcesLoader = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesLoader')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->resourcesCache = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesCache')
+        $this->resourcesProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->processor = new NormalizeEntityClass(
             $this->valueNormalizer,
-            $this->resourcesLoader,
-            $this->resourcesCache
+            $this->resourcesProvider
         );
     }
 
@@ -60,35 +53,10 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
             ->method('normalizeValue')
             ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
-        $this->resourcesCache->expects($this->once())
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn(['Test\Class']);
-
-        $this->processor->process($this->context);
-
-        $this->assertSame('Test\Class', $this->context->getClassName());
-    }
-
-    public function testProcessWhenNoResourcesCache()
-    {
-        $this->context->setClassName('test');
-
-        $this->valueNormalizer->expects($this->once())
-            ->method('normalizeValue')
-            ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
-            ->willReturn('Test\Class');
-        $this->resourcesCache->expects($this->at(0))
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn(null);
-        $this->resourcesLoader->expects($this->once())
-            ->method('getResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType());
-        $this->resourcesCache->expects($this->at(1))
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn(['Test\Class']);
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceAccessible')
+            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
 
         $this->processor->process($this->context);
 
@@ -103,10 +71,10 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
             ->method('normalizeValue')
             ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
-        $this->resourcesCache->expects($this->once())
-            ->method('getAccessibleResources')
-            ->with($this->context->getVersion(), $this->context->getRequestType())
-            ->willReturn([]);
+        $this->resourcesProvider->expects($this->once())
+            ->method('isResourceAccessible')
+            ->with('Test\Class', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(false);
 
         $this->processor->process($this->context);
 

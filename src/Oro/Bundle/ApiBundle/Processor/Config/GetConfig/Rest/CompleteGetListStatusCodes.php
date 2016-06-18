@@ -16,18 +16,16 @@ class CompleteGetListStatusCodes extends CompleteStatusCodes
      */
     protected function addStatusCodes(StatusCodesConfig $statusCodes)
     {
-        if (!$statusCodes->hasCode(Response::HTTP_OK)) {
-            $statusCodes->addCode(
-                Response::HTTP_OK,
-                $this->createStatusCode('Returned when successful')
-            );
-        }
-        if (!$statusCodes->hasCode(Response::HTTP_FORBIDDEN)) {
-            $statusCodes->addCode(
-                Response::HTTP_FORBIDDEN,
-                $this->createStatusCode('Returned when no permissions to get the entities')
-            );
-        }
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_OK,
+            'Returned when successful'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_FORBIDDEN,
+            'Returned when no permissions to get the entities'
+        );
 
         parent::addStatusCodes($statusCodes);
     }

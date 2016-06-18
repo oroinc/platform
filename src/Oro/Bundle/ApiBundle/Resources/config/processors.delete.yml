@@ -38,8 +38,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_loader'
-            - '@oro_api.resources_cache'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 20 }
 
@@ -97,6 +96,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.criteria_connector'
         tags:
             - { name: oro.api.processor, action: delete, group: build_query, priority: -100 }
 
@@ -107,7 +107,7 @@ services:
     oro_api.delete.load_data_by_orm_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery
         tags:
-            - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
 
     oro_api.delete.validate_loaded_result:
         class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateLoadedResult

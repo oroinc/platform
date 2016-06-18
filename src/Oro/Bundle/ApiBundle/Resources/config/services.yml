@@ -12,6 +12,16 @@ services:
         arguments:
             - '@oro_api.processor_factory'
             - %kernel.debug%
+            - '@oro_api.processor_applicable_checker_factory'
+            - '@oro_api.processor_iterator_factory'
+
+    oro_api.processor_iterator_factory:
+        class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIteratorFactory
+        public: false
+
+    oro_api.processor_applicable_checker_factory:
+        class: Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory
+        public: false
 
     oro_api.processor_factory:
         class: Oro\Component\ChainProcessor\ChainProcessorFactory
@@ -29,6 +39,23 @@ services:
         public: false
         arguments:
             - '@service_container'
+
+    oro_api.criteria_connector:
+        class: Oro\Bundle\ApiBundle\Util\CriteriaConnector
+        public: false
+        arguments:
+            - '@oro_api.criteria_normalizer'
+            - '@oro_api.criteria_placeholders_resolver'
+
+    oro_api.criteria_normalizer:
+        class: Oro\Bundle\ApiBundle\Util\CriteriaNormalizer
+        public: false
+        arguments:
+            - '@oro_api.criteria_placeholders_resolver'
+
+    oro_api.criteria_placeholders_resolver:
+        class: Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver
+        public: false
 
     oro_api.doctrine_helper:
         class: Oro\Bundle\ApiBundle\Util\DoctrineHelper
@@ -60,7 +87,6 @@ services:
 
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
-        public: false
         arguments:
             - '@oro_api.normalize_value.processor'
 
@@ -95,10 +121,17 @@ services:
             - '@oro_api.processor_bag'
             - customize_loaded_data
 
-    oro_api.resources_loader:
-        class: Oro\Bundle\ApiBundle\Provider\ResourcesLoader
+    oro_api.resources_provider:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesProvider
         arguments:
             - '@oro_api.collect_resources.processor'
+            - '@oro_api.resources_cache'
+
+    oro_api.subresources_provider:
+        class: Oro\Bundle\ApiBundle\Provider\SubresourcesProvider
+        arguments:
+            - '@oro_api.collect_subresources.processor'
+            - '@oro_api.resources_provider'
             - '@oro_api.resources_cache'
 
     oro_api.resources_cache:
@@ -208,11 +241,13 @@ services:
             - '@doctrine'
 
     oro_api.entity_serializer.query_factory:
-        class: Oro\Component\EntitySerializer\QueryFactory
+        class: Oro\Bundle\ApiBundle\Util\AclProtectedQueryFactory
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
             - '@oro_entity.query_hint_resolver'
+        calls:
+            - [setAclHelper, ['@oro_security.acl_helper']]
 
     oro_api.entity_serializer.field_accessor:
         class: Oro\Component\EntitySerializer\FieldAccessor
@@ -280,38 +315,75 @@ services:
             - '@oro_api.exception_text_extractor'
         lazy: true
 
-    oro_api.rest.routing_options_resolver:
-        class: Oro\Bundle\ApiBundle\Routing\RestRouteOptionsResolver
+    oro_api.json_api.relationship_error_completer:
+        class: Oro\Bundle\ApiBundle\Request\JsonApi\RelationshipErrorCompleter
+        public: false
+        arguments:
+            - '@oro_api.exception_text_extractor'
+        lazy: true
+
+    oro_api.rest.routing_options_resolver.default:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver
         public: false
         arguments:
             - %installed%
-            - '@oro_api.resources_loader'
+            - '@oro_api.rest.request_type_provider'
+            - '@oro_api.resources_provider'
+            - '@oro_api.subresources_provider'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: routing.options_resolver.api_doc, priority: -255 }
+            - { name: oro_api.routing_options_resolver }
 
-    oro_api.routing_options_resolver.api_doc:
-        class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
-        public: false
-
-    oro_api.rest.doc_handler:
-        class: Oro\Bundle\ApiBundle\Routing\RestDocHandler
+    oro_api.rest.routing_options_resolver:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver
         public: false
         arguments:
             - '@oro_api.rest.doc_view_detector'
+
+    oro_api.rest.doc_handler:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler
+        public: false
+        arguments:
+            - '@oro_api.rest.request_type_provider'
             - '@oro_api.action_processor_bag'
-            - '@oro_entity.entity_class_name_provider'
+            - '@oro_api.resource_doc_provider'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
 
     oro_api.rest.doc_view_detector:
-        class: Oro\Bundle\ApiBundle\Routing\RestDocViewDetector
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
         public: false
         arguments:
             - '@request_stack'
+
+    oro_api.rest.request_type_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ChainRequestTypeProvider
+        public: false
+
+    oro_api.rest.request_type_provider.default:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+        tags:
+            - { name: oro_api.request_type_provider }
+
+    oro_api.listener.dump_api_doc_console_command_listener:
+        class: Oro\Bundle\ApiBundle\EventListener\DumpApiDocConsoleCommandListener
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
+
+    oro_api.resource_doc_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
+        public: false
+        arguments:
+            - '@oro_entity.entity_class_name_provider'
+            - '@oro_api.subresources_provider'
 
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory

@@ -5,7 +5,6 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestCreationEntity;
@@ -81,13 +80,13 @@ class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
         return [
             'no value 1' => [null, null],
             'no value 2' => ['', null],
-            'no json data and not scalar' => [
+            'no json data and not scalar and nod valid array' => [
                 [1],
                 null,
                 'value',
                 false,
                 'name',
-                new UnexpectedTypeException([1], 'json encoded string or scalar value')
+                new InvalidConfigurationException('No data provided for new entity property.')
             ],
             'load entity: id from json' => [
                 json_encode(['id' => 15]),
@@ -137,7 +136,20 @@ class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
                 json_encode(['id' => null, 'value' => 'test']),
                 new TestCreationEntity(null, 'test'),
             ],
+            'create entity with value from array' => [
+                ['value' => 'test'],
+                new TestCreationEntity(null, 'test'),
+            ],
         ];
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage json encoded string, array or scalar value
+     */
+    public function testReverseTransformUnexpectedType()
+    {
+        $this->transformer->reverseTransform(new \stdClass);
     }
 
     protected function setLoadEntityExpectations($entity, $id)
