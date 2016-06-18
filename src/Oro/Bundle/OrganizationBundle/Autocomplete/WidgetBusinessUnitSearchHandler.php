@@ -13,6 +13,9 @@ class WidgetBusinessUnitSearchHandler extends SearchHandler
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var bool */
+    protected $addCurrent = false;
+
     /**
      * @param TranslatorInterface $translator
      * @param array               $entityName
@@ -31,6 +34,19 @@ class WidgetBusinessUnitSearchHandler extends SearchHandler
     /**
      * {@inheritdoc}
      */
+    public function search($query, $page, $perPage, $searchById = false)
+    {
+        $page = (int)$page > 0 ? (int)$page : 1;
+        if ($page === 1) {
+            $this->addCurrent = true;
+        }
+
+        return parent::search($query, $page, $perPage, $searchById);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function convertItems(array $items)
     {
         $result = parent::convertItems($items);
@@ -41,7 +57,7 @@ class WidgetBusinessUnitSearchHandler extends SearchHandler
                 return $item[$this->idFieldName] === OwnerHelper::CURRENT_BUSINESS_UNIT;
             }
         );
-        if (empty($current)) {
+        if (empty($current) && $this->addCurrent) {
             $text = reset($this->properties);
             $current = [
                 $this->idFieldName => OwnerHelper::CURRENT_BUSINESS_UNIT,

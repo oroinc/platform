@@ -12,6 +12,9 @@ class WidgetUserSearchHandler extends UserSearchHandler
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var bool */
+    protected $addCurrent = false;
+
     /**
      * @param TranslatorInterface $translator
      * @param AttachmentManager   $attachmentManager
@@ -32,6 +35,19 @@ class WidgetUserSearchHandler extends UserSearchHandler
     /**
      * {@inheritdoc}
      */
+    public function search($query, $page, $perPage, $searchById = false)
+    {
+        $page = (int)$page > 0 ? (int)$page : 1;
+        if ($page === 1) {
+            $this->addCurrent = true;
+        }
+
+        return parent::search($query, $page, $perPage, $searchById);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function convertItems(array $items)
     {
         $result = parent::convertItems($items);
@@ -42,7 +58,7 @@ class WidgetUserSearchHandler extends UserSearchHandler
                 return $item[$this->idFieldName] === OwnerHelper::CURRENT_USER;
             }
         );
-        if (empty($current)) {
+        if (empty($current) && $this->addCurrent) {
             $current = [
                 $this->idFieldName => OwnerHelper::CURRENT_USER,
                 'fullName'         => $this->translator->trans('oro.user.dashboard.current_user'),
