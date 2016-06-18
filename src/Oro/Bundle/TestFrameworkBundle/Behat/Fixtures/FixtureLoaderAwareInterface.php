@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
+namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 interface FixtureLoaderAwareInterface
 {
