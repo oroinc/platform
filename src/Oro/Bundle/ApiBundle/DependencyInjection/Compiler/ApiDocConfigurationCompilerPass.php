@@ -6,16 +6,24 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+
 class ApiDocConfigurationCompilerPass implements CompilerPassInterface
 {
-    const API_DOC_EXTRACTOR_SERVICE                = 'nelmio_api_doc.extractor.api_doc_extractor';
-    const EXPECTED_API_DOC_EXTRACTOR_CLASS         = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
-    const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
-    const NEW_API_DOC_EXTRACTOR_CLASS              = 'Oro\Component\Routing\ApiDoc\ApiDocExtractor';
-    const NEW_CACHING_API_DOC_EXTRACTOR_CLASS      = 'Oro\Component\Routing\ApiDoc\CachingApiDocExtractor';
-    const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE = 'oro_api.routing_options_resolver.api_doc';
-    const ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE =
+    const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
+    const EXPECTED_API_DOC_EXTRACTOR_CLASS          = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
+    const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS  = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
+    const NEW_API_DOC_EXTRACTOR_CLASS               = 'Oro\Bundle\ApiBundle\ApiDoc\ApiDocExtractor';
+    const NEW_CACHING_API_DOC_EXTRACTOR_CLASS       = 'Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor';
+    const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.rest.routing_options_resolver';
+    const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
+    const REST_DOC_VIEW_DETECTOR_AWARE_INTERFACE    =
+        'Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetectorAwareInterface';
+    const ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE  =
         'Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface';
+    const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro_api.routing_options_resolver';
+    const REQUEST_TYPE_PROVIDER_SERVICE             = 'oro_api.rest.request_type_provider';
+    const REQUEST_TYPE_PROVIDER_TAG                 = 'oro_api.request_type_provider';
 
     /**
      * {@inheritdoc}
@@ -36,12 +44,72 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
         }
 
         $apiDocExtractorDef->setClass($newApiDocExtractorClass);
+        if (is_subclass_of($apiDocExtractorDef->getClass(), self::REST_DOC_VIEW_DETECTOR_AWARE_INTERFACE)) {
+            $apiDocExtractorDef->addMethodCall(
+                'setRestDocViewDetector',
+                [new Reference(self::REST_DOC_VIEW_DETECTOR_SERVICE)]
+            );
+        }
         if (is_subclass_of($apiDocExtractorDef->getClass(), self::ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE)) {
             $apiDocExtractorDef->addMethodCall(
                 'setRouteOptionsResolver',
                 [new Reference(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)]
             );
         }
+
+        $this->registerRoutingOptionsResolvers($container);
+        $this->registerRequestTypeProviders($container);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function registerRoutingOptionsResolvers(ContainerBuilder $container)
+    {
+        $chainServiceDef = DependencyInjectionUtil::findDefinition(
+            $container,
+            self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE
+        );
+        if (null !== $chainServiceDef) {
+            // find services
+            $services = [];
+            $taggedServices = $container->findTaggedServiceIds(self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME);
+            foreach ($taggedServices as $id => $attributes) {
+                foreach ($attributes as $attribute) {
+                    $priority = isset($attribute['priority']) ? $attribute['priority'] : 0;
+                    $view = null;
+                    if (!empty($attribute['view'])) {
+                        $view = $attribute['view'];
+                    }
+                    $services[$priority][] = [new Reference($id), $view];
+                }
+            }
+            if (empty($services)) {
+                return;
+            }
+
+            // sort by priority and flatten
+            krsort($services);
+            $services = call_user_func_array('array_merge', $services);
+
+            // register
+            foreach ($services as $service) {
+                $chainServiceDef->addMethodCall('addResolver', $service);
+            }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function registerRequestTypeProviders(ContainerBuilder $container)
+    {
+        DependencyInjectionUtil::registerTaggedServices(
+            $container,
+            self::REQUEST_TYPE_PROVIDER_SERVICE,
+            self::REQUEST_TYPE_PROVIDER_TAG,
+            'addProvider'
+        );
     }
 
     /**

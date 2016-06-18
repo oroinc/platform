@@ -636,8 +636,8 @@ class Context extends ApiContext implements ContextInterface
      */
     public function setMetadataExtras(array $extras)
     {
-        foreach ($extras as $configExtra) {
-            if (!$configExtra instanceof MetadataExtraInterface) {
+        foreach ($extras as $metadataExtra) {
+            if (!$metadataExtra instanceof MetadataExtraInterface) {
                 throw new \InvalidArgumentException(
                     'Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".'
                 );

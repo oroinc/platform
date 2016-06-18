@@ -21,11 +21,11 @@ class ValidateClassNameExists implements ProcessorInterface
         /** @var Context $context */
 
         $entityClass = $context->getClassName();
-        if (empty($entityClass)) {
+        if (!$entityClass) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::ENTITY_TYPE,
-                    'The name of an entity class must be set in the context.'
+                    'The entity class must be set in the context.'
                 )
             );
         }

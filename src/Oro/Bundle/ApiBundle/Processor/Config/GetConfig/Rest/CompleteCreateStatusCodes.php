@@ -16,24 +16,21 @@ class CompleteCreateStatusCodes extends CompleteStatusCodes
      */
     protected function addStatusCodes(StatusCodesConfig $statusCodes)
     {
-        if (!$statusCodes->hasCode(Response::HTTP_CREATED)) {
-            $statusCodes->addCode(
-                Response::HTTP_CREATED,
-                $this->createStatusCode('Returned when entity was successfully created')
-            );
-        }
-        if (!$statusCodes->hasCode(Response::HTTP_BAD_REQUEST)) {
-            $statusCodes->addCode(
-                Response::HTTP_BAD_REQUEST,
-                $this->createStatusCode('Returned when the request data is not valid')
-            );
-        }
-        if (!$statusCodes->hasCode(Response::HTTP_FORBIDDEN)) {
-            $statusCodes->addCode(
-                Response::HTTP_FORBIDDEN,
-                $this->createStatusCode('Returned when no permissions to create the entity')
-            );
-        }
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_CREATED,
+            'Returned when entity was successfully created'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_BAD_REQUEST,
+            'Returned when the request data is not valid'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_FORBIDDEN,
+            'Returned when no permissions to create the entity'
+        );
 
         parent::addStatusCodes($statusCodes);
     }

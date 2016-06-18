@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddAssociationValidators;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 use Oro\Bundle\ApiBundle\Validator\Constraints\All;
+use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 
 class AddAssociationValidatorsTest extends ConfigProcessorTestCase
 {
@@ -97,13 +98,19 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         $this->assertEquals(
             [
                 'test_option' => 'test_value',
-                'constraints' => [new All(new AccessGranted())]
+                'constraints' => [
+                    new HasAdderAndRemover(['class' => self::TEST_CLASS_NAME, 'property' => 'association2']),
+                    new All(new AccessGranted())
+                ]
             ],
             $configObject->getField('association2')->getFormOptions()
         );
         $this->assertEquals(
             [
-                'constraints' => [new All(new AccessGranted())]
+                'constraints' => [
+                    new HasAdderAndRemover(['class' => self::TEST_CLASS_NAME, 'property' => 'realAssociation3']),
+                    new All(new AccessGranted())
+                ]
             ],
             $configObject->getField('association3')->getFormOptions()
         );

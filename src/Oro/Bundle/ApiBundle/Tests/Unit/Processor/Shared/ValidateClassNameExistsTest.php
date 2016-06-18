@@ -32,7 +32,7 @@ class ValidateClassNameExistsTest extends GetListProcessorTestCase
             [
                 Error::createValidationError(
                     'entity type constraint',
-                    'The name of an entity class must be set in the context.'
+                    'The entity class must be set in the context.'
                 )
             ],
             $this->context->getErrors()

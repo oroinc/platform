@@ -12,9 +12,10 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
+ * Adds fields and associations which were not configured yet based on an entity metadata.
  * Marks all not accessible fields and associations as excluded.
  * The entity exclusion provider is used.
- * Sets "identifier only" configuration for all associations were not configured yet.
+ * Sets "identifier only" configuration for all associations which were not configured yet.
  */
 class CompleteDefinition implements ProcessorInterface
 {
