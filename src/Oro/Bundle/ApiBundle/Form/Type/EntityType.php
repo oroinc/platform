@@ -11,6 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 
 class EntityType extends AbstractType
 {
@@ -30,15 +31,17 @@ class EntityType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['multiple']) {
+        /** @var AssociationMetadata $metadata */
+        $metadata = $options['metadata'];
+        if ($metadata->isCollection()) {
             $builder
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(
-                    new CollectionToArrayTransformer(new EntityToIdTransformer($this->doctrine)),
+                    new CollectionToArrayTransformer(new EntityToIdTransformer($this->doctrine, $metadata)),
                     true
                 );
         } else {
-            $builder->addViewTransformer(new EntityToIdTransformer($this->doctrine));
+            $builder->addViewTransformer(new EntityToIdTransformer($this->doctrine, $metadata));
         }
     }
 
@@ -48,12 +51,9 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(
-                [
-                    'multiple' => false,
-                    'compound' => false
-                ]
-            );
+            ->setDefaults(['compound' => false])
+            ->setRequired(['metadata'])
+            ->setAllowedTypes('metadata', ['Oro\Bundle\ApiBundle\Metadata\AssociationMetadata']);
     }
 
     /**

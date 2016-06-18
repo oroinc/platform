@@ -29,6 +29,7 @@ class ActionProcessorDataCollector extends DataCollector
     {
         $this->data['name'] = $this->logger->getSectionName();
         $this->data['actions'] = $this->logger->getActions();
+        $this->data['applicableCheckers'] = $this->logger->getApplicableCheckers();
     }
 
     /**
@@ -131,6 +132,16 @@ class ActionProcessorDataCollector extends DataCollector
     }
 
     /**
+     * Gets executed applicable checkers.
+     *
+     * @return array
+     */
+    public function getApplicableCheckers()
+    {
+        return $this->data['applicableCheckers'];
+    }
+
+    /**
      * Gets the total time of all executed actions.
      *
      * @return float
@@ -142,6 +153,11 @@ class ActionProcessorDataCollector extends DataCollector
             foreach ($this->data['actions'] as $action) {
                 if (isset($action['time'])) {
                     $this->totalTime += $action['time'];
+                }
+            }
+            foreach ($this->data['applicableCheckers'] as $applicableChecker) {
+                if (isset($applicableChecker['time'])) {
+                    $this->totalTime += $applicableChecker['time'];
                 }
             }
         }

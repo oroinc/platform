@@ -80,14 +80,6 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 new Processor\NormalizeEntityType($entityAliasResolver)
             ],
             [
-                $this->addProcessor($processorBag, 'entityAlias', DataType::ENTITY_ALIAS),
-                new Processor\NormalizeEntityAlias($entityAliasResolver)
-            ],
-            [
-                $this->addProcessor($processorBag, 'entityPluralAlias', DataType::ENTITY_PLURAL_ALIAS),
-                new Processor\NormalizeEntityPluralAlias($entityAliasResolver)
-            ],
-            [
                 $this->addProcessor($processorBag, 'rest.datetime', DataType::DATETIME, [RequestType::REST]),
                 new Processor\Rest\NormalizeDateTime()
             ],
@@ -452,10 +444,6 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 [RequestType::REST],
                 true
             ],
-            ['Test\Entity', 'test_entity', DataType::ENTITY_ALIAS, [RequestType::REST], false],
-            ['Test\Entity', 'Test\Entity', DataType::ENTITY_ALIAS, [RequestType::REST], false],
-            ['Test\Entity', 'test_entities', DataType::ENTITY_PLURAL_ALIAS, [RequestType::REST], false],
-            ['Test\Entity', 'Test\Entity', DataType::ENTITY_PLURAL_ALIAS, [RequestType::REST], false],
             ['test_entities', 'Test\Entity', DataType::ENTITY_TYPE, [RequestType::REST], false],
             ['test_entities', 'test_entities', DataType::ENTITY_TYPE, [RequestType::REST], false],
             ['Test\Entity', 'test_entities', DataType::ENTITY_CLASS, [RequestType::REST], false],
