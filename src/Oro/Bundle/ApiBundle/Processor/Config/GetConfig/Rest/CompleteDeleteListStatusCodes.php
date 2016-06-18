@@ -16,18 +16,16 @@ class CompleteDeleteListStatusCodes extends CompleteStatusCodes
      */
     protected function addStatusCodes(StatusCodesConfig $statusCodes)
     {
-        if (!$statusCodes->hasCode(Response::HTTP_NO_CONTENT)) {
-            $statusCodes->addCode(
-                Response::HTTP_NO_CONTENT,
-                $this->createStatusCode('Returned when the entities successfully deleted')
-            );
-        }
-        if (!$statusCodes->hasCode(Response::HTTP_FORBIDDEN)) {
-            $statusCodes->addCode(
-                Response::HTTP_FORBIDDEN,
-                $this->createStatusCode('Returned when no permissions to delete the entities')
-            );
-        }
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_NO_CONTENT,
+            'Returned when the entities successfully deleted'
+        );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_FORBIDDEN,
+            'Returned when no permissions to delete the entities'
+        );
 
         parent::addStatusCodes($statusCodes);
     }

@@ -4,10 +4,11 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
+use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DumperInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepository;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\KernelServiceFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -22,25 +23,25 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     /** @var KernelServiceFactory */
     protected $kernelServiceFactory;
 
-    /** @var ReferenceRepository  */
-    protected $referenceRepository;
+    /** @var ReferenceRepositoryInitializer  */
+    protected $referenceRepositoryInitializer;
 
     /**
      * @param DumperInterface[] $dumpers
      * @param FixtureLoader $fixtureLoader
      * @param KernelServiceFactory $kernelServiceFactory
-     * @param ReferenceRepository $referenceRepository
+     * @param ReferenceRepositoryInitializer $referenceRepositoryInitializer
      */
     public function __construct(
         array $dumpers,
         FixtureLoader $fixtureLoader,
         KernelServiceFactory $kernelServiceFactory,
-        ReferenceRepository $referenceRepository
+        ReferenceRepositoryInitializer $referenceRepositoryInitializer
     ) {
         $this->dumpers = $dumpers;
         $this->fixtureLoader = $fixtureLoader;
         $this->kernelServiceFactory = $kernelServiceFactory;
-        $this->referenceRepository = $referenceRepository;
+        $this->referenceRepositoryInitializer = $referenceRepositoryInitializer;
     }
 
     /**
@@ -52,6 +53,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
             BeforeSuiteTested::BEFORE => ['injectSuite', 5],
             BeforeFeatureTested::BEFORE  => ['beforeFeature', 100],
             AfterFeatureTested::AFTER  => ['afterFeature', -100],
+            ScenarioTested::BEFORE => ['beforeScenario', 100]
         ];
     }
 
@@ -83,6 +85,11 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
         $this->shutdownKernel();
     }
 
+    public function beforeScenario()
+    {
+        $this->refreshDependencies();
+    }
+
     public function bootKernel()
     {
         $this->kernelServiceFactory->boot();
@@ -90,8 +97,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
 
     public function initDependencies()
     {
-        $this->referenceRepository->init();
-        $this->fixtureLoader->initReferences($this->referenceRepository);
+        $this->referenceRepositoryInitializer->init();
     }
 
     /**
@@ -115,8 +121,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
 
     public function clearDependencies()
     {
-        $this->referenceRepository->clear();
-        $this->fixtureLoader->clearReferences();
+        $this->referenceRepositoryInitializer->clear();
     }
 
     public function restore()
@@ -129,5 +134,10 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     public function shutdownKernel()
     {
         $this->kernelServiceFactory->shutdown();
+    }
+
+    protected function refreshDependencies()
+    {
+        $this->referenceRepositoryInitializer->refresh();
     }
 }

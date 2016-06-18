@@ -4,8 +4,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Initializer\ContextInitializer;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoaderAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 
 class FixtureLoaderInitializer implements ContextInitializer
 {

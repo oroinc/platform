@@ -1,0 +1,19 @@
+services:
+    oro_api.collect_subresources.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CollectSubresourcesProcessor
+        public: false
+        arguments:
+            - '@oro_api.processor_bag'
+            - collect_subresources
+
+    #
+    # collect_subresources
+    #
+
+    oro_api.collect_subresources.initialize_subresources:
+        class: Oro\Bundle\ApiBundle\Processor\CollectSubresources\InitializeSubresources
+        arguments:
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+        tags:
+            - { name: oro.api.processor, action: collect_subresources, priority: 10 }
