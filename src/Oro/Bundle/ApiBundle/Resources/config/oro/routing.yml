@@ -2,7 +2,7 @@ oro_rest_api_cget_deprecated:
     path: /api/{entity}.{_format}
     methods: [GET]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/\.]+)
+        entity: (?:(?!(soap|rest)[$/])[^/\.]+)
         _format: json
     defaults:
         _controller: OroApiBundle:RestApi:cget
@@ -15,7 +15,7 @@ oro_rest_api_get_deprecated:
     path: /api/{entity}/{id}.{_format}
     methods: [GET]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/\.]+)
+        entity: (?:(?!(soap|rest)[$/])[^/\.]+)
         _format: json
     defaults:
         _controller: OroApiBundle:RestApi:get
@@ -29,7 +29,7 @@ oro_rest_api_cget:
     path: /api/{entity}
     methods: [GET]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:cget
         _action: get_list
@@ -41,7 +41,7 @@ oro_rest_api_get:
     path: /api/{entity}/{id}
     methods: [GET]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:get
         _action: get
@@ -53,7 +53,7 @@ oro_rest_api_delete:
     path: /api/{entity}/{id}
     methods: [DELETE]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:delete
         _action: delete
@@ -65,7 +65,7 @@ oro_rest_api_cdelete:
     path: /api/{entity}
     methods: [DELETE]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:cdelete
         _action: delete_list
@@ -77,7 +77,7 @@ oro_rest_api_post:
     path: /api/{entity}
     methods: [POST]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:post
         _action: create
@@ -89,7 +89,7 @@ oro_rest_api_patch:
     path: /api/{entity}/{id}
     methods: [PATCH]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:patch
         _action: update
@@ -102,7 +102,7 @@ oro_rest_api_get_subresource:
     path: /api/{entity}/{id}/{association}
     methods: [GET]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApiSubresource:get
         _action: get_subresource
@@ -115,7 +115,7 @@ oro_rest_api_get_relationship:
     path: /api/{entity}/{id}/relationships/{association}
     methods: [GET]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApiRelationship:get
         _action: get_relationship
@@ -129,7 +129,7 @@ oro_rest_api_patch_relationship:
     path: /api/{entity}/{id}/relationships/{association}
     methods: [PATCH]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApiRelationship:patch
         _action: update_relationship
@@ -141,7 +141,7 @@ oro_rest_api_post_relationship:
     path: /api/{entity}/{id}/relationships/{association}
     methods: [POST]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApiRelationship:post
         _action: add_relationship
@@ -153,7 +153,7 @@ oro_rest_api_delete_relationship:
     path: /api/{entity}/{id}/relationships/{association}
     methods: [DELETE]
     requirements:
-        entity: (?:(?!(soap|rest)$)[^/]+)
+        entity: (?:(?!(soap|rest)[$/])[^/]+)
     defaults:
         _controller: OroApiBundle:RestApiRelationship:delete
         _action: delete_relationship
