@@ -2,6 +2,7 @@ Debug commands
 --------------
 
 ### oro:api:dump
+
 This command shows all resources accessible through Data API.
 
 Run this command without parameters to see all available resources:
@@ -16,7 +17,26 @@ or specify the `request-type` option if you need to know resources for a particu
 php app/console oro:api:dump --request-type=rest --request-type=json_api
 ```
 
+Also the `sub-resources` option can be used to show all available sub-resources:
+
+```bash
+php app/console oro:api:dump --sub-resources
+```
+
+If you are interested in information about a concrete entity, you can specify entity class or entity alias as an argument:
+
+```bash
+php app/console oro:api:dump "Oro\Bundle\UserBundle\Entity\User" --sub-resources
+```
+
+or
+
+```bash
+php app/console oro:api:dump users --sub-resources
+```
+
 ### oro:api:debug
+
 This command shows details about registered Data API actions and processors.
 
 If you want to know all actions run this command without parameters:
@@ -38,6 +58,7 @@ php app/console oro:api:debug get_list --request-type=rest --request-type=json_a
 ```
 
 ### oro:api:config:dump
+
 This command shows configuration for a particular entity.
 
 Run this command and specify entity class or entity alias as an argument:
@@ -95,8 +116,8 @@ or it's also possible to pass multiple options
 php app/console oro:api:config:dump users --extra=sorters --extra=descriptions --extra=filters --extra="Acme\Bundle\AcmeBundle\Config\AcmeConfigExtra"
 ```
 
-
 ### oro:api:metadata:dump
+
 This command shows metadata for a particular entity.
 
 To see metadata run this command and specify entity class or entity alias as an argument:
@@ -124,6 +145,7 @@ php app/console oro:api:metadata:dump users --request-type=rest --request-type=j
 ```
 
 ### oro:api:config:dump-reference
+
 This command shows the structure of `Resources/config/oro/api.yml`.
 
 ```bash
