@@ -56,7 +56,7 @@ The following table shows all actions provided out of the box:
 | [update_relationship](#update_relationship-action) | Updates "to-one" relationship and completely replaces all members of "to-many" relationship |
 | [add_relationship](#add_relationship-action) | Adds one or several entities to a relationship. This action is applicable only for "to-many" relationships |
 | [delete_relationship](#delete_relationship-action) | Deletes one or several entities from a relationship. This action is applicable only for "to-many" relationships |
-| [customize_loaded_data](#customize_loaded_data-action) | Makes modifications of data loaded by [get](#get-action) or [get_list](#get_list-action) actions |
+| [customize_loaded_data](#customize_loaded_data-action) | Makes modifications of data loaded by [get](#get-action), [get_list](#get_list-action) and [get_subresource](#get_subresource-action) actions |
 | [get_config](#get_config-action) | Returns a configuration of an entity |
 | [get_relation_config](#get_relation_config-action) | Returns a configuration of an entity if it is used in a relationship |
 | [get_metadata](#get_metadata-action) | Returns a metadata of an entity |
@@ -475,7 +475,7 @@ Example of usage you can find in the `deleteAction` method of [RestApiRelationsh
 customize_loaded_data Action
 ----------------------------
 
-This action is intended to make modifications of data loaded by [get](#get-action) or [get_list](#get_list-action) actions.
+This action is intended to make modifications of data loaded by [get](#get-action), [get_list](#get_list-action) and [get_subresource](#get_subresource-action) actions.
 
 The context class: [CustomizeLoadedDataContext](../../Processor/CollectResources/CustomizeLoadedDataContext.php).
 
