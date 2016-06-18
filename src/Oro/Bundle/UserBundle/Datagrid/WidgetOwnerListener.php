@@ -42,7 +42,6 @@ class WidgetOwnerListener
     {
         $widgetOptions = $this->widgetConfigs->getWidgetOptions();
         $ids           = $this->ownerHelper->getOwnerIds($widgetOptions);
-
         if ($ids) {
             /** @var OrmDatasource $dataSource */
             $dataSource  = $event->getDatagrid()->getDatasource();
@@ -54,7 +53,10 @@ class WidgetOwnerListener
             /** @var Query $query */
             $query = $event->getQuery();
             $query->setDQL($dataSource->getQueryBuilder()->getQuery()->getDQL());
-            $query->setParameters($qb->getParameters());
+            $queryParameters = $query->getParameters();
+            foreach ($qb->getParameters() as $parameter) {
+                $queryParameters->add($parameter);
+            }
         }
     }
 }
