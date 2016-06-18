@@ -117,7 +117,7 @@ get Action
 
 This action is intended to get an entity by its identifier. More details you can find in [Fetching Data](http://jsonapi.org/format/#fetching) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_get`. Get URL example: `$router->generate('oro_rest_api_get', ['entity' => $entityType, 'id' => $entityId])`.
+The route name for REST API: `oro_rest_api_get`.
 
 The URL template for REST API: `/api/{entity}/{id}`.
 
@@ -149,7 +149,7 @@ get_list Action
 
 This action is intended to get a list of entities. More details you can find in [Fetching Data](http://jsonapi.org/format/#fetching) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_cget`. Get URL example: `$router->generate('oro_rest_api_cget', ['entity' => $entityType])`.
+The route name for REST API: `oro_rest_api_cget`.
 
 The URL template for REST API: `/api/{entity}`.
 
@@ -181,7 +181,7 @@ delete Action
 
 This action is intended to delete an entity by its identifier. More details you can find in [Deleting Resources](http://jsonapi.org/format/#crud-deleting) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_delete`. Get URL example: `$router->generate('oro_rest_api_delete', ['entity' => $entityType, 'id' => $entityId])`.
+The route name for REST API: `oro_rest_api_delete`.
 
 The URL template for REST API: `/api/{entity}/{id}`.
 
@@ -219,7 +219,7 @@ By default the maximum number of entities that can be deleted by one request is 
 You can change this limit for an entity in `Resources/config/acl.yml`, but please test your limit carefully because a big limit may make a big impact to the server.
 An example how to change default limit you can read at [how-to](how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request).
 
-The route name for REST API: `oro_rest_api_cdelete`. Get URL example: `$router->generate('oro_rest_api_cdelete', ['entity' => $entityType])`.
+The route name for REST API: `oro_rest_api_cdelete`.
 
 The URL template for REST API: `/api/{entity}`.
 
@@ -251,7 +251,7 @@ create Action
 
 This action is intended to create a new entity. More details you can find in [Creating Resources](http://jsonapi.org/format/#crud-creating) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_post`. Get URL example: `$router->generate('oro_rest_api_post', ['entity' => $entityType])`.
+The route name for REST API: `oro_rest_api_post`.
 
 The URL template for REST API: `/api/{entity}`.
 
@@ -284,7 +284,7 @@ update Action
 
 This action is intended to update an entity. More details you can find in [Updating Resources](http://jsonapi.org/format/#crud-updating) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_patch`. Get URL example: `$router->generate('oro_rest_api_patch', ['entity' => $entityType, 'id' => $entityId])`.
+The route name for REST API: `oro_rest_api_patch`.
 
 The URL template for REST API: `/api/{entity}/{id}`.
 
@@ -317,7 +317,7 @@ get_subresource Action
 
 This action is intended to get an entity (for "to-one" relationship) or a list of entities (for "to-many" relationship) connected to a given entity by a given association. More details you can find in [Fetching Resources](http://jsonapi.org/format/#fetching-resources) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_get_subresource`. Get URL example: `$router->generate('oro_rest_api_get_subresource', ['entity' => $entityType, 'id' => $entityId, 'association' => $associationName])`.
+The route name for REST API: `oro_rest_api_get_subresource`.
 
 The URL template for REST API: `/api/{entity}/{id}/{association}`.
 
@@ -349,7 +349,7 @@ get_relationship Action
 
 This action is intended to get an entity identifier (for "to-one" relationship) or a list of entities' identifiers (for "to-many" relationship) connected to a given entity by a given association. More details you can find in [Fetching Relationships](http://jsonapi.org/format/#fetching-relationships) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_get_relationship`. Get URL example: `$router->generate('oro_rest_api_get_relationship', ['entity' => $entityType, 'id' => $entityId, 'association' => $associationName])`.
+The route name for REST API: `oro_rest_api_get_relationship`.
 
 The URL template for REST API: `/api/{entity}/{id}/relationships/{association}`.
 
@@ -381,7 +381,7 @@ update_relationship Action
 
 This action is intended to change an entity (for "to-one" relationship) or completely replace all entities (for "to-many" relationship) connected to a given entity by a given association. More details you can find in [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_patch_relationship`. Get URL example: `$router->generate('oro_rest_api_patch_relationship', ['entity' => $entityType, 'id' => $entityId, 'association' => $associationName])`.
+The route name for REST API: `oro_rest_api_patch_relationship`.
 
 The URL template for REST API: `/api/{entity}/{id}/relationships/{association}`.
 
@@ -413,7 +413,7 @@ add_relationship Action
 
 This action is intended to add one or several entities to a "to-many" relationship. More details you can find in [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_post_relationship`. Get URL example: `$router->generate('oro_rest_api_post_relationship', ['entity' => $entityType, 'id' => $entityId, 'association' => $associationName])`.
+The route name for REST API: `oro_rest_api_post_relationship`.
 
 The URL template for REST API: `/api/{entity}/{id}/relationships/{association}`.
 
@@ -445,7 +445,7 @@ delete_relationship Action
 
 This action is intended to remove one or several entities from a "to-many" relationship. More details you can find in [Updating Relationships](http://jsonapi.org/format/#crud-updating-relationships) section of JSON.API specification.
 
-The route name for REST API: `oro_rest_api_delete_relationship`. Get URL example: `$router->generate('oro_rest_api_delete_relationship', ['entity' => $entityType, 'id' => $entityId, 'association' => $associationName])`.
+The route name for REST API: `oro_rest_api_delete_relationship`.
 
 The URL template for REST API: `/api/{entity}/{id}/relationships/{association}`.
 
