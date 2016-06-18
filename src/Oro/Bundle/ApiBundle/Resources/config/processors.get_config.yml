@@ -76,13 +76,20 @@ services:
             - { name: oro.api.processor, action: get_config, extra: definition&!identifier_fields_only, targetAction: create, priority: -51 }
             - { name: oro.api.processor, action: get_config, extra: definition&!identifier_fields_only, targetAction: update, priority: -51 }
 
+    oro_api.get_config.json_api.fix_field_naming:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi\FixFieldNaming
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: definition, requestType: json_api, priority: -100 }
+
     oro_api.get_config.filter_fields_by_extra:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition&filter_fields&!identifier_fields_only, priority: -100 }
+            - { name: oro.api.processor, action: get_config, extra: definition&filter_fields&!identifier_fields_only, priority: -110 }
 
     oro_api.get_config.complete_status_codes.get:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteGetStatusCodes
@@ -266,14 +273,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition&sorters, priority: -80 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition&sorters, priority: -80 }
-
-    oro_api.get_config.json_api.fix_field_naming:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi\FixFieldNaming
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, requestType: json_api, priority: -110 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, requestType: json_api, priority: -110 }
 
     oro_api.get_config.remove_excluded_filters:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\RemoveExcludedFilters
