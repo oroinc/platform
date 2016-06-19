@@ -22,7 +22,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
     /** @var array */
     protected $processed = [];
-    
+
     /** @var array */
     protected static $partChoicesMap = [
         DateModifierInterface::PART_MONTH   => [1, 12],
@@ -69,7 +69,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
             return;
         }
         $children = array_keys($form->get('value')->all());
-        $data = $this->dateFilterModifier->modify($data, $children);
+        $data     = $this->dateFilterModifier->modify($data, $children);
         // replace value form children to needed sub forms in case when part is selected
         if (array_key_exists($data['part'], static::$partChoicesMap)) {
             $min = static::$partChoicesMap[$data['part']][0];

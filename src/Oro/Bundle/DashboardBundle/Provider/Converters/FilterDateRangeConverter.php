@@ -30,28 +30,28 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     /** @var array */
     protected static $valueTypesStartVarsMap = [
         AbstractDateFilterType::TYPE_TODAY        => [
-            'var_start' => DateModifierInterface::VAR_TODAY,
-            'modify_end' => null,
+            'var_start'             => DateModifierInterface::VAR_TODAY,
+            'modify_end'            => null,
             'modify_previous_start' => '- 1 day'
         ],
         AbstractDateFilterType::TYPE_THIS_WEEK    => [
-            'var_start' => DateModifierInterface::VAR_SOW,
-            'modify_end' => '+ 1 week - 1 day',
+            'var_start'             => DateModifierInterface::VAR_SOW,
+            'modify_end'            => '+ 1 week - 1 day',
             'modify_previous_start' => '- 1 week'
         ],
         AbstractDateFilterType::TYPE_THIS_MONTH   => [
-            'var_start' => DateModifierInterface::VAR_SOM,
-            'modify_end' => '+ 1 month  - 1 day',
+            'var_start'             => DateModifierInterface::VAR_SOM,
+            'modify_end'            => '+ 1 month  - 1 day',
             'modify_previous_start' => '- 1 month'
         ],
         AbstractDateFilterType::TYPE_THIS_QUARTER => [
-            'var_start' => DateModifierInterface::VAR_SOQ,
-            'modify_end' => '+ 3 month - 1 day',
+            'var_start'             => DateModifierInterface::VAR_SOQ,
+            'modify_end'            => '+ 3 month - 1 day',
             'modify_previous_start' => '- 3 month'
         ],
         AbstractDateFilterType::TYPE_THIS_YEAR    => [
-            'var_start' => DateModifierInterface::VAR_SOY,
-            'modify_end' => '+ 1 year - 1 day',
+            'var_start'             => DateModifierInterface::VAR_SOY,
+            'modify_end'            => '+ 1 year - 1 day',
             'modify_previous_start' => '- 1 year'
         ],
     ];
@@ -79,8 +79,8 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
      */
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
-        $part = DateModifierInterface::PART_VALUE;
-        $type = AbstractDateFilterType::TYPE_BETWEEN;
+        $part                = DateModifierInterface::PART_VALUE;
+        $type                = AbstractDateFilterType::TYPE_BETWEEN;
         $cretePreviousPeriod = !empty($config['converter_attributes']['create_previous_period']);
         if (isset($value['type']) && in_array($value['type'], AbstractDateFilterType::$valueTypes)) {
             return $this->processValueTypes($value, $cretePreviousPeriod);
@@ -113,16 +113,16 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         ];
 
         if ($end && $start && $cretePreviousPeriod) {
-            $diff = $start->diff($end);
+            $diff      = $start->diff($end);
             $prevStart = clone $start;
             $prevStart->sub($diff);
             $prevEnd = clone $end;
             $prevEnd->sub($diff);
             $prevStart->setTime(0, 0, 0);
             $prevEnd->setTime(23, 59, 59);
-            
+
             $dateData['prev_start'] = $prevStart;
-            $dateData['prev_end'] = $prevEnd;
+            $dateData['prev_end']   = $prevEnd;
         }
 
         return $dateData;
@@ -145,7 +145,8 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             return $this->translator->trans('oro.dashboard.widget.filter.date_range.all_time');
         }
         if ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN
-            || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$end) {
+            || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$end
+        ) {
             return sprintf(
                 '%s %s',
                 $this->translator->trans('oro.filter.form.label_date_type_more_than'),
@@ -188,7 +189,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                 $type = AbstractDateFilterType::TYPE_BETWEEN;
             }
         }
-        
+
         if ($type === AbstractDateFilterType::TYPE_MORE_THAN
             || ($type === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
         ) {
@@ -211,7 +212,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     protected function processValueTypes(array $value, $cretePreviousPeriod)
     {
         $start = $end = $part = $prevStart = $prevEnd = null;
-        $type = AbstractDateFilterType::TYPE_BETWEEN;
+        $type  = AbstractDateFilterType::TYPE_BETWEEN;
         if (array_key_exists($value['type'], static::$valueTypesStartVarsMap)) {
             /** @var \Carbon\Carbon $start */
             $start  = $this->dateCompiler->compile(
@@ -225,7 +226,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             $start->setTime(0, 0, 0);
             $end->setTime(23, 59, 59);
             if ($cretePreviousPeriod) {
-                $prevStart = clone $start;
+                $prevStart  = clone $start;
                 $prevModify = static::$valueTypesStartVarsMap[$value['type']]['modify_previous_start'];
                 if ($prevModify) {
                     $prevStart->modify($prevModify);
@@ -243,12 +244,12 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         }
 
         return [
-            'start' => $start,
-            'end'   => $end,
-            'type'  => $type,
-            'part'  => $part,
+            'start'      => $start,
+            'end'        => $end,
+            'type'       => $type,
+            'part'       => $part,
             'prev_start' => $prevStart,
-            'prev_end' => $prevEnd
+            'prev_end'   => $prevEnd
         ];
     }
 }

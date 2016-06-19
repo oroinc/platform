@@ -46,9 +46,9 @@ class DateHelper
     /**
      * @param \DateTime $from
      * @param \DateTime $to
-     * @param array    $data
-     * @param string   $rowKey
-     * @param string   $dataKey
+     * @param array     $data
+     * @param string    $rowKey
+     * @param string    $dataKey
      *
      * @return array
      */
@@ -70,9 +70,9 @@ class DateHelper
     /**
      * @param \DateTime $from
      * @param \DateTime $to
-     * @param array    $data
-     * @param string   $rowKey
-     * @param string   $dataKey
+     * @param array     $data
+     * @param string    $rowKey
+     * @param string    $dataKey
      *
      * @return array
      */
@@ -166,8 +166,8 @@ class DateHelper
     }
 
     /**
-     * @param \DateTime     $start
-     * @param \DateTime     $end
+     * @param \DateTime    $start
+     * @param \DateTime    $end
      * @param QueryBuilder $qb
      * @param              $entityField
      */
@@ -220,7 +220,7 @@ class DateHelper
     /**
      * @param \DateTime $start
      * @param \DateTime $end
-     * @param          $row
+     * @param           $row
      *
      * @return string
      */
@@ -373,9 +373,9 @@ class DateHelper
     }
 
     /**
-     * @param array    $config
+     * @param array     $config
      * @param \DateTime $date
-     * @param          $increment
+     * @param           $increment
      *
      * @return string
      */

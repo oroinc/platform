@@ -8,11 +8,15 @@ use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
+/**
+ * Class DateFilterModifier
+ * @package Oro\Bundle\FilterBundle\Utils
+ */
 class DateFilterModifier
 {
     /** @var Compiler */
     protected $dateCompiler;
-    
+
     /** @var array */
     protected static $partFormatsMap = [
         DateModifierInterface::PART_MONTH => 'm',
@@ -35,22 +39,20 @@ class DateFilterModifier
      * Parses and modifies date filter data accordingly to part and value types
      *
      * @param array $data
-     *
      * @param array $valueKeys
-     *
      * @param bool  $compile
      *
      * @return array
      */
     public function modify(array $data, array $valueKeys = ['start', 'end'], $compile = true)
     {
-        $data     = $this->modifyDateForEqualType($data);
-        $data     = $this->modifyPartByVariable($data);
+        $data = $this->modifyDateForEqualType($data);
+        $data = $this->modifyPartByVariable($data);
         // compile expressions
         if ($compile) {
-            $data = $this->mapValues($valueKeys, $data, $this->getCompileClosure());    
+            $data = $this->mapValues($valueKeys, $data, $this->getCompileClosure());
         }
-        
+
         $data['part'] = isset($data['part']) ? $data['part'] : null;
 
         // change value type depending on date part
