@@ -170,7 +170,10 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
                 [
                     'part'  => DateModifierInterface::PART_VALUE,
                     'type'  => AbstractDateFilterType::TYPE_BETWEEN,
-                    'value' => ['start' => '{{' . DateModifierInterface::VAR_SOY . '}}', 'end' => date('Y') . '-01-01 23:59']
+                    'value' => [
+                        'start' => '{{' . DateModifierInterface::VAR_SOY . '}}',
+                        'end' => date('Y') . '-01-01 23:59'
+                    ]
                 ]
             ],
             'should process date start of the year value with not equals'         => [
@@ -182,7 +185,10 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
                 [
                     'part'  => DateModifierInterface::PART_VALUE,
                     'type'  => AbstractDateFilterType::TYPE_NOT_BETWEEN,
-                    'value' => ['end' => date('Y') . '-01-01 23:59', 'start' => '{{' . DateModifierInterface::VAR_SOY . '}}']
+                    'value' => [
+                        'end' => date('Y') . '-01-01 23:59',
+                        'start' => '{{' . DateModifierInterface::VAR_SOY . '}}'
+                    ]
                 ]
             ],
             'should change part to "value" with "this day without year" variable' => [
