@@ -78,10 +78,10 @@ class DateFilterUtility
         $data = [
             'date_start'          => $data['value']['start'],
             'date_end'            => $data['value']['end'],
-            'date_start_original' => isset($data['value']['start_original']) ? $data['value']['start_original'] : null,
-            'date_end_original'   => isset($data['value']['end_original']) ? $data['value']['end_original'] : null,
+            'date_start_original' => $this->getArrayValue($data['value'], 'start_original'),
+            'date_end_original'   => $this->getArrayValue($data['value'], 'end_original'),
             'type'                => $data['type'],
-            'part'                => isset($data['part']) ? $data['part'] : DateModifierInterface::PART_VALUE,
+            'part'                => $this->getArrayValue($data, 'part', DateModifierInterface::PART_VALUE),
             'field'               => $field
         ];
         $data = $this->applyDatePart($data, $type);
@@ -241,6 +241,20 @@ class DateFilterUtility
         $result = $this->expressionCompiler->compile($data[$key], true);
 
         return $result instanceof ExpressionResult ? $result : null;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $key
+     * @param mixed|null   $defaultValue
+     *
+     * @return mixed|null
+     */
+    protected function getArrayValue(array $data, $key, $defaultValue = null)
+    {
+        return isset($data[$key])
+            ? $data[$key]
+            : $defaultValue;
     }
 
     /**

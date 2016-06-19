@@ -84,6 +84,7 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function dataProvider()
     {

@@ -312,10 +312,6 @@ class DateHelper
             $start = new \DateTime($start, new \DateTimeZone('UTC'));
             $start = $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
-        if ($start === null && $end === null) {
-            $start = new \DateTime(self::MIN_DATE, new \DateTimeZone('UTC'));
-            $end   = new \DateTime('now', new \DateTimeZone('UTC'));
-        }
 
         return [$start, $end];
     }
