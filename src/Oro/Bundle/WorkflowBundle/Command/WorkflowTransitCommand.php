@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowTransitCommand extends ContainerAwareCommand
@@ -77,6 +78,11 @@ class WorkflowTransitCommand extends ContainerAwareCommand
                     $transitionName
                 )
             );
+        } catch (InvalidTransitionException $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+
+            // not throw exception for InvalidTransitionException
+            return;
         } catch (\Exception $e) {
             $output->writeln(
                 sprintf(
