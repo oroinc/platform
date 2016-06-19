@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Helper;
 
-use \DateTime;
-use \DateInterval;
-
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -20,6 +17,7 @@ class DateHelper
     const MONTH_TYPE_DAYS = 93;
     const WEEK_TYPE_DAYS  = 60;
     const DAY_TYPE_DAYS   = 2;
+    const MIN_DATE        = '1900-01-01';
 
     /** @var string */
     protected $offset;
@@ -46,15 +44,15 @@ class DateHelper
     }
 
     /**
-     * @param DateTime $from
-     * @param DateTime $to
-     * @param array    $data
-     * @param string   $rowKey
-     * @param string   $dataKey
+     * @param \DateTime $from
+     * @param \DateTime $to
+     * @param array     $data
+     * @param string    $rowKey
+     * @param string    $dataKey
      *
      * @return array
      */
-    public function convertToCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
+    public function convertToCurrentPeriod(\DateTime $from, \DateTime $to, array $data, $rowKey, $dataKey)
     {
         if (empty($data)) {
             return [];
@@ -70,15 +68,15 @@ class DateHelper
     }
 
     /**
-     * @param DateTime $from
-     * @param DateTime $to
-     * @param array    $data
-     * @param string   $rowKey
-     * @param string   $dataKey
+     * @param \DateTime $from
+     * @param \DateTime $to
+     * @param array     $data
+     * @param string    $rowKey
+     * @param string    $dataKey
      *
      * @return array
      */
-    public function combinePreviousDataWithCurrentPeriod(DateTime $from, DateTime $to, array $data, $rowKey, $dataKey)
+    public function combinePreviousDataWithCurrentPeriod(\DateTime $from, \DateTime $to, array $data, $rowKey, $dataKey)
     {
         if (empty($data)) {
             return [];
@@ -98,9 +96,9 @@ class DateHelper
         // null value is adding to the previous items
         // and first item of the previous items is dropping otherwise
         $countCurrentItems = count($currentItems);
-        $countItems = count($previousItems);
+        $countItems        = count($previousItems);
         if ($countCurrentItems != $countItems) {
-            $items = [];
+            $items     = [];
             $itemsKeys = array_keys($previousItems);
             for ($i = 0; $i < $countCurrentItems; $i++) {
                 if (isset($itemsKeys[$i])) {
@@ -133,11 +131,12 @@ class DateHelper
     }
 
     /**
-     * @param DateTime $start
-     * @param DateTime $end
+     * @param \DateTime $start
+     * @param \DateTime $end
+     *
      * @return array
      */
-    public function getDatePeriod(DateTime $start, DateTime $end)
+    public function getDatePeriod(\DateTime $start, \DateTime $end)
     {
         $start      = clone $start;
         $end        = clone $end;
@@ -167,12 +166,12 @@ class DateHelper
     }
 
     /**
-     * @param DateTime     $start
-     * @param DateTime     $end
+     * @param \DateTime    $start
+     * @param \DateTime    $end
      * @param QueryBuilder $qb
      * @param              $entityField
      */
-    public function addDatePartsSelect(DateTime $start, DateTime $end, QueryBuilder $qb, $entityField)
+    public function addDatePartsSelect(\DateTime $start, \DateTime $end, QueryBuilder $qb, $entityField)
     {
         switch ($this->getFormatStrings($start, $end)['viewType']) {
             case 'year':
@@ -219,12 +218,13 @@ class DateHelper
     }
 
     /**
-     * @param DateTime $start
-     * @param DateTime $end
-     * @param          $row
+     * @param \DateTime $start
+     * @param \DateTime $end
+     * @param           $row
+     *
      * @return string
      */
-    public function getKey(DateTime $start, DateTime $end, $row)
+    public function getKey(\DateTime $start, \DateTime $end, $row)
     {
         $config = $this->getFormatStrings($start, $end);
         switch ($config['viewType']) {
@@ -250,11 +250,12 @@ class DateHelper
     }
 
     /**
-     * @param DateTime $start
-     * @param DateTime $end
+     * @param \DateTime $start
+     * @param \DateTime $end
+     *
      * @return array
      */
-    public function getFormatStrings(DateTime $start, DateTime $end)
+    public function getFormatStrings(\DateTime $start, \DateTime $end)
     {
         $diff = $end->diff($start);
 
@@ -293,6 +294,7 @@ class DateHelper
      * @param array  $dateRange selected date range
      * @param string $entity    Entity name to search min date
      * @param string $field     Field name to search min date
+     *
      * @return array
      */
     public function getPeriod($dateRange, $entity, $field)
@@ -310,16 +312,20 @@ class DateHelper
             $start = new \DateTime($start, new \DateTimeZone('UTC'));
             $start = $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
+        if ($start === null && $end === null) {
+            $start = new \DateTime(self::MIN_DATE, new \DateTimeZone('UTC'));
+            $end   = new \DateTime('now', new \DateTimeZone('UTC'));
+        }
 
         return [$start, $end];
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
     public function getCurrentDateTime()
     {
-        $now = new DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
+        $now = new \DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
 
         return $now;
     }
@@ -339,7 +345,7 @@ class DateHelper
         $end = $this->getCurrentDateTime();
         $end->setTime(23, 59, 59);
 
-        $start = $start->sub(new DateInterval($interval));
+        $start = $start->sub(new \DateInterval($interval));
 
         return [$start, $end];
     }
@@ -347,32 +353,33 @@ class DateHelper
     /**
      * Gets previous date interval
      *
-     * @param DateTime $from
-     * @param DateTime $to
+     * @param \DateTime $from
+     * @param \DateTime $to
      *
      * @return array
      */
-    public function getPreviousDateTimeInterval(DateTime $from, DateTime $to)
+    public function getPreviousDateTimeInterval(\DateTime $from, \DateTime $to)
     {
         $interval = $from->diff($to);
         $start    = clone $from;
         $start    = $start->sub($interval);
-        $start    = $start->sub(new DateInterval('PT1S'));
+        $start    = $start->sub(new \DateInterval('PT1S'));
 
         $end = clone $to;
         $end = $end->sub($interval);
-        $end = $end->sub(new DateInterval('PT1S'));
+        $end = $end->sub(new \DateInterval('PT1S'));
 
         return [$start, $end];
     }
 
     /**
-     * @param array    $config
-     * @param DateTime $date
-     * @param          $increment
+     * @param array     $config
+     * @param \DateTime $date
+     * @param           $increment
+     *
      * @return string
      */
-    protected function getFormattedLabel($config, DateTime $date, $increment)
+    protected function getFormattedLabel($config, \DateTime $date, $increment)
     {
         switch ($config['viewType']) {
             case 'year':
