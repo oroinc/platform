@@ -90,4 +90,44 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
 
         return $this->aclHelper->apply($qb)->getResult();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
+    {
+        if ($value === null) {
+            return $this->getDefaultChoices($config);
+        }
+
+        return parent::getConvertedValue($widgetConfig, $value, $config, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormValue(array $config, $value)
+    {
+        if ($value === null) {
+            return $this->getDefaultChoices($config);
+        }
+
+        return parent::getFormValue($config, $value);
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    protected function getDefaultChoices(array $config)
+    {
+        $values = [];
+
+        if (isset($config['converter_attributes']['default_selected'])) {
+            $values = $config['converter_attributes']['default_selected'];
+        }
+
+        return $values;
+    }
 }
