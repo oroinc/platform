@@ -16,49 +16,59 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
     const NEW_API_DOC_EXTRACTOR_CLASS               = 'Oro\Bundle\ApiBundle\ApiDoc\ApiDocExtractor';
     const NEW_CACHING_API_DOC_EXTRACTOR_CLASS       = 'Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor';
     const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.rest.routing_options_resolver';
-    const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
-    const REST_DOC_VIEW_DETECTOR_AWARE_INTERFACE    =
-        'Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetectorAwareInterface';
-    const ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE  =
-        'Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface';
     const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro_api.routing_options_resolver';
-    const REQUEST_TYPE_PROVIDER_SERVICE             = 'oro_api.rest.request_type_provider';
+    const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
     const REQUEST_TYPE_PROVIDER_TAG                 = 'oro_api.request_type_provider';
-
+    
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::API_DOC_EXTRACTOR_SERVICE)) {
-            return;
-        }
-        if (!$container->hasDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)) {
+        if (!$this->isApplicable($container)) {
             return;
         }
 
+        // extractor
         $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
-        $newApiDocExtractorClass = $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass());
-        if (!$newApiDocExtractorClass) {
-            return;
-        }
-
-        $apiDocExtractorDef->setClass($newApiDocExtractorClass);
-        if (is_subclass_of($apiDocExtractorDef->getClass(), self::REST_DOC_VIEW_DETECTOR_AWARE_INTERFACE)) {
-            $apiDocExtractorDef->addMethodCall(
-                'setRestDocViewDetector',
-                [new Reference(self::REST_DOC_VIEW_DETECTOR_SERVICE)]
-            );
-        }
-        if (is_subclass_of($apiDocExtractorDef->getClass(), self::ROUTING_OPTIONS_RESOLVER_AWARE_INTERFACE)) {
-            $apiDocExtractorDef->addMethodCall(
-                'setRouteOptionsResolver',
-                [new Reference(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)]
-            );
-        }
+        $apiDocExtractorDef->setClass(
+            $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass())
+        );
+        $apiDocExtractorDef->addMethodCall(
+            'setRestDocViewDetector',
+            [new Reference(self::REST_DOC_VIEW_DETECTOR_SERVICE)]
+        );
+        $apiDocExtractorDef->addMethodCall(
+            'setRouteOptionsResolver',
+            [new Reference(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)]
+        );
 
         $this->registerRoutingOptionsResolvers($container);
         $this->registerRequestTypeProviders($container);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return bool
+     */
+    protected function isApplicable(ContainerBuilder $container)
+    {
+        // extractor
+        if (!$container->hasDefinition(self::API_DOC_EXTRACTOR_SERVICE)) {
+            return false;
+        }
+        $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
+        $newApiDocExtractorClass = $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass());
+        if (!$newApiDocExtractorClass) {
+            return false;
+        }
+
+        if (!$container->hasDefinition(self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -106,9 +116,9 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
     {
         DependencyInjectionUtil::registerTaggedServices(
             $container,
-            self::REQUEST_TYPE_PROVIDER_SERVICE,
+            self::REST_DOC_VIEW_DETECTOR_SERVICE,
             self::REQUEST_TYPE_PROVIDER_TAG,
-            'addProvider'
+            'addRequestTypeProvider'
         );
     }
 

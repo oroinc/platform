@@ -11,10 +11,10 @@ use Oro\Component\Routing\RouteCollectionUtil;
 
 trait ApiDocExtractorTrait
 {
-    /** @var RouteOptionsResolverInterface|null */
+    /** @var RouteOptionsResolverInterface */
     protected $routeOptionsResolver;
 
-    /** @var RestDocViewDetector|null */
+    /** @var RestDocViewDetector */
     protected $docViewDetector;
 
     /**
@@ -44,16 +44,29 @@ trait ApiDocExtractorTrait
      */
     protected function processRoutes(array $routes)
     {
-        if (null !== $this->routeOptionsResolver) {
-            $routeCollection = new EnhancedRouteCollection($routes);
-            $routeCollectionAccessor = new RouteCollectionAccessor($routeCollection);
-            /** @var Route $route */
-            foreach ($routeCollection as $route) {
-                $this->routeOptionsResolver->resolve($route, $routeCollectionAccessor);
-            }
-            $routes = $routeCollection->all();
+        $routeCollection = new EnhancedRouteCollection($routes);
+        $routeCollectionAccessor = new RouteCollectionAccessor($routeCollection);
+        /** @var Route $route */
+        foreach ($routeCollection as $route) {
+            $this->routeOptionsResolver->resolve($route, $routeCollectionAccessor);
         }
+        $routes = $routeCollection->all();
 
         return RouteCollectionUtil::filterHidden($routes);
+    }
+
+    /**
+     * @param string $view
+     *
+     * @return string
+     */
+    protected function resolveView($view)
+    {
+        $detectedView = $this->docViewDetector->getView();
+        if ($detectedView) {
+            $view = $detectedView;
+        }
+
+        return $view;
     }
 }

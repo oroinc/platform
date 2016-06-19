@@ -327,7 +327,7 @@ services:
         public: false
         arguments:
             - %installed%
-            - '@oro_api.rest.request_type_provider'
+            - '@oro_api.rest.doc_view_detector'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
             - '@oro_api.doctrine_helper'
@@ -345,7 +345,7 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler
         public: false
         arguments:
-            - '@oro_api.rest.request_type_provider'
+            - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
             - '@oro_api.resource_doc_provider'
             - '@oro_api.doctrine_helper'
@@ -360,14 +360,8 @@ services:
             - '@request_stack'
 
     oro_api.rest.request_type_provider:
-        class: Oro\Bundle\ApiBundle\ApiDoc\ChainRequestTypeProvider
-        public: false
-
-    oro_api.rest.request_type_provider.default:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider
         public: false
-        arguments:
-            - '@oro_api.rest.doc_view_detector'
         tags:
             - { name: oro_api.request_type_provider }
 

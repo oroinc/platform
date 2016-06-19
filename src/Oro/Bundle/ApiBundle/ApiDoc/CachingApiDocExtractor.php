@@ -30,19 +30,11 @@ class CachingApiDocExtractor extends BaseExtractor implements
         return $this->routes;
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function all($view = ApiDoc::DEFAULT_VIEW)
     {
-        if ($this->docViewDetector) {
-            $detectedView = $this->docViewDetector->getView();
-            if ($detectedView) {
-                $view = $detectedView;
-            }
-        }
-
-        return parent::all($view);
+        return parent::all($this->resolveView($view));
     }
 }

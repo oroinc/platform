@@ -20,16 +20,14 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class RestDocHandler implements HandlerInterface
 {
-    /** @var RequestTypeProviderInterface */
-    protected $requestTypeProvider;
+    /** @var RestDocViewDetector */
+    protected $docViewDetector;
 
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
@@ -43,24 +41,21 @@ class RestDocHandler implements HandlerInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var RequestType */
-    protected $requestType;
-
     /**
-     * @param RequestTypeProviderInterface $requestTypeProvider
+     * @param RestDocViewDetector          $docViewDetector
      * @param ActionProcessorBagInterface  $processorBag
      * @param ResourceDocProviderInterface $resourceDocProvider
      * @param DoctrineHelper               $doctrineHelper
      * @param ValueNormalizer              $valueNormalizer
      */
     public function __construct(
-        RequestTypeProviderInterface $requestTypeProvider,
+        RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
         ResourceDocProviderInterface $resourceDocProvider,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
-        $this->requestTypeProvider = $requestTypeProvider;
+        $this->docViewDetector = $docViewDetector;
         $this->processorBag = $processorBag;
         $this->doctrineHelper = $doctrineHelper;
         $this->valueNormalizer = $valueNormalizer;
@@ -75,7 +70,7 @@ class RestDocHandler implements HandlerInterface
         if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP) {
             return;
         }
-        if ($this->getRequestType()->isEmpty()) {
+        if ($this->docViewDetector->getRequestType()->isEmpty()) {
             return;
         }
         $action = $route->getDefault('_action');
@@ -85,13 +80,13 @@ class RestDocHandler implements HandlerInterface
 
         $entityType = $this->extractEntityTypeFromRoute($route);
         if ($entityType) {
+            $annotation->setSection($entityType);
+
             $entityClass = $this->getEntityClass($entityType);
             $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
-
             $actionContext = $this->getContext($action, $entityClass, $associationName);
             $config = $actionContext->getConfig();
 
-            $annotation->setSection($entityType);
             $this->setDescription($annotation, $action, $actionContext);
             $statusCodes = $config->getStatusCodes();
             if ($statusCodes) {
@@ -131,7 +126,7 @@ class RestDocHandler implements HandlerInterface
         return ValueNormalizerUtil::convertToEntityClass(
             $this->valueNormalizer,
             $entityType,
-            $this->getRequestType()
+            $this->docViewDetector->getRequestType()
         );
     }
 
@@ -146,7 +141,7 @@ class RestDocHandler implements HandlerInterface
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $entityClass,
-            $this->getRequestType(),
+            $this->docViewDetector->getRequestType(),
             $throwException
         );
     }
@@ -166,7 +161,7 @@ class RestDocHandler implements HandlerInterface
         $context->removeConfigExtra(SortersConfigExtra::NAME);
         $context->addConfigExtra(new DescriptionsConfigExtra($action));
         $context->addConfigExtra(new StatusCodesConfigExtra($action));
-        $context->getRequestType()->set($this->getRequestType()->toArray());
+        $context->getRequestType()->set($this->docViewDetector->getRequestType()->toArray());
         $context->setLastGroup('initialize');
         if ($associationName) {
             /** @var SubresourceContext $context */
@@ -191,23 +186,22 @@ class RestDocHandler implements HandlerInterface
      */
     protected function setDescription(ApiDoc $annotation, $action, Context $actionContext)
     {
-        $requestType = $this->getRequestType();
         if ($actionContext instanceof SubresourceContext) {
             $parentEntityClass = $actionContext->getParentClassName();
             $associationName = $actionContext->getAssociationName();
             $parentConfig = $actionContext->getParentConfig()->toArray();
             $description = $this->resourceDocProvider->getSubresourceDescription(
                 $action,
-                Version::LATEST,
-                $requestType,
+                $this->docViewDetector->getVersion(),
+                $this->docViewDetector->getRequestType(),
                 $parentConfig,
                 $parentEntityClass,
                 $associationName
             );
             $documentation = $this->resourceDocProvider->getSubresourceDocumentation(
                 $action,
-                Version::LATEST,
-                $requestType,
+                $this->docViewDetector->getVersion(),
+                $this->docViewDetector->getRequestType(),
                 $parentConfig,
                 $parentEntityClass,
                 $associationName
@@ -217,15 +211,15 @@ class RestDocHandler implements HandlerInterface
             $config = $actionContext->getConfig()->toArray();
             $description = $this->resourceDocProvider->getResourceDescription(
                 $action,
-                Version::LATEST,
-                $requestType,
+                $this->docViewDetector->getVersion(),
+                $this->docViewDetector->getRequestType(),
                 $config,
                 $entityClass
             );
             $documentation = $this->resourceDocProvider->getResourceDocumentation(
                 $action,
-                Version::LATEST,
-                $requestType,
+                $this->docViewDetector->getVersion(),
+                $this->docViewDetector->getRequestType(),
                 $config,
                 $entityClass
             );
@@ -270,7 +264,9 @@ class RestDocHandler implements HandlerInterface
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
                 'requirement' => $requirement,
-                'description' => $this->resourceDocProvider->getIdentifierDescription($this->getRequestType())
+                'description' => $this->resourceDocProvider->getIdentifierDescription(
+                    $this->docViewDetector->getRequestType()
+                )
             ]
         );
     }
@@ -288,7 +284,7 @@ class RestDocHandler implements HandlerInterface
                     'description' => $filter->getDescription(),
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
-                        $this->getRequestType(),
+                        $this->docViewDetector->getRequestType(),
                         $filter->isArrayAllowed()
                     )
                 ];
@@ -334,17 +330,5 @@ class RestDocHandler implements HandlerInterface
     protected function hasAttribute(Route $route, $placeholder)
     {
         return false !== strpos($route->getPath(), $placeholder);
-    }
-
-    /**
-     * @return RequestType
-     */
-    protected function getRequestType()
-    {
-        if (null === $this->requestType) {
-            $this->requestType = $this->requestTypeProvider->getRequestType() ?: new RequestType([]);
-        }
-
-        return $this->requestType;
     }
 }

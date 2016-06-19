@@ -56,7 +56,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
         $requestType = $this->getRequestType($input);
         // @todo: API version is not supported for now
         //$version = $input->getArgument('version');
-        $version = Version::LATEST;
+        $version = Version::normalizeVersion(null);
         $action = $input->getOption('action');
 
         /** @var ProcessorBagInterface $processorBag */

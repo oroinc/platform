@@ -20,11 +20,6 @@ class NormalizeVersion implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $version = $context->getVersion();
-        if (null === $version) {
-            $context->setVersion(Version::LATEST);
-        } elseif (0 === strpos($version, 'v')) {
-            $context->setVersion(substr($version, 1));
-        }
+        $context->setVersion(Version::normalizeVersion($context->getVersion()));
     }
 }

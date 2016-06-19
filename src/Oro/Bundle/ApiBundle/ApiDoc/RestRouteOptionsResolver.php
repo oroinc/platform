@@ -8,11 +8,10 @@ use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
@@ -28,8 +27,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var bool */
     protected $isApplicationInstalled;
 
-    /** @var RequestTypeProviderInterface */
-    protected $requestTypeProvider;
+    /** @var RestDocViewDetector */
+    protected $docViewDetector;
 
     /** @var ResourcesProvider */
     protected $resourcesProvider;
@@ -43,30 +42,27 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var RequestType */
-    protected $requestType;
-
     /** @var array */
-    protected $supportedEntities;
+    protected $resources;
 
     /**
-     * @param bool|string|null             $isApplicationInstalled
-     * @param RequestTypeProviderInterface $requestTypeProvider
-     * @param ResourcesProvider            $resourcesProvider
-     * @param SubresourcesProvider         $subresourcesProvider
-     * @param DoctrineHelper               $doctrineHelper
-     * @param ValueNormalizer              $valueNormalizer
+     * @param bool|string|null     $isApplicationInstalled
+     * @param RestDocViewDetector  $docViewDetector
+     * @param ResourcesProvider    $resourcesProvider
+     * @param SubresourcesProvider $subresourcesProvider
+     * @param DoctrineHelper       $doctrineHelper
+     * @param ValueNormalizer      $valueNormalizer
      */
     public function __construct(
         $isApplicationInstalled,
-        RequestTypeProviderInterface $requestTypeProvider,
+        RestDocViewDetector $docViewDetector,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
         $this->isApplicationInstalled = !empty($isApplicationInstalled);
-        $this->requestTypeProvider = $requestTypeProvider;
+        $this->docViewDetector = $docViewDetector;
         $this->resourcesProvider = $resourcesProvider;
         $this->subresourcesProvider = $subresourcesProvider;
         $this->doctrineHelper = $doctrineHelper;
@@ -78,7 +74,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if (!$this->isApplicationInstalled || $this->getRequestType()->isEmpty()) {
+        if (!$this->isApplicationInstalled || $this->docViewDetector->getRequestType()->isEmpty()) {
             return;
         }
         if ($route->getOption('group') === 'rest_api_deprecated') {
@@ -90,9 +86,9 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         }
 
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
-            $entities = $this->getSupportedEntities();
-            if (!empty($entities)) {
-                $this->adjustRoutes($route, $routes, $entities);
+            $resources = $this->getResources();
+            if (!empty($resources)) {
+                $this->adjustRoutes($route, $routes, $resources);
             }
             $route->setRequirement(self::ENTITY_ATTRIBUTE, '\w+');
 
@@ -101,62 +97,64 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * @return RequestType
+     * @param string $entityType
+     *
+     * @return string
      */
-    protected function getRequestType()
+    protected function getEntityClass($entityType)
     {
-        if (null === $this->requestType) {
-            $this->requestType = $this->requestTypeProvider->getRequestType() ?: new RequestType([]);
-        }
-
-        return $this->requestType;
+        return ValueNormalizerUtil::convertToEntityClass(
+            $this->valueNormalizer,
+            $entityType,
+            $this->docViewDetector->getRequestType()
+        );
     }
 
     /**
-     * @return array [[entity class, entity type, [excluded action, ...]], ...]
+     * @param string $entityClass
+     *
+     * @return string
      */
-    protected function getSupportedEntities()
+    protected function getEntityType($entityClass)
     {
-        if (null === $this->supportedEntities) {
-            $resources = $this->resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $this->docViewDetector->getRequestType()
+        );
+    }
 
-            $this->supportedEntities = [];
-            foreach ($resources as $resource) {
-                $className = $resource->getEntityClass();
-                $entityType = $this->valueNormalizer->normalizeValue(
-                    $className,
-                    DataType::ENTITY_TYPE,
-                    $this->getRequestType()
-                );
-                if (!empty($entityType)) {
-                    $this->supportedEntities[] = [
-                        $className,
-                        $entityType,
-                        $resource->getExcludedActions()
-                    ];
-                }
-            }
+    /**
+     * @return ApiResource[]
+     */
+    protected function getResources()
+    {
+        if (null === $this->resources) {
+            $this->resources = $this->resourcesProvider->getResources(
+                $this->docViewDetector->getVersion(),
+                $this->docViewDetector->getRequestType()
+            );
         }
 
-        return $this->supportedEntities;
+        return $this->resources;
     }
 
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param array                   $entities [[entity class, entity type, [excluded action, ...]], ...]
+     * @param ApiResource[]           $resources
      */
-    protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
+    protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $resources)
     {
         $routeName = $routes->getName($route);
 
         $action = $route->getDefault('_action');
-        foreach ($entities as $entity) {
-            list($entityClass, $entityType, $excludedActions) = $entity;
-
+        foreach ($resources as $resource) {
+            $entityClass = $resource->getEntityClass();
+            $entityType = $this->getEntityType($entityClass);
             if ($this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER)) {
                 $this->addSubresources($action, $entityType, $entityClass, $routeName, $route, $routes);
-            } elseif (!in_array($action, $excludedActions, true)) {
+            } elseif (!in_array($action, $resource->getExcludedActions(), true)) {
                 $this->addResource($entityType, $entityClass, $routeName, $route, $routes);
             }
         }
@@ -223,8 +221,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     ) {
         $entitySubresources = $this->subresourcesProvider->getSubresources(
             $entityClass,
-            Version::LATEST,
-            $this->getRequestType()
+            $this->docViewDetector->getVersion(),
+            $this->docViewDetector->getRequestType()
         );
         $subresources = $entitySubresources->getSubresources();
         if (empty($subresources)) {
@@ -310,7 +308,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function getIdFieldRequirement($fieldType)
     {
-        $result = $this->valueNormalizer->getRequirement($fieldType, $this->getRequestType());
+        $result = $this->valueNormalizer->getRequirement($fieldType, $this->docViewDetector->getRequestType());
 
         if (ValueNormalizer::DEFAULT_REQUIREMENT === $result) {
             $result = '[^\.]+';

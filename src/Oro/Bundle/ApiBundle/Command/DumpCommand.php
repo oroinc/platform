@@ -59,7 +59,7 @@ class DumpCommand extends AbstractDebugCommand
         $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $requestType);
         // @todo: API version is not supported for now
         //$version = $input->getArgument('version');
-        $version = Version::LATEST;
+        $version = Version::normalizeVersion(null);
         $isSubresourcesRequested = $input->getOption('sub-resources');
 
         /** @var ResourcesProvider $resourcesProvider */
