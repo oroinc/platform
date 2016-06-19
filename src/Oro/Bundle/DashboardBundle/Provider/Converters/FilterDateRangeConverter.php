@@ -90,8 +90,9 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         } else {
             $saveOpenRange = !empty($config['converter_attributes']['save_open_range']);
             list($start, $end, $type) = $this->getPeriodValues($value, $saveOpenRange);
-            $start = $start instanceof \DateTime ? $start : $this->dateCompiler->compile($start);
-            $end   = $end instanceof \DateTime ? $end : $this->dateCompiler->compile($end);
+            $start = $this->getCompiledDate($start);
+            $end   = $this->getCompiledDate($end);
+            
             //Swap start and end dates if end date is behind start date
             if ($end && $start > $end) {
                 $e     = $end;
@@ -133,13 +134,8 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
      */
     public function getViewValue($value)
     {
-        $start = $value['start'] instanceof \DateTime
-            ? $value['start']
-            : $this->dateCompiler->compile($value['start']);
-
-        $end = $value['end'] instanceof \DateTime
-            ? $value['end']
-            : $this->dateCompiler->compile($value['end']);
+        $start = $this->getCompiledDate($value['start']);
+        $end   = $this->getCompiledDate($value['end']);
 
         if (isset($value['part']) && $value['part'] === DateModifierInterface::PART_ALL_TIME) {
             return $this->translator->trans('oro.dashboard.widget.filter.date_range.all_time');
@@ -251,5 +247,12 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             'prev_start' => $prevStart,
             'prev_end'   => $prevEnd
         ];
+    }
+    
+    protected function getCompiledDate($value)
+    {
+        return $value instanceof \DateTime
+            ? $value
+            : $this->dateCompiler->compile($value);
     }
 }

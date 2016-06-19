@@ -10,7 +10,6 @@ use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 
 class DateFilterProcessor
 {
-
     /** @var DateRangeFilter */
     protected $dateFilter;
 
