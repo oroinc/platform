@@ -134,8 +134,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted. | If you add a new processor in this group, it should be added in the **security_check** group of actions that execute this action, e.g. look at **security_check** group of [create](#create-action) or [update](#update-action) actions. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted. | If you add a new processor in this group, it should be added in the **security_check** group of actions that execute this action, e.g. look at **security_check** group of [create](#create-action) or [update](#update-action) actions. |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php). |
@@ -166,8 +166,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
@@ -198,8 +198,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load an entity to be deleted | |
 | load_data | Loading an entity that should be deleted and save it in the `result` property of the context | |
 | delete_data | Deleting the entity stored in the `result` property of the context | |
@@ -236,8 +236,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load an entities list to be deleted | |
 | load_data | Loading an entities list that should be deleted and save it in the `result` property of the context | |
 | delete_data | Deleting the entities list stored in the `result` property of the context | |
@@ -268,8 +268,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to a newly created entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.create.load_normalized_entity** processor. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to a newly created entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.create.load_normalized_entity** processor. |
 | load_data | Creating an new entity object | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -301,8 +301,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to updated entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.update.load_normalized_entity** processor. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to updated entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.update.load_normalized_entity** processor. |
 | load_data | Loading an entity object to be updated | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -334,8 +334,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
@@ -366,8 +366,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
@@ -398,8 +398,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -430,8 +430,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -462,8 +462,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |

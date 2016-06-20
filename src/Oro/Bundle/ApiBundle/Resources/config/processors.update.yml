@@ -33,11 +33,6 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: initialize, priority: 200 }
 
-    oro_api.update.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: update, group: initialize, priority: 50 }
-
     oro_api.update.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -52,34 +47,13 @@ services:
             - { name: oro.api.processor, action: update, group: initialize, priority: 10 }
 
     #
-    # security_check
-    #
-
-    oro_api.update.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - EDIT
-        tags:
-            - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
-
-    # VIEW permissions are required to update an entity because the updated entity should be returned in response
-    # the "security_check" group is disabled for the "get" action is executed by
-    # the "oro_api.update.load_normalized_entity" processor
-    # so, if you add own security processor for the "get" action, add it here as well
-    oro_api.update.entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
-
-    #
     # normalize_input
     #
+
+    oro_api.update.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: 240 }
 
     oro_api.update.validate_request_data_exist:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestDataExist
@@ -119,6 +93,32 @@ services:
             - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: rest, priority: -110 }
+
+    #
+    # security_check
+    #
+
+    oro_api.update.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - EDIT
+        tags:
+            - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
+
+    # VIEW permissions are required to update an entity because the updated entity should be returned in response
+    # the "security_check" group is disabled for the "get" action is executed by
+    # the "oro_api.update.load_normalized_entity" processor
+    # so, if you add own security processor for the "get" action, add it here as well
+    oro_api.update.entity_type_security_check.view:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
 
     #
     # build_query

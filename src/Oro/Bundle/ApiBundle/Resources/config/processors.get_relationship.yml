@@ -39,11 +39,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 200 }
 
-    oro_api.get_relationship.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 50 }
-
     oro_api.get_relationship.normalize_parent_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
         arguments:
@@ -108,21 +103,13 @@ services:
             - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: json_api, priority: -105 }
 
     #
-    # security_check
-    #
-
-    oro_api.get_relationship.parent_entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
-
-    #
     # normalize_input
     #
+
+    oro_api.get_relationship.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: normalize_input, priority: 240 }
 
     oro_api.get_relationship.validate_parent_entity_id_exists:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityIdExists
@@ -158,6 +145,19 @@ services:
             - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get_relationship, group: normalize_input, collection: true, priority: -100 }
+
+    #
+    # security_check
+    #
+
+    oro_api.get_relationship.parent_entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
 
     #
     # build_query

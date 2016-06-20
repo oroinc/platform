@@ -34,11 +34,6 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: initialize, priority: 200 }
 
-    oro_api.create.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: create, group: initialize, priority: 50 }
-
     oro_api.create.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -55,6 +50,11 @@ services:
     #
     # normalize_input
     #
+
+    oro_api.create.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, priority: 240 }
 
     oro_api.create.validate_request_data_exist:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestDataExist

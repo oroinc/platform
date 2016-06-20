@@ -34,11 +34,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 200 }
 
-    oro_api.delete_list.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 50 }
-
     oro_api.delete_list.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -67,21 +62,13 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: -55 }
 
     #
-    # security_check
-    #
-
-    oro_api.delete_list.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - DELETE
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
-
-    #
     # normalize_input
     #
+
+    oro_api.delete_list.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 240 }
 
     oro_api.delete_list.validate_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\ValidateFilterValues
@@ -94,6 +81,19 @@ services:
             - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 100 }
+
+    #
+    # security_check
+    #
+
+    oro_api.delete_list.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - DELETE
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
 
     #
     # build_query

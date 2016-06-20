@@ -34,11 +34,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: 200 }
 
-    oro_api.get_list.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, priority: 50 }
-
     oro_api.get_list.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -122,21 +117,13 @@ services:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -200 }
 
     #
-    # security_check
-    #
-
-    oro_api.get_list.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
-
-    #
     # normalize_input
     #
+
+    oro_api.get_list.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 240 }
 
     oro_api.get_list.normalize_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues
@@ -160,6 +147,19 @@ services:
             - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -100 }
+
+    #
+    # security_check
+    #
+
+    oro_api.get_list.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
 
     #
     # build_query

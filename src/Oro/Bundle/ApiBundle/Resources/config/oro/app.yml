@@ -121,9 +121,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -139,9 +139,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -157,9 +157,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -175,9 +175,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -193,9 +193,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 load_data:
                     priority: -40
@@ -213,9 +213,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -235,9 +235,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -253,9 +253,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -271,9 +271,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 load_data:
                     priority: -40
@@ -289,9 +289,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 load_data:
                     priority: -40
@@ -307,9 +307,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 load_data:
                     priority: -40
