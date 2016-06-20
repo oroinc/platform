@@ -506,7 +506,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUpWorkflowManagerMock($entity, $hasWorkflow = true)
     {
-        $this->workflowManager->expects($this->any())->method('hasApplicableWorkflowByEntityClass')->with($entity)
+        $this->workflowManager->expects($this->any())->method('hasApplicableWorkflowsByEntityClass')->with($entity)
             ->will($this->returnValue($hasWorkflow));
     }
 

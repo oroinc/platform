@@ -2,7 +2,6 @@ parameters:
     oro_workflow.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
     oro_workflow.datagrid.action.workflow_activate.class: Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction
-    oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.process_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
     oro_workflow.process_trigger.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
@@ -72,17 +71,18 @@ services:
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-deactivate }
 
-    oro_workflow.entity_connector:
-        class: %oro_workflow.entity_connector.class%
+    oro_workflow.manager.system_config:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@oro_workflow.changes.event.dispatcher'
 
     oro_workflow.manager:
         class: %oro_workflow.manager.class%
         arguments:
-            - '@doctrine'
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.config_manager'
-            - '@oro_workflow.changes.event.dispatcher'
+            - '@oro_workflow.manager.system_config'
 
     oro_workflow.process.process_factory:
         class: %oro_workflow.process.process_factory.class%
@@ -249,7 +249,6 @@ services:
         arguments:
             - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.transition_schedule.query_factory'
-            - '@oro_workflow.entity_connector'
         calls:
             - ['addOptionVerifier', ['cron', '@oro_workflow.validator_expression.cron_expression_verifier']]
             - ['addOptionVerifier', ['filter', '@oro_workflow.validator_expression.dql_expression_verifier']]

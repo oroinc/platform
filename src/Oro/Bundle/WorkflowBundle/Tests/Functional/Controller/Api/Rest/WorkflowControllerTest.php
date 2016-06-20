@@ -4,10 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
@@ -220,11 +218,11 @@ class WorkflowControllerTest extends WebTestCase
     protected function assertActiveWorkflow($entityClass, $workflowName)
     {
         if ($workflowName) {
-            $activeWorkflow = $this->getWorkflowManager()->getApplicableWorkflowByEntityClass($entityClass);
-            $this->assertNotEmpty($activeWorkflow);
-            $this->assertEquals($workflowName, $activeWorkflow->getName());
+            $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entityClass);
+            $this->assertNotEmpty($activeWorkflows);
+            $this->assertContains($workflowName, $activeWorkflows);
         } else {
-            $this->assertNull($this->getWorkflowManager()->getApplicableWorkflowByEntityClass($entityClass));
+            $this->assertEmpty($this->getWorkflowManager()->getApplicableWorkflows($entityClass));
         }
     }
 

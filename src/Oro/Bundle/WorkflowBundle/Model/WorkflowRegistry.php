@@ -41,8 +41,7 @@ class WorkflowRegistry
         ManagerRegistry $managerRegistry,
         WorkflowAssembler $workflowAssembler,
         ConfigProvider $configProvider
-    )
-    {
+    ) {
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;
         $this->configProvider = $configProvider;
@@ -96,34 +95,19 @@ class WorkflowRegistry
      * Get Active Workflow that is applicable to entity class
      *
      * @param string $entityClass
-     * @param $workflowName
-     *
-     * @throws \BadMethodCallException
-     *
-     * @return Workflow|null
+     * @return Workflow[]
+     * @deprecated
      */
-    public function getActiveWorkflowByEntityClass($entityClass, $workflowName)
+    public function getActiveWorkflowByEntityClass($entityClass)
     {
-        if (!$workflowName) {
-            throw new \BadMethodCallException('Workflow name must be defined');
-        }
-
-        $workflows = $this->getActiveWorkflowsByEntityClass($entityClass);
-
-        foreach ($workflows as $workflow) {
-            if ($workflowName === $workflow->getName()) {
-                return $workflow;
-            }
-        }
-
-        return null;
+        throw new \RuntimeException('TODO Refactor an remove usage of method. Entity has many workflows now.');
     }
 
     /**
      * Get Active Workflow that is applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow[]|array
+     * @return Workflow[]
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
@@ -146,13 +130,11 @@ class WorkflowRegistry
      * Check is there an active workflow for entity class
      *
      * @param string $entityClass
-     * @param $workflowName
-     *
      * @return bool
      */
-    public function hasActiveWorkflowByEntityClass($entityClass, $workflowName)
+    public function hasActiveWorkflowByEntityClass($entityClass)
     {
-        return $this->getActiveWorkflowByEntityClass($entityClass, $workflowName) !== null;
+        return $this->getActiveWorkflowByEntityClass($entityClass) !== null;
     }
 
     /**

@@ -80,7 +80,6 @@ services:
         class: %oro_workflow.form.type.applicable_entities.class%
         arguments:
             - '@oro_entity_config.config_manager'
-            - '@oro_workflow.entity_connector'
         tags:
             - { name: form.type, alias: oro_workflow_applicable_entities }
 
