@@ -67,7 +67,6 @@ class WorkflowSystemConfigManager
     }
 
     /**
-     * todo fix duplicate code with setWorkflowInactive
      * @param WorkflowDefinition $definition
      * @throws WorkflowException
      */
