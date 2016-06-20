@@ -19,8 +19,8 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
 
-    oro_api.get.validate_request_type_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+    oro_api.get.validate_request_type_and_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 210 }
 
@@ -28,11 +28,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 210 }
-
-    oro_api.get.normalize_version:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
 
     oro_api.get.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass

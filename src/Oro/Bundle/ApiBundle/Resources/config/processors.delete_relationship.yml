@@ -19,8 +19,8 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 250 }
 
-    oro_api.delete_relationship.validate_request_type_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+    oro_api.delete_relationship.validate_request_type_and_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 210 }
 
@@ -33,11 +33,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateAssociationNameExists
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 210 }
-
-    oro_api.delete_relationship.normalize_version:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 200 }
 
     oro_api.delete_relationship.normalize_parent_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
