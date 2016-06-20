@@ -15,6 +15,8 @@ Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
             - NotBlank:     ~
         attendees:
             - Valid: ~
+        recurrence:
+            - Valid: ~
 
 Oro\Bundle\CalendarBundle\Entity\CalendarProperty:
     properties:
