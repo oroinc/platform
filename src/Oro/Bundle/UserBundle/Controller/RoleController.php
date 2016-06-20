@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -101,6 +101,7 @@ class RoleController extends Controller
      */
     protected function update(Role $entity)
     {
+        /** @var AclRoleHandler $aclRoleHandler */
         $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
         $aclRoleHandler->createForm($entity);
 
@@ -118,65 +119,9 @@ class RoleController extends Controller
         $tabs = array_filter(array_map(function($category) {
             return $category['tab'] ? $category['id'] : null;
         }, $categoriesList));
-        // @todo: redevelop it as grid
+
         $form = $aclRoleHandler->createView();
         $translator = $this->get('translator');
-        $permissionManager = $this->get('oro_security.acl.permission_manager');
-        /** @var ConfigProvider $configEntityManager */
-        $configEntityManager = $this->get('oro_entity_config.provider.entity');
-        $form->children['entity']->children;
-        $gridData = [];
-        foreach ($form->children['entity']->children as $child) {
-            $identity = $child->children['identity'];
-            $oid = $identity->children['id']->vars['value'];
-            $item = [
-                'entity' => $translator->trans($identity->children['name']->vars['value']),
-                'identity' => $oid,
-                'group' => null,
-                'permissions' => []
-            ];
-            if (strpos($oid, 'entity:') === 0) {
-                $entityClass = substr($oid, 7);
-                if ($entityClass !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-                    $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
-                    $config = $configEntityManager->getConfig($entityClass);
-                    if ($config->has('category')) {
-                        $item['group'] = $config->get('category');
-                    }
-                }
-            }
-
-            // all data transformation are taken from form type blocks
-            foreach ($child->vars['privileges_config']['permissions'] as $field) {
-                foreach ($child->children['permissions']->children as $permission) {
-                    if ($permission->vars['value']->getName() === $field) {
-                        $accessLevelVars = $permission->children['accessLevel']->vars;
-                        $permissionEntity = $permissionManager->getPermissionByName($field);
-                        $permissionLabel = $permissionEntity->getLabel() ? $permissionEntity->getLabel() : $field;
-                        $permissionDescription = '';
-                        if ($permissionEntity->getDescription()) {
-                            $permissionDescription = $translator->trans($permissionEntity->getDescription());
-                        }
-                        $valueText = $accessLevelVars['translation_prefix'] .
-                            (empty($accessLevelVars['level_label']) ? 'NONE' : $accessLevelVars['level_label']);
-                        $valueText = $translator->trans($valueText, [], $accessLevelVars['translation_domain']);
-                        $item['permissions'][] = [
-                            'id' => $permissionEntity->getId(),
-                            'name' => $permissionEntity->getName(),
-                            'label' => $translator->trans($permissionLabel),
-                            'description' => $permissionDescription,
-                            'full_name' => $accessLevelVars['full_name'],
-                            'identity' => $accessLevelVars['identity'],
-                            'access_level' => $accessLevelVars['value'],
-                            'access_level_label' => $valueText
-                        ];
-                        break;
-                    }
-                }
-            }
-
-            $gridData[] = $item;
-        }
 
         $capabilitiesData = [];
         foreach ($categories as $category) {
@@ -187,24 +132,21 @@ class RoleController extends Controller
             ];
         }
 
-        foreach ($form->children['action']->children as $action_id => $child) {
-            $permission = reset($child->children['permissions']->children)->vars['value'];
-            $description = $child->vars['value']->getDescription();
-            $category = $child->vars['value']->getCategory();
-            $capabilitiesData[$category]['items'][] = [
-                'id' => $action_id,
-                'identity' => $child->children['identity']->children['id']->vars['value'],
-                'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
-                'description' => $description ? $translator->trans($description) : '',
-                'name' => $permission->getName(),
-                'access_level' => $permission->getAccessLevel(),
-                'selected_access_level' => 5,
-                'unselected_access_level' => 0
-            ];
-        }
-
-        $gridDatasource = $this->get('oro_user.datagrid.datasource.repository');
-        $gridDatasource->setResults($gridData);
+//        foreach ($form->children['action']->children as $action_id => $child) {
+//            $permission = reset($child->children['permissions']->children)->vars['value'];
+//            $description = $child->vars['value']->getDescription();
+//            $category = $child->vars['value']->getCategory();
+//            $capabilitiesData[$category]['items'][] = [
+//                'id' => $action_id,
+//                'identity' => $child->children['identity']->children['id']->vars['value'],
+//                'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
+//                'description' => $description ? $translator->trans($description) : '',
+//                'name' => $permission->getName(),
+//                'access_level' => $permission->getAccessLevel(),
+//                'selected_access_level' => 5,
+//                'unselected_access_level' => 0
+//            ];
+//        }
         
         return array(
             'entity' => $entity,
@@ -214,7 +156,6 @@ class RoleController extends Controller
                     return in_array($category['id'], $tabs);
                 })
             ],
-            'gridData' => $gridData,
             'capabilitySetOptions' => [
                 'data' => array_values($capabilitiesData),
                 'tabIds' => $tabs
