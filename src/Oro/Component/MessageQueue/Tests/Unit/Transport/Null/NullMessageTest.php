@@ -33,13 +33,6 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $message->getProperties());
     }
 
-    public function testShouldNewMessageReturnEmptyLocalProperties()
-    {
-        $message = new NullMessage();
-
-        $this->assertSame([], $message->getLocalProperties());
-    }
-
     public function testShouldNewMessageReturnEmptyHeaders()
     {
         $message = new NullMessage();
@@ -99,33 +92,6 @@ class NullMessageTest extends \PHPUnit_Framework_TestCase
         $message->setProperties(['foo' => 'fooVal']);
 
         $this->assertSame('barDefault', $message->getProperty('bar', 'barDefault'));
-    }
-
-    public function testShouldAllowGetPreviouslySetLocalProperties()
-    {
-        $message = new NullMessage();
-
-        $message->setLocalProperties(['foo' => 'fooVal']);
-
-        $this->assertSame(['foo' => 'fooVal'], $message->getLocalProperties());
-    }
-
-    public function testShouldAllowGetByNamePreviouslySetLocalProperty()
-    {
-        $message = new NullMessage();
-
-        $message->setLocalProperties(['foo' => 'fooVal']);
-
-        $this->assertSame('fooVal', $message->getLocalProperty('foo'));
-    }
-    
-    public function testShouldReturnDefaultIfLocalPropertyNotSet()
-    {
-        $message = new NullMessage();
-
-        $message->setLocalProperties(['foo' => 'fooVal']);
-
-        $this->assertSame('barDefault', $message->getLocalProperty('bar', 'barDefault'));
     }
 
     public function testShouldReturnDefaultIfHeaderNotSet()

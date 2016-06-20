@@ -11,12 +11,6 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
-    oro_message_queue.consumption.json_decode_extension:
-        class: 'Oro\Component\MessageQueue\Consumption\Extension\JsonDecodeExtension'
-        public: false
-        tags:
-            - { name: 'oro_message_queue.consumption.extension' }
-
     oro_message_queue.consumption.docrine_ping_connection_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrinePingConnectionExtension'
         public: false

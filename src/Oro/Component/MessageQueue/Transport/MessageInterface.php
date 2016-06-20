@@ -36,26 +36,6 @@ interface MessageInterface
     public function getProperty($name, $default = null);
 
     /**
-     * @param array $properties
-     *
-     * @return void
-     */
-    public function setLocalProperties(array $properties);
-
-    /**
-     * @return array
-     */
-    public function getLocalProperties();
-
-    /**
-     * @param string $name
-     * @param mixed $default
-     *
-     * @return string
-     */
-    public function getLocalProperty($name, $default = null);
-
-    /**
      * @param array $headers
      *
      * @return void
