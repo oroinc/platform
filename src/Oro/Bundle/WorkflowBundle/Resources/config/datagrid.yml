@@ -189,7 +189,7 @@ datagrid:
                 icon:          ok
                 link:          activate_link
             deactivate:
-                type:          ajax
+                type:          workflow-deactivate
                 acl_resource:  oro_workflow_definition_update
                 label:         oro.workflow.workflowdefinition.datagrid.deactivate
                 icon:          remove

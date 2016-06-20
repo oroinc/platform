@@ -1,40 +1,33 @@
-define(['jquery', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/messenger', 'oroui/js/error'],
-function($, __, Modal, Messenger, Error) {
+define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'],
+function(__, routing, DialogWidget) {
     'use strict';
 
     /**
      * Activation handler
      *
-     * @export  oroworkflow/js/activation-handler
-     * @class   oroworkflow.WorkflowActivationHandler
+     * @export oroworkflow/js/activation-handler
+     * @class  oroworkflow.WorkflowActivationHandler
      */
-    return function(url, hideNotifications) {
-        var element = this;
-
-        var confirmActivation = new Modal({
-            title:   __('Workflow reset'),
-            content: __('Attention: This action will reset all workflow data for this entity.'),
-            okText:  __('Yes, Reset')
+    return function(url) {
+        var el = this;
+        var formWidget = new DialogWidget({
+            title: __('oro.workflow.workflowdefinition.activate', {label : this.model.get('label')}),
+            url: routing.generate('oro_workflow_definition_activate_from_widget', {name: this.model.get('name')}),
+            stateEnabled: false,
+            incrementalPosition: false,
+            loadingMaskEnabled: true,
+            dialogOptions: {
+                modal: true,
+                resizable: true,
+                width: 500,
+                autoResize: true
+            }
         });
 
-        confirmActivation.on('ok', function() {
-            element.trigger('activation_start');
-            $.ajax({
-                url: url,
-                type: 'GET',
-                success: function(response) {
-                    if (response.message && !hideNotifications) {
-                        Messenger.notificationFlashMessage('success', response.message);
-                    }
-                    element.trigger('activation_success', [response]);
-                },
-                error: function(xhr, textStatus, error) {
-                    Error.handle({}, xhr, {enforce: true});
-                    element.trigger('activation_error', [xhr, textStatus, error]);
-                }
-            });
+        formWidget.on('formSave', function(response) {
+            el.trigger('activation_success', response);
         });
 
-        confirmActivation.open();
+        formWidget.render();
     };
 });

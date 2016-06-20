@@ -205,6 +205,9 @@ oro:
             placeholder:
                 select_replacement: Select Replacement
 
+            form:
+                replace_message: "Please, select workflows that should be replaced."
+
         workflowitem:
             entity_label:             Workflow Item
             entity_plural_label:      Workflow Items

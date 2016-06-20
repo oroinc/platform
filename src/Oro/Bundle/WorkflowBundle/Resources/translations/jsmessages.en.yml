@@ -1,6 +1,11 @@
 oro:
     workflow:
         change_entity_confirmation: "Are you sure you want to change entity?"
+        activated: "Workflow activated"
+        deactivated_list: "Deactivated workflows: "
+        workflowdefinition:
+            activate: 'Activate workflow "{{ label }}"'
+            deactivate: 'Deactivate workflow "{{ label }}"'
 
 "Gray button": "Gray button"
 "Navy blue button": "Navy blue button"

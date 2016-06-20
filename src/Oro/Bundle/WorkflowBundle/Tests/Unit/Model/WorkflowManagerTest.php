@@ -354,6 +354,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflowItem->setDefinition($workflowDefinition);
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -363,7 +367,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs([$aclManager, $restrictionManager, null, null, null])
+            ->setConstructorArgs([$doctrineHelper, $aclManager, $restrictionManager, null, null, null])
             ->setMethods(null)
             ->getMock();
         $workflow->setName($workflowName);
@@ -377,7 +381,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $activeWorkflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs([$aclManager, $restrictionManager, $stepManager, null, null])
+            ->setConstructorArgs([$doctrineHelper, $aclManager, $restrictionManager, $stepManager, null, null])
             ->setMethods(['start'])
             ->getMock();
 
@@ -459,6 +463,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entity = new WorkflowAwareEntity();
         $workflowItem->setEntity($entity);
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -468,7 +476,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs([$aclManager, $restrictionManager, null, null, null])
+            ->setConstructorArgs([$doctrineHelper, $aclManager, $restrictionManager, null, null, null])
             ->setMethods(null)
             ->getMock();
 
@@ -1007,6 +1015,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getStartTransitions')
             ->will($this->returnValue(new ArrayCollection($startTransitions)));
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -1017,7 +1029,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs(
-                [$aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
             )
             ->setMethods(
                 [

@@ -12,12 +12,18 @@ config:
         'oroworkflow/js/transition-executor':                       'bundles/oroworkflow/js/transition-executor.js'
         'oroworkflow/js/reset-handler':                             'bundles/oroworkflow/js/reset-handler.js'
         'oroworkflow/js/activation-handler':                        'bundles/oroworkflow/js/activation-handler.js'
+        'oroworkflow/js/deactivation-handler':                      'bundles/oroworkflow/js/deactivation-handler.js'
 
         'oroworkflow/js/app/modules/workflow-steps-module':          'bundles/oroworkflow/js/app/modules/workflow-steps-module.js'
         'oroworkflow/js/app/views/page-element/workflow-steps-view': 'bundles/oroworkflow/js/app/views/page-element/workflow-steps-view.js'
 
         'oroworkflow/js/app/components/workflow-editor-component':  'bundles/oroworkflow/js/app/components/workflow-editor-component.js'
         'oro/datagrid/action/workflow-activate-action':             'bundles/oroworkflow/js/datagrid/action/workflow-activate-action.js'
+        'oro/datagrid/action/workflow-deactivate-action':           'bundles/oroworkflow/js/datagrid/action/workflow-deactivate-action.js'
         'oro/select2-workflow-replacement-component':               'bundles/oroworkflow/js/app/components/select2-workflow-replacement-component.js'
+
+        'oroworkflow/js/app/components/deactivate-form-widget-component': 'bundles/oroworkflow/js/app/components/deactivate-form-widget-component.js'
+        'oroworkflow/js/app/views/workflow-activate-btn-view': 'bundles/oroworkflow/js/app/views/workflow-activate-btn-view.js'
+        'oroworkflow/js/app/views/workflow-deactivate-btn-view': 'bundles/oroworkflow/js/app/views/workflow-deactivate-btn-view.js'
     appmodules:
         - 'oroworkflow/js/app/modules/workflow-steps-module'

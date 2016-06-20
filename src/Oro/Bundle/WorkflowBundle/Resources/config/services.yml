@@ -65,6 +65,15 @@ services:
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-activate }
 
+    oro_workflow.datagrid.action.workflow_deactivate:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowDeactivateAction'
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: workflow-deactivate }
+
+    oro_workflow.entity_connector:
+        class: %oro_workflow.entity_connector.class%
+
     oro_workflow.manager:
         class: %oro_workflow.manager.class%
         arguments:

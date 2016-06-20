@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
 
 /**
  * @Route("/workflowdefinition")
@@ -177,5 +179,61 @@ class WorkflowDefinitionController extends Controller
         return array(
             'entity' => $workflowDefinition
         );
+    }
+
+    /**
+     * Deactivate WorkflowDefinition form
+     *
+     * @Route("/deactivate-form/{name}", name="oro_workflow_definition_activate_from_widget")
+     * @AclAncestor("oro_workflow_definition_update")
+     * @Template("OroWorkflowBundle:WorkflowDefinition:widget/deactivateForm.html.twig")
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
+    public function deactivateFormAction(WorkflowDefinition $workflowDefinition)
+    {
+        $form = $this->createForm(
+            WorkflowReplacementSelectType::NAME,
+            null,
+            ['workflow' => $workflowDefinition->getName()]
+        );
+
+        $response = $this->get('oro_form.model.update_handler')
+            ->handleUpdate(
+                $workflowDefinition,
+                $form,
+                null,
+                null,
+                null,
+                null,
+                function (WorkflowDefinition $workflowDefinition, FormInterface $form) {
+                    return [
+                        'form' => $form->createView(),
+                        'workflow' => $workflowDefinition->getName()
+                    ];
+                }
+            );
+
+        if ($form->isValid()) {
+            $workflowManager = $this->get('oro_workflow.manager');
+            $workflows = $form->getData();
+            
+            $deactivated = [];
+            foreach ($workflows as $workflowName) {
+                if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
+                    $workflow = $workflowManager->getWorkflow($workflowName);
+
+                    $workflowManager->resetWorkflowData($workflow->getDefinition());
+                    $workflowManager->deactivateWorkflow($workflow);
+
+                    $deactivated[] = $workflow->getLabel();
+                }
+            }
+            
+            $response['deactivated'] = $deactivated;
+        }
+
+        return $response;
     }
 }
