@@ -141,7 +141,6 @@ class WorkflowManager
 
         try {
             $currentWorkflowName = $workflowItem->getWorkflowName();
-            $this->getWorkflow($workflowItem)->resetWorkflowData($entity);
             $em->remove($workflowItem);
             $em->flush();
             //todo fix in BAP-10808 or BAP-10809

@@ -11,10 +11,8 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -339,6 +337,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param boolean $withStartStep
      * @dataProvider resetWorkflowItemProvider
+     *
+     * @deprecated Cuz uses old logic and now one entity can be attached to many workflows
      */
     public function testResetWorkflowItem($withStartStep)
     {
@@ -346,10 +346,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $activeWorkflowName = self::TEST_WORKFLOW_NAME;// . '_active';
         $workflowItem = $this->createWorkflowItem();
         $entity = new WorkflowAwareEntity();
-        $workflowStep = new WorkflowStep();
-
-        $entity->setWorkflowItem($workflowItem);
-        $entity->setWorkflowStep($workflowStep);
 
         $workflowItem->setEntity($entity);
 
@@ -357,6 +353,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowDefinition->setRelatedEntity(get_class($entity));
 
         $workflowItem->setDefinition($workflowDefinition);
+
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
@@ -367,7 +367,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs([new EntityConnector(), $aclManager, $restrictionManager, null, null, null])
+            ->setConstructorArgs([$doctrineHelper, $aclManager, $restrictionManager, null, null, null])
             ->setMethods(null)
             ->getMock();
         $workflow->setName($workflowName);
@@ -381,7 +381,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $activeWorkflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs([new EntityConnector(), $aclManager, $restrictionManager, $stepManager, null, null])
+            ->setConstructorArgs([$doctrineHelper, $aclManager, $restrictionManager, $stepManager, null, null])
             ->setMethods(['start'])
             ->getMock();
 
@@ -463,6 +463,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entity = new WorkflowAwareEntity();
         $workflowItem->setEntity($entity);
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -472,7 +476,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs([new EntityConnector(), $aclManager, $restrictionManager, null, null, null])
+            ->setConstructorArgs([$doctrineHelper, $aclManager, $restrictionManager, null, null, null])
             ->setMethods(null)
             ->getMock();
 
@@ -1011,9 +1015,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getStartTransitions')
             ->will($this->returnValue(new ArrayCollection($startTransitions)));
 
-        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -1024,7 +1029,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs(
-                [$entityConnector, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
             )
             ->setMethods(
                 [

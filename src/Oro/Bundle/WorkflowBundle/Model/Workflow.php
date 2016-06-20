@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Model\AttributeManager as BaseAttributeManager;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -24,9 +27,9 @@ class Workflow
     protected $name;
 
     /**
-     * @var EntityConnector
+     * @var DoctrineHelper
      */
-    protected $entityConnector;
+    protected $doctrineHelper;
 
     /**
      * @var AclManager
@@ -67,29 +70,29 @@ class Workflow
      * @var WorkflowDefinition
      */
     protected $definition;
-    
+
     /**
      * @var Collection
      */
     protected $restrictions;
 
     /**
-     * @param EntityConnector                            $entityConnector
-     * @param AclManager                                 $aclManager
+     * @param DoctrineHelper $doctrineHelper
+     * @param AclManager $aclManager
      * @param RestrictionManager $restrictionManager
-     * @param StepManager|null                           $stepManager
-     * @param BaseAttributeManager|null                  $attributeManager
-     * @param TransitionManager|null                     $transitionManager
+     * @param StepManager|null $stepManager
+     * @param BaseAttributeManager|null $attributeManager
+     * @param TransitionManager|null $transitionManager
      */
     public function __construct(
-        EntityConnector $entityConnector,
+        DoctrineHelper $doctrineHelper,
         AclManager $aclManager,
         RestrictionManager $restrictionManager,
         StepManager $stepManager = null,
         BaseAttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
     ) {
-        $this->entityConnector         = $entityConnector;
+        $this->doctrineHelper          = $doctrineHelper;
         $this->aclManager              = $aclManager;
         $this->restrictionManager      = $restrictionManager;
         $this->stepManager             = $stepManager ? $stepManager : new StepManager();
@@ -172,8 +175,8 @@ class Workflow
     /**
      * Start workflow.
      *
-     * @param array  $data
      * @param object $entity
+     * @param array  $data
      * @param string $startTransitionName
      *
      * @return WorkflowItem
@@ -292,23 +295,9 @@ class Workflow
         $transition->transit($workflowItem);
         $workflowItem->addTransitionRecord($transitionRecord);
 
-        $entity = $workflowItem->getEntity();
-        $this->entityConnector->setWorkflowItem($entity, $workflowItem);
-        $this->entityConnector->setWorkflowStep($entity, $workflowItem->getCurrentStep());
-
         $this->aclManager->updateAclIdentities($workflowItem);
         $this->restrictionManager->updateEntityRestrictions($workflowItem);
 
-    }
-
-    /**
-     * Reset workflow item data.
-     *
-     * @param $entity
-     */
-    public function resetWorkflowData($entity)
-    {
-        $this->entityConnector->resetWorkflowData($entity);
     }
 
     /**
@@ -326,6 +315,8 @@ class Workflow
         $workflowItem = new WorkflowItem();
         $workflowItem
             ->setWorkflowName($this->getName())
+            ->setEntityClass($this->doctrineHelper->getEntityClass($entity))
+            ->setEntityId($this->doctrineHelper->getSingleEntityIdentifier($entity))
             ->setEntity($entity);
 
         if (array_key_exists($entityAttributeName, $data)) {
@@ -408,8 +399,8 @@ class Workflow
     /**
      * Check that transition is available to show.
      *
-     * @param string|Transition $transition
      * @param WorkflowItem      $workflowItem
+     * @param string|Transition $transition
      * @param Collection        $errors
      *
      * @return bool
@@ -517,7 +508,7 @@ class Workflow
     public function setRestrictions($restrictions)
     {
         $this->restrictions = $restrictions;
-        
+
         return $this;
     }
 }
