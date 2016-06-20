@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Command\Stub\TestOutput;
 
@@ -213,13 +213,9 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
                 'name' => 'transit',
                 'output' => [
                     'Start transition...',
-                    'Step "test_step" of workflow "test_workflow" doesn\'t have allowed transition "transit"',
+                    'Transition "transit" is not allowed.',
                 ],
-                'exception' => InvalidTransitionException::stepHasNoAllowedTransition(
-                    'test_workflow',
-                    'test_step',
-                    'transit'
-                ),
+                'exception' => new ForbiddenTransitionException('Transition "transit" is not allowed.'),
             ],
         ];
     }
