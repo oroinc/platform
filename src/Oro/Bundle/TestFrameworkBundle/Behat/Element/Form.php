@@ -7,9 +7,12 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\WaitingDictionary;
 
 class Form extends Element
 {
+    use WaitingDictionary;
+
     /**
      * @param TableNode $table
      * @throws ElementNotFoundException
@@ -52,7 +55,7 @@ class Form extends Element
         if ($element->hasClass('select2-offscreen')) {
             $this->setSelect2Input($element, $value);
         } else {
-            $element->setValue(null);
+            $element->setValue('');
             $element->setValue($value);
         }
     }
@@ -182,7 +185,7 @@ class Form extends Element
      */
     public function getSelect2ResultsCount()
     {
-        $this->waitForSelect2SearchResults();
+        $this->waitForAjax();
 
         return count($this->getPage()->findAll('css', '.select2-results li'));
     }
@@ -193,7 +196,7 @@ class Form extends Element
      */
     public function pressTextInSearchResult($text)
     {
-        $this->waitForSelect2SearchResults();
+        $this->waitForAjax();
         /** @var NodeElement $resultItem */
         foreach ($this->getPage()->findAll('css', '.select2-results li') as $resultItem) {
             if (preg_match(sprintf('/%s/', $text), $resultItem->getText())) {
@@ -224,13 +227,5 @@ class Form extends Element
         } while ($field === null && $i < $deep);
 
         return $field;
-    }
-
-    protected function waitForSelect2SearchResults()
-    {
-        $searchInProgress = <<<JS
-            $('li.select2-searching').length == 0;
-JS;
-        $this->getDriver()->wait(5000, $searchInProgress);
     }
 }
