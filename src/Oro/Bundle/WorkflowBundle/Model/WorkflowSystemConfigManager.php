@@ -21,7 +21,7 @@ class WorkflowSystemConfigManager
     private $configManager;
 
     /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var DoctrineHelper */
     private $doctrineHelper;
