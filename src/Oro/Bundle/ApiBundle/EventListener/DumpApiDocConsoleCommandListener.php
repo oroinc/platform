@@ -66,8 +66,8 @@ class DumpApiDocConsoleCommandListener
             $property->setAccessible(true);
             $innerCommand = $property->getValue($helpCommand);
         }
-        if (!$innerCommand && $input->hasArgument('command_name')) {
-            $innerCommandName = $input->getArgument('command_name');
+        if (!$innerCommand) {
+            $innerCommandName = $this->getApiDocDumpCommandFromParameterOptions($input);
             if ($innerCommandName && $helpCommand->getApplication()->has($innerCommandName)) {
                 $innerCommand = $helpCommand->getApplication()->find($innerCommandName);
             }
@@ -83,7 +83,32 @@ class DumpApiDocConsoleCommandListener
      */
     protected function isApiDocDumpCommand(Command $command)
     {
-        return in_array($command->getName(), ['api:doc:dump', 'api:swagger:dump'], true);
+        return in_array($command->getName(), $this->getApiDocDumpCommands(), true);
+    }
+
+    /**
+     * @param InputInterface $input
+     *
+     * @return string|null
+     */
+    protected function getApiDocDumpCommandFromParameterOptions(InputInterface $input)
+    {
+        $commands = $this->getApiDocDumpCommands();
+        foreach ($commands as $command) {
+            if (false !== $input->getParameterOption($command)) {
+                return $command;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getApiDocDumpCommands()
+    {
+        return ['api:doc:dump', 'api:swagger:dump'];
     }
 
     /**

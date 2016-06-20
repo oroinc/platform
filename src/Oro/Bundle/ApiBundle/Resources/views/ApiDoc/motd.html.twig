@@ -1,6 +1,9 @@
 {% include 'NelmioApiDocBundle::Components/motd.html.twig' %}
 <script src="{{ asset('bundles/oroapi/lib/jquery.bind-first-0.2.3.min.js') }}"></script>
 <script src="{{ asset('bundles/oroapi/lib/wsse.js') }}"></script>
+<style type="text/css">
+    #summary { display: none; }
+</style>
 <script type="text/javascript">
     gotoResource = function (resourceId) {
         var $section = $('#' + resourceId).closest('.section'),
