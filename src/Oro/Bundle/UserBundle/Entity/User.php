@@ -41,7 +41,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-user",
- *              "category"="user"
+ *              "category"="account_management"
  *          },
  *          "grouping"={
  *              "groups"={"dictionary"}

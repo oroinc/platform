@@ -53,7 +53,7 @@ class MergeController extends Controller
      *      id="oro_entity_merge",
      *      label="oro.entity_merge.acl.merge",
      *      type="action",
-     *      category="entity_merge"
+     *      category="entity"
      * )
      * @Template()
      */

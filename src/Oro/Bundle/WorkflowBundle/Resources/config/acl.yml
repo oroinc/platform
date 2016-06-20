@@ -4,4 +4,4 @@ oro_workflow:
     type:       action
     group_name: ""
     bindings:   ~
-    category: "workflow"
+    category: "application"

@@ -19,7 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-calendar",
- *              "category"="calendar"
+ *              "category"="account_management"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

@@ -23,7 +23,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-file",
- *              "category"="attachment"
+ *              "category"="account_management"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

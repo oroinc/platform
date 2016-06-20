@@ -21,7 +21,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      routeName="oro_embedded_form_list",
  *      defaultValues={
  *          "entity"={
- *              "category"="embedded_form"
+ *              "category"="account_management"
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",

@@ -19,7 +19,7 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-inbox",
- *              "category"="workflow"
+ *              "category"="account_management"
  *          },
  *          "security"={
  *              "type"="ACL",

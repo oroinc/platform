@@ -21,7 +21,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-list",
- *              "category"="locale"
+ *              "category"="account_management"
  *          },
  *          "security"={
  *              "type"="ACL",

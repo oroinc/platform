@@ -20,7 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *  defaultValues={
  *      "entity"={
  *          "icon"="icon-external-link",
- *          "category"="tracking"
+ *          "category"="account_management"
  *      },
  *      "security"={
  *          "type"="ACL"

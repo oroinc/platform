@@ -15,7 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-tasks",
- *              "category"="cron"
+ *              "category"="account_management"
  *          },
  *          "security"={
  *              "type"="ACL",

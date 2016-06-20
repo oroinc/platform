@@ -26,7 +26,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "category"="email"
+ *              "category"="account_management"
  *          },
  *          "security"={
  *              "type"="ACL",

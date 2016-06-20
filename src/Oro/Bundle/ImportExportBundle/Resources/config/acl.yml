@@ -3,11 +3,11 @@ oro_importexport_import:
     type: action
     group_name: ""
     bindings: ~
-    category: "import_export"
+    category: "entity"
 
 oro_importexport_export:
     label: oro.importexport.action.export
     type: action
     group_name: ""
     bindings: ~
-    category: "import_export"
+    category: "entity"

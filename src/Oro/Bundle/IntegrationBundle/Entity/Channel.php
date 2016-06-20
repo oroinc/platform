@@ -24,7 +24,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      routeName="oro_integration_index",
  *      defaultValues={
  *          "entity"={
- *              "category"="integration"
+ *              "category"="account_management"
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",

@@ -31,7 +31,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-time",
- *              "category"="calendar"
+ *              "category"="account_management"
  *          },
  *          "dataaudit"={
  *              "auditable"=true

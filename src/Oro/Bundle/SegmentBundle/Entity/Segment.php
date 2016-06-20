@@ -21,7 +21,7 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  *      routeName="oro_segment_index",
  *      defaultValues={
  *          "entity"={
- *              "category"="segment"
+ *              "category"="account_management"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",

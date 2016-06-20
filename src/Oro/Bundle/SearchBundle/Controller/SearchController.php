@@ -24,7 +24,7 @@ class SearchController extends Controller
      *      type="action",
      *      label="oro.search.module_name",
      *      group_name="",
-     *      category="search"
+     *      category="entity"
      * )
      */
     public function ajaxAdvancedSearchAction()

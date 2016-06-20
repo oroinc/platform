@@ -20,7 +20,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "category"="data_grid"
+ *              "category"="account_management"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",
