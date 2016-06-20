@@ -4,8 +4,6 @@ namespace Oro\Bundle\CalendarBundle\Model;
 
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
 class ExtendCalendarEvent implements ActivityInterface
 {

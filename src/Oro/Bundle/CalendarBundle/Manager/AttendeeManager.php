@@ -42,7 +42,7 @@ class AttendeeManager
     }
 
     /**
-     * @param Attendee[]|Collection|null $attendees
+     * @param Attendee[]|Collection $attendees
      *
      * @return array
      */
