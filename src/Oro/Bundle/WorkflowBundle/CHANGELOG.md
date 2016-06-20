@@ -4,6 +4,7 @@ CHANGELOG for BAP-10806
 * Removed `\Oro\Bundle\WorkflowBundle\Model\EntityConnector` dependency form `\Oro\Bundle\WorkflowBundle\Model\Workflow` class
 * Updated `\Oro\Bundle\WorkflowBundle\Model\WorkflowManager`, removed unnecessary calling of `resetWorkflowItem`.
 * Updated all Unit Tests to support new `\Oro\Bundle\WorkflowBundle\Model\Workflow`
+* Definition for `oro_workflow.prototype.workflow` was changed, removed `\Oro\Bundle\WorkflowBundle\Model\EntityConnector` dependency
 
 CHANGELOG for BAP-10805
 =======================

@@ -123,8 +123,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $hasCurrentStep,
         $stepAllowTransition,
         $fireExceptions = true
-    )
-    {
+    ) {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('test_step');
 
@@ -762,8 +761,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $aclManager = null,
         $attributeManager = null,
         $transitionManager = null
-    )
-    {
+    ) {
         if (!$aclManager) {
             $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
                 ->disableOriginalConstructor()
