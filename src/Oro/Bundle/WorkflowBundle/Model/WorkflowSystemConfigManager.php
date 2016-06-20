@@ -73,41 +73,22 @@ class WorkflowSystemConfigManager
      */
     public function setWorkflowActive(WorkflowDefinition $definition)
     {
-        $entityConfig = $this->getEntityConfig($definition->getRelatedEntity());
-
-        $entityConfig->set(
-            self::CONFIG_KEY,
-            array_values(array_merge($entityConfig->get(self::CONFIG_KEY, false, []), [$definition->getName()]))
-        );
-
-        $this->persistEntityConfig($entityConfig);
-
-        $this->eventDispatcher->dispatch(WorkflowEvents::WORKFLOW_ACTIVATED, new WorkflowChangesEvent($definition));
+        $this->setWorkflowState($definition, true);
     }
 
     /**
-     * todo fix duplicate code with setWorkflowActive
      * @param WorkflowDefinition $definition
      * @throws WorkflowException
      */
     public function setWorkflowInactive(WorkflowDefinition $definition)
     {
-        $entityConfig = $this->getEntityConfig($definition->getRelatedEntity());
-
-        $entityConfig->set(
-            self::CONFIG_KEY,
-            array_values(array_diff($entityConfig->get(self::CONFIG_KEY, false, []), [$definition->getName()]))
-        );
-
-        $this->persistEntityConfig($entityConfig);
-
-        $this->eventDispatcher->dispatch(WorkflowEvents::WORKFLOW_DEACTIVATED, new WorkflowChangesEvent($definition));
+        $this->setWorkflowState($definition, false);
     }
 
     /**
      * @param ConfigInterface $entityConfig
      */
-    protected function persistEntityConfig(ConfigInterface $entityConfig)
+    private function persistEntityConfig(ConfigInterface $entityConfig)
     {
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
@@ -118,7 +99,7 @@ class WorkflowSystemConfigManager
      * @return ConfigInterface
      * @throws WorkflowException
      */
-    protected function getEntityConfig($entityClass)
+    private function getEntityConfig($entityClass)
     {
         $workflowConfigProvider = $this->configManager->getProvider(self::CONFIG_PROVIDER_NAME);
         if ($workflowConfigProvider->hasConfig($entityClass)) {
@@ -126,5 +107,26 @@ class WorkflowSystemConfigManager
         }
 
         throw new WorkflowException(sprintf('Entity %s is not configurable', $entityClass));
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @param bool $isActive
+     * @return ConfigInterface
+     */
+    private function setWorkflowState(WorkflowDefinition $definition, $isActive)
+    {
+        $entityConfig = $this->getEntityConfig($definition->getRelatedEntity());
+
+        $configValue = $entityConfig->get(self::CONFIG_KEY, false, []);
+        $newConfigValue = $isActive
+            ? array_merge($configValue, [$definition->getName()])
+            : array_diff($configValue, [$definition->getName()]);
+        $entityConfig->set(self::CONFIG_KEY, array_values($newConfigValue));
+
+        $this->persistEntityConfig($entityConfig);
+        $event = $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED;
+
+        $this->eventDispatcher->dispatch($event, new WorkflowChangesEvent($definition));
     }
 }

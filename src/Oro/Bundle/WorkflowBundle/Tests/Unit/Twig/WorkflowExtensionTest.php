@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Twig\WorkflowExtension;
 
 class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Oro\Bundle\WorkflowBundle\Model\WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $workflowManager;
 
@@ -46,6 +47,9 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(WorkflowExtension::NAME, $this->extension->getName());
     }
 
+    /**
+     * @return array
+     */
     public function workflowDataProvider()
     {
         return [
@@ -54,6 +58,9 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public function workflowItemDataProvider()
     {
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
@@ -66,6 +73,9 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public function stepsDataProvider()
     {
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')

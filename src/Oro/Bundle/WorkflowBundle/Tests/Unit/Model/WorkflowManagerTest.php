@@ -36,7 +36,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var \Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowSystemConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowSystemConfig;
 
     protected function setUp()

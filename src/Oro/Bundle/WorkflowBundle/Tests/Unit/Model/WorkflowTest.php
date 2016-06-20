@@ -15,6 +15,7 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
 
 /**
@@ -39,6 +40,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, call_user_func_array(array($workflow, $getter), array()));
     }
 
+    /**
+     * @return array
+     */
     public function propertiesDataProvider()
     {
         return array(
@@ -114,6 +118,13 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider isTransitionAllowedDataProvider
+     * @param mixed $expectedResult
+     * @param bool $transitionExist
+     * @param bool $transitionAllowed
+     * @param bool $isTransitionStart
+     * @param bool $hasCurrentStep
+     * @param bool $stepAllowTransition
+     * @param bool $fireExceptions
      */
     public function testIsTransitionAllowed(
         $expectedResult,
@@ -232,9 +243,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ),
             'not_start_transition_fire_exception' => array(
                 'expectedException' => InvalidTransitionException::notStartTransition(
-                        'test_workflow',
-                        'test_transition'
-                    ),
+                    'test_workflow',
+                    'test_transition'
+                ),
                 'transitionExist' => true,
                 'transitionAllowed' => true,
                 'isTransitionStart' => false,
@@ -252,10 +263,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ),
             'step_not_allow_transition_fire_exception' => array(
                 'expectedException' => InvalidTransitionException::stepHasNoAllowedTransition(
-                        'test_workflow',
-                        'test_step',
-                        'test_transition'
-                    ),
+                    'test_workflow',
+                    'test_step',
+                    'test_transition'
+                ),
                 'transitionExist' => true,
                 'transitionAllowed' => true,
                 'isTransitionStart' => false,
@@ -460,6 +471,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array_merge($data, array('entity' => $entity)), $item->getData()->getValues());
     }
 
+    /**
+     * @return array
+     */
     public function startDataProvider()
     {
         return array(
@@ -468,6 +482,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param string $name
+     * @return Step|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getStepMock($name)
     {
         $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
@@ -480,6 +498,12 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         return $step;
     }
 
+    /**
+     * @param string $name
+     * @param bool $isStart
+     * @param null $step
+     * @return Transition|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getTransitionMock($name, $isStart = false, $step = null)
     {
         $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
@@ -546,6 +570,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testIsTransitionAvailable()
     {
+        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
             ->getMock();
@@ -566,9 +591,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
         $workflowName = null;
         $aclManager = null;
-        $attributManager = null;
+        $attributeManager = null;
 
-        $workflow = $this->createWorkflow($workflowName, $aclManager, $attributManager, $transitionManager);
+        $workflow = $this->createWorkflow($workflowName, $aclManager, $attributeManager, $transitionManager);
 
         $this->assertTrue($workflow->isTransitionAvailable($workflowItem, $transition, $errors));
     }
@@ -601,9 +626,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
         $workflowName = null;
         $aclManager = null;
-        $attributManager = null;
+        $attributeManager = null;
 
-        $workflow = $this->createWorkflow($workflowName, $aclManager, $attributManager, $transitionManager);
+        $workflow = $this->createWorkflow($workflowName, $aclManager, $attributeManager, $transitionManager);
 
         $workflow->setDefinition($workflowDefinition);
         $workflow->getAttributeManager()->setAttributes(array($entityAttribute));
@@ -652,6 +677,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * @return array
+     */
     public function passedStepsDataProvider()
     {
         return array(
@@ -729,6 +757,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param string $stepToName
+     * @return WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getTransitionRecordMock($stepToName)
     {
         $workflowStep = new WorkflowStep();
@@ -743,11 +775,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
         return $record;
     }
-
-    /**
-     * @param null|string $workflowName
-     * @return Workflow
-     */
 
     /**
      * @param string $workflowName
@@ -768,6 +795,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         }
 
+        /** @var RestrictionManager|\PHPUnit_Framework_MockObject_MockObject $restrictionManager */
         $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
             ->disableOriginalConstructor()
             ->getMock();
