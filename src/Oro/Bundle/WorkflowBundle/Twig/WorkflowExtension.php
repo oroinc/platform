@@ -23,12 +23,14 @@ class WorkflowExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        //todo fix/remove in BAP-10813 and BAP-10814 usage of entity for single workflow retrieval  
+        //todo fix/remove in BAP-10813 and BAP-10814 usage of entity for single workflow retrieval
         return array(
             new \Twig_SimpleFunction('has_workflow', array($this, 'hasWorkflow')),
             new \Twig_SimpleFunction('has_workflow_start_step', array($this, 'hasWorkflowStartStep')),
             new \Twig_SimpleFunction('has_workflow_item', array($this, 'hasWorkflowItem')),
             new \Twig_SimpleFunction('is_workflow_reset_allowed', array($this, 'isResetAllowed')),
+            new \Twig_SimpleFunction('has_workflows', [$this->workflowManager, 'hasApplicableWorkflowsByEntityClass']),
+            new \Twig_SimpleFunction('has_workflow_items', [$this->workflowManager, 'hasWorkflowItemsByEntity']),
         );
     }
 

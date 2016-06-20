@@ -84,7 +84,7 @@ oro:
                 general:
                     label: Perform workflow transitions
                     description: Reveals workflow transition buttons to the user and allows them to manipulate workflows
-                reset_data: Reset workflow data
+                reset_data: Reset workflow "{workflow}"
 
         block:
             title:
@@ -204,6 +204,9 @@ oro:
 
             placeholder:
                 select_replacement: Select Replacement
+
+            form:
+                replace_message: "Please, select workflows that should be replaced."
 
         workflowitem:
             entity_label:             Workflow Item
