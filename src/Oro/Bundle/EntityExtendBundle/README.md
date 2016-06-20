@@ -1,9 +1,9 @@
 OroEntityExtendBundle
 =====================
 
+- Allows to add new entities
 - Allows to add an additional fields into existing entities
 - Allows to add an additional relations into existing entities
-- Allows to add new entities
 
 All additions can be done through UI or using [migration scripts](../MigrationBundle/README.md).
 
@@ -181,8 +181,6 @@ Same principle applied to field name, in case above - it should be less than 27 
 To load a list of options you can use data fixtures, for example:
 
 ``` php
-<?php
-
 <?php
 
 namespace OroCRM\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;
