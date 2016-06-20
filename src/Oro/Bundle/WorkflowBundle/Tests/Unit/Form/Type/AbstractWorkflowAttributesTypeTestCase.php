@@ -39,6 +39,10 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         array $steps = array(),
         $relatedEntity = null
     ) {
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -47,7 +51,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             ->disableOriginalConstructor()
             ->getMock();
 
-        $workflow = new Workflow($aclManager, $restrictionManager);
+        $workflow = new Workflow($doctrineHelper, $aclManager, $restrictionManager);
 
         $workflow->setName($workflowName);
 
