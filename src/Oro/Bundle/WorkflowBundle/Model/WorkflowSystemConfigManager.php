@@ -1,12 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matey
- * Date: 17.06.2016
- * Time: 14:36
- */
 
 namespace Oro\Bundle\WorkflowBundle\Model;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -15,7 +11,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowSystemConfigManager
 {
@@ -31,6 +26,11 @@ class WorkflowSystemConfigManager
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    /**
+     * @param ConfigManager $configManager
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(
         ConfigManager $configManager,
         EventDispatcherInterface $eventDispatcher,

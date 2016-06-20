@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -156,6 +157,12 @@ class WorkflowManager
         );
     }
 
+    /**
+     * @param callable $callable
+     * @param string $entityClass
+     * @return mixed
+     * @throws \Exception
+     */
     private function inTransaction(callable $callable, $entityClass)
     {
         $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
@@ -244,9 +251,9 @@ class WorkflowManager
                     $workflow = $this->getWorkflow($row['workflow']);
                     $entity = $row['entity'];
                     $transition = !empty($row['transition']) ? $row['transition'] : null;
-                    $data = !empty($row['data']) ? $row['data'] : [];
+                    $rowData = !empty($row['data']) ? $row['data'] : [];
 
-                    $workflowItem = $workflow->start($entity, $data, $transition);
+                    $workflowItem = $workflow->start($entity, $rowData, $transition);
                     $em->persist($workflowItem);
                 }
 
