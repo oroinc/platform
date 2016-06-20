@@ -8,6 +8,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -27,10 +28,17 @@ class WorkflowSystemConfigManager
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    public function __construct(ConfigManager $configManager, EventDispatcherInterface $eventDispatcher)
-    {
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    public function __construct(
+        ConfigManager $configManager,
+        EventDispatcherInterface $eventDispatcher,
+        DoctrineHelper $doctrineHelper
+    ) {
         $this->configManager = $configManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -45,6 +53,17 @@ class WorkflowSystemConfigManager
             (array)$this->getEntityConfig($definition->getRelatedEntity())->get(self::CONFIG_KEY),
             true
         );
+    }
+
+    /**
+     * @param object|string $entity An instance of entity or its class name
+     * @return string[]
+     */
+    public function getActiveWorkflowNamesByEntity($entity)
+    {
+        $class = $this->doctrineHelper->getEntityClass($entity);
+
+        return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
     }
 
     /**
@@ -74,12 +93,12 @@ class WorkflowSystemConfigManager
     public function setWorkflowInactive(WorkflowDefinition $definition)
     {
         $entityConfig = $this->getEntityConfig($definition->getRelatedEntity());
-        
+
         $entityConfig->set(
             self::CONFIG_KEY,
             array_values(array_diff($entityConfig->get(self::CONFIG_KEY, false, []), [$definition->getName()]))
         );
-        
+
         $this->persistEntityConfig($entityConfig);
 
         $this->eventDispatcher->dispatch(WorkflowEvents::WORKFLOW_DEACTIVATED, new WorkflowChangesEvent($definition));

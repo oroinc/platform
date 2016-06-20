@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -9,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -21,6 +23,9 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
     /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
+    /**@var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
     /**@var WorkflowSystemConfigManager */
     protected $manager;
 
@@ -28,8 +33,13 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configManager = $this->getMockBuilder(ConfigManager::class)->disableOriginalConstructor()->getMock();
         $this->eventDispatcher = $this->getMock(EventDispatcher::class);
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
 
-        $this->manager = new WorkflowSystemConfigManager($this->configManager, $this->eventDispatcher);
+        $this->manager = new WorkflowSystemConfigManager(
+            $this->configManager,
+            $this->eventDispatcher,
+            $this->doctrineHelper
+        );
     }
 
     public function testIsActiveWorkflowTrue()
@@ -139,6 +149,38 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($wfConfigProvider);
 
         return $entityConfig;
+    }
+
+    public function testGetActiveWorkflowNamesByEntity()
+    {
+        $entity = new EntityStub(24);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entity)
+            ->willReturn(EntityStub::class);
+
+        $entityConfig = $this->emulateGetEntityConfig(EntityStub::class);
+
+        $entityConfig->expects($this->once())
+            ->method('get')
+            ->with('active_workflows', false, [])
+            ->willReturn(
+                [
+                    'some_workflow_1',
+                    'some_workflow_2',
+                ]
+            );
+
+        $result = $this->manager->getActiveWorkflowNamesByEntity($entity);
+
+        $this->assertEquals(
+            [
+                'some_workflow_1',
+                'some_workflow_2',
+            ],
+            $result,
+            'Expected same as config returned'
+        );
     }
 
     public function testEntityIsNotConfigurable()

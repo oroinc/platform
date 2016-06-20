@@ -76,6 +76,7 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_workflow.changes.event.dispatcher'
+            - '@oro_entity.doctrine_helper'
 
     oro_workflow.manager:
         class: %oro_workflow.manager.class%
