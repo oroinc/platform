@@ -8,9 +8,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub;
 
-class EntitySub
+class EntityStub
 {
-    /** @var integer */
+    /** @var mixed */
     private $id;
 
     public function __construct($id)

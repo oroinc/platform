@@ -15,7 +15,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntitySub;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -212,7 +212,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowItem = new WorkflowItem();
         $workflowName = 'test_workflow';
         $workflowDefinition = (new WorkflowDefinition())->setName($workflowName);
-        $entity = new EntitySub(42);
+        $entity = new EntityStub(42);
         $workflowItem
             ->setEntity($entity)
             ->setWorkflowName($workflowName);
@@ -248,7 +248,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $newItem = new WorkflowItem();
         $workflowName = 'test_workflow';
         $workflowDefinition = (new WorkflowDefinition())->setName($workflowName);
-        $entity = new EntitySub(42);
+        $entity = new EntityStub(42);
         $workflowItem
             ->setEntity($entity)
             ->setWorkflowName($workflowName);
@@ -566,6 +566,42 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetWorkflowItem()
+    {
+        $entity = new EntityStub(42);
+        $workflowName = 'test_workflow';
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn(42);
+
+        $repository = $this->getMockBuilder(WorkflowItemRepository::class)->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->with(WorkflowItem::class)
+            ->willReturn($repository);
+        $this->doctrineHelper->expects($this->once())->method('getEntityClass')->with($entity)
+            ->willReturn(EntityStub::class);
+        $repository->expects($this->once())->method('findOneByEntityMetadata')
+            ->with(
+                EntityStub::class, 42, $workflowName
+            )
+            ->willReturn(['result']);
+
+        $result = $this->workflowManager->getWorkflowItem($entity, $workflowName);
+
+        $this->assertEquals(['result'], $result);
+    }
+
+    public function testGetWorkflowItemUnsupportedIdentifier()
+    {
+        $entity = new EntityStub('string');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn('string');
+
+        $result = $this->workflowManager->getWorkflowItem($entity, 'workflow_name');
+
+        $this->assertNull($result, 'If not an integer identifier got - return null');
+    }
+
     /**
      * @param string $workflowItemDefinition
      * @param string $activeDefinition
@@ -684,6 +720,33 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             'null' => [null, []],
             'object' => [new \stdClass(), []],
         ];
+    }
+
+    public function testActivateWorkflow()
+    {
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())->method('setWorkflowActive')->with($workflowDefinition);
+
+        $this->workflowManager->activateWorkflow($workflowDefinition);
+    }
+
+    public function testDeactivateWorkflow()
+    {
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())->method('setWorkflowInactive')->with($workflowDefinition);
+
+        $this->workflowManager->deactivateWorkflow($workflowDefinition);
+    }
+
+    public function testIsActiveWorkflow()
+    {
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())->method('isActiveWorkflow')->with($workflowDefinition);
+
+        $this->workflowManager->isActiveWorkflow($workflowDefinition);
     }
 
     /**
