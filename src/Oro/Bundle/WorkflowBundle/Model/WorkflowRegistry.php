@@ -2,20 +2,21 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
 class WorkflowRegistry
 {
     /**
-     * @var ManagerRegistry
+     * @var DoctrineHelper
      */
-    protected $managerRegistry;
+    protected $doctrineHelper;
 
     /**
      * @var WorkflowAssembler
@@ -33,16 +34,17 @@ class WorkflowRegistry
     protected $workflowByName = [];
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param DoctrineHelper $doctrineHelper
      * @param WorkflowAssembler $workflowAssembler
      * @param ConfigProvider $configProvider
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
+        DoctrineHelper $doctrineHelper,
         WorkflowAssembler $workflowAssembler,
         ConfigProvider $configProvider
-    ) {
-        $this->managerRegistry = $managerRegistry;
+    )
+    {
+        $this->doctrineHelper = $doctrineHelper;
         $this->workflowAssembler = $workflowAssembler;
         $this->configProvider = $configProvider;
     }
@@ -94,25 +96,15 @@ class WorkflowRegistry
     /**
      * Get Active Workflow that is applicable to entity class
      *
-     * @param string $entityClass
+     * @param string $entityOrClass
      * @return Workflow[]
-     * @deprecated
      */
-    public function getActiveWorkflowByEntityClass($entityClass)
+    public function getActiveWorkflowsByEntityClass($entityOrClass)
     {
-        throw new \RuntimeException('TODO Refactor an remove usage of method. Entity has many workflows now.');
-    }
+        $class = $this->doctrineHelper->getEntityClass($entityOrClass);
 
-    /**
-     * Get Active Workflow that is applicable to entity class
-     *
-     * @param string $entityClass
-     * @return Workflow[]
-     */
-    public function getActiveWorkflowsByEntityClass($entityClass)
-    {
-        if ($this->configProvider->hasConfig($entityClass)) {
-            $entityConfig = $this->configProvider->getConfig($entityClass);
+        if ($this->configProvider->hasConfig($class)) {
+            $entityConfig = $this->configProvider->getConfig($class);
             $activeWorkflows = $entityConfig->get('active_workflows', false, []);
 
             return array_map(
@@ -134,17 +126,6 @@ class WorkflowRegistry
      */
     public function hasActiveWorkflowByEntityClass($entityClass)
     {
-        return $this->getActiveWorkflowByEntityClass($entityClass) !== null;
-    }
-
-    /**
-     * Check is there an active workflow for entity class
-     *
-     * @param string $entityClass
-     * @return bool
-     */
-    public function hasActiveWorkflowsByEntityClass($entityClass)
-    {
         return count($this->getActiveWorkflowsByEntityClass($entityClass)) > 0;
     }
 
@@ -153,7 +134,7 @@ class WorkflowRegistry
      */
     protected function getWorkflowDefinitionRepository()
     {
-        return $this->managerRegistry->getRepository('OroWorkflowBundle:WorkflowDefinition');
+        return $this->doctrineHelper->getEntityRepositoryForClass('OroWorkflowBundle:WorkflowDefinition');
     }
 
     /**
@@ -179,7 +160,7 @@ class WorkflowRegistry
     protected function refreshWorkflowDefinition(WorkflowDefinition $definition)
     {
         /** @var EntityManager $entityManager */
-        $entityManager = $this->managerRegistry->getManagerForClass('OroWorkflowBundle:WorkflowDefinition');
+        $entityManager = $this->doctrineHelper->getEntityManagerForClass('OroWorkflowBundle:WorkflowDefinition');
 
         if (!$entityManager->getUnitOfWork()->isInIdentityMap($definition)) {
             $definitionName = $definition->getName();

@@ -25,8 +25,5 @@ CHANGELOG for BAP-10810
 =======================
 * Added new method `getActiveWorkflowsByEntityClass`, that returns all found workflows for an entity class
 * Added new method `hasActiveWorkflowsByEntityClass`, that indicates if an entity class has one or more linked workflows
-* Changed signature for method `getActiveWorkflowByEntityClass` at `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, added mandatory secondary argument `workflowName`
-* Changed signature for method `hasActiveWorkflowByEntityClass` at `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, added mandatory secondary argument `workflowName`
-* Changed signature for method `getApplicableWorkflowByEntityClass` at `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`, added mandatory secondary argument `workflowName`
-* Changed signature for method `hasApplicableWorkflowByEntityClass` at `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`, added mandatory secondary argument `workflowName`
-* Changed signature for method `getApplicableWorkflow` at `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`, added mandatory secondary argument `workflowName`
+* Removed method `getActiveWorkflowByEntityClass` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, use `getActiveWorkflowsByEntityClass`
+* Removed method `hasActiveWorkflowByEntityClass` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, use `hasActiveWorkflowsByEntityClass`

@@ -797,6 +797,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getStartTransitions')
             ->will($this->returnValue(new ArrayCollection($startTransitions)));
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -807,7 +811,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs(
-                [$aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
             )
             ->setMethods(
                 [
