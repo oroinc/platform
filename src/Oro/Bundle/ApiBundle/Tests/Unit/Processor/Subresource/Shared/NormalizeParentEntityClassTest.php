@@ -35,6 +35,21 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         );
     }
 
+    public function testProcessWhenParentClassNameIsNotSet()
+    {
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [
+                Error::createValidationError(
+                    'entity type constraint',
+                    'The parent entity class must be set in the context.'
+                )
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessWhenParentClassAlreadyNormalized()
     {
         $this->context->setParentClassName('Test\Class');

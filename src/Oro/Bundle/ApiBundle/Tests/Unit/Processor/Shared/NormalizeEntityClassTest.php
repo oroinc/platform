@@ -35,6 +35,21 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         );
     }
 
+    public function testProcessWhenClassIsNotSet()
+    {
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [
+                Error::createValidationError(
+                    'entity type constraint',
+                    'The entity class must be set in the context.'
+                )
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessWhenClassAlreadyNormalized()
     {
         $this->context->setClassName('Test\Class');

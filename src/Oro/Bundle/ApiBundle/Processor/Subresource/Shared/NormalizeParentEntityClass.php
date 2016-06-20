@@ -13,8 +13,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * Checks that the "parentClass" attribute of the Context represents FQCN of an entity
- * and this entity is accessible through Data API.
+ * Makes sure that the class name of the parent entity exists in the Context,
+ * if required converts it to FQCN of an entity
+ * and check that this entity is accessible through Data API.
  */
 class NormalizeParentEntityClass implements ProcessorInterface
 {
@@ -42,6 +43,17 @@ class NormalizeParentEntityClass implements ProcessorInterface
         /** @var SubresourceContext $context */
 
         $parentEntityClass = $context->getParentClassName();
+        if (!$parentEntityClass) {
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::ENTITY_TYPE,
+                    'The parent entity class must be set in the context.'
+                )
+            );
+
+            return;
+        }
+
         if (false !== strpos($parentEntityClass, '\\')) {
             // the parent entity class is already normalized
             return;

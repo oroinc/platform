@@ -24,11 +24,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 210 }
 
-    oro_api.delete.validate_class_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
-        tags:
-            - { name: oro.api.processor, action: delete, group: initialize, priority: 210 }
-
     oro_api.delete.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
