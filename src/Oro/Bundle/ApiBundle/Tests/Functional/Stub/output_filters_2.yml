@@ -1,0 +1,34 @@
+data:
+  0:
+    type: testemployees
+    id: "1"
+    attributes:
+      name: "TestEmployee30"
+      position: 'developer'
+    relationships:
+      department:
+        data:
+          type: 'testdepartments'
+          id: 1
+  1:
+    type: testemployees
+    id: "2"
+    attributes:
+      name: "TestEmployee29"
+      position: 'developer'
+    relationships:
+      department:
+        data:
+          type: 'testdepartments'
+          id: 1
+  2:
+    type: testemployees
+    id: "3"
+    attributes:
+      name: "TestEmployee28"
+      position: 'developer'
+    relationships:
+      department:
+        data:
+          type: 'testdepartments'
+          id: 1

@@ -43,8 +43,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_loader'
-            - '@oro_api.resources_cache'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 20 }
 
@@ -87,14 +86,14 @@ services:
     oro_api.delete_list.validate_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\ValidateFilterValues
         tags:
-            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 0 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 200 }
 
     oro_api.delete_list.normalize_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues
         arguments:
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: -10 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 100 }
 
     #
     # build_query
@@ -109,20 +108,11 @@ services:
 
     oro_api.delete_list.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: 50 }
-
-    oro_api.delete_list.complete_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
         arguments:
+            - '@oro_api.config_provider'
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -50 }
-
-    oro_api.delete_list.optimize_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\OptimizeCriteria
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -60 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: 50 }
 
     oro_api.delete_list.set_delete_limit:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit
@@ -148,6 +138,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.criteria_connector'
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -100 }
 
@@ -158,7 +149,7 @@ services:
     oro_api.delete_list.load_data_by_orm_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByOrmQuery
         tags:
-            - { name: oro.api.processor, action: delete_list, group: load_data, priority: -20 }
+            - { name: oro.api.processor, action: delete_list, group: load_data, priority: -10 }
 
     #
     # delete_data

@@ -58,12 +58,35 @@ class LoadEntityMetadata implements ProcessorInterface
             : [];
 
         $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $entityMetadata = $this->entityMetadataFactory->createEntityMetadata($classMetadata);
-
+        $entityMetadata = $this->createEntityMetadata($classMetadata, $config);
         $this->loadFields($entityMetadata, $classMetadata, $allowedFields, $config);
         $this->loadAssociations($entityMetadata, $classMetadata, $allowedFields, $config);
 
         $context->setResult($entityMetadata);
+    }
+
+    /**
+     * @param ClassMetadata               $classMetadata
+     * @param EntityDefinitionConfig|null $config
+     *
+     * @return EntityMetadata
+     */
+    protected function createEntityMetadata(ClassMetadata $classMetadata, EntityDefinitionConfig $config = null)
+    {
+        $entityMetadata = $this->entityMetadataFactory->createEntityMetadata($classMetadata);
+        if (null !== $config && $config->hasFields()) {
+            $idFieldNames = $entityMetadata->getIdentifierFieldNames();
+            if (!empty($idFieldNames)) {
+                $normalizedIdFieldNames = [];
+                foreach ($idFieldNames as $propertyPath) {
+                    $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
+                    $normalizedIdFieldNames[] = $fieldName ?: $propertyPath;
+                }
+                $entityMetadata->setIdentifierFieldNames($normalizedIdFieldNames);
+            }
+        }
+
+        return $entityMetadata;
     }
 
     /**

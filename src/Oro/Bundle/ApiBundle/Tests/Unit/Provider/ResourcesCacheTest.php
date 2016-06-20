@@ -108,7 +108,7 @@ class ResourcesCacheTest extends \PHPUnit_Framework_TestCase
                 ['Test\Entity1', 'Test\Entity3']
             );
 
-        $this->resourcesCache->save(
+        $this->resourcesCache->saveResources(
             '1.2',
             new RequestType(['rest']),
             [$resource1, $resource2, $resource3]

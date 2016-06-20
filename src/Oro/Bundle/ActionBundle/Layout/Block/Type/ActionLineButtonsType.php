@@ -4,8 +4,6 @@ namespace Oro\Bundle\ActionBundle\Layout\Block\Type;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 
@@ -13,6 +11,7 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Exception\LogicException;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class ActionLineButtonsType extends AbstractType
 {
@@ -49,7 +48,7 @@ class ActionLineButtonsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -59,9 +58,9 @@ class ActionLineButtonsType extends AbstractType
                     'data-page-component-module' => 'oroaction/js/app/components/buttons-component'
                 ]
             ]
-        );
-        $resolver->setRequired(['actions']);
-        $resolver->setOptional(['entity', 'entityClass']);
+        )
+            ->setRequired(['actions'])
+            ->setDefined(['entity', 'entityClass']);
     }
 
     /**

@@ -38,11 +38,22 @@ abstract class CompleteStatusCodes implements ProcessorInterface
      */
     protected function addStatusCodes(StatusCodesConfig $statusCodes)
     {
-        if (!$statusCodes->hasCode(Response::HTTP_INTERNAL_SERVER_ERROR)) {
-            $statusCodes->addCode(
-                Response::HTTP_INTERNAL_SERVER_ERROR,
-                $this->createStatusCode('Returned when an unexpected error occurs')
-            );
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            'Returned when an unexpected error occurs'
+        );
+    }
+
+    /**
+     * @param StatusCodesConfig $statusCodes
+     * @param int               $statusCode
+     * @param string            $message
+     */
+    protected function addStatusCode(StatusCodesConfig $statusCodes, $statusCode, $message)
+    {
+        if (!$statusCodes->hasCode($statusCode)) {
+            $statusCodes->addCode($statusCode, $this->createStatusCode($message));
         }
     }
 

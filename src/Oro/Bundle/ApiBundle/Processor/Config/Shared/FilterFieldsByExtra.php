@@ -61,26 +61,50 @@ class FilterFieldsByExtra implements ProcessorInterface
         $this->filterFields(
             $definition,
             $entityClass,
-            $context->get(FilterFieldsConfigExtra::NAME),
-            $context->getRequestType()
+            $this->normalizeFieldFilters($context->get(FilterFieldsConfigExtra::NAME), $context->getRequestType())
         );
+    }
+
+    /**
+     * @param array       $fieldFilters
+     * @param RequestType $requestType
+     *
+     * @return array
+     */
+    protected function normalizeFieldFilters(array $fieldFilters, RequestType $requestType)
+    {
+        $result = [];
+        foreach ($fieldFilters as $entity => $fields) {
+            if (false === strpos($entity, '\\')) {
+                $entityClass = ValueNormalizerUtil::convertToEntityClass(
+                    $this->valueNormalizer,
+                    $entity,
+                    $requestType,
+                    false
+                );
+                if ($entityClass) {
+                    $entity = $entityClass;
+                }
+            }
+            $result[$entity] = $fields;
+        }
+
+        return $result;
     }
 
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      * @param array                  $fieldFilters
-     * @param RequestType            $requestType
      */
     protected function filterFields(
         EntityDefinitionConfig $definition,
         $entityClass,
-        array $fieldFilters,
-        RequestType $requestType
+        array $fieldFilters
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $allowedFields = $this->getAllowedFields($metadata, $fieldFilters, $requestType);
+        $allowedFields = $this->getAllowedFields($metadata, $fieldFilters);
         if (null !== $allowedFields) {
             $idFieldNames = $metadata->getIdentifierFieldNames();
             $fields       = $definition->getFields();
@@ -103,8 +127,7 @@ class FilterFieldsByExtra implements ProcessorInterface
                     $this->filterFields(
                         $field->getTargetEntity(),
                         $metadata->getAssociationTargetClass($propertyPath),
-                        $fieldFilters,
-                        $requestType
+                        $fieldFilters
                     );
                 }
             }
@@ -114,48 +137,29 @@ class FilterFieldsByExtra implements ProcessorInterface
     /**
      * @param ClassMetadata $metadata
      * @param array         $fieldFilters
-     * @param RequestType   $requestType
      *
      * @return string[]|null
      */
-    protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters, RequestType $requestType)
+    protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters)
     {
         $allowedFields = null;
         if ($metadata->inheritanceType === ClassMetadata::INHERITANCE_TYPE_NONE) {
-            $entityType = $this->convertToEntityType($metadata->name, $requestType);
-            if (null !== $entityType && !empty($fieldFilters[$entityType])) {
-                $allowedFields = $fieldFilters[$entityType];
+            if (!empty($fieldFilters[$metadata->name])) {
+                $allowedFields = $fieldFilters[$metadata->name];
             }
         } else {
             $entityClasses = array_unique(array_merge([$metadata->name], $metadata->subClasses));
             foreach ($entityClasses as $entityClass) {
-                $entityType = $this->convertToEntityType($entityClass, $requestType);
-                if (null !== $entityType && !empty($fieldFilters[$entityType])) {
+                if (!empty($fieldFilters[$entityClass])) {
                     if (null === $allowedFields) {
-                        $allowedFields = $fieldFilters[$entityType];
+                        $allowedFields = $fieldFilters[$entityClass];
                     } else {
-                        $allowedFields = array_unique(array_merge($allowedFields, $fieldFilters[$entityType]));
+                        $allowedFields = array_unique(array_merge($allowedFields, $fieldFilters[$entityClass]));
                     }
                 }
             }
         }
 
         return $allowedFields;
-    }
-
-    /**
-     * @param string      $entityClass
-     * @param RequestType $requestType
-     *
-     * @return string|null
-     */
-    protected function convertToEntityType($entityClass, RequestType $requestType)
-    {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $requestType,
-            false
-        );
     }
 }

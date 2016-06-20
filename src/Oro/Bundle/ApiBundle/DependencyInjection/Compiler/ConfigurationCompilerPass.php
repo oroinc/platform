@@ -16,15 +16,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     const PROCESSOR_BAG_SERVICE_ID          = 'oro_api.processor_bag';
     const ACTION_PROCESSOR_BAG_SERVICE_ID   = 'oro_api.action_processor_bag';
     const ACTION_PROCESSOR_TAG              = 'oro.api.action_processor';
-    const DATA_TRANSFORMER_SERVICE_ID       = 'oro_api.data_transformer_registry';
-    const DATA_TRANSFORMER_TAG              = 'oro.api.data_transformer';
     const FILTER_FACTORY_SERVICE_ID         = 'oro_api.filter_factory';
     const FILTER_FACTORY_TAG                = 'oro.api.filter_factory';
     const DEFAULT_FILTER_FACTORY_SERVICE_ID = 'oro_api.filter_factory.default';
-    const EXCLUSION_PROVIDER_SERVICE_ID     = 'oro_api.entity_exclusion_provider';
-    const EXCLUSION_PROVIDER_TAG            = 'oro_entity.exclusion_provider.api';
-    const VIRTUAL_FIELD_PROVIDER_SERVICE_ID = 'oro_api.virtual_field_provider';
-    const VIRTUAL_FIELD_PROVIDER_TAG        = 'oro_entity.virtual_field_provider.api';
 
     const FORM_REGISTRY_SERVICE_ID                 = 'form.registry';
     const EXPECTED_FORM_REGISTRY_CLASS             = 'Symfony\Component\Form\FormRegistry';
@@ -40,12 +34,6 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     const API_FORM_TYPE_GUESSER_TAG                = 'oro.api.form.type_guesser';
     const API_FORM_METADATA_GUESSER_SERVICE_ID     = 'oro_api.form.guesser.metadata';
 
-    const EXCEPTION_TEXT_EXTRACTOR_SERVICE_ID = 'oro_api.exception_text_extractor';
-    const EXCEPTION_TEXT_EXTRACTOR_TAG        = 'oro.api.exception_text_extractor';
-
-    const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.routing_options_resolver.api_doc';
-    const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'routing.options_resolver.api_doc';
-
     /**
      * {@inheritdoc}
      */
@@ -53,51 +41,30 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     {
         $config = DependencyInjectionUtil::getConfig($container);
 
-        $this->registerProcessingGroups($container, $config);
-
-        $this->registerFilters($container, $config);
-
         $this->registerActionProcessors($container);
-
-        DependencyInjectionUtil::registerDataTransformers(
-            $container,
-            self::DATA_TRANSFORMER_SERVICE_ID,
-            self::DATA_TRANSFORMER_TAG
-        );
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::FILTER_FACTORY_SERVICE_ID,
-            self::FILTER_FACTORY_TAG,
-            'addFilterFactory'
-        );
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::EXCLUSION_PROVIDER_SERVICE_ID,
-            self::EXCLUSION_PROVIDER_TAG,
-            'addProvider'
-        );
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::VIRTUAL_FIELD_PROVIDER_SERVICE_ID,
-            self::VIRTUAL_FIELD_PROVIDER_TAG,
-            'addProvider'
-        );
-
+        $this->registerProcessingGroups($container, $config);
+        $this->registerFilters($container, $config);
         $this->configureForms($container, $config);
+    }
 
-        DependencyInjectionUtil::registerTaggedServices(
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function registerActionProcessors(ContainerBuilder $container)
+    {
+        $actionProcessorBagServiceDef = DependencyInjectionUtil::findDefinition(
             $container,
-            self::EXCEPTION_TEXT_EXTRACTOR_SERVICE_ID,
-            self::EXCEPTION_TEXT_EXTRACTOR_TAG,
-            'addExtractor'
+            self::ACTION_PROCESSOR_BAG_SERVICE_ID
         );
-
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE,
-            self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
-            'addResolver'
-        );
+        if (null !== $actionProcessorBagServiceDef) {
+            $taggedServices = $container->findTaggedServiceIds(self::ACTION_PROCESSOR_TAG);
+            foreach ($taggedServices as $id => $attributes) {
+                $actionProcessorBagServiceDef->addMethodCall(
+                    'addProcessor',
+                    [new Reference($id)]
+                );
+            }
+        }
     }
 
     /**
@@ -144,26 +111,12 @@ class ConfigurationCompilerPass implements CompilerPassInterface
                 );
             }
         }
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function registerActionProcessors(ContainerBuilder $container)
-    {
-        $actionProcessorBagServiceDef = DependencyInjectionUtil::findDefinition(
+        DependencyInjectionUtil::registerTaggedServices(
             $container,
-            self::ACTION_PROCESSOR_BAG_SERVICE_ID
+            self::FILTER_FACTORY_SERVICE_ID,
+            self::FILTER_FACTORY_TAG,
+            'addFilterFactory'
         );
-        if (null !== $actionProcessorBagServiceDef) {
-            $taggedServices = $container->findTaggedServiceIds(self::ACTION_PROCESSOR_TAG);
-            foreach ($taggedServices as $id => $attributes) {
-                $actionProcessorBagServiceDef->addMethodCall(
-                    'addProcessor',
-                    [new Reference($id)]
-                );
-            }
-        }
     }
 
     /**

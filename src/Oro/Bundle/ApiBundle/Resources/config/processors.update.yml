@@ -42,8 +42,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_loader'
-            - '@oro_api.resources_cache'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: update, group: initialize, priority: 20 }
 
@@ -132,13 +131,6 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: build_query, priority: 100 }
 
-    oro_api.update.complete_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: update, group: build_query, priority: -50 }
-
     oro_api.update.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
         arguments:
@@ -153,6 +145,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.criteria_connector'
         tags:
             - { name: oro.api.processor, action: update, group: build_query, priority: -100 }
 
@@ -203,8 +196,8 @@ services:
     # save_data
     #
 
-    oro_api.update.save_orm_entity:
-        class: Oro\Bundle\ApiBundle\Processor\Update\SaveOrmEntity
+    oro_api.update.save_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Update\SaveEntity
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
@@ -280,10 +273,10 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -100 }
 
-    oro_api.update.json_api.validate_result_schema:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
+    oro_api.update.json_api.validate_normalized_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultSchema
         tags:
-            - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -200 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -210 }
 
     oro_api.update.json_api.set_response_content_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType

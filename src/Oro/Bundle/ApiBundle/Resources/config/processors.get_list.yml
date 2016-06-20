@@ -43,8 +43,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_loader'
-            - '@oro_api.resources_cache'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: 20 }
 
@@ -87,26 +86,26 @@ services:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -55 }
 
     oro_api.get_list.rest.set_default_sorting:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultSorting
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetDefaultSorting
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -100 }
 
     oro_api.get_list.rest.set_default_paging:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultPaging
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetDefaultPaging
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -100 }
 
     oro_api.get_list.json_api.set_default_sorting:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultSorting
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetDefaultSorting
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -105 }
 
     oro_api.get_list.json_api.set_default_paging:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultPaging
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetDefaultPaging
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -105 }
 
@@ -139,22 +138,26 @@ services:
     # normalize_input
     #
 
-    oro_api.get_list.json_api.correct_sort_value:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\CorrectSortValue
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_input, requestType: json_api, priority: 10 }
-
     oro_api.get_list.normalize_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues
         arguments:
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -10 }
+            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 100 }
+
+    oro_api.get_list.json_api.correct_sort_value:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CorrectSortValue
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_input, requestType: json_api, priority: 90 }
 
     oro_api.get_list.validate_sorting:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\ValidateSorting
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -100 }
 
@@ -171,40 +174,22 @@ services:
 
     oro_api.get_list.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria
-        tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: 50 }
-
-    oro_api.get_list.complete_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
         arguments:
+            - '@oro_api.config_provider'
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: -50 }
-
-    oro_api.get_list.optimize_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\OptimizeCriteria
-        tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: -60 }
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: 50 }
 
     oro_api.get_list.normalize_paging:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizePaging
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -70 }
 
-    oro_api.get_list.protect_query_by_acl:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.acl_helper'
-            - '@oro_security.acl.annotation_provider'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: -90 }
-
     oro_api.get_list.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.criteria_connector'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -100 }
 
@@ -219,22 +204,17 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: load_data, priority: -10 }
 
-    oro_api.get_list.load_data_by_orm_query:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByOrmQuery
-        tags:
-            - { name: oro.api.processor, action: get_list, group: load_data, priority: -20 }
-
     oro_api.get_list.load_data_by_sql_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesBySqlQuery
         tags:
-            - { name: oro.api.processor, action: get_list, group: load_data, priority: -30 }
+            - { name: oro.api.processor, action: get_list, group: load_data, priority: -20 }
 
     oro_api.get_list.load_data_by_search_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesBySearchQuery
         arguments:
             - '@oro_search.index'
         tags:
-            - { name: oro.api.processor, action: get_list, group: load_data, priority: -40 }
+            - { name: oro.api.processor, action: get_list, group: load_data, priority: -30 }
 
     #
     # normalize_data
@@ -324,15 +304,20 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, priority: -100 }
 
-    oro_api.get_list.json_api.validate_result_schema:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
+    oro_api.get_list.validate_normalized_result_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateNormalizedResultExists
         tags:
-            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -200 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, priority: -200 }
 
-    oro_api.get_list.json_api.validate_result:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\ValidateResult
+    oro_api.get_list.json_api.validate_normalized_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultSchema
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -210 }
+
+    oro_api.get_list.json_api.validate_normalized_result_data_is_array:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultDataIsArray
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: json_api, priority: -215 }
 
     oro_api.get_list.json_api.set_response_content_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType

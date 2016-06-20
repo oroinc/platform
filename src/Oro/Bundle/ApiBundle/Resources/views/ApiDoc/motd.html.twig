@@ -1,7 +1,24 @@
 {% include 'NelmioApiDocBundle::Components/motd.html.twig' %}
 <script src="{{ asset('bundles/oroapi/lib/jquery.bind-first-0.2.3.min.js') }}"></script>
 <script src="{{ asset('bundles/oroapi/lib/wsse.js') }}"></script>
+<style type="text/css">
+    #summary { display: none; }
+</style>
 <script type="text/javascript">
+    gotoResource = function (resourceId) {
+        var $section = $('#' + resourceId).closest('.section'),
+            $toggler = $('#' + resourceId + ' > .toggler');
+        if (!$section.hasClass('active')) {
+            $section.find('h1').trigger('click');
+        }
+        if ($toggler.next().is(':visible')) {
+            window.location.hash = $toggler.data('href');
+        } else {
+            $toggler.trigger('click');
+        }
+
+        return false;
+    };
     $(function() {
         {% set user = get_current_user() %}
         var userName = {{ user ? user.username|json_encode|raw : 'null' }},
@@ -156,12 +173,43 @@
         });
 
         /**
-         * Add the operators selector for filters
+         * Add API resource handler
          */
         $('.toggler').on('click', function() {
             var $container = $(this).closest('.operation'),
+                $filters = $container.find('.pane.content>table>tbody table'),
                 $form = $container.find('.pane.sandbox form');
-            $container.find('.pane.content>table>tbody table td:contains(Operators)').each(function (index, el) {
+
+            /**
+             * Add relation links
+             */
+            $filters.find('td:contains(Relation)').each(function (index, el) {
+                var $el = $(el),
+                    $relationEl = $el.next(),
+                    relationText = $relationEl.text(),
+                    relations, links, resourceId;
+                if (relationText && relationText.substring(0, 2) !== '<a') {
+                    relations = relationText.split(',');
+                    links = [];
+                    for (var i = 0; i < relations.length; i++) {
+                        resourceId = 'get--api-' + relations[i].trim();
+                        if ($('#' + resourceId).length) {
+                            links.push('<a href="#' + resourceId
+                                + '" onclick="return gotoResource(\'' + resourceId + '\');">'
+                                + relations[i] + '</a>');
+                        } else {
+                            links.push(relations[i]);
+                        }
+                    }
+                    $relationEl.text('');
+                    $relationEl.append(links.join(', '));
+                }
+            });
+
+            /**
+             * Add the operators selector for filters
+             */
+            $filters.find('td:contains(Operators)').each(function (index, el) {
                 var $el = $(el),
                     filterId = $el.closest('table').parent().prev().text(),
                     operators = $el.next().text(),

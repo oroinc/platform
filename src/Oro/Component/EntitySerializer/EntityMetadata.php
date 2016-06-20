@@ -58,6 +58,17 @@ class EntityMetadata
     }
 
     /**
+     * Checks whether an entity is participate in an inheritance hierarchy,
+     * e.g. in the JOINED or SINGLE_TABLE inheritance mapping
+     *
+     * @return bool
+     */
+    public function hasInheritance()
+    {
+        return $this->metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE;
+    }
+
+    /**
      * Returns the discriminator value of the given entity class
      * This does only apply to the JOINED and SINGLE_TABLE inheritance mapping strategies
      * where a discriminator column is used
