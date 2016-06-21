@@ -29,13 +29,13 @@ class ProcessorIterator implements \Iterator
     protected $processorFactory;
 
     /** @var string */
-    private $action;
+    protected $action;
 
     /** @var int */
-    private $index;
+    protected $index;
 
     /** @var int */
-    private $maxIndex;
+    protected $maxIndex;
 
     /**
      * @param array                      $processors
@@ -92,7 +92,7 @@ class ProcessorIterator implements \Iterator
      */
     public function getGroup()
     {
-        if (!$this->valid()) {
+        if (-1 === $this->index || !$this->valid()) {
             return null;
         }
 
@@ -110,7 +110,7 @@ class ProcessorIterator implements \Iterator
      */
     public function getProcessorId()
     {
-        if (!$this->valid()) {
+        if (-1 === $this->index || !$this->valid()) {
             return null;
         }
 
@@ -124,7 +124,7 @@ class ProcessorIterator implements \Iterator
      */
     public function getProcessorAttributes()
     {
-        if (!$this->valid()) {
+        if (-1 === $this->index || !$this->valid()) {
             return null;
         }
 

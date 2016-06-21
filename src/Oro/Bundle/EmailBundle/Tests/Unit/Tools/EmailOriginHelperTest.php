@@ -3,10 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,6 +24,18 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailModel;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailOwnerProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacadeLink;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
+    /** @var  EmailAddressHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $emailAddressHelper;
 
     protected function setUp()
     {
@@ -42,7 +57,65 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->emailOriginHelper = new EmailOriginHelper($this->doctrineHelper);
+        $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacadeLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->setMethods(['getService'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->setMethods(['getLoggedUser', 'getOrganization'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacadeLink->expects($this->any())
+            ->method('getService')
+            ->will($this->returnValue($this->securityFacade));
+
+        $this->securityFacade->expects($this->any())
+            ->method('getOrganization')
+            ->will($this->returnValue($this->getTestOrganization()));
+
+        $this->emailAddressHelper = new EmailAddressHelper();
+
+        $this->emailOriginHelper = new EmailOriginHelper(
+            $this->doctrineHelper,
+            $this->securityFacadeLink,
+            $this->emailOwnerProvider,
+            $this->emailAddressHelper
+        );
+    }
+
+    public function testGetEmailOriginFromSecurity()
+    {
+        $email = 'test';
+        $organization = null;
+        $originName = InternalEmailOrigin::BAP;
+        $enableUseUserEmailOrigin = true;
+        $expectedOrigin = new \stdClass();
+        $owner = new \stdClass();
+
+        $this->emailOwnerProvider->expects($this->once())
+            ->method('findEmailOwner')
+            ->willReturn($owner);
+        $entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityRepository->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($expectedOrigin);
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($entityRepository);
+
+        $origin =
+            $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName, $enableUseUserEmailOrigin);
+
+        $this->assertEquals($expectedOrigin, $origin);
     }
 
     /**
@@ -251,5 +324,31 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
         return $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin')
                     ->disableOriginalConstructor()
                     ->getMock();
+    }
+
+    protected function getTestOrganization()
+    {
+        $organization = new Organization();
+        $organization->setId(1);
+
+        return $organization;
+    }
+
+    protected function getTestOrigin()
+    {
+        $outboxFolder = new EmailFolder();
+        $outboxFolder
+            ->setType(FolderType::SENT)
+            ->setName(FolderType::SENT)
+            ->setFullName(FolderType::SENT);
+
+        $origin = new InternalEmailOrigin();
+        $origin
+            ->setName('BAP_User_1')
+            ->addFolder($outboxFolder)
+            ->setOwner($this->getTestUser())
+            ->setOrganization($this->getTestOrganization());
+
+        return $origin;
     }
 }

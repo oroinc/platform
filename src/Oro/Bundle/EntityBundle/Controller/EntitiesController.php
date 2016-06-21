@@ -283,17 +283,12 @@ class EntitiesController extends Controller
                 $em->persist($record);
                 $em->flush();
 
-                $id = $record->getId();
-
                 $this->get('session')->getFlashBag()->add(
                     'success',
                     $this->get('translator')->trans('oro.entity.controller.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    ['route' => 'oro_entity_update', 'parameters' => ['entityName' => $entityName, 'id'=> $id]],
-                    ['route' => 'oro_entity_view', 'parameters' => ['entityName' => $entityName, 'id' => $id]]
-                );
+                return $this->get('oro_ui.router')->redirect($record);
             }
         }
 

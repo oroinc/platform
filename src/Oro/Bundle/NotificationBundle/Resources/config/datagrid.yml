@@ -1,4 +1,88 @@
 datagrid:
+    mass-notification-grid:
+        options:
+          entity_pagination: true
+        acl_resource: oro_notification_massnotification_view
+        source:
+            type: orm
+            query:
+                select:
+                    - e.id
+                    - e.subject
+                    - e.email
+                    - e.sender
+                    - e.status
+                    - e.processedAt
+                from:
+                    - { table: OroNotificationBundle:MassNotification, alias: e }
+
+        columns:
+            sender:
+                label: oro.notification.massnotification.sender.label
+                frontend_type: string
+            email:
+                label: oro.notification.massnotification.email.label
+                frontend_type: string
+            processedAt:
+                label: oro.notification.massnotification.processed_at.label
+                frontend_type: datetime
+            subject:
+                label: oro.notification.massnotification.subject.label
+                frontend_type: string
+            status:
+                label: oro.notification.massnotification.status.label
+                frontend_type: select
+                choices:
+                   - oro.notification.massnotification.status.failed
+                   - oro.notification.massnotification.status.success
+
+        properties:
+            id: ~
+            view_link:
+                type:       url
+                route:      oro_notification_massnotification_view
+                params:     [ id ]
+        actions:
+            view:
+                acl_resource: oro_notification_massnotification_view
+                type:         navigate
+                label:        oro.grid.action.view
+                icon:         eye-open
+                link:         view_link
+                rowAction:    true
+
+        sorters:
+            columns:
+                subject:
+                    data_name: e.subject
+                processedAt:
+                    data_name: e.processedAt
+            default:
+                processedAt: DESC
+
+        filters:
+            columns:
+                sender:
+                    type: string
+                    data_name: e.sender
+                email:
+                    type: string
+                    data_name: e.email
+                processedAt:
+                    type: datetime
+                    data_name: e.processedAt
+                subject:
+                    type: string
+                    data_name: e.subject
+                status:
+                    type: choice
+                    data_name: e.status
+                    options:
+                        field_options:
+                            choices:
+                                0: oro.notification.massnotification.status.failed
+                                1: oro.notification.massnotification.status.success
+
     email-notification-grid:
         options:
             entityHint: transactional email

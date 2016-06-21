@@ -11,10 +11,10 @@ class ActionProcessor extends ChainProcessor implements ActionProcessorInterface
     protected $action;
 
     /**
-     * @param ProcessorBag $processorBag
-     * @param string       $action
+     * @param ProcessorBagInterface $processorBag
+     * @param string                $action
      */
-    public function __construct(ProcessorBag $processorBag, $action)
+    public function __construct(ProcessorBagInterface $processorBag, $action)
     {
         parent::__construct($processorBag);
         $this->action = $action;

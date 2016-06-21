@@ -19,6 +19,34 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->processor = new NormalizeMetadata();
     }
 
+    /**
+     * @param string $fieldName
+     *
+     * @return FieldMetadata
+     */
+    protected function createFieldMetadata($fieldName)
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName($fieldName);
+
+        return $fieldMetadata;
+    }
+
+    /**
+     * @param string $associationName
+     * @param string $targetClass
+     *
+     * @return AssociationMetadata
+     */
+    protected function createAssociationMetadata($associationName, $targetClass)
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName($associationName);
+        $associationMetadata->setTargetClassName($targetClass);
+
+        return $associationMetadata;
+    }
+
     public function testProcessWithoutMetadata()
     {
         $this->processor->process($this->context);
@@ -55,54 +83,36 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
 
         $metadata = new EntityMetadata();
-        $field1   = new FieldMetadata();
-        $field1->setName('field1');
-        $metadata->addField($field1);
-        $field2 = new FieldMetadata();
-        $field2->setName('field2');
-        $metadata->addField($field2);
-        $field3 = new FieldMetadata();
-        $field3->setName('field3');
-        $metadata->addField($field3);
-        $field4 = new FieldMetadata();
-        $field4->setName('field4');
-        $metadata->addField($field4);
-        $association1 = new AssociationMetadata();
-        $association1->setTargetClassName('Test\Association1Target');
-        $association1->setName('association1');
-        $metadata->addAssociation($association1);
-        $association2 = new AssociationMetadata();
-        $association2->setTargetClassName('Test\Association2Target');
-        $association2->setName('association2');
-        $metadata->addAssociation($association2);
-        $association3 = new AssociationMetadata();
-        $association3->setTargetClassName('Test\Association3Target');
-        $association3->setName('realAssociation3');
-        $metadata->addAssociation($association3);
-        $association4 = new AssociationMetadata();
-        $association4->setTargetClassName('Test\Association4Target');
-        $association4->setName('association4');
-        $metadata->addAssociation($association4);
+        $metadata->addField($this->createFieldMetadata('field1'));
+        $metadata->addField($this->createFieldMetadata('field2'));
+        $metadata->addField($this->createFieldMetadata('field3'));
+        $metadata->addField($this->createFieldMetadata('field4'));
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('association1', 'Test\Association1Target')
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('association2', 'Test\Association2Target')
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('realAssociation3', 'Test\Association3Target')
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('association4', 'Test\Association4Target')
+        );
 
         $this->context->setConfig($this->createConfigObject($config));
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
         $expectedMetadata = new EntityMetadata();
-        $expectedField1   = new FieldMetadata();
-        $expectedField1->setName('field1');
-        $expectedMetadata->addField($expectedField1);
-        $expectedField3 = new FieldMetadata();
-        $expectedField3->setName('field3');
-        $expectedMetadata->addField($expectedField3);
-        $expectedAssociation2 = new AssociationMetadata();
-        $expectedAssociation2->setTargetClassName('Test\Association2Target');
-        $expectedAssociation2->setName('association2');
-        $expectedMetadata->addAssociation($expectedAssociation2);
-        $expectedAssociation3 = new AssociationMetadata();
-        $expectedAssociation3->setTargetClassName('Test\Association3Target');
-        $expectedAssociation3->setName('association3');
-        $expectedMetadata->addAssociation($expectedAssociation3);
+        $expectedMetadata->addField($this->createFieldMetadata('field1'));
+        $expectedMetadata->addField($this->createFieldMetadata('field3'));
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata('association2', 'Test\Association2Target')
+        );
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata('association3', 'Test\Association3Target')
+        );
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
