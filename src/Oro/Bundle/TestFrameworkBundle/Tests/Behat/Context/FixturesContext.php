@@ -39,14 +39,6 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
     }
 
     /**
-     * @Given there is System organization exists in the system
-     */
-    public function thereIsSystemOrganizationExistsInTheSystem()
-    {
-        throw new PendingException();
-    }
-
-    /**
      * Load random entities in database
      * Example: I have 6 contacts
      * Example: And there are 30 users
