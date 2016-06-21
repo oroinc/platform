@@ -10,7 +10,7 @@ Scenario: Try navigate on top menu
   Given menu is at the top
   And I open the menu "System -> User Management" and click "Users"
   When click view John Doe in grid
-  Then username field should be with admin value
+  And username field should have admin value
 
 Scenario: Change menu view
   Given I open the menu "System" and click "Configuration"
@@ -24,4 +24,4 @@ Scenario: Try to navigate on left menu
   Given menu is on the left side
   And I open the menu "System -> User Management" and click "Users"
   When click view John Doe in grid
-  Then username field should be with admin value
+  Then username field should have admin value
