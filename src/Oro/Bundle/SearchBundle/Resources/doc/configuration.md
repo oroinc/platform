@@ -15,7 +15,6 @@ oro_search:
     engine_parameters:
         ...
     log_queries: true
-    realtime_update: false
     item_container_template: MyBundle:Search:itemContainer.html.twig
     entities_config:
         ...
@@ -29,9 +28,6 @@ used to perform search and indexation (see section [Search Engine Configuration]
 of search engine used for initialization (f.e. IP, port, credentials etc);
 - **log_queries**, default false (converted to container parameter _oro_search.log_queries_) - flag that defines
 whether need to log search queries to the database;
-- **realtime_update**, default true (converted to container parameter _oro_search.realtime_update_) - flag that
-specifies is search index should be updated in the real time, i.e. right after indexed entity was changed;
-if set this flag to false then reindex jobs will be put to the queue and processed later;
 - **item_container_template**, default "OroSearchBundle:Datagrid:itemContainer.html.twig"
 (converted to container parameter _oro_search.twig.item_container_template_) - template used to render entity row
 in search results;

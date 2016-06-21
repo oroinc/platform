@@ -190,7 +190,6 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'oro_search' => array(
                 'engine'          => 'some-engine',
-                'realtime_update' => true
             )
         );
 
@@ -204,7 +203,6 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'oro_search' => array(
                 'engine'          => 'some-engine',
-                'realtime_update' => true,
                 'entities_config' => array(
                     'Oro\Bundle\DataBundle\Entity\Product' => array(
                         'alias'           => 'test_alias',
@@ -230,7 +228,6 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'oro_search' => array(
                 'engine'          => Configuration::DEFAULT_ENGINE,
-                'realtime_update' => true
             )
         );
 
