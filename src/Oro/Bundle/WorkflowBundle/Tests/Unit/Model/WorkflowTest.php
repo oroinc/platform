@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -368,6 +369,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('transit')
             ->with($workflowItem);
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -589,11 +594,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->with($transition)
             ->will($this->returnValue($transition));
 
-        $workflowName = null;
-        $aclManager = null;
-        $attributeManager = null;
-
-        $workflow = $this->createWorkflow($workflowName, $aclManager, $attributeManager, $transitionManager);
+        $workflow = $this->createWorkflow(null, null, null, $transitionManager);
 
         $this->assertTrue($workflow->isTransitionAvailable($workflowItem, $transition, $errors));
     }
@@ -624,11 +625,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $entityAttribute = new Attribute();
         $entityAttribute->setName('entity');
 
-        $workflowName = null;
-        $aclManager = null;
-        $attributeManager = null;
-
-        $workflow = $this->createWorkflow($workflowName, $aclManager, $attributeManager, $transitionManager);
+        $workflow = $this->createWorkflow(null, null, null, $transitionManager);
 
         $workflow->setDefinition($workflowDefinition);
         $workflow->getAttributeManager()->setAttributes(array($entityAttribute));
@@ -778,7 +775,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $workflowName
-     * @param AclManager $aclManager
+     * @param AclManager|\PHPUnit_Framework_MockObject_MockObject $aclManager
      * @param AttributeManager $attributeManager
      * @param TransitionManager $transitionManager
      * @return Workflow
@@ -789,6 +786,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $attributeManager = null,
         $transitionManager = null
     ) {
+        /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject $doctrineHelper */
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         if (!$aclManager) {
             $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
                 ->disableOriginalConstructor()
@@ -801,6 +803,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $workflow = new Workflow(
+            $doctrineHelper,
             $aclManager,
             $restrictionManager,
             null,
@@ -837,10 +840,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('getAttributes')
             ->will($this->returnValue($attributes));
 
-        $workflowName = null;
-        $aclManager = null;
-
-        $workflow = $this->createWorkflow($workflowName, $aclManager, $attributeManager);
+        $workflow = $this->createWorkflow(null, null, $attributeManager);
         $expected = array('name' => 'path');
         $this->assertEquals($expected, $workflow->getAttributesMapping());
     }
