@@ -21,6 +21,7 @@ define(function(require) {
             this._deferredInit();
 
             tools.loadModules(options.widgetModule, function initializeJqueryWidget(widgetName) {
+                widgetName = _.isString(widgetName) ? widgetName : '';
                 $elem[widgetName || options.widgetName](widgetOptions);
                 this._resolveDeferredInit();
             }, this);
