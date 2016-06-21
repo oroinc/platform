@@ -35,7 +35,6 @@ class UserRoleForm extends Form
         throw new ExpectationException(
             sprintf('There is no "%s" entity row', $accessLevel),
             $this->session->getDriver()
-
         );
     }
 
