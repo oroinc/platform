@@ -131,7 +131,8 @@ class OrmIndexerTest extends WebTestCase
     {
         $classes = $this->getSearchIndexer()->getClassesForReindex();
 
-        $this->assertCount(30, $classes);
+        $this->assertContains(Item::class, $classes);
+        $this->assertContains(Item2::class, $classes);
     }
 
     public function testShouldReturnClassesForReindexForClass()
