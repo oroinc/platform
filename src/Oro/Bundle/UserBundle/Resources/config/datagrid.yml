@@ -99,13 +99,13 @@ datagrid:
                     type: string
                     data_name: u.username
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
                 createdAt:
                     type: datetime
                     data_name: u.createdAt
@@ -351,13 +351,13 @@ datagrid:
                     type: string
                     data_name: u.username
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
         sorters:
             multiple_sorting: true
             columns:
@@ -431,13 +431,13 @@ datagrid:
                     type: string
                     data_name: u.username
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
         sorters:
             multiple_sorting: true
             columns:
@@ -519,13 +519,13 @@ datagrid:
                     type: string
                     data_name: u.username
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
 
     owner-users-select-grid:
         extended_entity_name: %oro_user.entity.class%
@@ -593,13 +593,13 @@ datagrid:
                     type: string
                     data_name: u.username
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
 
     users-select-grid-exclude-owner:
         extends: users-select-grid
@@ -681,10 +681,10 @@ datagrid:
                     type: string
                     data_name: u.username
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active

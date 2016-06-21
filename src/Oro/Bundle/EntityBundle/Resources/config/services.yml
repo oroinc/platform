@@ -168,7 +168,6 @@ services:
             - %oro_entity.virtual_fields%
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 0 }
-            - { name: oro_entity.virtual_field_provider.api }
 
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%

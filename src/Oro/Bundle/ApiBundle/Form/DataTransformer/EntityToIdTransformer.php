@@ -7,17 +7,24 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+
 class EntityToIdTransformer implements DataTransformerInterface
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var AssociationMetadata */
+    protected $metadata;
+
     /**
-     * @param ManagerRegistry $doctrine
+     * @param ManagerRegistry     $doctrine
+     * @param AssociationMetadata $metadata
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, AssociationMetadata $metadata)
     {
         $this->doctrine = $doctrine;
+        $this->metadata = $metadata;
     }
 
     /**
@@ -30,6 +37,7 @@ class EntityToIdTransformer implements DataTransformerInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function reverseTransform($value)
     {
@@ -51,6 +59,16 @@ class EntityToIdTransformer implements DataTransformerInterface
         }
 
         $entityClass = $value['class'];
+        if (!in_array($entityClass, $this->metadata->getAcceptableTargetClassNames(), true)) {
+            throw new TransformationFailedException(
+                sprintf(
+                    'The "%s" class is not acceptable. Acceptable classes: %s.',
+                    $entityClass,
+                    implode(',', $this->metadata->getAcceptableTargetClassNames())
+                )
+            );
+        }
+
         $manager = $this->doctrine->getManagerForClass($entityClass);
         if (null === $manager) {
             throw new TransformationFailedException(
