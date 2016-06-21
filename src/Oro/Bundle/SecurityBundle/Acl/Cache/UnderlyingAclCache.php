@@ -50,11 +50,6 @@ class UnderlyingAclCache
      */
     public function cacheUnderlying(ObjectIdentityInterface $oid)
     {
-        if (!is_int($oid->getIdentifier())) {
-            $this->cache->save($this->getUnderlyingDataKeyByIdentity($oid), true);
-            return;
-        }
-
         $batchNumber = $this->getBatchNumber($oid);
         $batchKey = $this->getBatchCacheKey($oid);
         $type = $oid->getType();
@@ -97,7 +92,7 @@ class UnderlyingAclCache
     public function isUnderlying(ObjectIdentityInterface $oid)
     {
         if (!is_int($oid->getIdentifier())) {
-            return $this->cache->contains($this->getUnderlyingDataKeyByIdentity($oid));
+            return false;
         }
 
         $batchNumber = $this->getBatchNumber($oid);
@@ -124,7 +119,11 @@ class UnderlyingAclCache
         }
         if (!array_key_exists($batchNumber, $this->loadedBatches[$type])
         ) {
-            $this->loadedBatches[$type][$batchNumber] = $this->cache->fetch($batchKey);
+            if ($this->cache->contains($batchKey)) {
+                $this->loadedBatches[$type][$batchNumber] = $this->cache->fetch($batchKey);
+            } else {
+                $this->loadedBatches[$type][$batchNumber] = [];
+            }
         }
 
         return array_key_exists($oid->getIdentifier(), $this->loadedBatches[$type][$batchNumber]);
