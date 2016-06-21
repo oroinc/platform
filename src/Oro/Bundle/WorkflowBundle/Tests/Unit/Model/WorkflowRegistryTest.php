@@ -2,82 +2,96 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 
 class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createWorkflowDefinitionRepositoryMock()
+    /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
+    private $entityRepository;
+
+    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    private $entityManager;
+
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    private $managerRegistry;
+
+    /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    private $assembler;
+
+    /** @var WorkflowRegistry */
+    private $registry;
+
+    protected function setUp()
     {
-        $workflowDefinitionRepository
-            = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository')
+        $this->entityRepository
+            = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('find', 'findByEntityClass'))
             ->getMock();
 
-        return $workflowDefinitionRepository;
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $workflowDefinitionRepository
-     *
-     * @return DoctrineHelper
-     */
-    protected function createDoctrineHelperMock($workflowDefinitionRepository = null)
-    {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->managerRegistry = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getEntityRepositoryForClass', 'getEntityManagerForClass'))
             ->getMockForAbstractClass();
-        if ($workflowDefinitionRepository) {
-            $doctrineHelper->expects($this->any())
-                ->method('getEntityRepositoryForClass')
-                ->with('OroWorkflowBundle:WorkflowDefinition')
-                ->will($this->returnValue($workflowDefinitionRepository));
-        }
 
-        return $doctrineHelper;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createConfigurationProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with(WorkflowDefinition::class)
+            ->willReturn($this->entityRepository);
+
+        $this->managerRegistry->expects($this->any())
+                ->method('getManagerForClass')
+                ->with(WorkflowDefinition::class)
+                ->willReturn($this->entityManager);
+
+        /** @var WorkflowSystemConfigManager $workflowSystemConfig */
+        $workflowSystemConfig = $this->getMockBuilder(WorkflowSystemConfigManager::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $this->assembler = $this->getMockBuilder(WorkflowAssembler::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('assemble'))
+            ->getMock();
+
+        $this->registry = new WorkflowRegistry($this->managerRegistry, $this->assembler, $workflowSystemConfig);
+    }
+
+    protected function tearDown()
+    {
+        unset(
+            $this->entityRepository,
+            $this->managerRegistry,
+            $this->entityManager,
+            $this->assembler,
+            $this->registry
+        );
     }
 
     /**
      * @param WorkflowDefinition|null $workflowDefinition
      * @param Workflow|null $workflow
-     * @return WorkflowAssembler
      */
-    public function createWorkflowAssemblerMock($workflowDefinition = null, $workflow = null)
+    public function prepareAssemblerMock($workflowDefinition = null, $workflow = null)
     {
-        $workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
-            ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
-            ->getMock();
         if ($workflowDefinition && $workflow) {
-            $workflowAssembler->expects($this->once())
+            $this->assembler->expects($this->once())
                 ->method('assemble')
                 ->with($workflowDefinition)
-                ->will($this->returnValue($workflow));
+                ->willReturn($workflow);
         } else {
-            $workflowAssembler->expects($this->never())
+            $this->assembler->expects($this->never())
                 ->method('assemble');
         }
-
-        return $workflowAssembler;
     }
 
     public function testGetWorkflow()
@@ -93,21 +107,17 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->method('getDefinition')
             ->will($this->returnValue($workflowDefinition));
 
-        $workflowDefinitionRepository = $this->createWorkflowDefinitionRepositoryMock();
-        $workflowDefinitionRepository->expects($this->once())
+        $this->entityRepository->expects($this->once())
             ->method('find')
             ->with($workflowName)
             ->will($this->returnValue($workflowDefinition));
-        $doctrineHelper = $this->createDoctrineHelperMock($workflowDefinitionRepository);
-        $workflowAssembler = $this->createWorkflowAssemblerMock($workflowDefinition, $workflow);
-        $configProvider = $this->createConfigurationProviderMock();
-        $this->setUpEntityManagerMock($doctrineHelper, $workflowDefinition);
+        $this->prepareAssemblerMock($workflowDefinition, $workflow);
+        $this->setUpEntityManagerMock($workflowDefinition);
 
-        $workflowRegistry = new WorkflowRegistry($doctrineHelper, $workflowAssembler, $configProvider);
         // run twice to test cache storage inside registry
-        $this->assertEquals($workflow, $workflowRegistry->getWorkflow($workflowName));
-        $this->assertEquals($workflow, $workflowRegistry->getWorkflow($workflowName));
-        $this->assertAttributeEquals(array($workflowName => $workflow), 'workflowByName', $workflowRegistry);
+        $this->assertEquals($workflow, $this->registry->getWorkflow($workflowName));
+        $this->assertEquals($workflow, $this->registry->getWorkflow($workflowName));
+        $this->assertAttributeEquals(array($workflowName => $workflow), 'workflowByName', $this->registry);
     }
 
     public function testGetWorkflowWithDbEntitiesUpdate()
@@ -125,24 +135,20 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $workflow->setDefinition($oldDefinition);
 
-        $workflowDefinitionRepository = $this->createWorkflowDefinitionRepositoryMock();
-        $workflowDefinitionRepository->expects($this->at(0))
+        $this->entityRepository->expects($this->at(0))
             ->method('find')
             ->with($workflowName)
             ->will($this->returnValue($oldDefinition));
-        $workflowDefinitionRepository->expects($this->at(1))
+        $this->entityRepository->expects($this->at(1))
             ->method('find')
             ->with($workflowName)
             ->will($this->returnValue($newDefinition));
-        $doctrineHelper = $this->createDoctrineHelperMock($workflowDefinitionRepository);
-        $workflowAssembler = $this->createWorkflowAssemblerMock($oldDefinition, $workflow);
-        $configProvider = $this->createConfigurationProviderMock();
-        $this->setUpEntityManagerMock($doctrineHelper, $oldDefinition, false);
+        $this->prepareAssemblerMock($oldDefinition, $workflow);
+        $this->setUpEntityManagerMock($oldDefinition, false);
 
-        $workflowRegistry = new WorkflowRegistry($doctrineHelper, $workflowAssembler, $configProvider);
-        $this->assertEquals($workflow, $workflowRegistry->getWorkflow($workflowName));
+        $this->assertEquals($workflow, $this->registry->getWorkflow($workflowName));
         $this->assertEquals($newDefinition, $workflow->getDefinition());
-        $this->assertAttributeEquals(array($workflowName => $workflow), 'workflowByName', $workflowRegistry);
+        $this->assertAttributeEquals(array($workflowName => $workflow), 'workflowByName', $this->registry);
     }
 
     /**
@@ -162,30 +168,25 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $workflow->setDefinition($workflowDefinition);
 
-        $workflowDefinitionRepository = $this->createWorkflowDefinitionRepositoryMock();
-        $workflowDefinitionRepository->expects($this->at(0))
+        $this->entityRepository->expects($this->at(0))
             ->method('find')
             ->with($workflowName)
             ->will($this->returnValue($workflowDefinition));
-        $workflowDefinitionRepository->expects($this->at(1))
+        $this->entityRepository->expects($this->at(1))
             ->method('find')
             ->with($workflowName)
             ->will($this->returnValue(null));
-        $doctrineHelper = $this->createDoctrineHelperMock($workflowDefinitionRepository);
-        $workflowAssembler = $this->createWorkflowAssemblerMock($workflowDefinition, $workflow);
-        $configProvider = $this->createConfigurationProviderMock();
-        $this->setUpEntityManagerMock($doctrineHelper, $workflowDefinition, false);
+        $this->prepareAssemblerMock($workflowDefinition, $workflow);
+        $this->setUpEntityManagerMock($workflowDefinition, false);
 
-        $workflowRegistry = new WorkflowRegistry($doctrineHelper, $workflowAssembler, $configProvider);
-        $workflowRegistry->getWorkflow($workflowName);
+        $this->registry->getWorkflow($workflowName);
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $doctrineHelper
      * @param WorkflowDefinition $workflowDefinition
      * @param boolean $isEntityKnown
      */
-    protected function setUpEntityManagerMock($doctrineHelper, $workflowDefinition, $isEntityKnown = true)
+    protected function setUpEntityManagerMock($workflowDefinition, $isEntityKnown = true)
     {
         $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
@@ -193,15 +194,8 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $unitOfWork->expects($this->any())->method('isInIdentityMap')->with($workflowDefinition)
             ->will($this->returnValue($isEntityKnown));
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['getUnitOfWork'])
-            ->getMock();
-        $entityManager->expects($this->any())->method('getUnitOfWork')
+        $this->entityManager->expects($this->any())->method('getUnitOfWork')
             ->will($this->returnValue($unitOfWork));
-
-        $doctrineHelper->expects($this->any())->method('getEntityManagerForClass')
-            ->with('OroWorkflowBundle:WorkflowDefinition')->will($this->returnValue($entityManager));
     }
 
     /**
@@ -212,16 +206,12 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $workflowName = 'not_existing_workflow';
 
-        $workflowDefinitionRepository = $this->createWorkflowDefinitionRepositoryMock();
-        $workflowDefinitionRepository->expects($this->once())
+        $this->entityRepository->expects($this->once())
             ->method('find')
             ->with($workflowName)
-            ->will($this->returnValue(null));
-        $doctrineHelper = $this->createDoctrineHelperMock($workflowDefinitionRepository);
-        $workflowAssembler = $this->createWorkflowAssemblerMock();
-        $configProvider = $this->createConfigurationProviderMock();
+            ->willReturn(null);
+        $this->prepareAssemblerMock();
 
-        $workflowRegistry = new WorkflowRegistry($doctrineHelper, $workflowAssembler, $configProvider);
-        $workflowRegistry->getWorkflow($workflowName);
+        $this->registry->getWorkflow($workflowName);
     }
 }
