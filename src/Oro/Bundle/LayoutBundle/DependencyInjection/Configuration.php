@@ -175,6 +175,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $assetsNode = $treeBuilder->root('assets');
+        $imagesNode = $treeBuilder->root('images');
 
         $assetsNode
             ->useAttributeAsKey('asset-identifier')
@@ -195,6 +196,21 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $imagesNode
+            ->children()
+                ->arrayNode('types')
+                ->useAttributeAsKey('image-type-identifier')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('label')->cannotBeEmpty()->end()
+                            ->scalarNode('dimensions')->defaultNull()->end()
+                            ->scalarNode('max_number')->defaultNull()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
         $dataNode->append($assetsNode);
+        $dataNode->append($imagesNode);
     }
 }

@@ -8,10 +8,9 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
@@ -23,20 +22,14 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroElementFactoryAware,
-    KernelAwareContext,
-    FixtureLoaderAwareInterface
+    KernelAwareContext
 {
-    use KernelDictionary;
+    use KernelDictionary, WaitingDictionary;
 
     /**
      * @var OroElementFactory
      */
     protected $elementFactory;
-
-    /**
-     * @var FixtureLoader
-     */
-    protected $fixtureLoader;
 
     /** @BeforeStep */
     public function beforeStep(BeforeStepScope $scope)
@@ -89,14 +82,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setFixtureLoader(FixtureLoader $fixtureLoader)
-    {
-        $this->fixtureLoader = $fixtureLoader;
-    }
-
-    /**
      * @Then I should see :title flash message
      */
     public function iShouldSeeFlashMessage($title)
@@ -129,48 +114,6 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
-    }
-
-    /**
-     * Wait PAGE load
-     * @param int $time Time should be in milliseconds
-     */
-    protected function waitPageToLoad($time = 15000)
-    {
-        $this->getSession()->wait(
-            $time,
-            '"complete" == document["readyState"] '.
-            '&& (typeof($) != "undefined" '.
-            '&& document.title !=="Loading..." '.
-            '&& $ !== null '.
-            '&& false === $( "div.loader-mask" ).hasClass("shown"))'
-        );
-    }
-
-    /**
-     * Wait AJAX request
-     * @param int $time Time should be in milliseconds
-     */
-    protected function waitForAjax($time = 15000)
-    {
-        $this->waitPageToLoad($time);
-
-        $jsAppActiveCheck = <<<JS
-        (function () {
-            var isAppActive = false;
-            try {
-                if (!window.mediatorCachedForSelenium) {
-                    window.mediatorCachedForSelenium = require('oroui/js/mediator');
-                }
-                isAppActive = window.mediatorCachedForSelenium.execute('isInAction');
-            } catch (e) {
-                return false;
-            }
-
-            return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;
-        })();
-JS;
-        $this->getSession()->wait($time, $jsAppActiveCheck);
     }
 
     /**
