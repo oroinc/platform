@@ -26,6 +26,9 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AttachmentManager
 {
     const READ_COUNT = 100000;
@@ -510,5 +513,16 @@ class AttachmentManager
     protected function generateFileName($extension)
     {
         return sprintf('%s.%s', uniqid(), $extension);
+    }
+
+    /**
+     * @param $entity
+     * @param File $attachment
+     *
+     * @return string
+     */
+    public function getAttachmentURL($entity, $attachment)
+    {
+        return $this->getFileUrl($entity, 'attachment', $attachment, 'download');
     }
 }
