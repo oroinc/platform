@@ -817,7 +817,6 @@ define(function(require) {
         },
 
         setTimeline: function() {
-            var todayElement;
             var timeGrid;
             var timelineElement;
             var percentOfDay;
@@ -826,16 +825,9 @@ define(function(require) {
             var dayCol;
             var calendarElement = this.getCalendarElement();
             var currentView = calendarElement.fullCalendar('getView');
-            var currentDate = calendarElement.fullCalendar('getDate');
-            var viewKey = this.getStorageKey('defaultView');
-            var dateKey = this.getStorageKey('defaultDate');
 
             if (this.options.eventsOptions.recoverView) {
-                persistentStorage.setItem(viewKey, currentView.name);
-
-                if (!isNaN(currentDate)) {
-                    persistentStorage.setItem(dateKey, currentDate.unix());
-                }
+                this.persistView();
             }
 
             // shown interval in calendar timezone
@@ -854,11 +846,10 @@ define(function(require) {
             // this function is called every 1 minute
             if (now.hours() === 0 && now.minutes() <= 2) {
                 // the day has changed
-                todayElement = calendarElement.find('.fc-today');
-                todayElement.removeClass('fc-today');
-                todayElement.removeClass('fc-state-highlight');
-                todayElement.next().addClass('fc-today');
-                todayElement.next().addClass('fc-state-highlight');
+                calendarElement.find('.fc-today')
+                    .removeClass('fc-today fc-state-highlight')
+                    .next()
+                    .addClass('fc-today fc-state-highlight');
             }
 
             timeGrid = calendarElement.find('.fc-time-grid');
@@ -888,6 +879,22 @@ define(function(require) {
                         left: (dayCol.position().left) + 'px',
                         width: (dayCol.width() + 3) + 'px'
                     });
+                }
+            }
+        },
+
+        persistView: function() {
+            var calendarElement = this.getCalendarElement();
+            var currentDate = calendarElement.fullCalendar('getDate');
+            var currentView = calendarElement.fullCalendar('getView');
+            var viewKey = this.getStorageKey('defaultView');
+            var dateKey = this.getStorageKey('defaultDate');
+
+            if (this.options.eventsOptions.recoverView) {
+                persistentStorage.setItem(viewKey, currentView.name);
+
+                if (!isNaN(currentDate)) {
+                    persistentStorage.setItem(dateKey, currentDate.unix());
                 }
             }
         },

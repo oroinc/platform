@@ -95,21 +95,9 @@ class LocalizationController extends Controller
 
         /** @var $handler UpdateHandler */
         $handler = $this->get('oro_form.model.update_handler');
-        return $handler->handleUpdate(
+        return $handler->update(
             $localization,
             $form,
-            function (Localization $localization) {
-                return [
-                    'route' => 'oro_locale_localization_update',
-                    'parameters' => ['id' => $localization->getId()]
-                ];
-            },
-            function (Localization $localization) {
-                return [
-                    'route' => 'oro_locale_localization_view',
-                    'parameters' => ['id' => $localization->getId()]
-                ];
-            },
             $this->get('translator')->trans('oro.locale.controller.localization.saved.message')
         );
     }

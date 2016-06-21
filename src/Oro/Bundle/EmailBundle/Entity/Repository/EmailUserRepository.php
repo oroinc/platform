@@ -185,16 +185,23 @@ class EmailUserRepository extends EntityRepository
      * @param User                 $user
      * @param string|string[]|null $folderType
      * @param bool                 $isAllSelected
+     * @param Organization         $organization
      *
      * @return QueryBuilder
      */
-    public function getEmailUserBuilderForMassAction($ids, User $user, $folderType, $isAllSelected)
-    {
+    public function getEmailUserBuilderForMassAction(
+        $ids,
+        User $user,
+        $folderType,
+        $isAllSelected,
+        Organization $organization
+    ) {
         $queryBuilder = $this->createQueryBuilder('eu');
         $queryBuilder->join('eu.email', 'e');
 
         $this->applyOwnerFilter($queryBuilder, $user);
         $this->applyHeadFilter($queryBuilder, true);
+        $this->applyOrganizationFilter($queryBuilder, $organization);
 
         if ($folderType) {
             $this->applyFolderFilter($queryBuilder, $folderType);
@@ -403,8 +410,20 @@ class EmailUserRepository extends EntityRepository
      */
     protected function applyHeadFilter(QueryBuilder $queryBuilder, $isHead = true)
     {
-        $queryBuilder
-            ->add('where', $queryBuilder->expr()->andX($queryBuilder->expr()->eq('e.head', ':head')))
-            ->setParameters(['head' => (bool)$isHead]);
+        $queryBuilder->andWhere($queryBuilder->expr()->andX($queryBuilder->expr()->eq('e.head', ':head')));
+        $queryBuilder->setParameter('head', (bool)$isHead);
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param Organization $organization
+     * @return $this
+     */
+    protected function applyOrganizationFilter(QueryBuilder $queryBuilder, Organization $organization)
+    {
+        $queryBuilder->andWhere('eu.organization = :organization');
+        $queryBuilder->setParameter('organization', $organization);
+
+        return $this;
     }
 }
