@@ -187,10 +187,24 @@ services:
             - { name: oro_security.acl.extension, priority: 10 }
 
     oro_security.acl.provider:
-        public: false
+        public: true
         class: %oro_security.acl.provider.class%
         arguments:
             - '@oro_security.acl.object_identity_factory'
+        calls:
+            - [setUnderlyingCache, ["@security.acl.underlying.cache"]]
+
+    security.acl.underlying.cache:
+        public: false
+        class: Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache
+        arguments:
+            - "@security.acl.underlying.cache.doctrine.cache_impl"
+
+    security.acl.underlying.cache.doctrine.cache_impl:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_acl_underlying' ]]
 
     oro_security.acl.voter_link:
         tags:

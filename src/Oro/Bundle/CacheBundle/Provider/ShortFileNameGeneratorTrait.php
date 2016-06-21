@@ -27,8 +27,11 @@ trait ShortFileNameGeneratorTrait
         }
         $id = $this->removeSpecialChars($id);
 
-        return $this->getDirectory() . DIRECTORY_SEPARATOR
+        return $this->getDirectory()
+        . DIRECTORY_SEPARATOR
         . ($namespace ? $this->removeSpecialChars($namespace) . DIRECTORY_SEPARATOR : '')
+        . substr(hash('sha256', $id), 0, 2)
+        . DIRECTORY_SEPARATOR
         . $id . $this->getExtension();
     }
 
