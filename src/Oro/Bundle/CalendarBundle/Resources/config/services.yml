@@ -6,7 +6,7 @@ parameters:
     oro_calendar.listener.entity_listener.class:                 Oro\Bundle\CalendarBundle\EventListener\EntityListener
     oro_calendar.listener.datagrid.activity.class:               Oro\Bundle\CalendarBundle\EventListener\Datagrid\ActivityGridListener
     oro_calendar.listener.datagrid.system_calendar.class:        Oro\Bundle\CalendarBundle\EventListener\Datagrid\SystemCalendarGridListener
-    oro_calendar.listener.datagrid.calendar_event_grid.class:    Oro\Bundle\CalendarBundle\EventListener\Datagrid\CalendarEventGridListener
+    oro_calendar.datagrid.helper.calendar_event_grid.class:      Oro\Bundle\CalendarBundle\Datagrid\CalendarEventGridHelper
     oro_calendar.datagrid.action_permission_provider.class:      Oro\Bundle\CalendarBundle\Datagrid\ActionPermissionProvider
     oro_calendar.calendar_event.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.calendar_property.manager.api.class:            Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager
@@ -276,8 +276,8 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.system-calendar-grid, method: onBuildBefore }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.system-calendar-grid, method: onBuildAfter }
 
-    oro_calendar.listener.datagrid.calendar_event_grid:
-        class: %oro_calendar.listener.datagrid.calendar_event_grid.class%
+    oro_calendar.datagrid.helper.calendar_event_grid:
+        class: %oro_calendar.datagrid.helper.calendar_event_grid.class%
         arguments:
             - '@router'
 

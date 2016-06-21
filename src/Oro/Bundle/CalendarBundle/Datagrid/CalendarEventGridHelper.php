@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\EventListener\Datagrid;
+namespace Oro\Bundle\CalendarBundle\Datagrid;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
-class CalendarEventGridListener
+class CalendarEventGridHelper
 {
     /** @var Router */
     protected $router;
