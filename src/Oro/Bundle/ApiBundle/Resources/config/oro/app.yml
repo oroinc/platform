@@ -35,8 +35,6 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
-        entityAlias: ~
-        entityPluralAlias: ~
 
     form_types:
         - form.type.form
@@ -123,9 +121,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -141,9 +139,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -159,9 +157,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -177,9 +175,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -195,9 +193,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 load_data:
                     priority: -40
@@ -215,9 +213,9 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
-                security_check:
-                    priority: -20
                 normalize_input:
+                    priority: -20
+                security_check:
                     priority: -30
                 build_query:
                     priority: -40
@@ -233,3 +231,93 @@ oro_api:
                     priority: -90
                 normalize_result:
                     priority: -100
+        get_subresource:
+            processing_groups:
+                initialize:
+                    priority: -10
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
+                normalize_data:
+                    priority: -60
+                finalize:
+                    priority: -70
+                normalize_result:
+                    priority: -80
+        get_relationship:
+            processing_groups:
+                initialize:
+                    priority: -10
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
+                normalize_data:
+                    priority: -60
+                finalize:
+                    priority: -70
+                normalize_result:
+                    priority: -80
+        delete_relationship:
+            processing_groups:
+                initialize:
+                    priority: -10
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                load_data:
+                    priority: -40
+                transform_data:
+                    priority: -50
+                save_data:
+                    priority: -60
+                finalize:
+                    priority: -70
+                normalize_result:
+                    priority: -80
+        add_relationship:
+            processing_groups:
+                initialize:
+                    priority: -10
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                load_data:
+                    priority: -40
+                transform_data:
+                    priority: -50
+                save_data:
+                    priority: -60
+                finalize:
+                    priority: -70
+                normalize_result:
+                    priority: -80
+        update_relationship:
+            processing_groups:
+                initialize:
+                    priority: -10
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                load_data:
+                    priority: -40
+                transform_data:
+                    priority: -50
+                save_data:
+                    priority: -60
+                finalize:
+                    priority: -70
+                normalize_result:
+                    priority: -80

@@ -173,6 +173,7 @@ services:
         arguments:
             - '@oro_workflow.permission_registry'
             - '@oro_workflow.restriction.manager'
+            - '@oro_entity_config.link.entity_manager'
 
     oro_workflow.restriction.manager:
         class: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager

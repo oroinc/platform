@@ -12,6 +12,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
+use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {
@@ -90,8 +91,9 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      * @param LoggerInterface              $logger Override for default logger. If this parameter is specified
      *                                             this logger will be used instead of a logger specified
      *                                             in the constructor
+     * @param array                        $params Additional params for template renderer
      */
-    public function process($object, $notifications, LoggerInterface $logger = null)
+    public function process($object, $notifications, LoggerInterface $logger = null, $params = [])
     {
         if (!$logger) {
             $logger = $this->logger;
@@ -103,7 +105,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
                     $emailTemplate,
-                    ['entity' => $object]
+                    ['entity' => $object] + $params
                 );
             } catch (\Twig_Error $e) {
                 $identity = method_exists($emailTemplate, '__toString')
@@ -141,6 +143,22 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             }
 
             $this->addJob(self::SEND_COMMAND);
+        }
+    }
+
+    /**
+     * Add log type to log email sending
+     *
+     * @param string $logType
+     */
+    public function addLogType($logType)
+    {
+        $transport = $this->mailer->getTransport();
+        if ($transport instanceof \Swift_Transport_SpoolTransport) {
+            $spool = $transport->getSpool();
+            if ($spool instanceof DbSpool) {
+                $spool->setLogType($logType);
+            }
         }
     }
 

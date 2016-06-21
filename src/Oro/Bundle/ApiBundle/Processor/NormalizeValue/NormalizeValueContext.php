@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 class NormalizeValueContext extends ApiContext
 {
+    /** indicates whether a suitable processor has processed a value */
+    const PROCESSED = 'processed';
+
     /** a data-type of a value */
     const DATA_TYPE = 'dataType';
 
@@ -22,6 +25,26 @@ class NormalizeValueContext extends ApiContext
     {
         parent::__construct();
         $this->set(self::ARRAY_DELIMITER, ',');
+    }
+
+    /**
+     * Gets a flag indicates whether a suitable processor has processed a value.
+     *
+     * @return bool
+     */
+    public function isProcessed()
+    {
+        return (bool)$this->get(self::PROCESSED);
+    }
+
+    /**
+     * Sets a flag indicates whether a suitable processor has processed a value.
+     *
+     * @param bool $flag
+     */
+    public function setProcessed($flag)
+    {
+        $this->set(self::PROCESSED, $flag);
     }
 
     /**

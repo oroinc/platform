@@ -1,19 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matey
- * Date: 10.06.2016
- * Time: 17:54
- */
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass;
 
 class WorkflowChangesEventsCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Symfony\Component\DependencyInjection\ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $containerBuilderMock;
 
     /** @var WorkflowChangesEventsCompilerPass */
@@ -128,7 +124,6 @@ class WorkflowChangesEventsCompilerPassTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             );
-
 
         $this->setExpectedException(
             'InvalidArgumentException',
