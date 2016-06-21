@@ -443,28 +443,4 @@ class WorkflowManager
     {
         $this->getWorkflowItemRepository()->resetWorkflowData($workflowDefinition);
     }
-
-    /**
-     * Check that entity workflow item is equal to the active workflow item.
-     *
-     * @param object $entity
-     * @param WorkflowItem $currentWorkflowItem
-     * @return bool
-     */
-    public function isResetAllowed($entity, WorkflowItem $currentWorkflowItem)
-    {
-        $activeWorkflows = $this->getApplicableWorkflows($entity);
-
-        if (!count($activeWorkflows)) {
-            return false;
-        }
-
-        foreach ($activeWorkflows as $activeWorkflow) {
-            if ($activeWorkflow->getName() === $currentWorkflowItem->getWorkflowName()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

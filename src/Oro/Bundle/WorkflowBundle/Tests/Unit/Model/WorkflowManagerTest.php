@@ -601,71 +601,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $workflowItemDefinition
-     * @param string $activeDefinition
-     * @param bool $result
-     * @dataProvider getActiveWorkflowDataProvider
-     */
-    public function testIsResetAllowed($workflowItemDefinition, $activeDefinition, $result)
-    {
-        $entity = new \DateTime('now');
-        $entityId = 1;
-        $entityClass = get_class($entity);
-        $workflowItem = null === $workflowItemDefinition ? null : $this->createWorkflowItem($workflowItemDefinition);
-
-        if (null === $activeDefinition) {
-            $workflow = null;
-        } else {
-            /**@var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
-            $workflow = $this->getMockBuilder(Workflow::class)
-                ->disableOriginalConstructor()
-                ->setMethods(null)
-                ->getMock();
-            $workflow->setName($activeDefinition);
-        }
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityClass')
-            ->with($entity)
-            ->will($this->returnValue($entityClass));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifier')
-            ->with($entity)
-            ->will($this->returnValue($entityId));
-
-        $workflowItemsRepository =
-            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
-                ->disableOriginalConstructor()
-                ->setMethods(['findByEntityMetadata'])
-                ->getMock();
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getRepositoryForClass')
-            ->with(WorkflowItem::class)
-            ->will($this->returnValue($workflowItemsRepository));
-        $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflowsByEntityClass')
-            ->with($entityClass)
-            ->willReturn($workflow ? [$workflow] : []);
-
-        $this->assertEquals($result, $this->workflowManager->isResetAllowed($entity, $workflowItem));
-    }
-
-    /**
-     * @return array
-     */
-    public function getActiveWorkflowDataProvider()
-    {
-        return [
-            ['active-workflow', 'active-workflow', false],
-            ['active-workflow', 'current-workflow', true],
-            ['current-workflow', null, false],
-            ['active-workflow', null, false],
-        ];
-    }
-
-    /**
      * @param mixed $entityId
      * @param WorkflowItem[] $workflowItems
      *
@@ -795,6 +730,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getStartTransitions')
             ->will($this->returnValue(new ArrayCollection($startTransitions)));
 
+        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -805,7 +742,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs(
-                [$aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
             )
             ->setMethods(
                 [

@@ -53,10 +53,6 @@ class WidgetController extends Controller
         foreach ($workflowItems as $workflowItem) {
             $name = $workflowItem->getWorkflowName();
 
-            if ($workflowManager->isResetAllowed($entity, $workflowItem)) {
-                continue;
-            }
-
             $workflow = $workflowManager->getWorkflow($name);
             if ($workflow->getDefinition()->isStepsDisplayOrdered()) {
                 $steps = $workflow->getStepManager()->getOrderedSteps();
@@ -268,14 +264,6 @@ class WidgetController extends Controller
         $workflowItems = $workflowManager->getWorkflowItemsByEntity($entity);
         foreach ($workflowItems as $workflowItem) {
             $name = $workflowItem->getWorkflowName();
-
-            if ($workflowManager->isResetAllowed($entity, $workflowItem)) {
-                $workflowsData[$name]['resetAllowed'] = true;
-                $workflowsData[$name]['workflowItem'] = $workflowItem;
-                $workflowsData[$name]['transitionsData'] = [];
-
-                continue;
-            }
 
             $workflowsData[$name]['transitionsData'] = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
         }

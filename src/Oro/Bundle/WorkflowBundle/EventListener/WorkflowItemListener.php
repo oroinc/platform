@@ -24,7 +24,7 @@ class WorkflowItemListener
     /**
      * @var array
      */
-    protected $entitiesScheduledForWorkflowStart = array();
+    protected $entitiesScheduledForWorkflowStart = [];
 
     /**
      * @var int
@@ -61,14 +61,14 @@ class WorkflowItemListener
     {
         $entity = $args->getEntity();
         $activeWorkflows = $this->workflowManager->getApplicableWorkflows($entity);
-    
-        if($activeWorkflows) {
+
+        if ($activeWorkflows) {
             foreach ($activeWorkflows as $activeWorkflow) {
                 if ($activeWorkflow->getStepManager()->hasStartStep()) {
-                    $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = array(
+                    $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = [
                         'entity' => $entity,
                         'workflow' => $activeWorkflow
-                    );
+                    ];
                 }
             }
         }
