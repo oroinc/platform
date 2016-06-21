@@ -1,7 +1,6 @@
 parameters:
     oro_workflow.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
-    oro_workflow.datagrid.action.workflow_activate.class: Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.process_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
     oro_workflow.process_trigger.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
@@ -60,7 +59,7 @@ services:
         deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.context_accessor" instead
 
     oro_workflow.datagrid.action.workflow_activate:
-        class: %oro_workflow.datagrid.action.workflow_activate.class%
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction'
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-activate }
