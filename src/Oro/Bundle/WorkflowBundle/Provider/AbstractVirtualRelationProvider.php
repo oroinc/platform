@@ -52,7 +52,7 @@ abstract class AbstractVirtualRelationProvider implements VirtualRelationProvide
     public function isVirtualRelation($className, $fieldName)
     {
         return $fieldName === $this->getRelationName()
-            && $this->workflowManager->hasApplicableWorkflowsByEntityClass($className);
+            && $this->workflowManager->hasApplicableWorkflows($className);
     }
 
     /**
@@ -60,7 +60,7 @@ abstract class AbstractVirtualRelationProvider implements VirtualRelationProvide
      */
     public function getVirtualRelations($className)
     {
-        if ($this->workflowManager->hasApplicableWorkflowsByEntityClass($className)) {
+        if ($this->workflowManager->hasApplicableWorkflows($className)) {
             return [
                 $this->getRelationName() => $this->getRelationDefinition(
                     $className,

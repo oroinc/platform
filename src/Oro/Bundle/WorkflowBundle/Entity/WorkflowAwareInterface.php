@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+/**
+ * @deprecated
+ * todo: remove after BAP-10823
+ */
 interface WorkflowAwareInterface
 {
     /**

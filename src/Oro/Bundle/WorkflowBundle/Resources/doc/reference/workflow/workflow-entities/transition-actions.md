@@ -141,13 +141,15 @@ Transit Workflow
 **Parameters:**
  - entity (or first parameter) - path to entity used for transition operation;
  - transition (or second parameter) - name of the transition;
- - data (or third parameter) - (optional) additional data passed to workflow item before transition;
+ - workflow (or third parameter) - name of the workflow;
+ - data (or fourth parameter) - (optional) additional data passed to workflow item before transition;
  
 **Configuration Example**
 ```
 - @transit_workflow:
     entity: $opportunity
     transition: develop
+    workflow: opportunity_flow
     data:
         budget_amount: 1000
         probability: 0.95
@@ -160,6 +162,7 @@ OR
     parameters:
         entity: $opportunity
         transition: develop
+        workflow: opportunity_flow
         data:
             budget_amount: 1000
             probability: 0.95
@@ -167,5 +170,5 @@ OR
 OR
 
 - @transit_workflow:
-    [$opportunity, 'develop', { budget_amount: 1000, probability: 0.95 }]
+    [$opportunity, 'develop', 'opportunity_flow', { budget_amount: 1000, probability: 0.95 }]
 ```

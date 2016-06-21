@@ -54,7 +54,7 @@ class WorkflowStepSelectType extends AbstractType
                             $workflowName = $options['workflow_name'];
                             $workflow = $workflowManager->getWorkflow($workflowName);
                         } elseif (isset($options['workflow_entity_class'])) {
-                            //todo fix in scope of BAP-10514
+                            //todo fix in scope of BAP-10801
                             $workflow = $workflowManager
                                 ->getApplicableWorkflowByEntityClass($options['workflow_entity_class']);
                         } else {
