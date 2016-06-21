@@ -26,7 +26,8 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
-        $this->repository = $this->getMockBuilder(WorkflowRestrictionRepository::class)->disableOriginalConstructor()->getMock();
+        $this->repository = $this->getMockBuilder(WorkflowRestrictionRepository::class)
+            ->disableOriginalConstructor()->getMock();
 
         $this->restrictionManager = new RestrictionManager(
             $this->workflowManager,
@@ -53,7 +54,6 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             ]);
 
-        /** \Oro\Bundle\WorkflowBundle\Model\Workflow|\PHPUnit_Framework_MockObject_MockObject */
         $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
         $workflow->expects($this->once())->method('getName')->willReturn('test_workflow');
 

@@ -128,8 +128,13 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
      * @param array $expectedData
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options, $expectedEntity, $expectedTransition, $expectedWorkflow, $expectedData = [])
-    {
+    public function testInitialize(
+        array $options,
+        $expectedEntity,
+        $expectedTransition,
+        $expectedWorkflow,
+        array $expectedData = []
+    ) {
         $this->action->initialize($options);
         $this->assertAttributeEquals($expectedEntity, 'entity', $this->action);
         $this->assertAttributeEquals($expectedTransition, 'transition', $this->action);

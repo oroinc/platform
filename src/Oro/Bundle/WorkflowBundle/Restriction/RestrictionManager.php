@@ -189,9 +189,9 @@ class RestrictionManager
     }
 
     /**
-     * @param array[] $restrictions raw WorkflowRestriction array
+     * @param array $restrictions raw WorkflowRestriction array
      *
-     * @return array[]
+     * @return array
      */
     protected function filterByActiveWorkflows(array $restrictions)
     {

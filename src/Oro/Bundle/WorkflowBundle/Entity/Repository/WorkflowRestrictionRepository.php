@@ -11,7 +11,7 @@ class WorkflowRestrictionRepository extends EntityRepository
     /**
      * @param $entityClass
      *
-     * @return array[]
+     * @return array
      */
     public function getClassRestrictions($entityClass)
     {

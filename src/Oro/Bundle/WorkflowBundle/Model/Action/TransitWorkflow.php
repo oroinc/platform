@@ -14,6 +14,11 @@ use Oro\Component\Action\Model\ContextAccessor;
  */
 class TransitWorkflow extends ComponentAbstractAction
 {
+    const OPTION_INDEX_ENTITY = 0;
+    const OPTION_INDEX_TRANSITION = 1;
+    const OPTION_INDEX_WORKFLOW = 2;
+    const OPTION_INDEX_DATA = 3;
+
     /**
      * @var WorkflowManager
      */
@@ -81,32 +86,32 @@ class TransitWorkflow extends ComponentAbstractAction
     {
         if (isset($options['entity'])) {
             $this->entity = $options['entity'];
-        } elseif (isset($options[0])) {
-            $this->entity = $options[0];
+        } elseif (isset($options[self::OPTION_INDEX_ENTITY])) {
+            $this->entity = $options[self::OPTION_INDEX_ENTITY];
         } else {
             throw new InvalidParameterException('Option "entity" is required.');
         }
         
         if (isset($options['transition'])) {
             $this->transition = $options['transition'];
-        } elseif (isset($options[1])) {
-            $this->transition = $options[1];
+        } elseif (isset($options[self::OPTION_INDEX_TRANSITION])) {
+            $this->transition = $options[self::OPTION_INDEX_TRANSITION];
         } else {
             throw new InvalidParameterException('Option "transition" is required.');
         }
 
-        if(isset($options['workflow'])) {
+        if (isset($options['workflow'])) {
             $this->workflow = $options['workflow'];
-        } elseif (isset($options[2])) {
-            $this->workflow = $options[2];
+        } elseif (isset($options[self::OPTION_INDEX_WORKFLOW])) {
+            $this->workflow = $options[self::OPTION_INDEX_WORKFLOW];
         } else {
             throw new InvalidParameterException('Option "workflow" is required.'); //todo update doc
         }
 
         if (isset($options['data'])) {
             $this->data = $options['data'];
-        } elseif (isset($options[3])) {
-            $this->data = $options[3];
+        } elseif (isset($options[self::OPTION_INDEX_DATA])) {
+            $this->data = $options[self::OPTION_INDEX_DATA];
         }
     }
 

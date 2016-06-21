@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
@@ -35,7 +36,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var \Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowSystemConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowSystemConfig;
 
     protected function setUp()
@@ -580,9 +581,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->expects($this->once())->method('getEntityClass')->with($entity)
             ->willReturn(EntityStub::class);
         $repository->expects($this->once())->method('findOneByEntityMetadata')
-            ->with(
-                EntityStub::class, 42, $workflowName
-            )
+            ->with(EntityStub::class, 42, $workflowName)
             ->willReturn(['result']);
 
         $result = $this->workflowManager->getWorkflowItem($entity, $workflowName);

@@ -65,7 +65,7 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
         $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflowsByEntityClass')->willReturn(false);
+            ->method('hasApplicableWorkflows')->willReturn(false);
 
         $this->assertFalse(
             $this->provider->isVirtualRelation('stdClass', $this->getRelationName())
@@ -77,20 +77,19 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
         $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflowsByEntityClass')
+            ->method('hasApplicableWorkflows')
             ->with('stdClass')
             ->willReturn(true);
 
         $this->assertTrue($this->provider->isVirtualRelation('stdClass', $this->getRelationName()));
     }
 
-    // testGetVirtualRelations
     public function testGetVirtualRelationsAndNoApplicableWorkflows()
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
         $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflowsByEntityClass')->willReturn(false);
+            ->method('hasApplicableWorkflows')->willReturn(false);
 
         $this->assertEquals([], $this->provider->getVirtualRelations('stdClass'));
     }
@@ -103,7 +102,7 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
             ->willReturn('id');
 
         $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflowsByEntityClass')
+            ->method('hasApplicableWorkflows')
             ->with('stdClass')
             ->willReturn(true);
 
@@ -119,7 +118,7 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
         $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflowsByEntityClass')->willReturn(false);
+            ->method('hasApplicableWorkflows')->willReturn(false);
 
         $this->assertEquals([], $this->provider->getVirtualRelationQuery('stdClass', 'field1'));
     }
@@ -129,7 +128,7 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
         $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifierFieldName');
 
         $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflowsByEntityClass')->willReturn(true);
+            ->method('hasApplicableWorkflows')->willReturn(true);
 
         $this->assertEquals([], $this->provider->getVirtualRelationQuery('stdClass', 'unknown_field'));
     }
@@ -141,7 +140,7 @@ abstract class AbstractVirtualRelationProviderTest extends \PHPUnit_Framework_Te
             ->willReturn('id');
 
         $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflowsByEntityClass')->willReturn(true);
+            ->method('hasApplicableWorkflows')->willReturn(true);
 
         $this->assertEquals(
             $this->getVirtualRelationsQuery('stdClass', 'id'),

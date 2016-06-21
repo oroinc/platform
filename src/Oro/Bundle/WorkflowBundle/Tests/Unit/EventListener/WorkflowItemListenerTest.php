@@ -174,7 +174,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntity')
             ->will($this->returnValue($entity));
         $this->workflowManager->expects($this->atLeastOnce())
-            ->method('getApplicableWorkflow')
+            ->method('getApplicableWorkflows')
             ->with($entity);
 
         $this->listener->postPersist($event);
@@ -204,9 +204,9 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($stepManager));
 
         $this->workflowManager->expects($this->atLeastOnce())
-            ->method('getApplicableWorkflow')
+            ->method('getApplicableWorkflows')
             ->with($entity)
-            ->will($this->returnValue($workflow));
+            ->willReturn([$workflow]);
 
         $this->listener->postPersist($event);
         $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
@@ -219,15 +219,15 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 
         list($event, $workflow) = $this->prepareEventForWorkflow($entity);
         $this->workflowManager->expects($this->at(0))
-            ->method('getApplicableWorkflow')
+            ->method('getApplicableWorkflows')
             ->with($entity)
-            ->will($this->returnValue($workflow));
+            ->willReturn([$workflow]);
 
         list($childEvent, $childWorkflow) = $this->prepareEventForWorkflow($childEntity);
         $this->workflowManager->expects($this->at(2))
-            ->method('getApplicableWorkflow')
+            ->method('getApplicableWorkflows')
             ->with($childEntity)
-            ->will($this->returnValue($childWorkflow));
+            ->willReturn([$childWorkflow]);
 
         $this->listener->postPersist($event);
 
