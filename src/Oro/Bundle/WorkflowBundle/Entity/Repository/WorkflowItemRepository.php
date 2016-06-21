@@ -169,4 +169,81 @@ class WorkflowItemRepository extends EntityRepository
 
         $entityManager->createQuery($deleteDql)->execute();
     }
+
+    /**
+     * @param string $entityClass
+     * @param array $entityIds
+     * @return array
+     */
+    public function getGroupedWorkflowNameAndWorkflowStepName($entityClass, array $entityIds)
+    {
+        $qb = $this->createQueryBuilder('wi');
+        $qb->select('wi.entityId AS entityId, d.label AS workflowName, ws.label AS stepName')
+            ->join('wi.currentStep', 'ws')
+            ->join('wi.definition', 'd')
+            ->where(
+                $qb->expr()->eq('wi.entityClass', ':entityClass'),
+                $qb->expr()->in('wi.entityId', ':entityId')
+            )
+            ->setParameter('entityClass', $entityClass)
+            ->setParameter('entityId', $entityIds);
+
+        $items = $qb->getQuery()->getArrayResult();
+
+        $result = [];
+        foreach ($items as $item) {
+            $result[$item['entityId']][] = $item;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param array $workflowStepIds
+     * @return array
+     */
+    public function getEntityIdsByEntityClassAndWorkflowStepIds($entityClass, array $workflowStepIds)
+    {
+        $qb = $this->createQueryBuilder('wi');
+        $qb->select('wi.entityId AS id')
+            ->join('wi.currentStep', 'ws')
+            ->where(
+                $qb->expr()->eq('wi.entityClass', ':entityClass'),
+                $qb->expr()->in('ws.id', ':stepIds')
+            )
+            ->setParameter('entityClass', $entityClass)
+            ->setParameter('stepIds', $workflowStepIds);
+
+        return array_map(
+            function ($item) {
+                return $item['id'];
+            },
+            $qb->getQuery()->getArrayResult()
+        );
+    }
+
+    /**
+     * @param string $entityClass
+     * @param array $workflowNames
+     * @return array
+     */
+    public function getEntityIdsByEntityClassAndWorkflowNames($entityClass, array $workflowNames)
+    {
+        $qb = $this->createQueryBuilder('wi');
+        $qb->select('wi.entityId AS id')
+            ->where(
+                $qb->expr()->eq('wi.entityClass', ':entityClass'),
+                $qb->expr()->in('IDENTITY(wi.definition)', ':workflowNames')
+            )
+            ->setParameter('entityClass', $entityClass)
+            ->setParameter('workflowNames', $workflowNames);
+
+        return array_map(
+            function ($item) {
+                return $item['id'];
+            },
+            $qb->getQuery()->getArrayResult()
+        );
+    }
 }
