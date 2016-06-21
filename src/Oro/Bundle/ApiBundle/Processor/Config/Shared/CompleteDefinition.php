@@ -7,15 +7,20 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
- * Adds fields and associations which were not configured yet based on an entity metadata.
- * Marks all not accessible fields and associations as excluded.
- * The entity exclusion provider is used.
- * Sets "identifier only" configuration for all associations which were not configured yet.
+ * If "identifier_fields_only" config extra is not exist:
+ * * Adds fields and associations which were not configured yet based on an entity metadata.
+ * * Marks all not accessible fields and associations as excluded.
+ * * The entity exclusion provider is used.
+ * * Sets "identifier only" configuration for all associations which were not configured yet.
+ * If "identifier_fields_only" config extra exists:
+ * * Adds identifier fields which were not configured yet based on an entity metadata.
+ * * Removes all other fields and association.
  */
 class CompleteDefinition implements ProcessorInterface
 {
@@ -56,15 +61,6 @@ class CompleteDefinition implements ProcessorInterface
             return;
         }
 
-        $this->completeDefinition($definition, $entityClass);
-    }
-
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     */
-    protected function completeDefinition(EntityDefinitionConfig $definition, $entityClass)
-    {
         $existingFields = [];
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
@@ -72,8 +68,37 @@ class CompleteDefinition implements ProcessorInterface
             $existingFields[$propertyPath] = $fieldName;
         }
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $this->completeFields($definition, $metadata, $existingFields);
-        $this->completeAssociations($definition, $metadata, $existingFields);
+        if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
+            $this->completeIdentifierFields($definition, $metadata, $existingFields);
+        } else {
+            $this->completeFields($definition, $metadata, $existingFields);
+            $this->completeAssociations($definition, $metadata, $existingFields);
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ClassMetadata          $metadata
+     * @param array                  $existingFields [property path => field name, ...]
+     */
+    protected function completeIdentifierFields(
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata,
+        array $existingFields
+    ) {
+        // make sure all identifier fields are added
+        $idFieldNames = $metadata->getIdentifierFieldNames();
+        foreach ($idFieldNames as $propertyPath) {
+            if (!isset($existingFields[$propertyPath])) {
+                $definition->addField($propertyPath);
+            }
+        }
+        // remove all not identifier fields
+        foreach ($existingFields as $propertyPath => $fieldName) {
+            if (!in_array($propertyPath, $idFieldNames, true)) {
+                $definition->remove($fieldName);
+            }
+        }
     }
 
     /**

@@ -92,7 +92,7 @@ php app/console oro:api:config:dump addresses --section=relations
 ```
 
 By default no extra configuration data are added into output, but they can be added with the `--extra` option.
-The value for `extra` option can be: actions, definition, filters, sorters, virtual_fields, descriptions or the full name of a class implements [ConfigExtraInterface](../../Config/ConfigExtraInterface.php), e.g.
+The value for `extra` option can be: actions, definition, filters, sorters, descriptions or the full name of a class implements [ConfigExtraInterface](../../Config/ConfigExtraInterface.php), e.g.
 
 ```bash
 php app/console oro:api:config:dump users --extra=filters --extra=sorters
