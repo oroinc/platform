@@ -106,7 +106,7 @@ class WorkflowRegistry
      * @param string $entityClass
      * @return bool
      */
-    public function hasActiveWorkflowByEntityClass($entityClass)
+    public function hasActiveWorkflowsByEntityClass($entityClass)
     {
         return count($this->getActiveWorkflowsByEntityClass($entityClass)) > 0;
     }

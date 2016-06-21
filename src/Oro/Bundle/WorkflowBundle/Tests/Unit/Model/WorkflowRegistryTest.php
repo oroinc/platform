@@ -221,7 +221,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->willReturn($workflowDefinition);
 
 
-        $this->assertEquals($expected, $this->registry->hasActiveWorkflowByEntityClass($entityClass));
+        $this->assertEquals($expected, $this->registry->hasActiveWorkflowsByEntityClass($entityClass));
     }
 
     /**
