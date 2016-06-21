@@ -25,7 +25,7 @@ class ValidateRequestDataExist implements ProcessorInterface
             $context->addError(
                 Error::createValidationError(
                     Constraint::REQUEST_DATA,
-                    'The request data should not be empty.'
+                    'The request data should not be empty'
                 )
             );
         }

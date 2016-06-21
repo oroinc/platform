@@ -80,16 +80,7 @@ class LoadEntityMetadata implements ProcessorInterface
                 $normalizedIdFieldNames = [];
                 foreach ($idFieldNames as $propertyPath) {
                     $fieldName = $config->findFieldNameByPropertyPath($propertyPath);
-                    if (!$fieldName) {
-                        throw new \RuntimeException(
-                            sprintf(
-                                'The "%s" entity does not have a configuration for the identifier field "%s".',
-                                $entityMetadata->getClassName(),
-                                $propertyPath
-                            )
-                        );
-                    }
-                    $normalizedIdFieldNames[] = $fieldName;
+                    $normalizedIdFieldNames[] = $fieldName ?: $propertyPath;
                 }
                 $entityMetadata->setIdentifierFieldNames($normalizedIdFieldNames);
             }
