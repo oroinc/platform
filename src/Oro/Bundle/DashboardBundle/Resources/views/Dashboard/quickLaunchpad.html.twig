@@ -4,15 +4,13 @@
 
 {% block content %}
     <ul class="quick-launchpad-toolbar">
-        {% set itemWidth = items|length > 0 ? (100 / items|length)|round(1) : 100 %}
         {% for item in items %}
-            <li style="width: {{ loop.last ? 100 - ((items|length - 1) * itemWidth) : itemWidth }}%">
-                <a href="{{ path(item.route, item.route_parameters) }}">
-                    <span class="title-box">{{ item.label|trans }}</span>
-                    <span class="list-content">
-                        <i class="icon-{{ item.icon }}"></i>
-                    </span>
-                </a>
+            <li>
+                <span class="title-box">{{ item.label|trans }}</span>
+                <span class="list-content">
+                    <i class="icon-{{ item.icon }}"></i>
+                </span>
+                <a href="{{ path(item.route, item.route_parameters) }}"></a>
             </li>
         {% endfor %}
     </ul>

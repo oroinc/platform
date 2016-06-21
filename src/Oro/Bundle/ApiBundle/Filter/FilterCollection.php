@@ -69,6 +69,16 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
+     * Checks whether the collection is empty (contains no elements).
+     *
+     * @return boolean TRUE if the collection is empty, FALSE otherwise.
+     */
+    public function isEmpty()
+    {
+        return empty($this->filters);
+    }
+
+    /**
      * Returns all filters in this collection.
      *
      * @return FilterInterface[]

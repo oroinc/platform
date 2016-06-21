@@ -88,7 +88,7 @@ define(function(require) {
         if (isActive && ($dropdownMenu = $parent.find('.dropdown-menu:first')).length) {
             var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
                 display: 'block',
-                width: $dropdownMenu.outerWidth()
+                width: $dropdownMenu.outerWidth() + 1
             });
             var originalPosition = {
                 parent: $parent.offset(),
@@ -192,7 +192,7 @@ define(function(require) {
     (function() {
         function makeFloating($toggle, $dropdownMenu) {
             if (!$toggle.data('container')) {
-                $toggle.data('container', 'body');
+                $toggle.data('container', 'body, .ui-dialog');
             }
             $toggle.dropdown('detach', true);
             var $placeholder = $toggle.data('related-data').$placeholder;
