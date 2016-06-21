@@ -86,9 +86,8 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
         $this->baseProvider->expects($this->never())
             ->method('cacheEmptyAcl');
-        // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
-        //$this->baseProvider->expects($this->never())
-        //    ->method('cacheWithUnderlyingAcl');
+        $this->underlyingCache->expects($this->never())
+            ->method('cacheUnderlying');
 
         $this->setFindAclExpectation(
             [
