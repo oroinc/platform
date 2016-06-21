@@ -90,11 +90,13 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
-        return array_map(
-            function ($activeWorkflowName) {
-                return $this->getWorkflow($activeWorkflowName, false);
-            },
-            $this->configManager->getActiveWorkflowNamesByEntity($entityClass)
+        return array_filter(
+            array_map(
+                function ($activeWorkflowName) {
+                    return $this->getWorkflow($activeWorkflowName, false);
+                },
+                $this->configManager->getActiveWorkflowNamesByEntity($entityClass)
+            )
         );
     }
 

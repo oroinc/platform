@@ -392,7 +392,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMassStartWorkflow(array $source, array $expected)
     {
-
         $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class);
 
         if ($expected) {
