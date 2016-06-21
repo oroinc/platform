@@ -43,6 +43,21 @@ app/console oro:install  --force --drop-database --user-name=admin --user-email=
 
 ### Run tests
 
+#### Configuration
+
+Base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
+Use it by parameter ```-c``` for use your custom config:
+
+```bash
+bin/behat -s OroUserBundle -c ~/config/behat.yml.dist
+```
+
+However you can copy behat.yml.dist to behat.yml in root of application and edit for your needs.
+Every bundle that configured symfony_bundle suite type will not be autoloaded by ```OroTestFrameworkExtension```. 
+See ***Architecture*** reference below.
+
+#### Run browser emulator
+
 For execute features you need browser emulator demon (Selenium2 or PhantomJs) runing.
 
 Install PhantomJs:
@@ -57,7 +72,7 @@ ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phanto
 Run PhantomJs:
 
 ```bash
-phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1 &
+phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1
 ```
 
 Install Selenium2
@@ -70,8 +85,19 @@ curl -L http://selenium-release.storage.googleapis.com/2.52/selenium-server-stan
 Run Selenium2:
 
 ```bash
-java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1 &
+java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1
 ```
+
+> For run emulator in background add ampersand symbol (&) to the end of line:
+> ```bash
+> phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1 &
+> ```
+> and
+> ```bash
+> java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1 &
+> ```
+
+#### Run tests
 
 Run tests with Selenium and Firefox:
 
@@ -153,19 +179,6 @@ Login:
 
 Every feature can interact with application, perform CRUD operation and thereby the database can be modified.
 So, it is why features are isolated each other. The isolation is reached by dumping the database before execution of tests and restoring the database after execution of any feature.
-
-### Configuration
-
-Base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
-Use it by parameter ```-c``` for use your custom config:
-
-```bash
-bin/behat -s OroUserBundle -c ~/config/behat.yml.dist
-```
-
-However you can copy behat.yml.dist to behat.yml in root of project and edit for your needs.
-Every bundle that configured symfony_bundle suite type will not be autoloaded by ```OroTestFrameworkExtension```. 
-See ***Architecture*** reference above.
 
 ### Write your first feature
 

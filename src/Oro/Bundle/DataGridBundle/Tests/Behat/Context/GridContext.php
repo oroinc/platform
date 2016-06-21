@@ -129,7 +129,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @Given /^(?:|I )click (?P<action>(?:[^"]|\\")*) (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click (?P<action>(?:\w+|!on)) (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickActionInRow($content, $action)
     {

@@ -25,15 +25,15 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
         $page->find('css', '.dropdown-organization-switcher')->clickLink($organization);
     }
 
+    //@codingStandardsIgnoreStart
     /**
-     * @codingStandardsIgnoreStart
      * Set access level for action for specified entity for admin user
      * Example: Given my permissions on Delete Cases is set to System
      * @Given /^(?:|I )have "(?P<accessLevel>(?:[^"]|\\")*)" permissions for "(?P<action>(?:[^"]|\\")*)" "(?P<entity>(?:[^"]|\\")*)" entity$/
      * @Given /^my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) is set to (?P<accessLevel>(?:[^"]|\\")*)$/
      * @When /^(?:|I )set my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) to (?P<accessLevel>(?:[^"]|\\")*)$/
-     * @codingStandardsIgnoreEnd
      */
+    //@codingStandardsIgnoreEnd
     public function iHavePermissionsForEntity($entity, $action, $accessLevel)
     {
         $this->getMink()->setDefaultSessionName('second_session');
@@ -52,14 +52,14 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
+    //@codingStandardsIgnoreStart
     /**
-     * @codingStandardsIgnoreStart
      * Set access level for several actions for specified entity for admin user
      * Example: Given my permissions on View Accounts as User and on Delete as System
      * Example: Given my permissions on View Cases as System and on Delete as User
      * @Given /^my permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) as (?P<accessLevel1>(?:[^"]|\\")*) and on (?P<action2>(?:|View|Create|Edit|Delete|Assign|Share)) as (?P<accessLevel2>(?:[^"]|\\")*)$/
-     * @codingStandardsIgnoreEnd
      */
+    //@codingStandardsIgnoreEnd
     public function iHaveSeveralPermissionsForEntity($entity, $action1, $accessLevel1, $action2, $accessLevel2)
     {
         $this->getMink()->setDefaultSessionName('second_session');
