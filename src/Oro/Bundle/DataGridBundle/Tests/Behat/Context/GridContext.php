@@ -6,7 +6,10 @@ use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
@@ -37,11 +40,27 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * @Given number of records should be :number
+     */
+    public function numberOfRecordsShouldBe($number)
+    {
+        expect($this->getGridPaginator()->getTotalRecordsCount())->toBe((int) $number);
+    }
+
+    /**
+     * @Given number of pages should be :number
+     */
+    public function numberOfPagesShouldBe($number)
+    {
+        expect($this->getGridPaginator()->getTotalPageCount())->toBe((int) $number);
+    }
+
+    /**
      * @Given /^(?:|I )keep in mind number of records in list$/
      */
     public function iKeepInMindNumberOfRecordsInList()
     {
-        $this->gridRecordsNumber = $this->getGrid()->getRecordsNumber();
+        $this->gridRecordsNumber = $this->getGridPaginator()->getTotalRecordsCount();
     }
 
     /**
@@ -76,7 +95,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function theNumberOfRecordsDecreasedBy($number)
     {
         expect($this->gridRecordsNumber - $number)
-            ->toBeEqualTo($this->getGrid()->getRecordsNumber());
+            ->toBeEqualTo($this->getGridPaginator()->getTotalRecordsCount());
     }
 
     /**
@@ -86,15 +105,112 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function theNumberOfRecordsRemainedTheSame()
     {
         expect($this->gridRecordsNumber)
-            ->toBeEqualTo($this->getGrid()->getRecordsNumber());
+            ->toBeEqualTo($this->getGridPaginator()->getTotalRecordsCount());
     }
 
     /**
      * @Given I select :number from per page list dropdown
+     * @Given I select :number records per page
      */
     public function iSelectFromPerPageListDropdown($number)
     {
         $this->getGrid()->selectPageSize($number);
+    }
+
+    /**
+     * @When I press next page button
+     */
+    public function iPressNextPageButton()
+    {
+        $this->getGridPaginator()->clickLink('Next');
+    }
+
+    /**
+     * @Then number of page should be :number
+     */
+    public function numberOfPageShouldBe($number)
+    {
+        expect($this->getGridPaginator()->find('css', 'input[type="number"]')->getAttribute('value'))
+            ->toBe($number);
+    }
+
+    /**
+     * @When I fill :number in page number input
+     */
+    public function iFillInPageNumberInput($number)
+    {
+        $this->getGridPaginator()->find('css', 'input[type="number"]')->setValue($number);
+    }
+
+    /**
+     * @When /^(?:|when )(?:|I )sort grid by (?P<field>([\w\s]*[^again]))(?:| again)$/
+     */
+    public function sortGridBy($field)
+    {
+        $this->elementFactory->createElement('GridHeader')->getHeaderLink($field)->click();
+    }
+
+    /**
+     * @codingStandardsIgnoreStart
+     * @Then /^(?P<column>([\w\s]+)) in (?P<rowNumber1>(first|second|[\d]+)) row must be (?P<comparison>(lower|greater|equal)) then in (?P<rowNumber2>(first|second|[\d]+)) row$/
+     * @codingStandardsIgnoreEnd
+     */
+    public function compareRowValues($column, $comparison, $rowNumber1, $rowNumber2)
+    {
+        $value1 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber1));
+        $value2 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber2));
+
+        switch ($comparison) {
+            case 'lower':
+                expect($value1 < $value2)->toBe(true);
+                break;
+            case 'greater':
+                expect($value1 > $value2)->toBe(true);
+                break;
+            case 'equal':
+                expect($value1 == $value2)->toBe(true);
+                break;
+        }
+    }
+
+    /**
+     * @Then /^(?P<content>([\w\s]+)) must be (?P<rowNumber>(first|second|[\d]+)) record$/
+     */
+    public function assertRowContent($content, $rowNumber)
+    {
+        $row = $this->getGrid()->getRowByNumber($this->getNumberFromString($rowNumber));
+        expect($row->getText())->toMatch(sprintf('/%s/i', $content));
+    }
+
+    /**
+     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s]+))"$/
+     */
+    public function applyStringFilter($filterName, $type, $value)
+    {
+        /** @var GridFilterStringItem $filterItem */
+        $filterItem = $this->getGridFilters()->getFilterItem('GridFilterStringItem', $filterName);
+
+        $filterItem->activate();
+        $filterItem->selectType($type);
+        $filterItem->setFilterValue($value);
+        $filterItem->submit();
+    }
+
+    /**
+     * @codingStandardsIgnoreStart
+     * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>([\w\s]+))" and "(?P<end>([\w\s]+))"/
+     * @codingStandardsIgnoreEnd
+     */
+    public function appllyDateTimeFilter($filterName, $type, $start, $end)
+    {
+        /** @var GridFilterDateTimeItem $filterItem */
+        $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
+
+        $filterItem->activate();
+        $filterItem->selectType($type);
+        $filterItem->setStartTime(new \DateTime($start));
+        $filterItem->setEndTime(new \DateTime($end));
+        $filterItem->submit();
     }
 
     /**
@@ -200,10 +316,42 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * @param string $stringNumber
+     * @return int
+     */
+    private function getNumberFromString($stringNumber)
+    {
+        switch (trim($stringNumber)) {
+            case 'first':
+                return 1;
+            case 'second':
+                return 2;
+            default:
+                return (int) $stringNumber;
+        }
+    }
+
+    /**
      * @return GridElement
      */
     private function getGrid()
     {
         return $this->elementFactory->createElement('Grid');
+    }
+
+    /**
+     * @return GridPaginator
+     */
+    private function getGridPaginator()
+    {
+        return $this->elementFactory->createElement('GridPaginator');
+    }
+
+    /**
+     * @return GridFilters
+     */
+    private function getGridFilters()
+    {
+        return $this->elementFactory->createElement('GridFilters');
     }
 }
