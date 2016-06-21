@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\SimpleProcessorFactory;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 
@@ -18,6 +18,12 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var ProcessorBag */
     protected $processorBag;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $metadataProvider;
+
     /** @var RequestActionProcessor */
     protected $processor;
 
@@ -29,7 +35,19 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processorBag->addGroup('group2', self::TEST_ACTION);
         $this->processorBag->addGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP, self::TEST_ACTION);
 
-        $this->processor = new RequestActionProcessor($this->processorBag, self::TEST_ACTION);
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->processor = new RequestActionProcessor(
+            $this->processorBag,
+            self::TEST_ACTION,
+            $this->configProvider,
+            $this->metadataProvider
+        );
     }
 
     /**
@@ -37,14 +55,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getContext()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $context = new Context($configProvider, $metadataProvider);
+        $context = new Context($this->configProvider, $this->metadataProvider);
         $context->setAction(self::TEST_ACTION);
 
         return $context;

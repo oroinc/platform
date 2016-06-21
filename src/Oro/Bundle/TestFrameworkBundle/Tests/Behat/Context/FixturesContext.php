@@ -39,14 +39,6 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
     }
 
     /**
-     * @Given there is System organization exists in the system
-     */
-    public function thereIsSystemOrganizationExistsInTheSystem()
-    {
-        throw new PendingException();
-    }
-
-    /**
      * Load random entities in database
      * Example: I have 6 contacts
      * Example: And there are 30 users
@@ -61,15 +53,15 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
         $this->fixtureLoader->loadRandomEntities($name, $numberOfEntities);
     }
 
+    //@codingStandardsIgnoreStart
     /**
-     * @codingStandardsIgnoreStart
      * Load extra user(s) with their|its own entities
      * It can be used for load random entities with specific owner
      * Example: And there are two users with their own 3 Tasks
      * Example: And there is user with its own Account
      * @Given /^there (?:are|is) (?P<userCount>(?:|one|two|\d+))(?:|\s)user(?: |s )with (?:their|its) own(?:|\s+)(?P<entitiesCount>(?:|\d+)) (?P<entity>(\D*))$/
-     * @codingStandardsIgnoreEnd
      */
+    //@codingStandardsIgnoreEnd
     public function iHaveUsersWithTheirEntities($userCount, $entity, $entitiesCount)
     {
         $userCount = $this->getCount($userCount);
