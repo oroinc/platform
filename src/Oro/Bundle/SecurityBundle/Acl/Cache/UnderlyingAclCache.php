@@ -103,10 +103,7 @@ class UnderlyingAclCache
         $batchNumber = $this->getBatchNumber($oid);
         $batchKey = $this->getBatchCacheKey($oid);
         $type = $oid->getType();
-        if (!$this->cache->contains($batchNumber) && !$this->cache->contains($batchKey)) {
-            return false;
-        }
-
+        
         // check if batches info loaded and load it
         if (!array_key_exists($type, $this->entityBatches)) {
             if ($this->cache->contains($type)) {
