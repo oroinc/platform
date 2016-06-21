@@ -83,7 +83,7 @@ class WorkflowRegistry
     }
 
     /**
-     * Get Active Workflows that is applicable to entity class
+     * Get Active Workflows that applicable to entity class
      *
      * @param string $entityClass
      * @return Workflow[]
