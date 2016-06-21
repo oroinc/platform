@@ -64,16 +64,6 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function checkEntity($entity)
-    {
-        return $this->authChecker->isGranted('VIEW', $entity) ?
-            static::FILTER_NOTHING :
-            static::FILTER_ALL;
-    }
-
-    /**
      * @param string $entityClass
      *
      * @return bool
@@ -82,7 +72,9 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
     {
         $securityConfig = $this->getSecurityConfig($entityClass);
 
-        return $securityConfig ? $securityConfig->get('field_acl_enabled') : false;
+        return $securityConfig
+            ? ($securityConfig->get('field_acl_supported') && $securityConfig->get('field_acl_enabled'))
+            : false;
     }
 
     /**
