@@ -25,10 +25,8 @@ class ValueNormalizer
      * @var array
      */
     protected $cachedData = [
-        DataType::ENTITY_TYPE         => [],
-        DataType::ENTITY_CLASS        => [],
-        DataType::ENTITY_ALIAS        => [],
-        DataType::ENTITY_PLURAL_ALIAS => [],
+        DataType::ENTITY_TYPE  => [],
+        DataType::ENTITY_CLASS => [],
     ];
 
     /**
