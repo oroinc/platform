@@ -180,8 +180,6 @@ define([
                 var options = {
                     wait: true,
                     error: _.bind(this._handleResponseError, this),
-                    // contentType: 'application/json',
-                    // data: JSON.stringify({'notifyInvitedUsers': true})
                 };
                 if (deleteUrl) {
                     options.url = deleteUrl;
