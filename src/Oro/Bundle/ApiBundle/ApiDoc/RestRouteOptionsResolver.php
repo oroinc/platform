@@ -9,9 +9,9 @@ use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
@@ -23,9 +23,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     const ID_PLACEHOLDER          = '{id}';
     const ASSOCIATION_ATTRIBUTE   = 'association';
     const ASSOCIATION_PLACEHOLDER = '{association}';
-
-    /** @var bool */
-    protected $isApplicationInstalled;
 
     /** @var RestDocViewDetector */
     protected $docViewDetector;
@@ -42,11 +39,10 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var array */
+    /** @var array [entity type => ApiResource, ...] */
     protected $resources;
 
     /**
-     * @param bool|string|null     $isApplicationInstalled
      * @param RestDocViewDetector  $docViewDetector
      * @param ResourcesProvider    $resourcesProvider
      * @param SubresourcesProvider $subresourcesProvider
@@ -54,14 +50,12 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      * @param ValueNormalizer      $valueNormalizer
      */
     public function __construct(
-        $isApplicationInstalled,
         RestDocViewDetector $docViewDetector,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
-        $this->isApplicationInstalled = !empty($isApplicationInstalled);
         $this->docViewDetector = $docViewDetector;
         $this->resourcesProvider = $resourcesProvider;
         $this->subresourcesProvider = $subresourcesProvider;
@@ -74,14 +68,14 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if (!$this->isApplicationInstalled || $this->docViewDetector->getRequestType()->isEmpty()) {
-            return;
-        }
-        if ($route->getOption('group') === 'rest_api_deprecated') {
+        $group = $route->getOption('group');
+        if ($group === 'rest_api_deprecated') {
             $routes->remove($routes->getName($route));
             return;
         }
-        if ($route->getOption('group') !== self::ROUTE_GROUP) {
+        if ($group !== self::ROUTE_GROUP
+            || $this->docViewDetector->getRequestType()->isEmpty()
+        ) {
             return;
         }
 
@@ -97,43 +91,24 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * @param string $entityType
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityType)
-    {
-        return ValueNormalizerUtil::convertToEntityClass(
-            $this->valueNormalizer,
-            $entityType,
-            $this->docViewDetector->getRequestType()
-        );
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return string
-     */
-    protected function getEntityType($entityClass)
-    {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $this->docViewDetector->getRequestType()
-        );
-    }
-
-    /**
-     * @return ApiResource[]
+     * @return ApiResource[] [entity type => ApiResource, ...]
      */
     protected function getResources()
     {
         if (null === $this->resources) {
-            $this->resources = $this->resourcesProvider->getResources(
+            $this->resources = [];
+            $resources = $this->resourcesProvider->getResources(
                 $this->docViewDetector->getVersion(),
                 $this->docViewDetector->getRequestType()
             );
+            foreach ($resources as $resource) {
+                $entityType = $this->valueNormalizer->normalizeValue(
+                    $resource->getEntityClass(),
+                    DataType::ENTITY_TYPE,
+                    $this->docViewDetector->getRequestType()
+                );
+                $this->resources[$entityType] = $resource;
+            }
         }
 
         return $this->resources;
@@ -142,16 +117,15 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param ApiResource[]           $resources
+     * @param ApiResource[]           $resources [entity type => ApiResource, ...]
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $resources)
     {
         $routeName = $routes->getName($route);
 
         $action = $route->getDefault('_action');
-        foreach ($resources as $resource) {
+        foreach ($resources as $entityType => $resource) {
             $entityClass = $resource->getEntityClass();
-            $entityType = $this->getEntityType($entityClass);
             if ($this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER)) {
                 $this->addSubresources($action, $entityType, $entityClass, $routeName, $route, $routes);
             } elseif (!in_array($action, $resource->getExcludedActions(), true)) {

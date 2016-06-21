@@ -22,7 +22,6 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class RestDocHandler implements HandlerInterface
 {
@@ -67,14 +66,13 @@ class RestDocHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP) {
-            return;
-        }
-        if ($this->docViewDetector->getRequestType()->isEmpty()) {
+        if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP
+            || $this->docViewDetector->getRequestType()->isEmpty()
+        ) {
             return;
         }
         $action = $route->getDefault('_action');
-        if (empty($action)) {
+        if (!$action) {
             return;
         }
 
@@ -82,7 +80,11 @@ class RestDocHandler implements HandlerInterface
         if ($entityType) {
             $annotation->setSection($entityType);
 
-            $entityClass = $this->getEntityClass($entityType);
+            $entityClass = $this->valueNormalizer->normalizeValue(
+                $entityType,
+                DataType::ENTITY_CLASS,
+                $this->docViewDetector->getRequestType()
+            );
             $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
             $actionContext = $this->getContext($action, $entityClass, $associationName);
             $config = $actionContext->getConfig();
@@ -117,33 +119,23 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param string $entityType
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityType)
-    {
-        return ValueNormalizerUtil::convertToEntityClass(
-            $this->valueNormalizer,
-            $entityType,
-            $this->docViewDetector->getRequestType()
-        );
-    }
-
-    /**
      * @param string $entityClass
-     * @param bool   $throwException
      *
      * @return string|null
      */
-    protected function getEntityType($entityClass, $throwException = true)
+    protected function getEntityType($entityClass)
     {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $this->docViewDetector->getRequestType(),
-            $throwException
-        );
+        try {
+            return $this->valueNormalizer->normalizeValue(
+                $entityClass,
+                DataType::ENTITY_TYPE,
+                $this->docViewDetector->getRequestType()
+            );
+        } catch (\Exception $e) {
+            // ignore any exception here
+        }
+
+        return null;
     }
 
     /**
@@ -304,7 +296,7 @@ class RestDocHandler implements HandlerInterface
                         ->getAcceptableTargetClassNames();
                     $targetEntityTypes = [];
                     foreach ($targetClassNames as $targetClassName) {
-                        $targetEntityType = $this->getEntityType($targetClassName, false);
+                        $targetEntityType = $this->getEntityType($targetClassName);
                         if ($targetEntityType) {
                             $targetEntityTypes[] = $targetEntityType;
                         }

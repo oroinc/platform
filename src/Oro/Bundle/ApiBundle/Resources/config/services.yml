@@ -326,7 +326,6 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver
         public: false
         arguments:
-            - %installed%
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
