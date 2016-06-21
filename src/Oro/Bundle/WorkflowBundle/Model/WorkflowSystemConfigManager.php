@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -23,22 +23,16 @@ class WorkflowSystemConfigManager
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
     /**
      * @param ConfigManager $configManager
      * @param EventDispatcherInterface $eventDispatcher
-     * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ConfigManager $configManager,
-        EventDispatcherInterface $eventDispatcher,
-        DoctrineHelper $doctrineHelper
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->configManager = $configManager;
         $this->eventDispatcher = $eventDispatcher;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -61,7 +55,7 @@ class WorkflowSystemConfigManager
      */
     public function getActiveWorkflowNamesByEntity($entity)
     {
-        $class = $this->doctrineHelper->getEntityClass($entity);
+        $class = is_object($entity) ? ClassUtils::getClass($entity) : ClassUtils::getRealClass($entity);
 
         return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
     }

@@ -142,10 +142,10 @@ class WorkflowManager
         return $this->inTransaction(
             function (EntityManager $em) use ($workflowItem, $entity) {
                 $currentWorkflowName = $workflowItem->getWorkflowName();
-                
+
                 $em->remove($workflowItem);
                 $em->flush();
-                
+
                 $workflow = $this->workflowRegistry->getWorkflow($currentWorkflowName);
                 if ($this->isActiveWorkflow($workflow) && $workflow->getStepManager()->hasStartStep()) {
                     return $this->startWorkflow($workflow->getName(), $entity);
@@ -407,7 +407,7 @@ class WorkflowManager
         $definition = $workflowIdentifier instanceof WorkflowDefinition
             ? $workflowIdentifier
             : $this->getWorkflow($workflowIdentifier)->getDefinition();
-        
+
         $this->config->setWorkflowActive($definition);
     }
 
@@ -459,11 +459,9 @@ class WorkflowManager
             return false;
         }
 
-        if ($currentWorkflowItem) {
-            foreach ($activeWorkflows as $activeWorkflow) {
-                if ($activeWorkflow->getName() === $currentWorkflowItem->getWorkflowName()) {
-                    return false;
-                }
+        foreach ($activeWorkflows as $activeWorkflow) {
+            if ($activeWorkflow->getName() === $currentWorkflowItem->getWorkflowName()) {
+                return false;
             }
         }
 
