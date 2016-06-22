@@ -175,8 +175,9 @@ at least one bundle must have file with name _Resources/config/oro/search_engine
 that contains configuration of search engine services that will be added to container services.
 
 To make engine work two services must be defined in engine configuration:
- *) Search service _oro_search.search.engine_ must implement _Oro\Bundle\SearchBundle\Engine\EngineInterface_.
- *) Indexer service _oro_search.search.engine.indexer_ must implement _Oro\Bundle\SearchBundle\Engine\IndexerInterface_.
+* Search service _oro_search.search.engine_ must implement _Oro\Bundle\SearchBundle\Engine\EngineInterface_.
+* Indexer service _oro_search.search.engine.indexer_ must implement _Oro\Bundle\SearchBundle\Engine\IndexerInterface_.
+
 To make implementation easier there is abstract classes _Oro\Bundle\SearchBundle\Engine\AbstractEngine_ and
 _Oro\Bundle\SearchBundle\Engine\AbstractIndexer_ that provides useful functionality (logging, queuing etc).
 
