@@ -74,6 +74,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             $this->entityRepository,
             $this->managerRegistry,
             $this->entityManager,
+            $this->configManager,
             $this->assembler,
             $this->registry
         );
