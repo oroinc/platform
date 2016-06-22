@@ -60,7 +60,6 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->addEntityFields($builder);
-        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
     }
 
     /**
@@ -239,32 +238,5 @@ class UserType extends AbstractType
                 'data'     => true
             ]
         );
-    }
-
-    /**
-     * Post set data handler
-     *
-     * @param FormEvent $event
-     */
-    public function postSetData(FormEvent $event)
-    {
-        /** @var Form $form */
-        $form = $event->getForm();
-        $data = $form->getData();
-        if ($data instanceof User) {
-            $token = $this->security->getToken();
-            if ($token && is_object($user = $token->getUser()) && $data->getId() == $user->getId()) {
-                $form->add(
-                    'signature',
-                    'oro_rich_text',
-                    [
-                        'label'    => 'oro.user.form.signature.label',
-                        'required' => false,
-                        'mapped'   => false,
-                        'data'     => $this->userConfigManager->get('oro_email.signature'),
-                    ]
-                );
-            }
-        }
     }
 }

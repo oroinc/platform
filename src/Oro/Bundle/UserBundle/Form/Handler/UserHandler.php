@@ -140,18 +140,7 @@ class UserHandler extends AbstractUserHandler
         // Reloads the user to reset its username. This is needed when the
         // username or password have been changed to avoid issues with the
         // security layer.
-        // Additional checking for userConfigManager !== null is added because of API
-        // to avoid "Call to a member function on a non-object".
         $this->manager->reloadUser($user);
-        if ($this->form->has('signature') && $this->userConfigManager !== null) {
-            $signature = $this->form->get('signature')->getData();
-            if ($signature) {
-                $this->userConfigManager->set('oro_email.signature', $signature);
-            } else {
-                $this->userConfigManager->reset('oro_email.signature');
-            }
-            $this->userConfigManager->flush();
-        }
     }
 
     /**

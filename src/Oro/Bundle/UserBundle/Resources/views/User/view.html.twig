@@ -5,6 +5,14 @@
 {% oro_title_set({params : {"%username%": fullname }}) %}
 
 {% block navButtons %}
+    {% if resource_granted('EDIT', entity) or editRoute is defined %}
+        {{ UI.button({
+            'path' : path('oro_user_config', { 'id': entity.id }),
+            'label': 'oro.user.user_configuration.label'|trans,
+            'title': 'oro.user.user_configuration.label'|trans,
+            'iCss': 'icon-cog',
+        }) }}
+    {% endif %}
     {% if editRoute is defined %}
         {{ UI.editButton({
             'path': path(editRoute),

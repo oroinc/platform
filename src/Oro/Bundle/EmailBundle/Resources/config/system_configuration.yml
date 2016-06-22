@@ -141,6 +141,28 @@ oro_system_configuration:
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    user_bar_settings:
+                                        children:
+                                            - oro_email.show_recent_emails_in_user_bar
+                            email_configuration:
+                                children:
+                                    signature_configuration:
+                                        children:
+                                            - oro_email.signature
+                                            - oro_email.append_signature
+                                    reply_configuration:
+                                        children:
+                                            - oro_email.default_button_reply
+                                    mailboxes:
+                                        children:
+                                            - oro_email.mailbox_grid
 
     api_tree:
         signature_configuration:

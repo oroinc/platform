@@ -64,6 +64,11 @@ oro_menu_config:
             route: 'oro_user_profile_view'
             extras:
                 position: 10
+        oro_user_profile_configuration:
+            label: 'oro.user.menu.oro_user_profile_configuration.label'
+            route: 'oro_user_profile_configuration'
+            extras:
+                position: 12
 
     tree:
         application_menu:
@@ -78,6 +83,7 @@ oro_menu_config:
         usermenu:
             children:
                 oro_user_profile_view: ~
+                oro_user_profile_configuration: ~
 
         shortcuts:
             children:

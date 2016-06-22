@@ -1,0 +1,25 @@
+{% extends 'OroConfigBundle::configPage.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% oro_title_set({params : {"%user%": entity.name }}) %}
+
+{% set pageTitle = [
+        UI.link({
+            'path': path('oro_user_index'),
+            'label': 'oro.user.entity_plural_label'|trans
+        }),
+        UI.link({
+            'path': path('oro_user_view', {id: entity.id}),
+            'label': entity|oro_format_name|default('N/A')
+        }),
+        'oro.user.user_configuration.label'|trans
+    ]
+%}
+
+{% set formAction    = path(
+        routeName,
+        routeParameters|merge({activeGroup: activeGroup, activeSubGroup: activeSubGroup})
+    )
+%}
+{% set routeName = routeName %}
+{% set routeParameters = routeParameters %}

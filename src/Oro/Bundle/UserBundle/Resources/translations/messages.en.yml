@@ -64,12 +64,17 @@ oro:
             shortcut_new_group.label: Create new group
             shortcut_new_group.description: Create new group instance
             oro_user_profile_view.label: My User
+            oro_user_profile_configuration.label: My Configuration
         controller:
             group.message.saved: "Group saved"
             role.message.saved: "Role saved"
             user.message.saved: "User saved"
             status.message.saved: "Status saved"
             invite.fail.message: An invitation email sending was failed
+        user_configuration:
+            label: Configuration
+            use_default: Use System
+            grid.action.config: Configuration
         #
         # Oro/Bundle/UserBundle/Entity/User
         #
