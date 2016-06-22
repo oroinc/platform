@@ -214,7 +214,7 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse($mappingPath));
+            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse(file_get_contents($mappingPath)));
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(1, $elementConfiguration);
