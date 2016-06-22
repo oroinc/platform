@@ -11,17 +11,6 @@ define(function(require) {
         className: 'action-permissions',
         animationDuration: 0,
         itemView: PermissionView,
-        listen: {
-            'change collection': 'onPermissionChange'
-        },
-
-        onPermissionChange: function(model) {
-            mediator.trigger('securityAccessLevelsComponent:link:click', {
-                accessLevel: model.get('access_level'),
-                identityId: model.get('identity'),
-                permissionName: model.get('name')
-            });
-        },
 
         initItemView: function(model) {
             return new this.itemView({

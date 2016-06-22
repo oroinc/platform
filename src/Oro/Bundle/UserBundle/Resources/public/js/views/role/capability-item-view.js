@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var CapabilityItemView;
-    var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
 
     /**
@@ -13,19 +12,16 @@ define(function(require) {
         template: require('tpl!orouser/templates/role/capability-item.html'),
         autoRender: true,
         listen: {
-            'change:access_level model': 'onAccessLevelChange'
+            'change:access_level model': 'render'
         },
         events: {
             'change [type=checkbox]': 'onChange'
         },
 
-        onAccessLevelChange: function(model) {
-            mediator.trigger('securityAccessLevelsComponent:link:click', {
-                accessLevel: model.get('access_level'),
-                identityId: model.get('identity'),
-                permissionName: model.get('name')
-            });
-            this.render();
+        getTemplateData: function() {
+            var data = CapabilityItemView.__super__.getTemplateData.call(this);
+            data.isAccessLevelChanged = this.model.isAccessLevelChanged();
+            return data;
         },
 
         onChange: function(e) {
