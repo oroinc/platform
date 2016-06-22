@@ -59,6 +59,8 @@ class ChoiceTreeFilter extends AbstractFilter
         $routeName = $this->getOr('autocomplete_url') ?
             $this->getOr('autocomplete_url') : 'oro_form_autocomplete_search';
         $metadata['autocomplete_url'] = $this->router->generate($routeName);
+        $metadata['renderedPropertyName'] = $this->getOr('renderedPropertyName') ?
+            $this->getOr('renderedPropertyName') : false;
 
         return $metadata;
     }
