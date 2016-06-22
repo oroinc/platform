@@ -106,6 +106,8 @@ class IndexCommandTest extends \PHPUnit_Framework_TestCase
             'class' => 'class-name',
             'identifiers' => ['id'],
         ]);
+
+        $this->assertContains('Started index update for entities.', $tester->getDisplay());
     }
 
     /**

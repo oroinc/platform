@@ -54,6 +54,8 @@ class IndexCommand extends ContainerAwareCommand
         }
 
         $this->getSearchIndexer()->save($entities);
+
+        $output->writeln('Started index update for entities.');
     }
 
     /**

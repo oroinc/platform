@@ -174,10 +174,11 @@ Used search engine defines in configuration under `oro_search.engine` key. To ma
 at least one bundle must have file with name _Resources/config/oro/search_engine/\<engine_name\>.yml_
 that contains configuration of search engine services that will be added to container services.
 
-The only one required service that must be defined in engine configuration is _oro_search.search.engine_.
-Search engine class must implement interface _Oro\Bundle\SearchBundle\Engine\EngineInterface_ and implement
-all required methods. To make implementation easier there is abstract engine
-_Oro\Bundle\SearchBundle\Engine\AbstractEngine_ that provides useful functionality (logging, queuing etc).
+To make engine work two services must be defined in engine configuration:
+ *) Search service _oro_search.search.engine_ must implement _Oro\Bundle\SearchBundle\Engine\EngineInterface_.
+ *) Indexer service _oro_search.search.engine.indexer_ must implement _Oro\Bundle\SearchBundle\Engine\IndexerInterface_.
+To make implementation easier there is abstract classes _Oro\Bundle\SearchBundle\Engine\AbstractEngine_ and
+_Oro\Bundle\SearchBundle\Engine\AbstractIndexer_ that provides useful functionality (logging, queuing etc).
 
 If search engine requires some additional parameters (credentials, index configuration etc.) then they can be
 passed through configuration using key _oro_search.engine_parameters_, so these parameters can be injected into

@@ -30,6 +30,8 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
 
         $tester = new CommandTester($command);
         $tester->execute([]);
+
+        $this->assertContains('Started reindex task for all mapped entities', $tester->getDisplay());
     }
 
     public function testShouldReindexOnlySingleClassIfClassArgumentExists()
@@ -51,6 +53,8 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
         $tester->execute([
             'class' => 'class-name'
         ]);
+
+        $this->assertContains('Started reindex task for "class-name" entity', $tester->getDisplay());
     }
 
     /**

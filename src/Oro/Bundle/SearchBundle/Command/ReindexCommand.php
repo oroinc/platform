@@ -38,7 +38,16 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->getSearchIndexer()->reindex($input->getArgument('class'));
+        $class = $input->getArgument('class');
+
+        $this->getSearchIndexer()->reindex($class);
+
+        $message = $class
+            ? sprintf('Started reindex task for "%s" entity', $class)
+            : 'Started reindex task for all mapped entities'
+        ;
+
+        $output->writeln($message);
     }
 
     /**
