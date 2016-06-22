@@ -4,10 +4,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\WaitingDictionary;
+use WebDriver\Element as WdElement;
+use WebDriver\Session as WdSession;
 
 class Form extends Element
 {
@@ -49,14 +52,23 @@ class Form extends Element
     /**
      * @param NodeElement $element
      * @param string $value
+     *
+     * @todo move to OroSelenium2Driver BAP-10843
      */
     protected function fillAsInput(NodeElement $element, $value)
     {
         if ($element->hasClass('select2-offscreen')) {
             $this->setSelect2Input($element, $value);
         } else {
-            $element->setValue('');
-            $element->setValue($value);
+            /** @var Selenium2Driver $driver */
+            $driver = $this->getDriver();
+            $wdElement = $driver->getWebDriverSession()->element('xpath', $element->getXpath());
+            $script = <<<JS
+var node = {{ELEMENT}};
+node.value = '$value';
+JS;
+
+            $this->executeJsOnElement($wdElement, $script);
         }
     }
 
@@ -227,5 +239,23 @@ class Form extends Element
         } while ($field === null && $i < $deep);
 
         return $field;
+    }
+
+    private function executeJsOnElement(WdElement $element, $script, $sync = true)
+    {
+        $script  = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
+        /** @var WdSession $wdSession */
+        $wdSession = $this->getDriver()->getWebDriverSession();
+
+        $options = array(
+            'script' => $script,
+            'args'   => array(array('ELEMENT' => $element->getID())),
+        );
+
+        if ($sync) {
+            return $wdSession->execute($options);
+        }
+
+        return $wdSession->execute_async($options);
     }
 }
