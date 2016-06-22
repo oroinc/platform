@@ -163,7 +163,7 @@ class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessDeleteShouldSendNotificationIfQueryIsPresent()
     {
-        $this->requestStack->push(new Request(['send_notification' => true]));
+        $this->requestStack->push(new Request([], ['notifyInvitedUsers' => true]));
 
         $event = new CalendarEvent();
         $this->emailSendProcessor->expects($this->once())
