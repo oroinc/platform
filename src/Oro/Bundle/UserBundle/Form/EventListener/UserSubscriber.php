@@ -9,6 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class UserSubscriber implements EventSubscriberInterface
 {
@@ -43,6 +44,7 @@ class UserSubscriber implements EventSubscriberInterface
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::PRE_SUBMIT => 'preSubmit',
+            FormEvents::POST_SUBMIT => 'postSubmit',
         ];
     }
 
@@ -63,6 +65,20 @@ class UserSubscriber implements EventSubscriberInterface
         }
 
         $event->setData($submittedData);
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function postSubmit(FormEvent $event) {
+        /** @var User $user */
+        $user = $event->getData();
+        $businessUnits = $user->getBusinessUnits();
+        $user->getOrganizations()->clear();
+        foreach ($businessUnits as $businessUnit) {
+            $organization = $businessUnit->getOrganization();
+            $user->addOrganization($organization);
+        }
     }
 
     /**
