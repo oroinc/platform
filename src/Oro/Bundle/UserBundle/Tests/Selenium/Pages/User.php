@@ -300,9 +300,8 @@ class User extends AbstractPageEntity
     {
         foreach ($businessUnits as $businessUnit) {
             $this->test->byXpath(
-                "//div[@data-ftid='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]".
-                "/preceding-sibling::input"
-            )->click();
+                "//div[@data-ftid='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]"
+                )->click();
         }
 
         return $this;
