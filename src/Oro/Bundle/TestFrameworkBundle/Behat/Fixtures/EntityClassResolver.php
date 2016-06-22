@@ -22,8 +22,8 @@ class EntityClassResolver
     }
 
     /**
-     * @param string $entityName
-     * @return string
+     * @param string $entityName Entity name in plural or single form, e.g. Tasks, Calendar Event etc.
+     * @return string Full namespace to class
      */
     public function getEntityClass($entityName)
     {

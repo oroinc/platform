@@ -3,12 +3,13 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 
-class Grid extends RawMinkContext implements OroElementFactoryAware
+class GridContext extends RawMinkContext implements OroElementFactoryAware
 {
     /**
      * @var int
@@ -38,7 +39,8 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @When I click ":title" link from mass action dropdown
+     * @When /^(?:|I )click "(?P<title>(?:[^"]|\\")*)" link from mass action dropdown$/
+     * @When /^(?:|I )click (?P<title>(?:[^"]|\\")*) mass action$/
      */
     public function clickLinkFromMassActionDropdown($title)
     {
@@ -47,7 +49,7 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @Given I keep in mind number of records in list
+     * @Given /^(?:|I )keep in mind number of records in list$/
      */
     public function iKeepInMindNumberOfRecordsInList()
     {
@@ -56,8 +58,9 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
 
     /**
      * @When /^(?:|I )check first (?P<number>(?:[^"]|\\")*) records in grid$/
+     * @When select few records
      */
-    public function iCheckFirstRecordsInGrid($number)
+    public function iCheckFirstRecordsInGrid($number = 2)
     {
         $this->getGrid()->checkFirstRecords($number);
     }
@@ -81,6 +84,7 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
 
     /**
      * @Then the number of records remained the same
+     * @Then no records were deleted
      */
     public function theNumberOfRecordsRemainedTheSame()
     {
@@ -105,7 +109,7 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @When I check all records in grid
+     * @When /^(?:|I )check all records in grid$/
      */
     public function iCheckAllRecordsInGrid()
     {
@@ -113,6 +117,7 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
     }
     /**
      * @Then there is no records in grid
+     * @Then all records should be deleted
      */
     public function thereIsNoRecordsInGrid()
     {
@@ -165,6 +170,36 @@ class Grid extends RawMinkContext implements OroElementFactoryAware
     public function cancelDeletion()
     {
         $this->elementFactory->createElement('Modal')->clickLink('Cancel');
+    }
+
+    /**
+     * @Then I should see success message with number of records were deleted
+     */
+    public function iShouldSeeSuccessMessageWithNumberOfRecordsWereDeleted()
+    {
+        $flashMessage = $this->getSession()->getPage()->find('css', '.flash-messages-holder');
+
+        if (!$flashMessage) {
+            throw new ExpectationException('Can\'t find flash message', $this->getSession()->getDriver());
+        }
+
+
+        $regex = '/\d+ entities were deleted/';
+        expect($flashMessage->getText())->toMatch($regex);
+    }
+
+    /**
+     * @Then I shouldn't see :action action
+     */
+    public function iShouldNotSeeDeleteAction($action)
+    {
+        $grid = $this->getGrid();
+        if ($grid->getMassActionLink($action)) {
+            throw new ExpectationException(
+                sprintf('%s mass action should not be accassable', $action),
+                $this->getSession()->getDriver()
+            );
+        }
     }
 
     /**

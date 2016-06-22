@@ -13,6 +13,7 @@ UPGRADE FROM 1.9 to 1.10
 
 ####EntityConfigBundle
 - Entity config class metadata now allows any `route*` options, that can be used for CRUD routes configuration - as well as already existing `routeName`, `routeView` and `routeCreate` options.
+- Added `Oro\Bundle\EntityConfigBundle\Migration\RemoveManyToOneRelationQuery` as an automated way to remove ManyToOne relation
 
 ####DashboardBundle
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
@@ -29,6 +30,7 @@ UPGRADE FROM 1.9 to 1.10
 
 ####ImportExportBundle
 - ACL resource (capability) `oro_importexport` was removed. Please, use `oro_importexport_import` or `oro_importexport_export` instead.
+- Added parameter `NewEntitiesHelper $newEntitiesHelper` to constructor of `Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy`
 
 ####SecurityBundle
 - **IMPORTANT**: The behaviour of the [Access Decision Manager](http://symfony.com/doc/current/components/security/authorization.html#access-decision-manager) was changed. Now the `allowIfAllAbstainDecisions` flag is set to `true` by default. It means that an access to a resource is denied as soon as there is one voter denying access. The goal of this change is to grant access when all voters abstain.
@@ -221,9 +223,17 @@ Now:
 ####EmailBundle
 - Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
 - Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
+- `Oro\Bundle\EmailBundle\Mailer\Processor::getEmailOrigin` marked as deprecated. Use method `Oro\Bundle\EmailBundle\Tools\EmailOriginHelper::getEmailOrigin` instead.
 
 ####PlatformBundle
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
+
+####AttachmentBundle:
+- Fixed `Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser` to avoid PHP notices on file upload in some cases
+- Added translation strategies to dynamically handle translation fallbacks
+
+####CalendarBundle
+- The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
 
 ####LayoutBundle:
 - Added possibility to create layout block types using only DI configuration, for details please check out documentation at
@@ -231,6 +241,8 @@ Now:
 - BlockType classes replaced with DI configuration for listed block types: `root`, `head`, `body`, `fieldset`, `list`, `listitem`, `text`, `button` and `button_group`.
 Corresponding block type classes was removed.
 - Renamed `setDefaultOptions` to `configureOptions` method at `Oro\Component\Layout\BlockTypeInterface\BlockTypeInterface` and `Oro\Component\Layout\BlockTypeInterface\BlockTypeExtensionInterface`.
+- Defined image types configuration section for theme config
+- Added `oro_layout.provider.image_type` service to get image types available across all themes
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.

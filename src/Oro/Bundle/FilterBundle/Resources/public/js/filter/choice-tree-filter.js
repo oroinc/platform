@@ -6,7 +6,7 @@ define(function(require) {
     var TextFilter = require('oro/filter/text-filter');
     var tools = require('oroui/js/tools');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var Select2TreeAutocompleteComponent = require('oroform/js/app/components/select2-tree-autocomplete-component');
+    var Select2TreeAutocompleteComponent = require('oro/select2-tree-autocomplete-component');
 
     /**
      * Number filter: formats value as a number
@@ -78,11 +78,11 @@ define(function(require) {
             var options = {
                 _sourceElement: this.$(this.criteriaValueSelectors.value),
                 configs: {
-                    "allowClear": true,
-                    "minimumInputLength": 0,
-                    "multiple": true
+                    allowClear: true,
+                    minimumInputLength: 0,
+                    multiple: true
                 }
-            }
+            };
             if (this.data) {
                 options.configs.data = {
                     results: this.data,
