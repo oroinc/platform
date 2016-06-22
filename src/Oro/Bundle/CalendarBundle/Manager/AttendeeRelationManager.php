@@ -80,7 +80,7 @@ class AttendeeRelationManager
      *
      * @param QueryBuilder $qb
      */
-    public function addRelatedUserInfo(QueryBuilder $qb)
+    public function addRelatedEntityInfo(QueryBuilder $qb)
     {
         $userName = $this->dqlNameFormatter->getFormattedNameDQL('user', 'Oro\Bundle\UserBundle\Entity\User');
 
