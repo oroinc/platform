@@ -93,8 +93,8 @@ objects by their names or managed entities.
 
 **Methods:**
 * **getWorkflow(workflowName)** - extracts Workflow object by it's name;
-* **getActiveWorkflowByEntityClass(entityClass)** - returns active Workflow that is applicable to passed entity class;
-* **hasActiveWorkflowByEntityClass(entityClass)** - check is there an active workflow for entity class.
+* **getActiveWorkflowsByEntityClass(entityOrClass)** - returns all Workflows for passed entity or entity class;
+* **hasActiveWorkflowsByEntityClass(entityOrClass)** - checks if entity or entity class have linked workflows.
 
 Step
 ----
