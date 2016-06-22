@@ -132,11 +132,7 @@ class EmailTemplateController extends Controller
                 $this->get('translator')->trans('oro.email.controller.emailtemplate.saved.message')
             );
 
-            return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_email_emailtemplate_update', 'parameters' => ['id' => $entity->getId()]],
-                ['route' => 'oro_email_emailtemplate_index'],
-                $entity
-            );
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         return array(

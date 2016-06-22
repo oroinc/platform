@@ -261,7 +261,7 @@ Summarizing all above, step has next configuration:
     *boolean*
     If true than step will be counted as workflow final step.
 * **entity_acl**
-    Defines an ACL for the workflow related entity when workflow is in this step.
+    Defines an ACL for an entity related to the specified attribute when workflow is in this step.
     * **update**
         *boolean*
         Can entity be updated. Default value is true.
@@ -284,6 +284,10 @@ workflows:
                 allowed_transitions: # list of allowed transitions from this step
                     - connected
                     - not_answered
+                entity_acl:
+                    owner:
+                        update: false
+                        delete: false
              start_conversation:
                 label: 'Call Phone Conversation'
                 allowed_transitions:
@@ -304,6 +308,9 @@ Transition configuration has next options:
 * **unique name**
     *string*
     A transition must have unique name in scope of Workflow. Step configuration references transitions by this value.
+* **label**
+    *string*
+    Label of transition, will to be shown in UI.
 * **step_to**
     *string*
     Next step name. This is a reference to step that will be set to Workflow Item after transition is performed.

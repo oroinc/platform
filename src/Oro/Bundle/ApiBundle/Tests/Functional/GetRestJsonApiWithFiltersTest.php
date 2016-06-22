@@ -2,44 +2,26 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolation
  */
-class GetRestJsonApiWithFiltersTest extends ApiTestCase
+class GetRestJsonApiWithFiltersTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->initClient(
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
-        );
-
         parent::setUp();
 
         $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadFiltersTestData']);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getRequestType()
-    {
-        return new RequestType([RequestType::REST, RequestType::JSON_API]);
-    }
-
-    /**
-     * @param string      $className            The FQCN of an entity
+     * @param string      $entityClass          The FQCN of an entity
      * @param integer     $expectedStatusCode   expected status code of a response
      * @param array       $params               request parameters
      * @param array       $expects              response expectation
@@ -49,37 +31,26 @@ class GetRestJsonApiWithFiltersTest extends ApiTestCase
      * @dataProvider getParamsAndExpectation
      */
     public function testGetEntity(
-        $className,
+        $entityClass,
         $expectedStatusCode,
         $params,
         $expects,
         $idsReplacementMethod = null,
         $identifier = null
     ) {
-        $entityAlias = $this->valueNormalizer->normalizeValue(
-            $className,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
-        );
+        $entityType = $this->getEntityType($entityClass);
 
-        // test get list request
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias]),
-            $params,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType]),
+            $params
         );
 
-        $response = $this->client->getResponse();
+        $this->assertApiResponseStatusCodeEquals($response, $expectedStatusCode, $entityType, 'get list');
+
         if ($idsReplacementMethod && $identifier) {
             $expects = $this->{$idsReplacementMethod}($expects, $identifier);
         }
-
-        $this->assertApiResponseStatusCodeEquals($response, $expectedStatusCode, $entityAlias, 'get list');
         $this->assertEquals($expects, json_decode($response->getContent(), true));
     }
 

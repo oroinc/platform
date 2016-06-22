@@ -19,7 +19,7 @@ class OroEmbeddedFormBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -45,6 +45,7 @@ class OroEmbeddedFormBundleInstaller implements Installation
         $table->addColumn('css', 'text', []);
         $table->addColumn('form_type', 'string', ['length' => 255]);
         $table->addColumn('success_message', 'text', []);
+        $table->addColumn('allowed_domains', 'text', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);

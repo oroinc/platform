@@ -117,7 +117,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
-            - '@oro_entity_config.provider.workflow'
+            - '@oro_workflow.manager.system_config'
 
     oro_workflow.permission_registry:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry
@@ -174,6 +174,7 @@ services:
         arguments:
             - '@oro_workflow.permission_registry'
             - '@oro_workflow.restriction.manager'
+            - '@oro_entity_config.link.entity_manager'
 
     oro_workflow.restriction.manager:
         class: Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager

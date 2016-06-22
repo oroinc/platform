@@ -23,17 +23,22 @@ class InitializeConfigExtrasTest extends GetProcessorTestCase
 
     public function testProcess()
     {
-        $existingExtra = new TestConfigExtra('test');
         $this->context->setConfigExtras([]);
+
+        $existingExtra = new TestConfigExtra('test');
         $this->context->addConfigExtra($existingExtra);
 
         $this->processor->process($this->context);
 
-        $this->assertCount(5, $this->context->getConfigExtras());
-        $this->assertTrue($this->context->hasConfigExtra($existingExtra->getName()));
-        $this->assertTrue($this->context->hasConfigExtra(EntityDefinitionConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(DataTransformersConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(FiltersConfigExtra::NAME));
+        $this->assertEquals(
+            [
+                new TestConfigExtra('test'),
+                new EntityDefinitionConfigExtra($this->context->getAction()),
+                new CustomizeLoadedDataConfigExtra(),
+                new DataTransformersConfigExtra(),
+                new FiltersConfigExtra()
+            ],
+            $this->context->getConfigExtras()
+        );
     }
 }

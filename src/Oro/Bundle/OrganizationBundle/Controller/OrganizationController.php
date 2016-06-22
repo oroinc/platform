@@ -47,11 +47,7 @@ class OrganizationController extends Controller
                 $this->get('translator')->trans('oro.organization.controller.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_organization_update_current'],
-                [],
-                $entity
-            );
+            return $this->get('oro_ui.router')->redirect($entity);
         }
 
         return [

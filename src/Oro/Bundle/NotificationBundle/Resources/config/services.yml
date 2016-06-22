@@ -2,6 +2,7 @@ parameters:
     # Entity classes
     oro_notification.event_entity.class: Oro\Bundle\NotificationBundle\Entity\Event
     oro_notification.emailnotification.entity.class: Oro\Bundle\NotificationBundle\Entity\EmailNotification
+    oro_notification.massnotification.entity.class: Oro\Bundle\NotificationBundle\Entity\MassNotification
 
     # Entity spool
     oro_notification.entity_spool.class: Oro\Bundle\NotificationBundle\Doctrine\EntityPool
@@ -15,6 +16,7 @@ parameters:
 
     # Listener classes
     oro_notification.doctrine_listener.class: Oro\Bundle\NotificationBundle\Provider\DoctrineListener
+    oro_notification.event_listener.mass_notification.class: Oro\Bundle\NotificationBundle\EventListener\MassNotificationListener
 
     # Email notification form services
     oro_notification.form.type.email_notification.class: Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType
@@ -36,6 +38,8 @@ parameters:
     oro_notification.event_listener.email_notification_service.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationGridHelper
 
     oro_notification.email_notification_entity_provider.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
+
+    oro_notification.mass_notification_sender.class: Oro\Bundle\NotificationBundle\Model\MassNotificationSender
 
 services:
     # Entity spool
@@ -144,6 +148,15 @@ services:
             - [ setEnv, [%kernel.environment%] ]
             - [ setMessageLimit, [100] ]
 
+    oro_notification.mass_notification_sender:
+        class: %oro_notification.mass_notification_sender.class%
+        arguments:
+            - '@oro_notification.email_processor'
+            - '@oro_config.user'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_notification.entity_spool'
+            - '@oro_locale.dql.formatter.name'
+
     oro_notification.email_handler:
         class: %oro_notification.email_handler.class%
         arguments:
@@ -160,6 +173,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_notification.entity_spool'
             - %oro_notification.mailer.transport.spool_entity.class%
+            - '@event_dispatcher'
 
     oro_notification.mailer.transport.eventdispatcher:
         parent: swiftmailer.transport.eventdispatcher.abstract
@@ -191,3 +205,10 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
         lazy: true
+
+    oro_notification.event_listener.mass_notification_log:
+        class: %oro_notification.event_listener.mass_notification.class%
+        arguments:
+            - '@doctrine.orm.entity_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro.notification.event.notification_send_after, method: logMassNotification}
