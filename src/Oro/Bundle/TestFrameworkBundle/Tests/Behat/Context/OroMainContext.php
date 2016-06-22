@@ -44,6 +44,8 @@ class OroMainContext extends MinkContext implements
         $this->waitForAjax();
     }
 
+
+
     /**
      * @BeforeScenario
      */
@@ -72,7 +74,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then I should see :title flash message
+     * @Then /^(?:|I should )see "(?P<title>[^"]+)" flash message$/
      */
     public function iShouldSeeFlashMessage($title)
     {
@@ -159,7 +161,9 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then I press on :text in search result
+     * Press on record in search results of select2-results field
+     *
+     * @Then /^(?:|I )press on "(?P<text>[\w\s]+)" in search result$/
      */
     public function iPressTextInSearchResults($text)
     {
@@ -167,7 +171,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @When I save and close form
+     * @When /^(?:|I )save and close form$/
      */
     public function iSaveAndCloseForm()
     {

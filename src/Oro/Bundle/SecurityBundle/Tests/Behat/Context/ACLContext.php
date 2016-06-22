@@ -16,7 +16,7 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
     use WaitingDictionary, ElementFactoryDictionary;
 
     /**
-     * @Given /^I am logged in under (?P<organization>(\D*)) organization$/
+     * @Given /^(?:|I am )logged in under (?P<organization>(\D*)) organization$/
      */
     public function iAmLoggedInUnderSystemOrganization($organization)
     {

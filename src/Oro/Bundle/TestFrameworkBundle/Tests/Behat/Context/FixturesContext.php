@@ -46,7 +46,7 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
      * Example: And there are 5 calls
      * Example: I have 3 accounts
      * @Given /^there (?:is|are) (\d+) ([\w ]+)$/
-     * @Given /^I have (?P<numberOfEntities>(?:\d+)) (?P<name>(?:(?!from)(\D*)))$/
+     * @Given /^(?:|I )have (?P<numberOfEntities>(?:\d+)) (?P<name>(?:(?!from)(\D*)))$/
      */
     public function thereIs($numberOfEntities, $name)
     {

@@ -109,8 +109,8 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @Given I select :number from per page list dropdown
-     * @Given I select :number records per page
+     * @Given /^(?:|I )select (?P<number>[\d]+) from per page list dropdown$/
+     * @Given /^(?:|I )select (?P<number>[\d]+) records per page$/
      */
     public function iSelectFromPerPageListDropdown($number)
     {
@@ -118,7 +118,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @When I press next page button
+     * @When /^(?:|I )press next page button$/
      */
     public function iPressNextPageButton()
     {
@@ -135,7 +135,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @When I fill :number in page number input
+     * @When /^(?:|I )fill (?P<number>[\d]+) in page number input$/
      */
     public function iFillInPageNumberInput($number)
     {
@@ -150,11 +150,11 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
         $this->elementFactory->createElement('GridHeader')->getHeaderLink($field)->click();
     }
 
+    //@codingStandardsIgnoreStart
     /**
-     * @codingStandardsIgnoreStart
      * @Then /^(?P<column>([\w\s]+)) in (?P<rowNumber1>(first|second|[\d]+)) row must be (?P<comparison>(lower|greater|equal)) then in (?P<rowNumber2>(first|second|[\d]+)) row$/
-     * @codingStandardsIgnoreEnd
      */
+    //@codingStandardsIgnoreEnd
     public function compareRowValues($column, $comparison, $rowNumber1, $rowNumber2)
     {
         $value1 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber1));
@@ -196,11 +196,11 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
         $filterItem->submit();
     }
 
+    //@codingStandardsIgnoreStart
     /**
-     * @codingStandardsIgnoreStart
      * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>([\w\s]+))" and "(?P<end>([\w\s]+))"/
-     * @codingStandardsIgnoreEnd
      */
+    //@codingStandardsIgnoreEnd
     public function appllyDateTimeFilter($filterName, $type, $start, $end)
     {
         /** @var GridFilterDateTimeItem $filterItem */
@@ -214,7 +214,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @When I check All Visible records in grid
+     * @When /^(?:|I )check All Visible records in grid$/
      */
     public function iCheckAllVisibleRecordsInGrid()
     {
@@ -235,22 +235,6 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function thereIsNoRecordsInGrid()
     {
         $this->getGrid()->assertNoRecords();
-    }
-
-    /**
-     * @Given I should see :arg1 records in grid
-     */
-    public function iShouldSeeRecordsInGrid($arg1)
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given see :arg3 record in grid with :arg1 as :arg2 column
-     */
-    public function seeRecordInGridWithAsColumn($arg1, $arg2, $arg3)
-    {
-        throw new PendingException();
     }
 
     /**
@@ -286,7 +270,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @Then I should see success message with number of records were deleted
+     * @Then /^(?:|I )should see success message with number of records were deleted$/
      */
     public function iShouldSeeSuccessMessageWithNumberOfRecordsWereDeleted()
     {
@@ -302,7 +286,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @Then I shouldn't see :action action
+     * @Then /^(?:|I )shouldn't see (?P<action>(?:[^"]|\\")*) action$/
      */
     public function iShouldNotSeeDeleteAction($action)
     {
