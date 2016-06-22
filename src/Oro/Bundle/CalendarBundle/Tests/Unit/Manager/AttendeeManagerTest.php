@@ -132,13 +132,16 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($qb));
 
         $this->attendeeRelationManager->expects($this->once())
-            ->method('addRelatedUserInfo')
+            ->method('addRelatedEntityInfo')
             ->with($qb);
 
         $result = $this->attendeeManager->getAttendeeListsByCalendarEventIds($calendarEventIds);
         $this->assertEquals($expectedResult, $result);
     }
 
+    /**
+     * @return array
+     */
     public function getAttendeeListsByCalendarEventIdsDataProvider()
     {
         return [
