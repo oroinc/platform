@@ -72,7 +72,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         $definitions = $this->getDefinitions();
 
         $this->workflowManager->expects($this->once())
-            ->method('getApplicableWorkflowsByEntityClass')
+            ->method('getApplicableWorkflows')
             ->with(self::WORKFLOW_ENTITY_NAME)
             ->willReturn($this->getWorkflows());
 

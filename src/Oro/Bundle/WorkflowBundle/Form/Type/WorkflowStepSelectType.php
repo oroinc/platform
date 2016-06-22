@@ -52,7 +52,7 @@ class WorkflowStepSelectType extends AbstractType
                         $workflowName = $options['workflow_name'];
                         $workflows = [$this->workflowManager->getWorkflow($workflowName)];
                     } elseif (isset($options['workflow_entity_class'])) {
-                        $workflows = $this->workflowManager->getApplicableWorkflowsByEntityClass(
+                        $workflows = $this->workflowManager->getApplicableWorkflows(
                             $options['workflow_entity_class']
                         );
                     } else {
