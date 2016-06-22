@@ -63,7 +63,11 @@ class WorkflowSystemConfigManager
     {
         $class = $this->doctrineHelper->getEntityClass($entity);
 
-        return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
+        try {
+            return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
+        } catch (WorkflowException $e) {
+            return [];
+        }
     }
 
     /**
