@@ -244,3 +244,10 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units_search_handler }
         lazy: true
+
+    oro_organization.form.type.business_unit_search:
+        class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitAutocomplete
+        arguments:
+            - '@oro_organization.business_unit_manager'
+        tags:
+            - { name: form.type, alias: "oro_business_unit_select_autocomplete" }
