@@ -57,7 +57,11 @@ class WorkflowSystemConfigManager
     {
         $class = is_object($entity) ? ClassUtils::getClass($entity) : ClassUtils::getRealClass($entity);
 
-        return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
+        try {
+            return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
+        } catch (WorkflowException $e) {
+            return [];
+        }
     }
 
     /**
