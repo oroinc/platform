@@ -42,7 +42,19 @@ Create or update request should contain `email` and/or `displayName`. One of the
             ['method' => 'web_socket', 'interval' => ['number' => 15, 'unit' => 'M']], # add reminder in 5 min interval
         ],
         'isCancelled' => false, # does this calendar event is canceled
-        'recurrence'  => null, # does this event recurrence
+        'recurrence'  => [ # create reccurring event, if 'recurrence' is null recurring event will be converted to simple calendar event
+            "recurrenceType": "weekly",
+            "interval": 1,
+            "dayOfWeek": [
+                "friday"
+            ],
+            "dayOfMonth": null,
+            "monthOfYear": null,
+            "startTime": "2015-06-19T06:00:00+00:00",
+            "endTime": "2015-06-27T06:00:00+00:00",
+            "occurrences": 5,
+            "instance": null,
+        ],
         'attendees'   => [ # add event guests
             ['email' => 'admin@example.com', 'status' => 'none', 'type' => 'organizer'],
             ['email' => 'sales_man@user.com', 'displayName'=>'test name', 'status' => 'none'],
