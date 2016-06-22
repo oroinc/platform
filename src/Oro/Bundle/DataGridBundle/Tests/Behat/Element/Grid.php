@@ -204,7 +204,10 @@ class Grid extends Element
             }
         }
 
-        throw new ExpectationException('Grid has no records', $this->session->getDriver());
+        throw new ExpectationException(
+            sprintf('Grid has no record with "%s" content', $content),
+            $this->session->getDriver()
+        );
     }
 
     /**

@@ -17,7 +17,7 @@ class SystemConfigForm extends Form
         $label = $this->find('css', $selector);
 
         if (null === $label) {
-            throw new ElementNotFoundException($this->getDriver(), 'label', 'id|name|title|alt|value', $label);
+            throw new ElementNotFoundException($this->getDriver(), 'label', 'text', $label);
         }
 
         $useDefaultLabel = $label->getParent()->getParent()->find('css', "label:contains('Use default')");
