@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -44,6 +45,16 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->childEventsSubscriber = new ChildEventsSubscriber(
             $registry,
             $securityFacade
+        );
+    }
+
+    public function testGetSubscribedEvents()
+    {
+        $this->assertEquals(
+            [
+                FormEvents::POST_SUBMIT => 'postSubmit',
+            ],
+            $this->childEventsSubscriber->getSubscribedEvents()
         );
     }
 

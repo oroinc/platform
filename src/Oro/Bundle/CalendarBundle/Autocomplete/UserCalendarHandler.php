@@ -53,6 +53,8 @@ class UserCalendarHandler extends UserAclHandler
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * {@inheritdoc}
      */
     protected function createQueryBuilder()
