@@ -60,7 +60,12 @@ define(function(require) {
         },
 
         val: function() {
-            return this.applyWidgetFunction('val', arguments);
+            var result = this.applyWidgetFunction('val', arguments);
+
+            if (!arguments.length) {
+                return result;
+            }
+            return this.$el;
         },
 
         data: function() {

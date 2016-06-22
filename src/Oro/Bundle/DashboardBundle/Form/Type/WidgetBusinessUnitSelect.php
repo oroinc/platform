@@ -73,7 +73,6 @@ class WidgetBusinessUnitSelect extends AbstractType
                 'configs'            => [
                     'multiple'    => true,
                     'width'       => '400px',
-                    'component'   => 'tree-autocomplete',
                     'placeholder' => 'oro.dashboard.form.choose_business_unit',
                     'allowClear'  => true,
                 ]

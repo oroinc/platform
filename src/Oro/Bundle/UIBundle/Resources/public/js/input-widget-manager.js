@@ -143,6 +143,7 @@ define(function(require) {
          * @param {Object} options
          */
         createWidget: function($input, Widget, options) {
+            options = $.extend(true, {}, $input.data('input-widget-options') || {}, options || {});
             if (!options) {
                 options = {};
             }
