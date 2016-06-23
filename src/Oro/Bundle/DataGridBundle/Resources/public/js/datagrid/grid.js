@@ -256,9 +256,9 @@ define(function(require) {
             }
 
             this.body = options.body || this.body;
+
             var bodyOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.body, bodyOptions);
-
             this.footer = options.footer || this.footer;
             var footerOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.footer, footerOptions);
@@ -268,9 +268,11 @@ define(function(require) {
 
             // must construct body first so it listens to backgrid:sort first
             this.body = new this.body(bodyOptions);
+            this.subview('body', this.body);
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
+                this.subview('header', this.header);
                 if ('selectState' in this.header.row.subviews[0]) {
                     this.selectState = this.header.row.subviews[0].selectState;
                 }
@@ -281,6 +283,7 @@ define(function(require) {
 
             if (this.footer) {
                 this.footer = new this.footer(footerOptions);
+                this.subview('footer', this.footer);
             }
 
             this.listenTo(this.columns, 'reset', function() {
@@ -432,8 +435,7 @@ define(function(require) {
             subviews = ['header', 'body', 'footer', 'loadingMask'];
             _.each(subviews, function(viewName) {
                 if (this[viewName]) {
-                    this[viewName].dispose();
-                    delete this[viewName];
+                    this.removeSubview(viewName);
                 }
             }, this);
 
@@ -935,6 +937,7 @@ define(function(require) {
             this.loadingMask = new LoadingMaskView({
                 container: this.$(this.selectors.loadingMaskContainer)
             });
+            this.subview('loadingMask', this.loadingMask);
         },
 
         /**

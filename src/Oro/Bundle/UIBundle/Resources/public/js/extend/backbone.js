@@ -7,7 +7,63 @@ define([
     'use strict';
 
     // Backbone.View
+    Backbone.View.prototype.subviews = [];
+    Backbone.View.prototype.subviewsByName = {};
     _.extend(Backbone.View.prototype, componentContainerMixin);
+
+    Backbone.View.prototype.subview = function(name, view) {
+        var subviews = this.subviews;
+        var byName = this.subviewsByName;
+        if (name && view) {
+            this.removeSubview(name);
+            subviews.push(view);
+            byName[name] = view;
+            return view;
+        } else if (name) {
+            return byName[name];
+        }
+    };
+
+    Backbone.View.prototype.removeSubview = function(nameOrView) {
+        var byName;
+        var index;
+        var name;
+        var otherName;
+        var otherView;
+        var subviews;
+        var view;
+        if (!nameOrView) {
+            return;
+        }
+        subviews = this.subviews;
+        byName = this.subviewsByName;
+        if (typeof nameOrView === 'string') {
+            name = nameOrView;
+            view = byName[name];
+        } else {
+            view = nameOrView;
+            for (otherName in byName) {
+                if (byName.hasOwnProperty(otherName)) {
+                    otherView = byName[otherName];
+                    if (otherView !== view) {
+                        continue;
+                    }
+                    name = otherName;
+                    break;
+                }
+            }
+        }
+        if (!(name && view && view.dispose)) {
+            return;
+        }
+        view.dispose();
+        index = _.indexOf(subviews, view);
+        if (index !== -1) {
+            subviews.splice(index, 1);
+        }
+        return delete byName[name];
+    };
+
     Backbone.View.prototype.disposed = false;
     Backbone.View.prototype.dispose = function() {
         var prop;
@@ -76,9 +132,25 @@ define([
      * @protected
      */
     Backbone.View.prototype._resolveDeferredRender = function() {
+        var self = this;
         if (this.deferredRender) {
-            this.deferredRender.resolve(this);
-            delete this.deferredRender;
+            var promises = [];
+
+            if (this.subviews.length) {
+                _.each(this.subviews, function(subview) {
+                    if (subview.deferredRender) {
+                        var promise = $.Deferred();
+                        promises.push(promise);
+                        subview.deferredRender.done(function() {
+                            promise.resolve();
+                        });
+                    }
+                });
+            }
+            $.when.apply($, promises).done(function() {
+                self.deferredRender.resolve(self);
+                delete self.deferredRender;
+            });
         }
     };
 

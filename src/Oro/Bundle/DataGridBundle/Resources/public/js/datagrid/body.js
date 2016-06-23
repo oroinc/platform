@@ -98,6 +98,7 @@ define([
                 };
                 this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
                 var row = new this.row(rowOptions);
+                this.subview('row' + model.id, row);
                 this.attachListenerToSingleRow(row);
                 return row;
             }, this);
@@ -183,10 +184,12 @@ define([
          * @inheritDoc
          */
         render: function() {
+            this._deferredRender();
             Body.__super__.render.apply(this, arguments);
             if (this.rowClassName) {
                 this.$('> *').addClass(this.rowClassName);
             }
+            this._resolveDeferredRender();
             return this;
         },
 
