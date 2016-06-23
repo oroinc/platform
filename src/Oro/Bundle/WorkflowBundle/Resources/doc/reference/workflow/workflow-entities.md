@@ -405,7 +405,6 @@ workflow itself;
 WorkflowItem instance or WorkflowDefinition instance;
 * **deactivateWorkflow(entityClass)** - perform deactivation workflow by entity class;
 * **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for given workflow definition;
-* **isResetAllowed(entity)** - check that entity workflow item is equal to the active workflow item;
 
 Workflow Data
 -------------
