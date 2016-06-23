@@ -22,12 +22,38 @@ class Grid extends Element
         $massActionLink->click();
     }
 
-    public function getRecordsNumber()
+    /**
+     * @param string $header
+     * @param int $rowNumber
+     * @return string
+     * @throws ExpectationException
+     */
+    public function getRowValue($header, $rowNumber)
     {
-        /** @var GridPaginator $paginator */
-        $paginator = $this->elementFactory->createElement('GridPaginator');
+        $columns = $this->getRowByNumber($rowNumber)->findAll('css', 'td');
+        $columnNumber = $this->elementFactory->createElement('GridHeader')->getColumnNumber($header);
 
-        return $paginator->getTotalRecordsCount();
+        return $this->normalizeValueByGuessingType($columns[$columnNumber]->getText());
+    }
+
+    /**
+     * @param $rowNumber
+     * @return NodeElement
+     * @throws ExpectationException
+     */
+    public function getRowByNumber($rowNumber)
+    {
+        $rowIndex = $rowNumber - 1;
+        $rows = $this->getRows();
+
+        if (!isset($rows[$rowIndex])) {
+            throw new ExpectationException(
+                sprintf('Can\'t get %s row, because there are only %s rows in grid', $rowNumber, count($rows)),
+                $this->getDriver()
+            );
+        }
+
+        return $rows[$rowIndex];
     }
 
     /**
@@ -52,16 +78,25 @@ class Grid extends Element
         for ($i = 0; $i < $number; $i++) {
             /** @var NodeElement $row */
             $row = $rows[$i];
-            $massActionCell = $row->find('css', '.grid-body-cell-massAction');
-            $massActionCell->click();
+            $this->checkRowCheckbox($row);
         }
+    }
+
+    /**
+     * @param string $content
+     * @throws ExpectationException
+     */
+    public function checkRecord($content)
+    {
+        $row = $this->getRowByContent($content);
+        $this->checkRowCheckbox($row);
     }
 
     /**
      * @return NodeElement
      * @throws \Exception
      */
-    private function getMassActionButton()
+    public function getMassActionButton()
     {
         $massActionsButton = $this->findButton('Mass Actions');
         if (!$massActionsButton || !$massActionsButton->isVisible()) {
@@ -79,7 +114,7 @@ class Grid extends Element
      * @return NodeElement
      * @throws \Exception
      */
-    private function getMassActionLink($title)
+    public function getMassActionLink($title)
     {
         return $this->elementFactory->createElement('GridFloatingMenu')->findLink($title);
     }
@@ -118,23 +153,38 @@ class Grid extends Element
     public function clickActionLink($content, $action)
     {
         $row = $this->getRowByContent($content);
+        $link = $this->getActionLink($action, $row);
+        $link->click();
+    }
 
+    /**
+     * @param $action
+     * @param NodeElement $row
+     * @return NodeElement
+     * @throws ElementNotFoundException
+     */
+    public function getActionLink($action, NodeElement $row)
+    {
         if ($showMoreLink = $row->find('named', ['link', '...'])) {
             $showMoreLink->mouseOver();
-            $this->elementFactory
+            $link = $this->elementFactory
                 ->createElement('GridFloatingMenu')
-                ->find('named', ['link', ucfirst($action)])
-                ->click();
+                ->find('named', ['link', ucfirst($action)]);
         } else {
-            $row->find('named', ['link', $action])->click();
+            $link = $row->find('named', ['link', $action]);
         }
 
+        if (!$link) {
+            throw new ElementNotFoundException($this->getDriver(), 'link', 'id|title|alt|text', $action);
+        }
+
+        return $link;
     }
 
     /**
      * @return NodeElement[]
      */
-    private function getRows()
+    public function getRows()
     {
         return $this->findAll('css', 'tbody tr');
     }
@@ -144,7 +194,7 @@ class Grid extends Element
      * @return NodeElement
      * @throws ExpectationException
      */
-    protected function getRowByContent($content)
+    public function getRowByContent($content)
     {
         $rows = $this->getRows();
 
@@ -154,6 +204,47 @@ class Grid extends Element
             }
         }
 
-        throw new ExpectationException('Grid has no records', $this->session->getDriver());
+        throw new ExpectationException(
+            sprintf('Grid has no record with "%s" content', $content),
+            $this->session->getDriver()
+        );
+    }
+
+    /**
+     * Try to guess type of value and return that data in that type
+     * @param string $value
+     * @return \DateTime|int|string
+     */
+    protected function normalizeValueByGuessingType($value)
+    {
+        $value = trim($value);
+
+        if (preg_match('/^[0-9]+$/', $value)) {
+            return (int) $value;
+        } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/', $value, $matches)) {
+            return (int) $matches['amount'];
+        } elseif ($date = date_create($value)) {
+            return $date;
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param NodeElement $row
+     * @throws ExpectationException
+     */
+    protected function checkRowCheckbox(NodeElement $row)
+    {
+        $rowCheckbox = $row->find('css', '[type="checkbox"]');
+
+        if (!$rowCheckbox) {
+            throw new ExpectationException(
+                sprintf('No mass action checkbox found for "%s"', $row->getText()),
+                $this->getDriver()
+            );
+        }
+
+        $rowCheckbox->click();
     }
 }
