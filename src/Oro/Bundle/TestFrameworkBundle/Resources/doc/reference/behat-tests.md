@@ -46,32 +46,8 @@ app/console oro:install  --force --drop-database --user-name=admin --user-email=
 #### Configuration
 
 Base configuration is located in [behat.yml.dist](../../config/behat.yml.dist).
-Use it by parameter ```-c``` for use your custom config:
-
-```bash
-bin/behat -s OroUserBundle -c ~/config/behat.yml.dist
-```
-
 However you can copy ```behat.yml.dist``` to ```behat.yml``` in root of application and edit for your needs.
-Every bundle that has configured suite in configuration will not be autoloaded.
-See [Architecture](./behat-tests.md#architecture) reference below.
-
-#### Configurate suite
-
-You can manually configure suite for bundle in application behat config:
-```yml
-default: &default
-  suites:
-    AcmeDemoBundle:
-      type: symfony_bundle
-      bundle: AcmeDemoBundle
-      contexts:
-        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
-        - Acme\DemoBundle\Tests\Behat\Context\FeatureContext
-      paths:
-        - src/Acme/DemoBundle/Tests/Behat/Features
-```
+Also check ```base_url``` setting, for example for crm-enterprise application by default it is ```http://dev-crm-enterprise.local/``` and in your system it may differ.
 
 #### Run browser emulator
 
@@ -161,13 +137,33 @@ Every bundle has its own test suite and can be run separately:
  bin/behat -s OroUserBundle
  ```
 
+#### Suites autoload
+
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
-During initialization, Extension will create test suite with bundle name if any ```Tests/Behat/Features``` directory exits.
+During initialization, Extension will create [test suite](http://docs.behat.org/en/v3.0/guides/5.suites.html) with bundle name if any ```Tests/Behat/Features``` directory exits.
 Thus, if bundle has no Features directory - no test suite would be crated for it.
 
 If you need some specific feature steps for your bundle you should create ```Tests/Behat/Context/FeatureContext``` class.
 This context will added to suite with other common contexts.
-The full list of common context configured in behat configuration file under ```shared_contexts``` of ```OroTestFrameworkExtension``` definition
+The full list of common context configured in behat configuration file under ```shared_contexts``` see [behat.yml.dist](../../config/behat.yml.dist#L21-L25)
+
+You can manually configure suite for bundle in application behat config:
+
+```yml
+default: &default
+  suites:
+    AcmeDemoBundle:
+      type: symfony_bundle
+      bundle: AcmeDemoBundle
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Acme\DemoBundle\Tests\Behat\Context\FeatureContext
+      paths:
+        - src/Acme/DemoBundle/Tests/Behat/Features
+```
+
+Every bundle that has configured suite in configuration file will not be autoloaded by extension.
 
 #### Page elements
 
