@@ -27,13 +27,24 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetImageTypes()
     {
+        $theme1MainDimensions = [
+            ['width' => 100, 'height' => 100],
+            ['width' => 1000, 'height' => 1000]
+        ];
+        $theme1ListingDimensions = [
+            ['width' => 10, 'height' => 10]
+        ];
+        $theme2ListingDimensions = [
+            ['width' => 10, 'height' => 10],
+            ['width' => 200, 'height' => 200]
+        ];
         $this->themeManager->getAllThemes()->willReturn([
             $this->prepareTheme('theme1', [
-                'main' => ['Main', 1],
-                'listing' => ['Listing', 3],
+                'main' => ['Main', 1, $theme1MainDimensions],
+                'listing' => ['Listing', 3, $theme1ListingDimensions],
             ]),
             $this->prepareTheme('theme2', [
-                'listing' => ['Listing', 5],
+                'listing' => ['Listing', 5, $theme2ListingDimensions],
             ]),
             $this->prepareTheme('theme3', [])
         ]);
@@ -41,11 +52,13 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         $imageTypes = $this->provider->getImageTypes();
 
         $this->assertCount(2, $imageTypes);
-        $this->assertValidImageType($imageTypes['main'], 'main', 'Main', 1);
-        $this->assertValidImageType($imageTypes['listing'], 'listing', 'Listing', 5);
+        $this->assertValidImageType($imageTypes['main'], 'main', 'Main', 1, [[100, 100], [1000, 1000]]);
+        $this->assertValidImageType($imageTypes['listing'], 'listing', 'Listing', 5, [[10, 10], [200, 200]]);
     }
 
     /**
+     * @param string $name
+     * @param array $imageTypes
      * @return Theme
      */
     private function prepareTheme($name, array $imageTypes)
@@ -57,10 +70,10 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         ];
 
         foreach ($imageTypes as $key => $imageType) {
-            list($label, $maxNumber) = $imageType;
+            list($label, $maxNumber, $dimensions) = $imageType;
             $data['images']['types'][$key] = [
                 'label' => $label,
-                'dimensions' => [],
+                'dimensions' => $dimensions,
                 'max_number' => $maxNumber
             ];
         }
@@ -76,11 +89,36 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @param string $label
      * @param int $maxNumber
+     * @param array $dimensions
      */
-    private function assertValidImageType(ThemeImageType $imageType, $name, $label, $maxNumber)
+    private function assertValidImageType(ThemeImageType $imageType, $name, $label, $maxNumber, array $dimensions)
     {
         $this->assertEquals($name, $imageType->getName());
         $this->assertEquals($label, $imageType->getLabel());
         $this->assertEquals($maxNumber, $imageType->getMaxNumber());
+        $this->assertCount(count($dimensions), $imageType->getDimensions());
+
+        foreach ($dimensions as $dimension) {
+            $this->assertHasDimension($imageType, $dimension[0], $dimension[1]);
+        }
+    }
+
+    /**
+     * @param ThemeImageType $imageType
+     * @param int $width
+     * @param int $height
+     */
+    private function assertHasDimension(ThemeImageType $imageType, $width, $height)
+    {
+        $hasDimension = false;
+
+        foreach ($imageType->getDimensions() as $dimension) {
+            if ($dimension->getWidth() === $width && $dimension->getHeight() === $height) {
+                $hasDimension = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($hasDimension, sprintf('Image type does not contain dimension %dx%d', $width, $height));
     }
 }

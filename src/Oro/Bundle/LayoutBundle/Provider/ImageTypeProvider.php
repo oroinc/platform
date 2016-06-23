@@ -44,7 +44,13 @@ class ImageTypeProvider
 
         foreach ($themes as $theme) {
             foreach ($this->extractImageTypes($theme) as $imageType) {
-                $this->imageTypes[$imageType->getName()] = $imageType;
+                $imageTypeName = $imageType->getName();
+
+                if (isset($this->imageTypes[$imageTypeName])) {
+                    $imageType->mergeDimensions($this->imageTypes[$imageTypeName]->getDimensions());
+                }
+
+                $this->imageTypes[$imageTypeName] = $imageType;
             }
         }
     }
