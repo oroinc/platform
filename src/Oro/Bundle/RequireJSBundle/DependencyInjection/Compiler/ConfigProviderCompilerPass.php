@@ -18,7 +18,7 @@ class ConfigProviderCompilerPass implements CompilerPassInterface
     {
         if ($container->hasDefinition(self::PROVIDER_SERVICE)) {
             $chainDef = $container->getDefinition(self::PROVIDER_SERVICE);
-
+            
             foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $serviceId => $tag) {
                 $chainDef->addMethodCall('addProvider', [new Reference($serviceId)]);
             }
