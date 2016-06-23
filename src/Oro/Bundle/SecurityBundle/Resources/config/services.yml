@@ -187,7 +187,7 @@ services:
             - { name: oro_security.acl.extension, priority: 10 }
 
     oro_security.acl.provider:
-        public: true
+        public: false
         class: %oro_security.acl.provider.class%
         arguments:
             - '@oro_security.acl.object_identity_factory'
