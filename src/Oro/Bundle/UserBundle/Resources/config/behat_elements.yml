@@ -17,3 +17,7 @@ User:
       First Name: oro_user_user_form[firstName]
       Last Name: oro_user_user_form[lastName]
       Primary Email: oro_user_user_form[email]
+
+UserRoleForm:
+  selector: "form[id^='oro_user_role_form']"
+  class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm
