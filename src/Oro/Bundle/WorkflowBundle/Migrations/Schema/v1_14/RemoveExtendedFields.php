@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -13,19 +13,10 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class RemoveExtendedFields implements Migration, ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     const PROPERTY_WORKFLOW_ITEM = 'workflowItem';
     const PROPERTY_WORKFLOW_STEP = 'workflowStep';
-
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * @inheritdoc
