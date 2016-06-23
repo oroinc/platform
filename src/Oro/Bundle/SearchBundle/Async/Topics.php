@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Async;
 class Topics
 {
     const INDEX_ENTITY = 'oro.search.index_entity';
-    const INDEX_ENTITIES_BY_CLASS = 'oro.search.index_entities_by_class';
-    const INDEX_ENTITIES_BY_ID = 'oro.search.index_entities_by_id';
-    const REINDEX_ENTITIES = 'oro.search.reindex_entities';
+    const INDEX_ENTITY_TYPE = 'oro.search.index_entity_type';
+    const INDEX_ENTITIES = 'oro.search.index_entities';
+    const REINDEX = 'oro.search.reindex';
 }

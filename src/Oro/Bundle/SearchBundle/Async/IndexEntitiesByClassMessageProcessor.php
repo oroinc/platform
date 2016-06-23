@@ -98,6 +98,6 @@ class IndexEntitiesByClassMessageProcessor implements MessageProcessorInterface,
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::INDEX_ENTITIES_BY_CLASS];
+        return [Topics::INDEX_ENTITY_TYPE];
     }
 }

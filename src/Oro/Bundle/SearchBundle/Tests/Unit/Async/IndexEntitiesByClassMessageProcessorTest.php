@@ -25,7 +25,7 @@ class IndexEntitiesByClassMessageProcessorTest extends \PHPUnit_Framework_TestCa
     public function testShouldBeSubscribedForTopics()
     {
         $expectedSubscribedTopics = [
-            Topics::INDEX_ENTITIES_BY_CLASS,
+            Topics::INDEX_ENTITY_TYPE,
         ];
 
         $this->assertEquals($expectedSubscribedTopics, IndexEntitiesByClassMessageProcessor::getSubscribedTopics());

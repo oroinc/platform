@@ -88,7 +88,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITIES_BY_ID, $this->identicalTo($expectedMessage))
+            ->with(Topics::INDEX_ENTITIES, $this->identicalTo($expectedMessage))
         ;
 
         $doctrineHelper = $this->createDoctrineHelperMock();
@@ -126,7 +126,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITIES_BY_ID, $this->identicalTo($expectedMessage))
+            ->with(Topics::INDEX_ENTITIES, $this->identicalTo($expectedMessage))
         ;
 
         $doctrineHelper = $this->createDoctrineHelperMock();
@@ -164,7 +164,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITIES_BY_ID, $this->identicalTo($expectedMessage))
+            ->with(Topics::INDEX_ENTITIES, $this->identicalTo($expectedMessage))
         ;
 
         $doctrineHelper = $this->createDoctrineHelperMock();
@@ -202,7 +202,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITIES_BY_ID, $this->identicalTo($expectedMessage))
+            ->with(Topics::INDEX_ENTITIES, $this->identicalTo($expectedMessage))
         ;
 
         $doctrineHelper = $this->createDoctrineHelperMock();
@@ -236,7 +236,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::REINDEX_ENTITIES, $this->identicalTo($expectedMessage))
+            ->with(Topics::REINDEX, $this->identicalTo($expectedMessage))
         ;
 
         $indexer = new Indexer($producer, $this->createDoctrineHelperMock());
@@ -253,7 +253,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::REINDEX_ENTITIES, $this->identicalTo($expectedMessage))
+            ->with(Topics::REINDEX, $this->identicalTo($expectedMessage))
         ;
 
         $indexer = new Indexer($producer, $this->createDoctrineHelperMock());

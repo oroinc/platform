@@ -21,7 +21,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnSubscribedTopics()
     {
-        $expectedSubscribedTopics = [Topics::INDEX_ENTITIES_BY_ID];
+        $expectedSubscribedTopics = [Topics::INDEX_ENTITIES];
 
         $this->assertEquals($expectedSubscribedTopics, IndexEntitiesByIdMessageProcessor::getSubscribedTopics());
     }

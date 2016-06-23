@@ -18,7 +18,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnSubscribedTopics()
     {
-        $expectedSubscribedTopics = [Topics::REINDEX_ENTITIES];
+        $expectedSubscribedTopics = [Topics::REINDEX];
 
         $this->assertEquals($expectedSubscribedTopics, ReindexEntityMessageProcessor::getSubscribedTopics());
     }
@@ -40,7 +40,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITIES_BY_CLASS, 'class-name')
+            ->with(Topics::INDEX_ENTITY_TYPE, 'class-name')
         ;
 
         $message = new NullMessage();
@@ -70,7 +70,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITIES_BY_CLASS, 'class-name')
+            ->with(Topics::INDEX_ENTITY_TYPE, 'class-name')
         ;
 
         $message = new NullMessage();
@@ -103,7 +103,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::INDEX_ENTITIES_BY_CLASS, 'class-name')
+            ->with(Topics::INDEX_ENTITY_TYPE, 'class-name')
         ;
 
         $message = new NullMessage();

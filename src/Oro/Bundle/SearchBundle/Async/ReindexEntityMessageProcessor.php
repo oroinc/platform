@@ -58,7 +58,7 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
         }
 
         foreach ($entityNames as $entityName) {
-            $this->producer->send(Topics::INDEX_ENTITIES_BY_CLASS, $entityName);
+            $this->producer->send(Topics::INDEX_ENTITY_TYPE, $entityName);
         }
 
         return self::ACK;
@@ -69,6 +69,6 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::REINDEX_ENTITIES];
+        return [Topics::REINDEX];
     }
 }
