@@ -1,5 +1,4 @@
-Attendee
-=========
+#Attendee
 
 Main responsibility of Attendee entity is to store Calendar events guests and their connection with users (if attendee's email matches on user email).
 Matching works only in organisation scope. If user does not have permission to see other users information, he (user) will not see Attendee->User relation on view.
@@ -28,8 +27,7 @@ Create or update request should contain `email` and/or `displayName`. One of the
 * for sending notification in CRM side after event deleting, should use additional parameter in url: `notifyInvitedUsers` (example: DELETE /api/rest/latest/calendarevents/458?notifyInvitedUsers=true)
 * via API should send parameter `notifyInvitedUsers` to false
 
-API Example:
-------------
+##API Example:
 
 Via API for Attendee you could use next fields: `email`, `status`,  `type`, `displayName`.
 Bellow examples in json and array format. 
