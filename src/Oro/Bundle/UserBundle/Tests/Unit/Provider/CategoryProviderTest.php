@@ -3,16 +3,16 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\UserBundle\Provider\CategoryProvider;
+use Oro\Bundle\UserBundle\Provider\RolePermissionCategoryProvider;
 
 class CategoryProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var CategoryProvider */
+    /** @var RolePermissionCategoryProvider */
     private $categoryProvider;
 
     protected function setUp()
     {
-        $this->categoryProvider = new CategoryProvider();
+        $this->categoryProvider = new RolePermissionCategoryProvider();
     }
 
     public function testCategoryListFetchSuccess()

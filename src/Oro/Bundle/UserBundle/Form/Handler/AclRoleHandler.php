@@ -216,7 +216,8 @@ class AclRoleHandler
                 return true;
             }
         } else {
-            $this->setRolePrivileges($role);
+            $formPrivileges = $this->prepareRolePrivelegies($role);
+            $this->form->get('privileges')->setData(json_encode($formPrivileges));
         }
 
         return false;
@@ -234,41 +235,41 @@ class AclRoleHandler
 
     /**
      * @param AbstractRole $role
+     *
+     * @return array
      */
-    protected function setRolePrivileges(AbstractRole $role)
+    public function getAllPriveleges(AbstractRole $role)
     {
-        $allPrivileges = array();
+        $allPrivileges = [];
         $privileges = $this->getRolePrivileges($role);
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $sortedPrivileges = $this->filterPrivileges($privileges, $config['types']);
             $this->applyOptions($sortedPrivileges, $config);
+            $allPrivileges[$fieldName] = $sortedPrivileges;
+        }
 
+        return $allPrivileges;
+    }
+
+    /**
+     * @param AbstractRole $role
+     *
+     * @return array
+     */
+    protected function prepareRolePrivelegies(AbstractRole $role)
+    {
+        $allPrivileges = [];
+        /**
+         * @var string $fieldName
+         * @var ArrayCollection|AclPrivilege[] $sortedPrivileges
+         */
+        foreach ($this->getAllPriveleges($role) as $fieldName => $sortedPrivileges) {
             $this->form->get($fieldName)->setData($sortedPrivileges);
             $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
         }
 
-        $formPrivileges = [];
-        foreach ($allPrivileges as $key => $privilege) {
-            /** @var AclPrivilege $privilege */
-            $result = [
-                'identity' => [
-                    'id' => $privilege->getIdentity()->getId(),
-                    'name' => $privilege->getIdentity()->getName(),
-                ],
-                'permissions' => [],
-            ];
-            foreach ($privilege->getPermissions() as $permissionName => $permission) {
-                /** @var AclPermission $permission */
-                $result['permissions'][$permissionName] = [
-                    'name' => $permission->getName(),
-                    'accessLevel' => $permission->getAccessLevel(),
-                ];
-            }
-            $formPrivileges[$privilege->getExtensionKey()][$key] = $result;
-        }
-
-        $this->form->get('privileges')->setData(json_encode($formPrivileges));
+        return $this->getFormPriveleges($allPrivileges);
     }
 
     /**
@@ -455,5 +456,35 @@ class AclRoleHandler
     protected function getAclGroup()
     {
         return AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
+    }
+
+    /**
+     * @param $allPrivileges
+     *
+     * @return array
+     */
+    protected function getFormPriveleges($allPrivileges)
+    {
+        $formPrivileges = [];
+        foreach ($allPrivileges as $key => $privilege) {
+            /** @var AclPrivilege $privilege */
+            $result = [
+                'identity'    => [
+                    'id'   => $privilege->getIdentity()->getId(),
+                    'name' => $privilege->getIdentity()->getName(),
+                ],
+                'permissions' => [],
+            ];
+            foreach ($privilege->getPermissions() as $permissionName => $permission) {
+                /** @var AclPermission $permission */
+                $result['permissions'][$permissionName] = [
+                    'name'        => $permission->getName(),
+                    'accessLevel' => $permission->getAccessLevel(),
+                ];
+            }
+            $formPrivileges[$privilege->getExtensionKey()][$key] = $result;
+        }
+
+        return $formPrivileges;
     }
 }

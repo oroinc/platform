@@ -388,7 +388,7 @@ datagrid:
     role-permission-grid:
             acl_resource: oro_user_role_update
             source:
-                type: repository
+                type: role-permission-provider
             columns:
                 entity:
                     label: "Entity"
@@ -412,8 +412,8 @@ datagrid:
                     type: frontend
                     frontend_type: role-permissions
                     rowAction: true
-            filters: []
-            sorters: []
+            filters: ~
+            sorters: ~
             options:
                 requireJSModules:
                     - orouser/js/datagrid/roles-datagrid-builder

@@ -96,78 +96,46 @@ class RoleController extends Controller
     }
 
     /**
-     * @param Role $entity
+     * @param Role $role
+     *
      * @return array
      */
-    protected function update(Role $entity)
+    protected function update(Role $role)
     {
+        $categoryProvider = $this->get('oro_user.provider.role_permission_category_provider');
+
         /** @var AclRoleHandler $aclRoleHandler */
         $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
-        $aclRoleHandler->createForm($entity);
+        $aclRoleHandler->createForm($role);
 
-        if ($aclRoleHandler->process($entity)) {
+        if ($aclRoleHandler->process($role)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.user.controller.role.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get('oro_ui.router')->redirect($role);
         }
-        
-        $categoriesList = $this->get('oro_user.provider.category_provider')->getList();
-        $categories = array_values($categoriesList);
-        $tabs = array_filter(array_map(function($category) {
-            return $category['tab'] ? $category['id'] : null;
-        }, $categoriesList));
 
         $form = $aclRoleHandler->createView();
-        $translator = $this->get('translator');
-
-        $capabilitiesData = [];
-        foreach ($categories as $category) {
-            $capabilitiesData[$category['id']] = [
-                'group' => $category['id'],
-                'label' => $category['label'],
-                'items' => []
-            ];
-        }
-
-//        foreach ($form->children['action']->children as $action_id => $child) {
-//            $permission = reset($child->children['permissions']->children)->vars['value'];
-//            $description = $child->vars['value']->getDescription();
-//            $category = $child->vars['value']->getCategory();
-//            $capabilitiesData[$category]['items'][] = [
-//                'id' => $action_id,
-//                'identity' => $child->children['identity']->children['id']->vars['value'],
-//                'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
-//                'description' => $description ? $translator->trans($description) : '',
-//                'name' => $permission->getName(),
-//                'access_level' => $permission->getAccessLevel(),
-//                'selected_access_level' => 5,
-//                'unselected_access_level' => 0
-//            ];
-//        }
-        
         return array(
-            'entity' => $entity,
+            'entity' => $role,
             'form' => $form,
             'tabsOptions' => [
-                'data' => array_filter($categories, function ($category) use ($tabs) {
-                    return in_array($category['id'], $tabs);
-                })
+                'data' => $categoryProvider->getTabbedCategories()
             ],
             'capabilitySetOptions' => [
-                'data' => array_values($capabilitiesData),
-                'tabIds' => $tabs
+                'data' => $this->get('oro_user.provider.role_permission_capability_provider')->getCapabilities($role),
+                'tabIds' => $categoryProvider->getTabList()
             ],
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete a role and un-assign it from all users or reassign users to another role before
             'allow_delete' =>
-                $entity->getId() &&
+                $role->getId() &&
                 !$this->get('doctrine.orm.entity_manager')
                     ->getRepository('OroUserBundle:Role')
-                    ->hasAssignedUsers($entity)
+                    ->hasAssignedUsers($role)
         );
     }
 }
