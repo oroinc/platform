@@ -80,18 +80,12 @@ class TriggerScheduleOptionsVerifier
      */
     protected function prepareExpressions(array $options, WorkflowDefinition $workflowDefinition, $transitionName)
     {
-        $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
-        $entity = $workflowDefinition->getRelatedEntity();
-
         if (array_key_exists('filter', $options)) {
-            $steps = [];
-            foreach ($workflow->getStepManager()->getRelatedTransitionSteps($transitionName) as $step) {
-                $steps[] = $step->getName();
-            }
-
+            $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
+            
             $options['filter'] = $this->queryFactory->create(
-                $steps,
-                $entity,
+                $workflow,
+                $transitionName,
                 $options['filter']
             );
         }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TriggerScheduleOptionsVerifier;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
@@ -66,30 +65,14 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareFilterExpression()
     {
-        $step = new Step();
-        $step->setName('step1');
-
-        $stepsManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\StepManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stepsManager->expects($this->once())
-            ->method('getRelatedTransitionSteps')
-            ->with('transitionName')
-            ->willReturn([$step]);
-
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
             ->getMock();
-        $workflow->expects($this->once())
-            ->method('getStepManager')
-            ->willReturn($stepsManager);
 
         $this->workflowAssembler->expects($this->once())
             ->method('assemble')
             ->with($this->workflowDefinition, false)
             ->willReturn($workflow);
-
-        $this->workflowDefinition->expects($this->once())->method('getRelatedEntity')->willReturn('EntityClass');
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->setMethods(['getDQL'])
@@ -98,7 +81,7 @@ class TriggerScheduleOptionsVerifierTest extends \PHPUnit_Framework_TestCase
 
         $this->queryFactory->expects($this->once())
             ->method('create')
-            ->with(['step1'], 'EntityClass', 'filterDQL')
+            ->with($workflow, 'transitionName', 'filterDQL')
             ->willReturn($query);
 
         /** @var ExpressionVerifierInterface|\PHPUnit_Framework_MockObject_MockObject $expressionVerifier */
