@@ -26,10 +26,11 @@ class BusinessUnitSearchHandler extends SearchHandler
     {
         $result = parent::convertItem($item);
 
-        $businnesUnit = $this->doctrine->getManager()->getRepository('OroOrganizationBundle:BusinessUnit')
+        $businessUnit = $this->doctrine->getManager()->getRepository('OroOrganizationBundle:BusinessUnit')
             ->find($result[$this->idFieldName]);
 
-        $result['treePath'] = $this->getPath($businnesUnit, []);
+        $result['treePath'] = $this->getPath($businessUnit, []);
+        $result['organization_id'] = $businessUnit->getOrganization()->getId();
 
         return $result;
     }
