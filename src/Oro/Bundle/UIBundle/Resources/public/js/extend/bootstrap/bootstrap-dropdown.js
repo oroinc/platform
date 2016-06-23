@@ -4,6 +4,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
     require('bootstrap');
     var toggleDropdown = '[data-toggle=dropdown]';
 
@@ -159,7 +160,7 @@ define(function(require) {
 
     $(document)
         .on('click.dropdown.data-api', toggleDropdown, Dropdown.prototype.toggle)
-        .on('tohide.bs.dropdown', function(e) {
+        .on('tohide.bs.dropdown', toggleDropdown + ', .dropdown.open', function(e) {
             /**
              * Performs safe hide action for dropdown and triggers 'hide.bs.dropdown'
              * (the event 'tohide.bs.dropdown' have to be triggered on toggleDropdown or dropdown elements)
@@ -172,6 +173,7 @@ define(function(require) {
                 $target.trigger('hide.bs.dropdown');
             }
             $target.removeClass('open');
+            e.stopImmediatePropagation();
         });
 
     Dropdown.prototype.destroy = function() {
@@ -214,25 +216,42 @@ define(function(require) {
                     $placeholder.trigger(e.type);
                 });
             $toggle.on('mouseleave.floating-dropdown', function(e) {
-                if (!$dropdownMenu.is(e.relatedTarget)) {
+                if (!$dropdownMenu.is(e.relatedTarget) && !$dropdownMenu.has(e.relatedTarget).length) {
                     $placeholder.trigger(e.type);
                 }
             });
-
-            function toClose() {
-                $placeholder.parent().trigger('tohide.bs.dropdown');
-            }
-
-            $placeholder.parents().add(window)
-                .on('scroll.floating-dropdown resize.floating-dropdown', toClose);
         }
 
-        function makeEmbedded($toggle, $dropdownMenu, $placeholder) {
-            $placeholder.parents().add(window)
-                .off('.floating-dropdown');
+        function makeEmbedded($toggle, $dropdownMenu) {
             $dropdownMenu.removeClass('dropdown-menu__floating');
             $toggle.dropdown('detach', false)
                 .off('.floating-dropdown');
+        }
+
+        function updatePosition($toggle, $dropdownMenu, e) {
+            if (e && e.type === 'scroll') {
+                var scrollableRect = scrollHelper.getFinalVisibleRect(e.target);
+                var dropdownRect = $dropdownMenu[0].getBoundingClientRect();
+                var inRange = scrollableRect.top < dropdownRect.top &&
+                    scrollableRect.left < dropdownRect.left &&
+                    scrollableRect.right > dropdownRect.right &&
+                    scrollableRect.bottom > dropdownRect.bottom;
+                if ($dropdownMenu.is('.dropdown-menu__floating')) {
+                    // floating mode
+                    if (!inRange) {
+                        makeEmbedded($toggle, $dropdownMenu);
+                    } else {
+                        $toggle.dropdown('updatePosition');
+                    }
+                } else {
+                    // embedded mode
+                    if (inRange) {
+                        makeFloating($toggle, $dropdownMenu);
+                    }
+                }
+            } else {
+                $toggle.dropdown('updatePosition');
+            }
         }
 
         $(document)
@@ -241,15 +260,20 @@ define(function(require) {
                 var $dropdownMenu = $('>.dropdown-menu', this);
                 var options = $dropdownMenu.data('options');
                 if (options && options.html) {
+                    var handlePositionChange = _.partial(updatePosition, $toggle, $dropdownMenu);
+                    $(window).on('resize.floating-dropdown', handlePositionChange);
+                    $dropdownMenu.parents().on('scroll.floating-dropdown', handlePositionChange);
+                    mediator.on('layout:adjustHeight', handlePositionChange, this);
                     makeFloating($toggle, $dropdownMenu);
                 }
             })
             .on('hide.bs.dropdown', '.dropdown.open', function() {
                 var $toggle = $(toggleDropdown, this);
-                var $placeholder = $('>.dropdown-menu__placeholder', this);
-                var $dropdownMenu = $placeholder.data('related-menu');
+                var $dropdownMenu = $('>.dropdown-menu__placeholder', this).data('related-menu');
                 if ($dropdownMenu && $dropdownMenu.length) {
-                    makeEmbedded($toggle, $dropdownMenu, $placeholder);
+                    makeEmbedded($toggle, $dropdownMenu);
+                    mediator.off('layout:adjustHeight', null, this);
+                    $dropdownMenu.parents().add(window).off('.floating-dropdown');
                 }
             });
 
@@ -263,14 +287,5 @@ define(function(require) {
             return event.handler.name === 'clearMenus';
         });
         clickEvents.splice(clickEvents.indexOf(clearMenusHandler), 0, clickEvents.pop());
-
-        var _updateDropdownsPosition = function() {
-            $('.dropdown-menu').filter('.open, .detach').each(function() {
-                $(this).data('related-toggle').dropdown('updatePosition');
-            });
-        };
-
-        $(window).on('resize', _.debounce(_updateDropdownsPosition, 100));
-        mediator.on('layout:adjustHeight', _updateDropdownsPosition, this);
     })();
 });
