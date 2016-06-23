@@ -58,7 +58,6 @@ class UnderlyingAclCache
             $this->entityBatches[$type] = [];
         }
 
-
         if (!array_key_exists($type, $this->loadedBatches)
             || !array_key_exists($batchNumber, $this->loadedBatches[$type])
         ) {
