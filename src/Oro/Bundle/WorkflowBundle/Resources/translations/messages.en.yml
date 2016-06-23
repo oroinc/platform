@@ -217,6 +217,7 @@ oro:
             current_step.label:       Current step
             definition.label:         Workflow definition
             entity_id.label:          Entity identifier
+            entity_class.label:       Entity class
             serialized_data.label:    Serialized data
             transition_records.label: Transition records
             workflow_name.label:      Workflow name
