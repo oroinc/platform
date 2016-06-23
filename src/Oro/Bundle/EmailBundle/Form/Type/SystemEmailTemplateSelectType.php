@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -41,11 +42,7 @@ class SystemEmailTemplateSelectType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'query_builder' => $this->getRepository()->getEntityTemplatesQueryBuilder(
-                '',
-                $this->securityFacade->getOrganization(),
-                true
-            ),
+            'query_builder' => $this->getQueryBuilder(),
             'class' => 'OroEmailBundle:EmailTemplate',
             'choice_value' => 'name',
         ]);
@@ -85,6 +82,20 @@ class SystemEmailTemplateSelectType extends AbstractType
     public function getParent()
     {
         return 'genemu_jqueryselect2_translatable_entity';
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    protected function getQueryBuilder()
+    {
+        $qb = $this->getRepository()->getEntityTemplatesQueryBuilder(
+            '',
+            $this->securityFacade->getOrganization(),
+            true
+        );
+
+        return $qb;
     }
 
     /**
