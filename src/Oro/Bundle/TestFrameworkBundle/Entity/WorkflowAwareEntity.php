@@ -13,9 +13,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareTrait;
  * @ORM\Entity
  * @Config
  */
-class WorkflowAwareEntity implements TestFrameworkEntityInterface, WorkflowAwareInterface
+class WorkflowAwareEntity implements TestFrameworkEntityInterface//, WorkflowAwareInterface
 {
-    use WorkflowAwareTrait;
+    //use WorkflowAwareTrait;
     /**
      * @var integer $id
      *

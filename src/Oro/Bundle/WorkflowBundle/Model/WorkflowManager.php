@@ -142,10 +142,10 @@ class WorkflowManager
         return $this->inTransaction(
             function (EntityManager $em) use ($workflowItem, $entity) {
                 $currentWorkflowName = $workflowItem->getWorkflowName();
-                
+
                 $em->remove($workflowItem);
                 $em->flush();
-                
+
                 $workflow = $this->workflowRegistry->getWorkflow($currentWorkflowName);
                 if ($this->isActiveWorkflow($workflow) && $workflow->getStepManager()->hasStartStep()) {
                     return $this->startWorkflow($workflow->getName(), $entity);
@@ -410,7 +410,7 @@ class WorkflowManager
         $definition = $workflowIdentifier instanceof WorkflowDefinition
             ? $workflowIdentifier
             : $this->getWorkflow($workflowIdentifier)->getDefinition();
-        
+
         $this->config->setWorkflowActive($definition);
     }
 
@@ -445,31 +445,5 @@ class WorkflowManager
     public function resetWorkflowData(WorkflowDefinition $workflowDefinition)
     {
         $this->getWorkflowItemRepository()->resetWorkflowData($workflowDefinition);
-    }
-
-    /**
-     * Check that entity workflow item is equal to the active workflow item.
-     *
-     * @param object $entity
-     * @param WorkflowItem $currentWorkflowItem
-     * @return bool
-     */
-    public function isResetAllowed($entity, WorkflowItem $currentWorkflowItem)
-    {
-        $activeWorkflows = $this->getApplicableWorkflows($entity);
-
-        if (!count($activeWorkflows)) {
-            return false;
-        }
-
-        if ($currentWorkflowItem) {
-            foreach ($activeWorkflows as $activeWorkflow) {
-                if ($activeWorkflow->getName() === $currentWorkflowItem->getWorkflowName()) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 }
