@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -18,7 +19,7 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
     use ContainerAwareTrait;
 
     const OLD_CONFIG_KEY = 'active_workflow';
-    const NEW_CONFIG_KEY = 'active_workflows';
+    const NEW_CONFIG_KEY = WorkflowSystemConfigManager::CONFIG_KEY;
 
     /**
      * {@inheritdoc}
@@ -45,7 +46,7 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
     {
         /* @var $configManager ConfigManager */
         $configManager = $this->container->get('oro_entity_config.config_manager');
-        $configProvider = $configManager->getProvider('workflow');
+        $configProvider = $configManager->getProvider(WorkflowSystemConfigManager::CONFIG_PROVIDER_NAME);
 
         foreach ($configProvider->getConfigs() as $config) {
             /* @var $config ConfigInterface */
