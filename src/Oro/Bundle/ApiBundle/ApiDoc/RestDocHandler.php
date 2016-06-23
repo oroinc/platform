@@ -39,9 +39,6 @@ class RestDocHandler implements HandlerInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var EntityMetadata[] */
-    protected $parentMetadata = [];
-
     /**
      * @param RestDocViewDetector          $docViewDetector
      * @param ActionProcessorBagInterface  $processorBag
@@ -95,14 +92,7 @@ class RestDocHandler implements HandlerInterface
             }
             if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
                 if ($associationName) {
-                    $parentEntityClass = $actionContext->getParentClassName();
-                    if (isset($this->parentMetadata[$parentEntityClass])) {
-                        $parentEntityMetadata = $this->parentMetadata[$parentEntityClass];
-                    } else {
-                        $parentEntityMetadata = $actionContext->getParentMetadata();
-                        $this->parentMetadata[$parentEntityClass] = $parentEntityMetadata;
-                    }
-                    $this->addIdRequirement($annotation, $parentEntityMetadata);
+                    $this->addIdRequirement($annotation, $actionContext->getParentMetadata());
                 } else {
                     $this->addIdRequirement($annotation, $actionContext->getMetadata());
                 }

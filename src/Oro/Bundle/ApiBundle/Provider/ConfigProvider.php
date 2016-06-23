@@ -52,6 +52,10 @@ class ConfigProvider extends AbstractConfigProvider
         $this->processor->process($context);
 
         $config = $this->buildResult($context);
+        $definition = $config->getDefinition();
+        if ($definition) {
+            $definition->setKey($cacheKey);
+        }
 
         $this->cache[$cacheKey] = $config;
 

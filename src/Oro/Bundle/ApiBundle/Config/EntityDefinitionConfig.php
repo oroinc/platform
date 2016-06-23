@@ -52,6 +52,41 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     const FORM_OPTIONS = 'form_options';
 
     /**
+     * A string that unique identify this instance of entity definition config.
+     * This value is set by config providers and is used by a metadata provider
+     * to build a metadata cache key. It allows to avoid loading the same metadata
+     * several times and as result it improves a performance.
+     * @see Oro\Bundle\ApiBundle\Provider\MetadataProvider
+     * @see Oro\Bundle\ApiBundle\Provider\ConfigProvider
+     * @see Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
+     *
+     * @var string|null
+     */
+    protected $key;
+
+    /**
+     * Gets a string that unique identify this instance of entity definition config.
+     *
+     * @return string|null
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
+     * Sets a string that unique identify this instance of entity definition config.
+     * Do not set this value in your code.
+     * @see Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig::id
+     *
+     * @param string|null $key
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function toArray()
