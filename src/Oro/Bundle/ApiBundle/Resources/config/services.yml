@@ -342,7 +342,6 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
             - '@oro_api.resource_doc_provider'
-            - '@oro_api.metadata_provider'
             - '@oro_api.value_normalizer'
         tags:
             - { name: nelmio_api_doc.extractor.handler }

@@ -8,7 +8,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra;
@@ -20,7 +19,6 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
-use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
@@ -38,33 +36,27 @@ class RestDocHandler implements HandlerInterface
     /** @var ResourceDocProviderInterface */
     protected $resourceDocProvider;
 
-    /** @var MetadataProvider */
-    protected $metadataProvider;
-
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
     /** @var EntityMetadata[] */
-    protected $metadata = [];
+    protected $parentMetadata = [];
 
     /**
      * @param RestDocViewDetector          $docViewDetector
      * @param ActionProcessorBagInterface  $processorBag
      * @param ResourceDocProviderInterface $resourceDocProvider
-     * @param MetadataProvider             $metadataProvider
      * @param ValueNormalizer              $valueNormalizer
      */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
         ResourceDocProviderInterface $resourceDocProvider,
-        MetadataProvider $metadataProvider,
         ValueNormalizer $valueNormalizer
     ) {
         $this->docViewDetector = $docViewDetector;
         $this->processorBag = $processorBag;
         $this->resourceDocProvider = $resourceDocProvider;
-        $this->metadataProvider = $metadataProvider;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -103,15 +95,16 @@ class RestDocHandler implements HandlerInterface
             }
             if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
                 if ($associationName) {
-                    $this->addIdRequirement(
-                        $annotation,
-                        $this->getMetadata($actionContext->getParentClassName(), $actionContext->getParentConfig())
-                    );
+                    $parentEntityClass = $actionContext->getParentClassName();
+                    if (isset($this->parentMetadata[$parentEntityClass])) {
+                        $parentEntityMetadata = $this->parentMetadata[$parentEntityClass];
+                    } else {
+                        $parentEntityMetadata = $actionContext->getParentMetadata();
+                        $this->parentMetadata[$parentEntityClass] = $parentEntityMetadata;
+                    }
+                    $this->addIdRequirement($annotation, $parentEntityMetadata);
                 } else {
-                    $this->addIdRequirement(
-                        $annotation,
-                        $this->getMetadata($entityClass, $config)
-                    );
+                    $this->addIdRequirement($annotation, $actionContext->getMetadata());
                 }
             }
             $filters = $actionContext->getFilters();
@@ -372,29 +365,5 @@ class RestDocHandler implements HandlerInterface
     protected function hasAttribute(Route $route, $placeholder)
     {
         return false !== strpos($route->getPath(), $placeholder);
-    }
-
-    /**
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     *
-     * @return EntityMetadata
-     */
-    protected function getMetadata($entityClass, EntityDefinitionConfig $config)
-    {
-        if (isset($this->metadata[$entityClass])) {
-            return $this->metadata[$entityClass];
-        }
-
-        $metadata = $this->metadataProvider->getMetadata(
-            $entityClass,
-            $this->docViewDetector->getVersion(),
-            $this->docViewDetector->getRequestType(),
-            [],
-            $config
-        );
-        $this->metadata[$entityClass] = $metadata;
-
-        return $metadata;
     }
 }
