@@ -34,7 +34,9 @@ services:
             - '@oro_entity_config.provider.workflow'
             - '@oro_workflow.manager'
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore, priority: 255 }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter, priority: 255 }
         calls:
             - [addWorkflowStepColumn, ["workflowStep"]]
             - [addWorkflowStepColumn, ["workflowStepLabel"]]

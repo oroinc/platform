@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -25,9 +24,6 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
     /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
-    /**@var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
-
     /**@var WorkflowSystemConfigManager */
     protected $manager;
 
@@ -35,12 +31,10 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configManager = $this->getMockBuilder(ConfigManager::class)->disableOriginalConstructor()->getMock();
         $this->eventDispatcher = $this->getMock(EventDispatcher::class);
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
 
         $this->manager = new WorkflowSystemConfigManager(
             $this->configManager,
-            $this->eventDispatcher,
-            $this->doctrineHelper
+            $this->eventDispatcher
         );
     }
 
@@ -156,10 +150,6 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetActiveWorkflowNamesByEntity()
     {
         $entity = new EntityStub(24);
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entity)
-            ->willReturn(EntityStub::class);
 
         $entityConfig = $this->emulateGetEntityConfig(EntityStub::class);
 
