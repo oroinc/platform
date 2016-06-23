@@ -120,7 +120,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $workflow = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Model\Workflow');
 
         $this->workflowManager->expects($this->once())
-            ->method('getApplicableWorkflowsByEntityClass')
+            ->method('getApplicableWorkflows')
             ->with($options['workflow_entity_class'])
             ->willReturn([$workflow]);
 

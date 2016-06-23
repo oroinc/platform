@@ -333,7 +333,7 @@ class WorkflowManager
     {
         throw new \RuntimeException(
             'No single workflow supported for an entity. ' .
-            'See \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflowsByEntityClass'
+            'See \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflows'
         );
     }
 
