@@ -88,8 +88,16 @@ class FixtureLoader
 
         $rows = $table->getRows();
         $headers = array_shift($rows);
+        array_walk($headers, function (&$header) {
+            $header = ucfirst(preg_replace('/\s*/', '', $header));
+        });
 
         foreach ($rows as $row) {
+            array_walk($row, function (&$value) {
+                if (0 === strpos($value, '[')) {
+                    $value = explode(', ', trim($value, '[]'));
+                }
+            });
             $values = array_combine($headers, $row);
             $object = $this->getObjectFromArray($className, $values);
 
