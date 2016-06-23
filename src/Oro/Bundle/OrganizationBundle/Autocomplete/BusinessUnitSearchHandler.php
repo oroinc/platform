@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class BusinessUnitSearchHandler extends SearchHandler
 {
@@ -31,6 +32,18 @@ class BusinessUnitSearchHandler extends SearchHandler
         $result['treePath'] = $this->getPath($businnesUnit, []);
 
         return $result;
+    }
+
+    /**
+     * @param Indexer $indexer
+     * @param array   $config
+     * @throws \RuntimeException
+     */
+    public function initSearchIndexer(Indexer $indexer, array $config)
+    {
+        parent::initSearchIndexer($indexer, $config);
+        $this->indexer->setIsAllowedApplyAcl(false);
+        $this->indexer->setSearchHandlerState('business_units_search_handler');
     }
 
     /**

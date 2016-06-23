@@ -133,6 +133,12 @@ services:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
             - { name: doctrine.event_listener, event: onClear }
 
+    oro_organization.listener.indexer_prepare_query_listener:
+        class: Oro\Bundle\OrganizationBundle\EventListener\IndexerPrepareQueryListener
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: kernel.event_listener, event: oro_search.indexed_prepare_query, method: updateQuery }
     #
     # DataGrid
     #
@@ -233,7 +239,7 @@ services:
             - '@?security.acl.voter.basic_permissions'
             - '@oro_security.ownership_tree_provider'
 
-    # Autocomplete business unit search handler
+    # Autocomplete business unit search handler for organization structure
     oro_organization.autocomplete.business_unit_search_handler:
         class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitSearchHandler
         parent: oro_form.autocomplete.search_handler
