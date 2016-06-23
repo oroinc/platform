@@ -1,6 +1,16 @@
 Debug commands
 --------------
 
+### oro:api:cache:clear
+
+This command command clears Data API cache.
+
+Usually you need to run this command when you add a new entity to `Resources/config/oro/api.yml` or you add a new processor that changes a list of available through Data API resources.
+
+```bash
+php app/console oro:api:cache:clear
+```
+
 ### oro:api:dump
 
 This command shows all resources accessible through Data API.

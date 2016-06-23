@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetDefaultPaging;
@@ -19,7 +20,7 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         $this->processor = new SetDefaultPaging();
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessWhenQueryIsAlreadyExist()
     {
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -31,12 +32,13 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         $this->assertSame($qb, $this->context->getQuery());
     }
 
-    public function testProcess()
+    public function testProcessWithDefaultPaging()
     {
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
-        $this->assertEquals(2, $filters->count());
+        $this->assertCount(2, $filters);
         /** @var PageSizeFilter $pageSizeFilter */
         $pageSizeFilter = $filters->get('limit');
         $this->assertEquals(10, $pageSizeFilter->getDefaultValue());
@@ -46,5 +48,38 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
 
         // check that filters are added in correct order
         $this->assertEquals(['limit', 'page'], array_keys($filters->all()));
+    }
+
+    public function testProcessWhenPageSizeExistsInConfig()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setPageSize(123);
+
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        $this->assertCount(2, $filters);
+        /** @var PageSizeFilter $pageSizeFilter */
+        $pageSizeFilter = $filters->get('limit');
+        $this->assertEquals(123, $pageSizeFilter->getDefaultValue());
+        /** @var PageNumberFilter $pageNumberFilter */
+        $pageNumberFilter = $filters->get('page');
+        $this->assertEquals(1, $pageNumberFilter->getDefaultValue());
+
+        // check that filters are added in correct order
+        $this->assertEquals(['limit', 'page'], array_keys($filters->all()));
+    }
+
+    public function testProcessWhenPagingIsDisabled()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setPageSize(-1);
+
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        $this->assertCount(0, $filters);
     }
 }
