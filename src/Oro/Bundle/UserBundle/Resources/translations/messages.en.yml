@@ -105,6 +105,7 @@ oro:
         id.label:                    Id
         avatar.label:                Avatar
         imap_configuration.label:    Email synchronization settings
+        imap_configuration.update:   Update settings
         last_login.label:            Last logged in
         last_name.label:             Last name
         login_count.label:           Login count

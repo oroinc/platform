@@ -31,14 +31,6 @@ class EmailSignatureTest extends Selenium2TestCase
         $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN])
-            ->edit()
-            ->setSignature('')
-            ->save()
-            ->assertMessage('User saved');
-        /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
-            ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
-            ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN])
             ->runActionInGroup('Send email');
         /** @var Email $login */
         $login->openEmail('Oro\Bundle\EmailBundle')
@@ -53,6 +45,7 @@ class EmailSignatureTest extends Selenium2TestCase
      */
     public function testAddUserEmailSignature()
     {
+        $this->markTestSkipped('Signature configuration was moved to user configuration page');
         $signature = "Test signature for user_".mt_rand(10, 99);
 
         $login = $this->login();
@@ -84,6 +77,7 @@ class EmailSignatureTest extends Selenium2TestCase
      */
     public function testPriorityOfSystemSignatureOverUser($signature)
     {
+        $this->markTestSkipped('Signature configuration was moved to user configuration page');
         $login = $this->login();
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')

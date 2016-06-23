@@ -260,3 +260,6 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 
 ####NotificationBundle:
 - The constructor of the `Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool` class was changed. Before: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass)`. After: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass, EventDispatcherInterface $eventDispatcher)`.
+
+####UserBundle:
+- The constructor of the `Oro\Bundle\UserBundle\Form\Type\UserType` class was changed. Before: `__construct(SecurityContextInterface $security, SecurityFacade $securityFacade, Request $request, ConfigManager $userConfigManager)`. After: `__construct(SecurityContextInterface $security, SecurityFacade $securityFacade, Request $request)`.

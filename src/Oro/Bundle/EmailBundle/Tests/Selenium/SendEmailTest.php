@@ -44,6 +44,7 @@ class SendEmailTest extends Selenium2TestCase
      */
     public function testUserImapSync()
     {
+        $this->markTestSkipped('Imap configuration was moved to user configuration page');
         $imapSetting = array(
             'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
             'port' => '143',

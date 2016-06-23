@@ -5,9 +5,10 @@
 {% oro_title_set({params : {"%username%": fullname }}) %}
 
 {% block navButtons %}
-    {% if resource_granted('EDIT', entity) or editRoute is defined %}
+    {% set canEdit = resource_granted('EDIT', entity)  %}
+    {% if canEdit or editRoute is defined %}
         {{ UI.button({
-            'path' : path('oro_user_config', { 'id': entity.id }),
+            'path' : canEdit ? path('oro_user_config', { 'id': entity.id }) : path('oro_user_profile_configuration'),
             'label': 'oro.user.user_configuration.label'|trans,
             'title': 'oro.user.user_configuration.label'|trans,
             'iCss': 'icon-cog',
@@ -19,7 +20,7 @@
             'entity_label': 'profile'|trans
         }) }}
     {% else %}
-        {% if resource_granted('EDIT', entity) %}
+        {% if canEdit %}
             {{ UI.editButton({
                 'path' : path('oro_user_update', { id: entity.id }),
                 'entity_label': 'oro.user.entity_label'|trans

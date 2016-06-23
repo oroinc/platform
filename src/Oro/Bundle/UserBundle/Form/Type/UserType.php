@@ -32,24 +32,18 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
-    /** ConfigManager */
-    protected $userConfigManager;
-
     /**
      * @param SecurityContextInterface $security Security context
      * @param SecurityFacade           $securityFacade
      * @param Request                  $request Request
-     * @param ConfigManager            $userConfigManager
      */
     public function __construct(
         SecurityContextInterface $security,
         SecurityFacade           $securityFacade,
-        Request                  $request,
-        ConfigManager            $userConfigManager
+        Request                  $request
     ) {
         $this->security          = $security;
         $this->securityFacade    = $securityFacade;
-        $this->userConfigManager = $userConfigManager;
 
         $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
     }
@@ -145,19 +139,6 @@ class UserType extends AbstractType
                     'prototype_name' => 'tag__name__'
                 ]
             );
-        if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
-            $builder->add(
-                'imapAccountType',
-                'oro_imap_choice_account_type',
-                ['label' => 'oro.user.imap_configuration.label']
-            );
-        } else {
-            $builder->add(
-                'imapConfiguration',
-                'oro_imap_configuration',
-                ['label' => 'oro.user.imap_configuration.label']
-            );
-        }
         $builder->add('change_password', ChangePasswordType::NAME)
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 

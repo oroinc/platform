@@ -28,6 +28,10 @@ oro_system_configuration:
             title: oro.email.system_configuration.mailbox_configuration.label
             priority: -10
 
+        user_mailbox:
+            title: oro.user.imap_configuration.label
+            priority: -10
+
         user_bar_settings:
             title: oro.user.user_bar_settings.title
             priority: 100
@@ -110,6 +114,15 @@ oro_system_configuration:
                 tooltip: oro.email.form.tooltip.attachment_sync.preview_limit
                 required: true
 
+        oro_email.user_mailbox:
+            type: oro_user_emailsettings_button
+            ui_only: true
+            priority: 10
+            options:
+                label: false
+                required: false
+                resettable: false
+
     tree:
         system_configuration:
             platform:
@@ -160,9 +173,9 @@ oro_system_configuration:
                                     reply_configuration:
                                         children:
                                             - oro_email.default_button_reply
-                                    mailboxes:
+                                    user_mailbox:
                                         children:
-                                            - oro_email.mailbox_grid
+                                            - oro_email.user_mailbox
 
     api_tree:
         signature_configuration:
