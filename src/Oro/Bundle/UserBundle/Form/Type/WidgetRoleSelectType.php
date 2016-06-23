@@ -15,7 +15,7 @@ class WidgetRoleSelectType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'autocomplete_alias' => 'roles',
+                'autocomplete_alias' => 'widget_owner_roles',
                 'configs'            => [
                     'multiple'    => true,
                     'width'       => '400px',

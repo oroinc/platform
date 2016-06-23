@@ -204,6 +204,15 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles, acl_resource: oro_user_role_view }
 
+    oro_user.autocomplete.widget_role.search_handler:
+        class: Oro\Bundle\UserBundle\Autocomplete\WidgetRoleSearchHandler
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_user.role.entity.class%
+            - ["label"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: widget_owner_roles, acl_resource: oro_user_role_view }
+
     # Autocomplete role search handler for authenticated roles
     oro_user.autocomplete.role.authenticated_search_handler:
         class: %oro_user.autocomplete.role.authenticated_search_handler.class%
