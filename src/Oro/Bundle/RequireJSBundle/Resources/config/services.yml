@@ -23,4 +23,6 @@ services:
             - OroRequireJSBundle::require_config.js.twig
         calls:
             - [ setCache, [ '@oro_requirejs.cache' ] ]
+        tags:
+            - { name: requirejs.config_provider}
         lazy: true

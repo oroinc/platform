@@ -13,15 +13,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $parameters = array(
-            'oro_require_js' => array(
+        $parameters = [
+            'oro_require_js' => [
                 'build_path' => 'js/app.min.js'
-            ),
-            'kernel.bundles' => array(
+            ],
+            'kernel.bundles' => [
                 'Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\TestBundle\TestBundle',
                 'Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle',
-            )
-        );
+            ]
+        ];
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
@@ -44,36 +44,41 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMainConfig()
     {
-        $expected = array(
-            'config' => array(
-                'paths' => array(
+        $defaultExpected = [
+            'config' => [
+                'paths' => [
                     'oro/test' => 'orosecondtest/js/second-test'
-                )
-            )
-        );
-        $this->assertEquals($expected, $this->configProvider->getMainConfig());
+                ]
+            ]
+        ];
+        $this->assertEquals($defaultExpected, $this->configProvider->getMainConfig());
 
+        $expected = $defaultExpected;
         $expected['config']['paths']['oro/test2'] = 'orotest/js/test2';
 
-        $cache = $this->getMock('\Doctrine\Common\Cache\PhpFileCache', array(), array(), '', false);
+        $returnValue['_main']['mainConfig'] = $expected;
+        $cache = $this->getMock('\Doctrine\Common\Cache\PhpFileCache', [], [], '', false);
         $cache->expects($this->any())
             ->method('fetch')
-            ->will($this->returnValue($expected));
+            ->will($this->returnValue($returnValue));
         $this->configProvider->setCache($cache);
 
         $this->assertEquals($expected, $this->configProvider->getMainConfig());
+
+        $this->configProvider->setTheme('undefined');
+        $this->assertEquals($defaultExpected, $this->configProvider->getMainConfig());
     }
 
     public function testGenerateMainConfig()
     {
         $this->assertEquals(
-            array(
-                'config' => array(
-                    'paths' => array(
+            [
+                'config' => [
+                    'paths' => [
                         'oro/test' => 'orosecondtest/js/second-test'
-                    )
-                )
-            ),
+                    ]
+                ]
+            ],
             $this->configProvider->generateMainConfig()
         );
     }
@@ -81,17 +86,17 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testGenerateBuildConfig()
     {
         $this->assertEquals(
-            array(
-                'paths' => array(
+            [
+                'paths' => [
                     'oro/test' => 'empty:',
                     'require-config' => '../main-config',
                     'require-lib' => 'ororequirejs/lib/require',
-                ),
+                ],
                 'baseUrl' => './bundles',
                 'out' => './js/app.min.js',
                 'mainConfigFile' => './main-config.js',
-                'include' => array('require-config', 'require-lib', 'oro/test')
-            ),
+                'include' => ['require-config', 'require-lib', 'oro/test']
+            ],
             $this->configProvider->generateBuildConfig('main-config.js')
         );
     }
@@ -99,19 +104,19 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testCollectConfigs()
     {
         $this->assertEquals(
-            array(
+            [
                 'build_path' => 'js/app.min.js',
-                'config' => array(
-                    'paths' => array(
+                'config' => [
+                    'paths' => [
                         'oro/test' => 'bundles/orosecondtest/js/second-test.js'
-                    )
-                ),
-                'build' => array(
-                    'paths' => array(
+                    ]
+                ],
+                'build' => [
+                    'paths' => [
                         'oro/test' => 'empty:'
-                    )
-                )
-            ),
+                    ]
+                ]
+            ],
             $this->configProvider->collectConfigs()
         );
     }

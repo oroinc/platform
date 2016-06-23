@@ -2,26 +2,24 @@
 
 namespace Oro\Bundle\RequireJSBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\Common\Cache\CacheProvider;
+
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Templating\TemplateReferenceInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
-use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
-class Config
+class Config implements ConfigProviderInterface
 {
-    const REQUIREJS_CONFIG_CACHE_KEY = 'requirejs_config';
+    const REQUIREJS_CONFIG_CACHE_KEY    = 'requirejs_config';
+
+    const MAIN_CONFIG_FILE_NAME         = 'js/require-config.js';
+    const OUTPUT_FILE_NAME              = 'js/oro.min.js';
 
     /**
-     * @var \Doctrine\Common\Cache\CacheProvider
-     */
-    protected $cache;
-
-    /**
-     * @var  ContainerInterface
+     * @var ContainerInterface
      */
     protected $container;
 
@@ -41,9 +39,23 @@ class Config
     protected $collectedConfig;
 
     /**
+     * Cache instance
+     *
+     * @var CacheProvider
+     */
+    protected $cache;
+
+    /**
+     * Active theme
+     *
+     * @var string
+     */
+    protected $theme = '_main';
+
+    /**
      * @param ContainerInterface $container
      * @param EngineInterface $templating
-     * @param $template
+     * @param string|TemplateReferenceInterface $template
      */
     public function __construct(ContainerInterface $container, EngineInterface $templating, $template)
     {
@@ -55,32 +67,86 @@ class Config
     /**
      * Set cache instance
      *
-     * @param \Doctrine\Common\Cache\CacheProvider $cache
+     * @param CacheProvider $cache
+     *
+     * @return Config
      */
     public function setCache(CacheProvider $cache)
     {
         $this->cache = $cache;
+
+        return $this;
     }
 
     /**
-     * Fetches piece of JS-code with require.js main config from cache
-     * or if it was not there - generates and put into a cache
+     * Set active theme
      *
-     * @return string
+     * @param string $theme
+     *
+     * @return Config
+     */
+    public function setTheme($theme)
+    {
+        $this->theme = $theme;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigFilePath()
+    {
+        return self::MAIN_CONFIG_FILE_NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOutputFilePath()
+    {
+        $configs = $this->collectConfigs();
+        return $configs['build_path'];
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getMainConfig()
     {
-        $config = null;
         if ($this->cache) {
-            $config = $this->cache->fetch(self::REQUIREJS_CONFIG_CACHE_KEY);
-        }
-        if (empty($config)) {
-            $config = $this->generateMainConfig();
-            if ($this->cache) {
-                $this->cache->save(self::REQUIREJS_CONFIG_CACHE_KEY, $config);
+            if (!$this->cache->contains($this->getCacheKey())) {
+                $this->generateBuildConfigs();
+            }
+
+            $configs = $this->cache->fetch($this->getCacheKey());
+            if (!empty($configs[$this->theme])) {
+                return $configs[$this->theme]['mainConfig'];
             }
         }
-        return $config;
+
+        return $this->generateMainConfig();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateBuildConfigs()
+    {
+        $buildConfig = [
+            $this->theme => [
+                'mainConfig' => $this->generateMainConfig(),
+                'buildConfig' => $this->generateBuildConfig(),
+            ]
+        ];
+
+        if (!$this->cache) {
+            return $buildConfig;
+        }
+
+        $this->cache->save($this->getCacheKey(), $buildConfig);
+
+        return $this->cache->fetch($this->getCacheKey());
     }
 
     /**
@@ -109,28 +175,35 @@ class Config
      * Generates build config for require.js
      *
      * @param string $configPath path to require.js main config
+     *
      * @return array
      */
-    public function generateBuildConfig($configPath)
+    public function generateBuildConfig($configPath = null)
     {
+        $configPath = $configPath ? $configPath : $this->getConfigFilePath();
+
         $config = $this->collectConfigs();
 
         $config['build']['baseUrl'] = './bundles';
-        $config['build']['out'] = './' . $config['build_path'];
+        $config['build']['out'] = './' . $this->getOutputFilePath();
         $config['build']['mainConfigFile'] = './' . $configPath;
 
-        $paths = array(
+        $paths = [
             // build-in configuration
             'require-config' => '../' . substr($configPath, 0, -3),
             // build-in require.js lib
             'require-lib' => 'ororequirejs/lib/require',
-        );
+        ];
 
         $config['build']['paths'] = array_merge($config['build']['paths'], $paths);
-        $config['build']['include'] = array_merge(
-            array_keys($paths),
-            array_keys($config['config']['paths'])
-        );
+
+        $config['build']['include'] = [];
+        if (isset($config['config']['paths'])) {
+            $config['build']['include'] = array_merge(
+                array_keys($paths),
+                array_keys($config['config']['paths'])
+            );
+        }
 
         return $config['build'];
     }
@@ -146,8 +219,7 @@ class Config
             $config = $this->container->getParameter('oro_require_js');
             $bundles = $this->container->getParameter('kernel.bundles');
             foreach ($bundles as $bundle) {
-                $reflection = new \ReflectionClass($bundle);
-                if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/requirejs.yml')) {
+                if (is_file($file = $this->getFilePath($bundle))) {
                     $requirejs = Yaml::parse(file_get_contents(realpath($file)));
                     $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $requirejs);
                 }
@@ -157,5 +229,24 @@ class Config
         }
 
         return $this->collectedConfig;
+    }
+
+    /**
+     * @param $bundle
+     *
+     * @return string
+     */
+    protected function getFilePath($bundle)
+    {
+        $reflection = new \ReflectionClass($bundle);
+        return dirname($reflection->getFileName()) . '/Resources/config/requirejs.yml';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCacheKey()
+    {
+        return self::REQUIREJS_CONFIG_CACHE_KEY;
     }
 }
