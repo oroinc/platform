@@ -3,9 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionSchedule;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
@@ -40,6 +42,8 @@ class TransitionQueryFactory
 
         $entityClass = $workflow->getDefinition()->getRelatedEntity();
 
+        $identifier = $this->getIdentifierField($entityClass);
+
         $queryBuilder = $this->getEntityRepositoryForClass(WorkflowItem::class)
             ->createQueryBuilder('wi')
             ->select('wi.id')
@@ -49,7 +53,7 @@ class TransitionQueryFactory
                 $entityClass,
                 'e',
                 Query\Expr\Join::WITH,
-                'wi.entityId = IDENTITY(e)'
+                sprintf('wi.entityId = e.%s', $identifier)
             );
 
         $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
@@ -72,5 +76,31 @@ class TransitionQueryFactory
     private function getEntityRepositoryForClass($entityClass)
     {
         return $this->registry->getManagerForClass($entityClass)->getRepository($entityClass);
+    }
+
+    /**
+     * @param $entityClass
+     * @return mixed
+     * @throws WorkflowException
+     */
+    protected function getIdentifierField($entityClass)
+    {
+        /** @var ClassMetadataInfo $metadata */
+        $metadata = $this->registry->getManagerForClass($entityClass)
+            ->getClassMetadata($entityClass);
+
+        if ($metadata->isIdentifierComposite) {
+            throw new WorkflowException(
+                sprintf(
+                    'Entity `%s` transition query build failed. ' .
+                    'Composite primary keys are not supported for workflow entities.',
+                    $entityClass
+                )
+            );
+        }
+
+        $identifiers = $metadata->getIdentifierFieldNames();
+
+        return $identifiers[0];
     }
 }
