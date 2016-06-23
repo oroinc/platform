@@ -1,4 +1,4 @@
-#Attendee
+# Attendee
 
 Main responsibility of Attendee entity is to store Calendar events guests and their connection with users (if attendee's email matches on user email).
 Matching works only in organisation scope. If user does not have permission to see other users information, he (user) will not see Attendee->User relation on view.
@@ -27,6 +27,12 @@ Create or update request should contain `email` and/or `displayName`. One of the
 * for sending notification in CRM side after event deleting, should use additional parameter in url: `notifyInvitedUsers` (example: DELETE /api/rest/latest/calendarevents/458?notifyInvitedUsers=true)
 * via API should send parameter `notifyInvitedUsers` to false
 
+
+#### AtendeeRelationManager
+
+In case it is desired to have additional entity relations with attendees (similar to users), this manager is place to update.
+
+
 ##API Example:
 
 Via API for Attendee you could use next fields: `email`, `status`,  `type`, `displayName`.
@@ -34,7 +40,7 @@ Bellow examples in json and array format.
 
 ##### GET query example
 
-For getting calendar events with attendees form server you should send GET request ot `/api/rest/latest/calendarevents/{id}` 
+For getting calendar events with attendees from server you should send GET request to `/api/rest/latest/calendarevents/{id}` 
 
 
 ##### POST query example 
@@ -64,7 +70,7 @@ POST request you should send to `/api/rest/latest/calendarevents` in json format
             "endTime": "2015-06-27T06:00:00+00:00",
             "occurrences": 5,
             "instance": null,
-        ],d
+        ],
         'attendees'   => [ # add event guests
             ['email' => 'admin@example.com', 'status' => 'none', 'type' => 'organizer'],
             ['email' => 'sales_man@user.com', 'displayName'=>'test name', 'status' => 'none'],
@@ -72,7 +78,11 @@ POST request you should send to `/api/rest/latest/calendarevents` in json format
         ],
     ];
 
-Response on this will be json: `{"id":1}` where `1` is a calendar event id that was created
+Response on this will be json: `{"id":1}` where `1` is a calendar event id that was created.
+
+Server tries to find users for emails `admin@example.com`, `sales_man@user.com`, `user@user.com` and assign them
+to attendees with the email via `user` property + creates CalendarEvent entity for each found user so that the user
+can see the event in his/her calendar.
 
 
 ##### PUT query example {#put_query_example}
