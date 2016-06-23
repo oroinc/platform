@@ -46,11 +46,11 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => [
+        $message->setBody(json_encode(
+            [
                 'key' => 'value',
             ]
-        ]);
+        ));
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createSessionMock());
@@ -72,11 +72,11 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => [
+        $message->setBody(json_encode(
+            [
                 'class' => 'class-name',
             ]
-        ]);
+        ));
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createSessionMock());
@@ -102,12 +102,12 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => [
+        $message->setBody(json_encode(
+            [
                 'class' => 'class-name',
                 'id' => 'id',
             ]
-        ]);
+        ));
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createSessionMock());
@@ -156,12 +156,12 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => [
+        $message->setBody(json_encode(
+            [
                 'class' => 'class-name',
                 'id' => 'id',
             ]
-        ]);
+        ));
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createSessionMock());
@@ -216,12 +216,12 @@ class IndexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => [
+        $message->setBody(json_encode(
+            [
                 'class' => 'class-name',
                 'id' => 'id',
             ]
-        ]);
+        ));
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createSessionMock());

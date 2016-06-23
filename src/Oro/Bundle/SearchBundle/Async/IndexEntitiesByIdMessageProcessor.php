@@ -6,6 +6,7 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class IndexEntitiesByIdMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
@@ -35,7 +36,7 @@ class IndexEntitiesByIdMessageProcessor implements MessageProcessorInterface, To
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $entities = $message->getLocalProperty('json_body');
+        $entities = JSON::decode($message->getBody());
 
         if (false == is_array($entities)) {
             $this->logger->error(sprintf(

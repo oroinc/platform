@@ -68,11 +68,9 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => [
-                [],
-            ],
-        ]);
+        $message->setBody(json_encode(
+            [[]]
+        ));
 
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
@@ -97,13 +95,13 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => [
+        $message->setBody(json_encode(
+            [
                 [
                     'class' => 'class-name',
                 ],
-            ],
-        ]);
+            ]
+        ));
 
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
@@ -128,14 +126,14 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => [
+        $message->setBody(json_encode(
+            [
                 [
                     'class' => 'class-name',
                     'id' => 'id',
                 ],
-            ],
-        ]);
+            ]
+        ));
 
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 

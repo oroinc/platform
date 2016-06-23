@@ -74,9 +74,9 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => 'class-name',
-        ]);
+        $message->setBody(json_encode(
+            'class-name'
+        ));
 
         $processor = new ReindexEntityMessageProcessor($indexer, $producer);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
@@ -107,9 +107,9 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $message = new NullMessage();
-        $message->setLocalProperties([
-            'json_body' => ['class-name'],
-        ]);
+        $message->setBody(json_encode(
+            ['class-name']
+        ));
 
         $processor = new ReindexEntityMessageProcessor($indexer, $producer);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));

@@ -2,13 +2,12 @@
 namespace Oro\Bundle\SearchBundle\Async;
 
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 
 class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -37,7 +36,7 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $classes = $message->getLocalProperty('json_body');
+        $classes = JSON::decode($message->getBody());
 
         if (false == $classes) {
             $this->indexer->resetIndex();

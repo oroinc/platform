@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -45,7 +46,7 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = $message->getLocalProperty('json_body');
+        $body = JSON::decode($message->getBody());
 
         if (empty($body['class'])) {
             $this->logger->error(sprintf(
