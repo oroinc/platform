@@ -1,17 +1,12 @@
 {% block oro_config_form_field_type_widget %}
-    {% set additionalOptions = {} %}
-    {% if form.use_parent_scope_value is defined %}
-        {% set additionalOptions = {disabled: form.use_parent_scope_value.vars.data == true} %}
-    {% endif %}
     {% set valueContainerId = form.value.vars.id ~ '_container' %}
-
     {% set valueContainerClass = form.value.vars.attr.class|default('oro-clearfix controls control-subgroup') %}
     {% if form.value.vars.errors|length > 0 %}
         {% set valueContainerClass = valueContainerClass ~ ' validation-error' %}
     {% endif %}
 
     <div id="{{ valueContainerId }}" class="{{ valueContainerClass }}">
-        {{ form_widget(form.value, additionalOptions) }}
+        {{ form_widget(form.value) }}
         {{ form_errors(form.value) }}
     </div>
 
