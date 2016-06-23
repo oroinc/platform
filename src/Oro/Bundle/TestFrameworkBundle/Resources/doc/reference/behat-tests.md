@@ -52,22 +52,48 @@ Use it by parameter ```-c``` for use your custom config:
 bin/behat -s OroUserBundle -c ~/config/behat.yml.dist
 ```
 
-However you can copy behat.yml.dist to behat.yml in root of application and edit for your needs.
-Every bundle that configured symfony_bundle suite type will not be autoloaded by ```OroTestFrameworkExtension```. 
-See ***Architecture*** reference below.
+However you can copy ```behat.yml.dist``` to ```behat.yml``` in root of application and edit for your needs.
+Every bundle that has configured suite in configuration will not be autoloaded.
+See [Architecture](./behat-tests.md#architecture) reference below.
+
+#### Configurate suite
+
+You can manually configure suite for bundle in application behat config:
+```yml
+default: &default
+  suites:
+    AcmeDemoBundle:
+      type: symfony_bundle
+      bundle: AcmeDemoBundle
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Acme\DemoBundle\Tests\Behat\Context\FeatureContext
+      paths:
+        - src/Acme/DemoBundle/Tests/Behat/Features
+```
 
 #### Run browser emulator
 
 For execute features you need browser emulator demon (Selenium2 or PhantomJs) runing.
+PhantomJs works faster but you can't view how it works in real browser.
+Selenium2 server run features in firefox browser
 
 Install PhantomJs:
 
 ```bash
 mkdir $HOME/phantomjs
 wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
-tar -xvf $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/travis-phantomjs
-ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
+tar -xvf $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/phantomjs
+sudo ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
 ```
+
+This commands accomplishes a number of things:
+
+1. Created dir for phantomjs in your home directory
+2. Download phantomjs into directory that you just created
+3. Uncompress files
+4. Created symbolic link. Now you can use ```phantomjs``` in terminal
 
 Run PhantomJs:
 
@@ -178,7 +204,9 @@ Login:
 #### Feature isolation
 
 Every feature can interact with application, perform CRUD operation and thereby the database can be modified.
-So, it is why features are isolated each other. The isolation is reached by dumping the database before execution of tests and restoring the database after execution of any feature.
+So, it is why features are isolated to each other.
+The isolation is reached by dumping the database and cache dir before tests execution
+and restoring the cache and database after execution of each feature.
 
 ### Write your first feature
 
@@ -237,3 +265,60 @@ and contains a description of the scenario.
 5. ```Scenario Outline: Fail login``` starts the next scenario. Scenario Outlines allow express examples through the use of a template with placeholders
  The Scenario Outline steps provide a template which is never directly run. A Scenario Outline is run once for each row in the Examples section beneath it (except for the first header row).
  Think of a placeholder like a variable. It is replaced with a real value from the Examples: table row, where the text between the placeholder angle brackets matches that of the table column header. 
+
+### Feature fixtures
+
+Every time when behat run new feature, application state will reset to default. (See [Feature isolation](./behat-tests.md#feature-isolation))
+This mean that there are only one admin user, organization, business unit and default roles in database.
+Your feature must based on data that has application after oro:install command.
+But this is not enough in most cases.
+Thereby you have two ways to get more data in the system - inline fixtures and alice fixtures.
+
+#### Inline fixtures
+
+You can create any number of any entities right in the feature.
+```FixtureContext``` will guess entity class, create necessary number of objects and fill required fields, that was not specified, by [faker](https://github.com/fzaninotto/faker).
+You can use [faker](https://github.com/fzaninotto/faker) and and [entity references](./behat-tests.md#entity-references) in inline fixtures.
+
+```yml
+  Given the following contacts:
+    | First Name | Last Name | Email     |
+    | Joan       | Anderson  | <email()> |
+    | Craig      | Bishop    | <email()> |
+    | Jean       | Castillo  | <email()> |
+    | Willie     | Chavez    | <email()> |
+    | Arthur     | Fisher    | <email()> |
+    | Wanda      | Ford      | <email()> |
+  Given I have 5 Cases
+  And there are 5 calls
+  And there are two users with their own 7 Accounts
+  And there are 3 users with their own 3 Tasks
+  And there is user with its own Account
+```
+
+#### Alice fixtures
+
+Sometimes you need create too much different entities with complex relationships.
+In such cases you can use alice fixtures.
+Alice is a library that allows you easily create fixtures in yml format.
+See [Alice Documentation](https://github.com/nelmio/alice/blob/2.x/README.md).
+
+Fixtures should be located in ```{BundleName}/Tests/Behat/Features/Fixtures``` directory.
+For load fixture before feature add tag with fixture file name and ```@fixture-``` prefix.
+
+```gherkin
+#package/crm/src/OroCRM/Bundle/ContactBundle/Tests/Behat/Features/contact-grid.feature
+@fixture-contacts.yml
+Feature: Contacts grid
+```
+
+#### Entity references
+
+In both type of fixtures you can use references to entities.
+[See Alice documentation about References](https://github.com/nelmio/alice/blob/2.x/doc/relations-handling.md#handling-relations).
+You can use default references that was created by ```ReferenceRepositoryInitializer``` before tests run:
+
+- ```@admin``` - Admin user
+- ```@adminRole``` - Administrator role
+- ```@organization``` - Default organization
+- ```@business_unit``` - Default business unit
