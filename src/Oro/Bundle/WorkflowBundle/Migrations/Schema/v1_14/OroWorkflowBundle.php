@@ -73,7 +73,7 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
             $configManager->flush();
 
             $queries->addPostQuery(sprintf(
-                'UPDATE `oro_workflow_item` SET `entity_class` = "%s" WHERE `workflow_name` = "%s"',
+                'UPDATE oro_workflow_item SET entity_class = \'%s\' WHERE workflow_name = \'%s\'',
                 str_replace('\\', '\\\\', $class),
                 $workflow
             ));
@@ -86,11 +86,11 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
     protected function updateReportsDefinitions(QueryBag $queries)
     {
         $queries->addPostQuery(sprintf(
-            'UPDATE `oro_report` SET `definition` = REPLACE(`definition`, "%s", "%s")',
+            'UPDATE oro_report SET definition = REPLACE(definition, \'%s\', \'%s\')',
             self::OLD_ITEMS_RELATION, self::NEW_ITEMS_RELATION
         ));
         $queries->addPostQuery(sprintf(
-            'UPDATE `oro_report` SET `definition` = REPLACE(`definition`, "%s", "%s")',
+            'UPDATE oro_report SET definition = REPLACE(definition, \'%s\', \'%s\')',
             self::OLD_STEPS_RELATION, self::NEW_STEPS_RELATION
         ));
     }
