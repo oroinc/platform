@@ -617,27 +617,45 @@ class EntitySerializer
             $qb->addOrderBy(sprintf('r.%s', $field), $direction);
         }
 
-        $fields = $this->fieldAccessor->getFieldsToSerialize($mapping['targetEntity'], $config);
-        foreach ($fields as $field) {
-            $qb->addSelect(sprintf('r.%s', $field));
-        }
+        $result = [];
 
-        $items = $this->queryFactory->getQuery($qb, $config)->getArrayResult();
-
-        $result      = [];
         $entityClass = $mapping['targetEntity'];
-
-        $postSerializeHandler = $config->getPostSerializeHandler();
-        if (null !== $postSerializeHandler) {
-            foreach ($items as $item) {
-                $result[$item['entityId']][] = $this->postSerialize(
-                    $this->serializeItem($item, $entityClass, $config),
-                    $postSerializeHandler
-                );
+        $targetEntityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        if ($targetEntityMetadata->hasInheritance()) {
+            $fields = $this->fieldAccessor->getFieldsToSelect($entityClass, $config);
+            $qb->addSelect(sprintf('partial r.{%s}', implode(',', $fields)));
+            $items = $this->queryFactory->getQuery($qb, $config)->getResult();
+            $postSerializeHandler = $config->getPostSerializeHandler();
+            if (null !== $postSerializeHandler) {
+                foreach ($items as $item) {
+                    $result[$item['entityId']][] = $this->postSerialize(
+                        $this->serializeItem($item[0], $entityClass, $config),
+                        $postSerializeHandler
+                    );
+                }
+            } else {
+                foreach ($items as $item) {
+                    $result[$item['entityId']][] = $this->serializeItem($item[0], $entityClass, $config);
+                }
             }
         } else {
-            foreach ($items as $item) {
-                $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config);
+            $fields = $this->fieldAccessor->getFieldsToSerialize($entityClass, $config);
+            foreach ($fields as $field) {
+                $qb->addSelect(sprintf('r.%s', $field));
+            }
+            $items = $this->queryFactory->getQuery($qb, $config)->getArrayResult();
+            $postSerializeHandler = $config->getPostSerializeHandler();
+            if (null !== $postSerializeHandler) {
+                foreach ($items as $item) {
+                    $result[$item['entityId']][] = $this->postSerialize(
+                        $this->serializeItem($item, $entityClass, $config),
+                        $postSerializeHandler
+                    );
+                }
+            } else {
+                foreach ($items as $item) {
+                    $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config);
+                }
             }
         }
 

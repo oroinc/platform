@@ -17,6 +17,17 @@ class AssociationMetadata extends PropertyMetadata
     private $targetMetadata;
 
     /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        parent::__clone();
+        if (null !== $this->targetMetadata) {
+            $this->targetMetadata = clone $this->targetMetadata;
+        }
+    }
+
+    /**
      * Gets metadata of an association target.
      *
      * @return EntityMetadata|null
