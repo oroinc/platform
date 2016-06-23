@@ -52,13 +52,17 @@ class RelationConfigProvider extends AbstractConfigProvider
         $this->processor->process($context);
 
         $config = $this->buildResult($context);
-        $definition = $config->getDefinition();
-        if ($definition) {
-            $definition->setKey('relation|' . $cacheKey);
-        }
 
         $this->cache[$cacheKey] = $config;
 
         return clone $config;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildConfigKey($className, array $extras)
+    {
+        return 'relation|' . parent::buildConfigKey($className, $extras);
     }
 }
