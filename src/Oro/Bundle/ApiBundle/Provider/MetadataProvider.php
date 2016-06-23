@@ -62,9 +62,11 @@ class MetadataProvider
         $metadata = $this->loadMetadata($className, $version, $requestType, $extras, $config);
         $this->cache[$cacheKey] = $metadata;
 
-        return null !== $metadata
-            ? clone $metadata
-            : null;
+        if (null === $metadata) {
+            return null;
+        }
+
+        return clone $metadata;
     }
 
     /**
