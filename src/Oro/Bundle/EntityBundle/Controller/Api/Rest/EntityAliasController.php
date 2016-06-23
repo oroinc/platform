@@ -40,14 +40,23 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
         $resolver = $this->get('oro_entity.entity_alias_resolver');
         /** @var EntityClassNameHelper $entityClassNameHelper */
         $entityClassNameHelper = $this->get('oro_entity.entity_class_name_helper');
+        /** @var  $entityClassNameHelper */
+        $entityConfigManager = $this->get('oro_entity_config.config_manager');
 
         $result = [];
         foreach ($resolver->getAll() as $className => $entityAlias) {
+            $isCustomEntity = false;
+            if ($entityConfigManager->hasConfig($className)) {
+                $config = $entityConfigManager->getEntityConfig('extend', $className);
+                $isCustomEntity = $config->get('owner') !== 'System';
+            }
+
             $result[] = [
                 'entity'      => $className,
                 'alias'       => $entityAlias->getAlias(),
                 'pluralAlias' => $entityAlias->getPluralAlias(),
-                'urlSafeName' => $entityClassNameHelper->getUrlSafeClassName($className)
+                'urlSafeName' => $entityClassNameHelper->getUrlSafeClassName($className),
+                'isCustomEntity' => $isCustomEntity
             ];
         }
 

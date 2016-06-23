@@ -21,11 +21,12 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class RestDocHandler implements HandlerInterface
 {
+    const ID_ATTRIBUTE   = 'id';
+    const ID_PLACEHOLDER = '{id}';
+
     /** @var RestDocViewDetector */
     protected $docViewDetector;
 
@@ -35,9 +36,6 @@ class RestDocHandler implements HandlerInterface
     /** @var ResourceDocProviderInterface */
     protected $resourceDocProvider;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
@@ -45,21 +43,18 @@ class RestDocHandler implements HandlerInterface
      * @param RestDocViewDetector          $docViewDetector
      * @param ActionProcessorBagInterface  $processorBag
      * @param ResourceDocProviderInterface $resourceDocProvider
-     * @param DoctrineHelper               $doctrineHelper
      * @param ValueNormalizer              $valueNormalizer
      */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
         ResourceDocProviderInterface $resourceDocProvider,
-        DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
         $this->docViewDetector = $docViewDetector;
         $this->processorBag = $processorBag;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->valueNormalizer = $valueNormalizer;
         $this->resourceDocProvider = $resourceDocProvider;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -67,14 +62,13 @@ class RestDocHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP) {
-            return;
-        }
-        if ($this->docViewDetector->getRequestType()->isEmpty()) {
+        if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP
+            || $this->docViewDetector->getRequestType()->isEmpty()
+        ) {
             return;
         }
         $action = $route->getDefault('_action');
-        if (empty($action)) {
+        if (!$action) {
             return;
         }
 
@@ -82,7 +76,11 @@ class RestDocHandler implements HandlerInterface
         if ($entityType) {
             $annotation->setSection($entityType);
 
-            $entityClass = $this->getEntityClass($entityType);
+            $entityClass = $this->valueNormalizer->normalizeValue(
+                $entityType,
+                DataType::ENTITY_CLASS,
+                $this->docViewDetector->getRequestType()
+            );
             $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
             $actionContext = $this->getContext($action, $entityClass, $associationName);
             $config = $actionContext->getConfig();
@@ -92,12 +90,12 @@ class RestDocHandler implements HandlerInterface
             if ($statusCodes) {
                 $this->setStatusCodes($annotation, $statusCodes);
             }
-            if ($this->hasAttribute($route, RestRouteOptionsResolver::ID_PLACEHOLDER)) {
-                $this->addIdRequirement(
-                    $annotation,
-                    $entityClass,
-                    $route->getRequirement(RestRouteOptionsResolver::ID_ATTRIBUTE)
-                );
+            if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
+                if ($associationName) {
+                    $this->addIdRequirement($annotation, $actionContext->getParentMetadata());
+                } else {
+                    $this->addIdRequirement($annotation, $actionContext->getMetadata());
+                }
             }
             $filters = $actionContext->getFilters();
             if (!$filters->isEmpty()) {
@@ -117,33 +115,23 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param string $entityType
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityType)
-    {
-        return ValueNormalizerUtil::convertToEntityClass(
-            $this->valueNormalizer,
-            $entityType,
-            $this->docViewDetector->getRequestType()
-        );
-    }
-
-    /**
      * @param string $entityClass
-     * @param bool   $throwException
      *
      * @return string|null
      */
-    protected function getEntityType($entityClass, $throwException = true)
+    protected function getEntityType($entityClass)
     {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $this->docViewDetector->getRequestType(),
-            $throwException
-        );
+        try {
+            return $this->valueNormalizer->normalizeValue(
+                $entityClass,
+                DataType::ENTITY_TYPE,
+                $this->docViewDetector->getRequestType()
+            );
+        } catch (\Exception $e) {
+            // ignore any exception here
+        }
+
+        return null;
     }
 
     /**
@@ -151,7 +139,7 @@ class RestDocHandler implements HandlerInterface
      * @param string      $entityClass
      * @param string|null $associationName
      *
-     * @return Context
+     * @return Context|SubresourceContext
      */
     protected function getContext($action, $entityClass, $associationName = null)
     {
@@ -247,28 +235,65 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param ApiDoc $annotation
-     * @param string $entityClass
-     * @param string $requirement
+     * @param ApiDoc         $annotation
+     * @param EntityMetadata $metadata
      */
-    protected function addIdRequirement(ApiDoc $annotation, $entityClass, $requirement)
+    protected function addIdRequirement(ApiDoc $annotation, EntityMetadata $metadata)
     {
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $idFields = $metadata->getIdentifierFieldNames();
         $dataType = count($idFields) === 1
-            ? $metadata->getTypeOfField(reset($idFields))
+            ? $metadata->getField(reset($idFields))->getDataType()
             : DataType::STRING;
 
         $annotation->addRequirement(
-            RestRouteOptionsResolver::ID_ATTRIBUTE,
+            self::ID_ATTRIBUTE,
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
-                'requirement' => $requirement,
+                'requirement' => $this->getIdRequirement($metadata),
                 'description' => $this->resourceDocProvider->getIdentifierDescription(
                     $this->docViewDetector->getRequestType()
                 )
             ]
         );
+    }
+
+    /**
+     * @param EntityMetadata $metadata
+     *
+     * @return string
+     */
+    protected function getIdRequirement(EntityMetadata $metadata)
+    {
+        $idFields = $metadata->getIdentifierFieldNames();
+        $idFieldCount = count($idFields);
+        if ($idFieldCount === 1) {
+            // single identifier
+            return $this->getIdFieldRequirement($metadata->getField(reset($idFields))->getDataType());
+        }
+
+        // combined identifier
+        $requirements = [];
+        foreach ($idFields as $field) {
+            $requirements[] = $field . '=' . $this->getIdFieldRequirement($metadata->getField($field)->getDataType());
+        }
+
+        return implode(',', $requirements);
+    }
+
+    /**
+     * @param string $fieldType
+     *
+     * @return string
+     */
+    protected function getIdFieldRequirement($fieldType)
+    {
+        $result = $this->valueNormalizer->getRequirement($fieldType, $this->docViewDetector->getRequestType());
+
+        if (ValueNormalizer::DEFAULT_REQUIREMENT === $result) {
+            $result = '[^\.]+';
+        }
+
+        return $result;
     }
 
     /**
@@ -304,7 +329,7 @@ class RestDocHandler implements HandlerInterface
                         ->getAcceptableTargetClassNames();
                     $targetEntityTypes = [];
                     foreach ($targetClassNames as $targetClassName) {
-                        $targetEntityType = $this->getEntityType($targetClassName, false);
+                        $targetEntityType = $this->getEntityType($targetClassName);
                         if ($targetEntityType) {
                             $targetEntityTypes[] = $targetEntityType;
                         }

@@ -19,25 +19,10 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 250 }
 
-    oro_api.get.validate_request_type_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+    oro_api.get.validate_request_type_and_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 210 }
-
-    oro_api.get.validate_class_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 210 }
-
-    oro_api.get.normalize_version:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
-
-    oro_api.get.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 50 }
 
     oro_api.get.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
@@ -84,6 +69,27 @@ services:
             - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -200 }
 
     #
+    # normalize_input
+    #
+
+    oro_api.get.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, priority: 240 }
+
+    oro_api.get.validate_entity_id_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, priority: -100 }
+
+    oro_api.get.rest.normalize_entity_id:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
+        arguments:
+            - '@oro_api.rest.entity_id_transformer'
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, requestType: rest, priority: -110 }
+
+    #
     # security_check
     #
     # if you add a new processor in this group, it should be added in the "security_check" group of
@@ -97,22 +103,6 @@ services:
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
-
-    #
-    # normalize_input
-    #
-
-    oro_api.get.validate_entity_id_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
-        tags:
-            - { name: oro.api.processor, action: get, group: normalize_input, priority: -100 }
-
-    oro_api.get.rest.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
-        arguments:
-            - '@oro_api.rest.entity_id_transformer'
-        tags:
-            - { name: oro.api.processor, action: get, group: normalize_input, requestType: rest, priority: -110 }
 
     #
     # build_query

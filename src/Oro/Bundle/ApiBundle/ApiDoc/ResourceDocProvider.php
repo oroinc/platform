@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig as FieldConfig;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class ResourceDocProvider implements ResourceDocProviderInterface
 {
@@ -16,35 +15,29 @@ class ResourceDocProvider implements ResourceDocProviderInterface
     protected $templates = [
         'get'                 => [
             'description'          => 'Get {name}',
-            'fallback_description' => 'Get {class}',
-            'get_name_method'      => 'getEntityClassName'
+            'fallback_description' => 'Get {class}'
         ],
         'get_list'            => [
             'description'          => 'Get {name}',
             'fallback_description' => 'Get a list of {class}',
-            'get_name_method'      => 'getEntityClassPluralName',
             'is_collection'        => true
         ],
         'delete'              => [
             'description'          => 'Delete {name}',
-            'fallback_description' => 'Delete {class}',
-            'get_name_method'      => 'getEntityClassName'
+            'fallback_description' => 'Delete {class}'
         ],
         'delete_list'         => [
             'description'          => 'Delete {name}',
             'fallback_description' => 'Delete a list of {class}',
-            'get_name_method'      => 'getEntityClassName',
             'is_collection'        => true
         ],
         'create'              => [
             'description'          => 'Create {name}',
-            'fallback_description' => 'Create {class}',
-            'get_name_method'      => 'getEntityClassName'
+            'fallback_description' => 'Create {class}'
         ],
         'update'              => [
             'description'          => 'Update {name}',
-            'fallback_description' => 'Update {class}',
-            'get_name_method'      => 'getEntityClassName'
+            'fallback_description' => 'Update {class}'
         ],
         'get_subresource'     => [
             'description'   => 'Get {association}',
@@ -74,21 +67,14 @@ class ResourceDocProvider implements ResourceDocProviderInterface
         ],
     ];
 
-    /** @var EntityClassNameProviderInterface */
-    protected $entityClassNameProvider;
-
     /** @var SubresourcesProvider */
     protected $subresourcesProvider;
 
     /**
-     * @param EntityClassNameProviderInterface $entityClassNameProvider
-     * @param SubresourcesProvider             $subresourcesProvider
+     * @param SubresourcesProvider $subresourcesProvider
      */
-    public function __construct(
-        EntityClassNameProviderInterface $entityClassNameProvider,
-        SubresourcesProvider $subresourcesProvider
-    ) {
-        $this->entityClassNameProvider = $entityClassNameProvider;
+    public function __construct(SubresourcesProvider $subresourcesProvider)
+    {
         $this->subresourcesProvider = $subresourcesProvider;
     }
 
@@ -122,10 +108,7 @@ class ResourceDocProvider implements ResourceDocProviderInterface
         if ($description) {
             $description = strtr($templates['description'], ['{name}' => $description]);
         } elseif ($entityClass) {
-            $entityName = $this->entityClassNameProvider->{$templates['get_name_method']}($entityClass);
-            $description = $entityName
-                ? strtr($templates['description'], ['{name}' => $entityName])
-                : strtr($templates['fallback_description'], ['{class}' => $entityClass]);
+            $description = strtr($templates['fallback_description'], ['{class}' => $entityClass]);
         }
 
         return $description;
@@ -144,13 +127,6 @@ class ResourceDocProvider implements ResourceDocProviderInterface
         $documentation = null;
         if (!empty($config[EntityConfig::DESCRIPTION])) {
             $documentation = $config[EntityConfig::DESCRIPTION];
-        }
-        if (!$documentation && $entityClass) {
-            $templates = $this->templates[$action];
-            $entityName = $this->entityClassNameProvider->{$templates['get_name_method']}($entityClass);
-            if ($entityName) {
-                $documentation = $entityName;
-            }
         }
 
         return $documentation;

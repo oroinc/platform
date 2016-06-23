@@ -35,13 +35,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: actions&!definition, priority: 10 }
 
-    oro_api.get_config.load_virtual_fields:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadVirtualFields
-        arguments:
-            - '@oro_api.virtual_field_provider'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: definition&virtual_fields&!identifier_fields_only, priority: -21 }
-
     oro_api.get_config.complete_definition.associations.by_config:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfAssociationsByConfig
         arguments:
@@ -91,60 +84,10 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition&filter_fields&!identifier_fields_only, priority: -110 }
 
-    oro_api.get_config.complete_status_codes.get:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteGetStatusCodes
+    oro_api.get_config.complete_status_codes:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteStatusCodes
         tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: get, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.get_list:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteGetListStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: get_list, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.delete:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteDeleteStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: delete, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.delete_list:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteDeleteListStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: delete_list, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.create:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteCreateStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: create, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.update:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteUpdateStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: update, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.get_subresource:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteGetSubresourceStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: get_subresource, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.get_relationship:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteGetRelationshipStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: get_relationship, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.update_relationship:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteUpdateRelationshipStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: update_relationship, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.add_relationship:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteAddRelationshipStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: add_relationship, requestType: rest, priority: -160 }
-
-    oro_api.get_config.complete_status_codes.delete_relationship:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteDeleteRelationshipStatusCodes
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: delete_relationship, requestType: rest, priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: status_codes, requestType: rest, priority: -160 }
 
     oro_api.get_config.set_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities
@@ -224,16 +167,8 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_exclusion_provider'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition&!identifier_fields_only, priority: -30 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition&!identifier_fields_only, priority: -30 }
-
-    oro_api.get_config.complete_definition_for_identifier_fields:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionForIdentifierFields
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: definition&identifier_fields_only, priority: -30 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition&identifier_fields_only, priority: -30 }
+            - { name: oro.api.processor, action: get_config, extra: definition, priority: -30 }
+            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -30 }
 
     oro_api.get_config.finish_completion_of_definition:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FinishCompletionOfDefinition

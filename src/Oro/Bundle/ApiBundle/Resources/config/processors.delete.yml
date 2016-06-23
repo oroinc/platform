@@ -19,20 +19,10 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 250 }
 
-    oro_api.delete.validate_request_type_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+    oro_api.delete.validate_request_type_and_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 210 }
-
-    oro_api.delete.validate_class_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
-        tags:
-            - { name: oro.api.processor, action: delete, group: initialize, priority: 210 }
-
-    oro_api.delete.normalize_version:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
-        tags:
-            - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
 
     oro_api.delete.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
@@ -42,18 +32,10 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 20 }
 
-    #
-    # security_check
-    #
-
-    oro_api.delete.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - DELETE
+    oro_api.delete.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\InitializeConfigExtras
         tags:
-            - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 10 }
 
     #
     # normalize_input
@@ -70,6 +52,19 @@ services:
             - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_input, requestType: rest, priority: -110 }
+
+    #
+    # security_check
+    #
+
+    oro_api.delete.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - DELETE
+        tags:
+            - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
 
     #
     # build_query

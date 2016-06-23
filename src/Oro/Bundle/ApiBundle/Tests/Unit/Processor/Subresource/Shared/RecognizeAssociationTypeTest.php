@@ -38,6 +38,21 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    public function testProcessWhenAssociationNameIsNotSet()
+    {
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [
+                Error::createValidationError(
+                    'relationship constraint',
+                    'The association name must be set in the context.'
+                )
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessForUnknownAssociation()
     {
         $parentEntityClass = 'Test\ParentClass';

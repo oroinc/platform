@@ -168,7 +168,6 @@ services:
             - %oro_entity.virtual_fields%
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 0 }
-            - { name: oro_entity.virtual_field_provider.api }
 
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%
@@ -284,7 +283,6 @@ services:
 
     oro_entity.entity_alias_cache:
         parent: oro.cache.abstract
-        public: false
         calls:
             - [ setNamespace, [ 'oro_entity_aliases' ] ]
 
@@ -316,6 +314,7 @@ services:
             - '@oro_entity.entity_alias_config_bag'
         tags:
             - { name: oro_entity.alias_provider, priority: -100 }
+            - { name: oro_entity.class_provider }
 
     oro_entity.entity_class_name_helper:
         class: %oro_entity.entity_class_name_helper.class%

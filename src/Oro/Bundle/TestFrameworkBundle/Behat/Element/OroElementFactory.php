@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Mink;
 
 class OroElementFactory
@@ -41,6 +42,32 @@ class OroElementFactory
         }
 
         return $this->instantiateElement($this->configuration[$name]);
+    }
+
+    /**
+     * Create specific element by name and common NodeElement object
+     * Specific element most commonly has more wide interface than NodeElement
+     *
+     * @param string $name
+     * @param NodeElement $element
+     * @return NodeElement
+     */
+    public function wrapElement($name, NodeElement $element)
+    {
+        if (false === array_key_exists($name, $this->configuration)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Could not find element with "%s" name',
+                $name
+            ));
+        }
+
+        $elementClass = $this->configuration[$name]['class'];
+
+        return new $elementClass(
+            $this->mink->getSession(),
+            $this,
+            ['type' => 'xpath', 'locator' => $element->getXpath()]
+        );
     }
 
     /**

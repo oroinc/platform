@@ -13,8 +13,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * Checks that the "class" attribute of the Context represents FQCN of an entity
- * and this entity is accessible through Data API.
+ * Makes sure that an entity class name exists in the Context,
+ * if required converts it to FQCN of an entity
+ * and check that this entity is accessible through Data API.
  */
 class NormalizeEntityClass implements ProcessorInterface
 {
@@ -42,6 +43,17 @@ class NormalizeEntityClass implements ProcessorInterface
         /** @var Context $context */
 
         $entityClass = $context->getClassName();
+        if (!$entityClass) {
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::ENTITY_TYPE,
+                    'The entity class must be set in the context.'
+                )
+            );
+
+            return;
+        }
+
         if (false !== strpos($entityClass, '\\')) {
             // an entity class is already normalized
             return;

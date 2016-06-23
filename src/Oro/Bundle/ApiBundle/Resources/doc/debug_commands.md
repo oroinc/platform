@@ -1,6 +1,16 @@
 Debug commands
 --------------
 
+### oro:api:cache:clear
+
+This command command clears Data API cache.
+
+Usually you need to run this command when you add a new entity to `Resources/config/oro/api.yml` or you add a new processor that changes a list of available through Data API resources.
+
+```bash
+php app/console oro:api:cache:clear
+```
+
 ### oro:api:dump
 
 This command shows all resources accessible through Data API.
@@ -92,7 +102,7 @@ php app/console oro:api:config:dump addresses --section=relations
 ```
 
 By default no extra configuration data are added into output, but they can be added with the `--extra` option.
-The value for `extra` option can be: actions, definition, filters, sorters, virtual_fields, descriptions or the full name of a class implements [ConfigExtraInterface](../../Config/ConfigExtraInterface.php), e.g.
+The value for `extra` option can be: actions, definition, filters, sorters, descriptions or the full name of a class implements [ConfigExtraInterface](../../Config/ConfigExtraInterface.php), e.g.
 
 ```bash
 php app/console oro:api:config:dump users --extra=filters --extra=sorters
