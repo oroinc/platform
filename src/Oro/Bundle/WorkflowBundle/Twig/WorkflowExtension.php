@@ -13,6 +13,9 @@ class WorkflowExtension extends \Twig_Extension
      */
     protected $workflowManager;
 
+    /**
+     * @param WorkflowManager $workflowManager
+     */
     public function __construct(WorkflowManager $workflowManager)
     {
         $this->workflowManager = $workflowManager;
@@ -23,10 +26,10 @@ class WorkflowExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction('has_workflows', [$this->workflowManager, 'hasApplicableWorkflowsByEntityClass']),
-            new \Twig_SimpleFunction('has_workflow_items', [$this->workflowManager, 'hasWorkflowItemsByEntity']),
-        );
+            new \Twig_SimpleFunction('has_workflow_items', [$this->workflowManager, 'hasWorkflowItemsByEntity'])
+        ];
     }
 
     /**
