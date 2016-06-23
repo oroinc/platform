@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -14,12 +13,20 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
+use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
+
 class OroWorkflowBundle implements Migration, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
     const OLD_CONFIG_KEY = 'active_workflow';
     const NEW_CONFIG_KEY = WorkflowSystemConfigManager::CONFIG_KEY;
+
+    const OLD_ITEMS_RELATION = 'workflowItem';
+    const OLD_STEPS_RELATION = 'workflowStep';
+    const NEW_ITEMS_RELATION = WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME;
+    const NEW_STEPS_RELATION = WorkflowVirtualRelationProvider::STEPS_RELATION_NAME;
 
     /**
      * {@inheritdoc}
@@ -28,6 +35,7 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
     {
         $this->createColumns($schema);
         $this->moveActiveWorkflows($queries);
+        $this->updateReportsDefinitions($queries);
     }
 
     /**
@@ -70,5 +78,20 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
                 $workflow
             ));
         }
+    }
+
+    /**
+     * @param QueryBag $queries
+     */
+    protected function updateReportsDefinitions(QueryBag $queries)
+    {
+        $queries->addPostQuery(sprintf(
+            'UPDATE `oro_report` SET `definition` = REPLACE(`definition`, "%s", "%s")',
+            self::OLD_ITEMS_RELATION, self::NEW_ITEMS_RELATION
+        ));
+        $queries->addPostQuery(sprintf(
+            'UPDATE `oro_report` SET `definition` = REPLACE(`definition`, "%s", "%s")',
+            self::OLD_STEPS_RELATION, self::NEW_STEPS_RELATION
+        ));
     }
 }
