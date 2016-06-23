@@ -141,7 +141,7 @@ Every bundle has its own test suite and can be run separately:
 
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
 During initialization, Extension will create [test suite](http://docs.behat.org/en/v3.0/guides/5.suites.html) with bundle name if any ```Tests/Behat/Features``` directory exits.
-Thus, if bundle has no Features directory - no test suite would be crated for it.
+Thus, if bundle has no Features directory - no test suite would be created for it.
 
 If you need some specific feature steps for your bundle you should create ```Tests/Behat/Context/FeatureContext``` class.
 This context will added to suite with other common contexts.
