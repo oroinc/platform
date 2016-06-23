@@ -260,6 +260,23 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $indexer->reindex($classes);
     }
 
+    public function testReindexShouldAcceptNullAndSendMessageToProducer()
+    {
+        $classes = null;
+
+        $expectedMessage = [];
+
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+            ->with(Topics::REINDEX, $this->identicalTo($expectedMessage))
+        ;
+
+        $indexer = new Indexer($producer, $this->createDoctrineHelperMock());
+        $indexer->reindex($classes);
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
      */

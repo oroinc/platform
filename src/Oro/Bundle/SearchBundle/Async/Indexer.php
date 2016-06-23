@@ -64,7 +64,7 @@ class Indexer implements IndexerInterface
      */
     public function reindex($class = null)
     {
-        $classes = is_array($class) ? $class : [$class];
+        $classes = is_array($class) ? $class : ($class ? [$class] : []);
 
         $this->producer->send(Topics::REINDEX, $classes);
     }
