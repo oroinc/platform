@@ -250,6 +250,47 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testPageSize()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasPageSize());
+        $this->assertNull($config->getPageSize());
+
+        $config->setPageSize(50);
+        $this->assertTrue($config->hasPageSize());
+        $this->assertEquals(50, $config->getPageSize());
+        $this->assertEquals(['page_size' => 50], $config->toArray());
+
+        $config->setPageSize('100');
+        $this->assertTrue($config->hasPageSize());
+        $this->assertSame(100, $config->getPageSize());
+        $this->assertSame(['page_size' => 100], $config->toArray());
+
+        $config->setPageSize(-1);
+        $this->assertTrue($config->hasPageSize());
+        $this->assertEquals(-1, $config->getPageSize());
+        $this->assertEquals(['page_size' => -1], $config->toArray());
+
+        $config->setPageSize(null);
+        $this->assertFalse($config->hasPageSize());
+        $this->assertNull($config->getPageSize());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testSortingFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertTrue($config->isSortingEnabled());
+
+        $config->disableSorting();
+        $this->assertFalse($config->isSortingEnabled());
+        $this->assertEquals(['disable_sorting' => true], $config->toArray());
+
+        $config->enableSorting();
+        $this->assertTrue($config->isSortingEnabled());
+        $this->assertEquals([], $config->toArray());
+    }
+
     public function testMaxResults()
     {
         $config = new EntityDefinitionConfig();

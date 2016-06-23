@@ -30,6 +30,12 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /** a human-readable description of the entity */
     const DESCRIPTION = 'description';
 
+    /** the default page size */
+    const PAGE_SIZE = 'page_size';
+
+    /** a flag indicates whether a sorting is disabled */
+    const DISABLE_SORTING = 'disable_sorting';
+
     /** the name of ACL resource */
     const ACL_RESOURCE = 'acl_resource';
 
@@ -161,6 +167,77 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function setExclusionPolicy($exclusionPolicy)
     {
         $this->items[self::EXCLUSION_POLICY] = $exclusionPolicy;
+    }
+
+    /**
+     * Indicates whether the default page size is set.
+     *
+     * @return bool
+     */
+    public function hasPageSize()
+    {
+        return array_key_exists(EntityDefinitionConfig::PAGE_SIZE, $this->items);
+    }
+
+    /**
+     * Gets the default page size.
+     *
+     * @return int|null A positive number
+     *                  NULL if the default page size should be set be a processor
+     *                  -1 if the pagination should be disabled
+     */
+    public function getPageSize()
+    {
+        return array_key_exists(self::PAGE_SIZE, $this->items)
+            ? $this->items[self::PAGE_SIZE]
+            : null;
+    }
+
+    /**
+     * Sets the default page size.
+     * Set NULL if the default page size should be set be a processor.
+     * Set -1 if the pagination should be disabled.
+     * Set a positive number to set own page size that should be used as a default one.
+     *
+     * @param int|null $pageSize A positive number, NULL or -1
+     */
+    public function setPageSize($pageSize = null)
+    {
+        if (null === $pageSize) {
+            unset($this->items[self::PAGE_SIZE]);
+        } else {
+            $pageSize = (int)$pageSize;
+
+            $this->items[self::PAGE_SIZE] = $pageSize >= 0 ? $pageSize : -1;
+        }
+    }
+
+    /**
+     * Indicates whether a sorting is enabled.
+     *
+     * @return bool
+     */
+    public function isSortingEnabled()
+    {
+        return array_key_exists(self::DISABLE_SORTING, $this->items)
+            ? !$this->items[self::DISABLE_SORTING]
+            : true;
+    }
+
+    /**
+     * Enables a sorting.
+     */
+    public function enableSorting()
+    {
+        unset($this->items[self::DISABLE_SORTING]);
+    }
+
+    /**
+     * Disables a sorting.
+     */
+    public function disableSorting()
+    {
+        $this->items[self::DISABLE_SORTING] = true;
     }
 
     /**
