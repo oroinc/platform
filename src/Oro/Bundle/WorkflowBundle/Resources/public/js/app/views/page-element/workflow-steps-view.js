@@ -38,11 +38,15 @@ define(function(require) {
         },
         updateContainerWidth: function() {
             var $container = this.$el;
-            var $list = this.$('.workflow-step-container');
+            var $lists = this.$('.workflow-step-container');
             $container.width(10000);
-            $list.css({float: 'left'});
-            $container.width($list.width() + 1/* floating pixel calculation compensation */);
-            $list.css({float: 'none'});
+            var maxListWidth = $lists.width();
+            _.each($lists, function($list){
+                if((this.$($list).width()+1)>maxListWidth){
+                    maxListWidth = this.$($list).width();
+                }
+            }, this);
+            $container.width(maxListWidth + 1/* floating pixel calculation compensation */);
         },
         updateMaxWidth: function() {
             this.$el.css({
