@@ -326,7 +326,10 @@ class WorkflowManager
 
     /**
      * @param string $entityClass
+     *
      * @return null|Workflow
+     *
+     * @throws \RuntimeException
      * @deprecated use getApplicableWorkflows
      */
     public function getApplicableWorkflowByEntityClass($entityClass)

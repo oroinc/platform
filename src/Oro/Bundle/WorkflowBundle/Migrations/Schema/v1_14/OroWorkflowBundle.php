@@ -37,6 +37,7 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
     {
         $table = $schema->getTable('oro_workflow_item');
         $table->addColumn('entity_class', 'string', ['notnull' => false]);
+        $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
     }
 
     /**

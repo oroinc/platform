@@ -46,7 +46,7 @@ class OroWorkflowBundleInstaller implements Installation
         $this->addOroWorkflowEntityAclIdentForeignKeys($schema);
         $this->addOroWorkflowDefinitionForeignKeys($schema);
         $this->addOroWorkflowStepForeignKeys($schema);
-        
+
         CreateEntityRestrictionsTable::createOroWorkflowEntityRestrictionsTable($schema);
     }
 
@@ -61,7 +61,7 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('current_step_id', 'integer', ['notnull' => false]);
         $table->addColumn('workflow_name', 'string', ['length' => 255]);
-        $table->addColumn('entity_id', 'integer', ['notnull' => false]);
+        $table->addColumn('entity_id', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('entity_class', 'string', ['notnull' => false]);
         $table->addColumn('created', 'datetime', []);
         $table->addColumn('updated', 'datetime', ['notnull' => false]);
