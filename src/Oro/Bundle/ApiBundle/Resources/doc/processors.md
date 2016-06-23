@@ -60,6 +60,20 @@ Please note that:
 - A processor must be a public service because it is loaded on demand.
 - The `priority` attribute is used to control the order in which processors are executed. The highest the priority, the earlier a processor is executed. Default value is 0. The possible range is from -255 to 255. But for some types of processors the range can be different. More details you can find in the [documentation of the ChainProcessor](../../../../Component/ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority the order they are executed is unpredictable.
 - Each processor should check whether its' work is already done, because there can be a processor with higher priority which does the same but in another way. For example such processors can be created for customization purposes.
+- As Data API resources can be created for any type of objects, not only ORM entities, it is always a good idea to check whether a processor is applicable for ORM entities. This check is very fast and allows to avoid possible logic issues and performance impact. Please use the `oro_api.doctrine_helper` service to get an instance of [Oro\Bundle\ApiBundle\Util\DoctrineHelper](../../Util/DoctrineHelper.php) as this class is optimized to be used in Data API stack. An example:
+
+```php
+    public function process(ContextInterface $context)
+    {
+        $entityClass = $context->getClassName();
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // only manageable entities are supported
+            return;
+        }
+
+        // do some work
+    }
+```
 
 The list of all existing processors you can find in the [Processor](../../Processor) folder.
 
