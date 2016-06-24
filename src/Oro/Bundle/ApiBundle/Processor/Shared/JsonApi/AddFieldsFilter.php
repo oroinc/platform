@@ -61,7 +61,10 @@ class AddFieldsFilter implements ProcessorInterface
         }
         */
 
-        $this->addFilter($filters, $context->getClassName(), $context->getRequestType());
+        if (count($context->getConfig()->getFields()) > 1) {
+            // the "fields" filter for the primary entity has sense only if it has more than one field
+            $this->addFilter($filters, $context->getClassName(), $context->getRequestType());
+        }
 
         $associations = $context->getMetadata()->getAssociations();
         foreach ($associations as $association) {

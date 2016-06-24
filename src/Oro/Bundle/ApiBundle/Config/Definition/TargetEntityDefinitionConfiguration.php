@@ -8,8 +8,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 
-class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection implements
-    ConfigurationSectionInterface
+class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 {
     /** @var string */
     protected $parentSectionName;

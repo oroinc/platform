@@ -11,9 +11,9 @@ use Symfony\Component\Validator\Validation;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipContextTest;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipTestCase;
 
-class CollectFormErrorsTest extends ChangeRelationshipContextTest
+class CollectFormErrorsTest extends ChangeRelationshipTestCase
 {
     /** @var CollectFormErrors */
     protected $processor;

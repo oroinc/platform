@@ -6,6 +6,21 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 
 class FieldMetadataTest extends \PHPUnit_Framework_TestCase
 {
+    public function testClone()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('fieldName');
+        $fieldMetadata->set('test_scalar', 'value');
+        $objValue = new \stdClass();
+        $objValue->someProp = 123;
+        $fieldMetadata->set('test_object', $objValue);
+
+        $fieldMetadataClone = clone $fieldMetadata;
+
+        $this->assertEquals($fieldMetadata, $fieldMetadataClone);
+        $this->assertNotSame($objValue, $fieldMetadataClone->get('test_object'));
+    }
+
     public function testGetName()
     {
         $fieldMetadata = new FieldMetadata();
