@@ -37,9 +37,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     protected $configProvider;
 
     /** @var bool */
-    protected $isFieldAclEnabled = false;
-
-    /** @var bool */
     protected $showRestricted = true;
 
     public function __construct(
@@ -79,15 +76,15 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
         try {
             $securityConfig    = $this->configProvider->getConfig($className);
-            $this->isFieldAclEnabled = ($securityConfig->get('field_acl_supported')
+            $isFieldAclEnabled = ($securityConfig->get('field_acl_supported')
                 && $securityConfig->get('field_acl_enabled'));
             $this->showRestricted    = $securityConfig->get('show_restricted_fields');
         } catch (\Exception $e) {
-            $this->isFieldAclEnabled = false;
+            $isFieldAclEnabled = false;
             $this->showRestricted = true;
         }
 
-        return $this->isFieldAclEnabled;
+        return $isFieldAclEnabled;
     }
 
     /**
@@ -235,7 +232,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         }
     }
 
-        /**
+    /**
      * Return class property form mapped to
      *
      * @param FormInterface $form

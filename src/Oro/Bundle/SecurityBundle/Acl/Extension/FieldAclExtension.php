@@ -8,10 +8,12 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
@@ -55,6 +57,9 @@ class FieldAclExtension extends AbstractAclExtension
     /** @var EntityOwnerAccessor */
     protected $entityOwnerAccessor;
 
+    /** @var ConfigProvider */
+    protected $securityConfigProvider;
+
     /**
      * key = Permission
      * value = The identity of a permission mask builder
@@ -86,7 +91,8 @@ class FieldAclExtension extends AbstractAclExtension
         PermissionManager $permissionManager,
         AclGroupProviderInterface $groupProvider,
         DoctrineHelper $doctrineHelper,
-        EntityOwnerAccessor $entityOwnerAccessor
+        EntityOwnerAccessor $entityOwnerAccessor,
+        ConfigProvider $configProvider
     ) {
         $this->entityClassResolver = $entityClassResolver;
         $this->entityMetadataProvider = $entityMetadataProvider;
@@ -95,6 +101,7 @@ class FieldAclExtension extends AbstractAclExtension
         $this->entityOwnerAccessor = $entityOwnerAccessor;
         $this->decisionMaker = $decisionMaker;
         $this->objectIdAccessor = $objectIdAccessor;
+        $this->securityConfigProvider = $configProvider;
 
         $this->permissionToMaskBuilderIdentity = [
             'VIEW'   => FieldMaskBuilder::IDENTITY,
@@ -132,7 +139,9 @@ class FieldAclExtension extends AbstractAclExtension
      */
     public function supports($type, $id)
     {
-        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE
+            || $type === 'Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference'
+        ) {
             return $id === $this->getExtensionKey();
         }
 
@@ -306,7 +315,16 @@ class FieldAclExtension extends AbstractAclExtension
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
         // check whether we check permissions for a domain object
-        if ($object === null || !is_object($object) || $object instanceof ObjectIdentityInterface) {
+        if ($object === null
+            || !is_object($object)
+            || ($object instanceof ObjectIdentityInterface && !($object instanceof EntityObjectReference))
+        ) {
+            return true;
+        }
+
+        $securityConfig = $this->securityConfigProvider->getConfig($this->getObjectClassName($object));
+        // check if FACL is enabled for given object. If FACL not enabled - grant access
+        if (!($securityConfig->get('field_acl_supported') && $securityConfig->get('field_acl_enabled'))) {
             return true;
         }
 
@@ -595,6 +613,8 @@ class FieldAclExtension extends AbstractAclExtension
         } elseif (is_string($object)) {
             $className = $id = $group = null;
             $this->parseDescriptor($object, $className, $id, $group);
+        } elseif ($object instanceof EntityObjectReference) {
+            $className = $object->getType();
         } else {
             $className = ClassUtils::getRealClass($object);
         }
@@ -628,12 +648,14 @@ class FieldAclExtension extends AbstractAclExtension
     {
         try {
             // try to get entity organization value
-            $objectOrganization = $this->entityOwnerAccessor->getOrganization($object);
+            if ($object instanceof EntityObjectReference) {
+                $objectOrganizationId = $object->getOrganizationId();
+            } else {
+                $objectOrganizationId = $this->entityOwnerAccessor->getOrganization($object)->getId();
+            }
 
             // check entity organization with current organization
-            if ($objectOrganization
-                && $objectOrganization->getId() !== $securityToken->getOrganizationContext()->getId()
-            ) {
+            if ($objectOrganizationId && $objectOrganizationId !== $securityToken->getOrganizationContext()->getId()) {
                 return true;
             }
         } catch (InvalidEntityException $e) {

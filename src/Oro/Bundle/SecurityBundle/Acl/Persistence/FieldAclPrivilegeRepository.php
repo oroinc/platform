@@ -8,6 +8,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
@@ -45,10 +46,8 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
      */
     public function getFieldsPrivileges(SID $sid, $className)
     {
-        $extensionKey = 'field';
-        $extension = $this->manager->getExtensionSelector()->select(
-            $extensionKey . ':' . $className
-        );
+        $extensionKey = FieldAclExtension::NAME;
+        $extension = $this->manager->getExtensionSelector()->selectByExtensionKey($extensionKey);
         $entityClass = $this->getClassMetadata($className, $extension);
         $objectIdentity = new OID($extensionKey, $className);
         $oids[] = $objectIdentity;

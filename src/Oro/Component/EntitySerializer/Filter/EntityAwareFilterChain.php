@@ -43,25 +43,4 @@ class EntityAwareFilterChain implements EntityAwareFilterInterface
 
         return $finalResult;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkEntity($entity)
-    {
-        // if no filters - nothing will be filtered
-        $finalResult = static::FILTER_NOTHING;
-
-        foreach ($this->filters as $filters) {
-            foreach ($filters as $filter) {
-                $result = $filter->checkEntity($entity);
-
-                if ($result < static::FILTER_NOTHING) {
-                    $finalResult = $result;
-                }
-            }
-        }
-
-        return $finalResult;
-    }
 }

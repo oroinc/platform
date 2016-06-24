@@ -31,6 +31,8 @@ class AclConfigurationPass implements CompilerPassInterface
     const SECURITY_FACADE_SERVICE = 'oro_security.security_facade';
 
     const ACL_GROUP_PROVIDER_CHAIN_PROVIDER = 'oro_security.acl.group_provider.chain';
+    
+    const UNDERLYING_CACHE = 'security.acl.underlying.cache';
 
     /**
      * {@inheritDoc}
@@ -111,6 +113,7 @@ class AclConfigurationPass implements CompilerPassInterface
             if ($container->hasDefinition(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY)) {
                 $cacheDef->replaceArgument(1, new Reference(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY));
             }
+            $cacheDef->addMethodCall('setUnderlyingCache',  array(new Reference(self::UNDERLYING_CACHE)));
         }
     }
 
