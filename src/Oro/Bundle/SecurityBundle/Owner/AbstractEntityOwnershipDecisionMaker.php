@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
-use Oro\Bundle\SecurityBundle\Acl\Domain\EntityDomainObject;
+use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
@@ -123,7 +123,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     public function isGlobalLevelEntity($domainObject)
     {
         return is_a(
-            $domainObject instanceof EntityDomainObject ? $domainObject->getType() : $domainObject,
+            $domainObject instanceof EntityObjectReference ? $domainObject->getType() : $domainObject,
             $this->getMetadataProvider()->getGlobalLevelClass(),
             true
         );
@@ -135,7 +135,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     public function isLocalLevelEntity($domainObject)
     {
         return is_a(
-            $domainObject instanceof EntityDomainObject ? $domainObject->getType() : $domainObject,
+            $domainObject instanceof EntityObjectReference ? $domainObject->getType() : $domainObject,
             $this->getMetadataProvider()->getLocalLevelClass(),
             true
         );
@@ -148,7 +148,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     public function isBasicLevelEntity($domainObject)
     {
         return is_a(
-            $domainObject instanceof EntityDomainObject ? $domainObject->getType() : $domainObject,
+            $domainObject instanceof EntityObjectReference ? $domainObject->getType() : $domainObject,
             $this->getMetadataProvider()->getBasicLevelClass(),
             true
         );
@@ -262,7 +262,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             return false;
         }
 
-        $ownerId = $domainObject instanceof EntityDomainObject ?
+        $ownerId = $domainObject instanceof EntityObjectReference ?
             $domainObject->getOwnerId() :
             $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
         if ($metadata->isLocalLevelOwned()) {
@@ -309,7 +309,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
         $metadata = $this->getObjectMetadata($domainObject);
         if ($metadata->isBasicLevelOwned()) {
-            $ownerId = $domainObject instanceof EntityDomainObject ?
+            $ownerId = $domainObject instanceof EntityObjectReference ?
                 $domainObject->getOwnerId() :
                 $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
 
@@ -424,7 +424,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      */
     protected function getObjectId($domainObject)
     {
-        return $domainObject instanceof EntityDomainObject ?
+        return $domainObject instanceof EntityObjectReference ?
             $domainObject->getIdentifier() :
             $this->getObjectIdAccessor()->getId($domainObject);
     }
@@ -443,7 +443,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             return null;
         }
 
-        return $domainObject instanceof EntityDomainObject ?
+        return $domainObject instanceof EntityObjectReference ?
             $domainObject->getIdentifier() :
             $this->getObjectIdAccessor()->getId($domainObject);
     }
@@ -457,8 +457,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     protected function getObjectClass($domainObjectOrClassName)
     {
         return ClassUtils::getRealClass(
-            $domainObjectOrClassName instanceof EntityDomainObject ?
-            $domainObjectOrClassName->getType() : $domainObjectOrClassName
+            $domainObjectOrClassName instanceof EntityObjectReference ?
+            $domainObjectOrClassName->getType() :
+            $domainObjectOrClassName
         );
     }
 

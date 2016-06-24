@@ -7,7 +7,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 /**
  * Storage for entity security data.
  */
-class EntityDomainObject implements ObjectIdentityInterface
+class EntityObjectReference implements ObjectIdentityInterface
 {
     /**
      * @var string Entity class name

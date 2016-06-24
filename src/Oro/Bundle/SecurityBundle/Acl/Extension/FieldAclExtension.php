@@ -13,7 +13,7 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Acl\Domain\EntityDomainObject;
+use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
@@ -317,7 +317,7 @@ class FieldAclExtension extends AbstractAclExtension
         // check whether we check permissions for a domain object
         if ($object === null
             || !is_object($object)
-            || ($object instanceof ObjectIdentityInterface && !($object instanceof EntityDomainObject))
+            || ($object instanceof ObjectIdentityInterface && !($object instanceof EntityObjectReference))
         ) {
             return true;
         }
@@ -613,7 +613,7 @@ class FieldAclExtension extends AbstractAclExtension
         } elseif (is_string($object)) {
             $className = $id = $group = null;
             $this->parseDescriptor($object, $className, $id, $group);
-        } elseif ($object instanceof EntityDomainObject) {
+        } elseif ($object instanceof EntityObjectReference) {
             $className = $object->getType();
         } else {
             $className = ClassUtils::getRealClass($object);
@@ -648,7 +648,7 @@ class FieldAclExtension extends AbstractAclExtension
     {
         try {
             // try to get entity organization value
-            if ($object instanceof EntityDomainObject) {
+            if ($object instanceof EntityObjectReference) {
                 $objectOrganizationId = $object->getOrganizationId();
             } else {
                 $objectOrganizationId = $this->entityOwnerAccessor->getOrganization($object)->getId();
