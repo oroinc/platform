@@ -58,14 +58,15 @@ class ItemsFetcher
             $transition->getScheduleFilter()
         );
 
-        $ids = [];
         $result = $query->getArrayResult();
+
+        $ids = [];
         foreach ($result as $row) {
             $ids[] = $row['id'];
         }
 
         // if needed - check conditions
-        if ($ids && $transition->isScheduleCheckСonditions()) {
+        if ($ids && $transition->isScheduleCheckConditions()) {
             /** @var WorkflowItem[] $workflowItems */
             $workflowItems = $this->workflowItemRepository->findBy(['id' => $ids]);
             $ids = [];

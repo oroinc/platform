@@ -75,7 +75,7 @@ class ItemsFetcherTest extends \PHPUnit_Framework_TestCase
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Transition');
         $transition->expects($this->once())->method('getScheduleFilter')->willReturn('schedule_filter != null');
-        $transition->expects($this->once())->method('isScheduleCheckСonditions')->willReturn($checkConditions);
+        $transition->expects($this->once())->method('isScheduleCheckConditions')->willReturn($checkConditions);
 
         $this->prepareMocks($workflowName, $transitionName, $transition);
         if ($checkConditions) {

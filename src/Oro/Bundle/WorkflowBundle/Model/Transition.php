@@ -109,7 +109,7 @@ class Transition
     /**
      * @var bool
      */
-    protected $scheduleCheckСonditions = false;
+    protected $scheduleCheckConditions = false;
 
     /**
      * Set label.
@@ -562,12 +562,12 @@ class Transition
     }
 
     /**
-     * @param bool $scheduleCheckСonditions
+     * @param bool $scheduleCheckConditions
      * @return $this
      */
-    public function setScheduleCheckСonditions($scheduleCheckСonditions)
+    public function setScheduleCheckConditions($scheduleCheckConditions)
     {
-        $this->scheduleCheckСonditions = $scheduleCheckСonditions;
+        $this->scheduleCheckConditions = $scheduleCheckConditions;
 
         return $this;
     }
@@ -575,9 +575,9 @@ class Transition
     /**
      * @return bool
      */
-    public function isScheduleCheckСonditions()
+    public function isScheduleCheckConditions()
     {
-        return $this->scheduleCheckСonditions;
+        return $this->scheduleCheckConditions;
     }
 
     /**

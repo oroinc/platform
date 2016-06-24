@@ -151,7 +151,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         if (!empty($options['schedule'])) {
             $transition->setScheduleCron($this->getOption($options['schedule'], 'cron', null));
             $transition->setScheduleFilter($this->getOption($options['schedule'], 'filter', null));
-            $transition->setScheduleCheckСonditions(
+            $transition->setScheduleCheckConditions(
                 $this->getOption($options['schedule'], 'check_conditions_before_job_creation', false)
             );
         }
