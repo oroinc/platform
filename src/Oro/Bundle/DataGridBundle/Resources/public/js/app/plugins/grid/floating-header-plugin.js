@@ -87,9 +87,12 @@ define(function(require) {
             };
         },
 
-        supportDropdowns: function () {
+        supportDropdowns: function() {
+            var debouncedHideDropdowns = _.debounce(_.bind(function() {
+                this.domCache.thead.find('.dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
+            }, this), 100, true);
             // use capture phase to scroll dropdown toggle into view before dropdown will be opened
-            this.$grid[0].addEventListener('click', _.bind(function (e) {
+            this.$grid[0].addEventListener('click', _.bind(function(e) {
                 var dropdownToggle = $(e.target).closest('.dropdown-toggle');
                 if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.open)')) {
                     // this will hide dropdowns and ignore next calls to it
@@ -98,14 +101,11 @@ define(function(require) {
                     scrollHelper.scrollIntoView(dropdownToggle[0], void 0, 10, 10);
                 }
             }, this), true);
-            this.$grid.on('hide.bs.dropdown', '.dropdown.open', _.bind(function () {
+            this.$grid.on('hide.bs.dropdown', '.dropdown.open', _.bind(function() {
                 this.isHeaderDropdownVisible = false;
                 this.selectMode();
             }, this));
-            var debouncedHideDropdowns = _.debounce(_.bind(function () {
-                this.domCache.thead.find('.dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
-            }, this), 100, true);
-            this.domCache.gridContainer.parents().add(document).on('scroll.float-thead', _.bind(function () {
+            this.domCache.gridContainer.parents().add(document).on('scroll.float-thead', _.bind(function() {
                 debouncedHideDropdowns();
                 this.checkLayout();
             }, this));
