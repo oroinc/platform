@@ -181,3 +181,7 @@ services:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:
             - '@request_stack'
+
+    oro_layout.imports_storage:
+        class: Doctrine\Common\Collections\ArrayCollection
+        public: false
