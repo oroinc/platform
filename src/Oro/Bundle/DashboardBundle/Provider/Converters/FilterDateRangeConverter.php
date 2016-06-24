@@ -131,6 +131,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getViewValue($value)
     {
