@@ -74,8 +74,6 @@ class AttendeeRelationManager
     }
 
     /**
-     * @todo rename method
-     *
      * Adds fullName column with text representation of attendee into the result
      *
      * @param QueryBuilder $qb
