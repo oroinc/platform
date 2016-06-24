@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Extension\Theme\Model;
+namespace Oro\Component\Layout;
 
 interface ImportsAwareLayoutUpdateInterface
 {
