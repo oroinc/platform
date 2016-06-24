@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\EventListener;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -76,6 +77,21 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
          */
         if ($this->hasAttendeeInRequest()) {
             $form->remove('invitedUsers');
+        }
+
+        /**
+         * We check if there is no type in request data for attendee we set default value - Attendee::TYPE_REQUIRED
+         */
+        if (!empty($data['attendees'])&& is_array($data['attendees'])) {
+            $attendees = &$data['attendees'];
+
+            foreach ($attendees as &$attendee) {
+                if (!array_key_exists('type', $attendee)) {
+                    $attendee['type'] = Attendee::TYPE_REQUIRED;
+                }
+            }
+
+            $event->setData($data);
         }
 
         if (empty($data['recurrence'])) {

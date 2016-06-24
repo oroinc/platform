@@ -31,13 +31,13 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
     /**
      * @param ManagerRegistry $registry
-     * @param SecurityFacade $securityFacade
+     * @param SecurityFacade  $securityFacade
      */
     public function __construct(
         ManagerRegistry $registry,
         SecurityFacade $securityFacade
     ) {
-        $this->registry= $registry;
+        $this->registry       = $registry;
         $this->securityFacade = $securityFacade;
     }
 
@@ -47,8 +47,33 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            FormEvents::PRE_SUBMIT  => 'preSubmit',
             FormEvents::POST_SUBMIT => 'postSubmit', // synchronize child events
         ];
+    }
+
+    /**
+     * We check if there is wrong value in attendee type and set it to null
+     *
+     * @param FormEvent $event
+     */
+    public function preSubmit(FormEvent $event)
+    {
+        $data = $event->getData();
+
+        if (!empty($data['attendees']) && count($data['attendees']) > 0) {
+            $attendees = &$data['attendees'];
+
+            foreach ($attendees as &$attendee) {
+                $type = array_key_exists('type', $attendee) ? $attendee['type'] : null;
+
+                if ($this->shouldTypeBeChecked($type)) {
+                    $attendee['type'] = $this->getTypeEnum($type);
+                }
+            }
+
+            $event->setData($data);
+        }
     }
 
     /**
@@ -71,7 +96,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         }
 
         $this->setDefaultAttendeeStatus($parentEvent->getRelatedAttendee(), CalendarEvent::STATUS_ACCEPTED);
-        $this->setDefaultAttendeeType($parentEvent->getRelatedAttendee());
+        #$this->setDefaultAttendeeType($parentEvent->getRelatedAttendee());
         foreach ($parentEvent->getChildEvents() as $calendarEvent) {
             $calendarEvent
                 ->setTitle($parentEvent->getTitle())
@@ -83,7 +108,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
         foreach ($parentEvent->getChildAttendees() as $attendee) {
             $this->setDefaultAttendeeStatus($attendee);
-            $this->setDefaultAttendeeType($attendee);
+            #$this->setDefaultAttendeeType($attendee);
         }
     }
 
@@ -95,7 +120,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     protected function updateCalendarEvents(CalendarEvent $parent)
     {
         $attendeesByUserId = [];
-        $attendees = $parent->getAttendees();
+        $attendees         = $parent->getAttendees();
         foreach ($attendees as $attendee) {
             if (!$attendee->getUser()) {
                 continue;
@@ -106,7 +131,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         $currentUserIds = array_keys($attendeesByUserId);
 
         $calendarEventOwnerIds = [];
-        $calendar = $parent->getCalendar();
+        $calendar              = $parent->getCalendar();
         if ($calendar && $calendar->getOwner()) {
             $owner = $calendar->getOwner();
             if (isset($attendeesByUserId[$owner->getId()])) {
@@ -177,7 +202,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
     /**
      * @param Attendee|null $attendee
-     * @param string $type
+     * @param string        $type
      */
     protected function setDefaultAttendeeType(Attendee $attendee = null, $type = Attendee::TYPE_REQUIRED)
     {
@@ -185,9 +210,8 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $typeEnum = $this->registry
-            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE))
-            ->find($type);
+        $typeEnum = $this->getTypeEnum($type);
+
         $attendee->setType($typeEnum);
     }
 
@@ -213,5 +237,29 @@ class ChildEventsSubscriber implements EventSubscriberInterface
                 }
             }
         }
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    protected function shouldTypeBeChecked($type)
+    {
+        return
+            null !== $type
+            && !in_array($type, [Attendee::TYPE_OPTIONAL, Attendee::TYPE_REQUIRED, Attendee::TYPE_ORGANIZER]);
+    }
+
+    /**
+     * @param $type
+     *
+     * @return object
+     */
+    protected function getTypeEnum($type)
+    {
+        return $this->registry
+            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE))
+            ->find($type);
     }
 }
