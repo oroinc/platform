@@ -140,7 +140,7 @@ class FieldAclExtension extends AbstractAclExtension
     public function supports($type, $id)
     {
         if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE
-            || $type === 'Oro\Bundle\SecurityBundle\Acl\Domain\EntityDomainObject'
+            || $type === 'Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference'
         ) {
             return $id === $this->getExtensionKey();
         }
