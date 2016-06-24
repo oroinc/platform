@@ -53,7 +53,7 @@ class TransitionQueryFactory
                 $entityClass,
                 'e',
                 Query\Expr\Join::WITH,
-                sprintf('wi.entityId = e.%s', $identifier)
+                sprintf('wi.entityId = CAST(e.%s as text)', $identifier)
             );
 
         $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
