@@ -9,7 +9,7 @@
 {% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
 {% set importLabel = importLabel|default('oro.importexport.import.label'|trans) %}
 {% set exportLabel = exportPopupConfig.exportLabel|default('oro.importexport.export.label'|trans) %}
-{% set exportTemplateLabel = hasExportTemplatePopupConfig.label|default('oro.importexport.export_template.label'|trans) %}
+{% set exportTemplateLabel = exportTemplatePopupConfig.label|default('oro.importexport.export_template.label'|trans) %}
 
 {% if exportAllowed or importAllowed %}
     {% if options is not defined %}
