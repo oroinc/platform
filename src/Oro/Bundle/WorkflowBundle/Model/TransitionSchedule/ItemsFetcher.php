@@ -37,13 +37,13 @@ class ItemsFetcher
 
         if (!$transition instanceof Transition) {
             throw new \RuntimeException(
-                sprintf('Cant get transition by given identifier "%s"', (string)$transitionName)
+                sprintf('Can\'t get transition by given identifier "%s"', (string)$transitionName)
             );
         }
 
         $query = $this->queryFactory->create(
-            $this->getRelatedSteps($workflow->getStepManager(), $transitionName),
-            $workflow->getDefinition()->getRelatedEntity(),
+            $workflow,
+            $transitionName,
             $transition->getScheduleFilter()
         );
 
@@ -55,21 +55,5 @@ class ItemsFetcher
         }
 
         return $ids;
-    }
-
-    /**
-     * @param StepManager $stepManager
-     * @param $transitionName
-     * @return array
-     */
-    private function getRelatedSteps(StepManager $stepManager, $transitionName)
-    {
-        $relatedSteps = [];
-        $steps = $stepManager->getRelatedTransitionSteps($transitionName);
-        foreach ($steps as $step) {
-            $relatedSteps[] = $step->getName();
-        }
-
-        return $relatedSteps;
     }
 }

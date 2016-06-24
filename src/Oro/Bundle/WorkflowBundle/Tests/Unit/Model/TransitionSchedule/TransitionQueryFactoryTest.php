@@ -2,9 +2,23 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Func;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\Step;
+use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
+
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class TransitionQueryFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,65 +36,87 @@ class TransitionQueryFactoryTest extends \PHPUnit_Framework_TestCase
         $this->queryFactory = new TransitionQueryFactory($this->registry);
     }
 
-    /**
-     * @dataProvider createQueryDataProvider
-     *
-     * @param array $steps
-     * @param string $dqlFilter
-     */
-    public function testCreateQuery(array $steps, $dqlFilter)
+    public function testCreateQuery()
     {
-        $dqlString = 'test string';
+        $transitionName = 'transition_with_schedule';
+        $additionalWhereClauseDql = 'e.id = 42';
+        $relatedEntity = EntityStub::class;
 
-        $whereClauseMock = $this->getMockBuilder('\Doctrine\ORM\Query\Expr\Func')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /**@var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        $stepsManager = new StepManager(
+            [
+                (new Step())->setName('step_one')->setAllowedTransitions(['trans_other', $transitionName]),
+                (new Step())->setName('step_two')->setAllowedTransitions(['trans_other', $transitionName])
+            ]
+        );
+        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
 
-        $expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')->getMock();
-        $expr->expects($this->once())->method('in')->with('ws.name', ':workflowSteps')->willReturn($whereClauseMock);
+        $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
-        $queryBuilder->expects($this->once())->method('select')->with('wi.id')->willReturnSelf();
-        $queryBuilder->expects($this->at(1))->method('innerJoin')->with('e.workflowItem', 'wi')->willReturnSelf();
-        $queryBuilder->expects($this->at(2))->method('innerJoin')->with('e.workflowStep', 'ws')->willReturnSelf();
-        $queryBuilder->expects($this->at(3))->method('innerJoin')->with('wi.definition', 'wd')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('expr')->willReturn($expr);
-        $queryBuilder->expects($this->once())->method('where')->with($whereClauseMock)->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('setParameter')->with('workflowSteps', $steps);
-        $queryBuilder->expects($this->once())->method('getQuery')->willReturn($dqlString);
+        //identifier
+        $this->registry->expects($this->at(0))
+            ->method('getManagerForClass')
+            ->with($relatedEntity)
+            ->willReturn($entityManager);
 
-        if ($dqlFilter) {
-            $queryBuilder->expects($this->once())->method('andWhere')->with($dqlFilter);
-        }
+        $metadataInfo = new ClassMetadataInfo($relatedEntity);
+        $metadataInfo->setIdentifier(['id']);
+        $entityManager->expects($this->once())->method('getClassMetadata')->with($relatedEntity)
+            ->willReturn($metadataInfo);
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
-        $repository->expects($this->once())
-            ->method('createQueryBuilder')
-            ->with('e')
+        $this->registry->expects($this->at(1))->method('getManagerForClass')->with(WorkflowItem::class)
+            ->willReturn($entityManager);
+
+        //retrieve WorkflowItem QueryBuilder
+        $entityManager->expects($this->once())->method('getRepository')->with(WorkflowItem::class)
+            ->willReturn($repository);
+        $repository->expects($this->once())->method('createQueryBuilder')->with('wi')
             ->willReturn($queryBuilder);
 
-        $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $em->expects($this->once())->method('getRepository')->with('EntityClass')->willReturn($repository);
+        $workflow->expects($this->once())->method('getStepManager')->willReturn($stepsManager);
 
-        $this->registry->expects($this->once())->method('getManagerForClass')->with('EntityClass')->willReturn($em);
+        $workflow->expects($this->once())
+            ->method('getDefinition')
+            ->willReturn((new WorkflowDefinition())->setRelatedEntity($relatedEntity));
 
-        $this->assertEquals($dqlString, $this->queryFactory->create($steps, 'EntityClass', $dqlFilter));
-    }
+        $queryBuilder->expects($this->at(0))->method('select')->with('wi.id')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->at(1))->method('innerJoin')->with('wi.definition', 'wd')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->at(2))->method('innerJoin')->with('wi.currentStep', 'ws')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->at(3))
+            ->method('innerJoin')->with(
+                $relatedEntity,
+                'e',
+                Join::WITH,
+                'wi.entityId = e.id'
+            )->willReturnSelf();
 
-    /**
-     * @return array
-     */
-    public function createQueryDataProvider()
-    {
-        return [
-            'without dql' => [
-                ['step1', 'step2'],
-                null
-            ],
-            'with dql' => [
-                ['step1', 'step2'],
-                'custom filter dql expression'
-            ]
-        ];
+        $queryBuilder->expects($this->at(4))->method('expr')
+            ->willReturn(new Expr);
+
+        $queryBuilder->expects($this->at(5))->method('where')->with(
+            $this->logicalAnd(
+                $this->isInstanceOf(Func::class),
+                $this->attributeEqualTo('name', 'ws.name IN'),
+                $this->attributeEqualTo('arguments', [':workflowSteps'])
+            )
+        )->willReturnSelf();
+
+        $queryBuilder->expects($this->at(6))->method('setParameter')->with('workflowSteps', ['step_one', 'step_two']);
+
+        $queryBuilder->expects($this->at(7))->method('andWhere')->with('wd.relatedEntity = :entityClass')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->at(8))->method('setParameter')->with('entityClass', $relatedEntity);
+
+        $queryBuilder->expects($this->at(9))
+            ->method('andWhere')
+            ->with($additionalWhereClauseDql);
+
+        $this->queryFactory->create($workflow, $transitionName, $additionalWhereClauseDql);
     }
 }
