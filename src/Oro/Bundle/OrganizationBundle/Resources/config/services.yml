@@ -251,6 +251,18 @@ services:
             - { name: oro_form.autocomplete.search_handler, alias: business_units_search_handler }
         lazy: true
 
+    oro_organization.autocomplete.business_unit_owner_search_handler:
+        class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitOwnerSearchHandler
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_organization.business_unit.entity.class%
+            - ["name"]
+            - '@doctrine'
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: business_units_owner_search_handler }
+        lazy: true
+
+
     oro_organization.form.type.business_unit_search:
         class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitAutocomplete
         arguments:
