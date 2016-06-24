@@ -36,15 +36,30 @@ abstract class CsvFileStreamWriter implements ItemWriterInterface, ClosableInter
     protected $firstLineIsHeader = true;
 
     /**
+     * @var bool
+     */
+    protected $writeBom = true;
+
+    /**
      * @var array
      */
     protected $header;
+
+    /**
+     *  UTF-8 BOM sequence
+     */
+    const BOM_UTF8 = "\xEF\xBB\xBF";
 
     /**
      * {@inheritdoc}
      */
     public function write(array $items)
     {
+        // write the UTF-8 BOM if needed
+        if ($this->writeBom) {
+            fwrite($this->getFile(), static::BOM_UTF8);
+        }
+
         // write a header if needed
         if (!$this->fileHandle && $this->firstLineIsHeader) {
             if (!$this->header && count($items) > 0) {
