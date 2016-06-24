@@ -8,7 +8,6 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var CellIterator = require('../../../datagrid/cell-iterator');
-    var gridViewsBuilder = require('../../../inline-editing/builder');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var Modal = require('oroui/js/modal');
     var SplitEventList = require('./inline-editing-plugin/split-event-list');
@@ -239,27 +238,7 @@ define(function(require) {
             if (fullRestriction) {
                 return false;
             }
-            var editable;
-            var enableConfigValue = columnMetadata.inline_editing && columnMetadata.inline_editing.enable;
-            // validateUrlParameters
-            switch (this.options.metadata.inline_editing.behaviour) {
-                case 'enable_all':
-                    if (enableConfigValue !== false) {
-                        editable = (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
-                            (columnMetadata.type || gridViewsBuilder.DEFAULT_COLUMN_TYPE) in
-                                this.options.metadata.inline_editing.default_editors;
-                    } else {
-                        editable = false;
-                    }
-                    break;
-                case 'enable_selected':
-                    editable = enableConfigValue === true;
-                    break;
-                default:
-                    throw new Error('Unknown behaviour');
-            }
-
-            return editable ?
+            return columnMetadata.inline_editing && columnMetadata.inline_editing.enable ?
                 this.getCellEditorOptions(cell)
                     .save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
                 false;
@@ -271,10 +250,6 @@ define(function(require) {
                 var columnMetadata = cell.column.get('metadata');
                 cellEditorOptions = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
                 var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
-                var fieldName = cell.column.get('name');
-                var fieldRestrictions = _.find(cell.model.get('entity_restrictions'), function(restriction) {
-                    return restriction.field === fieldName;
-                });
 
                 if (!cellEditorOptions.component_options) {
                     cellEditorOptions.component_options = {};
@@ -304,13 +279,8 @@ define(function(require) {
                     validationRules: validationRules
                 });
 
-                if (fieldRestrictions) {
-                    cellEditorOptions.viewOptions.fieldRestrictions = fieldRestrictions;
-                }
-
                 cell.column.set('cellEditorOptions', cellEditorOptions);
             }
-
             return cellEditorOptions;
         },
 

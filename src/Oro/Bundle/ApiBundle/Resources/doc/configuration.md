@@ -23,6 +23,8 @@ oro_api:
         Acme\Bundle\ProductBundle\Product: ~
 ```
 
+Do not forget to run `oro:api:cache:clear` CLI command to immediately make an entity accessible through Data API. Also please see other [debug commands](./debug_commands.md) that may be helpful.
+
 Configuration structure
 -----------------------
 
@@ -144,8 +146,10 @@ Each entity can have next properties:
 * **inherit** *boolean* By default `true`. The flag indicates that the configuration for certain entity should be merged with the configuration of a parent entity. If a derived entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`.
 * **exclusion_policy** *string* - Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used for the entity. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
 * **disable_partial_load** *boolean* The flag indicates whether usage of Doctrine partial objects is disabled. By default `false`. It can be helpful for entities with table inheritance mapping.
-* **max_results** *integer* The maximum number of entities in the result. Set -1 (it means unlimited), zero or positive value to set the limit. Can be used to set the limit for both root and related entities.
+* **page_size** *integer* The default page size. Set a positive number or -1 if a pagination should be disabled. Default value is `10`.
+* **max_results** *integer* The maximum number of entities in the result. Set -1 (it means unlimited), zero or positive number to set the limit. Can be used to set the limit for both root and related entities.
 * **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
+* **disable_sorting** *boolean* The flag indicates whether a sorting is disabled. By default `false`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
 * **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.

@@ -30,6 +30,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 class EmailRecipientsHelper
 {
     const ORGANIZATION_PROPERTY = 'organization';
+    const EMAIL_IDS_SEPARATOR   = ';';
 
      /** @var AclHelper */
     protected $aclHelper;
@@ -167,9 +168,9 @@ class EmailRecipientsHelper
         }
 
         return [
-            'id' => $recipient->getId(),
-            'text' => $recipient->getName(),
-            'data' => json_encode($data),
+            'id'    => self::prepareFormRecipientIds($recipient->getId()),
+            'text'  => $recipient->getName(),
+            'data'  => json_encode($data),
         ];
     }
 
@@ -325,7 +326,7 @@ class EmailRecipientsHelper
         foreach ($result as $row) {
             $recipient = new CategorizedRecipient(
                 $row['email'],
-                sprintf('%s <%s>', $row['name'], $row['email']),
+                sprintf('"%s" <%s>', $row['name'], $row['email']),
                 new RecipientEntity(
                     $entityClass,
                     $row['entityId'],
@@ -350,5 +351,45 @@ class EmailRecipientsHelper
         }
 
         return $this->propertyAccessor;
+    }
+
+    /**
+     * Prepares base64 encoded emails to be used as ids in recipients form for select2 component.
+     *
+     * @param  array|string $ids
+     * @return string;
+     */
+    public static function prepareFormRecipientIds($ids)
+    {
+        if (is_string($ids)) {
+            return base64_encode($ids);
+        }
+
+        $ids = array_map("base64_encode", $ids);
+
+        return implode(self::EMAIL_IDS_SEPARATOR, $ids);
+    }
+
+    /**
+     * Extracts base64 encoded selected email values, that are used as ids in recipients form for select2 component.
+     *
+     * @param  array|string $value
+     * @return array;
+     */
+    public static function extractFormRecipientIds($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        /*
+         * str_getcsv is used to cover the case if emails are pasted directly with ";" separator
+         * and it protects from ";" used  in full email address. (example: "Recipient Name; Name2" <myemail@domain.com>)
+         */
+        $idsEncoded = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
+        $idsDecoded = array_map(function ($idEncoded) {
+            return base64_decode($idEncoded, true) ? : $idEncoded;
+        }, $idsEncoded);
+
+        return $idsDecoded;
     }
 }

@@ -62,7 +62,9 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         $this->result[self::DATA] = [];
         if (is_array($collection) || $collection instanceof \Traversable) {
             foreach ($collection as $object) {
-                $this->result[self::DATA][] = $this->transformObjectToArray($object, $metadata);
+                $this->result[self::DATA][] = null === $object || is_scalar($object)
+                    ? $object
+                    : $this->transformObjectToArray($object, $metadata);
             }
         } else {
             throw $this->createUnexpectedValueException('array or \Traversable', $collection);
