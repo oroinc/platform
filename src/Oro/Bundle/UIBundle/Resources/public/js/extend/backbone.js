@@ -139,11 +139,7 @@ define([
             if (this.subviews.length) {
                 _.each(this.subviews, function(subview) {
                     if (subview.deferredRender) {
-                        var promise = $.Deferred();
-                        promises.push(promise);
-                        subview.deferredRender.done(function() {
-                            promise.resolve();
-                        });
+                        promises.push(subview.deferredRender.promise());
                     }
                 });
             }

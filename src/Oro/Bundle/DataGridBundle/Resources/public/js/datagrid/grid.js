@@ -435,7 +435,8 @@ define(function(require) {
             subviews = ['header', 'body', 'footer', 'loadingMask'];
             _.each(subviews, function(viewName) {
                 if (this[viewName]) {
-                    this.removeSubview(viewName);
+                    this[viewName].dispose();
+                    delete this[viewName];
                 }
             }, this);
 
