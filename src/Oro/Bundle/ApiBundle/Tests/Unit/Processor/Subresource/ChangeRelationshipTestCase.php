@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class ChangeRelationshipContextTest extends \PHPUnit_Framework_TestCase
+class ChangeRelationshipTestCase extends \PHPUnit_Framework_TestCase
 {
+    const TEST_VERSION      = '1.1';
+    const TEST_REQUEST_TYPE = RequestType::REST;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
@@ -27,21 +29,7 @@ class ChangeRelationshipContextTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->context = new ChangeRelationshipContext($this->configProvider, $this->metadataProvider);
-    }
-
-    public function testGetParentConfigExtras()
-    {
-        $this->context->setParentClassName('Test\Class');
-        $this->context->setAssociationName('test');
-
-        $this->assertEquals(
-            [
-                new EntityDefinitionConfigExtra('update'),
-                new FilterFieldsConfigExtra(
-                    [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-                )
-            ],
-            $this->context->getParentConfigExtras()
-        );
+        $this->context->setVersion(self::TEST_VERSION);
+        $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
     }
 }

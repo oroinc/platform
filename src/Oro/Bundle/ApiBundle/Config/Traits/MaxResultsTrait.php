@@ -34,7 +34,7 @@ trait MaxResultsTrait
     /**
      * Sets the maximum number of items in the result.
      * Set NULL to use a default limit.
-     * Set -1 (it means unlimited), zero or positive value to set own limit.
+     * Set -1 (it means unlimited), zero or positive number to set own limit.
      *
      * @param int|null $maxResults The maximum number of items, NULL or -1 to set unlimited
      */

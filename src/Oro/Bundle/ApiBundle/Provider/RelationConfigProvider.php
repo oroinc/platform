@@ -57,4 +57,12 @@ class RelationConfigProvider extends AbstractConfigProvider
 
         return clone $config;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildConfigKey($className, array $extras)
+    {
+        return 'relation|' . parent::buildConfigKey($className, $extras);
+    }
 }
