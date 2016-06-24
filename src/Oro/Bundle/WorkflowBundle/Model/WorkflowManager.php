@@ -454,6 +454,6 @@ class WorkflowManager
      */
     protected function isSupportedIdentifier($identifier)
     {
-        return is_numeric($identifier) || is_string($identifier);
+        return is_int($identifier) || is_string($identifier);
     }
 }

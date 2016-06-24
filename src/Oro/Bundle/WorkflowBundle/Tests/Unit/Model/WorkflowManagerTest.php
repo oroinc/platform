@@ -587,16 +587,34 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['result'], $result);
     }
 
-    public function testGetWorkflowItemUnsupportedIdentifier()
+    /**
+     * @dataProvider unsupportedIdentifiersDataProvider
+     * @param $id
+     */
+    public function testGetWorkflowItemUnsupportedIdentifier($id)
     {
-        $entity = new EntityStub(['an array']);
+        $entity = new EntityStub($id);
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')->with($entity)->willReturn(['an array']);
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn($id);
+
+        $this->doctrineHelper->expects($this->never())->method('getEntityRepository');
 
         $result = $this->workflowManager->getWorkflowItem($entity, 'workflow_name');
 
         $this->assertNull($result, 'If not an integer identifier got - return null');
+    }
+
+    /**
+     * @return array
+     */
+    public function unsupportedIdentifiersDataProvider()
+    {
+        return [
+            [['array']],
+            [1.123123],
+            [(object)[]]
+        ];
     }
 
     /**
