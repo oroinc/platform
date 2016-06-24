@@ -403,7 +403,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                 [
                     'required' => false,
                     'label' => $this->fieldLabel,
-                    'autocomplete_alias' => 'business_units_search_handler',
+                    'autocomplete_alias' => 'business_units_owner_search_handler',
                     'empty_value' => $emptyValueLabel,
                     'configs' => [
                         'multiple' => false,
