@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Selenium;
 
+use Oro\Bundle\ConfigBundle\Tests\Selenium\Pages\UserImapSettings;
 use Oro\Bundle\EmailBundle\Tests\Selenium\Pages\Emails;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
@@ -44,7 +45,6 @@ class SendEmailTest extends Selenium2TestCase
      */
     public function testUserImapSync()
     {
-        $this->markTestSkipped('Imap configuration was moved to user configuration page');
         $imapSetting = array(
             'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
             'port' => '143',
@@ -72,12 +72,13 @@ class SendEmailTest extends Selenium2TestCase
             ->setRoles(['Administrator'], true)
             ->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
-            ->setImap($imapSetting)
             ->save()
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
             ->submit();
+        /** @var UserImapSettings $login */
+        $login->openUserImapSettings('Oro\Bundle\ConfigBundle')->setImap($imapSetting);
         exec("app/console oro:cron:imap-sync --env prod");
         /** @var Emails $login */
         $login->openEmails('Oro\Bundle\EmailBundle')
