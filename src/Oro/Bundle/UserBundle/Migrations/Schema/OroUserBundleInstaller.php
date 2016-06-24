@@ -50,7 +50,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_21';
+        return 'v1_22';
     }
 
     /**
@@ -311,6 +311,7 @@ class OroUserBundleInstaller implements
                 ]
             ]
         );
+        $table->addColumn('self_managed', 'boolean');
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
         $table->setPrimaryKey(['id']);
     }

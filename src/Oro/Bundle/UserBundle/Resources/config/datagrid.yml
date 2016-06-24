@@ -209,6 +209,7 @@ datagrid:
                     - r.id
                     - r.role
                     - r.label
+                    - r.selfManaged
                 from:
                     - { table: %oro_user.role.entity.class%, alias: r }
                 where:
@@ -217,7 +218,9 @@ datagrid:
         columns:
             label:
                 label: oro.user.role.label.label
-
+            selfManaged:
+                label: oro.user.role.self_managed.label
+                frontend_type: boolean
         properties:
             id: ~
             update_link:
