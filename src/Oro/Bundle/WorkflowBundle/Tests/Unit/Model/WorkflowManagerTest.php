@@ -589,10 +589,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWorkflowItemUnsupportedIdentifier()
     {
-        $entity = new EntityStub('string');
+        $entity = new EntityStub(['an array']);
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')->with($entity)->willReturn('string');
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn(['an array']);
 
         $result = $this->workflowManager->getWorkflowItem($entity, 'workflow_name');
 

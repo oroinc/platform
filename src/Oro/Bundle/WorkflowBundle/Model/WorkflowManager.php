@@ -358,7 +358,7 @@ class WorkflowManager
     public function getWorkflowItem($entity, $workflowName)
     {
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if (false === filter_var($entityIdentifier, FILTER_VALIDATE_INT)) {
+        if (!$this->isSupportedIdentifier($entityIdentifier)) {
             return null;
         }
 
@@ -393,7 +393,8 @@ class WorkflowManager
     public function getWorkflowItemsByEntity($entity)
     {
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if (false === filter_var($entityIdentifier, FILTER_VALIDATE_INT)) {
+
+        if (!$this->isSupportedIdentifier($entityIdentifier)) {
             return [];
         }
 
@@ -445,5 +446,14 @@ class WorkflowManager
     public function resetWorkflowData(WorkflowDefinition $workflowDefinition)
     {
         $this->getWorkflowItemRepository()->resetWorkflowData($workflowDefinition);
+    }
+
+    /**
+     * @param mixed $identifier
+     * @return bool
+     */
+    protected function isSupportedIdentifier($identifier)
+    {
+        return is_numeric($identifier) || is_string($identifier);
     }
 }

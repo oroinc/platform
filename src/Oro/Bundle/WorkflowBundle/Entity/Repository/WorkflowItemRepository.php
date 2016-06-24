@@ -70,7 +70,7 @@ class WorkflowItemRepository extends EntityRepository
             ->where('wd.relatedEntity = :entityClass')
             ->andWhere('wi.entityId = :entityId')
             ->setParameter('entityClass', $entityClass)
-            ->setParameter('entityId', (int)$entityIdentifier);
+            ->setParameter('entityId', (string)$entityIdentifier);
 
         return $qb;
     }
