@@ -140,6 +140,19 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         if (isset($value['part']) && $value['part'] === DateModifierInterface::PART_ALL_TIME) {
             return $this->translator->trans('oro.dashboard.widget.filter.date_range.all_time');
         }
+
+        if ($value['type'] === AbstractDateFilterType::TYPE_THIS_MONTH) {
+            return $this->formatter->formatMonth($start);
+        }
+
+        if ($value['type'] === AbstractDateFilterType::TYPE_THIS_QUARTER) {
+            return $this->formatter->formatQuarter($start);
+        }
+
+        if ($value['type'] === AbstractDateFilterType::TYPE_THIS_YEAR) {
+            return $this->formatter->formatYear($start);
+        }
+
         if ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN
             || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$end
         ) {
@@ -208,7 +221,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     protected function processValueTypes(array $value, $cretePreviousPeriod)
     {
         $start = $end = $part = $prevStart = $prevEnd = null;
-        $type  = AbstractDateFilterType::TYPE_BETWEEN;
+        $type = isset($value['type']) ? $value['type'] : AbstractDateFilterType::TYPE_BETWEEN;
         if (array_key_exists($value['type'], static::$valueTypesStartVarsMap)) {
             /** @var \Carbon\Carbon $start */
             $start  = $this->dateCompiler->compile(

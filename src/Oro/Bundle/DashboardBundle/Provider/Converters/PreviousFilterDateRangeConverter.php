@@ -34,14 +34,44 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                 && $currentDateRange['start']
                 && $currentDateRange['end']
             ) {
-                list($start, $end) = $this->dateHelper->getPreviousDateTimeInterval(
-                    $currentDateRange['start'],
-                    $currentDateRange['end']
-                );
+                if (in_array(
+                    $currentDateRange['type'],
+                    [
+                        AbstractDateFilterType::TYPE_THIS_MONTH,
+                        AbstractDateFilterType::TYPE_THIS_QUARTER,
+                        AbstractDateFilterType::TYPE_THIS_YEAR
+                    ],
+                    true
+                )) {
+                    /** @var \DateTime $start */
+                    $start = clone $currentDateRange['start'];
+                    /** @var \DateTime $end */
+                    $end = clone $currentDateRange['end'];
+
+                    if ($currentDateRange['type'] == AbstractDateFilterType::TYPE_THIS_MONTH) {
+                        $start->modify('first day of previous month');
+                        $end->modify('last day of previous month');
+                    } elseif ($currentDateRange['type'] == AbstractDateFilterType::TYPE_THIS_YEAR) {
+                        $start->modify('first day of previous year');
+                        $end->modify('last day of previous year');
+                    } elseif ($currentDateRange['type'] == AbstractDateFilterType::TYPE_THIS_QUARTER) {
+                        $start->modify('first day of - 3 month');
+                        $end->modify('last day of - 3 month');
+                    }
+                } else {
+                    list($start, $end) = $this->dateHelper->getPreviousDateTimeInterval(
+                        $currentDateRange['start'],
+                        $currentDateRange['end']
+                    );
+                }
 
                 $result['start'] = $start;
                 $result['end']   = $end;
-                $result['type']  = AbstractDateFilterType::TYPE_BETWEEN;
+                $type            = AbstractDateFilterType::TYPE_BETWEEN;
+                if (isset($currentDateRange['type'])) {
+                    $type = $currentDateRange['type'];
+                }
+                $result['type'] = $type;
             }
         }
 

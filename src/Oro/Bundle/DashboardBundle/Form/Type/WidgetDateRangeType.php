@@ -83,6 +83,7 @@ class WidgetDateRangeType extends AbstractType
 
         $resolver->setDefaults(
             [
+                'tooltip'          => 'oro.filter.date.info',
                 'required'         => false,
                 'compile_date'     => false,
                 'field_type'       => WidgetDateRangeValueType::NAME,

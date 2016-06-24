@@ -266,3 +266,11 @@ services:
         arguments:
             - '@oro_dashboard.filter.date_range'
             - '@oro_filter.utils.date_filter_modifier'
+
+    # Twig extension
+    oro_dashboard.twig.filter_date_range_extension:
+        class: Oro\Bundle\DashboardBundle\Twig\FilterDateRangeExtension
+        arguments:
+            - '@oro_dashboard.widget_config_value.date_range.converter'
+        tags:
+            - { name: twig.extension }

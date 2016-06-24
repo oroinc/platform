@@ -82,7 +82,7 @@ oro:
                 add.label: Add
                 add_all.label: Add all
                 delete.label: Delete column
-        form.choose_business_unit: Choose Business Unit
+        form.choose_business_unit: Choose a business unit...
 
         widget:
             big_number:
