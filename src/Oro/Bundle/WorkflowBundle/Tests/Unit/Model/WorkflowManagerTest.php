@@ -565,13 +565,18 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testGetWorkflowItem()
+    /**
+     * @dataProvider getWorkflowItemDataProvider
+     *
+     * @param int|string $id
+     */
+    public function testGetWorkflowItem($id)
     {
-        $entity = new EntityStub(42);
+        $entity = new EntityStub($id);
         $workflowName = 'test_workflow';
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')->with($entity)->willReturn(42);
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn($id);
 
         $repository = $this->getMockBuilder(WorkflowItemRepository::class)->disableOriginalConstructor()->getMock();
         $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->with(WorkflowItem::class)
@@ -579,7 +584,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->expects($this->once())->method('getEntityClass')->with($entity)
             ->willReturn(EntityStub::class);
         $repository->expects($this->once())->method('findOneByEntityMetadata')
-            ->with(EntityStub::class, 42, $workflowName)
+            ->with(EntityStub::class, $id, $workflowName)
             ->willReturn(['result']);
 
         $result = $this->workflowManager->getWorkflowItem($entity, $workflowName);
@@ -588,8 +593,19 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return array
+     */
+    public function getWorkflowItemDataProvider()
+    {
+        return [
+            [42],
+            ['string']
+        ];
+    }
+
+    /**
      * @dataProvider unsupportedIdentifiersDataProvider
-     * @param $id
+     * @param mixed $id
      */
     public function testGetWorkflowItemUnsupportedIdentifier($id)
     {
