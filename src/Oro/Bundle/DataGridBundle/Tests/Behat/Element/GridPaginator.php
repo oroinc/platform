@@ -15,4 +15,14 @@ class GridPaginator extends Element
 
         return isset($matches['count']) ? (int) $matches['count'] : 0;
     }
+
+    /**
+     * @return int
+     */
+    public function getTotalPageCount()
+    {
+        preg_match('/(page:).+(?P<count>\d+).+total/i', $this->getText(), $matches);
+
+        return isset($matches['count']) ? (int) $matches['count'] : 0;
+    }
 }
