@@ -29,7 +29,7 @@ define([
                 datagrid.collection.fetch({reset: true});
             });
 
-            ActivationHandler.call(this, this.getLink());
+            ActivationHandler.call(this, this.model.toJSON(), this.getLink());
         }
     });
 

@@ -55,7 +55,7 @@ define(function(require) {
                 mediator.execute('refreshPage');
             });
 
-            deactivationHandler.call(el, el.prop('href'));
+            deactivationHandler.call(el, el.data(), el.prop('href'));
         },
 
         dispose: function() {

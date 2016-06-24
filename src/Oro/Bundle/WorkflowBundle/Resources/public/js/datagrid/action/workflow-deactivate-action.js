@@ -28,7 +28,7 @@ define([
                 datagrid.hideLoading();
             });
 
-            DeactivationHandler.call(this, this.getLink());
+            DeactivationHandler.call(this, this.model.toJSON(), this.getLink());
         }
     });
 
