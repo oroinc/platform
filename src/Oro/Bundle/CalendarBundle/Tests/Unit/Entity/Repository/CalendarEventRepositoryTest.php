@@ -68,7 +68,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
-            . ' e.originalStart, e.isCancelled,'
+            . ' e.originalStart, e.cancelled AS isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -111,7 +111,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
-            . ' e.originalStart, e.isCancelled,'
+            . ' e.originalStart, e.cancelled AS isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -158,7 +158,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
-            . ' e.originalStart, e.isCancelled,'
+            . ' e.originalStart, e.cancelled AS isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -206,7 +206,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
-            . ' e.originalStart, e.isCancelled,'
+            . ' e.originalStart, e.cancelled AS isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"

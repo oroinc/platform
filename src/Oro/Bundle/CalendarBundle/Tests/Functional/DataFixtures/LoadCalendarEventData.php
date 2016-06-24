@@ -73,7 +73,7 @@ class LoadCalendarEventData extends AbstractFixture implements DependentFixtureI
                             new \DateTime(gmdate(DATE_RFC3339, strtotime($exceptionItem['end'])))
                         )
                         ->setAllDay($exceptionItem['allDay'])
-                        ->setIsCancelled($exceptionItem['isCancelled'])
+                        ->setCancelled($exceptionItem['isCancelled'])
                         ->setOriginalStart($start)
                         ->setRecurringEvent($event);
                     $event->addRecurringEventException($exception);

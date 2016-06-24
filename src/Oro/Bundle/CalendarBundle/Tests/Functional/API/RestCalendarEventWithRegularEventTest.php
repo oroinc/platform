@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Model\Recurrence;
-
 /**
  * @dbIsolation
  *
