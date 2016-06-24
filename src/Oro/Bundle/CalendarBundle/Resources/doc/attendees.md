@@ -85,7 +85,7 @@ to attendees with the email via `user` property + creates CalendarEvent entity f
 can see the event in his/her calendar.
 
 
-##### PUT query example {#put_query_example}
+##### PUT query example
 
 PUT request you should send to `/api/rest/latest/calendarevents/{id}` in json format where `{id}` is calendar event id that you want to update. Below written option as an array:
 
@@ -102,7 +102,7 @@ If this query successfully send you will not receive any body but response statu
 
 ##### DELETE query example 
 
-If you want to remove Attendees from event you should send PUT request see [PUT query example](#put_query_example)
+If you want to remove Attendees from event you should send PUT request see  **PUT query example**
 
     [
         'attendees' => []
