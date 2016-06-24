@@ -80,7 +80,8 @@ define(function(require) {
                 configs: {
                     allowClear: true,
                     minimumInputLength: 0,
-                    multiple: true
+                    multiple: true,
+                    renderedPropertyName: this.renderedPropertyName
                 }
             };
             if (this.data) {

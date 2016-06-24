@@ -1,5 +1,5 @@
 <% if (typeof treePath === 'undefined') { %>
-    <%= name %>
+    <%= getLabel(obj, highlight) %>
 <% } else if (treePath.length > 3) { %>
    <%= getLabel(treePath[0], highlight) %>
    <span class="select2-tree-result-item-divider">/</span>
