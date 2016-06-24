@@ -19,9 +19,6 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  * @ORM\Table(name="oro_grid_view")
  * @Config(
  *      defaultValues={
- *          "entity"={
- *              "category"="account_management"
- *          },
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
@@ -31,7 +28,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          }
  *      }
  * )

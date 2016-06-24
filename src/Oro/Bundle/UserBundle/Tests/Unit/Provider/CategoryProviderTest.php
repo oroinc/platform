@@ -40,7 +40,7 @@ class CategoryProviderTest extends \PHPUnit_Framework_TestCase
                     'tab' => false
                 ]
             ],
-            $this->categoryProvider->getList()
+            $this->categoryProvider->getPermissionCategories()
         );
     }
 }

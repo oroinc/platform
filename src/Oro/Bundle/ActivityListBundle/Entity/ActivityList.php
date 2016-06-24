@@ -28,8 +28,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-align-justify",
- *              "category"="account_management"
+ *              "icon"="icon-align-justify"
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",
@@ -50,7 +49,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          }
  *      }
  * )

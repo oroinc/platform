@@ -18,8 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-calendar",
- *              "category"="account_management"
+ *              "icon"="icon-calendar"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",
@@ -30,7 +29,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

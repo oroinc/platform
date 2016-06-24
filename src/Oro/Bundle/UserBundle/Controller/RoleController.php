@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
+use Oro\Bundle\UserBundle\Model\PermissionCategory;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -118,11 +118,19 @@ class RoleController extends Controller
         }
 
         $form = $aclRoleHandler->createView();
+        $tabs = array_map(function ($tab) {
+            /** @var PermissionCategory $tab */
+            return [
+                'id' => $tab->getId(),
+                'label' => $this->get('translator')->trans($tab->getLabel())
+            ];
+        }, $categoryProvider->getTabbedCategories());
+
         return array(
             'entity' => $role,
             'form' => $form,
             'tabsOptions' => [
-                'data' => $categoryProvider->getTabbedCategories()
+                'data' => $tabs
             ],
             'capabilitySetOptions' => [
                 'data' => $this->get('oro_user.provider.role_permission_capability_provider')->getCapabilities($role),

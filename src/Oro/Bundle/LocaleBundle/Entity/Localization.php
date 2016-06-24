@@ -20,12 +20,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      routeUpdate="oro_locale_localization_update",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-list",
- *              "category"="account_management"
+ *              "icon"="icon-list"
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          }
  *      }
  * )

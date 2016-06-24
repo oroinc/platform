@@ -20,9 +20,6 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  * @Config(
  *      routeName="oro_segment_index",
  *      defaultValues={
- *          "entity"={
- *              "category"="account_management"
- *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
@@ -32,7 +29,8 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

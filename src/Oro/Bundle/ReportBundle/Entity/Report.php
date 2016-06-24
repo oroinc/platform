@@ -17,9 +17,6 @@ use Oro\Bundle\ReportBundle\Model\ExtendReport;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
- *          "entity"={
- *              "category"="account_management"
- *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
@@ -29,7 +26,8 @@ use Oro\Bundle\ReportBundle\Model\ExtendReport;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

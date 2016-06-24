@@ -2,69 +2,123 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
+use Oro\Bundle\UserBundle\Model\PermissionCategory;
+use Oro\Bundle\UserBundle\Model\PermissionCategoryProviderInterface;
+
 class RolePermissionCategoryProvider
 {
-    const DEFAULT_ACTION_CATEGORY = 'account_management';
-    const DEFAULT_ENTITY_CATEGORY = null;
+    /**
+     * @var PermissionCategoryProviderInterface[]
+     */
+    protected $providers = [];
 
+    /**
+     * @var PermissionCategory[]
+     */
+    protected $categoryList = [];
+
+    
+    /**
+     * Add provider to registry
+     *
+     * @param PermissionCategoryProviderInterface $provider
+     */
+    public function addProvider(PermissionCategoryProviderInterface $provider)
+    {
+        $this->providers[$provider->getName()] = $provider;
+    }
+
+    /**
+     * Get all providers
+     *
+     * @return PermissionCategoryProviderInterface[]
+     */
+    public function getProviders()
+    {
+        return $this->providers;
+    }
+
+    /**
+     * Get provider by name
+     *
+     * @param string $name
+     *
+     * @return null|PermissionCategoryProviderInterface
+     */
+    public function getProviderByName($name)
+    {
+        if ($this->hasProvider($name)) {
+            return $this->providers[$name];
+        }
+
+        return null;
+    }
+
+    /**
+     * Check available provider by name
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasProvider($name)
+    {
+        return array_key_exists($name, $this->providers);
+    }
+    
     /**
      * Get all categories
      * 
-     * @return array
+     * @return PermissionCategory[]
      */
-    public function getList()
+    public function getPermissionCategories()
     {
-        return [
-            'account_management' => [
-                'id' => 'account_management',
-                'label' => 'Account Management',
-                'tab' => true
-            ],
-            'marketing' => [
-                'id' => 'marketing',
-                'label' => 'Marketing',
-                'tab' => true
-            ],
-            'sales_data' => [
-                'id' => 'sales_data',
-                'label' => 'Sales Data',
-                'tab' => true
-            ],
-            'address' => [
-                'id' => 'address',
-                'label' => 'Address',
-                'tab' => false
-            ],
-            'application' => [
-                'id' => 'application',
-                'label' => 'Applications',
-                'tab' => false
-            ],
-            'calendar' => [
-                'id' => 'calendar',
-                'label' => 'Calendar',
-                'tab' => false
-            ],
-            'entity' => [
-                'id' => 'entity',
-                'label' => 'Entities',
-                'tab' => false
-            ]
-        ];
+        if ($this->categoryList) {
+            return $this->categoryList;
+        }
+
+        $categoryList = [];
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
+            $categories = $provider->getRolePermissionCategory();
+            if (is_object($categories)) {
+                $categories = [$categories];
+            }
+            $categoryList = array_merge(array_values($categoryList), array_values($categories));
+        }
+
+        $orderedCategoryList = [];
+        /** @var PermissionCategory $category */
+        foreach ($categoryList as $category) {
+            $priority = $category->getPriority();
+            $orderedCategoryList[$priority][] = $category;
+        }
+        ksort($orderedCategoryList);
+        $this->categoryList = call_user_func_array('array_merge', $orderedCategoryList);
+        
+        return $this->categoryList;
+    }
+    
+    protected function getPredefinedCategories()
+    {
+        $categoryList = [];
+        $categoryList[] = new PermissionCategory('sales_data', 'oro.user.role.category.sales_data.label', true, 7);
+        
+        return $categoryList;
     }
 
     /**
      * Get categories market as tabbed
      *
-     * @return array
+     * @return PermissionCategory[]
      */
     public function getTabbedCategories()
     {
-        $categories = array_values($this->getList());
         $tabs = $this->getTabList();
-        
-        return array_filter($categories, function ($category) use ($tabs) {
-            return in_array($category['id'], $tabs, true);
+
+        return array_filter($this->getPermissionCategories(), function ($category) use ($tabs) {
+            /** @var PermissionCategory $category */
+            return in_array($category->getId(), $tabs, true);
         });
     }
 
@@ -76,7 +130,8 @@ class RolePermissionCategoryProvider
     public function getTabList()
     {
         return array_filter(array_map(function ($category) {
-            return $category['tab'] ? $category['id'] : null;
-        }, $this->getList()));
+            /** @var PermissionCategory $category */
+            return $category->getTab() ? $category->getId() : null;
+        }, $this->getPermissionCategories()));
     }
 }

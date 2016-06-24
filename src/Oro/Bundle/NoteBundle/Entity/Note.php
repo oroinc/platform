@@ -22,8 +22,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-comment-alt",
- *              "category"="account_management"
+ *              "icon"="icon-comment-alt"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",
@@ -34,7 +33,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "activity"={
  *              "immutable"=true

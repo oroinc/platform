@@ -38,6 +38,7 @@ parameters:
     oro_user.provider.role_permission_category_provider.class: Oro\Bundle\UserBundle\Provider\RolePermissionCategoryProvider
     oro_user.datagrid.datasource.role_permission_datasource.class: Oro\Bundle\UserBundle\Datagrid\RolePermissionDatasource
     oro_user.provider.role_permission_capability_provider.class: Oro\Bundle\UserBundle\Provider\RolePermissionCapabilityProvider
+    oro_user.provider.permission_category_provider.class: Oro\Bundle\UserBundle\Provider\PermissionCategoryProvider
 
     oro_user.token.factory.wsse.class:            Oro\Bundle\UserBundle\Security\WsseTokenFactory
 
@@ -317,6 +318,11 @@ services:
 
     oro_user.provider.role_permission_category_provider:
         class: %oro_user.provider.role_permission_category_provider.class%
+
+    oro_user.provider.permission_category_provider:
+        class: %oro_user.provider.permission_category_provider.class%
+        tags:
+            - { name: oro_user.permission_category}
 
     oro_user.provider.role_permission_capability_provider:
         class: %oro_user.provider.role_permission_capability_provider.class%

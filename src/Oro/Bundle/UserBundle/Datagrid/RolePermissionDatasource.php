@@ -4,37 +4,25 @@ namespace Oro\Bundle\UserBundle\Datagrid;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Bundle\UserBundle\Provider\RolePermissionAbstractProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Provider\RolePermissionCategoryProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use Oro\Bundle\UserBundle\Provider\RolePermissionCategoryProvider;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Entity\Role;
 
-class RolePermissionDatasource implements DatasourceInterface
+class RolePermissionDatasource extends RolePermissionAbstractProvider implements DatasourceInterface
 {
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /** @var PermissionManager */
     protected $permissionManager;
-
-    /** @var RolePermissionCategoryProvider */
-    protected $categoryProvider;
-
-    /** @var AclRoleHandler */
-    protected $aclRoleHandler;
 
     /** @var ConfigManager */
     protected $configEntityManager;
@@ -58,13 +46,14 @@ class RolePermissionDatasource implements DatasourceInterface
         RolePermissionCategoryProvider $categoryProvider,
         ConfigManager $configEntityManager
     ) {
-        $this->translator = $translator;
+        parent::__construct($translator, $categoryProvider, $aclRoleHandler);
         $this->permissionManager = $permissionManager;
-        $this->aclRoleHandler = $aclRoleHandler;
-        $this->categoryProvider = $categoryProvider;
         $this->configEntityManager = $configEntityManager;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function process(DatagridInterface $grid, array $config)
     {
         $this->role = $grid->getParameters()->get('role');
@@ -72,48 +61,27 @@ class RolePermissionDatasource implements DatasourceInterface
     }
 
     /**
-     * @return ResultRecordInterface[]
+     * {@inheritdoc}
      */
     public function getResults()
     {
         $gridData = [];
-        $allPrivileges = $this->preparePriveleges($this->role);
+        $allPrivileges = $this->preparePriveleges($this->role, 'entity');
+        $categories = $this->categoryProvider->getPermissionCategories();
 
         foreach ($allPrivileges as $key => $privilege) {
             /** @var AclPrivilege $privilege */
             $item = [
                 'identity' => $privilege->getIdentity()->getId(),
                 'entity' => $this->translator->trans($privilege->getIdentity()->getName()),
-                'group' => RolePermissionCategoryProvider::DEFAULT_ENTITY_CATEGORY,
+                'group' => $this->getPrivelegeCategory($privilege, $categories),
                 'permissions' => [],
             ];
-            $item['group'] = $this->getEntityCategory($privilege->getIdentity()->getId());
             $item = $this->preparePermissions($privilege, $item);
             $gridData[] = new ResultRecord($item);
         }
 
         return $gridData;
-    }
-
-    /**
-     * @param Role $role
-     *
-     * @return array
-     */
-    protected function preparePriveleges(Role $role)
-    {
-        $allPrivileges = [];
-        /**
-         * @var string $type
-         * @var ArrayCollection $sortedPrivileges
-         */
-        foreach ($this->aclRoleHandler->getAllPriveleges($role) as $type => $sortedPrivileges) {
-            if ($type === 'entity') {
-                $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
-            }
-        }
-
-        return $allPrivileges;
     }
 
     /**
@@ -139,30 +107,6 @@ class RolePermissionDatasource implements DatasourceInterface
         }
 
         return $item;
-    }
-
-    /**
-     * @param string $oid
-     *
-     * @return mixed|null
-     */
-    protected function getEntityCategory($oid)
-    {
-        $entityPrefix =  'entity:';
-
-        if (strpos($oid, $entityPrefix) === 0) {
-            $entityClass = substr($oid, 7);
-            if ($entityClass !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-                if ($this->configEntityManager->hasConfig($entityClass)) {
-                    $config = $this->configEntityManager->getProvider('entity')->getConfig($entityClass);
-                    if ($config->has('category')) {
-                        return $config->get('category');
-                    }
-                }
-            }
-        }
-
-        return RolePermissionCategoryProvider::DEFAULT_ENTITY_CATEGORY;
     }
 
     /**

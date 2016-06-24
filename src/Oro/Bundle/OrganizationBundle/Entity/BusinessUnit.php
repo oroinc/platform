@@ -34,8 +34,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "activity_support"="true"
  *          },
  *          "entity"={
- *              "icon"="icon-building",
- *              "category"="account_management"
+ *              "icon"="icon-building"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
@@ -46,7 +45,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "grid"={
  *              "default"="business-unit-grid"

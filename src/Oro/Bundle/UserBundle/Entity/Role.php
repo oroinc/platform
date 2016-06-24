@@ -17,12 +17,10 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
- *          "entity"={
- *              "category"="account_management"
- *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

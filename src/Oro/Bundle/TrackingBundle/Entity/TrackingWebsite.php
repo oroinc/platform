@@ -19,11 +19,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *  routeView="oro_tracking_website_view",
  *  defaultValues={
  *      "entity"={
- *          "icon"="icon-external-link",
- *          "category"="account_management"
+ *          "icon"="icon-external-link"
  *      },
  *      "security"={
- *          "type"="ACL"
+ *          "type"="ACL",
+ *          "category"="account_management"
  *      },
  *      "ownership"={
  *          "owner_type"="USER",

@@ -29,9 +29,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation")
  * @Config(
  *      defaultValues={
- *          "entity"={
- *              "category"="account_management"
- *          },
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
@@ -41,7 +38,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

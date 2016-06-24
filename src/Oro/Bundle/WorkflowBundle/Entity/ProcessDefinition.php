@@ -18,12 +18,12 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *      routeView="oro_process_definition_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-inbox",
- *              "category"="account_management"
+ *              "icon"="icon-inbox"
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

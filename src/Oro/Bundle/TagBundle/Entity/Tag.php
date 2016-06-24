@@ -26,8 +26,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-tag",
- *              "category"="account_management"
+ *              "icon"="icon-tag"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",
@@ -46,7 +45,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

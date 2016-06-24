@@ -40,8 +40,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeView="oro_user_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-user",
- *              "category"="account_management"
+ *              "icon"="icon-user"
  *          },
  *          "grouping"={
  *              "groups"={"dictionary"}
@@ -62,7 +61,8 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "dataaudit"={"auditable"=true},
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "form"={
  *              "form_type"="oro_user_select",

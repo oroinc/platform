@@ -25,12 +25,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  *
  * @Config(
  *      defaultValues={
- *          "entity"={
- *              "category"="account_management"
- *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

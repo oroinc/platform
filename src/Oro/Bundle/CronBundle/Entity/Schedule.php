@@ -14,12 +14,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-tasks",
- *              "category"="account_management"
+ *              "icon"="icon-tasks"
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          }
  *      }
  * )

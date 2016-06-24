@@ -20,12 +20,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      routeView="oro_workflow_definition_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-exchange",
- *              "category"="account_management"
+ *              "icon"="icon-exchange"
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

@@ -23,9 +23,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *      routeName="oro_integration_index",
  *      defaultValues={
- *          "entity"={
- *              "category"="account_management"
- *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",
  *              "owner_field_name"="organization",
@@ -33,7 +30,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

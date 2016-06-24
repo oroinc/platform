@@ -30,15 +30,15 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *      routeView="oro_calendar_event_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-time",
- *              "category"="account_management"
+ *              "icon"="icon-time"
  *          },
  *          "dataaudit"={
  *              "auditable"=true
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "grouping"={
  *              "groups"={"activity"}

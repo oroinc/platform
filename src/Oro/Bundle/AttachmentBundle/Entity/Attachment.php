@@ -22,8 +22,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-file",
- *              "category"="account_management"
+ *              "icon"="icon-file"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",
@@ -33,7 +32,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
- *              "type"="ACL"
+ *              "type"="ACL",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true
