@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Adds AccessGranted validation constraint for all associations.
+ * Adds HasAdderAndRemover validation constraint for all "to-many" associations.
  */
 class AddAssociationValidators implements ProcessorInterface
 {
@@ -54,6 +55,9 @@ class AddAssociationValidators implements ProcessorInterface
             if ($metadata->hasAssociation($fieldName)) {
                 $fieldOptions = $field->getFormOptions();
                 if ($metadata->isCollectionValuedAssociation($fieldName)) {
+                    $fieldOptions['constraints'][] = new Assert\HasAdderAndRemover(
+                        ['class' => $metadata->name, 'property' => $fieldName]
+                    );
                     $fieldOptions['constraints'][] = new Assert\All(new Assert\AccessGranted());
                 } else {
                     $fieldOptions['constraints'][] = new Assert\AccessGranted();

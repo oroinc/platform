@@ -2,6 +2,25 @@ Grid:
   selector: 'div.grid-container'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
 
+GridHeader:
+  selector: 'div.grid-container .grid-header:nth-child(1)'
+  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader
+
+GridFilters:
+  selector: 'div.filter-box'
+  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters
+
+GridFilterStringItem:
+  selector: 'div.filter-item:contains("%s")'
+  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem
+
+GridFilterDateTimeItem:
+  selector: 'div.filter-item:contains("%s")'
+  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem
+
+DateTimePicker:
+  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker
+
 GridPaginator:
   selector: 'div.toolbar div.pagination'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator

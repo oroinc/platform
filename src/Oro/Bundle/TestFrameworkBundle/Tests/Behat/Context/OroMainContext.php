@@ -8,10 +8,11 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\FixtureLoaderAwareInterface;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
@@ -23,20 +24,9 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroElementFactoryAware,
-    KernelAwareContext,
-    FixtureLoaderAwareInterface
+    KernelAwareContext
 {
-    use KernelDictionary;
-
-    /**
-     * @var OroElementFactory
-     */
-    protected $elementFactory;
-
-    /**
-     * @var FixtureLoader
-     */
-    protected $fixtureLoader;
+    use KernelDictionary, WaitingDictionary, ElementFactoryDictionary;
 
     /** @BeforeStep */
     public function beforeStep(BeforeStepScope $scope)
@@ -53,6 +43,8 @@ class OroMainContext extends MinkContext implements
 
         $this->waitForAjax();
     }
+
+
 
     /**
      * @BeforeScenario
@@ -77,27 +69,12 @@ class OroMainContext extends MinkContext implements
             $scope->getFeature()->getTitle(),
             $scope->getScenario()->getLine()
         );
+
         file_put_contents($screenshot, $this->getSession()->getScreenshot());
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setElementFactory(OroElementFactory $elementFactory)
-    {
-        $this->elementFactory = $elementFactory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFixtureLoader(FixtureLoader $fixtureLoader)
-    {
-        $this->fixtureLoader = $fixtureLoader;
-    }
-
-    /**
-     * @Then I should see :title flash message
+     * @Then /^(?:|I should )see "(?P<title>[^"]+)" flash message$/
      */
     public function iShouldSeeFlashMessage($title)
     {
@@ -132,53 +109,11 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Wait PAGE load
-     * @param int $time Time should be in milliseconds
-     */
-    protected function waitPageToLoad($time = 15000)
-    {
-        $this->getSession()->wait(
-            $time,
-            '"complete" == document["readyState"] '.
-            '&& (typeof($) != "undefined" '.
-            '&& document.title !=="Loading..." '.
-            '&& $ !== null '.
-            '&& false === $( "div.loader-mask" ).hasClass("shown"))'
-        );
-    }
-
-    /**
-     * Wait AJAX request
-     * @param int $time Time should be in milliseconds
-     */
-    protected function waitForAjax($time = 15000)
-    {
-        $this->waitPageToLoad($time);
-
-        $jsAppActiveCheck = <<<JS
-        (function () {
-            var isAppActive = false;
-            try {
-                if (!window.mediatorCachedForSelenium) {
-                    window.mediatorCachedForSelenium = require('oroui/js/mediator');
-                }
-                isAppActive = window.mediatorCachedForSelenium.execute('isInAction');
-            } catch (e) {
-                return false;
-            }
-
-            return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;
-        })();
-JS;
-        $this->getSession()->wait($time, $jsAppActiveCheck);
-    }
-
-    /**
      * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
      */
     public function iFillFormWith($formName, TableNode $table)
     {
-        $this->elementFactory->createElement($formName)->fill($table);
+        $this->createElement($formName)->fill($table);
     }
 
     /**
@@ -186,22 +121,147 @@ JS;
      */
     public function iOpenTheMenuAndClick($path, $linkLocator)
     {
-        $this->elementFactory->createElement('MainMenu')->openAndClick($path, $linkLocator);
+        $this->createElement('MainMenu')->openAndClick($path, $linkLocator);
     }
 
     /**
-     * @Given /^the following ([\w ]+):?$/
+     * @Given press select arrow in :locator field
      */
-    public function theFollowing($name, TableNode $table)
+    public function pressSelectArrowInOwnerField($locator)
     {
-        $this->fixtureLoader->loadTable($name, $table);
+        $field = $this->createElement('OroForm')->findField($locator);
+        $arrow = $field->getParent()->find('css', '.select2-arrow');
+        $arrow->click();
     }
 
     /**
-     * @Given /^there (?:is|are) (\d+) ([\w ]+)$/
+     * @Given press select entity button on :field field
      */
-    public function thereIs($numberOfEntities, $name)
+    public function pressSelectEntityButton($field)
     {
-        $this->fixtureLoader->loadRandomEntities($name, $numberOfEntities);
+        $this->createOroForm()->pressEntitySelectEntityButton($field);
+    }
+
+    /**
+     * @Given fill :text in search entity field
+     */
+    public function fillSelect2Search($text)
+    {
+        $this->createOroForm()->fillSelect2Search($text);
+    }
+
+    /**
+     * Check count entities in search result of select2 entity field
+     * @Given /^(?:|I )must see (?:|only )(?P<resultCount>(?:|one|two|\d+)) result$/
+     */
+    public function mustSeeCountOfResult($resultCount)
+    {
+        expect($this->createOroForm()->getSelect2ResultsCount())
+            ->toBe($this->getCount($resultCount));
+    }
+
+    /**
+     * Press on record in search results of select2-results field
+     *
+     * @Then /^(?:|I )press on "(?P<text>[\w\s]+)" in search result$/
+     */
+    public function iPressTextInSearchResults($text)
+    {
+        $this->createOroForm()->pressTextInSearchResult($text);
+    }
+
+    /**
+     * @When /^(?:|I )save and close form$/
+     */
+    public function iSaveAndCloseForm()
+    {
+        $this->createOroForm()->saveAndClose();
+    }
+
+    /**
+     * @When updated date must be grater then created date
+     */
+    public function updatedDateMustBeGraterThenCreatedDate()
+    {
+        /** @var NodeElement[] $records */
+        $records = $this->getSession()->getPage()->findAll('css', 'div.navigation div.customer-content ul li');
+        $createdDate = new \DateTime(
+            str_replace('Created At: ', '', $records[0]->getText())
+        );
+        $updatedDate = new \DateTime(
+            str_replace('Updated At: ', '', $records[1]->getText())
+        );
+
+        expect($updatedDate > $createdDate)->toBe(true);
+    }
+
+    /**
+     * @When /^([\w\s]*) should be an owner$/
+     */
+    public function userShouldBeAnOwner($owner)
+    {
+        expect($this->getSession()->getPage()->find('css', '.user-info-state li a')->getText())
+            ->toBe($owner);
+    }
+
+    /**
+     * @When /^([\w\s]*) field should have ([\w\s]*) value$/
+     */
+    public function fieldShouldHaveValue($fieldName, $fieldValue)
+    {
+        file_put_contents('/tmp/test.html', $this->getSession()->getPage()->getHtml());
+        $page = $this->getSession()->getPage();
+        $labels = $page->findAll('css', 'label');
+
+        /** @var NodeElement $label */
+        foreach ($labels as $label) {
+            if (preg_match(sprintf('/%s/i', $fieldName), $label->getText())) {
+                $value = $label->getParent()->find('css', 'div.control-label')->getText();
+                expect($value)->toMatch(sprintf('/%s/i', $fieldValue));
+
+                return;
+            }
+        }
+
+        throw new ExpectationException(
+            sprintf('Can\'t find field with "%s" label', $fieldName),
+            $this->getSession()->getDriver()
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function selectOption($select, $option)
+    {
+        $select = $this->fixStepArgument($select);
+        $option = $this->fixStepArgument($option);
+        $this->createElement('OroForm')->selectFieldOption($select, $option);
+    }
+
+    /**.
+     * @return OroForm
+     */
+    protected function createOroForm()
+    {
+        return $this->createElement('OroForm');
+    }
+
+    /**
+     * @param int|string $count
+     * @return int
+     */
+    protected function getCount($count)
+    {
+        switch (trim($count)) {
+            case '':
+                return 1;
+            case 'one':
+                return 1;
+            case 'two':
+                return 2;
+            default:
+                return (int) $count;
+        }
     }
 }

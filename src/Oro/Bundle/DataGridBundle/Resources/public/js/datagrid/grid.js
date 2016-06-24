@@ -173,9 +173,6 @@ define(function(require) {
             this._initProperties(opts);
 
             // use columns collection as event bus since there is no alternatives
-            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
-                this.trigger('afterMakeCell', row, cell);
-            });
             if (this.themeOptionsConfigurator) {
                 this.listenTo(this.columns, 'configureInitializeOptions', this.themeOptionsConfigurator);
             }

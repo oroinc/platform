@@ -402,4 +402,12 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     {
         return $this->organization;
     }
+
+    /**
+     * @return bool
+     */
+    public function isStaticType()
+    {
+        return $this->getType() && $this->getType()->getName() == SegmentType::TYPE_STATIC;
+    }
 }

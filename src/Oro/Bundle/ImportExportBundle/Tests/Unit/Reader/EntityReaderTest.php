@@ -222,7 +222,10 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->with($entityName)
             ->will($this->returnValue($classMetadata));
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
+        $queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
         $repository->expects($this->once())->method('createQueryBuilder')
