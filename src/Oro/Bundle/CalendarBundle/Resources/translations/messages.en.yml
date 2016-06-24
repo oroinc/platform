@@ -118,7 +118,6 @@ oro:
             invitation_status.label: Invitation status
             attendees.label: Guests
             related_attendee.label: Related Attendee
-            origin.label: Origin
 
             recurrence.label:      Recurrence
             recurrence.exception.label: Part of Recurrence
@@ -207,6 +206,7 @@ oro:
                 monthnth: "{1} Monthly the %instance% %day% of every 1 month|]1,Inf[ Monthly the %instance% %day% of every %count% months%occurrences%%end_date%"
                 yearly: "{1} Yearly every 1 year on %day%|]1,Inf[ Yearly every %count% years on %day%%occurrences%%end_date%"
                 yearnth: "{1} Yearly every 1 year on the %instance% %day% of %month%|]1,Inf[ Yearly every %count% years on the %instance% %day% of %month%%occurrences%%end_date%"
+                weekday: "Daily, every weekday%occurrences%%end_date%"
 
             types:
                 daily:              Daily

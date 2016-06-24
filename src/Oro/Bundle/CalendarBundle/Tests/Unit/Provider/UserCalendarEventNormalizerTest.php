@@ -114,7 +114,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'updatedAt'        => null,
                         'parentEventId'    => null,
                         'invitationStatus' => null,
-                        'origin'         => CalendarEvent::ORIGIN_SERVER
                     ],
                 ],
                 'invitees'               => [1 => []],
@@ -136,7 +135,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'editable'         => true,
                         'removable'        => true,
                         'notifiable'       => false,
-                        'origin'         => CalendarEvent::ORIGIN_SERVER
                     ],
                 ]
             ],
@@ -155,7 +153,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'updatedAt'        => null,
                         'parentEventId'    => null,
                         'invitationStatus' => null,
-                        'origin'           => CalendarEvent::ORIGIN_SERVER
                     ],
                 ],
                 'attendees'                => [
@@ -189,7 +186,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'email'       => 'user@example.com',
                             ],
                         ],
-                        'origin'         => CalendarEvent::ORIGIN_SERVER
                     ],
                 ]
             ],
@@ -248,7 +244,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'updatedAt'        => null,
                     'parentEventId'    => null,
                     'invitationStatus' => null,
-                    'origin'           => CalendarEvent::ORIGIN_CLIENT,
                     'invitedUsers'     => [],
                     'attendees'        => [],
                     'recurringEventId' => null,
@@ -272,7 +267,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'editable'         => true,
                     'removable'        => true,
                     'notifiable'       => false,
-                    'origin'           => CalendarEvent::ORIGIN_CLIENT,
                     'invitedUsers'     => [],
                     'attendees'        => [],
                     'recurringEventId' => null,
@@ -294,7 +288,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'updatedAt'        => null,
                     'parentEventId'    => null,
                     'invitationStatus' => CalendarEvent::STATUS_NONE,
-                    'origin'           => CalendarEvent::ORIGIN_SERVER,
                     'attendees'        => [
                         [
                             'displayName' => 'user',
@@ -323,7 +316,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'editable'         => true,
                     'removable'        => true,
                     'notifiable'       => true,
-                    'origin'           => CalendarEvent::ORIGIN_SERVER,
                     'invitedUsers'     => [],
                     'attendees'        => [
                         [
@@ -354,7 +346,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'updatedAt'        => null,
                     'parentEventId'    => null,
                     'invitationStatus' => CalendarEvent::STATUS_NONE,
-                    'origin'           => CalendarEvent::ORIGIN_EXTERNAL,
                     'invitedUsers'     => []
                 ],
                 'calendarId' => 456,
@@ -375,7 +366,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'editable'         => false,
                     'removable'        => false,
                     'notifiable'       => false,
-                    'origin'           => CalendarEvent::ORIGIN_EXTERNAL,
                     'invitedUsers'     => [],
                     'recurringEventId' => null,
                     'originalStart'    => null,
@@ -418,12 +408,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             $reflection->setAccessible(true);
             $reflection->setValue($calendar, $data['calendar']);
         }
-
-        if (!empty($data['origin'])) {
-            $origin = new TestEnumValue($data['origin'], $data['origin']);
-            $event->setOrigin($origin);
-        }
-
+        
         if (!empty($data['attendees'])) {
             foreach ($data['attendees'] as $attendeeData) {
                 $attendee = new Attendee();

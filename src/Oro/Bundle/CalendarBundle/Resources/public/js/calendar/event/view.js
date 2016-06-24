@@ -179,10 +179,12 @@ define([
             try {
                 var options = {
                     wait: true,
-                    error: _.bind(this._handleResponseError, this)
+                    error: _.bind(this._handleResponseError, this),
                 };
                 if (deleteUrl) {
                     options.url = deleteUrl;
+                } else {
+                    options.url = this.model.url() + '?notifyInvitedUsers=true';
                 }
                 this.model.destroy(options);
             } catch (err) {
@@ -265,7 +267,7 @@ define([
                                 input.on('select2-data-loaded', function() {
                                     self._hideMask();
                                 });
-                                input.val(_.last(modelData.id.match(/\d+/g)));
+                                input.val(self.model.originalId);
                             }
                         } else {
                             input.val(value);

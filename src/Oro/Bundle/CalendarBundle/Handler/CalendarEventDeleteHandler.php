@@ -143,6 +143,6 @@ class CalendarEventDeleteHandler extends DeleteHandler
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        return !$request || (bool) $request->query->get('send_notification', false);
+        return !$request || (bool) $request->request->get('notifyInvitedUsers', false);
     }
 }

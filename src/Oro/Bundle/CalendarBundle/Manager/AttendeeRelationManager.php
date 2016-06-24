@@ -74,16 +74,18 @@ class AttendeeRelationManager
     }
 
     /**
+     * @todo rename method
+     *
      * Adds fullName column with text representation of attendee into the result
      *
      * @param QueryBuilder $qb
      */
-    public function addRelatedDisplayName(QueryBuilder $qb)
+    public function addRelatedEntityInfo(QueryBuilder $qb)
     {
         $userName = $this->dqlNameFormatter->getFormattedNameDQL('user', 'Oro\Bundle\UserBundle\Entity\User');
 
         $qb
-            ->addSelect(sprintf('%s AS fullName', $userName))
+            ->addSelect(sprintf('%s AS fullName, user.id AS userId', $userName))
             ->leftJoin('attendee.user', 'user');
     }
 

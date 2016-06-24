@@ -59,7 +59,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'end'             => '2016-05-04T11:29:46+00:00',
             'allDay'          => true,
             'backgroundColor' => '#FF0000',
-            'origin'          => 'client',
             'attendees'       => [
                 [
                     'email'       => $adminUser->getEmail(),
@@ -122,11 +121,10 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 'allDay'           => true,
                 'backgroundColor'  => '#FF0000',
                 'invitationStatus' => 'accepted',
-                'origin'           => 'client',
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
-                'notifiable'       => false,
+                'notifiable'       => true,
                 'attendees'        => [
                     [
                         'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
@@ -198,7 +196,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'end'             => '2016-05-04T11:29:46+00:00',
             'allDay'          => true,
             'backgroundColor' => '#FF0000',
-            'origin'          => 'client',
             'attendees'       => [
                 [
                     'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
@@ -258,11 +255,10 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 'allDay'           => true,
                 'backgroundColor'  => '#FF0000',
                 'invitationStatus' => 'accepted',
-                'origin'           => 'client',
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
-                'notifiable'       => false,
+                'notifiable'       => true,
                 'attendees'        => [
                     [
                         'displayName' => 'Ext',
@@ -326,6 +322,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             $result[0]['attendees'][1]['createdAt'],
             $result[0]['attendees'][1]['updatedAt']
         );
+        $adminUser = $this->getAdminUser();
 
         $this->assertEquals(
             [
@@ -338,7 +335,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                     'allDay'           => true,
                     'backgroundColor'  => '#FF0000',
                     'invitationStatus' => 'accepted',
-                    'origin'           => 'client',
                     'parentEventId'    => null,
                     'editable'         => true,
                     'removable'        => true,
@@ -351,6 +347,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                             'status'      => 'tentative',
                             'type'        => 'organizer',
                             'fullName'    => '',
+                            'userId'      => null
                         ],
                         [
                             'displayName' => 'John Doe',
@@ -358,6 +355,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                             'status'      => 'accepted',
                             'type'        => 'required',
                             'fullName'    => 'John Doe ',
+                            'userId'      => $adminUser->getId()
                         ],
                     ],
                 ],
@@ -484,7 +482,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 'allDay'           => null,
                 'backgroundColor'  => null,
                 'invitationStatus' => null,
-                'origin'           => null,
                 'parentEventId'    => null,
                 'attendees'        => null,
                 'editable'         => null,
@@ -525,7 +522,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'end'             => '2016-05-04T11:29:46+00:00',
             'allDay'          => true,
             'backgroundColor' => '#FF0000',
-            'origin'          => 'server',
             'attendees'       => [
                 [
                     'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
@@ -584,7 +580,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 'allDay'           => true,
                 'backgroundColor'  => '#FF0000',
                 'invitationStatus' => 'accepted',
-                'origin'           => 'server',
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
@@ -644,7 +639,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'end'             => '2016-05-04T11:29:46+00:00',
             'allDay'          => true,
             'backgroundColor' => '#FF0000',
-            'origin'          => 'client',
             'invitedUsers'    => [$user->getId()]
         ];
         $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
@@ -698,11 +692,10 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 'allDay'           => true,
                 'backgroundColor'  => '#FF0000',
                 'invitationStatus' => 'none',
-                'origin'           => 'client',
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
-                'notifiable'       => false,
+                'notifiable'       => true,
                 'attendees'        => [
                     [
                         'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),

@@ -8,6 +8,7 @@ parameters:
     oro_email.form.extension.mailbox_unbound_rules.class: Oro\Bundle\EmailBundle\Form\Extension\MailboxUnboudRulesExtension
     oro_email.form.type.emailtemplate.class:              Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
     oro_email.form.type.emailtemplate_select.class:       Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType
+    oro_email.form.type.system_emailtemplate_select.class: Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType
     oro_email.form.type.emailtemplate_translation.class:  Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType
     oro_email.form.handler.emailtemplate.class:           Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler
     oro_email.form.type.emailtemplate.api.class:          Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType
@@ -103,6 +104,14 @@ services:
         class: %oro_email.form.type.emailtemplate_select.class%
         tags:
             - { name: form.type, alias: oro_email_template_list }
+
+    oro_email.form.type.system_emailtemplate_select:
+        class: %oro_email.form.type.system_emailtemplate_select.class%
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_security.security_facade'
+        tags:
+            - { name: form.type, alias: oro_email_system_template_list }
 
     oro_email.form.handler.emailtemplate:
         class: %oro_email.form.handler.emailtemplate.class%

@@ -11,9 +11,7 @@
         {% include 'OroCalendarBundle:CalendarEvent:invitationButtons.html.twig' with {'entity': entity} %}
     {% endif %}
 
-    {% set externalOrigin = constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::ORIGIN_EXTERNAL') %}
-
-    {% if entity.parent is empty and resource_granted('EDIT', entity) and entity.origin is not empty and entity.origin.id != externalOrigin %}
+    {% if entity.parent is empty and resource_granted('EDIT', entity) %}
         {# Button for add context on the activity list item view page #}
         {{ AC.addContextButton(entity) }}
         {{ UI.editButton({
@@ -23,7 +21,7 @@
     {% endif %}
     {% if resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
-            'dataUrl':      path('oro_api_delete_calendarevent', {'id': entity.id}),
+            'dataUrl':      path('oro_api_delete_calendarevent', {'id': entity.id, 'notifyInvitedUsers': true}),
             'dataRedirect': path('oro_calendar_event_index'),
             'aCss':         'no-hash remove-button',
             'dataId':       entity.id,

@@ -108,9 +108,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'recurringEventId' => $event->getRecurringEvent() ? $event->getRecurringEvent()->getId() : null,
                 'originalStart'    => $event->getOriginalStart(),
                 'isCancelled'      => $event->getIsCancelled(),
-                'origin'           => $event->getOrigin()
-                    ? $event->getOrigin()->getId()
-                    : null
             ],
             $this->prepareExtraValues($event, $extraValues)
         );
@@ -132,7 +129,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             !empty($item['invitationStatus'])
             && empty($item['parentEventId'])
             && !empty($item['attendees'])
-            && $item['origin'] === CalendarEvent::ORIGIN_SERVER
             && empty($item['recurrence']);
     }
 

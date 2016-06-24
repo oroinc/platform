@@ -10,7 +10,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 
@@ -29,9 +29,9 @@ class LoadEmailWithoutActivityData extends AbstractFixture implements
     protected $emailEntityBuilder;
 
     /**
-     * @var Processor
+     * @var EmailOriginHelper
      */
-    protected $mailerProcessor;
+    protected $emailOriginHelper;
 
     /**
      * @var ContainerInterface
@@ -57,7 +57,7 @@ class LoadEmailWithoutActivityData extends AbstractFixture implements
 
         $this->container = $container;
         $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
-        $this->mailerProcessor = $container->get('oro_email.mailer.processor');
+        $this->emailOriginHelper = $container->get('oro_email.tools.email_origin_helper');
     }
 
     /**
@@ -98,7 +98,7 @@ class LoadEmailWithoutActivityData extends AbstractFixture implements
 
         foreach ($this->templates as $index => $template) {
             $owner = $this->getReference('simple_user');
-            $origin = $this->mailerProcessor->getEmailOrigin($owner->getEmail());
+            $origin = $this->emailOriginHelper->getEmailOrigin($owner->getEmail());
 
             $emailUser = $this->emailEntityBuilder->emailUser(
                 $template['Subject'],

@@ -717,7 +717,7 @@
 #}
 {% macro saveActionButton(parameters) %}
     {% set defaultParameters = {
-        'type': 'submit',
+        'type' : 'submit',
         'class': 'btn-success main-group',
         'label': 'Save'|trans,
     } %}
@@ -1049,6 +1049,25 @@
             <li class="extra-list-element">{{ element }}</li>
         {% endfor -%}
     </ul>
+{% endmacro %}
+
+{%- macro renderTable(titles, rows, style) -%}
+     <table class="{{ style }}">
+     <thead>
+     <tr>
+    {%- for title in titles %}
+        <th>{{ title }}</th>
+    {% endfor -%}
+     </tr>
+     </thead>
+    {%- for row in rows %}
+        <tr>
+            {%- for element in row %}
+                <td>{{ element }}</td>
+            {% endfor -%}
+        </tr>
+    {% endfor -%}
+    </table>
 {% endmacro %}
 
 {%- macro entityViewLink(entity, label, route, permission) -%}

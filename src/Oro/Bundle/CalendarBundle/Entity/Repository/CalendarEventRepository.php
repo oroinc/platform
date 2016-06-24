@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
@@ -43,12 +44,9 @@ class CalendarEventRepository extends EntityRepository
     {
         $qb = $this->getEventListQueryBuilder($extraFields)
             ->addSelect('status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId, c.id as calendar')
-            ->addSelect('CASE WHEN parent.id IS NOT NULL THEN parentOrigin.id ELSE originEnum.id as origin')
             ->addSelect('IDENTITY(e.recurringEvent) AS recurringEventId, e.originalStart, e.isCancelled')
             ->leftJoin('e.relatedAttendee', 'relatedAttendee')
             ->leftJoin('e.parent', 'parent')
-            ->leftJoin('e.origin', 'originEnum')
-            ->leftJoin('parent.origin', 'parentOrigin')
             ->leftJoin('relatedAttendee.status', 'status')
             ->innerJoin('e.calendar', 'c');
 
@@ -226,7 +224,13 @@ class CalendarEventRepository extends EntityRepository
     protected function addRecurrenceData(QueryBuilder $queryBuilder)
     {
         $key = Recurrence::STRING_KEY;
-        $queryBuilder->leftJoin('e.recurrence', 'r')
+        $queryBuilder
+            ->leftJoin(
+                'OroCalendarBundle:Recurrence',
+                'r',
+                Join::WITH,
+                '(parent.id IS NOT NULL AND parent.recurrence = r.id) OR (parent.id IS NULL AND e.recurrence = r.id)'
+            )
             ->addSelect(
                 "r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
                 . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
@@ -272,5 +276,38 @@ class CalendarEventRepository extends EntityRepository
             ->setParameter('endDate', $endDate);
 
         return $this;
+    }
+
+    /**
+     * @param array $calendarEventIds
+     *
+     * @return array Map with structure "parentId => [parentId, childId, ...]"
+     * where value is array of items from $calendarEventIds
+     */
+    public function getParentEventIds(array $calendarEventIds)
+    {
+        if (!$calendarEventIds) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('event');
+
+        $queryResult = $qb
+            ->select('event.id AS parent, children.id AS child')
+            ->join('event.childEvents', 'children')
+            ->where($qb->expr()->in('children.id', $calendarEventIds))
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($calendarEventIds as $id) {
+            $result[$id][] = $id;
+        }
+
+        foreach ($queryResult as $row) {
+            $result[$row['parent']][] = $row['child'];
+        }
+
+        return $result;
     }
 }

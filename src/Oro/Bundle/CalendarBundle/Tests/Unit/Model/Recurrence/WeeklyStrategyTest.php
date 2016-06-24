@@ -370,6 +370,16 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.weekly2oro.calendar.recurrence.days'
                     . '.mondayoro.calendar.recurrence.patterns.end_date'
+            ],
+            'with_weekdays' => [
+                'params' => [
+                    'interval' => 1,
+                    'dayOfWeek' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                    'startTime' => '2016-04-28',
+                    'endTime' => '2016-06-10',
+                    'occurrences' => null,
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.weekdayoro.calendar.recurrence.patterns.end_date'
             ]
         ];
     }

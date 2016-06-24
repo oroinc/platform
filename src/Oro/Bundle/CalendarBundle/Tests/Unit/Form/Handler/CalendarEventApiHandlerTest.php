@@ -43,9 +43,10 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
+        $data = ['contexts' => []];
         $this->request = new Request();
-        $this->request->request = new ParameterBag($data = ['contexts' => []]);
-        $this->request->query = new ParameterBag(['send_notification' => true]);
+        $this->request->request = new ParameterBag($data);
+
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -94,8 +95,13 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessPOST()
     {
         $this->request->setMethod('POST');
-        $this->emailSendProcessor->expects($this->once())
+        $this->emailSendProcessor
+            ->expects($this->once())
             ->method('sendInviteNotification');
+
+        $this->form->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue(true));
 
         $this->handler->process($this->entity);
     }
@@ -141,7 +147,6 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('removeActivityTarget');
         $this->handler->process($this->entity);
 
-
         $this->assertSame($defaultCalendar, $this->entity->getCalendar());
     }
 
@@ -149,8 +154,12 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
     {
         ReflectionUtil::setId($this->entity, 1);
         $this->request->setMethod('PUT');
-        $this->emailSendProcessor->expects($this->once())
+        $this->emailSendProcessor
+            ->expects($this->once())
             ->method('sendUpdateParentEventNotification');
+        $this->form->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue(true));
 
         $this->handler->process($this->entity);
     }

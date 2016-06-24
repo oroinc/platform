@@ -11,7 +11,7 @@ datagrid:
                     - website.identifier
                     - website.url
                     - owner.id as ownerId
-                    - CONCAT(owner.firstName, CONCAT(' ', owner.lastName)) as ownerName
+                    - CONCAT_WS(' ', owner.firstName, owner.lastName) as ownerName
                     - website.createdAt
                     - website.updatedAt
                 from:
