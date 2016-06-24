@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -10,13 +12,14 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 
-class OroWorkflowBundle implements Migration, ContainerAwareInterface
+class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabasePlatformAwareInterface
 {
     use ContainerAwareTrait;
 
@@ -28,12 +31,23 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
     const NEW_ITEMS_RELATION = WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME;
     const NEW_STEPS_RELATION = WorkflowVirtualRelationProvider::STEPS_RELATION_NAME;
 
+    /** @var AbstractPlatform */
+    protected $platform;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDatabasePlatform(AbstractPlatform $platform)
+    {
+        $this->platform = $platform;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->createColumns($schema);
+        $this->updateColumns($schema);
         $this->moveActiveWorkflows($queries);
         $this->updateReportsDefinitions($queries);
     }
@@ -41,7 +55,7 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
     /**
      * @param Schema $schema
      */
-    public function createColumns(Schema $schema)
+    public function updateColumns(Schema $schema)
     {
         $table = $schema->getTable('oro_workflow_item');
         $table->addColumn('entity_class', 'string', ['notnull' => false]);
@@ -72,9 +86,13 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
             $configManager->persist($config);
             $configManager->flush();
 
+            if ($this->platform instanceof MySqlPlatform) {
+                $class = str_replace('\\', '\\\\', $class);
+            }
+
             $queries->addPostQuery(sprintf(
                 'UPDATE oro_workflow_item SET entity_class = \'%s\' WHERE workflow_name = \'%s\'',
-                str_replace('\\', '\\\\', $class),
+                $class,
                 $workflow
             ));
         }
