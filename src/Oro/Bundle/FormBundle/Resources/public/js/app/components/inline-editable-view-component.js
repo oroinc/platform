@@ -371,7 +371,9 @@ define(function(require) {
                 }, this);
             }
             mediator.execute('showFlashMessage', 'success', this.messages.success);
-            mediator.trigger('inlineEditor:' + this.eventChannelId + ':update', this.updateData);
+            if (this.eventChannelId) {
+                mediator.trigger('inlineEditor:' + this.eventChannelId + ':update', this.updateData);
+            }
         },
 
         onSaveError: function(jqXHR) {
