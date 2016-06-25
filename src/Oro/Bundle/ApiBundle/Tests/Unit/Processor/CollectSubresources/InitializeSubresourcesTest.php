@@ -11,7 +11,6 @@ use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContex
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\InitializeSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
-use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 

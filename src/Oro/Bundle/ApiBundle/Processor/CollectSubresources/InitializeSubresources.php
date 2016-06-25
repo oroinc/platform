@@ -162,6 +162,6 @@ class InitializeSubresources implements ProcessorInterface
             );
         }
 
-        return $result;
+        return array_values($result);
     }
 }
