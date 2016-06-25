@@ -51,3 +51,9 @@ services:
         class: %oro_filter.builder.many_relation.orm.class%
         arguments:
             - '@doctrine'
+
+    oro_filter.utils.date_filter_modifier:
+        class: Oro\Bundle\FilterBundle\Utils\DateFilterModifier
+        arguments:
+            - '@oro_filter.expression.date.compiler'
+
