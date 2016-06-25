@@ -161,36 +161,36 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $field2->setPropertyPath('realField2');
         $field3 = $config->addField('field3');
         $field3->setPropertyPath('field3');
-        $swapField1 = $config->addField('swapField');
-        $swapField1->setPropertyPath('realSwapField');
-        $swapField2 = $config->addField('realSwapField');
-        $swapField2->setPropertyPath('swapField');
+        $swapField = $config->addField('swapField');
+        $swapField->setPropertyPath('realSwapField');
+        $realSwapField = $config->addField('realSwapField');
+        $realSwapField->setPropertyPath('swapField');
 
-        $this->assertNull($config->findFieldNameByPropertyPath('unknown'));
         $this->assertNull($config->findField('unknown'));
         $this->assertNull($config->findField('unknown', true));
+        $this->assertNull($config->findFieldNameByPropertyPath('unknown'));
 
-        $this->assertSame('field1', $config->findFieldNameByPropertyPath('field1'));
         $this->assertSame($field1, $config->findField('field1'));
         $this->assertSame($field1, $config->findField('field1', true));
+        $this->assertSame('field1', $config->findFieldNameByPropertyPath('field1'));
 
-        $this->assertNull($config->findFieldNameByPropertyPath('field2'));
-        $this->assertSame('field2', $config->findFieldNameByPropertyPath('realField2'));
         $this->assertSame($field2, $config->findField('field2'));
         $this->assertNull($config->findField('field2', true));
+        $this->assertNull($config->findFieldNameByPropertyPath('field2'));
         $this->assertNull($config->findField('realField2'));
         $this->assertSame($field2, $config->findField('realField2', true));
+        $this->assertSame('field2', $config->findFieldNameByPropertyPath('realField2'));
 
-        $this->assertSame('field3', $config->findFieldNameByPropertyPath('field3'));
         $this->assertSame($field3, $config->findField('field3'));
         $this->assertSame($field3, $config->findField('field3', true));
+        $this->assertSame('field3', $config->findFieldNameByPropertyPath('field3'));
 
+        $this->assertSame($swapField, $config->findField('swapField'));
+        $this->assertSame($realSwapField, $config->findField('swapField', true));
         $this->assertSame('realSwapField', $config->findFieldNameByPropertyPath('swapField'));
+        $this->assertSame($realSwapField, $config->findField('realSwapField'));
+        $this->assertSame($swapField, $config->findField('realSwapField', true));
         $this->assertSame('swapField', $config->findFieldNameByPropertyPath('realSwapField'));
-        $this->assertSame($swapField1, $config->findField('swapField'));
-        $this->assertSame($swapField2, $config->findField('swapField', true));
-        $this->assertSame($swapField2, $config->findField('realSwapField'));
-        $this->assertSame($swapField1, $config->findField('realSwapField', true));
     }
 
     public function testGetOrAddField()
@@ -318,6 +318,20 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
 
         $config->enableSorting();
         $this->assertTrue($config->isSortingEnabled());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testIdentifierFieldNames()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertEquals([], $config->getIdentifierFieldNames());
+
+        $config->setIdentifierFieldNames(['id']);
+        $this->assertEquals(['id'], $config->getIdentifierFieldNames());
+        $this->assertEquals(['identifier_field_names' => ['id']], $config->toArray());
+
+        $config->setIdentifierFieldNames([]);
+        $this->assertEquals([], $config->getIdentifierFieldNames());
         $this->assertEquals([], $config->toArray());
     }
 

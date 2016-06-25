@@ -22,6 +22,20 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
         $this->processor = new InitializeConfigExtras();
     }
 
+    public function testProcessWhenConfigExtrasAreAlreadyInitialized()
+    {
+        $this->context->setConfigExtras([]);
+        $this->context->addConfigExtra(new EntityDefinitionConfigExtra());
+
+        $this->context->setAction('test_action');
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [new EntityDefinitionConfigExtra()],
+            $this->context->getConfigExtras()
+        );
+    }
+
     public function testProcess()
     {
         $this->context->setConfigExtras([]);

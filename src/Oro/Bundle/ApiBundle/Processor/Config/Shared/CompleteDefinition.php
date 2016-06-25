@@ -7,8 +7,11 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
@@ -21,6 +24,7 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  * If "identifier_fields_only" config extra exists:
  * * Adds identifier fields which were not configured yet based on an entity metadata.
  * * Removes all other fields and association.
+ * By performance reasons both actions are done in one processor.
  */
 class CompleteDefinition implements ProcessorInterface
 {
@@ -30,16 +34,22 @@ class CompleteDefinition implements ProcessorInterface
     /** @var ExclusionProviderInterface */
     protected $exclusionProvider;
 
+    /** @var ConfigProvider */
+    protected $configProvider;
+
     /**
      * @param DoctrineHelper             $doctrineHelper
      * @param ExclusionProviderInterface $exclusionProvider
+     * @param ConfigProvider             $configProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        ExclusionProviderInterface $exclusionProvider
+        ExclusionProviderInterface $exclusionProvider,
+        ConfigProvider $configProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->exclusionProvider = $exclusionProvider;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -56,23 +66,26 @@ class CompleteDefinition implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
-        $existingFields = [];
-        $fields = $definition->getFields();
-        foreach ($fields as $fieldName => $field) {
-            $propertyPath = $field->getPropertyPath() ?: $fieldName;
-            $existingFields[$propertyPath] = $fieldName;
-        }
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
-            $this->completeIdentifierFields($definition, $metadata, $existingFields);
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            $existingFields = [];
+            $fields = $definition->getFields();
+            foreach ($fields as $fieldName => $field) {
+                $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                $existingFields[$propertyPath] = $fieldName;
+            }
+            $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+            if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
+                $this->completeIdentifierFields($definition, $metadata, $existingFields);
+            } else {
+                $this->completeFields($definition, $metadata, $existingFields);
+                $this->completeAssociations($definition, $metadata, $existingFields);
+            }
         } else {
-            $this->completeFields($definition, $metadata, $existingFields);
-            $this->completeAssociations($definition, $metadata, $existingFields);
+            if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
+                $this->removeObjectNonIdentifierFields($definition);
+            } else {
+                $this->completeObjectAssociations($definition, $context->getVersion(), $context->getRequestType());
+            }
         }
     }
 
@@ -96,7 +109,7 @@ class CompleteDefinition implements ProcessorInterface
         // remove all not identifier fields
         foreach ($existingFields as $propertyPath => $fieldName) {
             if (!in_array($propertyPath, $idFieldNames, true)) {
-                $definition->remove($fieldName);
+                $definition->removeField($fieldName);
             }
         }
     }
@@ -160,6 +173,66 @@ class CompleteDefinition implements ProcessorInterface
                     $targetEntity->addField($idFieldName);
                 }
                 $field->setCollapsed();
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition)
+    {
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        $fieldNames = array_keys($definition->getFields());
+        foreach ($fieldNames as $fieldName) {
+            if (!in_array($fieldName, $idFieldNames, true)) {
+                $definition->removeField($fieldName);
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $version
+     * @param RequestType            $requestType
+     */
+    protected function completeObjectAssociations(
+        EntityDefinitionConfig $definition,
+        $version,
+        RequestType $requestType
+    ) {
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $targetClass = $field->getTargetClass();
+            if (!$targetClass) {
+                continue;
+            }
+
+            if ($field->hasTargetEntity()) {
+                $targetEntity = $field->getTargetEntity();
+                if (!$targetEntity->isExcludeAll()) {
+                    $targetEntity->setExcludeAll();
+                }
+            } else {
+                $config = $this->configProvider->getConfig(
+                    $targetClass,
+                    $version,
+                    $requestType,
+                    [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+                );
+                if ($config->hasDefinition()) {
+                    $targetEntity = $field->createAndSetTargetEntity();
+                    $targetEntity->setExcludeAll();
+                    $targetDefinition = $config->getDefinition();
+                    $idFieldNames = $targetDefinition->getIdentifierFieldNames();
+                    foreach ($idFieldNames as $idFieldName) {
+                        $targetEntity->addField($idFieldName);
+                    }
+                    $field->setCollapsed();
+                    if (!$field->getDataType() && 1 === count($idFieldNames)) {
+                        $field->setDataType($targetDefinition->getField(reset($idFieldNames))->getDataType());
+                    }
+                }
             }
         }
     }

@@ -71,8 +71,6 @@ services:
 
     oro_api.get_config.json_api.fix_field_naming:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi\FixFieldNaming
-        arguments:
-            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, requestType: json_api, priority: -100 }
 
@@ -152,6 +150,14 @@ services:
             - { name: oro.api.processor, action: get_config, priority: -5 }
             - { name: oro.api.processor, action: get_relation_config, priority: -5 }
 
+    oro_api.get_config.ensure_identifier_field_names_initialized:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\EnsureIdentifierFieldNamesInitialized
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, priority: -10 }
+            - { name: oro.api.processor, action: get_relation_config, priority: -10 }
+
     oro_api.get_config.complete_definition.expand_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities
         arguments:
@@ -166,6 +172,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_exclusion_provider'
+            - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: -30 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -30 }

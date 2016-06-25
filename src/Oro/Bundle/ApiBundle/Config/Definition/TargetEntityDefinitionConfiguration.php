@@ -190,6 +190,10 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->booleanNode(EntityDefinitionFieldConfig::EXCLUDE)->end()
             ->scalarNode(EntityDefinitionFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->scalarNode(EntityDefinitionFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
+            ->scalarNode(EntityDefinitionFieldConfig::TARGET_CLASS)->end()
+            ->enumNode(EntityDefinitionFieldConfig::TARGET_TYPE)
+                ->values(['to-many', 'to-one', 'collection'])
+            ->end()
             ->booleanNode(EntityDefinitionFieldConfig::COLLAPSE)->end()
             ->variableNode(EntityDefinitionFieldConfig::DATA_TRANSFORMER)->end()
             ->scalarNode(EntityDefinitionFieldConfig::LABEL)->cannotBeEmpty()->end()
@@ -218,6 +222,13 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         }
         if (empty($config[EntityDefinitionFieldConfig::FORM_OPTIONS])) {
             unset($config[EntityDefinitionFieldConfig::FORM_OPTIONS]);
+        }
+        if (!empty($config[EntityDefinitionFieldConfig::TARGET_TYPE])) {
+            if ('collection' === $config[EntityDefinitionFieldConfig::TARGET_TYPE]) {
+                $config[EntityDefinitionFieldConfig::TARGET_TYPE] = 'to-many';
+            }
+        } elseif (!empty($config[EntityDefinitionFieldConfig::TARGET_CLASS])) {
+            $config[EntityDefinitionFieldConfig::TARGET_TYPE] = 'to-one';
         }
 
         return $config;

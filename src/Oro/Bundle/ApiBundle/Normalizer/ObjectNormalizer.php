@@ -10,6 +10,7 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ObjectNormalizer
@@ -127,7 +128,7 @@ class ObjectNormalizer
     protected function normalizeObjectByConfig($object, $level, EntityConfig $config)
     {
         if (!$config->isExcludeAll()) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'The "%s" must be "%s".',
                     EntityDefinitionConfig::EXCLUSION_POLICY,
@@ -224,7 +225,7 @@ class ObjectNormalizer
                     } elseif ($count > 1) {
                         $value = $entityId;
                     } else {
-                        throw new \RuntimeException(
+                        throw new RuntimeException(
                             sprintf(
                                 'The entity "%s" does not have an identifier.',
                                 ClassUtils::getClass($value)
@@ -238,7 +239,7 @@ class ObjectNormalizer
                 } elseif (method_exists($value, '__toString')) {
                     $value = (string)$value;
                 } else {
-                    throw new \RuntimeException(
+                    throw new RuntimeException(
                         sprintf(
                             'Instance of "%s" cannot be normalized.',
                             get_class($value)

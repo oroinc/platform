@@ -18,6 +18,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get_metadata, priority: -20 }
 
+    oro_api.get_metadata.load_object_metadata:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadObjectMetadata
+        tags:
+            - { name: oro.api.processor, action: get_metadata, priority: -25 }
+
     oro_api.get_metadata.load_related_entity_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadRelatedEntityMetadata
         arguments:

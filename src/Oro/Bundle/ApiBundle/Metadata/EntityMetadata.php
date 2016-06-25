@@ -212,10 +212,14 @@ class EntityMetadata extends ParameterBag
      * Adds metadata of a field.
      *
      * @param FieldMetadata $field
+     *
+     * @return FieldMetadata
      */
     public function addField(FieldMetadata $field)
     {
         $this->fields[$field->getName()] = $field;
+
+        return $field;
     }
 
     /**
@@ -284,10 +288,14 @@ class EntityMetadata extends ParameterBag
      * Adds metadata of an association.
      *
      * @param AssociationMetadata $association
+     *
+     * @return AssociationMetadata
      */
     public function addAssociation(AssociationMetadata $association)
     {
         $this->associations[$association->getName()] = $association;
+
+        return $association;
     }
 
     /**

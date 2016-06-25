@@ -24,13 +24,14 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \Exception|null $innerException
+     * @param string          $processorId
      *
      * @return ExecutionFailedException
      */
-    protected function createExecutionFailedException(\Exception $innerException = null)
+    protected function createExecutionFailedException(\Exception $innerException = null, $processorId = 'processor1')
     {
         return new ExecutionFailedException(
-            'processor1',
+            $processorId,
             null,
             null,
             $innerException
@@ -102,15 +103,38 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
     public function getExceptionTextDataProvider()
     {
         return [
-            [new \Exception('some error'), null],
-            [new \UnexpectedValueException('some error'), 'some error'],
+            [
+                new \Exception('some error'),
+                null
+            ],
+            [
+                new \UnexpectedValueException('some error'),
+                'some error.'
+            ],
             [
                 $this->createExecutionFailedException(new \UnexpectedValueException('some error')),
-                'some error'
+                'some error. Processor: processor1.'
             ],
-            [new BadRequestHttpException('some error in request'), null],
+            [
+                $this->createExecutionFailedException(
+                    $this->createExecutionFailedException(new \UnexpectedValueException('some error')),
+                    'processor0'
+                ),
+                'some error. Processor: processor0->processor1.'
+            ],
+            [
+                new BadRequestHttpException('some error in request'),
+                null
+            ],
             [
                 $this->createExecutionFailedException(new BadRequestHttpException('some error in request')),
+                null
+            ],
+            [
+                $this->createExecutionFailedException(
+                    $this->createExecutionFailedException(new BadRequestHttpException('some error in request')),
+                    'processor0'
+                ),
                 null
             ],
         ];

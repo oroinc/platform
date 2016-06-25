@@ -151,8 +151,17 @@ class InitializeSubresources implements ProcessorInterface
      */
     protected function getSubresourceExcludedActions(array $resourceExcludedActions)
     {
-        return in_array('update', $resourceExcludedActions, true)
-            ? ['update_relationship', 'add_relationship', 'delete_relationship']
-            : [];
+        $result = array_intersect(
+            $resourceExcludedActions,
+            ['get_subresource', 'get_relationship', 'update_relationship', 'add_relationship', 'delete_relationship']
+        );
+
+        if (in_array('update', $resourceExcludedActions, true)) {
+            $result = array_unique(
+                array_merge($result, ['update_relationship', 'add_relationship', 'delete_relationship'])
+            );
+        }
+
+        return $result;
     }
 }

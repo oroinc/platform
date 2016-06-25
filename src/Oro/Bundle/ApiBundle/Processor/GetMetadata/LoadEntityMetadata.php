@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Adds metadata for manageable entity and its fields.
+ * Loads metadata for ORM entity.
  */
 class LoadEntityMetadata implements ProcessorInterface
 {

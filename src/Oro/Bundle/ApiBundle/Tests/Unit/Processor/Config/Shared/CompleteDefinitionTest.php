@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
+use Oro\Bundle\ApiBundle\Config\Config;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
@@ -12,6 +15,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $exclusionProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
 
     /** @var CompleteDefinition */
     protected $processor;
@@ -24,10 +30,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->processor = new CompleteDefinition(
             $this->doctrineHelper,
-            $this->exclusionProvider
+            $this->exclusionProvider,
+            $this->configProvider
         );
     }
 
@@ -44,9 +54,34 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessForNotManageableEntity()
     {
-        $config = [];
+        $config = [
+            'fields' => [
+                'field1'       => null,
+                'association1' => [
+                    'target_class'     => 'Test\Association1Target',
+                    'exclusion_policy' => 'none'
+                ],
+                'association2' => [
+                    'target_class' => 'Test\Association2Target'
+                ],
+                'association3' => [
+                    'target_class' => 'Test\Association3Target',
+                    'data_type'    => 'string'
+                ],
+                'association4' => [
+                    'target_class' => 'Test\Association4Target'
+                ],
+                'association5' => [
+                    'target_class' => 'Test\Association5Target',
+                    'data_type'    => 'string'
+                ],
+            ]
+        ];
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -55,8 +90,136 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadataForClass');
 
+        $this->configProvider->expects($this->at(0))
+            ->method('getConfig')
+            ->with(
+                'Test\Association2Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn($this->createRelationConfigObject());
+        $this->configProvider->expects($this->at(1))
+            ->method('getConfig')
+            ->with(
+                'Test\Association3Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+        $this->configProvider->expects($this->at(2))
+            ->method('getConfig')
+            ->with(
+                'Test\Association4Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+        $this->configProvider->expects($this->at(3))
+            ->method('getConfig')
+            ->with(
+                'Test\Association5Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id1', 'id2'],
+                        'fields'                 => [
+                            'id1' => [
+                                'data_type' => 'integer'
+                            ],
+                            'id2' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1'       => null,
+                    'association1' => [
+                        'target_class'     => 'Test\Association1Target',
+                        'exclusion_policy' => 'all'
+                    ],
+                    'association2' => [
+                        'target_class' => 'Test\Association2Target'
+                    ],
+                    'association3' => [
+                        'target_class'     => 'Test\Association3Target',
+                        'data_type'        => 'string',
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ],
+                    'association4' => [
+                        'target_class'     => 'Test\Association4Target',
+                        'data_type'        => 'integer',
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ],
+                    'association5' => [
+                        'target_class'     => 'Test\Association5Target',
+                        'data_type'        => 'string',
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id1' => null,
+                            'id2' => null
+                        ]
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    /**
+     * @param array|null $definition
+     *
+     * @return Config
+     */
+    protected function createRelationConfigObject(array $definition = null)
+    {
+        $config = new Config();
+        if (null !== $definition) {
+            $config->setDefinition($this->createConfigObject($definition));
+        }
+
+        return $config;
     }
 
     /**
@@ -299,6 +462,196 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                             'id' => null
                         ]
                     ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessIdentifierFieldsOnlyForManageableEntity()
+    {
+        $config = [
+            'fields' => [
+                'id'     => null,
+                'field1' => null,
+                'field2' => [
+                    'exclude' => true
+                ],
+                'field3' => [
+                    'property_path' => 'realField3'
+                ],
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'id' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessIdentifierFieldsOnlyWhenNoIdFieldInConfigForManageableEntity()
+    {
+        $config = [
+            'fields' => []
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'id' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessIdentifierFieldsOnlyWithRenamedIdFieldInConfigForManageableEntity()
+    {
+        $config = [
+            'fields' => [
+                'renamedId' => [
+                    'property_path' => 'name'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['name']);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'renamedId' => [
+                        'property_path' => 'name'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessIdentifierFieldsOnlyForNotManageableEntity()
+    {
+        $config = [
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null,
+                'field2' => [
+                    'exclude' => true
+                ],
+                'field3' => [
+                    'property_path' => 'realField3'
+                ],
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessIdentifierFieldsOnlyWithRenamedIdFieldInConfigForNotManageableEntity()
+    {
+        $config = [
+            'identifier_field_names' => ['renamedId'],
+            'fields'                 => [
+                'renamedId' => [
+                    'property_path' => 'name'
+                ]
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['renamedId'],
+                'fields'                 => [
+                    'renamedId' => [
+                        'property_path' => 'name'
+                    ]
                 ]
             ],
             $this->context->getResult()
