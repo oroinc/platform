@@ -84,11 +84,21 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      *
      * @return bool|null TRUE if a target association represents "to-many" relationship
      */
-    public function isCollectionValuedTarget()
+    public function isCollectionValuedAssociation()
     {
         return array_key_exists(self::TARGET_TYPE, $this->items)
             ? 'to-many' === $this->items[self::TARGET_TYPE]
             : null;
+    }
+
+    /**
+     * Indicates whether the type of a target association is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasTargetType()
+    {
+        return array_key_exists(self::TARGET_TYPE, $this->items);
     }
 
     /**

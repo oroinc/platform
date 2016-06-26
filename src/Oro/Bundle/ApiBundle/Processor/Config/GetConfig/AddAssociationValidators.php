@@ -75,7 +75,7 @@ class AddAssociationValidators implements ProcessorInterface
     {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->getTargetClass() && $field->isCollectionValuedTarget()) {
+            if ($field->getTargetClass() && $field->isCollectionValuedAssociation()) {
                 $fieldOptions = $field->getFormOptions();
                 $fieldOptions['constraints'][] = new Assert\HasAdderAndRemover(
                     ['class' => $entityClass, 'property' => $field->getPropertyPath() ?: $fieldName]

@@ -7,9 +7,8 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Component\EntitySerializer\ConfigUtil;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
-use Oro\Component\EntitySerializer\EntityConfig;
-use Oro\Component\EntitySerializer\FieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -48,12 +47,12 @@ class ObjectNormalizer
     }
 
     /**
-     * @param mixed             $object
-     * @param EntityConfig|null $config
+     * @param mixed                       $object
+     * @param EntityDefinitionConfig|null $config
      *
      * @return mixed
      */
-    public function normalizeObject($object, EntityConfig $config = null)
+    public function normalizeObject($object, EntityDefinitionConfig $config = null)
     {
         if (null !== $object) {
             $object = $this->normalizeValue($object, is_array($object) ? 0 : 1, $config);
@@ -116,16 +115,16 @@ class ObjectNormalizer
     }
 
     /**
-     * @param object       $object
-     * @param int          $level
-     * @param EntityConfig $config
+     * @param object                 $object
+     * @param int                    $level
+     * @param EntityDefinitionConfig $config
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function normalizeObjectByConfig($object, $level, EntityConfig $config)
+    protected function normalizeObjectByConfig($object, $level, EntityDefinitionConfig $config)
     {
         if (!$config->isExcludeAll()) {
             throw new RuntimeException(
@@ -155,7 +154,21 @@ class ObjectNormalizer
                     $childFieldNames = array_keys($targetEntity->getFields());
                     if ($field->isCollapsed() && count($childFieldNames) === 1) {
                         $childFieldName = reset($childFieldNames);
-                        if ($value instanceof \Traversable) {
+                        $isCollection = $field->hasTargetType()
+                            ? $field->isCollectionValuedAssociation()
+                            : $value instanceof \Traversable;
+                        if ($isCollection) {
+                            if (!$value instanceof \Traversable && !is_array($value)) {
+                                throw new RuntimeException(
+                                    sprintf(
+                                        'A value of "%s" field of entity "%s" should be "%s". Got: %s.',
+                                        $propertyPath,
+                                        ClassUtils::getClass($object),
+                                        '\Traversable or array',
+                                        is_object($value) ? get_class($value) : gettype($value)
+                                    )
+                                );
+                            }
                             $childValue = [];
                             foreach ($value as $val) {
                                 $childVal = null;
@@ -188,13 +201,13 @@ class ObjectNormalizer
     }
 
     /**
-     * @param mixed             $value
-     * @param int               $level
-     * @param EntityConfig|null $config
+     * @param mixed                       $value
+     * @param int                         $level
+     * @param EntityDefinitionConfig|null $config
      *
      * @return mixed
      */
-    protected function normalizeValue($value, $level, EntityConfig $config = null)
+    protected function normalizeValue($value, $level, EntityDefinitionConfig $config = null)
     {
         if (is_array($value)) {
             $nextLevel = $level + 1;
@@ -253,15 +266,19 @@ class ObjectNormalizer
     }
 
     /**
-     * @param string           $entityClass
-     * @param string           $fieldName
-     * @param mixed            $fieldValue
-     * @param FieldConfig|null $fieldConfig
+     * @param string                           $entityClass
+     * @param string                           $fieldName
+     * @param mixed                            $fieldValue
+     * @param EntityDefinitionFieldConfig|null $fieldConfig
      *
      * @return mixed
      */
-    protected function transformValue($entityClass, $fieldName, $fieldValue, FieldConfig $fieldConfig = null)
-    {
+    protected function transformValue(
+        $entityClass,
+        $fieldName,
+        $fieldValue,
+        EntityDefinitionFieldConfig $fieldConfig = null
+    ) {
         return $this->dataTransformer->transform(
             $entityClass,
             $fieldName,

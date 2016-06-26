@@ -108,8 +108,16 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
                 null
             ],
             [
+                new \Exception(),
+                null
+            ],
+            [
                 new \UnexpectedValueException('some error'),
                 'some error.'
+            ],
+            [
+                new \UnexpectedValueException(),
+                null
             ],
             [
                 $this->createExecutionFailedException(new \UnexpectedValueException('some error')),

@@ -77,7 +77,13 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         if ($this->isSafeException($underlyingException)) {
             $text = $underlyingException->getMessage();
         } elseif ($this->debug) {
-            $text = '*DEBUG ONLY* ' . $underlyingException->getMessage();
+            $text = $underlyingException->getMessage();
+            if ($text) {
+                $text = '*DEBUG ONLY* ' . $text;
+            }
+        }
+        if (null !== $text && !$text) {
+            $text = null;
         }
         if (null !== $text) {
             if (substr($text, -1) !== '.') {

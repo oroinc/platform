@@ -163,22 +163,26 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
     public function testTargetType()
     {
         $config = new EntityDefinitionFieldConfig();
+        $this->assertFalse($config->hasTargetType());
         $this->assertNull($config->getTargetType());
-        $this->assertNull($config->isCollectionValuedTarget());
+        $this->assertNull($config->isCollectionValuedAssociation());
 
         $config->setTargetType('to-one');
+        $this->assertTrue($config->hasTargetType());
         $this->assertEquals('to-one', $config->getTargetType());
-        $this->assertFalse($config->isCollectionValuedTarget());
+        $this->assertFalse($config->isCollectionValuedAssociation());
         $this->assertEquals(['target_type' => 'to-one'], $config->toArray());
 
         $config->setTargetType('to-many');
+        $this->assertTrue($config->hasTargetType());
         $this->assertEquals('to-many', $config->getTargetType());
-        $this->assertTrue($config->isCollectionValuedTarget());
+        $this->assertTrue($config->isCollectionValuedAssociation());
         $this->assertEquals(['target_type' => 'to-many'], $config->toArray());
 
         $config->setTargetType(null);
+        $this->assertFalse($config->hasTargetType());
         $this->assertNull($config->getTargetType());
-        $this->assertNull($config->isCollectionValuedTarget());
+        $this->assertNull($config->isCollectionValuedAssociation());
         $this->assertEquals([], $config->toArray());
     }
 
