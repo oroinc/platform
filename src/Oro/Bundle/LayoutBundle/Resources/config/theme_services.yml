@@ -78,6 +78,7 @@ services:
             - '@oro_layout.loader'
             - '@oro_layout.dependency_initializer'
             - '@oro_layout.loader.path_provider'
+            - '@oro_layout.imports_storage'
 
     oro_layout.data_provider.theme:
         class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider
