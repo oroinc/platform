@@ -116,6 +116,14 @@ class RecurrenceFormType extends AbstractType
                     'label' => 'oro.calendar.recurrence.occurrences.label',
                     'property_path' => 'occurrences',
                 ]
+            )
+            ->add(
+                'timezone',
+                'timezone',
+                [
+                    'required' => true,
+                    'label' => 'oro.calendar.recurrence.timezone.label',
+                ]
             );
     }
 

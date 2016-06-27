@@ -87,7 +87,8 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'monthOfYear' => $recurrence->getMonthOfYear(),
                 'startTime' => $recurrence->getStartTime(),
                 'endTime' => $recurrence->getEndTime(),
-                'occurrences' => $recurrence->getOccurrences()
+                'occurrences' => $recurrence->getOccurrences(),
+                'timezone' => $recurrence->getTimezone()
             ];
         }
 

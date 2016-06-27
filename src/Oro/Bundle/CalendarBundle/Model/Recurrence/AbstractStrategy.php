@@ -118,7 +118,10 @@ abstract class AbstractStrategy implements StrategyInterface
         if (!empty($currentEndTime)) {
             $result = $currentEndTime;
         } elseif (!empty($occurrences)) {
+            $recurrenceTimezone = new \DateTimeZone($recurrence->getTimezone());
+            $recurrence->getStartTime()->setTimezone($recurrenceTimezone);
             $result = $this->getLastOccurrence($recurrence);
+            $result->setTimezone(new \DateTimeZone('UTC'));
         } else {
             $result = new \DateTime(Recurrence::MAX_END_DATE, $this->getTimeZone());
         }

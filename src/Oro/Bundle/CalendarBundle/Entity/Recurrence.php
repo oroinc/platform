@@ -182,6 +182,18 @@ class Recurrence
     protected $occurrences;
 
     /**
+     * The time zone in which the time is specified.
+     * For recurring events this field is required and specifies the time zone in which the recurrence is expanded.
+     *
+     * The list of supported Timezones http://php.net/manual/en/timezones.php
+     *
+     * @var string
+     *
+     * @ORM\Column(name="timezone", type="string", length=255)
+     */
+    protected $timezone;
+
+    /**
      * Gets id
      *
      * @return integer
@@ -445,5 +457,29 @@ class Recurrence
     public function getOccurrences()
     {
         return $this->occurrences;
+    }
+
+    /**
+     * Sets timezone.
+     *
+     * @param string $timezone
+     *
+     * @return self
+     */
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+
+        return $this;
+    }
+
+    /**
+     * Gets timezone.
+     *
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
     }
 }

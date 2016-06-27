@@ -81,7 +81,7 @@ class YearNthStrategy extends AbstractStrategy
         $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
         $day = $this->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
         $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
-        $currentDate = new \DateTime('now', $this->getTimeZone());
+        $currentDate = new \DateTime('now', $recurrence->getStartTime()->getTimezone());
         $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $currentDate->format('d'));
         $month = $this->dateTimeFormatter->format($currentDate, null, \IntlDateFormatter::NONE, null, null, 'MMM');
 
@@ -114,7 +114,7 @@ class YearNthStrategy extends AbstractStrategy
      */
     protected function getNextOccurrence($interval, $dayOfWeek, $monthOfYear, $instance, \DateTime $date)
     {
-        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}", $this->getTimeZone());
+        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
         $instanceRelativeValue = $this->getInstanceRelativeValue($instance);
         $month = date('M', mktime(0, 0, 0, $monthOfYear));
@@ -125,7 +125,7 @@ class YearNthStrategy extends AbstractStrategy
             foreach ($dayOfWeek as $day) {
                 $nextDays[] = new \DateTime(
                     "{$instanceRelativeValue} {$day} of {$month} {$year} {$time}",
-                    $this->getTimeZone()
+                    $occurrenceDate->getTimezone()
                 );
             }
 
@@ -139,7 +139,7 @@ class YearNthStrategy extends AbstractStrategy
             foreach ($dayOfWeek as $day) {
                 $days[] = new \DateTime(
                     "{$instanceRelativeValue} {$day} of {$month} {$year} {$time}",
-                    $this->getTimeZone()
+                    $occurrenceDate->getTimezone()
                 );
             }
             $currentInstance++;
