@@ -8,11 +8,11 @@ function(__, routing, DialogWidget) {
      * @export oroworkflow/js/activation-handler
      * @class  oroworkflow.WorkflowActivationHandler
      */
-    return function(url) {
+    return function(url, name, label) {
         var el = this;
         var formWidget = new DialogWidget({
-            title: __('oro.workflow.workflowdefinition.activate', {label : this.model.get('label')}),
-            url: routing.generate('oro_workflow_definition_activate_from_widget', {name: this.model.get('name')}),
+            title: __('oro.workflow.workflowdefinition.activate', {label: label}),
+            url: routing.generate('oro_workflow_definition_activate_from_widget', {name: name}),
             stateEnabled: false,
             incrementalPosition: false,
             loadingMaskEnabled: true,

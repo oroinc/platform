@@ -233,7 +233,7 @@ class SubresourceContext extends Context
     protected function createParentConfigExtras()
     {
         return [
-            new EntityDefinitionConfigExtra('get_list'),
+            new EntityDefinitionConfigExtra(),
             new FilterFieldsConfigExtra([$this->getParentClassName() => [$this->getAssociationName()]])
         ];
     }

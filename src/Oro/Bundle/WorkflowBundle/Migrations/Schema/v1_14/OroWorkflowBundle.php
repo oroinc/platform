@@ -15,7 +15,7 @@ class OroWorkflowBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_workflow_item');
-        $table->addColumn('entity_class', 'string', ['notnull' => false]);
+        $table->addColumn('entity_class', 'string', ['length' => 255, 'notnull' => false]);
         $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
     }
 }

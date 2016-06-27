@@ -4,7 +4,7 @@
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 
 {% set entityConfiguration = oro_entity_config(entity.relatedEntity, 'workflow') %}
-{% set isActive = entityConfiguration.active_workflow is defined and entityConfiguration.active_workflow == entity.name %}
+{% set isActive = entityConfiguration.active_workflows is defined and entity.name in entityConfiguration.active_workflows %}
 
 {% set pageComponent = {
         module: 'oroworkflow/js/app/components/workflow-viewer-component',
@@ -50,6 +50,10 @@
                     'label': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
                     'path':  path('oro_api_workflow_deactivate', {'workflowDefinition': entity.name}),
                     'title': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
+                    'data': {
+                        'name': entity.name,
+                        'label': entity.label
+                    }
                 }) }}
             </span>
         {% else %}
@@ -72,7 +76,8 @@
                     'path': path('oro_api_workflow_activate', {'workflowDefinition': entity.name}),
                     'title': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
                     'data': {
-                        'name': entity.name
+                        'name': entity.name,
+                        'label': entity.label
                     }
                 }) }}
             </span>

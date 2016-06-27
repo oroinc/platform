@@ -1,0 +1,3 @@
+OroForm:
+  selector: 'form'
+  class: Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm

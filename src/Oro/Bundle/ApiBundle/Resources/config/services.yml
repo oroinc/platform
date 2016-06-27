@@ -136,7 +136,6 @@ services:
 
     oro_api.resources_cache:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesCache
-        public: false
         arguments:
             - '@oro_api.resources_cache.impl'
 
@@ -326,7 +325,6 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
-            - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
             - { name: oro_api.routing_options_resolver }
@@ -344,7 +342,6 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
             - '@oro_api.resource_doc_provider'
-            - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
@@ -372,7 +369,6 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
         public: false
         arguments:
-            - '@oro_entity.entity_class_name_provider'
             - '@oro_api.subresources_provider'
 
     oro_api.filter_factory:
