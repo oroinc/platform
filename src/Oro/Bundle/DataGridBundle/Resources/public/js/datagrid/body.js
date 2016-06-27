@@ -90,7 +90,7 @@ define([
         },
 
         createRows: function() {
-            this.rows = this.collection.map(function(model) {
+            this.rows = this.collection.map(function(model, i) {
                 var rowOptions = {
                     collection: this.filteredColumns,
                     columns: this.columns,
@@ -98,7 +98,7 @@ define([
                 };
                 this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
                 var row = new this.row(rowOptions);
-                this.subview('row' + model.id, row);
+                this.subview('row' + i, row);
                 this.attachListenerToSingleRow(row);
                 return row;
             }, this);
