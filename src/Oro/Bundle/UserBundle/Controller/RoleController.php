@@ -9,7 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
-use Oro\Bundle\UserBundle\Model\PermissionCategory;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -102,7 +102,7 @@ class RoleController extends Controller
      */
     protected function update(Role $role)
     {
-        $categoryProvider = $this->get('oro_user.provider.role_permission_category_provider');
+        $categoryProvider = $this->get('oro_user.provider.role_privilege_category_provider');
 
         /** @var AclRoleHandler $aclRoleHandler */
         $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
@@ -119,7 +119,7 @@ class RoleController extends Controller
 
         $form = $aclRoleHandler->createView();
         $tabs = array_map(function ($tab) {
-            /** @var PermissionCategory $tab */
+            /** @var PrivilegeCategory $tab */
             return [
                 'id' => $tab->getId(),
                 'label' => $this->get('translator')->trans($tab->getLabel())
@@ -133,7 +133,7 @@ class RoleController extends Controller
                 'data' => $tabs
             ],
             'capabilitySetOptions' => [
-                'data' => $this->get('oro_user.provider.role_permission_capability_provider')->getCapabilities($role),
+                'data' => $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilities($role),
                 'tabIds' => $categoryProvider->getTabList()
             ],
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),

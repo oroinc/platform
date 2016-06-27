@@ -35,10 +35,10 @@ parameters:
 
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
     oro_user.provider.filter.user_choice_tree.class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
-    oro_user.provider.role_permission_category_provider.class: Oro\Bundle\UserBundle\Provider\RolePermissionCategoryProvider
+    oro_user.provider.role_privilege_category_provider.class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider
     oro_user.datagrid.datasource.role_permission_datasource.class: Oro\Bundle\UserBundle\Datagrid\RolePermissionDatasource
-    oro_user.provider.role_permission_capability_provider.class: Oro\Bundle\UserBundle\Provider\RolePermissionCapabilityProvider
-    oro_user.provider.permission_category_provider.class: Oro\Bundle\UserBundle\Provider\PermissionCategoryProvider
+    oro_user.provider.role_privilege_capability_provider.class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider
+    oro_user.provider.privilege_category_provider.class: Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProvider
 
     oro_user.token.factory.wsse.class:            Oro\Bundle\UserBundle\Security\WsseTokenFactory
 
@@ -316,28 +316,28 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_locale.dql.formatter.name'
 
-    oro_user.provider.role_permission_category_provider:
-        class: %oro_user.provider.role_permission_category_provider.class%
+    oro_user.provider.role_privilege_category_provider:
+        class: %oro_user.provider.role_privilege_category_provider.class%
 
-    oro_user.provider.permission_category_provider:
-        class: %oro_user.provider.permission_category_provider.class%
+    oro_user.provider.privilege_category_provider:
+        class: %oro_user.provider.privilege_category_provider.class%
         tags:
-            - { name: oro_user.permission_category}
+            - { name: oro_user.privilege_category}
 
-    oro_user.provider.role_permission_capability_provider:
-        class: %oro_user.provider.role_permission_capability_provider.class%
+    oro_user.provider.role_privilege_capability_provider:
+        class: %oro_user.provider.role_privilege_capability_provider.class%
         arguments:
             - '@translator'
-            - '@oro_user.provider.role_permission_category_provider'
+            - '@oro_user.provider.role_privilege_category_provider'
             - '@oro_user.form.handler.abstract.acl_role='
 
-    oro_user.datagrid.datasource.role_permission_provider_datasource:
+    oro_user.datagrid.datasource.role_permission_datasource:
         class: %oro_user.datagrid.datasource.role_permission_datasource.class%
         arguments:
             - '@translator'
             - '@oro_security.acl.permission_manager'
             - '@oro_user.form.handler.abstract.acl_role='
-            - '@oro_user.provider.role_permission_category_provider'
+            - '@oro_user.provider.role_privilege_category_provider'
             - '@oro_entity_config.config_manager'
         tags:
             - { name: oro_datagrid.datasource, type: role-permission-provider }

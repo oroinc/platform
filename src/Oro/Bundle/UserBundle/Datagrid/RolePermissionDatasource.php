@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Datagrid;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\UserBundle\Provider\RolePermissionAbstractProvider;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -15,11 +15,11 @@ use Oro\Bundle\SecurityBundle\Form\Type\AclAccessLevelSelectorType;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
-use Oro\Bundle\UserBundle\Provider\RolePermissionCategoryProvider;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Entity\Role;
 
-class RolePermissionDatasource extends RolePermissionAbstractProvider implements DatasourceInterface
+class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
     /** @var PermissionManager */
     protected $permissionManager;
@@ -33,17 +33,17 @@ class RolePermissionDatasource extends RolePermissionAbstractProvider implements
     /**
      * RolePermissionDatasource constructor.
      *
-     * @param TranslatorInterface            $translator
-     * @param PermissionManager              $permissionManager
-     * @param AclRoleHandler                 $aclRoleHandler
-     * @param RolePermissionCategoryProvider $categoryProvider
-     * @param ConfigManager                  $configEntityManager
+     * @param TranslatorInterface           $translator
+     * @param PermissionManager             $permissionManager
+     * @param AclRoleHandler                $aclRoleHandler
+     * @param RolePrivilegeCategoryProvider $categoryProvider
+     * @param ConfigManager                 $configEntityManager
      */
     public function __construct(
         TranslatorInterface $translator,
         PermissionManager $permissionManager,
         AclRoleHandler $aclRoleHandler,
-        RolePermissionCategoryProvider $categoryProvider,
+        RolePrivilegeCategoryProvider $categoryProvider,
         ConfigManager $configEntityManager
     ) {
         parent::__construct($translator, $categoryProvider, $aclRoleHandler);
@@ -96,7 +96,7 @@ class RolePermissionDatasource extends RolePermissionAbstractProvider implements
             /** @var AclPermission $permission */
             $permissionEntity = $this->permissionManager->getPermissionByName($permission->getName());
             if ($permissionEntity) {
-                $item['permissions'][] = $this->setPrivelegePermission(
+                $item['permissions'][] = $this->setPrivilegePermission(
                     $privilege,
                     $permissionEntity,
                     $permissionName,
@@ -117,7 +117,7 @@ class RolePermissionDatasource extends RolePermissionAbstractProvider implements
      *
      * @return array
      */
-    protected function setPrivelegePermission(
+    protected function setPrivilegePermission(
         AclPrivilege $privilege,
         Permission $permissionEntity,
         $permissionName,

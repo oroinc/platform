@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
-use Oro\Bundle\UserBundle\Model\PermissionCategory;
-use Oro\Bundle\UserBundle\Model\PermissionCategoryProviderInterface;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategoryProviderInterface;
 
-class RolePermissionCategoryProvider
+class RolePrivilegeCategoryProvider
 {
     /**
-     * @var PermissionCategoryProviderInterface[]
+     * @var PrivilegeCategoryProviderInterface[]
      */
     protected $providers = [];
 
     /**
-     * @var PermissionCategory[]
+     * @var PrivilegeCategory[]
      */
     protected $categoryList = [];
 
@@ -21,9 +21,9 @@ class RolePermissionCategoryProvider
     /**
      * Add provider to registry
      *
-     * @param PermissionCategoryProviderInterface $provider
+     * @param PrivilegeCategoryProviderInterface $provider
      */
-    public function addProvider(PermissionCategoryProviderInterface $provider)
+    public function addProvider(PrivilegeCategoryProviderInterface $provider)
     {
         $this->providers[$provider->getName()] = $provider;
     }
@@ -31,7 +31,7 @@ class RolePermissionCategoryProvider
     /**
      * Get all providers
      *
-     * @return PermissionCategoryProviderInterface[]
+     * @return PrivilegeCategoryProviderInterface[]
      */
     public function getProviders()
     {
@@ -43,7 +43,7 @@ class RolePermissionCategoryProvider
      *
      * @param string $name
      *
-     * @return null|PermissionCategoryProviderInterface
+     * @return null|PrivilegeCategoryProviderInterface
      */
     public function getProviderByName($name)
     {
@@ -69,7 +69,7 @@ class RolePermissionCategoryProvider
     /**
      * Get all categories
      * 
-     * @return PermissionCategory[]
+     * @return PrivilegeCategory[]
      */
     public function getPermissionCategories()
     {
@@ -80,7 +80,7 @@ class RolePermissionCategoryProvider
         $categoryList = [];
         $providers = $this->getProviders();
         foreach ($providers as $provider) {
-            $categories = $provider->getRolePermissionCategory();
+            $categories = $provider->getRolePrivilegeCategory();
             if (is_object($categories)) {
                 $categories = [$categories];
             }
@@ -88,7 +88,7 @@ class RolePermissionCategoryProvider
         }
 
         $orderedCategoryList = [];
-        /** @var PermissionCategory $category */
+        /** @var PrivilegeCategory $category */
         foreach ($categoryList as $category) {
             $priority = $category->getPriority();
             $orderedCategoryList[$priority][] = $category;
@@ -102,7 +102,7 @@ class RolePermissionCategoryProvider
     protected function getPredefinedCategories()
     {
         $categoryList = [];
-        $categoryList[] = new PermissionCategory('sales_data', 'oro.user.role.category.sales_data.label', true, 7);
+        $categoryList[] = new PrivilegeCategory('sales_data', 'oro.user.role.category.sales_data.label', true, 7);
         
         return $categoryList;
     }
@@ -110,14 +110,14 @@ class RolePermissionCategoryProvider
     /**
      * Get categories market as tabbed
      *
-     * @return PermissionCategory[]
+     * @return PrivilegeCategory[]
      */
     public function getTabbedCategories()
     {
         $tabs = $this->getTabList();
 
         return array_filter($this->getPermissionCategories(), function ($category) use ($tabs) {
-            /** @var PermissionCategory $category */
+            /** @var PrivilegeCategory $category */
             return in_array($category->getId(), $tabs, true);
         });
     }
@@ -130,7 +130,7 @@ class RolePermissionCategoryProvider
     public function getTabList()
     {
         return array_filter(array_map(function ($category) {
-            /** @var PermissionCategory $category */
+            /** @var PrivilegeCategory $category */
             return $category->getTab() ? $category->getId() : null;
         }, $this->getPermissionCategories()));
     }

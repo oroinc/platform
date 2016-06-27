@@ -6,13 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\UserBundle\Model\PermissionCategory;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
-use Oro\Bundle\UserBundle\Model\PermissionCategoryProviderInterface;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategoryProviderInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 
-abstract class RolePermissionAbstractProvider
+abstract class RolePrivilegeAbstractProvider
 {
     const UNSELECTED_ACCESS_LEVEL = 0;
     const SELECTED_ACCESS_LEVEL = 5;
@@ -20,20 +20,20 @@ abstract class RolePermissionAbstractProvider
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var RolePermissionCategoryProvider */
+    /** @var RolePrivilegeCategoryProvider */
     protected $categoryProvider;
 
     /** @var AclRoleHandler */
     protected $aclRoleHandler;
 
     /**
-     * @param TranslatorInterface            $translator
-     * @param RolePermissionCategoryProvider $categoryProvider
-     * @param AclRoleHandler                 $aclRoleHandler
+     * @param TranslatorInterface           $translator
+     * @param RolePrivilegeCategoryProvider $categoryProvider
+     * @param AclRoleHandler                $aclRoleHandler
      */
     public function __construct(
         TranslatorInterface $translator,
-        RolePermissionCategoryProvider $categoryProvider,
+        RolePrivilegeCategoryProvider $categoryProvider,
         AclRoleHandler $aclRoleHandler
     ) {
         $this->translator = $translator;
@@ -42,20 +42,20 @@ abstract class RolePermissionAbstractProvider
     }
 
     /**
-     * @param AclPrivilege         $privilege
-     * @param PermissionCategory[] $categories
+     * @param AclPrivilege        $privilege
+     * @param PrivilegeCategory[] $categories
      *
      * @return string
      */
     protected function getPrivelegeCategory(AclPrivilege $privilege, $categories)
     {
         $categories = array_map(function ($category) {
-            /** @var PermissionCategory $category */
+            /** @var PrivilegeCategory $category */
             return $category->getId();
         }, $categories);
         $category = $privilege->getCategory();
         if (!in_array($category, $categories)) {
-            $category = PermissionCategoryProviderInterface::DEFAULT_ACTION_CATEGORY;
+            $category = PrivilegeCategoryProviderInterface::DEFAULT_ACTION_CATEGORY;
 
             return $category;
         }

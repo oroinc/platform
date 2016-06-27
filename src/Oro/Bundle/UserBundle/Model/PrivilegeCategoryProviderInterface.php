@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Model;
 
-interface PermissionCategoryProviderInterface
+interface PrivilegeCategoryProviderInterface
 {
     const DEFAULT_ACTION_CATEGORY = 'account_management';
     const DEFAULT_ENTITY_CATEGORY = null;
@@ -17,7 +17,7 @@ interface PermissionCategoryProviderInterface
     /**
      * Get entity role permission category
      *
-     * @return PermissionCategory|PermissionCategory[]
+     * @return PrivilegeCategory|PrivilegeCategory[]
      */
-    public function getRolePermissionCategory();
+    public function getRolePrivilegeCategory();
 }

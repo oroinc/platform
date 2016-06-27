@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Model;
 
-class PermissionCategory
+class PrivilegeCategory
 {
     /**
      * @var string
@@ -49,7 +49,7 @@ class PermissionCategory
     /**
      * @param string $id
      *
-     * @return PermissionCategory
+     * @return PrivilegeCategory
      */
     public function setId($id)
     {
@@ -69,7 +69,7 @@ class PermissionCategory
     /**
      * @param string $label
      *
-     * @return PermissionCategory
+     * @return PrivilegeCategory
      */
     public function setLabel($label)
     {
@@ -89,7 +89,7 @@ class PermissionCategory
     /**
      * @param bool $tab
      *
-     * @return PermissionCategory
+     * @return PrivilegeCategory
      */
     public function setTab($tab)
     {
@@ -109,7 +109,7 @@ class PermissionCategory
     /**
      * @param int $priority
      *
-     * @return PermissionCategory
+     * @return PrivilegeCategory
      */
     public function setPriority($priority)
     {

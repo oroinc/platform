@@ -6,10 +6,10 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class PermissionCategoryPass implements CompilerPassInterface
+class PrivilegeCategoryPass implements CompilerPassInterface
 {
-    const REGISTRY_SERVICE = 'oro_user.provider.role_permission_category_provider';
-    const TAG = 'oro_user.permission_category';
+    const REGISTRY_SERVICE = 'oro_user.provider.role_privilege_category_provider';
+    const TAG = 'oro_user.privilege_category';
     const PRIORITY = 'priority';
 
     /**

@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Provider;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\Role;
 
-class RolePermissionCapabilityProvider extends RolePermissionAbstractProvider
+class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
 {
     /**
      * @param Role $role
@@ -31,8 +31,8 @@ class RolePermissionCapabilityProvider extends RolePermissionAbstractProvider
                 'description'             => $description,
                 'name'                    => $permission->getName(),
                 'access_level'            => $permission->getAccessLevel(),
-                'selected_access_level'   => RolePermissionAbstractProvider::SELECTED_ACCESS_LEVEL,
-                'unselected_access_level' => RolePermissionAbstractProvider::UNSELECTED_ACCESS_LEVEL
+                'selected_access_level'   => RolePrivilegeAbstractProvider::SELECTED_ACCESS_LEVEL,
+                'unselected_access_level' => RolePrivilegeAbstractProvider::UNSELECTED_ACCESS_LEVEL
             ];
         }
         
