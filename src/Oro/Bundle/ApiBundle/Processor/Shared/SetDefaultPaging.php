@@ -28,9 +28,14 @@ abstract class SetDefaultPaging implements ProcessorInterface
             // a query is already built
             return;
         }
+        $pageSize = $context->getConfig()->getPageSize();
+        if (-1 === $pageSize) {
+            // a paging is disabled
+            return;
+        }
 
         $filters = $context->getFilters();
-        $this->addPageSizeFilter($filters);
+        $this->addPageSizeFilter($filters, $pageSize);
         $this->addPageNumberFilter($filters);
     }
 
@@ -61,8 +66,9 @@ abstract class SetDefaultPaging implements ProcessorInterface
 
     /**
      * @param FilterCollection $filters
+     * @param int|null         $pageSize
      */
-    protected function addPageSizeFilter(FilterCollection $filters)
+    protected function addPageSizeFilter(FilterCollection $filters, $pageSize)
     {
         $pageSizeFilterKey = $this->getPageSizeFilterKey();
         if (!$filters->has($pageSizeFilterKey)) {
@@ -71,7 +77,7 @@ abstract class SetDefaultPaging implements ProcessorInterface
                 new PageSizeFilter(
                     DataType::INTEGER,
                     'The number of items per page.',
-                    $this->getDefaultPageSize()
+                    null !== $pageSize ? $pageSize : $this->getDefaultPageSize()
                 )
             );
         }

@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Route;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
@@ -21,10 +22,12 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class RestDocHandler implements HandlerInterface
 {
+    const ID_ATTRIBUTE   = 'id';
+    const ID_PLACEHOLDER = '{id}';
+
     /** @var RestDocViewDetector */
     protected $docViewDetector;
 
@@ -34,9 +37,6 @@ class RestDocHandler implements HandlerInterface
     /** @var ResourceDocProviderInterface */
     protected $resourceDocProvider;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
@@ -44,21 +44,18 @@ class RestDocHandler implements HandlerInterface
      * @param RestDocViewDetector          $docViewDetector
      * @param ActionProcessorBagInterface  $processorBag
      * @param ResourceDocProviderInterface $resourceDocProvider
-     * @param DoctrineHelper               $doctrineHelper
      * @param ValueNormalizer              $valueNormalizer
      */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
         ResourceDocProviderInterface $resourceDocProvider,
-        DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
         $this->docViewDetector = $docViewDetector;
         $this->processorBag = $processorBag;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->valueNormalizer = $valueNormalizer;
         $this->resourceDocProvider = $resourceDocProvider;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -94,17 +91,18 @@ class RestDocHandler implements HandlerInterface
             if ($statusCodes) {
                 $this->setStatusCodes($annotation, $statusCodes);
             }
-            if ($this->hasAttribute($route, RestRouteOptionsResolver::ID_PLACEHOLDER)) {
-                $this->addIdRequirement(
-                    $annotation,
-                    $entityClass,
-                    $route->getRequirement(RestRouteOptionsResolver::ID_ATTRIBUTE)
-                );
+            if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
+                if ($associationName) {
+                    $this->addIdRequirement($annotation, $route, $actionContext->getParentMetadata());
+                } else {
+                    $this->addIdRequirement($annotation, $route, $actionContext->getMetadata());
+                }
             }
             $filters = $actionContext->getFilters();
             if (!$filters->isEmpty()) {
                 $this->addFilters($annotation, $filters, $actionContext->getMetadata());
             }
+            $this->sortFilters($annotation);
         }
     }
 
@@ -143,7 +141,7 @@ class RestDocHandler implements HandlerInterface
      * @param string      $entityClass
      * @param string|null $associationName
      *
-     * @return Context
+     * @return Context|SubresourceContext
      */
     protected function getContext($action, $entityClass, $associationName = null)
     {
@@ -239,28 +237,79 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param ApiDoc $annotation
-     * @param string $entityClass
-     * @param string $requirement
+     * @param ApiDoc         $annotation
+     * @param Route          $route
+     * @param EntityMetadata $metadata
      */
-    protected function addIdRequirement(ApiDoc $annotation, $entityClass, $requirement)
+    protected function addIdRequirement(ApiDoc $annotation, Route $route, EntityMetadata $metadata)
     {
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $idFields = $metadata->getIdentifierFieldNames();
-        $dataType = count($idFields) === 1
-            ? $metadata->getTypeOfField(reset($idFields))
-            : DataType::STRING;
+        $dataType = DataType::STRING;
+        if (count($idFields) === 1) {
+            $field = $metadata->getField(reset($idFields));
+            if (!$field) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'The metadata for "%s" entity does not contains "%s" identity field. Resource: %s %s',
+                        $metadata->getClassName(),
+                        reset($idFields),
+                        implode(' ', $route->getMethods()),
+                        $route->getPath()
+                    )
+                );
+            }
+            $dataType = $field->getDataType();
+        }
 
         $annotation->addRequirement(
-            RestRouteOptionsResolver::ID_ATTRIBUTE,
+            self::ID_ATTRIBUTE,
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
-                'requirement' => $requirement,
+                'requirement' => $this->getIdRequirement($metadata),
                 'description' => $this->resourceDocProvider->getIdentifierDescription(
                     $this->docViewDetector->getRequestType()
                 )
             ]
         );
+    }
+
+    /**
+     * @param EntityMetadata $metadata
+     *
+     * @return string
+     */
+    protected function getIdRequirement(EntityMetadata $metadata)
+    {
+        $idFields = $metadata->getIdentifierFieldNames();
+        $idFieldCount = count($idFields);
+        if ($idFieldCount === 1) {
+            // single identifier
+            return $this->getIdFieldRequirement($metadata->getField(reset($idFields))->getDataType());
+        }
+
+        // combined identifier
+        $requirements = [];
+        foreach ($idFields as $field) {
+            $requirements[] = $field . '=' . $this->getIdFieldRequirement($metadata->getField($field)->getDataType());
+        }
+
+        return implode(',', $requirements);
+    }
+
+    /**
+     * @param string $fieldType
+     *
+     * @return string
+     */
+    protected function getIdFieldRequirement($fieldType)
+    {
+        $result = $this->valueNormalizer->getRequirement($fieldType, $this->docViewDetector->getRequestType());
+
+        if (ValueNormalizer::DEFAULT_REQUIREMENT === $result) {
+            $result = '[^\.]+';
+        }
+
+        return $result;
     }
 
     /**
@@ -308,6 +357,21 @@ class RestDocHandler implements HandlerInterface
 
                 $annotation->addFilter($key, $options);
             }
+        }
+    }
+
+    /**
+     * @param ApiDoc $annotation
+     */
+    protected function sortFilters(ApiDoc $annotation)
+    {
+        $filters = $annotation->getFilters();
+        if (!empty($filters)) {
+            ksort($filters);
+            // unfortunately there is no other way to update filters except to use the reflection
+            $filtersProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'filters');
+            $filtersProperty->setAccessible(true);
+            $filtersProperty->setValue($annotation, $filters);
         }
     }
 

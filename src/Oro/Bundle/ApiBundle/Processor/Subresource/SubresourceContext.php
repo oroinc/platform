@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -38,6 +39,15 @@ class SubresourceContext extends Context
 
     /** metadata of the parent entity */
     const PARENT_METADATA = 'parentMetadata';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initialize()
+    {
+        parent::initialize();
+        $this->set(self::COLLECTION, false);
+    }
 
     /**
      * Gets FQCN of the parent entity.
@@ -233,7 +243,7 @@ class SubresourceContext extends Context
     protected function createParentConfigExtras()
     {
         return [
-            new EntityDefinitionConfigExtra('get_list'),
+            new EntityDefinitionConfigExtra(),
             new FilterFieldsConfigExtra([$this->getParentClassName() => [$this->getAssociationName()]])
         ];
     }
@@ -247,7 +257,7 @@ class SubresourceContext extends Context
         if (empty($parentEntityClass)) {
             $this->set(self::PARENT_CONFIG, null);
 
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'The parent entity class name must be set in the context before a configuration is loaded.'
             );
         }
