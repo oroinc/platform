@@ -15,6 +15,9 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -523,9 +526,17 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
+    public function testHasConfigOfUndefinedSection()
+    {
+        $this->context->setConfigExtras([new TestConfigSection('section1')]);
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->assertFalse($this->context->hasConfigOf('undefined'));
+    }
+
     public function testGetConfigOfUndefinedSection()
     {
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
@@ -534,7 +545,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->never())
             ->method('getConfig');
 
-        $this->context->getConfigOf('undefined');
+        $this->assertNull($this->context->getConfigOf('undefined'));
     }
 
     /**
