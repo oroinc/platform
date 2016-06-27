@@ -9,8 +9,8 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class IndexerPrepareQueryListenerTest extends \PHPUnit_Framework_TestCase {
-
+class IndexerPrepareQueryListenerTest extends \PHPUnit_Framework_TestCase
+{
     /** @var \PHPUnit_Framework_MockObject_MockObject|IndexerPrepareQueryListener  */
     protected $indexerPrepareQueryListener;
 
