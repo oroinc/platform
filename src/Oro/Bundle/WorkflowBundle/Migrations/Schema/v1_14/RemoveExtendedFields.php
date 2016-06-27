@@ -19,7 +19,7 @@ class RemoveExtendedFields implements Migration, ContainerAwareInterface
     const PROPERTY_WORKFLOW_STEP = 'workflowStep';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {

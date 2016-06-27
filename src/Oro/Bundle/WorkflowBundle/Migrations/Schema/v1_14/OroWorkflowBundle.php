@@ -47,25 +47,28 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabaseP
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->updateColumns($schema);
-        $this->moveActiveWorkflows($queries);
+        $this->updateColumns($schema, $queries);
+        $this->moveActiveWorkflows();
         $this->updateReportsDefinitions($queries);
     }
 
     /**
      * @param Schema $schema
+     * @param QueryBag $queries
      */
-    public function updateColumns(Schema $schema)
+    public function updateColumns(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_workflow_item');
         $table->addColumn('entity_class', 'string', ['length' => 255, 'notnull' => false]);
         $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
+
+        $queries->addPostQuery(
+            'UPDATE wi SET wi.entity_class = wd.related_entity ' .
+            'FROM oro_workflow_item AS wi INNER_JOIN oro_workflow_definition AS wd ON wd.name = wi.workflow_name'
+        );
     }
 
-    /**
-     * @param QueryBag $queries
-     */
-    protected function moveActiveWorkflows(QueryBag $queries)
+    protected function moveActiveWorkflows()
     {
         /* @var $configManager ConfigManager */
         $configManager = $this->container->get('oro_entity_config.config_manager');
@@ -89,12 +92,6 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabaseP
             if ($this->platform instanceof MySqlPlatform) {
                 $class = str_replace('\\', '\\\\', $class);
             }
-
-            $queries->addPostQuery(sprintf(
-                'UPDATE oro_workflow_item SET entity_class = \'%s\' WHERE workflow_name = \'%s\'',
-                $class,
-                $workflow
-            ));
         }
     }
 
@@ -103,13 +100,19 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabaseP
      */
     protected function updateReportsDefinitions(QueryBag $queries)
     {
-        $queries->addPostQuery(sprintf(
-            'UPDATE oro_report SET definition = REPLACE(definition, \'%s\', \'%s\')',
-            self::OLD_ITEMS_RELATION, self::NEW_ITEMS_RELATION
-        ));
-        $queries->addPostQuery(sprintf(
-            'UPDATE oro_report SET definition = REPLACE(definition, \'%s\', \'%s\')',
-            self::OLD_STEPS_RELATION, self::NEW_STEPS_RELATION
-        ));
+        $queries->addPostQuery(
+            sprintf(
+                'UPDATE oro_report SET definition = REPLACE(definition, \'%s\', \'%s\')',
+                self::OLD_ITEMS_RELATION,
+                self::NEW_ITEMS_RELATION
+            )
+        );
+        $queries->addPostQuery(
+            sprintf(
+                'UPDATE oro_report SET definition = REPLACE(definition, \'%s\', \'%s\')',
+                self::OLD_STEPS_RELATION,
+                self::NEW_STEPS_RELATION
+            )
+        );
     }
 }
