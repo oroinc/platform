@@ -151,7 +151,7 @@ class Role extends ExtendRole
     /**
      * @return string
      */
-    public function getSelfManaged()
+    public function isSelfManaged()
     {
         return $this->selfManaged;
     }
