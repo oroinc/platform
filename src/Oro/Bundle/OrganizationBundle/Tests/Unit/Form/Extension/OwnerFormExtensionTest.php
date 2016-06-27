@@ -229,19 +229,16 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'oro_business_unit_tree_select',
+            'oro_business_unit_select_autocomplete',
             array(
                 'empty_value' => 'oro.business_unit.form.choose_business_user',
-                'mapped' => true,
                 'label' => 'oro.user.owner.label',
-                'business_unit_ids' => array(),
-                'configs'     => array(
-                    'is_safe'              => true
-                ),
-                'translatable_options' => false,
-                'choices' => null,
-                'constraints' => array(new NotBlank()),
-                'required' => true,
+                'configs' => [
+                    'multiple' => false,
+                    'allowClear' => false,
+                ],
+                'required' => false,
+                'autocomplete_alias' => 'business_units_owner_search_handler'
             )
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
