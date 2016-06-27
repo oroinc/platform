@@ -12,12 +12,20 @@ class IndexerPrepareQueryListener
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /**
+     * IndexerPrepareQueryListener constructor.
+     *
+     * @param SecurityFacade $securityFacade
+     */
     public function __construct(
         SecurityFacade $securityFacade
     ) {
         $this->securityFacade = $securityFacade;
     }
 
+    /**
+     * @param IndexerPrepareQueryEvent $event
+     */
     public function updateQuery(IndexerPrepareQueryEvent $event)
     {
         if ($event->getSearchHandlerState() === static::BUSINESS_UNIT_STRUCTURE_ORGANIZATION) {
