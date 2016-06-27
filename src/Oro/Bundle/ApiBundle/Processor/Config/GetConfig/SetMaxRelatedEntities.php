@@ -9,7 +9,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -48,16 +47,15 @@ class SetMaxRelatedEntities implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            $this->setEntityLimits(
+                $definition,
+                $this->doctrineHelper->getEntityMetadataForClass($entityClass),
+                $maxRelatedEntities
+            );
+        } else {
+            $this->setObjectLimits($definition, $maxRelatedEntities);
         }
-
-        $this->setLimits(
-            $definition,
-            $this->doctrineHelper->getEntityMetadataForClass($entityClass),
-            $maxRelatedEntities
-        );
     }
 
     /**
@@ -65,14 +63,13 @@ class SetMaxRelatedEntities implements ProcessorInterface
      * @param ClassMetadata          $metadata
      * @param int                    $limit
      */
-    protected function setLimits(EntityDefinitionConfig $definition, ClassMetadata $metadata, $limit)
+    protected function setEntityLimits(EntityDefinitionConfig $definition, ClassMetadata $metadata, $limit)
     {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath() ?: $fieldName;
-            $path         = ConfigUtil::explodePropertyPath($propertyPath);
-            if (count($path) === 1) {
-                $this->setFieldLimit($field, $metadata, $propertyPath, $limit);
+            if ($metadata->hasAssociation($propertyPath)) {
+                $this->setEntityFieldLimit($field, $metadata, $propertyPath, $limit);
             }
         }
     }
@@ -83,25 +80,58 @@ class SetMaxRelatedEntities implements ProcessorInterface
      * @param string                      $fieldName
      * @param int                         $limit
      */
-    protected function setFieldLimit(
+    protected function setEntityFieldLimit(
         EntityDefinitionFieldConfig $field,
         ClassMetadata $metadata,
         $fieldName,
         $limit
     ) {
-        if ($metadata->hasAssociation($fieldName)) {
-            if ($metadata->isCollectionValuedAssociation($fieldName)) {
-                $targetEntity = $field->getOrCreateTargetEntity();
-                if (!$targetEntity->hasMaxResults()) {
-                    $targetEntity->setMaxResults($limit);
-                }
+        if ($metadata->isCollectionValuedAssociation($fieldName)) {
+            $targetEntity = $field->getOrCreateTargetEntity();
+            if (!$targetEntity->hasMaxResults()) {
+                $targetEntity->setMaxResults($limit);
+            } elseif ($targetEntity->getMaxResults() < 0) {
+                $targetEntity->setMaxResults(null);
             }
-            if ($field->hasTargetEntity()) {
-                $linkedMetadata = $this->doctrineHelper->getEntityMetadataForClass(
-                    $metadata->getAssociationTargetClass($fieldName)
-                );
-                $this->setLimits($field->getTargetEntity(), $linkedMetadata, $limit);
+        }
+        if ($field->hasTargetEntity()) {
+            $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass(
+                $metadata->getAssociationTargetClass($fieldName)
+            );
+            $this->setEntityLimits($field->getTargetEntity(), $targetMetadata, $limit);
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param int                    $limit
+     */
+    protected function setObjectLimits(EntityDefinitionConfig $definition, $limit)
+    {
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->getTargetClass()) {
+                $this->setObjectFieldLimit($field, $limit);
             }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     * @param int                         $limit
+     */
+    protected function setObjectFieldLimit(EntityDefinitionFieldConfig $field, $limit)
+    {
+        if ($field->isCollectionValuedAssociation()) {
+            $targetEntity = $field->getOrCreateTargetEntity();
+            if (!$targetEntity->hasMaxResults()) {
+                $targetEntity->setMaxResults($limit);
+            } elseif ($targetEntity->getMaxResults() < 0) {
+                $targetEntity->setMaxResults(null);
+            }
+        }
+        if ($field->hasTargetEntity()) {
+            $this->setObjectLimits($field->getTargetEntity(), $limit);
         }
     }
 }

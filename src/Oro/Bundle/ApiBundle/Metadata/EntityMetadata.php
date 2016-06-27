@@ -25,6 +25,31 @@ class EntityMetadata extends ParameterBag
     private $associations = [];
 
     /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        $this->items = array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $this->items
+        );
+        $this->fields = array_map(
+            function ($field) {
+                return clone $field;
+            },
+            $this->fields
+        );
+        $this->associations = array_map(
+            function ($association) {
+                return clone $association;
+            },
+            $this->associations
+        );
+    }
+
+    /**
      * Gets FQCN of an entity.
      *
      * @return string
@@ -187,10 +212,14 @@ class EntityMetadata extends ParameterBag
      * Adds metadata of a field.
      *
      * @param FieldMetadata $field
+     *
+     * @return FieldMetadata
      */
     public function addField(FieldMetadata $field)
     {
         $this->fields[$field->getName()] = $field;
+
+        return $field;
     }
 
     /**
@@ -259,10 +288,14 @@ class EntityMetadata extends ParameterBag
      * Adds metadata of an association.
      *
      * @param AssociationMetadata $association
+     *
+     * @return AssociationMetadata
      */
     public function addAssociation(AssociationMetadata $association)
     {
         $this->associations[$association->getName()] = $association;
+
+        return $association;
     }
 
     /**

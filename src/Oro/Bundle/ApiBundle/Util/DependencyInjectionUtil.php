@@ -77,38 +77,6 @@ class DependencyInjectionUtil
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param string           $chainServiceId
-     * @param string           $tagName
-     */
-    public static function registerDataTransformers(ContainerBuilder $container, $chainServiceId, $tagName)
-    {
-        $chainServiceDef = self::findDefinition($container, $chainServiceId);
-        if (null !== $chainServiceDef) {
-            // find services
-            $services = [];
-            $taggedServices = $container->findTaggedServiceIds($tagName);
-            foreach ($taggedServices as $id => $attributes) {
-                $dataType = $attributes[0]['dataType'];
-                $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-                $services[$priority][] = [$dataType, new Reference($id)];
-            }
-            if (empty($services)) {
-                return;
-            }
-
-            // sort by priority and flatten
-            krsort($services);
-            $services = call_user_func_array('array_merge', $services);
-
-            // register
-            foreach ($services as $serviceInfo) {
-                $chainServiceDef->addMethodCall('addDataTransformer', $serviceInfo);
-            }
-        }
-    }
-
-    /**
      * Replaces a regular service with the debug one
      *
      * @param ContainerBuilder $container
