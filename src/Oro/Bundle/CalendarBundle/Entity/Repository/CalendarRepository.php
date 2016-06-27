@@ -12,8 +12,6 @@ class CalendarRepository extends EntityRepository
     /**
      * Gets user's default calendar
      *
-     * @codeCoverageIgnore
-     *
      * @param int $userId
      * @param int $organizationId
      *
@@ -31,8 +29,6 @@ class CalendarRepository extends EntityRepository
 
     /**
      * Gets default calendars for the given users
-     *
-     * @codeCoverageIgnore
      *
      * @param int[] $userIds
      * @param int   $organizationId
