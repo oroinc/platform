@@ -38,16 +38,14 @@ interface DocumentBuilderInterface
     /**
      * Sets an error.
      *
-     * @param Error          $error
-     * @param EntityMetadata $metadata
+     * @param Error $error
      */
-    public function setErrorObject(Error $error, EntityMetadata $metadata = null);
+    public function setErrorObject(Error $error);
 
     /**
      * Sets errors collection.
      *
-     * @param Error[]        $errors
-     * @param EntityMetadata $metadata
+     * @param Error[] $errors
      */
-    public function setErrorCollection(array $errors, EntityMetadata $metadata = null);
+    public function setErrorCollection(array $errors);
 }

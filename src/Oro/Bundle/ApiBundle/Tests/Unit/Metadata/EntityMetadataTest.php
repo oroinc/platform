@@ -24,6 +24,28 @@ class EntityMetadataTest extends OrmRelatedTestCase
         $this->classMetadata = $this->em->getClassMetadata('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
     }
 
+    public function testClone()
+    {
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName('TestClass');
+        $entityMetadata->setIdentifierFieldNames(['field1']);
+        $entityMetadata->set('test_scalar', 'value');
+        $objValue = new \stdClass();
+        $objValue->someProp = 123;
+        $entityMetadata->set('test_object', $objValue);
+        $field1 = $this->getMetadata('Field', 'field1');
+        $entityMetadata->addField($field1);
+        $association1 = $this->getMetadata('Association', 'association1');
+        $entityMetadata->addAssociation($association1);
+
+        $entityMetadataClone = clone $entityMetadata;
+
+        $this->assertEquals($entityMetadata, $entityMetadataClone);
+        $this->assertNotSame($objValue, $entityMetadataClone->get('test_object'));
+        $this->assertNotSame($field1, $entityMetadataClone->getField('field1'));
+        $this->assertNotSame($association1, $entityMetadataClone->getAssociation('association1'));
+    }
+
     public function testGetSetClassName()
     {
         $entityMetadata = new EntityMetadata();
@@ -97,7 +119,11 @@ class EntityMetadataTest extends OrmRelatedTestCase
             $this->assertFalse($entityMetadata->hasField($fieldName));
             $this->assertNull($entityMetadata->getField($fieldName));
 
-            $entityMetadata->addField($this->getMetadata('Field', $fieldName));
+            $fieldMetadata = $this->getMetadata('Field', $fieldName);
+            $this->assertSame(
+                $fieldMetadata,
+                $entityMetadata->addField($fieldMetadata)
+            );
 
             $this->assertCount(++$index, $entityMetadata->getFields());
         }
@@ -145,7 +171,11 @@ class EntityMetadataTest extends OrmRelatedTestCase
             $this->assertFalse($entityMetadata->hasAssociation($associationName));
             $this->assertNull($entityMetadata->getAssociation($associationName));
 
-            $entityMetadata->addAssociation($this->getMetadata('Association', $associationName));
+            $associationMetadata = $this->getMetadata('Association', $associationName);
+            $this->assertSame(
+                $associationMetadata,
+                $entityMetadata->addAssociation($associationMetadata)
+            );
 
             $this->assertCount(++$index, $entityMetadata->getAssociations());
         }

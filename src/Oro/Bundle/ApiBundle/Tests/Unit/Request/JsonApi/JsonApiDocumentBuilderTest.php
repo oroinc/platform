@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi;
 
-use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
-class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
+class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
 {
     /** @var JsonApiDocumentBuilder */
     protected $documentBuilder;
@@ -471,9 +469,8 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
-        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorObject($error, $metadata);
+        $this->documentBuilder->setErrorObject($error);
         $this->assertEquals(
             [
                 'errors' => [
@@ -496,9 +493,8 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
-        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorCollection([$error], $metadata);
+        $this->documentBuilder->setErrorCollection([$error]);
         $this->assertEquals(
             [
                 'errors' => [
@@ -512,53 +508,5 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
             ],
             $this->documentBuilder->getDocument()
         );
-    }
-
-    /**
-     * @param string   $class
-     * @param string[] $idFields
-     *
-     * @return EntityMetadata
-     */
-    protected function getEntityMetadata($class, array $idFields)
-    {
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($class);
-        $metadata->setIdentifierFieldNames($idFields);
-
-        return $metadata;
-    }
-
-    /**
-     * @param string $fieldName
-     *
-     * @return FieldMetadata
-     */
-    protected function createFieldMetadata($fieldName)
-    {
-        $fieldMetadata = new FieldMetadata();
-        $fieldMetadata->setName($fieldName);
-
-        return $fieldMetadata;
-    }
-
-    /**
-     * @param string $associationName
-     * @param string $targetClass
-     * @param bool   $isCollection
-     *
-     * @return AssociationMetadata
-     */
-    protected function createAssociationMetadata($associationName, $targetClass, $isCollection = false)
-    {
-        $associationMetadata = new AssociationMetadata();
-        $associationMetadata->setName($associationName);
-        $associationMetadata->setTargetClassName($targetClass);
-        $associationMetadata->setAcceptableTargetClassNames([$targetClass]);
-        $associationMetadata->setIsCollection($isCollection);
-        $associationMetadata->setTargetMetadata($this->getEntityMetadata($targetClass, ['id']));
-        $associationMetadata->getTargetMetadata()->addField($this->createFieldMetadata('id'));
-
-        return $associationMetadata;
     }
 }

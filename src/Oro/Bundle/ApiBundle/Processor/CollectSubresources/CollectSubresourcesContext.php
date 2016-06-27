@@ -15,9 +15,12 @@ class CollectSubresourcesContext extends ApiContext
     /** @var ApiResource[] [entity class => ApiResource, ... ] */
     protected $resources = [];
 
-    public function __construct()
+    /**
+     * {@inheritdoc}
+     */
+    protected function initialize()
     {
-        parent::__construct();
+        parent::initialize();
         $this->setResult(new ApiResourceSubresourcesCollection());
     }
 
