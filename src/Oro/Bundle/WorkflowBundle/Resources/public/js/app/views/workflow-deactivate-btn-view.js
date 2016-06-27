@@ -55,7 +55,7 @@ define(function(require) {
                 mediator.execute('refreshPage');
             });
 
-            deactivationHandler.call(el, el.data(), el.prop('href'));
+            deactivationHandler.call(el, el.prop('href'), el.data('label'));
         },
 
         dispose: function() {

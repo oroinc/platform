@@ -8,10 +8,10 @@ function($, __, Modal, Messenger, Error) {
      * @export  oroworkflow/js/deactivation-handler
      * @class   oroworkflow.WorkflowDeactivationHandler
      */
-    return function(data, url, hideNotifications) {
+    return function(url, label, hideNotifications) {
         var el = this;
         var confirmDeactivation = new Modal({
-            title:   __('oro.workflow.workflowdefinition.deactivate', {label : data.label}),
+            title:   __('oro.workflow.workflowdefinition.deactivate', {label: label}),
             content: __('Attention: This action will reset all workflow data for this entity.'),
             okText:  __('Yes, Deactivate')
         });
