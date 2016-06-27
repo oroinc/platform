@@ -120,7 +120,7 @@ class WorkflowSystemConfigManager
         $newConfigValue = $isActive
             ? array_merge($configValue, [$definition->getName()])
             : array_diff($configValue, [$definition->getName()]);
-        $entityConfig->set(self::CONFIG_KEY, array_values($newConfigValue));
+        $entityConfig->set(self::CONFIG_KEY, array_values(array_unique($newConfigValue)));
 
         $this->persistEntityConfig($entityConfig);
         $event = $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED;
