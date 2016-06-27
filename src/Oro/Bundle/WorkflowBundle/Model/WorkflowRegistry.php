@@ -93,22 +93,17 @@ class WorkflowRegistry
     {
         $class = ClassUtils::getRealClass($entityClass);
 
-        return array_filter(
-            array_map(
-                function ($activeWorkflowName) {
-                    return $this->getWorkflow($activeWorkflowName, false);
-                },
-                $this->configManager->getActiveWorkflowNamesByEntity($entityClass)
-            ),
-            function ($workflow) use ($class) {
-                if (null !== $workflow) {
-                    /**@var Workflow $workflow */
-                    return $workflow->getDefinition()->getRelatedEntity() === $class;
-                }
+        $workflows = [];
 
-                return false;
+        foreach ($this->configManager->getActiveWorkflowNamesByEntity($entityClass) as $activeWorkflow) {
+            $workflow = $this->getWorkflow($activeWorkflow, false);
+            if (null !== $workflow && $workflow->getDefinition()->getRelatedEntity() === $class) {
+                /**@var Workflow $workflow */
+                $workflows[] = $workflow;
             }
-        );
+        }
+
+        return $workflows;
     }
 
     /**
