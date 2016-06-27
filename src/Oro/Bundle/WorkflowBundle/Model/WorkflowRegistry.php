@@ -87,7 +87,7 @@ class WorkflowRegistry
      * Get Active Workflows that applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow[]
+     * @return Workflow[] named array of active Workflow instances
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
@@ -97,9 +97,8 @@ class WorkflowRegistry
 
         foreach ($this->configManager->getActiveWorkflowNamesByEntity($entityClass) as $activeWorkflow) {
             $workflow = $this->getWorkflow($activeWorkflow, false);
-            if (null !== $workflow && $workflow->getDefinition()->getRelatedEntity() === $class) {
-                /**@var Workflow $workflow */
-                $workflows[] = $workflow;
+            if ($workflow instanceof Workflow && $workflow->getDefinition()->getRelatedEntity() === $class) {
+                $workflows[$activeWorkflow] = $workflow;
             }
         }
 
