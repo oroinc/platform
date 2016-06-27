@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -12,14 +10,13 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 
-class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabasePlatformAwareInterface
+class OroWorkflowBundle implements Migration, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
@@ -30,17 +27,6 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabaseP
     const OLD_STEPS_RELATION = 'workflowStep';
     const NEW_ITEMS_RELATION = WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME;
     const NEW_STEPS_RELATION = WorkflowVirtualRelationProvider::STEPS_RELATION_NAME;
-
-    /** @var AbstractPlatform */
-    protected $platform;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDatabasePlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
-    }
 
     /**
      * {@inheritdoc}
@@ -81,14 +67,14 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabaseP
             }
 
             $workflow = $config->get(self::OLD_CONFIG_KEY);
-            $class = $config->getId()->getClassName();
 
             $config->set(self::NEW_CONFIG_KEY, [$workflow]);
             $config->remove(self::OLD_CONFIG_KEY);
 
             $configManager->persist($config);
-            $configManager->flush();
         }
+
+        $configManager->flush();
     }
 
     /**
