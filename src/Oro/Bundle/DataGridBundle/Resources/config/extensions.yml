@@ -139,3 +139,13 @@ services:
             - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.field_acl:
+        class: Oro\Bundle\DataGridBundle\Extension\FieldAcl\FieldAclExtension
+        arguments:
+            - "@oro_security.owner.ownership_metadata_provider"
+            - "@oro_entity.orm.entity_class_resolver"
+            - '@security.authorization_checker'
+            - '@oro_entity_config.provider.security'
+        tags:
+            - { name: oro_datagrid.extension }

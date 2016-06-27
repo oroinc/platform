@@ -711,3 +711,8 @@ services:
         class: %oro_security.serializer.filter_chain.class%
         calls:
             - ["addFilter", ['@oro_security.serializer.acl_filter']]
+
+    oro_security.listener.config_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\FieldAclConfigListener
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
