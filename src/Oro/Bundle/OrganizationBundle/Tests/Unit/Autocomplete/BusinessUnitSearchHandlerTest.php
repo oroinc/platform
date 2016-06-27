@@ -49,7 +49,7 @@ class BusinessUnitSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $this->classMetadata = self::getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()->getMock();
 
-        $this->businessUnitSearchHandler = new BusinessUnitSearchHandler('', [], $this->doctrine);
+        $this->businessUnitSearchHandler = new BusinessUnitSearchHandler('entityName', [], $this->doctrine);
     }
 
     public function testCheckCorrectWork()
@@ -70,6 +70,16 @@ class BusinessUnitSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $response = $this->businessUnitSearchHandler->convertItem($item);
 
         self::assertEquals($this->getExpectedData(), $response);
+    }
+
+    public function testInitSearchIndexer()
+    {
+        $indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
+            ->disableOriginalConstructor()->getMock();
+        $indexer->expects(self::once())->method('setIsAllowedApplyAcl')->with(false);
+        $indexer->expects(self::once())->method('setSearchHandlerState')->with('business_units_search_handler');
+
+        $this->businessUnitSearchHandler->initSearchIndexer($indexer, ['entityName'=> ['alias'=>'alias']]);
     }
 
     /**
