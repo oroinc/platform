@@ -21,8 +21,6 @@ define([
     _.extend(Backbone.View.prototype, componentContainerMixin);
 
     Backbone.View.prototype.subview = function(name, view) {
-        this.subviews = this.subviews || [];
-        this.subviewsByName = this.subviewsByName || {};
         var subviews = this.subviews;
         var byName = this.subviewsByName;
         if (name && view) {

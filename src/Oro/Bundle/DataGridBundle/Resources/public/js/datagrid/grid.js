@@ -255,9 +255,9 @@ define(function(require) {
             }
 
             this.body = options.body || this.body;
-
             var bodyOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.body, bodyOptions);
+
             this.footer = options.footer || this.footer;
             var footerOptions = _.extend({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.footer, footerOptions);
