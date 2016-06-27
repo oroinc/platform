@@ -153,6 +153,9 @@ class MigrationExecutor
                 $this->queryExecutor->execute($query, $dryRun);
             }
         } catch (\Exception $ex) {
+            echo $ex->getMessage();
+            exit;
+
             $result = false;
             $this->logger->error(sprintf('  ERROR: %s', $ex->getMessage()));
         }

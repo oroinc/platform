@@ -311,7 +311,7 @@ class OroUserBundleInstaller implements
                 ]
             ]
         );
-        $table->addColumn('self_managed', 'boolean');
+        $table->addColumn('self_managed', 'boolean', ['precision' => 0]);
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
         $table->setPrimaryKey(['id']);
     }
