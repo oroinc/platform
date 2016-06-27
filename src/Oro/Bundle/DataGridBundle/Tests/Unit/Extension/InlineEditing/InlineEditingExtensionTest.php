@@ -124,7 +124,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
             Configuration::BASE_CONFIG_KEY => [
                 'enable' => false,
                 'entity_name' => $entityName,
-                'behaviour' => 'enable_selected',
+                'behaviour' => 'enable_all',
                 'save_api_accessor' => [
                     'route' => 'oro_api_patch_entity_data',
                     'http_method' => 'PATCH',

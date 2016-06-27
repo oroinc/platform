@@ -113,6 +113,14 @@ class User
     }
 
     /**
+     * @param Group[]|Collection $groups
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+    }
+
+    /**
      * @param Group $group
      */
     public function addGroup(Group $group)

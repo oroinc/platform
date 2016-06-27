@@ -128,17 +128,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumName must not be empty.');
         }
 
-        $tr = \Transliterator::create('Latin; Latin-ASCII; Lower');
-        $enumName = $tr->transliterate($enumName);
-
-        $result = preg_replace(
-            ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
-            ['_', '_', '', '_'],
-            trim($enumName)
-        );
-        if ($result === '_') {
-            $result = '';
-        }
+        $result = self::convertName($enumName);
 
         if (empty($result) && $throwExceptionIfInvalidName) {
             throw new \InvalidArgumentException(
@@ -221,19 +211,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumValueName must not be empty.');
         }
 
-        $tr = \Transliterator::create('Latin; Latin-ASCII; Lower');
-        if ($tr) {
-            $enumValueName = $tr->transliterate($enumValueName);
-        }
-
-        $result = preg_replace(
-            ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
-            ['_', '_', '', '_'],
-            trim($enumValueName)
-        );
-        if ($result === '_') {
-            $result = '';
-        }
+        $result = self::convertName($enumValueName);
 
         if (strlen($result) > self::MAX_ENUM_VALUE_ID_LENGTH) {
             $hash   = dechex(crc32($result));
@@ -244,6 +222,36 @@ class ExtendHelper
             throw new \InvalidArgumentException(
                 sprintf('The conversion of "%s" to enum value id produces empty string.', $enumValueName)
             );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Convert enum code/value
+     *
+     * @param string $name
+     * @return string
+     */
+    public static function convertName($name)
+    {
+        if ($name && function_exists('iconv')) {
+            $originalName = $name;
+            $name = @iconv('utf-8', 'ascii//TRANSLIT', $name);
+            if (!$name || strpos($name, '?') !== false) {
+                $name = hash('crc32', $originalName);
+            }
+        }
+
+        $result = strtolower(
+            preg_replace(
+                ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
+                ['_', '_', '', '_'],
+                trim($name)
+            )
+        );
+        if ($result === '_') {
+            $result = '';
         }
 
         return $result;

@@ -581,7 +581,7 @@ services:
         calls:
             - [setContainer, ['@service_container']]
         tags:
-            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
 
     oro_security.form.extension.aclprotected_type:
         class: %oro_security.form.extension.aclprotected_type.class%

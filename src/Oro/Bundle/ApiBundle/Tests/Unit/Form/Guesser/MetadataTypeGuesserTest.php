@@ -51,6 +51,40 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         return $metadataAccessor;
     }
 
+    /**
+     * @param string $fieldName
+     * @param string $dataType
+     *
+     * @return FieldMetadata
+     */
+    protected function createFieldMetadata($fieldName, $dataType)
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName($fieldName);
+        $fieldMetadata->setDataType($dataType);
+        
+        return $fieldMetadata;
+    }
+
+    /**
+     * @param string $associationName
+     * @param string $targetClass
+     * @param bool   $isCollection
+     * @param string $dataType
+     *
+     * @return AssociationMetadata
+     */
+    protected function createAssociationMetadata($associationName, $targetClass, $isCollection, $dataType)
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName($associationName);
+        $associationMetadata->setTargetClassName($targetClass);
+        $associationMetadata->setIsCollection($isCollection);
+        $associationMetadata->setDataType($dataType);
+
+        return $associationMetadata;
+    }
+
     public function testGuessRequired()
     {
         $this->assertNull($this->typeGuesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
@@ -99,10 +133,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
     {
         $metadata = new EntityMetadata();
         $metadata->setClassName(self::TEST_CLASS);
-        $fieldMetadata = new FieldMetadata();
-        $fieldMetadata->setName(self::TEST_PROPERTY);
-        $fieldMetadata->setDataType('integer');
-        $metadata->addField($fieldMetadata);
+        $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'integer'));
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
@@ -115,10 +146,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
     {
         $metadata = new EntityMetadata();
         $metadata->setClassName(self::TEST_CLASS);
-        $fieldMetadata = new FieldMetadata();
-        $fieldMetadata->setName(self::TEST_PROPERTY);
-        $fieldMetadata->setDataType('datetime');
-        $metadata->addField($fieldMetadata);
+        $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'datetime'));
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
@@ -135,18 +163,19 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
     {
         $metadata = new EntityMetadata();
         $metadata->setClassName(self::TEST_CLASS);
-        $associationMetadata = new AssociationMetadata();
-        $associationMetadata->setName(self::TEST_PROPERTY);
-        $associationMetadata->setDataType('integer');
-        $associationMetadata->setIsCollection(false);
-        $associationMetadata->setTargetClassName('Test\TargetEntity');
+        $associationMetadata = $this->createAssociationMetadata(
+            self::TEST_PROPERTY,
+            'Test\TargetEntity',
+            false,
+            'integer'
+        );
         $metadata->addAssociation($associationMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
             new TypeGuess(
                 'oro_api_entity',
-                ['multiple' => false],
+                ['metadata' => $associationMetadata],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
@@ -157,18 +186,19 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
     {
         $metadata = new EntityMetadata();
         $metadata->setClassName(self::TEST_CLASS);
-        $associationMetadata = new AssociationMetadata();
-        $associationMetadata->setName(self::TEST_PROPERTY);
-        $associationMetadata->setDataType('integer');
-        $associationMetadata->setIsCollection(true);
-        $associationMetadata->setTargetClassName('Test\TargetEntity');
+        $associationMetadata = $this->createAssociationMetadata(
+            self::TEST_PROPERTY,
+            'Test\TargetEntity',
+            true,
+            'integer'
+        );
         $metadata->addAssociation($associationMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
             new TypeGuess(
                 'oro_api_entity',
-                ['multiple' => true],
+                ['metadata' => $associationMetadata],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
