@@ -63,8 +63,8 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabaseP
         $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
 
         $queries->addPostQuery(
-            'UPDATE oro_workflow_item AS wi SET entity_class = wd.related_entity ' .
-            'FROM oro_workflow_definition AS wd WHERE wd.name = wi.workflow_name'
+            'UPDATE oro_workflow_item AS wi SET entity_class = ' .
+            '(SELECT related_entity FROM oro_workflow_definition AS wd WHERE wd.name = wi.workflow_name LIMIT 1)'
         );
     }
 
@@ -88,10 +88,6 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabaseP
 
             $configManager->persist($config);
             $configManager->flush();
-
-            if ($this->platform instanceof MySqlPlatform) {
-                $class = str_replace('\\', '\\\\', $class);
-            }
         }
     }
 
