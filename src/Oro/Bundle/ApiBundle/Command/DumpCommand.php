@@ -6,8 +6,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableSeparator;
 
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
@@ -72,38 +70,24 @@ class DumpCommand extends AbstractDebugCommand
         /** @var SubresourcesProvider $subresourcesProvider */
         $subresourcesProvider = $this->getContainer()->get('oro_api.subresources_provider');
 
-        $table = new Table($output);
-        $table->setHeaders(['Entity', 'Attributes']);
-
-        $i = 0;
         foreach ($resources as $resource) {
             if ($entityClass && $resource->getEntityClass() !== $entityClass) {
                 continue;
             }
-            if ($i > 0) {
-                $table->addRow(new TableSeparator());
-            }
-            $entityCellText = $resource->getEntityClass();
-            if ($isSubresourcesRequested) {
-                $entitySubresourcesText = $this->getEntitySubresourcesText(
-                    $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType)
-                );
-                if ($entitySubresourcesText) {
-                    $entityCellText .= "\n" . $entitySubresourcesText;
-                }
-            }
-            $table->addRow(
-                [
-                    $entityCellText,
-                    $this->convertResourceAttributesToString(
-                        $this->getResourceAttributes($resource, $version, $requestType)
-                    )
-                ]
+            $output->writeln(sprintf('<info>%s</info>', $resource->getEntityClass()));
+            $output->writeln(
+                $this->convertResourceAttributesToString(
+                    $this->getResourceAttributes($resource, $version, $requestType)
+                )
             );
-            $i++;
+            if ($isSubresourcesRequested) {
+                $output->writeln(
+                    $this->getEntitySubresourcesText(
+                        $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType)
+                    )
+                );
+            }
         }
-
-        $table->render();
     }
 
     /**
@@ -116,7 +100,7 @@ class DumpCommand extends AbstractDebugCommand
         $result = '';
         $subresources = $entitySubresources->getSubresources();
         if (!empty($subresources)) {
-            $result .= 'Sub resources:';
+            $result .= '<comment> Sub resources:</comment>';
             foreach ($subresources as $associationName => $subresource) {
                 $result .= "\n  " . $associationName;
                 $subresourceExcludedActions = $subresource->getExcludedActions();
@@ -190,7 +174,7 @@ class DumpCommand extends AbstractDebugCommand
             if ($i > 0) {
                 $result .= PHP_EOL;
             }
-            $result .= sprintf('%s: %s', $name, $this->convertValueToString($value));
+            $result .= sprintf('  %s: %s', $name, $this->convertValueToString($value));
             $i++;
         }
 

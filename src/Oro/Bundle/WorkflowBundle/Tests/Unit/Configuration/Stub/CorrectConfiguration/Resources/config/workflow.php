@@ -77,7 +77,8 @@ return array(
                 ),
                 'schedule' => [
                     'cron' => '1 * * * *',
-                    'filter' => "e.field < DATE_ADD(NOW(), 1, 'day')"
+                    'filter' => "e.field < DATE_ADD(NOW(), 1, 'day')",
+                    'check_conditions_before_job_creation' => true,
                 ]
             )
         ),

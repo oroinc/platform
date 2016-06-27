@@ -80,8 +80,8 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
     public function testIsCollection()
     {
         $this->assertFalse($this->context->isCollection());
-        $this->assertFalse($this->context->has(SubresourceContext::COLLECTION));
-        $this->assertNull($this->context->get(SubresourceContext::COLLECTION));
+        $this->assertTrue($this->context->has(SubresourceContext::COLLECTION));
+        $this->assertFalse($this->context->get(SubresourceContext::COLLECTION));
 
         $this->context->setIsCollection(true);
         $this->assertTrue($this->context->isCollection());

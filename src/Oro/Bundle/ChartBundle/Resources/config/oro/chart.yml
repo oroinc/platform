@@ -56,6 +56,24 @@ oro_chart:
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
         template: OroChartBundle:Chart:bar.html.twig
+    horizontal_bar_chart:
+        label: oro.chart.bar_chart.label
+        data_schema:
+          - name: label
+            label: oro.chart.bar_chart.params.label
+            required: true
+            default_type: string
+          - name: value
+            label: oro.chart.bar_chart.params.value
+            required: true
+            type_filter: [percent, number] # filter for fields, see query_designer.yml filter section
+            default_type: decimal
+        default_settings:
+            chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
+            chartFontSize: 9
+            chartFontColor: '#454545'
+            chartHighlightColor: '#FF5E5E'
+        template: OroChartBundle:Chart:horizontal_bar.html.twig
     pie_chart:
         label: oro.chart.pie_chart.label
         data_schema:

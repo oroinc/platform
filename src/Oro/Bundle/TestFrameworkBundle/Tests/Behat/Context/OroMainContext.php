@@ -13,6 +13,7 @@ use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
+use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
@@ -117,11 +118,17 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^(?:|I )open the menu "(?P<path>(?:[^"]|\\")*)" (and|then) click "(?P<linkLocator>(?:[^"]|\\")*)"$/
+     * Navigate through menu navigation
+     * Every menu link must be separated by slash symbol "/"
+     * Example: Given I go to System/ Channels
+     * Example: And go to System/ User Management/ Users
+     * @Given /^(?:|I )go to (?P<path>[^"]*)$/
      */
-    public function iOpenTheMenuAndClick($path, $linkLocator)
+    public function iOpenTheMenuAndClick($path)
     {
-        $this->createElement('MainMenu')->openAndClick($path, $linkLocator);
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $mainMenu->openAndClick($path);
     }
 
     /**
