@@ -134,9 +134,9 @@ class ImportExportController extends Controller
      *
      * @return Response
      */
-    public function instantExportAction($processorAlias)
+    public function instantExportAction($processorAlias, Request $request)
     {
-        $jobName = $this->getRequest()->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
+        $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
 
         return $this->getExportHandler()->handleExport(
             $jobName,
@@ -175,7 +175,10 @@ class ImportExportController extends Controller
 
                 return $this->forward(
                     'OroImportExportBundle:ImportExport:instantExport',
-                    ['processorAlias' => $data->getProcessorAlias()]
+                    [
+                        'processorAlias' => $data->getProcessorAlias(),
+                        'request' => $request
+                    ]
                 );
             }
         }
@@ -183,7 +186,8 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form' => $exportForm->createView(),
-            'options' => $this->getOptionsFromRequest()
+            'options' => $this->getOptionsFromRequest(),
+            'exportJob' => $request->get('exportJob')
         ];
     }
 

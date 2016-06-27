@@ -4,7 +4,7 @@
               data-nohash="true"
               id="{{ form.vars.id }}"
               name="{{ form.vars.name }}"
-              action="{{ path('oro_importexport_export_config', {entity: entityName, options: options}) }}"
+              action="{{ path('oro_importexport_export_config', {entity: entityName, options: options, exportJob: exportJob}) }}"
               class="form-horizontal"
                 {{ form_enctype(form) }}>
 
