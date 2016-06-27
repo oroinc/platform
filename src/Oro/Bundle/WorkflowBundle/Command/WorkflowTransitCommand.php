@@ -81,7 +81,7 @@ class WorkflowTransitCommand extends ContainerAwareCommand
         } catch (ForbiddenTransitionException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
 
-            // not throw exception for ForbiddenTransitionException
+            // do not throw exception for ForbiddenTransitionException (see BAP-10872)
             return;
         } catch (\Exception $e) {
             $output->writeln(
