@@ -326,14 +326,17 @@ class WorkflowManager
 
     /**
      * @param string $entityClass
+     *
      * @return null|Workflow
+     *
+     * @throws \RuntimeException
      * @deprecated use getApplicableWorkflows
      */
     public function getApplicableWorkflowByEntityClass($entityClass)
     {
         throw new \RuntimeException(
             'No single workflow supported for an entity. ' .
-            'See \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflowsByEntityClass'
+            'See \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflows'
         );
     }
 
@@ -355,7 +358,7 @@ class WorkflowManager
     public function getWorkflowItem($entity, $workflowName)
     {
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if (false === filter_var($entityIdentifier, FILTER_VALIDATE_INT)) {
+        if (!$this->isSupportedIdentifier($entityIdentifier)) {
             return null;
         }
 
@@ -390,7 +393,8 @@ class WorkflowManager
     public function getWorkflowItemsByEntity($entity)
     {
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if (false === filter_var($entityIdentifier, FILTER_VALIDATE_INT)) {
+
+        if (!$this->isSupportedIdentifier($entityIdentifier)) {
             return [];
         }
 
@@ -453,5 +457,14 @@ class WorkflowManager
     public function resetWorkflowData(WorkflowDefinition $workflowDefinition)
     {
         $this->getWorkflowItemRepository()->resetWorkflowData($workflowDefinition);
+    }
+
+    /**
+     * @param mixed $identifier
+     * @return bool
+     */
+    protected function isSupportedIdentifier($identifier)
+    {
+        return is_int($identifier) || is_string($identifier);
     }
 }

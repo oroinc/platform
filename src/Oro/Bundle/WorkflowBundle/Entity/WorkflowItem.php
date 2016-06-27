@@ -75,7 +75,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     /**
      * @var int
      *
-     * @ORM\Column(name="entity_id", type="integer", nullable=true)
+     * @ORM\Column(name="entity_id", type="string", length=255, nullable=true)
      * @Serializer\Expose()
      */
     protected $entityId;
@@ -293,7 +293,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     /**
      * This method should be called only from WorkflowItemListener.
      *
-     * @param int $entityId
+     * @param string $entityId
      * @return WorkflowItem
      * @throws WorkflowException
      */
@@ -311,7 +311,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     /**
      * This method should be called only from WorkflowDataSerializeListener.
      *
-     * @return int
+     * @return string
      */
     public function getEntityId()
     {

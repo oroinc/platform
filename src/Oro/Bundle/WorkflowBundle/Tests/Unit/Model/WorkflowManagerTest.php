@@ -391,7 +391,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMassStartWorkflow(array $source, array $expected)
     {
-
         $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class);
 
         if ($expected) {
@@ -566,13 +565,18 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testGetWorkflowItem()
+    /**
+     * @dataProvider getWorkflowItemDataProvider
+     *
+     * @param int|string $id
+     */
+    public function testGetWorkflowItem($id)
     {
-        $entity = new EntityStub(42);
+        $entity = new EntityStub($id);
         $workflowName = 'test_workflow';
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')->with($entity)->willReturn(42);
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn($id);
 
         $repository = $this->getMockBuilder(WorkflowItemRepository::class)->disableOriginalConstructor()->getMock();
         $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->with(WorkflowItem::class)
@@ -580,7 +584,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->expects($this->once())->method('getEntityClass')->with($entity)
             ->willReturn(EntityStub::class);
         $repository->expects($this->once())->method('findOneByEntityMetadata')
-            ->with(EntityStub::class, 42, $workflowName)
+            ->with(EntityStub::class, $id, $workflowName)
             ->willReturn(['result']);
 
         $result = $this->workflowManager->getWorkflowItem($entity, $workflowName);
@@ -588,16 +592,45 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['result'], $result);
     }
 
-    public function testGetWorkflowItemUnsupportedIdentifier()
+    /**
+     * @return array
+     */
+    public function getWorkflowItemDataProvider()
     {
-        $entity = new EntityStub('string');
+        return [
+            [42],
+            ['string']
+        ];
+    }
+
+    /**
+     * @dataProvider unsupportedIdentifiersDataProvider
+     * @param mixed $id
+     */
+    public function testGetWorkflowItemUnsupportedIdentifier($id)
+    {
+        $entity = new EntityStub($id);
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')->with($entity)->willReturn('string');
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn($id);
+
+        $this->doctrineHelper->expects($this->never())->method('getEntityRepository');
 
         $result = $this->workflowManager->getWorkflowItem($entity, 'workflow_name');
 
         $this->assertNull($result, 'If not an integer identifier got - return null');
+    }
+
+    /**
+     * @return array
+     */
+    public function unsupportedIdentifiersDataProvider()
+    {
+        return [
+            [['array']],
+            [1.123123],
+            [(object)[]]
+        ];
     }
 
     /**

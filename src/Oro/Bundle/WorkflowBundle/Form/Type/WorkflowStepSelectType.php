@@ -3,18 +3,24 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowStepSelectType extends AbstractType
 {
-    /**
-     * @var WorkflowManager
-     */
+    const NAME = 'oro_workflow_step_select';
+
+    /** @var WorkflowManager */
     protected $workflowManager;
 
     /**
@@ -28,15 +34,9 @@ class WorkflowStepSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(
-            [
-                'workflow_entity_class',
-                'workflow_name'
-            ]
-        );
-
+        $resolver->setDefined(['workflow_entity_class', 'workflow_name']);
         $resolver->setDefaults(
             [
                 'class' => 'OroWorkflowBundle:WorkflowStep',
@@ -44,37 +44,52 @@ class WorkflowStepSelectType extends AbstractType
             ]
         );
 
-        $workflowManager = $this->workflowManager;
-
-        $resolver->setNormalizers(
-            [
-                'query_builder' => function (Options $options, $qb) use ($workflowManager) {
-                    if (!$qb) {
-                        if (isset($options['workflow_name'])) {
-                            $workflowName = $options['workflow_name'];
-                            $workflow = $workflowManager->getWorkflow($workflowName);
-                        } elseif (isset($options['workflow_entity_class'])) {
-                            //todo fix in scope of BAP-10801
-                            $workflow = $workflowManager
-                                ->getApplicableWorkflowByEntityClass($options['workflow_entity_class']);
-                        } else {
-                            throw new \Exception('Either "workflow_name" or "workflow_entity_class" must be set');
-                        }
-
-                        $definition = $workflow ? $workflow->getDefinition() : null;
-                        /** @var EntityManager $em */
-                        $em = $options['em'];
-                        $qb = $em->getRepository($options['class'])->createQueryBuilder('ws')
-                            ->where('ws.definition = :workflowDefinition')
-                            ->setParameter('workflowDefinition', $definition)
-                            ->orderBy('ws.stepOrder', 'ASC')
-                            ->orderBy('ws.label', 'ASC');
+        $resolver->setNormalizer(
+            'query_builder',
+            function (Options $options, $qb) {
+                if (!$qb) {
+                    if (isset($options['workflow_name'])) {
+                        $workflowName = $options['workflow_name'];
+                        $workflows = [$this->workflowManager->getWorkflow($workflowName)];
+                    } elseif (isset($options['workflow_entity_class'])) {
+                        $workflows = $this->workflowManager->getApplicableWorkflows(
+                            $options['workflow_entity_class']
+                        );
+                    } else {
+                        throw new \InvalidArgumentException(
+                            'Either "workflow_name" or "workflow_entity_class" must be set'
+                        );
                     }
 
-                    return $qb;
-                },
-            ]
+                    $qb = $this->getQueryBuilder(
+                        $options['em'],
+                        $options['class'],
+                        array_map(
+                            function (Workflow $workflow) {
+                                return $workflow->getDefinition();
+                            },
+                            $workflows
+                        )
+                    );
+                }
+
+                return $qb;
+            }
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        /** @var ChoiceView $choiceView */
+        foreach ($view->vars['choices'] as $choiceView) {
+            /** @var WorkflowStep $step */
+            $step = $choiceView->data;
+
+            $choiceView->label = sprintf('%s: %s', $step->getDefinition()->getLabel(), $choiceView->label);
+        }
     }
 
     /**
@@ -82,7 +97,7 @@ class WorkflowStepSelectType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_workflow_step_select';
+        return self::NAME;
     }
 
     /**
@@ -91,5 +106,22 @@ class WorkflowStepSelectType extends AbstractType
     public function getParent()
     {
         return 'entity';
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param string $className
+     * @param array $definitions
+     * @return QueryBuilder
+     */
+    protected function getQueryBuilder(EntityManager $em, $className, array $definitions)
+    {
+        $qb = $em->getRepository($className)->createQueryBuilder('ws');
+
+        return $qb->where($qb->expr()->in('ws.definition', ':workflowDefinitions'))
+            ->setParameter('workflowDefinitions', $definitions)
+            ->orderBy('ws.definition', 'ASC')
+            ->orderBy('ws.stepOrder', 'ASC')
+            ->orderBy('ws.label', 'ASC');
     }
 }

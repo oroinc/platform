@@ -10,12 +10,12 @@ class MainMenu extends Element
 {
     /**
      * @param string $path
-     * @param string $linkLocator
      * @throws ElementNotFoundException
      */
-    public function openAndClick($path, $linkLocator)
+    public function openAndClick($path)
     {
-        $items = explode('->', $path);
+        $items = explode('/', $path);
+        $linkLocator = array_pop($items);
         $that = $this;
 
         while ($item = array_shift($items)) {
@@ -30,6 +30,6 @@ class MainMenu extends Element
             $that = $link->getParent();
         }
 
-        $that->clickLink($linkLocator);
+        $that->clickLink(trim($linkLocator));
     }
 }

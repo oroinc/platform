@@ -116,7 +116,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
-            - '@oro_entity_config.provider.workflow'
+            - '@oro_workflow.manager.system_config'
 
     oro_workflow.permission_registry:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry
@@ -131,21 +131,13 @@ services:
         tags:
             - { name: oro_entity.exclusion_provider.api }
 
-    oro_workflow.provider.virtual_relation.workflow_item:
-        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowItemVirtualRelationProvider'
+    oro_workflow.provider.virtual_relation.workflow:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider'
         arguments:
             - '@oro_workflow.manager'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
-
-    oro_workflow.provider.virtual_relation.workflow_step:
-        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowStepVirtualRelationProvider'
-        arguments:
-            - '@oro_workflow.manager'
-            - '@oro_entity.doctrine_helper'
-        tags:
-            - { name: oro_entity.virtual_relation_provider, priority: 160 }
 
     oro_workflow.handler.transition_helper:
         class: %oro_workflow.handler.transition_helper.class%

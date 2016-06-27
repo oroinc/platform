@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -11,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 
 class WorkflowSystemConfigManager
 {
@@ -58,7 +57,11 @@ class WorkflowSystemConfigManager
     {
         $class = is_object($entity) ? ClassUtils::getClass($entity) : ClassUtils::getRealClass($entity);
 
-        return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
+        try {
+            return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
+        } catch (WorkflowException $e) {
+            return [];
+        }
     }
 
     /**
