@@ -659,7 +659,24 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     {
         $workflowDefinition = new WorkflowDefinition();
 
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(false);
         $this->workflowSystemConfig->expects($this->once())->method('setWorkflowActive')->with($workflowDefinition);
+
+        $this->workflowManager->activateWorkflow($workflowDefinition);
+    }
+
+    public function testActivateWorkflowSkipIfAlreadyActive()
+    {
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(true);
+        $this->workflowSystemConfig->expects($this->never())->method('setWorkflowActive');
 
         $this->workflowManager->activateWorkflow($workflowDefinition);
     }
@@ -668,7 +685,24 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     {
         $workflowDefinition = new WorkflowDefinition();
 
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(true);
         $this->workflowSystemConfig->expects($this->once())->method('setWorkflowInactive')->with($workflowDefinition);
+
+        $this->workflowManager->deactivateWorkflow($workflowDefinition);
+    }
+
+    public function testDeactivateWorkflowSkipIfNotActive()
+    {
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(false);
+        $this->workflowSystemConfig->expects($this->never())->method('setWorkflowInactive');
 
         $this->workflowManager->deactivateWorkflow($workflowDefinition);
     }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -106,15 +107,33 @@ class WorkflowSystemConfigManager
      * @param WorkflowDefinition $definition
      * @param bool $isActive
      * @return ConfigInterface
+     * @throws WorkflowActivationException
      */
     private function setWorkflowState(WorkflowDefinition $definition, $isActive)
     {
         $entityConfig = $this->getEntityConfig($definition->getRelatedEntity());
 
         $configValue = $entityConfig->get(self::CONFIG_KEY, false, []);
+
+        $workflowName = $definition->getName();
+
+        if ($isActive) {
+            if (in_array($workflowName, $configValue, true)) {
+                throw new WorkflowActivationException(
+                    sprintf('Can not activate workflow `%s` again. Already activated.', $workflowName)
+                );
+            }
+        } else {
+            if (!in_array($workflowName, $configValue, true)) {
+                throw new WorkflowActivationException(
+                    sprintf('Can not deactivate workflow `%s`. It is currently not active.', $workflowName)
+                );
+            }
+        }
+
         $newConfigValue = $isActive
-            ? array_merge($configValue, [$definition->getName()])
-            : array_diff($configValue, [$definition->getName()]);
+            ? array_merge($configValue, [$workflowName])
+            : array_diff($configValue, [$workflowName]);
         $entityConfig->set(self::CONFIG_KEY, array_values($newConfigValue));
 
         $this->persistEntityConfig($entityConfig);
