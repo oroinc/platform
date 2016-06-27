@@ -38,7 +38,7 @@ class WorkflowSystemConfigManager
     /**
      * @param WorkflowDefinition $definition
      * @return bool
-     * @throws WorkflowException
+     * @throws WorkflowActivationException
      */
     public function isActiveWorkflow(WorkflowDefinition $definition)
     {
@@ -59,14 +59,14 @@ class WorkflowSystemConfigManager
 
         try {
             return $this->getEntityConfig($class)->get(self::CONFIG_KEY, false, []);
-        } catch (WorkflowException $e) {
+        } catch (WorkflowActivationException $e) {
             return [];
         }
     }
 
     /**
      * @param WorkflowDefinition $definition
-     * @throws WorkflowException
+     * @throws WorkflowActivationException
      */
     public function setWorkflowActive(WorkflowDefinition $definition)
     {
@@ -75,7 +75,7 @@ class WorkflowSystemConfigManager
 
     /**
      * @param WorkflowDefinition $definition
-     * @throws WorkflowException
+     * @throws WorkflowActivationException
      */
     public function setWorkflowInactive(WorkflowDefinition $definition)
     {
@@ -94,7 +94,7 @@ class WorkflowSystemConfigManager
     /**
      * @param $entityClass
      * @return ConfigInterface
-     * @throws WorkflowException
+     * @throws WorkflowActivationException
      */
     private function getEntityConfig($entityClass)
     {
@@ -103,7 +103,7 @@ class WorkflowSystemConfigManager
             return $workflowConfigProvider->getConfig($entityClass);
         }
 
-        throw new WorkflowException(sprintf('Entity %s is not configurable', $entityClass));
+        throw new WorkflowActivationException(sprintf('Entity %s is not configurable', $entityClass));
     }
 
     /**
@@ -137,7 +137,8 @@ class WorkflowSystemConfigManager
         $newConfigValue = $isActive
             ? array_merge($configValue, [$workflowName])
             : array_diff($configValue, [$workflowName]);
-        $entityConfig->set(self::CONFIG_KEY, array_values($newConfigValue));
+        
+        $entityConfig->set(self::CONFIG_KEY, array_values(array_unique($newConfigValue)));
 
         $this->persistEntityConfig($entityConfig);
         $event = $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED;
