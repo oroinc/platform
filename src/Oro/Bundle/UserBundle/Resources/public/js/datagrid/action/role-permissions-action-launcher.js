@@ -65,7 +65,7 @@ define(function(require) {
                         'dropdown-menu__role-permissions-action'
                     ].join(' '),
                     attributes: {
-                        'data-options': '{"html": true, "align": "right"}'
+                        'data-options': '{"align": "right"}'
                     },
                     collection: accessLevels,
                     keysMap: {
