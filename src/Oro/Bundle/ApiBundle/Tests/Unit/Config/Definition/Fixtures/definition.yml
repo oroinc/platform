@@ -76,6 +76,61 @@ invalid_direction_in_order_by:
     expected: []
     error: 'The value "other" is not allowed for path "entity.order_by.field1". Permissible values: "ASC", "DESC"'
 
+default_page_size:
+    config:
+        page_size: ~
+    expected: []
+    error: 'Invalid type for path "entity.page_size". Expected int, but got NULL.'
+
+disable_pagination:
+    config:
+        page_size: -1
+    expected:
+        page_size: -1
+        max_results: -1
+
+disable_pagination_but_custom_max_results:
+    config:
+        page_size: -1
+        max_results: 100
+    expected:
+        page_size: -1
+        max_results: 100
+
+invalid_page_size:
+    config:
+        page_size: -2
+    expected: []
+    error: 'The value -2 is too small for path "entity.page_size". Should be greater than or equal to -1'
+
+enable_sorting:
+    config:
+        disable_sorting: false
+    expected: []
+
+disable_sorting:
+    config:
+        disable_sorting: true
+    expected:
+        disable_sorting: true
+
+invalid_value_for_disable_sorting:
+    config:
+        disable_sorting: 123
+    expected: []
+    error: 'Invalid type for path "entity.disable_sorting". Expected boolean, but got integer'
+
+empty_identifier_field_names:
+    config:
+        identifier_field_names: []
+    expected: []
+
+invalid_identifier_field_names:
+    config:
+        identifier_field_names: 123
+    expected: []
+    error: 'Invalid type for path "entity.identifier_field_names". Expected array, but got integer'
+
 default_max_results:
     config:
         max_results: ~
@@ -177,7 +232,9 @@ all_attributes:
         disable_partial_load: true
         order_by:
             id: DESC
+        page_size: 20
         max_results: 50
+        identifier_field_names: ['id']
         hints:
             - HINT_1
             - {name: HINT_2, value: hint_val2}
@@ -190,7 +247,9 @@ all_attributes:
         disable_partial_load: true
         order_by:
             id: DESC
+        page_size: 20
         max_results: 50
+        identifier_field_names: ['id']
         hints:
             - {name: HINT_1}
             - {name: HINT_2, value: hint_val2}
@@ -350,6 +409,75 @@ empty_field_description:
     expected: []
     error: 'The path "entity.fields.field1.description" cannot contain an empty value, but got "".'
 
+empty_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: ""
+    expected: []
+    error: 'The value "" is not allowed for path "entity.fields.field1.target_type". Permissible values: "to-many", "to-one", "collection"'
+
+invalid_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: test
+    expected: []
+    error: 'The value "test" is not allowed for path "entity.fields.field1.target_type". Permissible values: "to-many", "to-one", "collection"'
+
+to_one_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: to-one
+    expected:
+        fields:
+            field1:
+                target_type: to-one
+
+to_many_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: to-many
+    expected:
+        fields:
+            field1:
+                target_type: to-many
+
+collection_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: collection
+    expected:
+        fields:
+            field1:
+                target_type: to-many
+
+field_target_class_without_target_type:
+    config:
+        fields:
+            field1:
+                target_class: Test\Class
+    expected:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-one
+
+field_target_class_with_target_type:
+    config:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-many
+    expected:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-many
+
 filters_and_sorters:
     config:
         filters:
@@ -435,6 +563,30 @@ field_with_target_entity:
                 hints:
                     - {name: HINT_1}
                     - {name: HINT_2, value: hint_val2}
+
+page_size_should_not_be_set_to_target_entity:
+    config:
+        fields:
+            field1:
+                page_size: 20
+    expected: []
+    error: 'Unrecognized option "page_size" under "entity.fields.field1"'
+
+disable_sorting_should_not_be_set_to_target_entity:
+    config:
+        fields:
+            field1:
+                disable_sorting: true
+    expected: []
+    error: 'Unrecognized option "disable_sorting" under "entity.fields.field1"'
+
+identifier_field_names_should_not_be_set_to_target_entity:
+    config:
+        fields:
+            field1:
+                identifier_field_names: ['id']
+    expected: []
+    error: 'Unrecognized option "identifier_field_names" under "entity.fields.field1"'
 
 extra_config:
     config:

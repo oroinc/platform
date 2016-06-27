@@ -192,4 +192,56 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider prepareFormRecipientIdsDataProvider
+     */
+    public function testPrepareFormRecipientIds($ids, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, EmailRecipientsHelper::prepareFormRecipientIds($ids));
+    }
+
+    public function prepareFormRecipientIdsDataProvider()
+    {
+        return [
+            [
+                [
+                    '"Recipient1 Name; Name2" <recipient1@example.com>',
+                    '"Recipient2 Name, Name2" <recipient2@example.com>'
+                ],
+
+                base64_encode('"Recipient1 Name; Name2" <recipient1@example.com>') . ';'
+                . base64_encode('"Recipient2 Name, Name2" <recipient2@example.com>')
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider extractFormRecipientIdsDataProvider
+     */
+    public function testExtractFormRecipientIds($value, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, EmailRecipientsHelper::extractFormRecipientIds($value));
+    }
+
+    public function extractFormRecipientIdsDataProvider()
+    {
+        return [
+            [
+                base64_encode('"Recipient1 Name; Name2" <recipient1@example.com>') . ';'
+                . base64_encode('"Recipient2 Name, Name2" <recipient2@example.com>'),
+                [
+                    '"Recipient1 Name; Name2" <recipient1@example.com>',
+                    '"Recipient2 Name, Name2" <recipient2@example.com>'
+                ]
+            ],
+            [
+                'recipient1@example.com;recipient2@example.com',
+                [
+                    'recipient1@example.com',
+                    'recipient2@example.com'
+                ]
+            ]
+        ];
+    }
 }

@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowTransitCommand extends ContainerAwareCommand
@@ -77,6 +78,11 @@ class WorkflowTransitCommand extends ContainerAwareCommand
                     $transitionName
                 )
             );
+        } catch (ForbiddenTransitionException $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+
+            // do not throw exception for ForbiddenTransitionException (see BAP-10872)
+            return;
         } catch (\Exception $e) {
             $output->writeln(
                 sprintf(

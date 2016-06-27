@@ -40,22 +40,22 @@ abstract class BuildResultDocument implements ProcessorInterface
 
         if ($context->hasErrors()) {
             try {
-                $this->documentBuilder->setErrorCollection($context->getErrors(), $context->getMetadata());
+                $this->documentBuilder->setErrorCollection($context->getErrors());
                 // remove errors from the Context to avoid processing them by other processors
                 $context->resetErrors();
             } catch (\Exception $e) {
                 $this->processException($context, $e);
                 $context->resetErrors();
             }
+            $context->setResult($this->documentBuilder->getDocument());
         } elseif ($context->hasResult()) {
             try {
                 $this->processResult($context);
             } catch (\Exception $e) {
                 $this->processException($context, $e);
             }
+            $context->setResult($this->documentBuilder->getDocument());
         }
-
-        $context->setResult($this->documentBuilder->getDocument());
     }
 
     /**

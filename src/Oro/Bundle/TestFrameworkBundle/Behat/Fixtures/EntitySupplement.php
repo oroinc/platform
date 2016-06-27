@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker\Factory;
 use Faker\ORM\Doctrine\ColumnTypeGuesser;
+use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -20,7 +21,7 @@ class EntitySupplement
     protected $registry;
 
     /**
-     * @var ReferenceRepository
+     * @var AliceCollection
      */
     protected $referenceRepository;
 
@@ -47,12 +48,12 @@ class EntitySupplement
     /**
      * EntitySupplement constructor.
      * @param Registry $registry
-     * @param ReferenceRepository $referenceRepository
+     * @param AliceCollection $referenceRepository
      * @param MetadataProviderInterface $metadataProvider
      */
     public function __construct(
         Registry $registry,
-        ReferenceRepository $referenceRepository,
+        AliceCollection $referenceRepository,
         MetadataProviderInterface $metadataProvider
     ) {
         $this->registry = $registry;
@@ -65,13 +66,15 @@ class EntitySupplement
 
     /**
      * @param object $entity
+     * @param array $values
      */
-    public function completeRequired($entity)
+    public function completeRequired($entity, array $values = [])
     {
         $className = get_class($entity);
         /** @var ClassMetadataInfo $metadata */
         $metadata = $this->registry->getManagerForClass($className)->getClassMetadata($className);
 
+        $this->setValues($entity, $values);
         $this->completeFields($entity, $metadata);
         $this->setOwnership($entity);
     }
@@ -86,16 +89,16 @@ class EntitySupplement
         $ownerField = $ownershipMetadata->getOwnerFieldName();
         $organizationField = $ownershipMetadata->getGlobalOwnerFieldName();
 
-        if ($ownerField && $this->accessor->getValue($entity, $ownerField)) {
+        if ($ownerField && !$this->accessor->getValue($entity, $ownerField)) {
             if ($ownershipMetadata->isBasicLevelOwned()) {
-                $this->accessor->setValue($entity, $ownerField, $this->referenceRepository->references['admin']);
+                $this->accessor->setValue($entity, $ownerField, $this->referenceRepository->get('admin'));
             } elseif ($ownershipMetadata->isLocalLevelOwned()) {
-                $entity->setOwner($this->referenceRepository->references['business_unit']);
+                $entity->setOwner($this->referenceRepository->get('business_unit'));
             }
         }
 
         if ($organizationField && !$this->accessor->getValue($entity, $organizationField)) {
-            $entity->setOrganization($this->referenceRepository->references['organization']);
+            $entity->setOrganization($this->referenceRepository->get('organization'));
         }
     }
 
@@ -115,6 +118,17 @@ class EntitySupplement
 
             $fakeData = $this->columnTypeGuesser->guessFormat($fieldName, $metadata);
             $this->accessor->setValue($entity, $fieldName, $fakeData());
+        }
+    }
+
+    /**
+     * @param object $entity
+     * @param array $values
+     */
+    public function setValues($entity, array $values)
+    {
+        foreach ($values as $property => $value) {
+            $this->accessor->setValue($entity, $property, $value);
         }
     }
 }

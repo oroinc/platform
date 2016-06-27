@@ -3,6 +3,7 @@ define(function(require) {
 
     var ChoiceTreeFilter;
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var TextFilter = require('oro/filter/choice-filter');
     var $ = require('jquery');
     var tools = require('oroui/js/tools');
@@ -108,7 +109,7 @@ define(function(require) {
 
         emptyValue: {
             type: 1,
-            value: 'All'
+            value: __('All')
         },
 
         searchEngine: searchEngine,
@@ -406,7 +407,7 @@ define(function(require) {
             var values = value.value.split(',');
             var label = [];
             for (var i in values) {
-                if (values[i] === 'All') {
+                if (values[i] === __('All')) {
                     label.push(values[i]);
                 } else {
                     for (var j in self.data) {

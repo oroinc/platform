@@ -365,6 +365,8 @@ Transition configuration has next options:
         - **wi** - WorkflowItem
         - **ws** - WorkflowStep
 
+    - **check_conditions_before_job_creation** (*boolean*, default = false) - whether to check conditions of transition before creating new `Job` for transition performing.
+    
     Transition for entity can be performed by schedule, when entity is on the appropriate step and all defined conditions are met.
 
 * **transition_definition**

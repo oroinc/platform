@@ -61,10 +61,10 @@ class RendererTest extends LayoutTestCase
         $context->set('body_class', 'test-body');
 
         $result   = $this->getCoreBlocksTestLayout($context)->setRenderer('php')->render();
+
         $expected = $this->getCoreBlocksTestLayoutResult(
             $this->getPhpFormLayoutResult()
         );
-
         $this->assertHtmlEquals($expected, $result);
     }
 
@@ -244,7 +244,7 @@ class RendererTest extends LayoutTestCase
             ->add(
                 'form',
                 'content',
-                'form',
+                'form_fields',
                 [
                     'preferred_fields' => ['jobTitle', 'user.lastName'],
                     'groups'           => [
@@ -261,7 +261,7 @@ class RendererTest extends LayoutTestCase
             )
             // swap 'general' and 'additional' groups to check that a layout update
             // can be applied for items added by a block type
-            ->move('form:group_general', null, 'form:group_additional')
+            ->move('form_fields:group_general', null, 'form_fields:group_additional')
             // test 'visible' option
             ->add('invisible_container', 'root', 'head', ['visible' => false])
             ->add('invisible_child', 'invisible_container', 'meta', ['charset' => 'invisible'])

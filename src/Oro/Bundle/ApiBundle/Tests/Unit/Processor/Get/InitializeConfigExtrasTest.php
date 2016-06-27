@@ -21,19 +21,38 @@ class InitializeConfigExtrasTest extends GetProcessorTestCase
         $this->processor = new InitializeConfigExtras();
     }
 
+    public function testProcessWhenConfigExtrasAreAlreadyInitialized()
+    {
+        $this->context->setConfigExtras([]);
+        $this->context->addConfigExtra(new EntityDefinitionConfigExtra());
+
+        $this->context->setAction('test_action');
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [new EntityDefinitionConfigExtra()],
+            $this->context->getConfigExtras()
+        );
+    }
+
     public function testProcess()
     {
-        $existingExtra = new TestConfigExtra('test');
         $this->context->setConfigExtras([]);
+
+        $existingExtra = new TestConfigExtra('test');
         $this->context->addConfigExtra($existingExtra);
 
         $this->processor->process($this->context);
 
-        $this->assertCount(5, $this->context->getConfigExtras());
-        $this->assertTrue($this->context->hasConfigExtra($existingExtra->getName()));
-        $this->assertTrue($this->context->hasConfigExtra(EntityDefinitionConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(DataTransformersConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(FiltersConfigExtra::NAME));
+        $this->assertEquals(
+            [
+                new TestConfigExtra('test'),
+                new EntityDefinitionConfigExtra($this->context->getAction()),
+                new CustomizeLoadedDataConfigExtra(),
+                new DataTransformersConfigExtra(),
+                new FiltersConfigExtra()
+            ],
+            $this->context->getConfigExtras()
+        );
     }
 }
