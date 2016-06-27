@@ -137,7 +137,7 @@ class WorkflowSystemConfigManager
         $newConfigValue = $isActive
             ? array_merge($configValue, [$workflowName])
             : array_diff($configValue, [$workflowName]);
-        
+
         $entityConfig->set(self::CONFIG_KEY, array_values(array_unique($newConfigValue)));
 
         $this->persistEntityConfig($entityConfig);
