@@ -214,7 +214,6 @@ define(function(require) {
          * @private
          */
         _initProperties: function(opts) {
-            this.subviews = [];
             this.collection = opts.collection;
 
             if (opts.columns.length === 0) {

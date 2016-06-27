@@ -6,12 +6,23 @@ define([
 ], function($, _, Backbone, componentContainerMixin) {
     'use strict';
 
+    var OriginalBackboneView = Backbone.View;
+    Backbone.View = _.wrap(Backbone.View, function(original) {
+        this.subviews = [];
+        this.subviewsByName = {};
+        original.apply(this, _.rest(arguments));
+    });
+    _.extend(Backbone.View, OriginalBackboneView);
+    Backbone.View.prototype = OriginalBackboneView.prototype;
+
     // Backbone.View
-    Backbone.View.prototype.subviews = [];
-    Backbone.View.prototype.subviewsByName = {};
+    Backbone.View.prototype.subviews = null;
+    Backbone.View.prototype.subviewsByName = null;
     _.extend(Backbone.View.prototype, componentContainerMixin);
 
     Backbone.View.prototype.subview = function(name, view) {
+        this.subviews = this.subviews || [];
+        this.subviewsByName = this.subviewsByName || {};
         var subviews = this.subviews;
         var byName = this.subviewsByName;
         if (name && view) {
