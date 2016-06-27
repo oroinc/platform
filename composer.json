@@ -76,6 +76,7 @@
         "oro/jsplumb": "~1.7",
         "oro/moment-timezone": "0.3.*",
         "vakata/jstree": "^3.2",
+        "liuggio/excelbundle": "~2.1",
         "symfony/polyfill-php70":"1.*"
     },
     "require-dev": {
