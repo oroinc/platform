@@ -64,9 +64,6 @@ define(function(require) {
                         'dropdown-menu__action-cell',
                         'dropdown-menu__role-permissions-action'
                     ].join(' '),
-                    attributes: {
-                        'data-options': '{"align": "right"}'
-                    },
                     collection: accessLevels,
                     keysMap: {
                         id: 'access_level',
