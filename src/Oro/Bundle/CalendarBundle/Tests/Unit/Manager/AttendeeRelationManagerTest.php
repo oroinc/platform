@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
+use Oro\Bundle\CalendarBundle\Entity\Attendee as AttendeeEntity;
 use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Email;
@@ -55,6 +56,87 @@ class AttendeeRelationManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->attendeeRelationManager = new AttendeeRelationManager($registry, $nameFormatter, $dqlNameFormatter);
+    }
+
+    /**
+     * @dataProvider createAttendeeProvider
+     */
+    public function testCreateAttendee($relatedEntity, $expectedAttendee)
+    {
+        $this->assertEquals($expectedAttendee, $this->attendeeRelationManager->createAttendee($relatedEntity));
+    }
+
+    public function createAttendeeProvider()
+    {
+        $user = (new User())
+            ->setFirstName('first')
+            ->setLastName('last')
+            ->setEmail('email@example.com');
+
+        return [
+            [
+                null,
+                null
+            ],
+            [
+                new AttendeeEntity(),
+                null,
+            ],
+            [
+                $user,
+                (new AttendeeEntity())
+                    ->setDisplayName('first last')
+                    ->setEmail('email@example.com')
+                    ->setUser($user),
+            ]
+        ];
+    }
+
+    public function testGetRelatedEntity()
+    {
+        $user = new User();
+        $attendee = (new Attendee())
+            ->setUser($user);
+
+        $this->assertSame($user, $this->attendeeRelationManager->getRelatedEntity($attendee));
+    }
+
+    /**
+     * @dataProvider getRelatedDisplayNameProvider
+     */
+    public function testGetRelatedDisplayName($attendee, $expectedDisplayName)
+    {
+        $this->assertEquals($expectedDisplayName, $this->attendeeRelationManager->getRelatedDisplayName($attendee));
+    }
+
+    public function getRelatedDisplayNameProvider()
+    {
+        return [
+            [
+                (new Attendee())
+                    ->setDisplayName('display name'),
+                'display name'
+            ],
+            [
+                (new Attendee())
+                    ->setUser(
+                        (new User())
+                            ->setFirstName('first')
+                            ->setLastName('last')
+                    ),
+                'first last'
+            ],
+            [
+                (new Attendee())
+                    ->setDisplayName('display name')
+                    ->setUser(
+                        (new User())
+                            ->setFirstName('first')
+                            ->setLastName('last')
+                    ),
+                'first last'
+            ],
+        ];
     }
 
     public function testBindAttendees()

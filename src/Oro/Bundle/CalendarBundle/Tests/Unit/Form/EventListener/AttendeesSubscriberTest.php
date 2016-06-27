@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\CalendarBundle\Form\EventListener\AttendeesSubscriber;
 use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
@@ -28,6 +29,17 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->attendeesSubscriber = new AttendeesSubscriber($this->attendeeRelationManager);
     }
 
+    public function testGetSubscribedEvents()
+    {
+        $this->assertEquals(
+            [
+                FormEvents::PRE_SUBMIT  => ['fixSubmittedData', 100],
+                FormEvents::POST_SUBMIT => ['postSubmit', -100],
+            ],
+            $this->attendeesSubscriber->getSubscribedEvents()
+        );
+    }
+
     /**
      * @dataProvider preSubmitProvider
      */
@@ -46,7 +58,62 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
     public function preSubmitProvider()
     {
         return [
-            'missing email' => [
+            'empty attendees' => [
+                [
+                    'displayName' => 'existing',
+                    'email' => 'existing@example.com',
+                ],
+                [],
+                [
+                    'displayName' => 'existing',
+                    'email' => 'existing@example.com',
+                ],
+            ],
+            'empty data' => [
+                [],
+                [
+                    'displayName' => 'existing',
+                    'email' => 'existing@example.com',
+                ],
+                [],
+            ],
+            'missing email and displayName in attendees' => [
+                [
+                    [
+                        'displayName' => 'existing',
+                        'email' => 'existing@example.com',
+                    ],
+                    [
+                        'displayname' => 'new',
+                        'email' => 'existing@example.com',
+                    ],
+                    [
+                        'displayname' => 'new2',
+                        'email' => 'new2@example.com',
+                    ],
+                ],
+                new ArrayCollection([
+                    (new Attendee())
+                        ->setDisplayName('existing')
+                        ->setEmail('existing@example.com'),
+                    (new Attendee()),
+                ]),
+                [
+                    [
+                        'displayName' => 'existing',
+                        'email' => 'existing@example.com',
+                    ],
+                    [
+                        'displayname' => 'new',
+                        'email' => 'existing@example.com',
+                    ],
+                    [
+                        'displayname' => 'new2',
+                        'email' => 'new2@example.com',
+                    ],
+                ],
+            ],
+            'missing email in data' => [
                 [
                     [
                         'displayName' => 'existing',
@@ -137,5 +204,15 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($attendees);
 
         $this->attendeesSubscriber->postSubmit($event);
+    }
+
+    public function testPostSubmitWithNullData()
+    {
+        $this->attendeeRelationManager->expects($this->never())
+            ->method('bindAttendees');
+
+        $this->attendeesSubscriber->postSubmit(
+            new FormEvent($this->getMock('Symfony\Component\Form\FormInterface'), null)
+        );
     }
 }
