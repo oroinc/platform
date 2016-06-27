@@ -15,21 +15,29 @@ interface ConfigProviderInterface
     /**
      * Get path to config file for require.js
      *
+     * @param $config
      * @return string
      */
-    public function getConfigFilePath();
+    public function getConfigFilePath($config);
 
     /**
      * Get path to output file
      *
+     * @param $config
      * @return string
      */
-    public function getOutputFilePath();
+    public function getOutputFilePath($config);
 
     /**
      * Generate build config for require.js
      *
      * @return array
      */
-    public function generateBuildConfigs();
+    public function collectAllConfigs();
+
+    /**
+     * @param $key
+     * @return array
+     */
+    public function collectConfigs($key);
 }
