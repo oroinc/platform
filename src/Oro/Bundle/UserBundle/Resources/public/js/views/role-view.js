@@ -49,7 +49,6 @@ define([
             this.$privileges = $(this.options.privilegesSelector);
             this.$appendUsers = $(this.options.appendUsersSelector);
             this.$removeUsers = $(this.options.removeUsersSelector);
-            this.privileges = JSON.parse(this.$privileges.val());
 
             var fields = {};
             _.each(
@@ -73,7 +72,6 @@ define([
             delete this.$privileges;
             delete this.$appendUsers;
             delete this.$removeUsers;
-            delete this.privileges;
             delete this.$fields;
 
             RoleView.__super__.dispose.call(this);
@@ -138,7 +136,7 @@ define([
                 }
             );
 
-            data[formName + '[privileges]'] = JSON.stringify(this.privileges);
+            data[formName + '[privileges]'] = this.$privileges.val();
             data[formName + '[appendUsers]'] = this.$appendUsers.val();
             data[formName + '[removeUsers]'] = this.$removeUsers.val();
 
@@ -152,8 +150,8 @@ define([
             if (this.disposed) {
                 return;
             }
-
-            $.each(this.privileges, function(scopeName, privileges) {
+            var obj = JSON.parse(this.$privileges.val());
+            $.each(obj, function(scopeName, privileges) {
                 $.each(privileges, function(key, privilege) {
                     if (privilege.identity.id === data.identityId) {
                         $.each(privilege.permissions, function(permissionName, permission) {
@@ -164,6 +162,7 @@ define([
                     }
                 });
             });
+            this.$privileges.val(JSON.stringify(obj)).trigger('change');
         }
     });
 

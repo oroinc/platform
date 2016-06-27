@@ -12,17 +12,21 @@ define(function(require) {
             if (this.model.get('active')) {
                 classes.push('active');
             }
+            if (this.model.get('changed')) {
+                classes.push('changed');
+            }
             return classes.join(' ');
         },
         template: _.template('<a href="#"><%= label %></a>'),
         listen: {
-            'change:active model': 'updateState'
+            'change:active model': 'updateClasses',
+            'change:changed model': 'updateClasses'
         },
         events: {
             'click a': 'onSelect'
         },
-        updateState: function() {
-            this.$el.toggleClass('active', this.model.get('active'));
+        updateClasses: function() {
+            this.$el[0].className = _.result(this, 'className');
         },
         onSelect: function() {
             this.model.set('active', true);

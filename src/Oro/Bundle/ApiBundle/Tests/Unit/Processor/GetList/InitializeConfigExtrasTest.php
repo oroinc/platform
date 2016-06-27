@@ -22,20 +22,40 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
         $this->processor = new InitializeConfigExtras();
     }
 
-    public function testProcess()
+    public function testProcessWhenConfigExtrasAreAlreadyInitialized()
     {
-        $existingExtra = new TestConfigExtra('test');
         $this->context->setConfigExtras([]);
-        $this->context->addConfigExtra($existingExtra);
+        $this->context->addConfigExtra(new EntityDefinitionConfigExtra());
 
+        $this->context->setAction('test_action');
         $this->processor->process($this->context);
 
-        $this->assertCount(6, $this->context->getConfigExtras());
-        $this->assertTrue($this->context->hasConfigExtra($existingExtra->getName()));
-        $this->assertTrue($this->context->hasConfigExtra(EntityDefinitionConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(DataTransformersConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(FiltersConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(SortersConfigExtra::NAME));
+        $this->assertEquals(
+            [new EntityDefinitionConfigExtra()],
+            $this->context->getConfigExtras()
+        );
+    }
+
+    public function testProcess()
+    {
+        $this->context->setConfigExtras([]);
+
+        $existingExtra = new TestConfigExtra('test');
+        $this->context->addConfigExtra($existingExtra);
+
+        $this->context->setAction('test_action');
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [
+                new TestConfigExtra('test'),
+                new EntityDefinitionConfigExtra($this->context->getAction()),
+                new CustomizeLoadedDataConfigExtra(),
+                new DataTransformersConfigExtra(),
+                new FiltersConfigExtra(),
+                new SortersConfigExtra()
+            ],
+            $this->context->getConfigExtras()
+        );
     }
 }

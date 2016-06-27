@@ -59,7 +59,7 @@ class ObjectAccessor implements ObjectAccessorInterface
         if (is_array($object)) {
             $this->accessors[$objectType] = new ArrayAccessor();
         } else {
-            throw new \RuntimeException(
+            throw new \InvalidArgumentException(
                 sprintf(
                     'The object accessor for "%s" type does not exist.',
                     is_object($object) ? get_class($object) : gettype($object)

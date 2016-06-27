@@ -47,6 +47,7 @@ define(function(require) {
 
         render: function() {
             var dropdown = this.subview('dropdown');
+            this.$el.trigger('tohide.bs.dropdown');
             if (dropdown) {
                 dropdown.$el.detach();
             }

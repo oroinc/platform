@@ -15,6 +15,14 @@ abstract class ApiContext extends BaseContext
 
     public function __construct()
     {
+        $this->initialize();
+    }
+
+    /**
+     * Sets default values into the Context.
+     */
+    protected function initialize()
+    {
         $this->set(self::REQUEST_TYPE, new RequestType([]));
     }
 

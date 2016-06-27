@@ -290,6 +290,34 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
+     * @param BusinessUnit $businessUnit
+     *
+     * @return self
+     */
+    public function addBusinessUnit(BusinessUnit $businessUnit)
+    {
+        if (!$this->businessUnits->contains($businessUnit)) {
+            $this->businessUnits->add($businessUnit);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param BusinessUnit $businessUnit
+     *
+     * @return self
+     */
+    public function removeBusinessUnit(BusinessUnit $businessUnit)
+    {
+        if ($this->businessUnits->contains($businessUnit)) {
+            $this->businessUnits->removeElement($businessUnit);
+        }
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getNotificationEmails()

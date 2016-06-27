@@ -41,10 +41,7 @@ define(function(require) {
             if (!this.isHeaderCellWidthFixed) {
                 this.fixHeaderCellWidth();
             }
-            this.$grid.on('click.float-thead', 'thead:first .dropdown', _.bind(function() {
-                this.setFloatTheadMode(this.scrollVisible ? 'relative' : 'default');
-            }, this));
-            this.domCache.gridContainer.parents().add(document).on('scroll', this.checkLayout);
+            this.supportDropdowns();
 
             this.listenTo(mediator, 'layout:headerStateChange', this.checkLayout);
             this.listenTo(mediator, 'layout:reposition', this.checkLayout);
@@ -59,12 +56,12 @@ define(function(require) {
             this.connected = false;
             clearInterval(this.checkLayoutIntervalId);
 
-            this.domCache.gridContainer.parents().add(document).off('scroll', this.checkLayout);
+            this.domCache.gridContainer.parents().add(document).off('.float-thead');
 
             if (!this.manager.disposing) {
                 this.setFloatTheadMode('default');
                 this.disableOtherScroll();
-                this.$grid.off('click.float-thead');
+                this.$grid.off('.float-thead');
                 // remove css
                 this.domCache.headerCells.attr('style', '');
                 this.domCache.firstRowCells.attr('style', '');
@@ -88,6 +85,30 @@ define(function(require) {
                 thead: this.$grid.find('thead:first'),
                 theadTr: this.$grid.find('thead:first tr:first')
             };
+        },
+
+        supportDropdowns: function() {
+            var debouncedHideDropdowns = _.debounce(_.bind(function() {
+                this.domCache.thead.find('.dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
+            }, this), 100, true);
+            // use capture phase to scroll dropdown toggle into view before dropdown will be opened
+            this.$grid[0].addEventListener('click', _.bind(function(e) {
+                var dropdownToggle = $(e.target).closest('.dropdown-toggle');
+                if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.open)')) {
+                    // this will hide dropdowns and ignore next calls to it
+                    debouncedHideDropdowns();
+                    this.isHeaderDropdownVisible = true;
+                    scrollHelper.scrollIntoView(dropdownToggle[0], void 0, 10, 10);
+                }
+            }, this), true);
+            this.$grid.on('hide.bs.dropdown', '.dropdown.open', _.bind(function() {
+                this.isHeaderDropdownVisible = false;
+                this.selectMode();
+            }, this));
+            this.domCache.gridContainer.parents().add(document).on('scroll.float-thead', _.bind(function() {
+                debouncedHideDropdowns();
+                this.checkLayout();
+            }, this));
         },
 
         fixHeaderCellWidth: function() {
@@ -170,7 +191,7 @@ define(function(require) {
             }, this.currentFloatTheadMode === 'default');
             var mode = 'default';
             if (visibleRect.top !== tableRect.top || this.grid.layout === 'fullscreen') {
-                mode = 'fixed';
+                mode = this.isHeaderDropdownVisible ? 'relative' : 'fixed';
             }
             this.setFloatTheadMode(mode, visibleRect, tableRect);
 
@@ -221,14 +242,12 @@ define(function(require) {
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-relative');
                         this.$el.addClass('floatThead-fixed');
-                        this.$grid.find('thead:first .dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
                         this._ensureTHeadSizing();
                     }
                     this.domCache.thead.css({
                         // show only visible part
                         top: visibleRect.top,
-                        width: visibleRect.right - visibleRect.left +
-                            (this.scrollStateModel.get('visible') ? scrollBarWidth : 0),
+                        width: visibleRect.right - visibleRect.left,
                         height: Math.min(this.headerHeight, visibleRect.bottom - visibleRect.top),
 
                         // left side should be also tracked

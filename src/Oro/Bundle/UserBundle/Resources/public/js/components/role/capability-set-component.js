@@ -6,9 +6,18 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var BaseCollection = require('oroui/js/app/models/base/collection');
+    var PermissionModel = require('orouser/js/models/role/permission-model');
     var CapabilitiesView = require('orouser/js/views/role/capabilities-view');
 
     CapabilitySetComponent = BaseComponent.extend({
+        GENERAL_CAPABILITIES_CATEGORY: 'system_capabilities',
+        COMMON_CATEGORY: 'all',
+
+        /**
+         * @type {Array<string>}
+         */
+        tabIds: null,
+
         /**
          * @param {Object} options
          * @param {Array<Object>} options.data collection of grouped capabilities
@@ -16,31 +25,70 @@ define(function(require) {
          * @param {Array<string>} options.tabIds list of category Ids that are represented as tabs
          */
         initialize: function(options) {
+            _.extend(this, _.pick(options, ['tabIds']));
             var groups = _.map(options.data, function(group) {
-                return _.extend({}, group, {
-                    items: new BaseCollection(group.items)
+                var itemsCollection = new BaseCollection(group.items, {
+                    model: PermissionModel
                 });
-            });
+                this.listenTo(itemsCollection, 'change', _.bind(this.onAccessLevelChange, this, group.group));
+                return _.extend({}, group, {
+                    items: itemsCollection
+                });
+            }, this);
 
-            var currentCategory = {
-                id: options.currentCategoryId || 'all'
+            this.currentCategory = {
+                id: options.currentCategoryId || this.COMMON_CATEGORY
             };
 
             this.view = new CapabilitiesView({
                 el: options._sourceElement,
                 collection: new BaseCollection(groups),
-                filterer: function(model) {
+                filterer: _.bind(function(model) {
                     var group = model.get('group');
-                    if (currentCategory.id === 'system_capabilities') {
-                        return Boolean(group) && !_.contains(options.tabIds, group);
+                    var currentCategory = this.currentCategory;
+                    if (currentCategory.id === this.GENERAL_CAPABILITIES_CATEGORY) {
+                        return group && !_.contains(options.tabIds, group);
                     }
-                    return currentCategory.id === 'all' || group === currentCategory.id;
-                }
+                    return currentCategory.id === this.COMMON_CATEGORY || group === currentCategory.id;
+                }, this)
             });
 
-            this.listenTo(mediator, 'role:entity-category:changed', function(category) {
-                _.extend(currentCategory, category);
-                this.view.filter();
+            this.listenTo(mediator, 'role:entity-category:changed', this.onCategoryChange);
+
+            CapabilitySetComponent.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * Handles category change
+         *  - updates local cache of current category
+         *  - filters collection view
+         *
+         * @param {Object} category
+         * @param {string} category.id
+         */
+        onCategoryChange: function(category) {
+            _.extend(this.currentCategory, category);
+            this.view.filter();
+        },
+
+        /**
+         * Handles access level change of some capability in a group
+         *
+         * @param {string} group
+         * @param {PermissionModel} model
+         */
+        onAccessLevelChange: function(group, model) {
+            var category = group;
+            if (category && !_.contains(this.tabIds, category)) {
+                category = this.GENERAL_CAPABILITIES_CATEGORY;
+            }
+            mediator.trigger('securityAccessLevelsComponent:link:click', {
+                accessLevel: model.get('access_level'),
+                identityId: model.get('identity'),
+                permissionName: model.get('name'),
+                group: group,
+                category: category,
+                isInitialValue: !model.isAccessLevelChanged()
             });
         }
     });
