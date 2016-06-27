@@ -30,6 +30,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('form.yml');
         $loader->load('processors.normalize_value.yml');
         $loader->load('processors.collect_resources.yml');
+        $loader->load('processors.collect_subresources.yml');
         $loader->load('processors.get_config.yml');
         $loader->load('processors.get_metadata.yml');
         $loader->load('processors.get_list.yml');
@@ -38,6 +39,11 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.delete_list.yml');
         $loader->load('processors.create.yml');
         $loader->load('processors.update.yml');
+        $loader->load('processors.get_subresource.yml');
+        $loader->load('processors.get_relationship.yml');
+        $loader->load('processors.delete_relationship.yml');
+        $loader->load('processors.add_relationship.yml');
+        $loader->load('processors.update_relationship.yml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');
@@ -48,10 +54,21 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             );
             DependencyInjectionUtil::registerDebugService(
                 $container,
+                'oro_api.processor_bag',
+                'Oro\Component\ChainProcessor\Debug\TraceableProcessorBag'
+            );
+            DependencyInjectionUtil::registerDebugService(
+                $container,
                 'oro_api.processor_factory',
                 'Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory'
             );
+            DependencyInjectionUtil::registerDebugService(
+                $container,
+                'oro_api.processor_applicable_checker_factory',
+                'Oro\Component\ChainProcessor\Debug\TraceableProcessorApplicableCheckerFactory'
+            );
             DependencyInjectionUtil::registerDebugService($container, 'oro_api.collect_resources.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.collect_subresources.processor');
             DependencyInjectionUtil::registerDebugService($container, 'oro_api.customize_loaded_data.processor');
             DependencyInjectionUtil::registerDebugService($container, 'oro_api.get_config.processor');
             DependencyInjectionUtil::registerDebugService($container, 'oro_api.get_relation_config.processor');

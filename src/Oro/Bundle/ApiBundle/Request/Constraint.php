@@ -15,4 +15,5 @@ final class Constraint
     const ENTITY_ID    = 'entity identifier constraint';
     const FORM         = 'form constraint';
     const EXTRA_FIELDS = 'extra fields constraint';
+    const RELATIONSHIP = 'relationship constraint';
 }

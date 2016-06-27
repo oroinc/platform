@@ -706,6 +706,11 @@ abstract class WebTestCase extends BaseWebTestCase
                         . ($errors ? '. Errors: ' . $errors : ''),
                         $e->getComparisonFailure()
                     );
+                } else {
+                    $e = new \PHPUnit_Framework_ExpectationFailedException(
+                        $e->getMessage() . ' Response content: ' . $response->getContent(),
+                        $e->getComparisonFailure()
+                    );
                 }
             }
             throw $e;

@@ -69,12 +69,7 @@ define([
                 backdrop: this.options.allowCancel ? true : 'static'
             }, this.options.modalOptions));
 
-            //Focus OK button
             $el.one('shown', function() {
-                if (self.options.focusOk) {
-                    $el.find('.btn.ok').focus();
-                }
-
                 if (self.options.content && self.options.content.trigger) {
                     self.options.content.trigger('shown', self);
                 }
@@ -140,6 +135,11 @@ define([
                 $(window).on('resize' + this._eventNamespace(), _.bind(this._fixHeightForMobile, this));
             }
             mediator.trigger('modal:open', this);
+
+            //Focus OK button
+            if (self.options.focusOk) {
+                $el.find('.btn.ok').focus();
+            }
 
             return this;
         },

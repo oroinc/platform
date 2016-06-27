@@ -56,4 +56,17 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn('N/A');
         $this->assertEquals('N/A', $this->extension->getRecurrenceTextValue(null));
     }
+
+    public function testGetFunctions()
+    {
+        $this->assertEquals(
+            [
+                'get_recurrence_text_value' => new \Twig_Function_Method(
+                    $this->extension,
+                    'getRecurrenceTextValue'
+                ),
+            ],
+            $this->extension->getFunctions()
+        );
+    }
 }

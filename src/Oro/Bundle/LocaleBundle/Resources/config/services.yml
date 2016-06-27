@@ -35,6 +35,8 @@ parameters:
 
     oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
 
+    oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
+
 services:
     oro_locale.cache:
             parent: oro.cache.abstract
