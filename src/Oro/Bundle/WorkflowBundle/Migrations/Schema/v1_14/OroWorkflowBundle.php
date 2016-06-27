@@ -63,8 +63,8 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface, DatabaseP
         $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
 
         $queries->addPostQuery(
-            'UPDATE wi SET wi.entity_class = wd.related_entity ' .
-            'FROM oro_workflow_item AS wi INNER_JOIN oro_workflow_definition AS wd ON wd.name = wi.workflow_name'
+            'UPDATE oro_workflow_item AS wi SET entity_class = wd.related_entity ' .
+            'FROM oro_workflow_definition AS wd WHERE wd.name = wi.workflow_name'
         );
     }
 
