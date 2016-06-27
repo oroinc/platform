@@ -119,75 +119,11 @@
     {% endif %}
 
     {% set rolePermissionsGrid %}
-        {% set _gridName = 'role-permission-grid' %}
-        {% set _gridOptions = {
-            gridName: _gridName,
-            inputName: _gridName,
-            name: _gridName,
-            enableFilters: false,
-            enableViews: false,
-            showViewsInNavbar: false,
-            builders: [
-                'orouser/js/datagrid/roles-datagrid-builder'
-            ],
-            metadata: {
-                mode: 'client',
-                state: {
-                    pageSize: 999999999,
-                },
-                initialState: {
-                    pageSize: 999999999,
-                },
-                options: {
-                    gridName: _gridName,
-                    toolbarOptions: {
-                        placement: {
-                            top: false
-                        }
-                    }
-                },
-                rowActions: [
-                    {
-                        frontend_type: 'role-permissions'
-                    }
-                ],
-                columns: [
-                    {
-                        "label": "Entity",
-                        "type": "string",
-                        "translatable": true,
-                        "name": "entity",
-                        "order": 0,
-                        "editable": false,
-                        "renderable": true,
-                        "sortable": false
-                    },
-                    {
-                        "label": "Permissions",
-                        "type": "action-permissions",
-                        "translatable": true,
-                        "name": "permissions",
-                        "order": 1,
-                        "editable": false,
-                        "renderable": true,
-                        "sortable": false
-                    }
-                ]
-            },
-            data: {
-                data: gridData
-            }
-        } %}
-
         <div {{ UI.renderPageComponentAttributes({
             module: 'orouser/js/components/role/entity-category-tabs-component',
             options: tabsOptions
         }) }}></div>
-        <div data-page-component-module="orodatagrid/js/app/components/datagrid-component"
-             data-page-component-name="{{ _gridOptions.gridName }}"
-             data-page-component-options="{{ _gridOptions|json_encode }}"
-             class="inner-permissions-grid">
-        </div>
+        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid' }) }}
         <div {{ UI.renderPageComponentAttributes({
             module: 'orouser/js/components/role/capability-set-component',
             options: capabilitySetOptions

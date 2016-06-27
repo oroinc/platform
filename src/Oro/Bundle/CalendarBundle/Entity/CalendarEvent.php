@@ -37,7 +37,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "grouping"={
  *              "groups"={"activity"}

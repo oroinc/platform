@@ -385,6 +385,42 @@ datagrid:
                     included: '#roleAppendUsers'
                     excluded: '#roleRemoveUsers'
 
+    role-permission-grid:
+            acl_resource: oro_user_role_update
+            source:
+                type: role-permission-provider
+            columns:
+                entity:
+                    label: "Entity"
+                    data_name: entity
+                    frontend_type: string
+                    translatable: true
+                permissions:
+                    label: "Permissions"
+                    data_name: permissions
+                    frontend_type: action-permissions
+                identity:
+                    data_name: identity
+                    frontend_type: string
+                    renderable: false
+                group:
+                    data_name: group
+                    frontend_type: string
+                    renderable: false
+            actions:
+                role-premissions:
+                    type: frontend
+                    frontend_type: role-permissions
+                    rowAction: true
+            filters: ~
+            sorters: ~
+            options:
+                requireJSModules:
+                    - orouser/js/datagrid/roles-datagrid-builder
+                toolbarOptions:
+                    placement:
+                        top: false
+
     group-users-grid:
         extends: user-relation-grid
 

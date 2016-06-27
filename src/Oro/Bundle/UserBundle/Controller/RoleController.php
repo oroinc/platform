@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -94,140 +96,54 @@ class RoleController extends Controller
     }
 
     /**
-     * @param Role $entity
+     * @param Role $role
+     *
      * @return array
      */
-    protected function update(Role $entity)
+    protected function update(Role $role)
     {
-        $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
-        $aclRoleHandler->createForm($entity);
+        $categoryProvider = $this->get('oro_user.provider.role_privilege_category_provider');
 
-        if ($aclRoleHandler->process($entity)) {
+        /** @var AclRoleHandler $aclRoleHandler */
+        $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
+        $aclRoleHandler->createForm($role);
+
+        if ($aclRoleHandler->process($role)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.user.controller.role.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get('oro_ui.router')->redirect($role);
         }
-        $categories = [
-            [
-                'id' => 'account_management',
-                'label' => 'Account Management'
-            ],
-            [
-                'id' => 'marketing',
-                'label' => 'Marketing'
-            ],
-            [
-                'id' => 'sales_data',
-                'label' => 'Sales Data'
-            ],
-            [
-                'id' => 'address',
-                'label' => 'Address'
-            ],
-            [
-                'id' => 'calendar',
-                'label' => 'Calendar'
-            ]
-        ];
-        
-        $tabs = ['account_management', 'marketing', 'sales_data'];
-        
-        // @todo: redevelop it as grid
+
         $form = $aclRoleHandler->createView();
-        $translator = $this->get('translator');
-        $permissionManager = $this->get('oro_security.acl.permission_manager');
-
-        $form->children['entity']->children;
-        $gridData = [];
-        foreach ($form->children['entity']->children as $child) {
-            $identity = $child->children['identity'];
-            $item = [
-                'entity' => $translator->trans($identity->children['name']->vars['value']),
-                'identity' => $identity->children['id']->vars['value'],
-                'group' => ['account_management', 'marketing', 'sales_data', null][count($gridData) % 4],
-                'permissions' => []
+        $tabs = array_map(function ($tab) {
+            /** @var PrivilegeCategory $tab */
+            return [
+                'id' => $tab->getId(),
+                'label' => $this->get('translator')->trans($tab->getLabel())
             ];
-            // all data transformation are taken from form type blocks
-            foreach ($child->vars['privileges_config']['permissions'] as $field) {
-                foreach ($child->children['permissions']->children as $permission) {
-                    if ($permission->vars['value']->getName() === $field) {
-                        $accessLevelVars = $permission->children['accessLevel']->vars;
-                        $permissionEntity = $permissionManager->getPermissionByName($field);
-                        $permissionLabel = $permissionEntity->getLabel() ? $permissionEntity->getLabel() : $field;
-                        $permissionDescription = '';
-                        if ($permissionEntity->getDescription()) {
-                            $permissionDescription = $translator->trans($permissionEntity->getDescription());
-                        }
-                        $valueText = $accessLevelVars['translation_prefix'] .
-                            (empty($accessLevelVars['level_label']) ? 'NONE' : $accessLevelVars['level_label']);
-                        $valueText = $translator->trans($valueText, [], $accessLevelVars['translation_domain']);
-                        $item['permissions'][] = [
-                            'id' => $permissionEntity->getId(),
-                            'name' => $permissionEntity->getName(),
-                            'label' => $translator->trans($permissionLabel),
-                            'description' => $permissionDescription,
-                            'full_name' => $accessLevelVars['full_name'],
-                            'identity' => $accessLevelVars['identity'],
-                            'access_level' => $accessLevelVars['value'],
-                            'access_level_label' => $valueText
-                        ];
-                        break;
-                    }
-                }
-            }
-
-            $gridData[] = $item;
-        }
-
-        $capabilitiesData = [];
-        foreach ($categories as $category) {
-            $capabilitiesData[] = [
-                'group' => $category['id'],
-                'label' => $category['label'],
-                'items' => []
-            ];
-        }
-
-        $index = 0;
-        foreach ($form->children['action']->children as $action_id => $child) {
-            $permission = reset($child->children['permissions']->children)->vars['value'];
-            $description = $child->vars['value']->getDescription();
-            $capabilitiesData[$index++ % count($categories)]['items'][] = [
-                'id' => $action_id,
-                'identity' => $child->children['identity']->children['id']->vars['value'],
-                'label' => $translator->trans($child->children['identity']->children['name']->vars['value']),
-                'description' => $description ? $translator->trans($description) : '',
-                'name' => $permission->getName(),
-                'access_level' => $permission->getAccessLevel(),
-                'selected_access_level' => 5,
-                'unselected_access_level' => 0
-            ];
-        }
+        }, $categoryProvider->getTabbedCategories());
 
         return array(
-            'entity' => $entity,
+            'entity' => $role,
             'form' => $form,
             'tabsOptions' => [
-                'data' => array_filter($categories, function ($category) use ($tabs) {
-                    return in_array($category['id'], $tabs);
-                })
+                'data' => $tabs
             ],
-            'gridData' => $gridData,
             'capabilitySetOptions' => [
-                'data' => $capabilitiesData,
-                'tabIds' => $tabs
+                'data' => $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilities($role),
+                'tabIds' => $categoryProvider->getTabList()
             ],
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete a role and un-assign it from all users or reassign users to another role before
             'allow_delete' =>
-                $entity->getId() &&
+                $role->getId() &&
                 !$this->get('doctrine.orm.entity_manager')
                     ->getRepository('OroUserBundle:Role')
-                    ->hasAssignedUsers($entity)
+                    ->hasAssignedUsers($role)
         );
     }
 }
