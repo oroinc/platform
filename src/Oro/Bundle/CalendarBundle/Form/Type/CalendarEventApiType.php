@@ -154,7 +154,14 @@ class CalendarEventApiType extends CalendarEventType
                     'model_timezone' => 'UTC',
                 ]
             )
-            ->add('isCancelled', 'checkbox', ['required' => false]);
+            ->add(
+                'isCancelled',
+                'checkbox',
+                [
+                    'required' => false,
+                    'property_path' => 'cancelled',
+                ]
+            );
 
         /** @deprecated since 1.10 'invitedUsers' field was replaced by field 'attendees' */
         $builder->add(

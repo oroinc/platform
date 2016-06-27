@@ -58,7 +58,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             ['updatedAt', new \DateTime()],
             ['recurrence', new Recurrence()],
             ['originalStart', new \DateTime()],
-            ['isCancelled', true],
+            ['cancelled', true],
             ['parent', new CalendarEvent()],
             ['recurringEvent', new CalendarEvent()],
             ['relatedAttendee', new Attendee()],
