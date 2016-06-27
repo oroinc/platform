@@ -18,13 +18,11 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($config->isEmpty());
         $this->assertEmpty($config->toArray());
 
-        $attrName = 'test';
-        $config->set($attrName, 'value');
+        $config->set('test', 'value');
 
         $configClone = clone $config;
 
         $this->assertEquals($config, $configClone);
-
     }
 
     public function testExcluded()

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
 class BigNumberProcessor
 {
@@ -12,19 +13,25 @@ class BigNumberProcessor
     /** @var BigNumberDateHelper */
     protected $dateHelper;
 
+    /** @var OwnerHelper */
+    protected $ownerHelper;
+
     /** @var object[] */
     protected $valueProviders = [];
 
     /**
      * @param BigNumberFormatter  $bigNumberFormatter
      * @param BigNumberDateHelper $dateHelper
+     * @param OwnerHelper         $ownerHelper
      */
     public function __construct(
         BigNumberFormatter $bigNumberFormatter,
-        BigNumberDateHelper $dateHelper
+        BigNumberDateHelper $dateHelper,
+        OwnerHelper $ownerHelper
     ) {
         $this->bigNumberFormatter = $bigNumberFormatter;
         $this->dateHelper         = $dateHelper;
+        $this->ownerHelper        = $ownerHelper;
     }
 
     /**
@@ -45,11 +52,12 @@ class BigNumberProcessor
         $lastWeek = false
     ) {
         $getter           = $this->getGetter($providerAlias, $getterName);
-        $lessIsBetter     = (bool) $lessIsBetter;
+        $lessIsBetter     = (bool)$lessIsBetter;
         $dateRange        = $lastWeek ? $this->dateHelper->getLastWeekPeriod() : $widgetOptions->get('dateRange');
-        $value            = call_user_func($getter, $dateRange);
+        $owners           = $this->ownerHelper->getOwnerIds($widgetOptions);
+        $value            = call_user_func($getter, $dateRange, $owners);
         $previousInterval = $widgetOptions->get('usePreviousInterval', []);
-        $previousData = [];
+        $previousData     = [];
 
         if (count($previousInterval)) {
             if ($lastWeek) {

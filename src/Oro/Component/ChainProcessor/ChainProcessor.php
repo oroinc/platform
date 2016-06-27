@@ -9,13 +9,13 @@ use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
  */
 class ChainProcessor implements ProcessorInterface
 {
-    /** @var ProcessorBag */
+    /** @var ProcessorBagInterface */
     protected $processorBag;
 
     /**
-     * @param ProcessorBag $processorBag
+     * @param ProcessorBagInterface $processorBag
      */
-    public function __construct(ProcessorBag $processorBag)
+    public function __construct(ProcessorBagInterface $processorBag)
     {
         $this->processorBag = $processorBag;
     }

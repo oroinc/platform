@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
@@ -50,66 +52,126 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            $this->completeEntityAssociations(
+                $this->doctrineHelper->getEntityMetadataForClass($entityClass),
+                $definition,
+                $context->getVersion(),
+                $context->getRequestType(),
+                $context->getPropagableExtras()
+            );
+        } else {
+            $this->completeObjectAssociations(
+                $definition,
+                $context->getVersion(),
+                $context->getRequestType(),
+                $context->getPropagableExtras()
+            );
         }
-
-        $this->completeAssociations(
-            $definition,
-            $entityClass,
-            $context->getVersion(),
-            $context->getRequestType(),
-            $context->getPropagableExtras()
-        );
     }
 
     /**
+     * @param ClassMetadata          $metadata
      * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
      * @param string                 $version
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
-    protected function completeAssociations(
+    protected function completeEntityAssociations(
+        ClassMetadata $metadata,
         EntityDefinitionConfig $definition,
-        $entityClass,
         $version,
         RequestType $requestType,
         array $extras
     ) {
-        $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $propertyPath => $mapping) {
-            $field = $definition->findField($propertyPath, true);
-            if (null !== $field && $field->hasTargetEntity()) {
+            $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
+            if ($fieldName && $definition->getField($fieldName)->hasTargetEntity()) {
                 continue;
             }
 
-            $config = $this->relationConfigProvider->getRelationConfig(
+            $this->completeAssociation(
+                $definition,
+                $fieldName ?: $propertyPath,
                 $mapping['targetEntity'],
                 $version,
                 $requestType,
                 $extras
             );
-            if ($config->hasDefinition()) {
-                $targetEntity = $config->getDefinition();
-                foreach ($extras as $extra) {
-                    $sectionName = $extra->getName();
-                    if ($extra instanceof ConfigExtraSectionInterface && $config->has($sectionName)) {
-                        $targetEntity->set($sectionName, $config->get($sectionName));
-                    }
-                }
+        }
+    }
 
-                if (null === $field) {
-                    $field = $definition->addField($propertyPath);
-                }
-                if ($targetEntity->isCollapsed()) {
-                    $field->setCollapsed();
-                    $targetEntity->setCollapsed(false);
-                }
-                $field->setTargetEntity($targetEntity);
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $version
+     * @param RequestType            $requestType
+     * @param ConfigExtraInterface[] $extras
+     */
+    protected function completeObjectAssociations(
+        EntityDefinitionConfig $definition,
+        $version,
+        RequestType $requestType,
+        array $extras
+    ) {
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->hasTargetEntity()) {
+                continue;
             }
+            $targetClass = $field->getTargetClass();
+            if (!$targetClass) {
+                continue;
+            }
+
+            $this->completeAssociation(
+                $definition,
+                $fieldName,
+                $targetClass,
+                $version,
+                $requestType,
+                $extras
+            );
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $fieldName
+     * @param string                 $targetClass
+     * @param string                 $version
+     * @param RequestType            $requestType
+     * @param ConfigExtraInterface[] $extras
+     */
+    protected function completeAssociation(
+        EntityDefinitionConfig $definition,
+        $fieldName,
+        $targetClass,
+        $version,
+        RequestType $requestType,
+        array $extras
+    ) {
+        $config = $this->relationConfigProvider->getRelationConfig(
+            $targetClass,
+            $version,
+            $requestType,
+            $extras
+        );
+        if ($config->hasDefinition()) {
+            $targetEntity = $config->getDefinition();
+            foreach ($extras as $extra) {
+                $sectionName = $extra->getName();
+                if ($extra instanceof ConfigExtraSectionInterface && $config->has($sectionName)) {
+                    $targetEntity->set($sectionName, $config->get($sectionName));
+                }
+            }
+
+            $field = $definition->getOrAddField($fieldName);
+            if ($targetEntity->isCollapsed()) {
+                $field->setCollapsed();
+                $targetEntity->setCollapsed(false);
+            }
+            $field->setTargetEntity($targetEntity);
         }
     }
 }

@@ -6,12 +6,33 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 
 class FieldMetadataTest extends \PHPUnit_Framework_TestCase
 {
+    public function testClone()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('fieldName');
+        $fieldMetadata->set('test_scalar', 'value');
+        $objValue = new \stdClass();
+        $objValue->someProp = 123;
+        $fieldMetadata->set('test_object', $objValue);
+
+        $fieldMetadataClone = clone $fieldMetadata;
+
+        $this->assertEquals($fieldMetadata, $fieldMetadataClone);
+        $this->assertNotSame($objValue, $fieldMetadataClone->get('test_object'));
+    }
+
+    public function testConstructor()
+    {
+        $fieldMetadata = new FieldMetadata('fieldName');
+        $this->assertEquals('fieldName', $fieldMetadata->getName());
+    }
+
     public function testGetName()
     {
         $fieldMetadata = new FieldMetadata();
 
         $this->assertNull($fieldMetadata->getName());
-        $fieldMetadata->setName('fieldName');
+        $this->assertSame($fieldMetadata, $fieldMetadata->setName('fieldName'));
         $this->assertEquals('fieldName', $fieldMetadata->getName());
     }
 
@@ -20,7 +41,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $fieldMetadata = new FieldMetadata();
 
         $this->assertNull($fieldMetadata->getDataType());
-        $fieldMetadata->setDataType('fieldType');
+        $this->assertSame($fieldMetadata, $fieldMetadata->setDataType('fieldType'));
         $this->assertEquals('fieldType', $fieldMetadata->getDataType());
     }
 
@@ -29,7 +50,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $fieldMetadata = new FieldMetadata();
 
         $this->assertFalse($fieldMetadata->isNullable());
-        $fieldMetadata->setIsNullable(true);
+        $this->assertSame($fieldMetadata, $fieldMetadata->setIsNullable(true));
         $this->assertTrue($fieldMetadata->isNullable());
     }
 

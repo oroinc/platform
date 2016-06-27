@@ -40,6 +40,7 @@ class ReferenceRepositoryInitializer
         $user = $this->getDefaultUser();
 
         $this->referenceRepository->set('admin', $user);
+        $this->referenceRepository->set('adminRole', $user->getRole(User::ROLE_ADMINISTRATOR));
         $this->referenceRepository->set('organization', $user->getOrganization());
         $this->referenceRepository->set('business_unit', $user->getOwner());
     }

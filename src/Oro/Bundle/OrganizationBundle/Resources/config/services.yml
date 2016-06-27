@@ -211,6 +211,16 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units, acl_resource: oro_business_unit_view }
 
+    oro_organization.autocomplete.widget_business_unit.search_handler:
+        class: Oro\Bundle\OrganizationBundle\Autocomplete\WidgetBusinessUnitSearchHandler
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - '@translator'
+            - %oro_organization.business_unit.entity.class%
+            - ["name"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: widget_owner_business_units, acl_resource: oro_business_unit_view }
+
     oro_organization.business_unit.handler.delete:
         class: Oro\Bundle\OrganizationBundle\Handler\BusinessUnitDeleteHandler
         parent: oro_soap.handler.delete.abstract

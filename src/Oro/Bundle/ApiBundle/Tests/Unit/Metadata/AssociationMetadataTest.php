@@ -17,6 +17,42 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->entityMetadata->setInheritedType(true);
     }
 
+    public function testClone()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('fieldName');
+        $associationMetadata->set('test_scalar', 'value');
+        $objValue = new \stdClass();
+        $objValue->someProp = 123;
+        $associationMetadata->set('test_object', $objValue);
+        $targetEntityMetadata = new EntityMetadata();
+        $targetEntityMetadata->setClassName('TargetEntityClassName');
+        $associationMetadata->setTargetMetadata($targetEntityMetadata);
+
+        $associationMetadataClone = clone $associationMetadata;
+
+        $this->assertEquals($associationMetadata, $associationMetadataClone);
+        $this->assertNotSame($objValue, $associationMetadataClone->get('test_object'));
+        $this->assertNotSame($targetEntityMetadata, $associationMetadataClone->getTargetMetadata());
+    }
+
+    public function testCloneWithoutTargetMetadata()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('fieldName');
+
+        $associationMetadataClone = clone $associationMetadata;
+
+        $this->assertEquals($associationMetadata, $associationMetadataClone);
+        $this->assertNull($associationMetadataClone->getTargetMetadata());
+    }
+
+    public function testConstructor()
+    {
+        $fieldMetadata = new AssociationMetadata('associationName');
+        $this->assertEquals('associationName', $fieldMetadata->getName());
+    }
+
     public function testGetName()
     {
         $associationMetadata = new AssociationMetadata();

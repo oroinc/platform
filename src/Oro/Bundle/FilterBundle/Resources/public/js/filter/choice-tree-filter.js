@@ -4,6 +4,7 @@ define(function(require) {
     var ChoiceTreeFilter;
     var _ = require('underscore');
     var TextFilter = require('oro/filter/text-filter');
+    var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var Select2TreeAutocompleteComponent = require('oro/select2-tree-autocomplete-component');
@@ -148,7 +149,7 @@ define(function(require) {
             var values = value.value.split(',');
             var label = [];
             for (var i in values) {
-                if (values[i] === 'All') {
+                if (values[i] === __('All')) {
                     label.push(values[i]);
                 } else {
                     for (var j in self.data) {
