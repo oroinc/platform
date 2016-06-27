@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Command\Stub\TestOutput;
 
@@ -97,10 +98,16 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
      * @param string $transition
      * @param array $expectedOutput
      * @param \Exception $exception
+     * @param \Exception $expectedException
      * @dataProvider executeProvider
      */
-    public function testExecute($id, $transition, $expectedOutput, \Exception $exception = null)
-    {
+    public function testExecute(
+        $id,
+        $transition,
+        $expectedOutput,
+        \Exception $exception = null,
+        \Exception $expectedException = null
+    ) {
         $this->expectContainerGetManagerRegistryAndWorkflowManager();
         $this->input->expects($this->exactly(2))
             ->method('getOption')
@@ -129,8 +136,8 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
                 ->will($exception ? $this->throwException($exception) : $this->returnSelf());
         }
 
-        if ($exception) {
-            $this->setExpectedException(get_class($exception), $exception->getMessage());
+        if ($expectedException) {
+            $this->setExpectedException(get_class($expectedException), $expectedException->getMessage());
         }
 
         $this->command->execute($this->input, $this->output);
@@ -171,6 +178,7 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
                     'Transition #transit failed: Transition 1 exception',
                 ],
                 'exception' => new \RuntimeException('Transition 1 exception'),
+                'expectedException' => new \RuntimeException('Transition 1 exception'),
             ],
             'no workflow item' => [
                 'id' => 99,
@@ -180,6 +188,7 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
                     'Exception: Workflow Item not found',
                 ],
                 'exception' => new \RuntimeException('Workflow Item not found'),
+                'expectedException' => new \RuntimeException('Workflow Item not found'),
             ],
             'no transition' => [
                 'id' => 2,
@@ -188,6 +197,7 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
                     'No Transition name defined',
                 ],
                 'exception' => new \RuntimeException('No Transition name defined'),
+                'expectedException' => new \RuntimeException('No Transition name defined'),
             ],
             'wrong workflow item id' => [
                 'id' => 'item_id',
@@ -196,6 +206,16 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
                     'No Workflow Item identifier defined',
                 ],
                 'exception' => new \RuntimeException('No Workflow Item identifier defined'),
+                'expectedException' => new \RuntimeException('No Workflow Item identifier defined'),
+            ],
+            'transition not allowed' => [
+                'id' => 2,
+                'name' => 'transit',
+                'output' => [
+                    'Start transition...',
+                    'Transition "transit" is not allowed.',
+                ],
+                'exception' => new ForbiddenTransitionException('Transition "transit" is not allowed.'),
             ],
         ];
     }

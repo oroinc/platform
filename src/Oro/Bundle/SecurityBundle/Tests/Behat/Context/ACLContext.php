@@ -5,6 +5,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
+use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
@@ -82,7 +85,8 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
     protected function loginAsAdmin()
     {
         $this->visitPath('/user/login');
-        $login = $this->elementFactory->createElement('Login');
+        /** @var Form $login */
+        $login = $this->createElement('Login');
         $login->fill(new TableNode([['Username', 'admin'], ['Password', 'admin']]));
         $login->pressButton('Log in');
         $this->waitForAjax();
@@ -93,9 +97,14 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
      */
     protected function openRoleEditForm($role)
     {
-        $this->elementFactory->createElement('MainMenu')->openAndClick('System -> User Management', 'Roles');
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $mainMenu->openAndClick('System/ User Management/ Roles');
         $this->waitForAjax();
-        $this->elementFactory->createElement('Grid')->clickActionLink($role, 'Edit');
+
+        /** @var Grid $grid */
+        $grid = $this->createElement('Grid');
+        $grid->clickActionLink($role, 'Edit');
         $this->waitForAjax();
     }
 }

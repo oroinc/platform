@@ -22,6 +22,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
                 ->min(-1)
             ->end()
             ->booleanNode(EntityDefinitionConfig::DISABLE_SORTING)->end()
+            ->arrayNode(EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES)->prototype('scalar')->end()->end()
             ->scalarNode(EntityDefinitionConfig::DELETE_HANDLER)->cannotBeEmpty()->end();
     }
 
@@ -43,6 +44,9 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
             && !$config[EntityDefinitionConfig::DISABLE_SORTING]
         ) {
             unset($config[EntityDefinitionConfig::DISABLE_SORTING]);
+        }
+        if (empty($config[EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES])) {
+            unset($config[EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES]);
         }
 
         return $config;

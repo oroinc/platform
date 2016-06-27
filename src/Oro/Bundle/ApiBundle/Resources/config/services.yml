@@ -282,7 +282,12 @@ services:
         public: false
         arguments:
             - %kernel.debug%
-            - []
+            -
+                - '\InvalidArgumentException'
+                - '\UnexpectedValueException'
+                - '\OutOfBoundsException'
+                - 'Oro\Bundle\ApiBundle\Exception\ExceptionInterface'
+                - 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface'
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }
 
