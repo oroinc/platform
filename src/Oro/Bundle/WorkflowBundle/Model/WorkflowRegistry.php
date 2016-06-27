@@ -100,8 +100,13 @@ class WorkflowRegistry
                 },
                 $this->configManager->getActiveWorkflowNamesByEntity($entityClass)
             ),
-            function (Workflow $workflow) use ($class) {
-                return $workflow->getDefinition()->getRelatedEntity() === $class;
+            function ($workflow) use ($class) {
+                if (null !== $workflow) {
+                    /**@var Workflow $workflow */
+                    return $workflow->getDefinition()->getRelatedEntity() === $class;
+                }
+
+                return false;
             }
         );
     }
