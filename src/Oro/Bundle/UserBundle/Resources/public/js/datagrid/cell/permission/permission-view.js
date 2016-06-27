@@ -65,9 +65,6 @@ define(function(require) {
                     keysMap: {
                         id: 'access_level',
                         text: 'access_level_label'
-                    },
-                    attributes: {
-                        'data-options': '{"html": true}'
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);

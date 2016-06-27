@@ -3,6 +3,17 @@
   .more-bar-holder > ul {
     margin-bottom: 0;
   }
+  table.grid, .grid-scrollable-container {
+    overflow: visible;
+  }
+  table tr:last-child {
+    td:first-child {
+      border-bottom-left-radius: 4px !important;
+    }
+    td:last-child {
+      border-bottom-right-radius: 4px !important;
+    }
+  }
 }
 .action-permissions {
   list-style: none;
