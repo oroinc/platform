@@ -7,7 +7,6 @@ parameters:
     oro_workflow.form.type.transition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
     oro_workflow.form.type.workflow_step_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType
     oro_workflow.form.type.workflow_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType
-    oro_workflow.form.type.applicable_entities.class: Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType
 
     oro_workflow.form.type.workflow_definition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType
 
@@ -82,13 +81,6 @@ services:
         class: %oro_workflow.form.type.workflow_definition.class%
         tags:
             - { name: form.type, alias: oro_workflow_definition }
-
-    oro_workflow.form.type.applicable_entities:
-        class: %oro_workflow.form.type.applicable_entities.class%
-        arguments:
-            - '@oro_entity_config.config_manager'
-        tags:
-            - { name: form.type, alias: oro_workflow_applicable_entities }
 
     oro_workflow.form.workflow_definition:
         class: Symfony\Component\Form\Form
