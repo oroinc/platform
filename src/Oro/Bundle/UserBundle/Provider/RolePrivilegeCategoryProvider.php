@@ -16,7 +16,6 @@ class RolePrivilegeCategoryProvider
      * @var PrivilegeCategory[]
      */
     protected $categoryList = [];
-
     
     /**
      * Add provider to registry
@@ -68,7 +67,7 @@ class RolePrivilegeCategoryProvider
     
     /**
      * Get all categories
-     * 
+     *
      * @return PrivilegeCategory[]
      */
     public function getPermissionCategories()
@@ -98,7 +97,10 @@ class RolePrivilegeCategoryProvider
         
         return $this->categoryList;
     }
-    
+
+    /**
+     * @return array
+     */
     protected function getPredefinedCategories()
     {
         $categoryList = [];

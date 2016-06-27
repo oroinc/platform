@@ -17,7 +17,7 @@ use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
-use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\AbstractRole;
 
 class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
@@ -27,7 +27,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     /** @var ConfigManager */
     protected $configEntityManager;
 
-    /** @var Role */
+    /** @var AbstractRole */
     protected $role;
 
     /**
