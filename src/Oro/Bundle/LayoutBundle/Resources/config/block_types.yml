@@ -49,6 +49,11 @@ services:
         tags:
              - { name: layout.block_type, alias: script }
 
+    oro_layout.block_type.requires:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\RequiresType
+        tags:
+            - { name: layout.block_type, alias: requires }
+
     oro_layout.block_type.style:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
         tags:

@@ -168,6 +168,14 @@ class RendererTest extends LayoutTestCase
                     'defer'   => new Condition\FalseCondition()
                 ]
             )
+            ->add(
+                'requires',
+                'head',
+                'requires',
+                [
+                    'theme' => 'default',
+                ]
+            )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
             ->add(
                 'content',
