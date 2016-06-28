@@ -128,14 +128,25 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSubmit()
     {
-        $data = ['key' => 'value'];
+        $data = ['imapConfiguration' => ['folders' => ['some folder']]];
+        $eventData = ['imapConfiguration' => ['imapPort' => '111']];
         $request = new Request();
         $request->attributes->set('oro_user_emailsettings', $data);
         $this->requestStack->push($request);
 
         $this->eventMock->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($eventData));
+        $this->eventMock->expects($this->once())
             ->method('setData')
-            ->with($this->equalTo($data));
+            ->with($this->equalTo(
+                [
+                    'imapConfiguration' => [
+                        'folders'  => ['some folder'],
+                        'imapPort' => '111'
+                    ]
+                ]
+            ));
 
         $this->subscriber->preSubmit($this->eventMock);
     }

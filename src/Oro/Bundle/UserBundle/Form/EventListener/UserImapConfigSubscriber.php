@@ -77,8 +77,9 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
         if ($request) {
             $data = $request->get('oro_user_emailsettings');
             if ($data) {
+                $eventData = (array) $event->getData();
                 //update configuration form with data from ajax-generated form
-                $event->setData($data);
+                $event->setData(array_merge_recursive($eventData, $data));
             }
         }
     }
