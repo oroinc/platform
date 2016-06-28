@@ -62,8 +62,8 @@ class ChoiceTreeFilter extends AbstractFilter
 
         $entities = [];
 
-        if ($this->getOr('className') && isset($this->state[$this->name])) {
-            $data = $this->parseData($this->state[$this->name]);
+        if ($this->getOr('className') && $this->state) {
+            $data = $this->parseData($this->state);
             
             $event = new ChoiceTreeFilterLoadDataEvent($this->getOr('className'), $data['value']);
             $this->eventDispatcher->dispatch(ChoiceTreeFilterLoadDataEvent::EVENT_NAME, $event);

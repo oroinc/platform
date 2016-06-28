@@ -27,11 +27,13 @@ class ChoiceTreeFilterLoadDataEvent extends Event
      */
     public function __construct($className, array $values)
     {
-        $this->className         = $className;
-        $this->values  = $values;
+        $this->className = $className;
+        $this->values = $values;
     }
 
     /**
+     * Return array id of entity
+     *
      * @return array
      */
     public function getValues()
@@ -47,11 +49,17 @@ class ChoiceTreeFilterLoadDataEvent extends Event
         return $this->className;
     }
 
+    /**
+     * @return array
+     */
     public function getData()
     {
         return $this->data;
     }
 
+    /**
+     * @param $values
+     */
     public function setData($values)
     {
         $this->data = $values;

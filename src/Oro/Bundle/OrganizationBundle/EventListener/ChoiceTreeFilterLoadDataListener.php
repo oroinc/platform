@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\EventListener;
 
 use Oro\Bundle\EntityBundle\ORM\Registry;
-
 use Oro\Bundle\FilterBundle\Event\ChoiceTreeFilterLoadDataEvent;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
@@ -19,9 +18,8 @@ class ChoiceTreeFilterLoadDataListener
      *
      * @param Registry $doctrine
      */
-    public function __construct(
-        Registry $doctrine
-    ) {
+    public function __construct(Registry $doctrine)
+    {
         $this->doctrine = $doctrine;
     }
 
@@ -31,20 +29,17 @@ class ChoiceTreeFilterLoadDataListener
     public function fillData(ChoiceTreeFilterLoadDataEvent $event)
     {
         if ($event->getClassName() === static::EXPECTED_CLASS_NAME) {
-            $event->getValues();
-
             $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id'=> $event->getValues()]);
 
             $data = [];
             /** @var BusinessUnit $entity */
             foreach ($entities as $entity) {
-                $result = [];
-                $result['id'] = $entity->getId();
-                $result['name'] = $entity->getName();
-                $result['treePath'] = $this->getPath($entity, []);
-                $result['organization_id'] = $entity->getOrganization()->getId();
-
-                $data[] = $result;
+                $data[] = [
+                    'id' => $entity->getId(),
+                    'name' => $entity->getName(),
+                    'treePath' => $this->getPath($entity, []),
+                    'organization_id' => $entity->getOrganization()->getId()
+                ];
             }
 
             $event->setData($data);

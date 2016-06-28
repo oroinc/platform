@@ -30,6 +30,7 @@ abstract class AbstractFilter implements FilterInterface
     /** @var array [array, ...] */
     protected $additionalOptions = [];
 
+    /** @var array */
     protected $state;
 
     /**
@@ -139,6 +140,8 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
+     * Set state of filter
+     *
      * @param $state
      *
      * @return $this
@@ -151,6 +154,8 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
+     * Get state of filter
+     *
      * @return mixed
      */
     public function getFilterState()
