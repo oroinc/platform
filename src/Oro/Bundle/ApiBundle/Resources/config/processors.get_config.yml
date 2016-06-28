@@ -155,8 +155,8 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, priority: -10 }
-            - { name: oro.api.processor, action: get_relation_config, priority: -10 }
+            - { name: oro.api.processor, action: get_config, extra: definition, priority: -10 }
+            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -10 }
 
     oro_api.get_config.complete_definition.expand_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities
