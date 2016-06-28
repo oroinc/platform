@@ -15,9 +15,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 class Config implements ConfigProviderInterface
 {
     const REQUIREJS_CONFIG_CACHE_KEY    = 'requirejs_config';
-
     const REQUIREJS_CONFIG_FILE         = 'js/require-config.js';
-    const REQUIREJS_DEFAULT_KEY         = '_main';
 
     /**
      * @var ContainerInterface
@@ -45,6 +43,11 @@ class Config implements ConfigProviderInterface
      * @var ArrayCollection
      */
     protected $configs;
+
+    /**
+     * @var string
+     */
+    protected $configKey = '_main';
 
     /**
      * @param ContainerInterface                $container
@@ -77,15 +80,16 @@ class Config implements ConfigProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getOutputFilePath($config)
+    public function getOutputFilePath()
     {
+        $config = $this->collectConfigs();
         return $config['build_path'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigFilePath($config)
+    public function getConfigFilePath()
     {
         return self::REQUIREJS_CONFIG_FILE;
     }
@@ -93,8 +97,10 @@ class Config implements ConfigProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getMainConfig($key = self::REQUIREJS_DEFAULT_KEY)
+    public function getMainConfig($configKey = null)
     {
+        $this->configKey = $configKey ? $configKey : $this->configKey;
+
         if (!$this->cache) {
             $configs = $this->collectAllConfigs();
         } else {
@@ -105,7 +111,7 @@ class Config implements ConfigProviderInterface
             $configs = $this->cache->fetch($this->getCacheKey());
         }
 
-        return $configs[$key]['mainConfig'];
+        return isset($configs[$this->configKey]) ? $configs[$this->configKey]['mainConfig'] : null;
     }
 
     /**
@@ -114,7 +120,7 @@ class Config implements ConfigProviderInterface
     public function collectAllConfigs()
     {
         $configs = [
-            self::REQUIREJS_DEFAULT_KEY => [
+            $this->configKey => [
                 'mainConfig'    => $this->generateMainConfig(),
                 'buildConfig'   => $this->collectBuildConfig(),
             ]
@@ -126,13 +132,12 @@ class Config implements ConfigProviderInterface
     /**
      * Collect require.js main config
      *
-     * @param string $key
-     *
      * @return string
      */
-    public function generateMainConfig($key = self::REQUIREJS_DEFAULT_KEY)
+    public function generateMainConfig()
     {
-        $config = $this->collectConfigs($key);
+        $config = $this->collectConfigs();
+
         return $this->extractMainConfig($config);
     }
 
@@ -165,13 +170,11 @@ class Config implements ConfigProviderInterface
     /**
      * Collect require.js build config
      *
-     * @param string $key
-     *
      * @return array
      */
-    protected function collectBuildConfig($key = self::REQUIREJS_DEFAULT_KEY)
+    protected function collectBuildConfig()
     {
-        $config = $this->collectConfigs($key);
+        $config = $this->collectConfigs();
         return $this->extractBuildConfig($config);
     }
 
@@ -189,7 +192,7 @@ class Config implements ConfigProviderInterface
         $buildConfig = $config['build'];
 
         $paths = [
-            'require-config'    => $webRoot . substr($this->getConfigFilePath($config), 0, -3),
+            'require-config'    => $webRoot . substr($this->getConfigFilePath(), 0, -3),
             'require-lib'       => 'ororequirejs/lib/require',
         ];
 
@@ -197,8 +200,8 @@ class Config implements ConfigProviderInterface
             $buildConfig,
             [
                 'baseUrl'           => $webRoot . 'bundles',
-                'out'               => $webRoot . $this->getOutputFilePath($config),
-                'mainConfigFile'    => $webRoot . $this->getConfigFilePath($config),
+                'out'               => $webRoot . $this->getOutputFilePath(),
+                'mainConfigFile'    => $webRoot . $this->getConfigFilePath(),
                 'include'           => [],
                 'paths'             => array_merge($config['build']['paths'], $paths)
             ]
@@ -217,39 +220,33 @@ class Config implements ConfigProviderInterface
     /**
      * Collect all require.js config
      *
-     * @param string $key
-     *
      * @return array
      */
-    public function collectConfigs($key = self::REQUIREJS_DEFAULT_KEY)
+    public function collectConfigs()
     {
-        if (!$this->configs->containsKey($key)) {
-            $this->configs->set($key, $this->collectBundlesConfig($key));
+        if (!$this->configs->containsKey($this->configKey)) {
+            $this->configs->set($this->configKey, $this->collectBundlesConfig());
         }
 
-        return $this->configs->get($key);
+        return $this->configs->get($this->configKey);
     }
 
     /**
      * Collect require.js config from all bundles
      *
-     * @param string $key
-     *
      * @return array
      */
-    protected function collectBundlesConfig($key = self::REQUIREJS_DEFAULT_KEY)
+    protected function collectBundlesConfig()
     {
         $config = $this->container->getParameter('oro_require_js');
 
         $bundles = $this->container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
-            foreach ($this->getFiles($bundle, $key) as $file) {
+            foreach ($this->getFiles($bundle) as $file) {
                 $extendedConfig = Yaml::parse(file_get_contents(realpath($file)));
                 $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $extendedConfig);
             }
         }
-
-        $config['config']['config_key'] = $key;
 
         return $config;
     }
@@ -258,10 +255,10 @@ class Config implements ConfigProviderInterface
      * Get config files from bundle
      *
      * @param string $bundle
-     * @param string $key
+     *
      * @return array
      */
-    protected function getFiles($bundle, $key = self::REQUIREJS_DEFAULT_KEY)
+    protected function getFiles($bundle)
     {
         $reflection = new \ReflectionClass($bundle);
         $file = dirname($reflection->getFileName()) . '/Resources/config/requirejs.yml';
@@ -273,6 +270,7 @@ class Config implements ConfigProviderInterface
      * Generates build config for require.js
      *
      * @param string $configPath path to require.js main config
+     *
      * @return array
      *
      * @deprecated
