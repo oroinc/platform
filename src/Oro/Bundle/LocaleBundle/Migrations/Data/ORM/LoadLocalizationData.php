@@ -14,7 +14,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -47,16 +47,6 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     }
 
     /**
-     * @return string
-     */
-    protected function getLocale()
-    {
-        $localeSettings = $this->container->get('oro_locale.settings');
-
-        return $localeSettings->getLocale();
-    }
-
-    /**
      * @param ObjectManager $manager
      * @param string $locale
      * @param string $language
@@ -74,19 +64,24 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     }
 
     /**
+     * @return string
+     */
+    protected function getLocale()
+    {
+        $localeSettings = $this->container->get('oro_locale.settings');
+
+        return $localeSettings->getLocale();
+    }
+
+    /**
      * @param string $locale
-     * @return bool
+     * @return string
      */
     protected function getLanguageCode($locale)
     {
-        $parts = explode('_', $locale);
-        $languages = Intl::getLanguageBundle()->getLanguageNames();
+        list($language) = explode('_', $locale);
 
-        if (!array_key_exists($parts[0], $languages)) {
-            throw new \LogicException(sprintf('There are no language with code "%s"!', $locale));
-        }
-
-        return $parts[0];
+        return $language;
     }
 
     /**
@@ -106,7 +101,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     protected function isSupportedLanguage($language)
     {
-        $languages = Intl::getLanguageBundle()->getLocales();
+        $languages = Intl::getLanguageBundle()->getLanguageNames();
 
         return array_key_exists($language, $languages);
     }
