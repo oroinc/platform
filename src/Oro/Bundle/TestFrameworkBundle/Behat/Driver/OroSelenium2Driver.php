@@ -26,7 +26,7 @@ class OroSelenium2Driver extends Selenium2Driver
      */
     public function setValue($xpath, $value)
     {
-        $element = $this->getWebDriverSession()->element('xpath', $xpath);
+        $element = $this->findElement($xpath);
         $elementName = strtolower($element->name());
 
         if ('input' === $elementName) {
@@ -34,17 +34,17 @@ class OroSelenium2Driver extends Selenium2Driver
             $classes = explode(' ', $element->attribute('class'));
 
             if (in_array('select2-offscreen', $classes, true)) {
-                $this->setSelect2Result($xpath, $value);
+                $this->fillSelect2Entity($xpath, $value);
 
                 return;
             } elseif ('text' === $element->attribute('type')) {
-                $this->setTextInput($element, $value);
+                $this->fillTextInput($element, $value);
 
                 return;
             }
         } elseif ('textarea' === $elementName) {
             if ('true' === $element->attribute('aria-hidden')) {
-                $this->fillAsTinyMce($element, $value);
+                $this->fillTinyMce($element, $value);
 
                 return;
             }
@@ -58,7 +58,7 @@ class OroSelenium2Driver extends Selenium2Driver
      * @param string $value
      * @throws ExpectationException
      */
-    protected function fillAsTinyMce(Element $element, $value)
+    protected function fillTinyMce(Element $element, $value)
     {
         $fieldId = $element->attribute('id');
 
@@ -82,7 +82,7 @@ class OroSelenium2Driver extends Selenium2Driver
      * @param Element $element
      * @param string $value
      */
-    protected function setTextInput(Element $element, $value)
+    protected function fillTextInput(Element $element, $value)
     {
         $script = <<<JS
 var node = {{ELEMENT}};
@@ -97,12 +97,18 @@ JS;
      * @throws ExpectationException
      * @throws \Exception
      */
-    protected function setSelect2Result($xpath, $value)
+    protected function fillSelect2Entity($xpath, $value)
     {
         $this
             ->findElement($this->xpathManipulator->prepend('/../a/span[contains(@class, "select2-arrow")]', $xpath))
             ->click();
-        $this->findElement('//div[contains(@class, "select2-search")]/input')->postValue(['value' => [$value]]);
+
+        foreach ($this->findElementXpaths('//div[contains(@class, "select2-search")]/input') as $input) {
+            $element = $this->findElement($input);
+            if ($element->displayed()) {
+                $element->postValue(['value' => [$value]]);
+            }
+        };
 
         $this->wait(3000, "0 == $('ul.select2-results li.select2-searching').length");
         $results = $this->findElementXpaths('//ul[contains(@class, "select2-results")]/li');
@@ -111,7 +117,7 @@ JS;
             throw new ExpectationException(sprintf('Too many results for "%s"', $value), $this);
         }
 
-        $firstResult = $this->getWebDriverSession()->element('xpath', array_shift($results));
+        $firstResult = $this->findElement(array_shift($results));
 
         if ('select2-no-results' === $firstResult->attribute('class')) {
             throw new ExpectationException(sprintf('Not found result for "%s"', $value), $this);
