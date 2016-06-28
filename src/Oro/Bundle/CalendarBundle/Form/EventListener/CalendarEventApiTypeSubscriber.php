@@ -82,7 +82,7 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
         /**
          * We check if there is no type in request data for attendee we set default value - Attendee::TYPE_REQUIRED
          */
-        if (!empty($data['attendees'])&& is_array($data['attendees'])) {
+        if (!empty($data['attendees']) && is_array($data['attendees'])) {
             $attendees = &$data['attendees'];
 
             foreach ($attendees as &$attendee) {
