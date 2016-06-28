@@ -58,10 +58,10 @@ class ChoiceTreeFilterLoadDataEvent extends Event
     }
 
     /**
-     * @param $values
+     * @param $data
      */
-    public function setData($values)
+    public function setData($data)
     {
-        $this->data = $values;
+        $this->data = $data;
     }
 }
