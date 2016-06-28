@@ -111,6 +111,7 @@ define([
             }
 
             var data = this.getData();
+
             var dataAction = $(event.target).attr('data-action');
             if (dataAction) {
                 data.input_action = dataAction;
@@ -134,7 +135,17 @@ define([
             _.each(
                 this.$fields,
                 function(element, name) {
-                    data[formName + '[' + name + ']'] = element.val();
+                    var value = element.val();
+
+                    if (element.attr('type') == 'checkbox') {
+                        value = element.is(':checked') ? 1 : 0;
+
+                        if (value == 0) { // do not send the value of checkbox,
+                            return;       // it will be set as false in the backend
+                        }
+                    }
+
+                    data[formName + '[' + name + ']'] = value;
                 }
             );
 

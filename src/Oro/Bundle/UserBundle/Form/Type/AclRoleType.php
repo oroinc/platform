@@ -38,15 +38,6 @@ class AclRoleType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'self_managed',
-            'checkbox',
-            [
-                'required' => false,
-                'label' => 'oro.user.role.self_managed.label'
-            ]
-        );
-
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $builder->add(
                 $fieldName,

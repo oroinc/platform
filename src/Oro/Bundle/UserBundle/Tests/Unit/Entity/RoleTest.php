@@ -41,16 +41,6 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($label, (string)$role);
     }
 
-    public function testSelfManaged()
-    {
-        $role = new Role();
-        
-        $this->assertFalse($role->isSelfManaged());
-
-        $role->setSelfManaged(true);
-        
-        $this->assertTrue($role->isSelfManaged());
-    }
     
     public function testClone()
     {

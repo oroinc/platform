@@ -68,15 +68,6 @@ class Role extends ExtendRole
     protected $label;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="boolean", name="self_managed")
-     * @JMS\Type("boolean")
-     * @JMS\Expose
-     */
-    protected $selfManaged = false;
-
-    /**
      * Populate the role field
      *
      * @param string $role ROLE_FOO etc
@@ -146,21 +137,5 @@ class Role extends ExtendRole
     public function getPrefix()
     {
         return static::PREFIX_ROLE;
-    }
-
-    /**
-     * @return string
-     */
-    public function isSelfManaged()
-    {
-        return $this->selfManaged;
-    }
-
-    /**
-     * @param string $selfManaged
-     */
-    public function setSelfManaged($selfManaged)
-    {
-        $this->selfManaged = $selfManaged;
     }
 }

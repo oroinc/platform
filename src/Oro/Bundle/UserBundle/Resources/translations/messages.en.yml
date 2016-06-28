@@ -151,7 +151,6 @@ oro:
             clone.label: 'Copy of %name%'
             clone: 'Clone'
             extend_description.label: Description
-            self_managed.label: Self managed
         invite:
             label: Send an Email Invitation
         privileges:
