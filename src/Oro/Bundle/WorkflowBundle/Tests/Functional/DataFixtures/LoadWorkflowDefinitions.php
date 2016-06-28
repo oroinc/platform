@@ -49,6 +49,10 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
                 continue;
             }
 
+            if (self::WITH_START_STEP === $workflowDefinition->getName()) {
+                $workflowDefinition->setSystem(true);
+            }
+
             $manager->persist($workflowDefinition);
             $hasDefinitions = true;
         }
