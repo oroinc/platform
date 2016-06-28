@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Model;
+namespace Oro\Bundle\UserBundle\Provider;
 
 interface PrivilegeCategoryProviderInterface
 {

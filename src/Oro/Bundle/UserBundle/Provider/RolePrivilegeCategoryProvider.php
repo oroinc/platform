@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
-use Oro\Bundle\UserBundle\Model\PrivilegeCategoryProviderInterface;
 
 class RolePrivilegeCategoryProvider
 {

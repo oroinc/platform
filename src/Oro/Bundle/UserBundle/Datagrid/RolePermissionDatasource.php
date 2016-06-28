@@ -66,7 +66,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     public function getResults()
     {
         $gridData = [];
-        $allPrivileges = $this->preparePriveleges($this->role, 'entity');
+        $allPrivileges = $this->preparePrivileges($this->role, 'entity');
         $categories = $this->categoryProvider->getPermissionCategories();
 
         foreach ($allPrivileges as $key => $privilege) {
@@ -74,7 +74,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
             $item = [
                 'identity' => $privilege->getIdentity()->getId(),
                 'entity' => $this->translator->trans($privilege->getIdentity()->getName()),
-                'group' => $this->getPrivelegeCategory($privilege, $categories),
+                'group' => $this->getPrivilegeCategory($privilege, $categories),
                 'permissions' => [],
             ];
             $item = $this->preparePermissions($privilege, $item);
@@ -110,7 +110,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     }
 
     /**
-     * @param AclPrivilege$privilege
+     * @param AclPrivilege $privilege
      * @param Permission $permissionEntity
      * @param string $permissionName
      * @param AclPermission $permission

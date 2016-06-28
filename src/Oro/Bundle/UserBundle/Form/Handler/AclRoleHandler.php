@@ -269,7 +269,7 @@ class AclRoleHandler
             $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
         }
 
-        return $this->getFormPriveleges($allPrivileges);
+        return $this->getFormPrivileges($allPrivileges);
     }
 
     /**
@@ -463,7 +463,7 @@ class AclRoleHandler
      *
      * @return array
      */
-    protected function getFormPriveleges($allPrivileges)
+    protected function getFormPrivileges($allPrivileges)
     {
         $formPrivileges = [];
         foreach ($allPrivileges as $key => $privilege) {

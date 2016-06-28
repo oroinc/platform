@@ -8,7 +8,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
-use Oro\Bundle\UserBundle\Model\PrivilegeCategoryProviderInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 
@@ -47,7 +46,7 @@ abstract class RolePrivilegeAbstractProvider
      *
      * @return string
      */
-    protected function getPrivelegeCategory(AclPrivilege $privilege, $categories)
+    protected function getPrivilegeCategory(AclPrivilege $privilege, $categories)
     {
         $categories = array_map(function ($category) {
             /** @var PrivilegeCategory $category */
@@ -69,7 +68,7 @@ abstract class RolePrivilegeAbstractProvider
      *
      * @return array
      */
-    protected function preparePriveleges(Role $role, $type)
+    protected function preparePrivileges(Role $role, $type)
     {
         $allPrivileges = [];
         /**

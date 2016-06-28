@@ -16,11 +16,11 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
     {
         $categories = $this->categoryProvider->getPermissionCategories();
         $capabilitiesData = $this->getCapabilitiesData($categories);
-        $allPrivileges = $this->preparePriveleges($role, 'action');
+        $allPrivileges = $this->preparePrivileges($role, 'action');
 
         /** @var AclPrivilege $privilege */
         foreach ($allPrivileges as $privilege) {
-            $category = $this->getPrivelegeCategory($privilege, $categories);
+            $category = $this->getPrivilegeCategory($privilege, $categories);
             $permissions = $privilege->getPermissions()->toArray();
             $permission = reset($permissions);
             $description = $privilege->getDescription() ? $this->translator->trans($privilege->getDescription()) : '';

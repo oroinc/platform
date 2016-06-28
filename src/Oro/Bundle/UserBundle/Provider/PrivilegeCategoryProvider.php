@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
-use Oro\Bundle\UserBundle\Model\PrivilegeCategoryProviderInterface;
 
 class PrivilegeCategoryProvider implements PrivilegeCategoryProviderInterface
 {
@@ -32,6 +31,8 @@ class PrivilegeCategoryProvider implements PrivilegeCategoryProviderInterface
         $categoryList[] = new PrivilegeCategory('address', 'oro.user.privilege.category.address.label', false, 10);
         $categoryList[] =
             new PrivilegeCategory('application', 'oro.user.privilege.category.application.label', false, 20);
+        $categoryList[] =
+            new PrivilegeCategory('applicationa', 'werwerwer', false, 20);
         $categoryList[] = new PrivilegeCategory('calendar', 'oro.user.privilege.category.calendar.label', false, 30);
         $categoryList[] = new PrivilegeCategory('entity', 'oro.user.privilege.category.entity.label', false, 40);
 
