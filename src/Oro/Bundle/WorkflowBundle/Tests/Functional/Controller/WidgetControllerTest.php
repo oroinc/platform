@@ -3,8 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
@@ -64,9 +67,7 @@ class WidgetControllerTest extends WebTestCase
 
     public function testStartTransitionFormAction()
     {
-        $workflowItem = $this->getContainer()
-            ->get('oro_workflow.manager')
-            ->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);
+        $workflowItem = $this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);
 
         $crawler = $this->client->request(
             'GET',
@@ -96,9 +97,8 @@ class WidgetControllerTest extends WebTestCase
         $this->assertContains($workflowItem->getWorkflowName(), $crawler->html());
         $this->assertContains((string)$workflowItem->getEntityId() . '', $crawler->html());
 
-        $workflowItemNew = $this->getContainer()
-            ->get('oro_workflow.manager')
-            ->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);
+        $workflowItemNew = $this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);
+
         $this->assertNotEquals(
             $workflowItem->getCurrentStep()->getName(),
             $workflowItemNew->getCurrentStep()->getName()
@@ -108,28 +108,61 @@ class WidgetControllerTest extends WebTestCase
 
     public function testTransitionFormAction()
     {
-        $this->client->request(
+        $workflowItem = $this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);
+
+        $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_process_definition_index'),
+            $this->getUrl('oro_workflow_widget_transition_form', [
+                '_widgetContainer' => 'dialog',
+                'workflowItemId' => $workflowItem->getId(),
+                'transitionName' => LoadWorkflowDefinitions::MULTISTEP_START_TRANSITION,
+            ]),
             [],
             [],
             $this->generateBasicAuthHeader()
         );
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        $this->assertNotEmpty($crawler->html());
+
+        $form = $crawler->selectButton('Submit')->form();
+
+        $this->client->followRedirects(true);
+        $crawler = $this->client->submit($form);
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        $this->assertContains((string)$workflowItem->getId(), $crawler->html());
+        $this->assertContains($workflowItem->getWorkflowName(), $crawler->html());
+        $this->assertContains((string)$workflowItem->getEntityId() . '', $crawler->html());
+
+        $workflowItemNew = $this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);
+
+        $this->assertNotEquals(
+            $workflowItem->getCurrentStep()->getName(),
+            $workflowItemNew->getCurrentStep()->getName()
+        );
+        $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
     }
 
     public function testButtonsAction()
     {
-        $this->client->request(
+        $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_process_definition_index'),
+            $this->getUrl('oro_workflow_widget_buttons', [
+                '_widgetContainer' => 'dialog',
+                'entityClass' => self::ENTITY_CLASS,
+                'entityId' => $this->entity->getId(),
+            ]),
             [],
             [],
             $this->generateBasicAuthHeader()
         );
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        $this->assertContains('transition-test_multistep_flow-starting_point_transition',$crawler->html());
+        $this->assertContains('transition-test_start_step_flow-start_transition',$crawler->html());
     }
 
     /**
@@ -143,5 +176,18 @@ class WidgetControllerTest extends WebTestCase
         $this->entityManager->flush($testEntity);
 
         return $testEntity;
+    }
+
+    /**
+     * @param WorkflowAwareEntity $entity
+     * @param $workflowName
+     *
+     * @return null|WorkflowItem
+     */
+    protected function getWorkflowItem(WorkflowAwareEntity $entity, $workflowName)
+    {
+        return $this->getContainer()
+            ->get('oro_workflow.manager')
+            ->getWorkflowItem($entity, $workflowName);
     }
 }
