@@ -10,15 +10,12 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
-use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
-use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -32,9 +29,6 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 class FieldAclExtension extends AbstractAclExtension
 {
     const NAME = 'field';
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
 
     /** @var EntitySecurityMetadataProvider */
     protected $entityMetadataProvider;
@@ -88,16 +82,12 @@ class FieldAclExtension extends AbstractAclExtension
         EntitySecurityMetadataProvider $entityMetadataProvider,
         MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
-        PermissionManager $permissionManager,
-        AclGroupProviderInterface $groupProvider,
-        DoctrineHelper $doctrineHelper,
         EntityOwnerAccessor $entityOwnerAccessor,
         ConfigProvider $configProvider
     ) {
         $this->entityClassResolver = $entityClassResolver;
         $this->entityMetadataProvider = $entityMetadataProvider;
         $this->metadataProvider = $metadataProvider;
-        $this->doctrineHelper = $doctrineHelper;
         $this->entityOwnerAccessor = $entityOwnerAccessor;
         $this->decisionMaker = $decisionMaker;
         $this->objectIdAccessor = $objectIdAccessor;
@@ -510,16 +500,6 @@ class FieldAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    protected function getIdentityForPermission($permission)
-    {
-        $identities = $this->getPermissionsToIdentityMap();
-
-        return empty($identities[$permission]) ? FieldMaskBuilder::IDENTITY : $identities[$permission];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getMaskBuilderConst($maskBuilderIdentity, $constName)
     {
         $maskBuilder = new FieldMaskBuilder(
@@ -649,13 +629,17 @@ class FieldAclExtension extends AbstractAclExtension
         try {
             // try to get entity organization value
             if ($object instanceof EntityObjectReference) {
-                $objectOrganizationId = $object->getOrganizationId();
+                $objectOrganization = $object->getOrganizationId();
             } else {
-                $objectOrganizationId = $this->entityOwnerAccessor->getOrganization($object)->getId();
+                $objectOrganization = $this->entityOwnerAccessor->getOrganization($object);
+            }
+
+            if (is_object($objectOrganization)) {
+                $objectOrganization = $objectOrganization->getId();
             }
 
             // check entity organization with current organization
-            if ($objectOrganizationId && $objectOrganizationId !== $securityToken->getOrganizationContext()->getId()) {
+            if ($objectOrganization && $objectOrganization !== $securityToken->getOrganizationContext()->getId()) {
                 return true;
             }
         } catch (InvalidEntityException $e) {
