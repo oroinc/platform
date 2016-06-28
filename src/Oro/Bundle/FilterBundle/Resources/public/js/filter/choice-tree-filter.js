@@ -24,6 +24,8 @@ define(function(require) {
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
+            'select2-data-loaded': 'onDataLoaded',
+            'select2-loaded': 'onDataLoaded'
         },
 
         emptyValue: {
@@ -37,6 +39,7 @@ define(function(require) {
 
         initialize: function() {
             ChoiceTreeFilter.__super__.initialize.apply(this, arguments);
+            this.data = this.data || [];
             if (this.lazy) {
                 this.loadedMetadata = false;
                 this.loader(
@@ -81,189 +84,24 @@ define(function(require) {
                     allowClear: true,
                     minimumInputLength: 0,
                     multiple: true,
-                    renderedPropertyName: this.renderedPropertyName
+                    renderedPropertyName: this.renderedPropertyName,
+                    forceSelectedData: true
                 }
             };
-            if (this.data) {
-                options.configs.data = {
-                    results: this.data,
-                    text: 'name'
-                };
-            } else if (this.autocomplete_url) {
+            if (this.autocomplete_url) {
                 options.url = this.autocomplete_url;
                 _.extend(options.configs, {
                     autocomplete_alias: this.autocomplete_alias
                 });
+            } else if (this.data) {
+                options.configs.data = {
+                    results: this.data,
+                    text: 'name'
+                };
             }
-            this.select2component = new Select2TreeAutocompleteComponent(options)
-        },
+            this.$(this.criteriaValueSelectors.value).data('selected-data', this.data);
+            this.select2component = new Select2TreeAutocompleteComponent(options);
 
-        _getListTemplate: function(items, searchQuery) {
-            var template;
-            var response = [];
-            var chain;
-
-            _.each(items, function(value) {
-                value.result = false;
-            });
-
-            if (searchQuery && searchQuery !== '') {
-                response = this.searchEngine.searchItems(searchQuery, items);
-                response = this.searchEngine._calculateChain(response, items);
-                chain = this._prepareItems(response, items);
-                items = chain;
-            }
-
-            if (this.mode === availableModes.selected) {
-                items = this._getSelectedItems(items);
-                var temp = [];
-                _.each(items, function(value) {
-                    temp.push({
-                        value: value,
-                        children: []
-                    });
-                });
-
-                response = temp;
-            } else {
-                response = this._convertToTree(items);
-            }
-
-            template = this.getListTemplate(response);
-            return template;
-        },
-
-        _getSelectedItems: function(data) {
-            var temp = [];
-            var values;
-            values = this.getValue().value.split(',');
-            _.each(values, function(value) {
-                _.each(data, function(item) {
-                    if (item.id === parseInt(value)) {
-                        temp.push(item);
-                    }
-                });
-            });
-
-            return temp;
-        },
-
-        _prepareItems: function(response, data) {
-            var root = {};
-            _.each(response, function(value) {
-                root[value.value.id] = value.value;
-                root[value.value.id].result = true;
-                _.each(value.value.chain, function(item) {
-                    _.each(data, function(bu) {
-                        if (bu.id === item) {
-                            if (!root[bu.id]) {
-                                root[bu.id] = bu;
-                            }
-                        }
-                    });
-                });
-            });
-
-            var rootArray = [];
-            for (var i in root) {
-                if (root.hasOwnProperty(i)) {
-                    rootArray.push(root[i]);
-                }
-            }
-
-            return rootArray;
-        },
-
-        _convertToTree: function(data) {
-            var response = [];
-            var idToNodeMap = {};
-            var element = {};
-
-            _.each(data, function(value) {
-                element = {};
-                element.value = value;
-                element.children = [];
-
-                idToNodeMap[element.value.id] = element;
-
-                if (!element.value.owner_id) {
-                    response.push(element);
-                } else {
-                    var parentNode = idToNodeMap[element.value.owner_id];
-                    if (parentNode) {
-                        parentNode.children.push(element);
-                    } else {
-                        response.push(element);
-                    }
-                }
-            });
-
-            return response;
-        },
-
-        isSelected: function(item) {
-            var value = this.getValue();
-            var values = value.value.split(',');
-
-            var response = false;
-            _.each(values, function(value) {
-                if (parseInt(value) === item.value.id) {
-                    response = true;
-                }
-            });
-
-            return response;
-        },
-
-        getListTemplate: function(items) {
-            var self = this;
-            var template = '<ul>';
-            $.each(items, function(key, value) {
-                var classSearchResult = '';
-                if (value.value.result) {
-                    classSearchResult = 'search-result';
-                }
-
-                var classSelected = '';
-                if (self.isSelected(value)) {
-                    classSelected = 'checked';
-                }
-
-                var id = self.name + '-' + value.value.id;
-
-                template += '<li>' +
-                    '<label for="' + id + '" class="' + classSearchResult + '">' +
-                    '<input id="' + id + '" ' +
-                    'value="' + value.value.id + '" ' +
-                    'type="checkbox" ' + classSelected + '>' +
-                    value.value.name +
-                    '</label>';
-                if (value.children.length > 0) {
-                    template += self.getListTemplate(value.children);
-                }
-                template += '</li>';
-            });
-            template += '</ul>';
-
-            return template;
-        },
-
-        _onChangeBusinessUnit: function(e) {
-            var values = [];
-            if ($(e.target).is(':checked')) {
-                this.checkedItems[$(e.target).val()] = true;
-            } else {
-                delete this.checkedItems[$(e.target).val()];
-            }
-
-            for (var i in this.checkedItems) {
-                if (this.checkedItems.hasOwnProperty(i)) {
-                    values.push(i);
-                }
-            }
-
-            values = values.join(',');
-            this.setValue({value: values}, true);
         },
 
         /**
@@ -301,11 +139,18 @@ define(function(require) {
             };
         },
 
+        onDataLoaded: function(e) {
+            var results = _.result(e.items, 'results') || [];
+            var existIds = _.pluck(this.data, 'id');
+            Array.prototype.push.apply(this.data, _.filter(results, function(item) {
+                return existIds.indexOf(item.id) === -1;
+            }));
+        },
+
         /**
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-            var self = this;
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             var option = null;
 
@@ -313,19 +158,14 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var values = value.value.split(',');
+            var renderedPropertyName = this.renderedPropertyName || 'name';
             var label = [];
-            for (var i in values) {
-                if (values[i] === 'All') {
-                    label.push(values[i]);
-                } else {
-                    for (var j in self.data) {
-                        if (parseInt(values[i]) === this.data[j].id) {
-                            label.push(this.data[j].name);
-                        }
-                    }
+            _.each(value.value.split(','), function(val) {
+                var item = _.findWhere(this.data, {id: parseInt(val)});
+                if (item !== void 0) {
+                    label.push(item[renderedPropertyName]);
                 }
-            }
+            }, this);
 
             var hintValue = this.wrapHintValue ? ('"' + label.join(',') + '"') : label.join(',');
             return (option ? option.label + ' ' : '') + hintValue;
