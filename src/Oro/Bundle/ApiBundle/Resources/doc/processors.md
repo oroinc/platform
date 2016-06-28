@@ -166,7 +166,14 @@ Examples of processor conditions
 
 ```yaml
     tags:
-        - { name: oro.api.processor, action: get_list, group: initialize, class: "Oro\Bundle\UserBundle\Entity\User" }
+        - { name: oro.api.processor, action: get_list, group: initialize, class: 'Oro\Bundle\UserBundle\Entity\User' }
+```
+
+- A processor is executed only for entities that implement some interface or extend some base class. Currently there are two attributes that being compared by **instance of** instead of **equal** operator. These attributes are **class** and **parentClass**.
+
+```yaml
+    tags:
+        - { name: oro.api.processor, action: get_list, group: initialize, class: 'Oro\Bundle\UserBundle\Entity\AbstractUser' }
 ```
 
 More examples you can find in [configuration of existing processors](../config). See `processors.*.yml` files.
