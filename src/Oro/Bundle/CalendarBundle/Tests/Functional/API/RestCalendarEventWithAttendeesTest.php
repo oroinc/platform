@@ -338,7 +338,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                     'parentEventId'    => null,
                     'editable'         => true,
                     'removable'        => true,
-                    'notifiable'       => false,
+                    'notifiable'       => true,
                     'calendarAlias'    => 'user',
                     'attendees'        => [
                         [
