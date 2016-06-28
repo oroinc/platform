@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
@@ -93,11 +94,16 @@ class ThemeExtension extends AbstractExtension
     protected function loadImports(LayoutUpdateInterface $update, ContextInterface $context, array &$updates)
     {
         if ($update instanceof ImportsAwareLayoutUpdateInterface) {
-            foreach ($update->getImports() as $importProperties) {
-                $importPaths = $this->getPathsForImport($context, $importProperties['id']);
+            $imports = $update->getImports();
+            if (!is_array($imports)) {
+                throw new LogicException(sprintf('Imports statement should be an array, %s given', gettype($imports)));
+            }
+            foreach ($imports as $importProperties) {
+                $import = $this->createImport($importProperties);
+                $importPaths = $this->getPathsForImport($context, $import->getId());
                 $importFiles = $this->findApplicableResources($importPaths);
                 foreach ($importFiles as $importFile) {
-                    $this->importStorage->set($importFile, $this->createImport($importProperties));
+                    $this->importStorage->set($importFile, $import);
                 }
                 $this->loadLayoutUpdatesWithImports($importFiles, $context, $updates);
             }
@@ -111,11 +117,13 @@ class ThemeExtension extends AbstractExtension
      */
     protected function getPathsForImport(ContextInterface $context, $importId)
     {
-        return [implode(PathProviderInterface::DELIMITER, [
-            $context->get(static::THEME_KEY),
-            static::IMPORT_FOLDER,
-            $importId,
-        ])];
+        return [
+            implode(PathProviderInterface::DELIMITER, [
+                $context->get(static::THEME_KEY),
+                static::IMPORT_FOLDER,
+                $importId,
+            ])
+        ];
     }
 
     /**
@@ -124,6 +132,15 @@ class ThemeExtension extends AbstractExtension
      */
     protected function createImport($importProperties)
     {
+        if (!is_array($importProperties)) {
+            $importProperties = [ImportsAwareLayoutUpdateInterface::ID_KEY => $importProperties];
+        }
+        if (!array_key_exists(ImportsAwareLayoutUpdateInterface::ID_KEY, $importProperties)) {
+            throw new LogicException(sprintf(
+                'Import id should be provided, array with "%s" keys given',
+                implode(', ', array_keys($importProperties))
+            ));
+        }
         $importProperties = array_merge([
             ImportsAwareLayoutUpdateInterface::ROOT_KEY => null,
             ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,

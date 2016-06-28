@@ -18,6 +18,9 @@ use Oro\Component\Layout\Model\LayoutUpdateImport;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithImports;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ThemeExtension */
@@ -39,7 +42,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     protected $importStorage;
 
     /** @var array */
-    protected $resources = [
+    protected static $resources = [
         'oro-default' => [
             'resource1.yml',
             'resource2.xml',
@@ -97,7 +100,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->importStorage = new ArrayCollection();
 
         $this->extension = new ThemeExtension(
-            $this->resources,
+            self::$resources,
             $loader,
             $this->dependencyInitializer,
             $this->provider,
@@ -205,13 +208,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
                 ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace',
             ]
         ]);
-        $importedLayoutUpdate = new LayoutUpdateWithImports([
-            [
-                ImportsAwareLayoutUpdateInterface::ID_KEY => 'second_level_import_id',
-                ImportsAwareLayoutUpdateInterface::ROOT_KEY => null,
-                ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,
-            ]
-        ]);
+        $importedLayoutUpdate = new LayoutUpdateWithImports(['second_level_import_id']);
         $secondLevelImportedLayoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $this->yamlDriver->expects($this->exactly(3))
@@ -234,7 +231,11 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEqualsImports($layoutUpdate->getImports()[0], $import);
         /** @var LayoutUpdateImport $secondLevelImport */
         $import = $this->importStorage->get('second-level-import-resource-gold.yml');
-        $this->assertEqualsImports($importedLayoutUpdate->getImports()[0], $import);
+        $this->assertEqualsImports([
+            ImportsAwareLayoutUpdateInterface::ID_KEY => $importedLayoutUpdate->getImports()[0],
+            ImportsAwareLayoutUpdateInterface::ROOT_KEY => null,
+            ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,
+        ], $import);
     }
 
     public function testThemeUpdatesWithImportsContainedMultipleUpdates()
@@ -247,11 +248,6 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
                 ImportsAwareLayoutUpdateInterface::ID_KEY => 'import_id',
                 ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
                 ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace',
-            ],
-            [
-                ImportsAwareLayoutUpdateInterface::ID_KEY => 'second_import_id',
-                ImportsAwareLayoutUpdateInterface::ROOT_KEY => null,
-                ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,
             ],
         ]);
         $importedLayoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
@@ -278,6 +274,48 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         /** @var LayoutUpdateImport $secondLevelImport */
         $import = $this->importStorage->get('second-import-resource-gold.yml');
         $this->assertEqualsImports($layoutUpdate->getImports()[0], $import);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Imports statement should be an array, string given
+     */
+    public function testThemeUpdatesWithNonArrayImports()
+    {
+        $themeName = 'oro-import';
+        $this->provider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
+
+        $layoutUpdate = new LayoutUpdateWithImports('string');
+
+        $this->yamlDriver->expects($this->once())
+            ->method('load')
+            ->with('resource-gold.yml')
+            ->willReturn($layoutUpdate);
+
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Import id should be provided, array with "root" keys given
+     */
+    public function testThemeUpdatesWithoutIdImportKey()
+    {
+        $themeName = 'oro-import';
+        $this->provider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
+
+        $layoutUpdate = new LayoutUpdateWithImports([
+            [
+                ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
+            ]
+        ]);
+
+        $this->yamlDriver->expects($this->once())
+            ->method('load')
+            ->with('resource-gold.yml')
+            ->willReturn($layoutUpdate);
+
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
 
     /**

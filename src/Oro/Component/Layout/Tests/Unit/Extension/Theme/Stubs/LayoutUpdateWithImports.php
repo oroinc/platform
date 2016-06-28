@@ -15,9 +15,9 @@ class LayoutUpdateWithImports implements LayoutUpdateInterface, ImportsAwareLayo
     private $imports;
 
     /**
-     * @param array $imports
+     * @param mixed $imports
      */
-    public function __construct(array $imports = [])
+    public function __construct($imports)
     {
         $this->imports = $imports;
     }
