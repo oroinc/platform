@@ -6,6 +6,7 @@ use Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -20,6 +21,9 @@ class ChoiceTreeFilterTest extends OrmTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
     protected $router;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
+    protected $dispatcher;
+
     protected function setUp()
     {
         $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
@@ -27,11 +31,14 @@ class ChoiceTreeFilterTest extends OrmTestCase
             ->getMock();
         $this->router = $this->getMock('Symfony\Component\Routing\RouterInterface');
 
+        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
         $this->filter = new ChoiceTreeFilter(
             $this->formFactory,
             new FilterUtility(),
             $registry,
-            $this->router
+            $this->router,
+            $this->dispatcher
         );
     }
 
@@ -127,7 +134,7 @@ class ChoiceTreeFilterTest extends OrmTestCase
             'choices' => [],
             'lazy' => false,
             'type' => 'choice-tree',
-            'data' => false,
+            'data' => [],
             'autocomplete_alias' => false,
             'autocomplete_url' => null,
             'renderedPropertyName' => false,

@@ -40,6 +40,7 @@ class ChoiceTreeFilterLoadDataListener
             foreach ($entities as $entity) {
                 $result = [];
                 $result['id'] = $entity->getId();
+                $result['name'] = $entity->getName();
                 $result['treePath'] = $this->getPath($entity, []);
                 $result['organization_id'] = $entity->getOrganization()->getId();
 
