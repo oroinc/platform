@@ -17,6 +17,7 @@ class OroLayoutExtension extends Extension
 {
     const UPDATE_LOADER_SERVICE_ID      = 'oro_layout.loader';
     const THEME_MANAGER_SERVICE_ID      = 'oro_layout.theme_manager';
+    const THEME_CONFIGS_PATH            = 'Resources/views/layouts/{folder}/';
 
     const RESOURCES_FOLDER_PLACEHOLDER  = '{folder}';
     const RESOURCES_FOLDER_PATTERN      = '[a-zA-Z][a-zA-Z0-9_\-:]*';
@@ -27,26 +28,24 @@ class OroLayoutExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $resources = $this->loadCumulativeResources(
-            'oro_layout',
             $container,
-            sprintf('Resources/views/layouts/%s/theme.yml', self::RESOURCES_FOLDER_PLACEHOLDER),
+            'theme.yml',
             'Resources/config/oro/layout.yml'
         );
         foreach ($resources as $resource) {
             $configs[] = $this->getThemeConfig($resource);
         }
-        $existingPaths = $this->getExistingPaths($resources);
+        $excludedPaths = $this->getExcludedPaths($resources);
 
 
         $resources = $this->loadCumulativeResources(
-            'oro_layout',
             $container,
-            sprintf('Resources/views/layouts/%s/requirejs.yml', self::RESOURCES_FOLDER_PLACEHOLDER)
+            'requirejs.yml'
         );
-        $existingPaths = array_merge($existingPaths, $this->getExistingPaths($resources));
+        $excludedPaths = array_merge($excludedPaths, $this->getExcludedPaths($resources));
 
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config        = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -86,14 +85,14 @@ class OroLayoutExtension extends Extension
         $themeManagerDef->replaceArgument(1, $config['themes']);
 
         $foundThemeLayoutUpdates = [];
-        $updateFileExtensions = [];
+        $updateFileExtensions    = [];
         $updateLoaderDef = $container->getDefinition(self::UPDATE_LOADER_SERVICE_ID);
         foreach ($updateLoaderDef->getMethodCalls() as $methodCall) {
             if ($methodCall[0] === 'addDriver') {
                 $updateFileExtensions[] = $methodCall[1][0];
             }
         }
-        $updatesLoader = new CumulativeConfigLoader(
+        $updatesLoader         = new CumulativeConfigLoader(
             'oro_layout_updates_list',
             [new FolderContentCumulativeLoader('Resources/views/layouts/', -1, false, $updateFileExtensions)]
         );
@@ -109,7 +108,7 @@ class OroLayoutExtension extends Extension
              *    ]
              * ]
              */
-            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($existingPaths, $resource->data);
+            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($excludedPaths, $resource->data);
             $resourceThemeLayoutUpdates = $this->sortThemeLayoutUpdates($resourceThemeLayoutUpdates);
             $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resourceThemeLayoutUpdates);
         }
@@ -120,9 +119,8 @@ class OroLayoutExtension extends Extension
     }
 
     /**
-     * Load resources for given config name from views and config file path
+     * Load resources from views and config file path
      *
-     * @param string            $name
      * @param ContainerBuilder  $container
      * @param string|null       $viewsFilePath
      * @param string|null       $configFilePath
@@ -130,7 +128,6 @@ class OroLayoutExtension extends Extension
      * @return CumulativeResourceInfo[]
      */
     protected function loadCumulativeResources(
-        $name,
         ContainerBuilder $container,
         $viewsFilePath = null,
         $configFilePath = null
@@ -141,7 +138,7 @@ class OroLayoutExtension extends Extension
             $resourceLoaders[] = new FolderingCumulativeFileLoader(
                 self::RESOURCES_FOLDER_PLACEHOLDER,
                 self::RESOURCES_FOLDER_PATTERN,
-                new YamlCumulativeFileLoader($viewsFilePath)
+                new YamlCumulativeFileLoader(self::THEME_CONFIGS_PATH . $viewsFilePath)
             );
         }
 
@@ -149,7 +146,7 @@ class OroLayoutExtension extends Extension
             $resourceLoaders[] = new YamlCumulativeFileLoader($configFilePath);
         }
 
-        $configLoader = new CumulativeConfigLoader($name, $resourceLoaders);
+        $configLoader = new CumulativeConfigLoader('oro_layout', $resourceLoaders);
 
         return $configLoader->load($container);
     }
@@ -158,14 +155,14 @@ class OroLayoutExtension extends Extension
      * @param CumulativeResourceInfo[] $resources
      * @return array
      */
-    protected function getExistingPaths(array $resources)
+    protected function getExcludedPaths(array $resources)
     {
-        $existingPaths = [];
+        $excludedPaths = [];
         foreach ($resources as $resource) {
-            $existingPaths[$resource->path] = true;
+            $excludedPaths[$resource->path] = true;
         }
 
-        return $existingPaths;
+        return $excludedPaths;
     }
 
     /**
