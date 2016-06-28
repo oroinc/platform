@@ -37,8 +37,7 @@ class IndexListenerTest extends WebTestCase
 
         $this->assertNotNull($item->getId());
         $this->assertCount(1, $traces);
-        $this->assertArrayHasKey(Topics::INDEX_ENTITIES, $traces);
-        $this->assertCount(1, $traces[Topics::INDEX_ENTITIES]);
+        $this->assertEquals(Topics::INDEX_ENTITIES, $traces[0]['topic']);
 
         $expectedMessage = [
             [
@@ -47,7 +46,7 @@ class IndexListenerTest extends WebTestCase
             ],
         ];
 
-        $this->assertEquals($expectedMessage, $traces[Topics::INDEX_ENTITIES][0]['message']);
+        $this->assertEquals($expectedMessage, $traces[0]['message']);
     }
 
     public function testShouldUpdateSearchIndexForEntityIfItWasUpdated()
@@ -67,8 +66,7 @@ class IndexListenerTest extends WebTestCase
 
         $this->assertNotEmpty($item->getId());
         $this->assertCount(1, $traces);
-        $this->assertArrayHasKey(Topics::INDEX_ENTITIES, $traces);
-        $this->assertCount(1, $traces[Topics::INDEX_ENTITIES]);
+        $this->assertEquals(Topics::INDEX_ENTITIES, $traces[0]['topic']);
 
         $expectedMessage = [
             [
@@ -77,7 +75,7 @@ class IndexListenerTest extends WebTestCase
             ],
         ];
 
-        $this->assertEquals($expectedMessage, $traces[Topics::INDEX_ENTITIES][0]['message']);
+        $this->assertEquals($expectedMessage, $traces[0]['message']);
     }
 
     public function testShouldDeleteSearchIndexForEntityIfItWasDeleted()
@@ -99,8 +97,7 @@ class IndexListenerTest extends WebTestCase
         $traces = $this->getMessageProducer()->getTraces();
 
         $this->assertCount(1, $traces);
-        $this->assertArrayHasKey(Topics::INDEX_ENTITIES, $traces);
-        $this->assertCount(1, $traces[Topics::INDEX_ENTITIES]);
+        $this->assertEquals(Topics::INDEX_ENTITIES, $traces[0]['topic']);
 
         $expectedMessage = [
             [
@@ -109,7 +106,7 @@ class IndexListenerTest extends WebTestCase
             ],
         ];
 
-        $this->assertEquals($expectedMessage, $traces[Topics::INDEX_ENTITIES][0]['message']);
+        $this->assertEquals($expectedMessage, $traces[0]['message']);
     }
 
     /**
