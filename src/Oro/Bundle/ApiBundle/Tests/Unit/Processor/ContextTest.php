@@ -199,6 +199,21 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(500, $this->context->get(Context::RESPONSE_STATUS_CODE));
     }
 
+    public function testIsSuccessResponse()
+    {
+        $this->assertFalse($this->context->isSuccessResponse());
+
+        $this->context->setResponseStatusCode(200);
+        $this->assertTrue($this->context->isSuccessResponse());
+        $this->context->setResponseStatusCode(299);
+        $this->assertTrue($this->context->isSuccessResponse());
+
+        $this->context->setResponseStatusCode(199);
+        $this->assertFalse($this->context->isSuccessResponse());
+        $this->context->setResponseStatusCode(300);
+        $this->assertFalse($this->context->isSuccessResponse());
+    }
+
     public function testClassName()
     {
         $this->assertNull($this->context->getClassName());
