@@ -7,12 +7,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\Testing\DbIsolationExtension;
 
 class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 {
-    use DbIsolationExtension;
-
     protected function setUp()
     {
         parent::setUp();
