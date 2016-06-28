@@ -47,7 +47,7 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
     {
         $data = JSON::decode($message->getBody());
 
-        if (empty($data['class']) || empty($data['offset']) || empty($data['limit'])) {
+        if (false == isset($data['class']) || false == isset($data['offset']) || false == isset($data['limit'])) {
             $this->logger->error(sprintf('Message is not valid: "%s"', $message->getBody()));
 
             return self::REJECT;
