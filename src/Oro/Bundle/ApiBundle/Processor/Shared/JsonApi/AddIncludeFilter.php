@@ -17,6 +17,9 @@ class AddIncludeFilter implements ProcessorInterface
 {
     const FILTER_KEY = 'include';
 
+    const FILTER_DESCRIPTION =
+        'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.';
+
     /**
      * {@inheritdoc}
      */
@@ -50,10 +53,7 @@ class AddIncludeFilter implements ProcessorInterface
             return;
         }
 
-        $filter = new IncludeFilter(
-            DataType::STRING,
-            'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.'
-        );
+        $filter = new IncludeFilter(DataType::STRING, self::FILTER_DESCRIPTION);
         $filter->setArrayAllowed(true);
         $filters->add(self::FILTER_KEY, $filter);
     }

@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Adds AccessGranted validation constraint for all associations.
+ * Adds AccessGranted validation constraint for all ORM associations.
  * Adds HasAdderAndRemover validation constraint for all "to-many" associations.
  */
 class AddAssociationValidators implements ProcessorInterface
@@ -33,20 +33,20 @@ class AddAssociationValidators implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
+        $definition = $context->getResult();
         $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            $this->addValidatorsForEntityAssociations($definition, $entityClass);
+        } else {
+            $this->addValidatorsForObjectAssociations($definition, $entityClass);
         }
-
-        $this->addAssociationValidators($context->getResult(), $entityClass);
     }
 
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      */
-    protected function addAssociationValidators(EntityDefinitionConfig $definition, $entityClass)
+    protected function addValidatorsForEntityAssociations(EntityDefinitionConfig $definition, $entityClass)
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $fields = $definition->getFields();
@@ -56,12 +56,30 @@ class AddAssociationValidators implements ProcessorInterface
                 $fieldOptions = $field->getFormOptions();
                 if ($metadata->isCollectionValuedAssociation($fieldName)) {
                     $fieldOptions['constraints'][] = new Assert\HasAdderAndRemover(
-                        ['class' => $metadata->name, 'property' => $fieldName]
+                        ['class' => $entityClass, 'property' => $fieldName]
                     );
                     $fieldOptions['constraints'][] = new Assert\All(new Assert\AccessGranted());
                 } else {
                     $fieldOptions['constraints'][] = new Assert\AccessGranted();
                 }
+                $field->setFormOptions($fieldOptions);
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     */
+    protected function addValidatorsForObjectAssociations(EntityDefinitionConfig $definition, $entityClass)
+    {
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->getTargetClass() && $field->isCollectionValuedAssociation()) {
+                $fieldOptions = $field->getFormOptions();
+                $fieldOptions['constraints'][] = new Assert\HasAdderAndRemover(
+                    ['class' => $entityClass, 'property' => $field->getPropertyPath() ?: $fieldName]
+                );
                 $field->setFormOptions($fieldOptions);
             }
         }

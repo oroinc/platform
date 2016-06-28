@@ -30,4 +30,25 @@ class AttendeeTest extends AbstractEntityTest
             'updatedAt'     => ['updatedAt', $date, $date]
         ];
     }
+
+    public function testToString()
+    {
+        $this->entity->setDisplayName('display name');
+        $this->assertEquals('display name', (string) $this->entity);
+    }
+
+    public function testLifecycleCallbacks()
+    {
+        // guards
+        $this->assertNull($this->entity->getCreatedAt());
+        $this->assertNull($this->entity->getUpdatedAt());
+
+        $this->entity->beforeSave();
+        $this->assertInstanceOf('DateTime', $this->entity->getCreatedAt());
+        $this->assertInstanceOf('DateTime', $this->entity->getUpdatedAt());
+
+        $originalUpdatedAt = $this->entity->getUpdatedAt();
+        $this->entity->preUpdate();
+        $this->assertNotSame($originalUpdatedAt, $this->entity->getUpdatedAt());
+    }
 }

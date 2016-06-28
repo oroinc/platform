@@ -32,6 +32,11 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 20 }
 
+    oro_api.delete.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\InitializeConfigExtras
+        tags:
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 10 }
+
     #
     # normalize_input
     #

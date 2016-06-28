@@ -79,7 +79,7 @@ class CalendarEventApiHandler
             if ($this->form->isValid()) {
                 /** @deprecated since version 1.10. Please use field attendees instead of invitedUsers */
                 if ($this->form->has('invitedUsers')) {
-                    $this->convertInvitedUsersToAttendee($entity, $this->form->get('invitedUsers')->getData());
+                    $this->convertInvitedUsersToAttendees($entity, $this->form->get('invitedUsers')->getData());
                 }
 
                 // TODO: should be refactored after finishing BAP-8722
@@ -116,7 +116,7 @@ class CalendarEventApiHandler
      * @param CalendarEvent $event
      * @param User[]        $users
      */
-    protected function convertInvitedUsersToAttendee(CalendarEvent $event, array $users)
+    protected function convertInvitedUsersToAttendees(CalendarEvent $event, array $users)
     {
         foreach ($users as $user) {
             $attendee = $this->attendeeRelationManager->createAttendee($user);

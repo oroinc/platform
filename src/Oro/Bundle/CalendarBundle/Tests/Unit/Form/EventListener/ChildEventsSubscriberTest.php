@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -21,12 +22,24 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->setMethods(['find', 'findDefaultCalendars'])
             ->disableOriginalConstructor()
             ->getMock();
         $repository->expects($this->any())
             ->method('find')
             ->will($this->returnCallback(function ($id) {
                 return new TestEnumValue($id, $id);
+            }));
+        $repository->expects($this->any())
+            ->method('findDefaultCalendars')
+            ->will($this->returnCallback(function ($userIds) {
+                return array_map(
+                    function ($userId) {
+                        return (new Calendar())
+                            ->setOwner(new User($userId));
+                    },
+                    $userIds
+                );
             }));
 
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
@@ -35,6 +48,7 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValueMap([
                 ['Extend\Entity\EV_Ce_Attendee_Status', null, $repository],
                 ['Extend\Entity\EV_Ce_Attendee_Type', null, $repository],
+                ['OroCalendarBundle:Calendar', null, $repository],
             ]));
 
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
@@ -44,6 +58,16 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->childEventsSubscriber = new ChildEventsSubscriber(
             $registry,
             $securityFacade
+        );
+    }
+
+    public function testGetSubscribedEvents()
+    {
+        $this->assertEquals(
+            [
+                FormEvents::POST_SUBMIT => 'postSubmit',
+            ],
+            $this->childEventsSubscriber->getSubscribedEvents()
         );
     }
 
@@ -146,6 +170,36 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->childEventsSubscriber->postSubmit(new FormEvent($form, []));
 
         $this->assertEquals($attendees->first(), $event->getRelatedAttendee());
+    }
+
+    public function testAddEvents()
+    {
+        $user = new User(1);
+        $user2 = new User(2);
+
+        $calendar = (new Calendar())
+            ->setOwner($user);
+
+        $attendees = new ArrayCollection([
+            (new Attendee())
+                ->setUser($user),
+            (new Attendee())
+                ->setUser($user2)
+        ]);
+
+        $event = (new CalendarEvent())
+            ->setAttendees($attendees)
+            ->setCalendar($calendar);
+
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue($event));
+
+        $this->childEventsSubscriber->postSubmit(new FormEvent($form, []));
+
+        $this->assertCount(1, $event->getChildEvents());
+        $this->assertSame($attendees->get(1), $event->getChildEvents()->first()->getRelatedAttendee());
     }
 
     public function testUpdateAttendees()

@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
-use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
