@@ -8,7 +8,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class ChoiceTreeFilterLoadDataListener
 {
-    const EXPECTED_CLASS_NAME = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
+    const SUPPORTED_CLASS_NAME = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
 
     /** @var Registry */
     protected $doctrine;
@@ -28,7 +28,7 @@ class ChoiceTreeFilterLoadDataListener
      */
     public function fillData(ChoiceTreeFilterLoadDataEvent $event)
     {
-        if ($event->getClassName() === static::EXPECTED_CLASS_NAME) {
+        if ($event->getClassName() === static::SUPPORTED_CLASS_NAME) {
             $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id'=> $event->getValues()]);
 
             $data = [];
