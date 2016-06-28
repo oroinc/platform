@@ -41,7 +41,6 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($label, (string)$role);
     }
 
-    
     public function testClone()
     {
         $role = new Role();
