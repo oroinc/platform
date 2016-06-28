@@ -9,6 +9,11 @@ class UserConfigurationFormProvider extends SystemConfigurationFormProvider
     const USER_TREE_NAME  = 'user_configuration';
 
     /**
+     * @var string
+     */
+    protected $parentCheckboxLabel = 'oro.user.user_configuration.use_default';
+
+    /**
      * {@inheritdoc}
      */
     public function getTree()
@@ -17,10 +22,18 @@ class UserConfigurationFormProvider extends SystemConfigurationFormProvider
     }
 
     /**
+     * @param string $label
+     */
+    public function setParentCheckboxLabel($label)
+    {
+        $this->parentCheckboxLabel = $label;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getParentCheckboxLabel()
     {
-        return 'oro.user.user_configuration.use_default';
+        return $this->parentCheckboxLabel;
     }
 }

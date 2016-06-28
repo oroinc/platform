@@ -85,6 +85,14 @@ class ConfigManager
     }
 
     /**
+     * @return array|null
+     */
+    public function getScopeInfo()
+    {
+        return $this->getScopeManager()->getScopeInfo();
+    }
+
+    /**
      * Get setting value
      *
      * @param string $name Setting name, for example "oro_user.level"

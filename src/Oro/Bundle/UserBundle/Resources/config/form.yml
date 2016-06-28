@@ -24,8 +24,6 @@ parameters:
     oro_user.form.type.organization_user_acl_select.class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclSelectType
     oro_user.form.type.organization_user_multiselect.class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType
     oro_user.form.type.user_emailsettings.class: Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
-    oro_user.form.type.user_emailsettings_button.class: Oro\Bundle\UserBundle\Form\Type\EmailSettingsButtonType
-    oro_user.form.handler.user_emailsettings.class: Oro\Bundle\UserBundle\Form\Handler\EmailSettingsHandler
 
 services:
     oro_user.form.user:
@@ -199,16 +197,9 @@ services:
         class: %oro_user.form.type.user_emailsettings.class%
         arguments:
             - '@oro_config.user'
+            - '@oro_user.imap_configuration.subscriber'
         tags:
             - { name: form.type, alias: oro_user_emailsettings }
-
-    oro_user.form.type.user_emailsettings_button:
-        class: %oro_user.form.type.user_emailsettings_button.class%
-        scope: request
-        arguments:
-            - '@request'
-        tags:
-            - { name: form.type, alias: oro_user_emailsettings_button }
 
     oro_user.form.handler.user:
         class: %oro_user.form.handler.user.class%
@@ -286,8 +277,3 @@ services:
             - '@oro_user.form.type.set_password.form'
             - '@oro_user.mailer.processor'
             - '@oro_user.manager'
-
-    oro_user.form.handler.user_emailsettings:
-        class: %oro_user.form.handler.user_emailsettings.class%
-        scope: request
-        arguments: ["@oro_user.form.emailsettings", "@request", "@doctrine.orm.entity_manager"]

@@ -278,6 +278,14 @@ abstract class AbstractScopeManager
     }
 
     /**
+     * @return null|array
+     */
+    public function getScopeInfo()
+    {
+        return null;
+    }
+
+    /**
      * Find scope id by provided entity object
      *
      * @param object $entity

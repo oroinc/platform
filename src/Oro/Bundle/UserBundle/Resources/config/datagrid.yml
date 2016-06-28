@@ -132,18 +132,18 @@ datagrid:
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_user_update
-            delete:
-                type:          delete
-                label:         oro.grid.action.delete
-                link:          delete_link
-                icon:          trash
-                acl_resource:  oro_user_user_delete
             config:
                 type:          navigate
                 label:         oro.user.user_configuration.grid.action.config
                 link:          config_link
                 icon:          cog
                 acl_resource:  oro_user_user_update
+            delete:
+                type:          delete
+                label:         oro.grid.action.delete
+                link:          delete_link
+                icon:          trash
+                acl_resource:  oro_user_user_delete
 
     groups-grid:
         extended_entity_name: %oro_user.group.entity.class%

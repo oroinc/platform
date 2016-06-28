@@ -30,7 +30,7 @@ oro_system_configuration:
 
         user_mailbox:
             title: oro.user.imap_configuration.label
-            priority: -10
+            priority: 95
 
         user_bar_settings:
             title: oro.user.user_bar_settings.title
@@ -115,7 +115,7 @@ oro_system_configuration:
                 required: true
 
         oro_email.user_mailbox:
-            type: oro_user_emailsettings_button
+            type: oro_user_emailsettings
             ui_only: true
             priority: 10
             options:

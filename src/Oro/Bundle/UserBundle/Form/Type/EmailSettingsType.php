@@ -7,19 +7,26 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 
 class EmailSettingsType extends AbstractType
 {
     /** ConfigManager */
     protected $userConfigManager;
 
+    /** UserImapConfigSubscriber */
+    protected $subscriber;
+
     /**
-     * @param ConfigManager            $userConfigManager
+     * @param ConfigManager $userConfigManager
+     * @param UserImapConfigSubscriber $subscriber
      */
     public function __construct(
-        ConfigManager            $userConfigManager
+        ConfigManager            $userConfigManager,
+        UserImapConfigSubscriber $subscriber
     ) {
         $this->userConfigManager = $userConfigManager;
+        $this->subscriber = $subscriber;
     }
 
     /**
@@ -31,7 +38,8 @@ class EmailSettingsType extends AbstractType
             'data_class'         => 'Oro\Bundle\UserBundle\Entity\User',
             'cascade_validation' => true,
             'ownership_disabled' => true,
-            'dynamic_fields_disabled' => true
+            'dynamic_fields_disabled' => true,
+            'label' => false,
         ]);
     }
 
@@ -40,6 +48,7 @@ class EmailSettingsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber($this->subscriber);
         if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
             $builder->add(
                 'imapAccountType',

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Bundle\Tests\Selenium;
 
-use Oro\Bundle\ConfigBundle\Tests\Selenium\Pages\UserImapSettings;
+use Oro\Bundle\ConfigBundle\Tests\Selenium\Pages\UserEmailSettings;
 use Oro\Bundle\EmailBundle\Tests\Selenium\Pages\Emails;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
@@ -28,8 +28,8 @@ class ImapTest extends Selenium2TestCase
         );
 
         $login = $this->login();
-        /** @var UserImapSettings $login */
-        $login->openUserImapSettings('Oro\Bundle\ConfigBundle')->setImap($imapSetting);
+        /** @var UserEmailSettings $login */
+        $login->openUserEmailSettings('Oro\Bundle\ConfigBundle')->setImap($imapSetting);
         exec("app/console oro:cron:imap-sync --env prod");
         /** @var Emails $login */
         $login->openEmails('Oro\Bundle\EmailBundle')

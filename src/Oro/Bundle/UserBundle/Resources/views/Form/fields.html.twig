@@ -41,21 +41,3 @@
         });
     </script>
 {% endblock %}
-{% block oro_user_emailsettings_button_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set route = form.vars.route %}
-    {% set routeParams = form.vars.routeParams %}
-    <div class="control-group">
-        <div class="control-label wrap"><label></label></div>
-        <div class="controls">
-            <div class="controls control-subgroup">
-                <div class="btn-group">
-                    {{ UI.addButton({
-                        'path': path(route, routeParams),
-                        'label': 'oro.user.imap_configuration.update'|trans
-                    }) }}
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}

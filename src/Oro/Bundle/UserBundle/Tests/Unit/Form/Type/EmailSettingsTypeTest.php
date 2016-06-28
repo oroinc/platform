@@ -13,6 +13,9 @@ class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $userConfigManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $subscriber;
+
     /**
      * Setup test env
      */
@@ -21,7 +24,10 @@ class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
         $this->userConfigManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->type = new EmailSettingsType($this->userConfigManager);
+        $this->subscriber = $this->getMockBuilder('Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->type = new EmailSettingsType($this->userConfigManager, $this->subscriber);
     }
 
     public function testConfigureOptions()
@@ -45,8 +51,9 @@ class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(['add'])
+            ->setMethods(['add', 'addEventSubscriber'])
             ->getMock();
+        $builder->expects($this->once())->method('addEventSubscriber')->with($this->subscriber);
         $builder->expects($this->once())->method('add')->with(
             'imapAccountType',
             'oro_imap_choice_account_type',
@@ -62,7 +69,7 @@ class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(['add'])
+            ->setMethods(['add', 'addEventSubscriber'])
             ->getMock();
         $builder->expects($this->once())->method('add')->with(
             'imapConfiguration',
