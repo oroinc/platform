@@ -23,7 +23,7 @@ class ImportsLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
         $phpClass = PhpClass::create('LayoutUpdateWithImport');
         $visitContext = new VisitContext($phpClass);
 
-        $method = PhpMethod::create('getImports');
+        $method = PhpMethod::create('testMethod');
 
         $condition->startVisit($visitContext);
         $visitContext->getUpdateMethodWriter()->writeln('echo 123;');
@@ -36,20 +36,18 @@ class ImportsLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
 <<<CLASS
 class LayoutUpdateWithImport implements \Oro\Component\Layout\ImportsAwareLayoutUpdateInterface
 {
-    private \$import;
+    public function testMethod()
+    {
+        echo 123;
+    }
 
     public function getImports()
     {
-        if (null === \$this->import) {
-            throw new \RuntimeException('Missing import for layout update');
-        }
-        echo 123;
-        return \$this->import;
-    }
-
-    public function __construct(\$import)
-    {
-        \$this->import = \$import;
+        return array (
+          'id' => 'import_id',
+          'root' => 'root_block_id',
+          'namespace' => 'import_namespace',
+        );
     }
 }
 CLASS

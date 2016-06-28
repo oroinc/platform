@@ -2,8 +2,6 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator\Extension;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
@@ -14,20 +12,9 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ImportsLayoutUpdateExtension */
     protected $extension;
 
-    /**
-     * @var KernelInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $kernel;
-
     protected function setUp()
     {
-        $this->kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
-        $this->kernel->expects($this->any())
-            ->method('locateResource')
-            ->will($this->returnCallback(function ($import) {
-                return $import . '_imported';
-            }));
-        $this->extension = new ImportsLayoutUpdateExtension($this->kernel);
+        $this->extension = new ImportsLayoutUpdateExtension();
     }
 
     /**
@@ -70,13 +57,17 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'source' => [
                     ImportsLayoutUpdateExtension::NODE_CONDITIONS => [
-                        'file.yml',
-                        '@file2.yml',
+                        'id' => 'import_id',
+                        'root' => 'root_block_id',
+                        'namespace' => 'import_namespace',
                     ]
                 ],
                 'expectedData' => [
-                    'file.yml',
-                    '@file2.yml_imported',
+                    [
+                    'id' => 'import_id',
+                    'root' => 'root_block_id',
+                    'namespace' => 'import_namespace',
+                    ]
                 ],
             ]
         ];

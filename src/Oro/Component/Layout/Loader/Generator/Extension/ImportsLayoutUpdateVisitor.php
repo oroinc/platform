@@ -3,8 +3,6 @@
 namespace Oro\Component\Layout\Loader\Generator\Extension;
 
 use CG\Generator\PhpMethod;
-use CG\Generator\PhpProperty;
-use CG\Generator\PhpParameter;
 
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
@@ -31,22 +29,10 @@ class ImportsLayoutUpdateVisitor implements VisitorInterface
     {
         $writer = $visitContext->createWriter();
         $class  = $visitContext->getClass();
-        $setFactoryMethod = PhpMethod::create('__construct');
-        $setFactoryMethod->addParameter(
-            PhpParameter::create('import')
-        );
-        $setFactoryMethod->setBody($writer->write('$this->import = $import;')->getContent());
-        $class->setMethod($setFactoryMethod);
-        $factoryProperty = PhpProperty::create('import');
-        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
-        $class->setProperty($factoryProperty);
-
         $class->addInterfaceName('Oro\Component\Layout\ImportsAwareLayoutUpdateInterface');
-        $visitContext->getUpdateMethodWriter()
-            ->writeln('if (null === $this->import) {')
-            ->writeln('    throw new \\RuntimeException(\'Missing import for layout update\');')
-            ->writeln('}');
-
+        $setFactoryMethod = PhpMethod::create('getImports');
+        $setFactoryMethod->setBody($writer->write('return '.var_export($this->import, true).';')->getContent());
+        $class->setMethod($setFactoryMethod);
     }
 
     /**
@@ -54,7 +40,5 @@ class ImportsLayoutUpdateVisitor implements VisitorInterface
      */
     public function endVisit(VisitContext $visitContext)
     {
-        $visitContext->getUpdateMethodWriter()
-            ->writeln('return $this->import;');
     }
 }
