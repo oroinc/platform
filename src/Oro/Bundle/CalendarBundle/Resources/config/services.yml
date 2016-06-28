@@ -266,6 +266,7 @@ services:
         arguments:
             - '@oro_notification.email_processor'
             - '@doctrine.orm.entity_manager'
+            - '@oro_security.security_facade'
 
     oro_calendar.listener.datagrid.system_calendar:
         class: %oro_calendar.listener.datagrid.system_calendar.class%
