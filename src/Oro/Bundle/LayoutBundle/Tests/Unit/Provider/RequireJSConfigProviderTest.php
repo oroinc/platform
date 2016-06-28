@@ -51,10 +51,16 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConfigFilePath()
     {
-        $this->assertEquals(
-            $this->themeName . DIRECTORY_SEPARATOR . RequireJSConfigProvider::REQUIREJS_CONFIG_FILE,
-            $this->provider->getConfigFilePath()
+        $filePath = implode(
+            [
+                RequireJSConfigProvider::REQUIREJS_JS_DIR,
+                $this->themeName,
+                RequireJSConfigProvider::REQUIREJS_CONFIG_FILE
+            ],
+            DIRECTORY_SEPARATOR
         );
+
+        $this->assertEquals($filePath, $this->provider->getConfigFilePath());
     }
 
     public function testGetOutputFilePath()
@@ -71,10 +77,12 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->method('collectConfigs')
             ->will($this->returnValue($config));
 
-        $this->assertEquals(
-            $this->themeName . DIRECTORY_SEPARATOR . $buildPath,
-            $this->provider->getOutputFilePath($config)
+        $filePath = implode(
+            [RequireJSConfigProvider::REQUIREJS_JS_DIR, $this->themeName, $buildPath],
+            DIRECTORY_SEPARATOR
         );
+
+        $this->assertEquals($filePath, $this->provider->getOutputFilePath($config));
     }
 
     public function testCollectAllConfigs()

@@ -16,7 +16,8 @@ use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 class RequireJSConfigProvider extends Config
 {
     const REQUIREJS_CONFIG_CACHE_KEY    = 'layout_requirejs_config';
-    const REQUIREJS_CONFIG_FILE         = 'js/require-config.js';
+    const REQUIREJS_CONFIG_FILE         = 'require-config.js';
+    const REQUIREJS_JS_DIR              = 'js/layout';
 
     /**
      * @var ThemeManager
@@ -36,7 +37,10 @@ class RequireJSConfigProvider extends Config
      */
     public function getConfigFilePath()
     {
-        return $this->configKey . DIRECTORY_SEPARATOR . self::REQUIREJS_CONFIG_FILE;
+        return implode(
+            [self::REQUIREJS_JS_DIR, $this->configKey, self::REQUIREJS_CONFIG_FILE],
+            DIRECTORY_SEPARATOR
+        );
     }
 
     /**
@@ -49,7 +53,10 @@ class RequireJSConfigProvider extends Config
             ? $config['config']['build_path']
             : parent::getOutputFilePath($config);
 
-        return $this->configKey . DIRECTORY_SEPARATOR . $path;
+        return implode(
+            [self::REQUIREJS_JS_DIR, $this->configKey, $path],
+            DIRECTORY_SEPARATOR
+        );
     }
 
     /**
