@@ -57,7 +57,7 @@ class IndexerPrepareQueryListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getExpectedQuery()
     {
-        $organizationsId = [1,2,3];
+        $organizationsId = [1, 2, 3];
         $expectedQuery = new Query();
         $expr = $expectedQuery->getCriteria()->expr();
         $expectedQuery->getCriteria()->andWhere(
