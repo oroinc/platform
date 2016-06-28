@@ -23,6 +23,11 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $theme;
 
+    /**
+     * @var string
+     */
+    protected $themeName = 'default';
+
     protected function setUp()
     {
         $this->theme = $this->getThemeMock();
@@ -37,48 +42,48 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getThemeManager')
             ->will($this->returnValue($this->themeManager));
+
+        $class = new \ReflectionClass(RequireJSConfigProvider::class);
+        $property = $class->getProperty('configKey');
+        $property->setAccessible(true);
+        $property->setValue($this->provider, $this->themeName);
     }
 
     public function testGetConfigFilePath()
     {
-        $theme = 'default';
-        $config = [
-            'config' => [
-                'config_key' => $theme
-            ]
-        ];
-
         $this->assertEquals(
-            $theme . DIRECTORY_SEPARATOR . RequireJSConfigProvider::REQUIREJS_CONFIG_FILE,
-            $this->provider->getConfigFilePath($config)
+            $this->themeName . DIRECTORY_SEPARATOR . RequireJSConfigProvider::REQUIREJS_CONFIG_FILE,
+            $this->provider->getConfigFilePath()
         );
     }
 
     public function testGetOutputFilePath()
     {
-        $theme = 'default';
-        $buildPath = './web';
+        $buildPath = 'build/path';
         $config = [
             'config' => [
-                'config_key' => $theme,
                 'build_path' => $buildPath,
             ]
         ];
 
+        $this->provider
+            ->expects($this->once())
+            ->method('collectConfigs')
+            ->will($this->returnValue($config));
+
         $this->assertEquals(
-            $theme . DIRECTORY_SEPARATOR . $buildPath,
+            $this->themeName . DIRECTORY_SEPARATOR . $buildPath,
             $this->provider->getOutputFilePath($config)
         );
     }
 
     public function testCollectAllConfigs()
     {
-        $theme = 'default';
         $mainConfig = ['Theme Main Config'];
         $buildConfig = ['Theme Build Config'];
 
         $configs = [
-            $theme => [
+            $this->themeName => [
                 'mainConfig' => $mainConfig,
                 'buildConfig' => $buildConfig
             ],
@@ -87,18 +92,16 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->theme
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($theme));
+            ->will($this->returnValue($this->themeName));
 
         $this->provider
             ->expects($this->once())
             ->method('generateMainConfig')
-            ->with($theme)
             ->will($this->returnValue($mainConfig));
 
         $this->provider
             ->expects($this->once())
             ->method('collectBuildConfig')
-            ->with($theme)
             ->will($this->returnValue($buildConfig));
 
         $this->assertEquals($configs, $this->provider->collectAllConfigs());
@@ -106,13 +109,11 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testCollectBuildConfig()
     {
-        $theme = 'default';
         $config = ['config'];
 
         $this->provider
             ->expects($this->once())
             ->method('collectConfigs')
-            ->with($theme)
             ->will($this->returnValue($config));
 
         $this->provider
@@ -125,12 +126,11 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
         $method = $class->getMethod('collectBuildConfig');
         $method->setAccessible(true);
 
-        $this->assertEquals($config, $method->invoke($this->provider, $theme));
+        $this->assertEquals($config, $method->invoke($this->provider, $this->themeName));
     }
 
     public function testGetFiles()
     {
-        $theme = 'default';
         $parentTheme = 'parent';
         $directory = 'directory';
         $bundle = 'Oro\Bundle\LayoutBundle\OroLayoutBundle';
@@ -138,7 +138,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->themeManager
             ->expects($this->at(0))
             ->method('getTheme')
-            ->with($theme)
+            ->with($this->themeName)
             ->will($this->returnValue($this->theme));
 
         $this->themeManager
@@ -172,24 +172,22 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
         $method = $class->getMethod('getFiles');
         $method->setAccessible(true);
 
-        $this->assertEquals([], $method->invoke($this->provider, $bundle, $theme));
+        $this->assertEquals([], $method->invoke($this->provider, $bundle, $this->themeName));
     }
 
     public function testGetTheme()
     {
-        $theme = 'default';
-
         $this->themeManager
             ->expects($this->once())
             ->method('getTheme')
-            ->with($theme)
+            ->with($this->themeName)
             ->will($this->returnValue($this->theme));
 
         $class = new \ReflectionClass(RequireJSConfigProvider::class);
         $method = $class->getMethod('getTheme');
         $method->setAccessible(true);
 
-        $this->assertEquals($this->theme, $method->invoke($this->provider, $theme));
+        $this->assertEquals($this->theme, $method->invoke($this->provider, $this->themeName));
     }
 
     public function testGetAllThemes()
