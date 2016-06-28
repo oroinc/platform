@@ -319,3 +319,11 @@ services:
             - @oro_security.security_facade
         tags:
             - {name: oro_entity.custom_grid_field_validator, entity_name: Oro_Bundle_UserBundle_Entity_User }
+
+    # Dashboard
+    oro_user.listener.choice_tree_filter_load_data_listener:
+        class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
+        arguments:
+            - @doctrine
+        tags:
+            - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
