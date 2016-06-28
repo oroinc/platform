@@ -354,3 +354,10 @@ services:
         arguments:
           - '@doctrine'
           - '@security.token_storage'
+
+    oro_user.listener.choice_tree_filter_load_data_listener:
+        class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }

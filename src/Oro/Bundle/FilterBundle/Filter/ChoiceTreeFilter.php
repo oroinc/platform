@@ -4,6 +4,8 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\FilterBundle\Event\ChoiceTreeFilterLoadDataEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -17,7 +19,10 @@ class ChoiceTreeFilter extends AbstractFilter
 
     /** @var RouterInterface */
     protected $router;
-    
+
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * ChoiceTreeFilter constructor.
      *
@@ -25,16 +30,19 @@ class ChoiceTreeFilter extends AbstractFilter
      * @param FilterUtility $util
      * @param ManagerRegistry $registry
      * @param RouterInterface $router
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
         ManagerRegistry $registry,
-        RouterInterface $router
+        RouterInterface $router,
+        EventDispatcherInterface $eventDispatcher
     ) {
         parent::__construct($factory, $util);
         $this->registry = $registry;
         $this->router = $router;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -51,9 +59,19 @@ class ChoiceTreeFilter extends AbstractFilter
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
+
+        $entities = [];
+
+        if ($this->getOr('className') && isset($this->state[$this->name])) {
+            $data = $this->parseData($this->state[$this->name]);
+            
+            $event = new ChoiceTreeFilterLoadDataEvent($this->getOr('className'), $data['value']);
+            $this->eventDispatcher->dispatch(ChoiceTreeFilterLoadDataEvent::EVENT_NAME, $event);
+            $entities = $event->getData();
+        }
+
         $metadata[FilterUtility::TYPE_KEY] = 'choice-tree';
-        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
-        $metadata['data'] = isset($options['data']) ? $options['data'] : false;
+        $metadata['data'] = $entities;
         $metadata['autocomplete_alias'] = $this->getOr('autocomplete_alias') ?
             $this->getOr('autocomplete_alias') : false;
         $routeName = $this->getOr('autocomplete_url') ?

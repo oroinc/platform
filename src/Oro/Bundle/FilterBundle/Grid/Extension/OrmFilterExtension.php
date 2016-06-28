@@ -142,6 +142,7 @@ class OrmFilterExtension extends AbstractExtension
             $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 
+            $filter->setFilterState($filtersState);
             $metadata          = $filter->getMetadata();
             $filtersMetaData[] = array_merge(
                 $metadata,
