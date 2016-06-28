@@ -68,7 +68,7 @@ class WorkflowStepSelectType extends AbstractType
                             function (Workflow $workflow) {
                                 return $workflow->getDefinition();
                             },
-                            $workflows
+                            array_values($workflows)
                         )
                     );
                 }

@@ -207,7 +207,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'testEntityClass';
         $workflowName = 'test_workflow';
-        $workflow = $this->createWorkflow($workflowName);
+        $workflow = $this->createWorkflow($workflowName, $entityClass);
         $workflowDefinition = $canAssemble ? $workflow->getDefinition() : null;
 
         $this->prepareAssemblerMock($workflowDefinition, $workflow);
@@ -243,11 +243,11 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
                 'canAssemble' => false,
                 'expected' => false,
             ],
-            'can assemble' => [
+            'can assemble without expected entity class' => [
                 'notEmptyList' => true,
                 'canAssemble' => true,
                 'expected' => true,
-            ],
+            ]
         ];
     }
 
