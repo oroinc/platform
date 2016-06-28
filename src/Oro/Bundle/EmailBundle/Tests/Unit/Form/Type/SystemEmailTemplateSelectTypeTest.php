@@ -89,12 +89,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->organization));
 
         $this->entityRepository->expects($this->any())
-            ->method('getEntityTemplatesQueryBuilder')
-            ->with(
-                '',
-                $this->organization,
-                true
-            )
+            ->method('getSystemTemplatesQueryBuilder')
             ->will($this->returnValue($this->queryBuilder));
 
         $this->em->expects($this->once())

@@ -3,11 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -23,17 +21,12 @@ class SystemEmailTemplateSelectType extends AbstractType
      */
     protected $em;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     /**
      * @param ObjectManager $objectManager
-     * @param SecurityFacade $securityFacade
      */
-    public function __construct(ObjectManager $objectManager, SecurityFacade $securityFacade)
+    public function __construct(ObjectManager $objectManager)
     {
         $this->em  = $objectManager;
-        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -42,7 +35,7 @@ class SystemEmailTemplateSelectType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'query_builder' => $this->getQueryBuilder(),
+            'query_builder' => $this->getRepository()->getSystemTemplatesQueryBuilder(),
             'class' => 'OroEmailBundle:EmailTemplate',
             'choice_value' => 'name',
         ]);
@@ -58,11 +51,11 @@ class SystemEmailTemplateSelectType extends AbstractType
                 function ($name) {
                     return $this->getRepository()->findByName($name);
                 },
-                function ($emailtTemplate) {
-                    if (is_null($emailtTemplate)) {
+                function ($emailTemplate) {
+                    if (is_null($emailTemplate)) {
                         return '';
                     }
-                    return $emailtTemplate->getName();
+                    return $emailTemplate->getName();
                 }
             )
         );
@@ -82,20 +75,6 @@ class SystemEmailTemplateSelectType extends AbstractType
     public function getParent()
     {
         return 'genemu_jqueryselect2_translatable_entity';
-    }
-
-    /**
-     * @return QueryBuilder
-     */
-    protected function getQueryBuilder()
-    {
-        $qb = $this->getRepository()->getEntityTemplatesQueryBuilder(
-            '',
-            $this->securityFacade->getOrganization(),
-            true
-        );
-
-        return $qb;
     }
 
     /**

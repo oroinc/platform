@@ -109,7 +109,6 @@ services:
         class: %oro_email.form.type.system_emailtemplate_select.class%
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '@oro_security.security_facade'
         tags:
             - { name: form.type, alias: oro_email_system_template_list }
 

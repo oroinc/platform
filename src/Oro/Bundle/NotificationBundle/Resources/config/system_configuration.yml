@@ -18,7 +18,7 @@ oro_system_configuration:
                 label: oro.notification.system_configuration.email_notification_sender_name
         oro_notification.mass_notification_template:
             data_type: string
-            type: oro_notification_maintenance_template_list
+            type: oro_email_system_template_list
             priority: 20
             options:
                 required: false
