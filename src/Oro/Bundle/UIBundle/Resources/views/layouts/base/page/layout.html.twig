@@ -10,8 +10,8 @@
         {%- placeholder requirejs_config_extend -%}
     {% endset %}
     {% include 'OroRequireJSBundle::scripts.html.twig' with {
-    compressed: not app.debug,
-    config_extend: requirejs_config_extend
+        compressed: not app.debug,
+        config_extend: requirejs_config_extend
     } %}
     {% placeholder scripts_after %}
     {{ block_widget(block) }}
