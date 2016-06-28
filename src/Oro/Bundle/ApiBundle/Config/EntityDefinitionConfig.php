@@ -36,6 +36,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /** a flag indicates whether a sorting is disabled */
     const DISABLE_SORTING = 'disable_sorting';
 
+    /** the names of identifier fields of the entity */
+    const IDENTIFIER_FIELD_NAMES = 'identifier_field_names';
+
     /** the name of ACL resource */
     const ACL_RESOURCE = 'acl_resource';
 
@@ -273,6 +276,32 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function disableSorting()
     {
         $this->items[self::DISABLE_SORTING] = true;
+    }
+
+    /**
+     * Gets the names of identifier fields of the entity.
+     *
+     * @return string[]
+     */
+    public function getIdentifierFieldNames()
+    {
+        return array_key_exists(self::IDENTIFIER_FIELD_NAMES, $this->items)
+            ? $this->items[self::IDENTIFIER_FIELD_NAMES]
+            : [];
+    }
+
+    /**
+     * Sets the names of identifier fields of the entity.
+     *
+     * @param string[] $fields
+     */
+    public function setIdentifierFieldNames(array $fields)
+    {
+        if (empty($fields)) {
+            unset($this->items[self::IDENTIFIER_FIELD_NAMES]);
+        } else {
+            $this->items[self::IDENTIFIER_FIELD_NAMES] = $fields;
+        }
     }
 
     /**

@@ -18,12 +18,18 @@
     {% if widgetConfiguration is defined %}
         {% for configName, config in widgetConfiguration %}
             {% if config.show_on_widget and config.value is not null%}
-                {% if config.options is defined and config.options.label is defined %}
-                    {% set label = config.options.label %}
+                {% if config.value is iterable %}
+                    {% for key,value in config.value %}
+                <div class="widget-config-data"><stong>{{ key|trans }}</stong>: {{ value }}</div>
+                    {% endfor %}
                 {% else %}
-                    {% set label = configName %}
+                    {% if config.options is defined and config.options.label is defined %}
+                        {% set label = config.options.label %}
+                    {% else %}
+                        {% set label = configName %}
+                    {% endif %}
+                    <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ config.value }}</div>
                 {% endif %}
-                <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ config.value }}</div>
             {% endif %}
         {% endfor %}
     {% endif %}

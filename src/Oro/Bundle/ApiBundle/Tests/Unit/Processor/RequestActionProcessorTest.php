@@ -233,7 +233,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('process');
 
         $this->setExpectedException(
-            '\RuntimeException',
+            '\Oro\Bundle\ApiBundle\Exception\RuntimeException',
             sprintf('An unexpected error occurred: %s.', $error->getTitle())
         );
 

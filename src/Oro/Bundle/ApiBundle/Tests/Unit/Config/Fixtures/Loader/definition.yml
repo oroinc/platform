@@ -50,6 +50,11 @@ enable_sorting:
     expected:
         disable_sorting: false
 
+empty_identifier_field_names:
+    config:
+        identifier_field_names: []
+    expected: []
+
 default_max_results:
     config:
         max_results: ~
@@ -120,6 +125,7 @@ all_attributes:
             id: DESC
         page_size: 20
         max_results: 50
+        identifier_field_names: ['id']
         hints:
             - hint1
             - {name: hint2, value: hint_val2}
@@ -136,6 +142,7 @@ all_attributes:
             id: DESC
         page_size: 20
         max_results: 50
+        identifier_field_names: ['id']
         hints:
             - hint1
             - {name: hint2, value: hint_val2}
@@ -239,6 +246,52 @@ field_description:
             field2: ~
             field3:
                 description: description1
+
+field_identifier_field_names:
+    config:
+        fields:
+            field1:
+                identifier_field_names: ['id']
+    expected:
+        fields:
+            field1:
+                identifier_field_names: ['id']
+
+field_target_class:
+    config:
+        fields:
+            field1:
+                target_class: ~
+            field2:
+                target_class: ""
+            field3:
+                target_class: Test\Class
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                target_class: Test\Class
+
+field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: ~
+            field2:
+                target_type: ""
+            field3:
+                target_type: to-one
+            field4:
+                target_type: to-many
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                target_type: to-one
+            field4:
+                target_type: to-many
 
 field_with_extra_attributes:
     config:
