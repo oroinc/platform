@@ -36,8 +36,6 @@ class IndexEntitiesByIdMessageProcessor implements MessageProcessorInterface, To
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        var_dump($message->getBody());
-
         $entities = JSON::decode($message->getBody());
 
         if (false == is_array($entities)) {

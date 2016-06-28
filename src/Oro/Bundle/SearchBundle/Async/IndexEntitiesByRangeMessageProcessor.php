@@ -45,8 +45,6 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        var_dump($message->getBody());
-
         $data = JSON::decode($message->getBody());
 
         if (false == isset($data['class']) || false == isset($data['offset']) || false == isset($data['limit'])) {

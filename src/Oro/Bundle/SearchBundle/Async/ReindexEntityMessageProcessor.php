@@ -36,8 +36,6 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        var_dump($message->getBody());
-
         $classes = JSON::decode($message->getBody());
 
         if (false == $classes) {
