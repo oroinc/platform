@@ -2,7 +2,6 @@
 namespace Oro\Bundle\SearchBundle\Async;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -15,7 +14,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
-     * @var EngineInterface
+     * @var IndexerInterface
      */
     protected $indexer;
 

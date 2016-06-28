@@ -2,7 +2,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
 use Doctrine\ORM\Query;
-use Oro\Bundle\SearchBundle\Async\IndexEntitiesByClassMessageProcessor;
+use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -11,11 +11,11 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class IndexEntitiesByClassMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredAttributes()
     {
-        new IndexEntitiesByClassMessageProcessor(
+        new IndexEntitiesByTypeMessageProcessor(
             $this->createDoctrineMock(),
             $this->createMessageProducerMock(),
             $this->createLoggerMock()
@@ -28,7 +28,7 @@ class IndexEntitiesByClassMessageProcessorTest extends \PHPUnit_Framework_TestCa
             Topics::INDEX_ENTITY_TYPE,
         ];
 
-        $this->assertEquals($expectedSubscribedTopics, IndexEntitiesByClassMessageProcessor::getSubscribedTopics());
+        $this->assertEquals($expectedSubscribedTopics, IndexEntitiesByTypeMessageProcessor::getSubscribedTopics());
     }
 
     public function testShouldRejectMessageIfEntityManagerWasNotFoundForClass()
@@ -51,7 +51,7 @@ class IndexEntitiesByClassMessageProcessorTest extends \PHPUnit_Framework_TestCa
         $message = new NullMessage();
         $message->setBody('entity-name');
 
-        $processor = new IndexEntitiesByClassMessageProcessor($doctrine, $producer, $logger);
+        $processor = new IndexEntitiesByTypeMessageProcessor($doctrine, $producer, $logger);
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);

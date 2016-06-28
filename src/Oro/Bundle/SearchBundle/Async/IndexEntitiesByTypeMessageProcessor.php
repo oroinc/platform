@@ -1,10 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Async;
 
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Expr\OrderBy;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -13,7 +10,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class IndexEntitiesByClassMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const BATCH_SIZE = 1000;
 
@@ -61,33 +58,20 @@ class IndexEntitiesByClassMessageProcessor implements MessageProcessorInterface,
             return self::REJECT;
         }
 
-        $identifierFieldName = $em->getClassMetadata($class)->getSingleIdentifierFieldName();
-
-        $orderingsExpr = new OrderBy();
-        $orderingsExpr->add('entity.' . $identifierFieldName);
-
-        $queryBuilder = $em->getRepository($class)
+        $entityCount = $em->getRepository($class)
             ->createQueryBuilder('entity')
-            ->select('entity.' . $identifierFieldName)
-            ->orderBy($orderingsExpr)
+            ->select('COUNT(entity)')
+            ->getQuery()
+            ->getSingleScalarResult()
         ;
 
-        $iterator = new BufferedQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize(static::BATCH_SIZE);
-        $iterator->setHydrationMode(AbstractQuery::HYDRATE_SCALAR);
-
-        $itemsCount = 0;
-        foreach ($iterator as $record) {
-            $itemsCount++;
-
-            $this->producer->send(Topics::INDEX_ENTITY, [
+        $batches = (int) ceil($entityCount / self::BATCH_SIZE);
+        for ($i = 0; $i < $batches; $i++) {
+            $this->producer->send(Topics::INDEX_ENTITY_BY_RANGE, [
                 'class' => $class,
-                'id' => $record[$identifierFieldName],
+                'offset' => $i * self::BATCH_SIZE,
+                'limit' => self::BATCH_SIZE,
             ]);
-
-            if (0 == $itemsCount % static::BATCH_SIZE) {
-                $em->clear();
-            }
         }
 
         return self::ACK;

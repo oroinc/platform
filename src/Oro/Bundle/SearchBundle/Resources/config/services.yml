@@ -209,11 +209,20 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_search.async.message_processor.index_entities_by_class:
-        class: 'Oro\Bundle\SearchBundle\Async\IndexEntitiesByClassMessageProcessor'
+    oro_search.async.message_processor.index_entities_by_type:
+        class: 'Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor'
         arguments:
             - '@doctrine'
             - '@oro_message_queue.client.message_producer'
+            - '@monolog.logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_search.async.message_processor.index_entities_by_range:
+        class: 'Oro\Bundle\SearchBundle\Async\IndexEntitiesByRangeMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_search.search.engine.indexer'
             - '@monolog.logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
