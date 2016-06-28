@@ -129,6 +129,17 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->setWorkflowInactive($definition);
     }
 
+    public function testIsConfigurable()
+    {
+        $wfConfigProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
+        $wfConfigProvider->expects($this->once())->method('hasConfig')->with(EntityStub::class)->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('workflow')
+            ->willReturn($wfConfigProvider);
+        $this->assertTrue($this->manager->isConfigurable(EntityStub::class));
+    }
+
     /**
      * @param $entityClass
      * @return EntityConfig|\PHPUnit_Framework_MockObject_MockObject

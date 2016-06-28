@@ -108,6 +108,15 @@ class WorkflowSystemConfigManager
     }
 
     /**
+     * @param string $entityClass
+     * @return bool
+     */
+    public function isConfigurable($entityClass)
+    {
+        return $this->configManager->getProvider(self::CONFIG_PROVIDER_NAME)->hasConfig($entityClass);
+    }
+
+    /**
      * @param WorkflowDefinition $definition
      * @param bool $isActive
      * @return ConfigInterface

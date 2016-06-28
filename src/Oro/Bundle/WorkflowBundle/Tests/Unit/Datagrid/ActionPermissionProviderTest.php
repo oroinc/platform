@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 
 class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowSystemConfigManager
      */
-    protected $configProvider;
+    protected $configManager;
 
     /**
      * @var ActionPermissionProvider
@@ -19,10 +20,10 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configManager = $this->getMockBuilder(WorkflowSystemConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->provider = new ActionPermissionProvider($this->configProvider);
+        $this->provider = new ActionPermissionProvider($this->configManager);
     }
 
     /**
@@ -32,6 +33,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetWorkflowDefinitionPermissionsSystemRelated(array $expected, $input)
     {
+        $this->configManager->expects($this->once())->method('getActiveWorkflowNamesByEntity')->willReturn([]);
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
@@ -40,12 +42,12 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function getWorkflowDefinitionPermissionsDataProvider()
     {
-        $systemDefinition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
+        $systemDefinition = $this->getMock(ResultRecordInterface::class);
         $systemDefinition->expects($this->any())
             ->method('getValue')
             ->will($this->returnValueMap(array(array('system', true))));
 
-        $regularDefinition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
+        $regularDefinition = $this->getMock(ResultRecordInterface::class);
         $regularDefinition->expects($this->any())
             ->method('getValue')
             ->will($this->returnValueMap(array(array('system', false))));
@@ -79,37 +81,19 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $expected
      * @param object $input
-     * @param bool $hasConfig
      * @param array $activeWorkflowNames
      * @dataProvider getWorkflowDefinitionActivationDataProvider
      */
     public function testGetWorkflowDefinitionPermissionsActivationRelated(
         array $expected,
         $input,
-        $hasConfig,
         array $activeWorkflowNames
     ) {
         $relatedEntity = $input->getValue('entityClass');
-        $this->configProvider->expects($this->once())
-            ->method('hasConfig')
+        $this->configManager->expects($this->once())
+            ->method('getActiveWorkflowNamesByEntity')
             ->with($relatedEntity)
-            ->will($this->returnValue($hasConfig));
-        if ($hasConfig) {
-            $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-                ->getMock();
-            $config->expects($this->once())
-                ->method('get')
-                ->with('active_workflows')
-                ->will($this->returnValue($activeWorkflowNames));
-
-            $this->configProvider->expects($this->once())
-                ->method('getConfig')
-                ->with($relatedEntity)
-                ->will($this->returnValue($config));
-        } else {
-            $this->configProvider->expects($this->never())
-                ->method('getConfig');
-        }
+            ->willReturn($activeWorkflowNames);
 
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
@@ -131,7 +115,6 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'deactivate' => false
                 ),
                 'input' => $this->getDefinitionMock(),
-                false,
                 []
             ),
             'active definition' => array(
@@ -144,7 +127,6 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'deactivate' => true
                 ),
                 'input' => $this->getDefinitionMock(),
-                true,
                 ['workflow_name']
             ),
             'inactive definition' => array(
@@ -157,7 +139,6 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'deactivate' => false
                 ),
                 'input' => $this->getDefinitionMock(),
-                true,
                 ['other_workflow_name']
             )
         );
@@ -168,7 +149,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getDefinitionMock()
     {
-        $definition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
+        $definition = $this->getMock(ResultRecordInterface::class);
 
         $definition->expects($this->any())
             ->method('getValue')
@@ -176,7 +157,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     array(
                         array('name', 'workflow_name'),
-                        array('entityClass', '\stdClass')
+                        array('entityClass', \stdClass::class)
                     )
                 )
             );

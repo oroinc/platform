@@ -3,21 +3,21 @@
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 
 class ActionPermissionProvider
 {
     /**
-     * @var ConfigProvider
+     * @var WorkflowSystemConfigManager
      */
-    protected $configProvider;
+    protected $configManager;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param WorkflowSystemConfigManager $configManager
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(WorkflowSystemConfigManager $configManager)
     {
-        $this->configProvider = $configProvider;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -26,12 +26,11 @@ class ActionPermissionProvider
      */
     public function getWorkflowDefinitionPermissions(ResultRecordInterface $record)
     {
-        $isActiveWorkflow = false;
         $relatedEntity = $record->getValue('entityClass');
-        if ($this->configProvider->hasConfig($relatedEntity)) {
-            $config = $this->configProvider->getConfig($relatedEntity);
-            $isActiveWorkflow = in_array($record->getValue('name'), $config->get('active_workflows', false, []), true);
-        }
+        
+        $activeWorkflows = $this->configManager->getActiveWorkflowNamesByEntity($relatedEntity);
+        
+        $isActiveWorkflow = in_array($record->getValue('name'), $activeWorkflows, true);
 
         $isSystem = $record->getValue('system');
 

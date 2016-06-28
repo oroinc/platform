@@ -6,8 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
-
 class WorkflowDefinitionType extends AbstractType
 {
     /**
@@ -28,7 +26,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'related_entity',
-                EntityChoiceType::NAME,
+                ApplicableEntitiesType::NAME,
                 array(
                     'label' => 'oro.workflow.workflowdefinition.related_entity.label',
                     'required' => true,
