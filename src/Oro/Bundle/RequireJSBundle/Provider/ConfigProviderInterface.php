@@ -8,36 +8,37 @@ interface ConfigProviderInterface
      * Fetches piece of JS-code with require.js main config from cache
      * or if it was not there - generates and put into a cache
      *
+     * @param $key
+     *
      * @return string
      */
-    public function getMainConfig();
+    public function getMainConfig($key);
 
     /**
      * Get path to config file for require.js
      *
-     * @param $config
      * @return string
      */
-    public function getConfigFilePath($config);
+    public function getConfigFilePath();
 
     /**
      * Get path to output file
      *
-     * @param $config
      * @return string
      */
-    public function getOutputFilePath($config);
+    public function getOutputFilePath();
 
     /**
-     * Generate build config for require.js
+     * Collect build and main configs for require.js
      *
      * @return array
      */
     public function collectAllConfigs();
 
     /**
-     * @param $key
+     * Collect basic configs for require.js
+     *
      * @return array
      */
-    public function collectConfigs($key);
+    public function collectConfigs();
 }

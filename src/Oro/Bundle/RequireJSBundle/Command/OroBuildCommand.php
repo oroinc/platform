@@ -38,19 +38,18 @@ class OroBuildCommand extends ContainerAwareCommand
         $chainConfigProvider = $this->getContainer()->get(ConfigProviderCompilerPass::PROVIDER_SERVICE);
         foreach ($chainConfigProvider->getProviders() as $configProvider) {
             foreach ($configProvider->collectAllConfigs() as $key => $configs) {
-                $config = $configProvider->collectConfigs($key);
                 $output->writeln(sprintf('Generating require.js config for "%s" theme', $key));
 
                 // for some reason built application gets broken with configuration in "oneline-json"
-                $configContent = str_replace(',', ",\n", $configs['mainConfig']);
-                $this->writeConfigFile(
+                $configContent = str_replace(',', ",\n", $configProvider->getMainConfig($key));
+                $this->writeFile(
                     $configContent,
-                    $this->getWebRoot() . $configProvider->getConfigFilePath($config)
+                    $this->getWebRoot() . $configProvider->getConfigFilePath()
                 );
 
                 $configContent = '(' . json_encode($configs['buildConfig']) . ')';
                 $configPath = $this->getWebRoot() . self::BUILD_CONFIG_FILE_NAME;
-                $this->writeConfigFile($configContent, $configPath);
+                $this->writeFile($configContent, $configPath);
 
                 $JSEngine = $this->getJSEngine($requireJSConfig);
                 if ($JSEngine) {
@@ -74,9 +73,7 @@ class OroBuildCommand extends ContainerAwareCommand
 
                     $output->writeln('Cleaning up');
 
-                    if (false === @unlink($configPath)) {
-                        throw new \RuntimeException('Unable to remove file ' . $configPath);
-                    }
+                    $this->removeFile($configPath);
 
                     $output->writeln(
                         sprintf(
@@ -84,7 +81,7 @@ class OroBuildCommand extends ContainerAwareCommand
                             date('H:i:s'),
                             realpath(
                                 $this->getWebRoot() .
-                                $configProvider->getOutputFilePath($config)
+                                $configProvider->getOutputFilePath()
                             )
                         )
                     );
@@ -109,7 +106,7 @@ class OroBuildCommand extends ContainerAwareCommand
      *
      * @return OroBuildCommand
      */
-    protected function writeConfigFile($content, $path)
+    protected function writeFile($content, $path)
     {
         $fs = new Filesystem();
 
@@ -117,6 +114,26 @@ class OroBuildCommand extends ContainerAwareCommand
             $fs->dumpFile($path, $content);
         } catch (IOExceptionInterface $e) {
             throw new \RuntimeException('Unable to write file ' . $e->getPath());
+        }
+
+        return $this;
+    }
+
+    /**
+     * Write config to config file
+     *
+     * @param string $path
+     *
+     * @return OroBuildCommand
+     */
+    protected function removeFile($path)
+    {
+        $fs = new Filesystem();
+
+        try {
+            $fs->remove($path);
+        } catch (IOExceptionInterface $e) {
+            throw new \RuntimeException('Unable to remove file ' . $e->getPath());
         }
 
         return $this;
