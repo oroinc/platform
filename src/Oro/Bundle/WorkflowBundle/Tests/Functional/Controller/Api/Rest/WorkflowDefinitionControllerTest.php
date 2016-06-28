@@ -30,6 +30,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
             $this->getUrl('oro_workflow_api_rest_workflowdefinition_post'),
             $this->getTestConfiguration()
         );
+
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertContains(self::TEST_DEFINITION_NAME, $result);
 

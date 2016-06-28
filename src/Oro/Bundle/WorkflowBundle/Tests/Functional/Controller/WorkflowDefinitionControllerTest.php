@@ -4,6 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolation
+ */
 class WorkflowDefinitionControllerTest extends WebTestCase
 {
     protected function setUp()

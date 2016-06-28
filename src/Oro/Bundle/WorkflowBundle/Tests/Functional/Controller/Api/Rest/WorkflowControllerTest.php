@@ -79,19 +79,6 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertNotEmpty($this->getWorkflowItem($entity, $workflowTwoName));
     }
 
-    /**
-     * @param WorkflowAwareEntity $entity
-     *
-     * @return WorkflowAwareEntity
-     */
-    protected function refreshEntity(WorkflowAwareEntity $entity)
-    {
-        $entity = $this->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity')
-            ->find($entity->getId());
-
-        return $entity;
-    }
-
     public function testDeactivateAndActivateActions()
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
@@ -119,7 +106,6 @@ class WorkflowControllerTest extends WebTestCase
         $processes = $repositoryProcess->findAll();
         $this->assertCount(count($processesBefore) - 1, $processes);
 
-        $testEntity = $this->refreshEntity($testEntity);
         $this->assertEmpty($this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP));
 
         $this->client->request(
@@ -307,5 +293,37 @@ class WorkflowControllerTest extends WebTestCase
     protected function getWorkflowItem($entity, $workflowName)
     {
         return $this->getWorkflowManager()->getWorkflowItem($entity, $workflowName);
+    }
+
+    public function testTransitAction()
+    {
+        $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
+        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::MULTISTEP);
+
+        $testEntity = $this->createNewEntity();
+
+        $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::MULTISTEP);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflow_transit',
+                [
+                    'workflowItemId' => $workflowItem->getId(),
+                    'transitionName' => LoadWorkflowDefinitions::MULTISTEP_START_TRANSITION,
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals($workflowItem->getId(), $result['workflowItem']['id']);
+        $this->assertEquals($workflowItem->getWorkflowName(), $result['workflowItem']['workflow_name']);
+        $this->assertEquals($workflowItem->getEntityId(), $result['workflowItem']['entity_id']);
+        $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
+
+        $workflowItemNew = $this->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')->find($workflowItem->getId());
+        $this->assertNotEquals($workflowItem->getCurrentStep(), $workflowItemNew->getCurrentStep());
+        $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
     }
 }
