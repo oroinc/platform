@@ -98,9 +98,9 @@ This allows to build conditions based on any attribute from the context.
 
 The types of conditions depend on registered [Applicable Checkers](../../../../Component/ChainProcessor/README.md#applicable-checkers). By default the following checkers are registered:
 
-- [GroupRangeApplicableChecker](../../../../Component/ChainProcessor/GroupRangeApplicableChecker.php)
-- [SkipGroupApplicableChecker](../../../../Component/ChainProcessor/SkipGroupApplicableChecker.php)
-- [MatchApplicableChecker](../../../../Component/ChainProcessor/MatchApplicableChecker.php)
+- [MatchApplicableChecker](../../Processor/MatchApplicableChecker.php)
+
+Also, by performance reasons, the functionality of [SkipGroupApplicableChecker](../../../../Component/ChainProcessor/SkipGroupApplicableChecker.php) and [GroupRangeApplicableChecker](../../../../Component/ChainProcessor/GroupRangeApplicableChecker.php) was implemented as part of [OptimizedProcessorIterator](../../Processor/OptimizedProcessorIterator.php).
 
 Examples of processor conditions
 --------------------------------
