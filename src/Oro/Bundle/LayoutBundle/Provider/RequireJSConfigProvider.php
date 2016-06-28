@@ -2,19 +2,21 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider;
 
-use Oro\Bundle\RequireJSBundle\Provider\Config;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
-use Oro\Component\Layout\Extension\Theme\Model\Theme;
-use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+
+use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Bundle\RequireJSBundle\Provider\Config;
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 
 class RequireJSConfigProvider extends Config
 {
     const REQUIREJS_CONFIG_CACHE_KEY    = 'layout_requirejs_config';
-
-    const REQUIREJS_CONFIG_FILE         = 'js/require-config1.js';
+    const REQUIREJS_CONFIG_FILE         = 'js/require-config.js';
 
     /**
      * @var ThemeManager
@@ -24,21 +26,30 @@ class RequireJSConfigProvider extends Config
     /**
      * {@inheritdoc}
      */
-    public function getConfigFilePath($config)
+    public function __construct(ContainerInterface $container, EngineInterface $templating, $template)
     {
-        return $config['config']['config_key'] . DIRECTORY_SEPARATOR . self::REQUIREJS_CONFIG_FILE;
+        parent::__construct($container, $templating, $template);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOutputFilePath($config)
+    public function getConfigFilePath()
     {
+        return $this->configKey . DIRECTORY_SEPARATOR . self::REQUIREJS_CONFIG_FILE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOutputFilePath()
+    {
+        $config = $this->collectConfigs();
         $path = !empty($config['config']['build_path'])
             ? $config['config']['build_path']
             : parent::getOutputFilePath($config);
 
-        return $config['config']['config_key'] . DIRECTORY_SEPARATOR . $path;
+        return $this->configKey . DIRECTORY_SEPARATOR . $path;
     }
 
     /**
@@ -46,13 +57,18 @@ class RequireJSConfigProvider extends Config
      */
     public function collectAllConfigs()
     {
+        $configKey = $this->configKey;
+
         $configs = [];
         foreach ($this->getAllThemes() as $theme) {
-            $configs[$theme->getName()] = [
-                'mainConfig'    => $this->generateMainConfig($theme->getName()),
-                'buildConfig'   => $this->collectBuildConfig($theme->getName()),
+            $this->configKey = $theme->getName();
+            $configs[$this->configKey] = [
+                'mainConfig'    => $this->generateMainConfig(),
+                'buildConfig'   => $this->collectBuildConfig(),
             ];
         }
+
+        $this->configKey = $configKey;
 
         return $configs;
     }
@@ -60,24 +76,16 @@ class RequireJSConfigProvider extends Config
     /**
      * {@inheritdoc}
      */
-    protected function collectBuildConfig($key = Config::REQUIREJS_DEFAULT_KEY)
+    protected function getFiles($bundle)
     {
-        $config = $this->collectConfigs($key);
-
-        return $this->extractBuildConfig($config);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFiles($bundle, $key)
-    {
-        $theme = $this->getTheme($key);
+        $theme = $this->getTheme($this->configKey);
         $reflection = new \ReflectionClass($bundle);
 
         $files = [];
         if ($theme->getParentTheme()) {
-            $files = array_merge($files, $this->getFiles($bundle, $theme->getParentTheme()));
+            $this->configKey = $theme->getParentTheme();
+            $files = array_merge($files, $this->getFiles($bundle));
+            $this->configKey = $theme->getName();
         }
 
         $file = dirname($reflection->getFileName()) .
