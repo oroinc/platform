@@ -25,6 +25,8 @@ define(function(require) {
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
+            'select2-data-loaded': 'onDataLoaded',
+            'select2-loaded': 'onDataLoaded'
         },
 
         emptyValue: {
@@ -38,6 +40,7 @@ define(function(require) {
 
         initialize: function() {
             ChoiceTreeFilter.__super__.initialize.apply(this, arguments);
+            this.data = this.data || [];
             if (this.lazy) {
                 this.loadedMetadata = false;
                 this.loader(
@@ -82,21 +85,24 @@ define(function(require) {
                     allowClear: true,
                     minimumInputLength: 0,
                     multiple: true,
-                    renderedPropertyName: this.renderedPropertyName
+                    renderedPropertyName: this.renderedPropertyName,
+                    forceSelectedData: true
                 }
             };
-            if (this.data) {
-                options.configs.data = {
-                    results: this.data,
-                    text: 'name'
-                };
-            } else if (this.autocomplete_url) {
+            if (this.autocomplete_url) {
                 options.url = this.autocomplete_url;
                 _.extend(options.configs, {
                     autocomplete_alias: this.autocomplete_alias
                 });
+            } else if (this.data) {
+                options.configs.data = {
+                    results: this.data,
+                    text: 'name'
+                };
             }
+            this.$(this.criteriaValueSelectors.value).data('selected-data', this.data);
             this.select2component = new Select2TreeAutocompleteComponent(options);
+
         },
 
         /**
@@ -134,11 +140,18 @@ define(function(require) {
             };
         },
 
+        onDataLoaded: function(e) {
+            var results = _.result(e.items, 'results') || [];
+            var existIds = _.pluck(this.data, 'id');
+            Array.prototype.push.apply(this.data, _.filter(results, function(item) {
+                return existIds.indexOf(item.id) === -1;
+            }));
+        },
+
         /**
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-            var self = this;
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             var option = null;
 
@@ -146,19 +159,14 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var values = value.value.split(',');
+            var renderedPropertyName = this.renderedPropertyName || 'name';
             var label = [];
-            for (var i in values) {
-                if (values[i] === __('All')) {
-                    label.push(values[i]);
-                } else {
-                    for (var j in self.data) {
-                        if (parseInt(values[i]) === this.data[j].id) {
-                            label.push(this.data[j].name);
-                        }
-                    }
+            _.each(value.value.split(','), function(val) {
+                var item = _.findWhere(this.data, {id: parseInt(val)});
+                if (item !== void 0) {
+                    label.push(item[renderedPropertyName]);
                 }
-            }
+            }, this);
 
             var hintValue = this.wrapHintValue ? ('"' + label.join(',') + '"') : label.join(',');
             return (option ? option.label + ' ' : '') + hintValue;
