@@ -7,7 +7,7 @@ layout:
     actions: []
     imports:
         -
-            resource: 'account_user_role_form_actions'
+            id: 'account_user_role_form_actions'
 ```
 or just
 ```yaml
@@ -55,7 +55,7 @@ Double underscore means namespace can be provided for this blocks. Namespace sho
 ```yaml
 imports:
     -
-        resource: 'account_user_role_form_actions'
+        id: 'account_user_role_form_actions'
         root: 'form_fields_container'
         namespace: 'form_fields'
 ```
@@ -64,8 +64,8 @@ Also special `root` parameter will replace `__root` in imported layout updates. 
 
 ```yaml
 tree:
-    form_fields_container: #root option replace “__root”
-        form_fields_update: ~ #namespace option replace all “__”
+    form_fields_container: #root option replaces “__root”
+        form_fields_update: ~ #namespace option replaces all first underscore of “__”
         form_fields_cancel: ~
 ```
 
