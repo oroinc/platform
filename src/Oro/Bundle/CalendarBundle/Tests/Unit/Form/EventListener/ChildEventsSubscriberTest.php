@@ -66,6 +66,7 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 FormEvents::POST_SUBMIT => 'postSubmit',
+                FormEvents::PRE_SUBMIT => 'preSubmit',
             ],
             $this->childEventsSubscriber->getSubscribedEvents()
         );
