@@ -96,7 +96,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         }
 
         $this->setDefaultAttendeeStatus($parentEvent->getRelatedAttendee(), CalendarEvent::STATUS_ACCEPTED);
-        #$this->setDefaultAttendeeType($parentEvent->getRelatedAttendee());
         foreach ($parentEvent->getChildEvents() as $calendarEvent) {
             $calendarEvent
                 ->setTitle($parentEvent->getTitle())
@@ -108,7 +107,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
         foreach ($parentEvent->getChildAttendees() as $attendee) {
             $this->setDefaultAttendeeStatus($attendee);
-            #$this->setDefaultAttendeeType($attendee);
         }
     }
 
@@ -198,21 +196,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
             ->find($status);
         $attendee->setStatus($statusEnum);
-    }
-
-    /**
-     * @param Attendee|null $attendee
-     * @param string        $type
-     */
-    protected function setDefaultAttendeeType(Attendee $attendee = null, $type = Attendee::TYPE_REQUIRED)
-    {
-        if (!$attendee || $attendee->getType()) {
-            return;
-        }
-
-        $typeEnum = $this->getTypeEnum($type);
-
-        $attendee->setType($typeEnum);
     }
 
     /**
