@@ -7,14 +7,13 @@ use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -27,7 +26,7 @@ class OroMainContext extends MinkContext implements
     OroElementFactoryAware,
     KernelAwareContext
 {
-    use KernelDictionary, WaitingDictionary, ElementFactoryDictionary;
+    use KernelDictionary, ElementFactoryDictionary;
 
     /** @BeforeStep */
     public function beforeStep(BeforeStepScope $scope)
@@ -35,17 +34,15 @@ class OroMainContext extends MinkContext implements
         $url = $this->getSession()->getCurrentUrl();
 
         if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
-            $this->waitPageToLoad();
+            $this->getSession()->getDriver()->waitPageToLoad();
 
             return;
-        } elseif ('about:blank' === $url) {
+        } elseif (false === strpos($url, 'http://')) {
             return;
         }
 
-        $this->waitForAjax();
+        $this->getSession()->getDriver()->waitForAjax();
     }
-
-
 
     /**
      * @BeforeScenario
@@ -114,7 +111,9 @@ class OroMainContext extends MinkContext implements
      */
     public function iFillFormWith($formName, TableNode $table)
     {
-        $this->createElement($formName)->fill($table);
+        /** @var Form $form */
+        $form = $this->createElement($formName);
+        $form->fill($table);
     }
 
     /**
@@ -132,49 +131,11 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given press select arrow in :locator field
-     */
-    public function pressSelectArrowInOwnerField($locator)
-    {
-        $field = $this->createElement('OroForm')->findField($locator);
-        $arrow = $field->getParent()->find('css', '.select2-arrow');
-        $arrow->click();
-    }
-
-    /**
      * @Given press select entity button on :field field
      */
     public function pressSelectEntityButton($field)
     {
         $this->createOroForm()->pressEntitySelectEntityButton($field);
-    }
-
-    /**
-     * @Given fill :text in search entity field
-     */
-    public function fillSelect2Search($text)
-    {
-        $this->createOroForm()->fillSelect2Search($text);
-    }
-
-    /**
-     * Check count entities in search result of select2 entity field
-     * @Given /^(?:|I )must see (?:|only )(?P<resultCount>(?:|one|two|\d+)) result$/
-     */
-    public function mustSeeCountOfResult($resultCount)
-    {
-        expect($this->createOroForm()->getSelect2ResultsCount())
-            ->toBe($this->getCount($resultCount));
-    }
-
-    /**
-     * Press on record in search results of select2-results field
-     *
-     * @Then /^(?:|I )press on "(?P<text>[\w\s]+)" in search result$/
-     */
-    public function iPressTextInSearchResults($text)
-    {
-        $this->createOroForm()->pressTextInSearchResult($text);
     }
 
     /**
@@ -243,7 +204,7 @@ class OroMainContext extends MinkContext implements
     {
         $select = $this->fixStepArgument($select);
         $option = $this->fixStepArgument($option);
-        $this->createElement('OroForm')->selectFieldOption($select, $option);
+        $this->createOroForm()->selectFieldOption($select, $option);
     }
 
     /**.
