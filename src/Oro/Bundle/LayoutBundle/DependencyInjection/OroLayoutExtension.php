@@ -86,13 +86,13 @@ class OroLayoutExtension extends Extension
 
         $foundThemeLayoutUpdates = [];
         $updateFileExtensions    = [];
-        $updateLoaderDef = $container->getDefinition(self::UPDATE_LOADER_SERVICE_ID);
+        $updateLoaderDef         = $container->getDefinition(self::UPDATE_LOADER_SERVICE_ID);
         foreach ($updateLoaderDef->getMethodCalls() as $methodCall) {
             if ($methodCall[0] === 'addDriver') {
                 $updateFileExtensions[] = $methodCall[1][0];
             }
         }
-        $updatesLoader         = new CumulativeConfigLoader(
+        $updatesLoader = new CumulativeConfigLoader(
             'oro_layout_updates_list',
             [new FolderContentCumulativeLoader('Resources/views/layouts/', -1, false, $updateFileExtensions)]
         );
