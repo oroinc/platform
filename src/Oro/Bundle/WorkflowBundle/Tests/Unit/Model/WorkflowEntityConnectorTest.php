@@ -39,7 +39,7 @@ class WorkflowEntityConnectorTest extends \PHPUnit_Framework_TestCase
 
         $this->registry->expects($this->never())->method('getManagerForClass');
 
-        $this->entityConnector->isApplicableEntity(new EntityStub(42));
+        $this->assertFalse($this->entityConnector->isApplicableEntity(new EntityStub(42)));
     }
 
     public function testIsApplicableEntityNotConfigurable()
@@ -63,7 +63,7 @@ class WorkflowEntityConnectorTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(NotManageableEntityException::class);
 
-        $this->entityConnector->isApplicableEntity(new EntityStub(42));
+        $this->assertFalse($this->entityConnector->isApplicableEntity(new EntityStub(42)));
     }
 
     public function testIsApplicableEntityNotSupportCompositePrimaryKeys()

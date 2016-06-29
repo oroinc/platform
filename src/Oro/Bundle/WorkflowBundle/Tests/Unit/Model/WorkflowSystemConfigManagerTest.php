@@ -173,6 +173,7 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getProvider')
             ->with('workflow')
             ->willReturn($wfConfigProvider);
+
         $this->assertTrue($this->manager->isConfigurable(EntityStub::class));
     }
 

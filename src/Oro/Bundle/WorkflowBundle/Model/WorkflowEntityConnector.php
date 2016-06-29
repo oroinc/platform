@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Cache;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
@@ -17,6 +16,7 @@ class WorkflowEntityConnector
     /** @var WorkflowSystemConfigManager */
     protected $workflowConfigManager;
 
+    /** @var array */
     protected $supportedIdentifierTypes = [
         Type::BIGINT,
         Type::DECIMAL,
@@ -47,31 +47,18 @@ class WorkflowEntityConnector
     {
         $entityClass = is_object($entity) ? ClassUtils::getClass($entity) : ClassUtils::getRealClass($entity);
 
-        if (array_key_exists($entityClass, $this->cache)) {
-            return $this->cache[$entityClass];
+        if (!array_key_exists($entityClass, $this->cache)) {
+            $this->cache[$entityClass] = $this->workflowConfigManager->isConfigurable($entityClass) &&
+                $this->isSupportedIdentifierType($entityClass);
         }
 
-        return $this->cache[$entityClass] = $this->check($entityClass);
+        return $this->cache[$entityClass];
     }
 
     /**
-     * @param $entityClass
-     * @return bool
-     */
-    protected function check($entityClass)
-    {
-        if (!$this->workflowConfigManager->isConfigurable($entityClass)) {
-            return false;
-        }
-
-        if (!$this->isSupportedIdentifierType($entityClass)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
+     * Not supports composed Primary Keys (more than one identifier field)
+     * Supports only list of specified in $supportedIdentifierTypes
+     *
      * @param string $class
      * @return bool
      */
@@ -89,15 +76,7 @@ class WorkflowEntityConnector
 
         $type = $metadata->getTypeOfField($identifier[0]);
 
-        /*
-         * Not supports composed Primary Keys (more than one identifier field)
-         * Supports only list of specified in $supportedIdentifierTypes
-         */
-
-        return count($identifier) === 1 && in_array(
-            is_object($type) && method_exists($type, 'getName') ? $type->getName() : (string)$type,
-            $this->supportedIdentifierTypes,
-            true
-        );
+        return count($identifier) === 1 &&
+            in_array($type instanceof Type ? $type->getName() : (string)$type, $this->supportedIdentifierTypes, true);
     }
 }

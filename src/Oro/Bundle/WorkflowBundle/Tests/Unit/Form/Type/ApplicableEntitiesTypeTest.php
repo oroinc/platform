@@ -3,10 +3,12 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Inflector\Inflector;
-use Oro\Bundle\SegmentBundle\Tests\Unit\Fixtures\StubEntity;
+
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Fixtures\StubEntity;
 
 class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,6 +22,7 @@ class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->entityConnector = $this->getMockBuilder(WorkflowEntityConnector::class)
             ->disableOriginalConstructor()->getMock();
+
         $this->type = new ApplicableEntitiesType($this->entityConnector);
     }
 
@@ -35,10 +38,6 @@ class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->type->configureOptions($resolver);
-        
-        $expectedChoices = [
-            StubEntity::class => Inflector::tableize(StubEntity::class)
-        ];
 
         $this->entityConnector->expects($this->at(0))
             ->method('isApplicableEntity')
@@ -51,6 +50,12 @@ class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
 
         $result = $resolver->resolve([]);
-        $this->assertEquals($expectedChoices, $result['choices']);
+
+        $this->assertEquals(
+            [
+                StubEntity::class => Inflector::tableize(StubEntity::class)
+            ],
+            $result['choices']
+        );
     }
 }
