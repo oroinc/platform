@@ -508,7 +508,9 @@ services:
             - @oro_email.direct_mailer
             - @oro_email.email.address.helper
             - @oro_email.email.entity.builder=
+            - @oro_email.email.owner.provider
             - @oro_email.email.activity.manager
+            - @oro_security.security_facade.link
             - @event_dispatcher
             - @oro_security.encoder.mcrypt
             - @oro_email.mailer.email_origin_helper
