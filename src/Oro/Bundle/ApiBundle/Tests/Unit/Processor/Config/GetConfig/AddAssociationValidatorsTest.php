@@ -30,15 +30,58 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
 
     public function testProcessForNotManageableEntity()
     {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1'       => null,
+                'association1' => [
+                    'target_class' => 'Test\Association1Target'
+                ],
+                'association2' => [
+                    'target_class' => 'Test\Association2Target',
+                    'target_type'  => 'to-many',
+                    'form_options' => ['test_option' => 'test_value']
+                ],
+                'association3' => [
+                    'target_class' => 'Test\Association3Target',
+                    'target_type'  => 'to-many',
+                    'property_path' => 'realAssociation3'
+                ],
+            ]
+        ];
+
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
 
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
         $this->processor->process($this->context);
+
+        $this->assertNull($configObject->getField('field1')->getFormOptions());
+        $this->assertNull($configObject->getField('association1')->getFormOptions());
+        $this->assertEquals(
+            [
+                'test_option' => 'test_value',
+                'constraints' => [
+                    new HasAdderAndRemover(['class' => self::TEST_CLASS_NAME, 'property' => 'association2'])
+                ]
+            ],
+            $configObject->getField('association2')->getFormOptions()
+        );
+        $this->assertEquals(
+            [
+                'constraints' => [
+                    new HasAdderAndRemover(['class' => self::TEST_CLASS_NAME, 'property' => 'realAssociation3'])
+                ]
+            ],
+            $configObject->getField('association3')->getFormOptions()
+        );
     }
 
-    public function testProcess()
+    public function testProcessForManageableEntity()
     {
         $config = [
             'exclusion_policy' => 'all',

@@ -150,6 +150,7 @@ Each entity can have next properties:
 * **max_results** *integer* The maximum number of entities in the result. Set -1 (it means unlimited), zero or positive number to set the limit. Can be used to set the limit for both root and related entities.
 * **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
 * **disable_sorting** *boolean* The flag indicates whether a sorting is disabled. By default `false`.
+* **identifier_field_names** *string[]* The names of identifier fields of the entity. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity. For ORM entities a value of this option is retrieved from an entity metadata.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
 * **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
@@ -209,7 +210,6 @@ oro_api:
 
 Each field can have next properties:
 
-* **data_type** *string* The data type of the field value. Can be `boolean`, `integer`, `string`, etc.
 * **label** *string* A human-readable representation of the field. Used in auto generated documentation only.
 * **description** *string* A human-readable description of the field. Used in auto generated documentation only.
 
@@ -308,6 +308,31 @@ oro_api:
                     form_type: text
                     form_options:
                         trim: false
+```
+
+* **data_type** *string* The data type of the field value. Can be `boolean`, `integer`, `string`, etc. If a field represents an association the data type should be a type of an identity field of the target entity.
+* **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
+* **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
+
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Api\Model\AcmeEntity:
+            ...
+            identifier_field_names: [field1]
+            fields:
+                field1: # identity field
+                    data_type: string
+                field2: # to-one association
+                    data_type: integer # the data type of an identifier field of the target
+                    target_class: Acme\Bundle\AcmeBundle\Api\Model\AcmeTargetEntity
+                field3: # to-many association
+                    data_type: integer # the data type of an identifier field of the target
+                    target_class: Acme\Bundle\AcmeBundle\Api\Model\AcmeTargetEntity
+                    target_type: collection
 ```
 
 * **filters** - This section describes fields by which the result data can be filtered. It contains two properties: `exclusion_policy` and `fields`.

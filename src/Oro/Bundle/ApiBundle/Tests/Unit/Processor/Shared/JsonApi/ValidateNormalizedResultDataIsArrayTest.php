@@ -29,7 +29,7 @@ class ValidateNormalizedResultDataIsArrayTest extends GetListProcessorTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The "data" section must be an array.
      */
     public function testProcessWhenResultResultDataIsNotArray()

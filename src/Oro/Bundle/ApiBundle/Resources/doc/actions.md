@@ -622,6 +622,7 @@ General methods:
 - **setResponseHeaders(parameterBag)** - Sets an object that will be used to accessing response headers.
 - **getResponseStatusCode()** - Gets the response status code.
 - **setResponseStatusCode(statusCode)** - Sets the response status code.
+- **isSuccessResponse()** - Indicates whether a result document represents a success response.
 - **getFilters()** - Gets a [list of filters](../../Filter/FilterCollection.php) is used to add additional restrictions to a query is used to get entity data.
 - **getFilterValues()** - Gets a collection of the [FilterValue](../../Filter/FilterValue.php) objects that contains all incoming filters.
 - **setFilterValues(accessor)** - Sets an [object](../../Filter/FilterValueAccessorInterface.php) that will be used to accessing incoming filters.
@@ -647,13 +648,13 @@ Entity configuration related methods:
 - **hasConfig()** - Checks whether a configuration of an entity exists.
 - **getConfig()** - Gets a [configuration of an entity](../../Config/EntityDefinitionConfig.php).
 - **setConfig(config)** - Sets a custom configuration of an entity. This method can be used to completely override the default configuration of an entity.
-- **hasConfigOfFilters()** - Checks whether an entity has a configuration of filters.
+- **hasConfigOfFilters(initialize)** - Checks whether an entity has a configuration of filters.
 - **getConfigOfFilters()** - Gets a [configuration of filters](../../Config/FiltersConfig.php) for an entity.
 - **setConfigOfFilters(config)** - Sets a custom configuration of filters. This method can be used to completely override the default configuration of filters.
-- **hasConfigOfSorters()** - Checks whether an entity has a configuration of sorters.
+- **hasConfigOfSorters(initialize)** - Checks whether an entity has a configuration of sorters.
 - **getConfigOfSorters()** - Gets a [configuration of sorters](../../Config/SortersConfig.php) for an entity.
 - **setConfigOfSorters(config)** - Sets a custom configuration of sorters. This method can be used to completely override the default configuration of sorters.
-- **hasConfigOf(configSection)** - Checks whether a configuration of the given section exists.
+- **hasConfigOf(configSection, initialize)** - Checks whether a configuration of the given section exists.
 - **getConfigOf(configSection)** - Gets a configuration from the given section.
 - **setConfigOf(configSection, config)** - Sets a configuration for the given section. This method can be used to completely override the default configuration for the given section.
 
