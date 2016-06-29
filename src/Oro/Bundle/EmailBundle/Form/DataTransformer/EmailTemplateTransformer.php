@@ -20,26 +20,40 @@ class EmailTemplateTransformer implements DataTransformerInterface
     }
 
     /**
-     * Replaces escaped brackets '{{' and '}}' for further replacing these values with system/entity variables.
-     *
      * {@inheritdoc}
      */
     public function transform($value)
     {
         $value = $this->transformer->transform($value);
 
-        return preg_replace('/(%7B%7B(.*?)%7D%7D)/', '{{$2}}', $value);
+        return $this->decodeTemplateVariables($value);
     }
 
     /**
-     * Replaces escaped brackets '{{' and '}}' for further replacing these values with system/entity variables.
-     *
      * {@inheritdoc}
      */
     public function reverseTransform($value)
     {
         $value = $this->transformer->reverseTransform($value);
 
-        return preg_replace('/(%7B%7B(.*?)%7D%7D)/', '{{$2}}', $value);
+        return $this->decodeTemplateVariables($value);
+    }
+
+    /**
+     * Decodes encoded brackets '{{' and '}}' and data inside them for further replacing with system/entity variables.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function decodeTemplateVariables($value)
+    {
+        return preg_replace_callback(
+            '/%7B%7B.*%7D%7D/',
+            function ($matches) {
+                return urldecode(reset($matches));
+            },
+            $value
+        );
     }
 }
