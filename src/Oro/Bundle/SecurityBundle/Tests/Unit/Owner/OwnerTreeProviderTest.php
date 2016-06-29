@@ -92,6 +92,9 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         unset($this->cache, $this->container, $this->treeProvider, $this->em);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testGetTree()
     {
         $userRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
