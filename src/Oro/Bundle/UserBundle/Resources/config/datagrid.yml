@@ -137,7 +137,7 @@ datagrid:
                 label:         oro.user.user_configuration.grid.action.config
                 link:          config_link
                 icon:          cog
-                acl_resource:  oro_user_user_update
+                acl_resource:  oro_user_user_config
             delete:
                 type:          delete
                 label:         oro.grid.action.delete

@@ -180,6 +180,15 @@ oro:
             password_management:
                 label: Manage passwords
                 description: Reset or change passwords of other users
+            update_profile:
+                label: Update Profile
+                description: Update own user profile
+            update_configuration:
+                label: Update Configuration
+                description: Update own user configuration
+        permission:
+            update_configuration:
+                label: Update Configuration Settings
 
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email

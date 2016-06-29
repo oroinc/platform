@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -21,7 +22,12 @@ class ConfigurationController extends Controller
      *      defaults={"activeGroup" = null, "activeSubGroup" = null}
      * )
      * @Template()
-     * @AclAncestor("oro_user_user_update")
+     * @Acl(
+     *      id="oro_user_user_config",
+     *      type="entity",
+     *      class="OroUserBundle:User",
+     *      permission="CONFIGURE"
+     * )
      *
      * @param User $entity
      * @param null $activeGroup
@@ -40,6 +46,7 @@ class ConfigurationController extends Controller
     /**
      * @Route("/user/profile/{activeGroup}/{activeSubGroup}", name="oro_user_profile_configuration")
      * @Template("OroUserBundle:Configuration:userConfig.html.twig")
+     * @AclAncestor("update_own_configuration")
      *
      * @param null $activeGroup
      * @param null $activeSubGroup

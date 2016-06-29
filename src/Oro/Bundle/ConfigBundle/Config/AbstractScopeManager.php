@@ -278,11 +278,11 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * @return null|array
+     * @return string
      */
     public function getScopeInfo()
     {
-        return null;
+        return '';
     }
 
     /**

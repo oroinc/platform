@@ -85,7 +85,7 @@ class ConfigManager
     }
 
     /**
-     * @return array|null
+     * @return string
      */
     public function getScopeInfo()
     {
