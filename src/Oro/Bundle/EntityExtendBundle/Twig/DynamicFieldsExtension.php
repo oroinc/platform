@@ -100,6 +100,10 @@ class DynamicFieldsExtension extends \Twig_Extension
                 $event
             );
 
+            if (!$event->isFieldVisible()) {
+                continue;
+            }
+
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
             $dynamicRow[$fieldName] = [
                 'type'     => $this->viewProvider->getConfigById($fieldConfigId)->get('type') ?: $fieldType,
