@@ -24,6 +24,6 @@ class PhpDriver extends AbstractDriver
      */
     protected function loadResourceGeneratorData($file)
     {
-        return new GeneratorData(file_get_contents($file));
+        return new GeneratorData(file_get_contents($file), $file);
     }
 }

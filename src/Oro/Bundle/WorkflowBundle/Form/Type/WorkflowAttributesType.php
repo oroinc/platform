@@ -7,6 +7,7 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
@@ -15,6 +16,7 @@ use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Event\TransitionsAttributeEvent;
 
 use Oro\Component\Action\Model\ContextAccessor;
 
@@ -53,12 +55,18 @@ class WorkflowAttributesType extends AbstractType
     protected $contextAccessor;
 
     /**
-     * @param WorkflowRegistry           $workflowRegistry
-     * @param AttributeGuesser           $attributeGuesser ,
-     * @param DefaultValuesListener      $defaultValuesListener
-     * @param InitActionsListener        $initActionsListener
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
+     * @param WorkflowRegistry $workflowRegistry
+     * @param AttributeGuesser $attributeGuesser ,
+     * @param DefaultValuesListener $defaultValuesListener
+     * @param InitActionsListener $initActionsListener
      * @param RequiredAttributesListener $requiredAttributesListener
-     * @param ContextAccessor            $contextAccessor
+     * @param ContextAccessor $contextAccessor
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
@@ -66,7 +74,8 @@ class WorkflowAttributesType extends AbstractType
         DefaultValuesListener $defaultValuesListener,
         InitActionsListener $initActionsListener,
         RequiredAttributesListener $requiredAttributesListener,
-        ContextAccessor $contextAccessor
+        ContextAccessor $contextAccessor,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->attributeGuesser = $attributeGuesser;
@@ -74,6 +83,7 @@ class WorkflowAttributesType extends AbstractType
         $this->initActionsListener = $initActionsListener;
         $this->requiredAttributesListener = $requiredAttributesListener;
         $this->contextAccessor = $contextAccessor;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -160,6 +170,11 @@ class WorkflowAttributesType extends AbstractType
         array $options
     ) {
         $attributeOptions = $this->prepareAttributeOptions($attribute, $attributeOptions, $options);
+
+        $event = new TransitionsAttributeEvent($attribute, $attributeOptions, $options);
+        $this->dispatcher->dispatch(TransitionsAttributeEvent::BEFORE_ADD, $event);
+        $attributeOptions = $event->getAttributeOptions();
+
         $builder->add($attribute->getName(), $attributeOptions['form_type'], $attributeOptions['options']);
     }
 
@@ -211,15 +226,26 @@ class WorkflowAttributesType extends AbstractType
             $attributeOptions['options']['disabled'] = true;
         }
 
-        $contextAccessor = $this->contextAccessor;
-        array_walk_recursive(
-            $attributeOptions,
-            function (&$leaf) use ($options, $contextAccessor) {
-                $leaf = $contextAccessor->getValue($options['workflow_item'], $leaf);
-            }
-        );
+        return $this->resolveContextValue($options['workflow_item'], $attributeOptions);
+    }
 
-        return $attributeOptions;
+    /**
+     * This method is used instead of `array_walk_recursive`,
+     * because `array_walk_recursive` moves array pointer to the end. So `current` function returns false.
+     *
+     * @param $context
+     * @param mixed $option
+     * @return array|mixed
+     */
+    protected function resolveContextValue($context, $option)
+    {
+        if (is_array($option)) {
+            return array_map(function ($value) use ($context) {
+                return $this->resolveContextValue($context, $value);
+            }, $option);
+        } else {
+            return $this->contextAccessor->getValue($context, $option);
+        }
     }
 
     /**

@@ -14,7 +14,6 @@ parameters:
     oro_entity.exclusion_provider.config.class:                                        Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                                         Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
     oro_entity.dictionary_value_list_provider.class:                                   Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
-    oro_entity.exclusion_provider.dictionary.class:                                    Oro\Bundle\EntityBundle\Provider\DictionaryExclusionProvider
     oro_entity.virtual_relation_provider.config.class:                                 Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider
     oro_entity.virtual_relation_provider.chain.class:                                  Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
     oro_entity.virtual_field_provider.class:                                           Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
@@ -153,16 +152,11 @@ services:
     oro_entity.exclusion_provider.config:
         class: %oro_entity.exclusion_provider.config.class%
         arguments:
-            - '@oro_entity.entity_hierarchy_provider'
+            - '@oro_entity.entity_hierarchy_provider.all'
             - %oro_entity.exclusions%
         tags:
             - { name: oro_entity.exclusion_provider.default }
             - { name: oro_entity.exclusion_provider.api, priority: 50 }
-
-    oro_entity.exclusion_provider.dictionary:
-        class: %oro_entity.exclusion_provider.dictionary.class%
-        arguments:
-            - '@oro_entity_config.provider.grouping'
 
     oro_entity.virtual_field_provider.chain:
         class: %oro_entity.virtual_field_provider.chain.class%
@@ -170,11 +164,10 @@ services:
     oro_entity.virtual_field_provider:
         class: %oro_entity.virtual_field_provider.class%
         arguments:
-            - '@oro_entity.entity_hierarchy_provider'
+            - '@oro_entity.entity_hierarchy_provider.all'
             - %oro_entity.virtual_fields%
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 0 }
-            - { name: oro_entity.virtual_field_provider.api }
 
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%
@@ -199,7 +192,7 @@ services:
     oro_entity.virtual_relation_provider.config:
         class: %oro_entity.virtual_relation_provider.config.class%
         arguments:
-            - '@oro_entity.entity_hierarchy_provider'
+            - '@oro_entity.entity_hierarchy_provider.all'
             - %oro_entity.virtual_relations%
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 0 }
@@ -290,7 +283,6 @@ services:
 
     oro_entity.entity_alias_cache:
         parent: oro.cache.abstract
-        public: false
         calls:
             - [ setNamespace, [ 'oro_entity_aliases' ] ]
 
@@ -322,6 +314,7 @@ services:
             - '@oro_entity.entity_alias_config_bag'
         tags:
             - { name: oro_entity.alias_provider, priority: -100 }
+            - { name: oro_entity.class_provider }
 
     oro_entity.entity_class_name_helper:
         class: %oro_entity.entity_class_name_helper.class%

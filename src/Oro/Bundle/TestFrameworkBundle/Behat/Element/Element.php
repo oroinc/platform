@@ -61,7 +61,7 @@ class Element extends NodeElement
      */
     protected function getPage()
     {
-        $this->session->getPage();
+        return $this->session->getPage();
     }
 
     /**

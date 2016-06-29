@@ -8,12 +8,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Component\ChainProcessor\ProcessorBag;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpMetadataCommand extends AbstractDebugCommand
 {
@@ -29,14 +29,22 @@ class DumpMetadataCommand extends AbstractDebugCommand
                 'entity',
                 InputArgument::REQUIRED,
                 'The entity class name or alias'
-            );
+            )
             // @todo: API version is not supported for now
             //->addArgument(
             //    'version',
             //    InputArgument::OPTIONAL,
             //    'API version',
             //    Version::LATEST
-            //);
+            //)
+            ->addOption(
+                'action',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The name of action for which the metadata should be displayed.' .
+                'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.'.
+                'get'
+            );
         parent::configure();
     }
 
@@ -45,20 +53,19 @@ class DumpMetadataCommand extends AbstractDebugCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var EntityClassNameHelper $entityClassNameHelper */
-        $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
-
-        $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'), true);
         $requestType = $this->getRequestType($input);
         // @todo: API version is not supported for now
-        //$version     = $input->getArgument('version');
-        $version = Version::LATEST;
+        //$version = $input->getArgument('version');
+        $version = Version::normalizeVersion(null);
+        $action = $input->getOption('action');
 
-        /** @var ProcessorBag $processorBag */
+        /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
-        $processorBag->addApplicableChecker(new RequestTypeApplicableChecker());
+        $processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 
-        $metadata = $this->getMetadata($entityClass, $version, $requestType);
+        $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $requestType);
+
+        $metadata = $this->getMetadata($entityClass, $version, $requestType, $action);
         $output->write(Yaml::dump($metadata, 100, 4, true, true));
     }
 
@@ -66,17 +73,22 @@ class DumpMetadataCommand extends AbstractDebugCommand
      * @param string      $entityClass
      * @param string      $version
      * @param RequestType $requestType
+     * @param string      $action
      *
      * @return array
      */
-    protected function getMetadata($entityClass, $version, RequestType $requestType)
+    protected function getMetadata($entityClass, $version, RequestType $requestType, $action)
     {
         /** @var MetadataProvider $configProvider */
         $metadataProvider = $this->getContainer()->get('oro_api.metadata_provider');
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
 
-        $config   = $configProvider->getConfig($entityClass, $version, $requestType);
+        $configExtras = [
+            new EntityDefinitionConfigExtra($action)
+        ];
+
+        $config   = $configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
         $metadata = $metadataProvider->getMetadata(
             $entityClass,
             $version,

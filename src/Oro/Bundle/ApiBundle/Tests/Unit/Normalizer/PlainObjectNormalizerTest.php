@@ -3,8 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
+use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -22,12 +24,15 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->willReturn(null);
 
+        $normalizers = new ObjectNormalizerRegistry();
         $this->objectNormalizer = new ObjectNormalizer(
+            $normalizers,
             new DoctrineHelper($doctrine),
-            new EntityDataAccessor()
+            new EntityDataAccessor(),
+            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'))
         );
 
-        $this->objectNormalizer->addNormalizer(
+        $normalizers->addNormalizer(
             new DateTimeNormalizer()
         );
     }
@@ -101,7 +106,8 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'name'     => 'user_name',
                 'category' => null,
                 'groups'   => [],
-                'products' => []
+                'products' => [],
+                'owner'    => null
             ],
             $result
         );
@@ -119,7 +125,8 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'name'     => 'user_name',
                 'category' => 'owner_category_name',
                 'groups'   => ['owner_group1', 'owner_group2'],
-                'products' => ['product_name']
+                'products' => ['product_name'],
+                'owner'    => null
             ],
             $result
         );
@@ -135,16 +142,14 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $product->setName('product_name');
         $product->setUpdatedAt(new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')));
 
-        $category = new Entity\Category();
-        $category->setName('category_name');
+        $category = new Entity\Category('category_name');
         $category->setLabel('category_label');
         $product->setCategory($category);
 
         $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
-        $ownerCategory = new Entity\Category();
-        $ownerCategory->setName('owner_category_name');
+        $ownerCategory = new Entity\Category('owner_category_name');
         $ownerCategory->setLabel('owner_category_label');
         $owner->setCategory($ownerCategory);
         $ownerGroup1 = new Entity\Group();

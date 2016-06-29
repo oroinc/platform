@@ -298,13 +298,22 @@
   width: 100%;
   margin: 0;
   list-style: none;
+  display: table;
+  table-layout: fixed;
   & > li{
-    float: left;
     border-left: 1px solid #eaeaea;
+    display: table-cell;
+    position: relative;
+    vertical-align: middle;
     text-align: center;
-    > a {
-      padding: 15px 0 25px;
+    padding-bottom: 60px;
+    a {
       display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
     }
     /* width: 20%; calculated on backend and depends on a number of items */
     #gradient > .vertical(#ffffff, #f1f1f1);
@@ -315,6 +324,7 @@
       #gradient > .vertical(#f1f1f1, #ffffff);
     }
     .title-box{
+      margin-top: 15px;
       margin-bottom: 19px;
       display: block;
       text-overflow: ellipsis;
@@ -325,7 +335,11 @@
     }
     .list-content{
       display: block;
-       i{
+      position: absolute;
+      bottom: 25px;
+      left: 0;
+      width: 100%;
+      i {
         font-size: 35px;
         color: #444;
       }

@@ -186,3 +186,11 @@ oro:
         api.tooltip_text: >
             API key could be used for authentication in third party software.
             Please keep your regular password in secret.
+
+        dashboard:
+            role: Role
+            owner: Owner
+            owners: Owners
+            all_owners: All owners
+            business_unit: Business Unit
+            current_user: Current User

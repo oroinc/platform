@@ -15,8 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      routeName="oro_test_item_index",
  *      routeView="oro_test_item_view",
  *      routeCreate="oro_test_item_create",
- *      routeUpdate="oro_test_item_update",
- *      routeDelete="oro_test_item_delete",
+ *      routeUpdate="oro_test_item_update"
  * )
  */
 class Item implements TestFrameworkEntityInterface
@@ -99,7 +98,7 @@ class Item implements TestFrameworkEntityInterface
     protected $objectValue;
 
     /**
-     * @var ItemValue
+     * @var ItemValue[]
      *
      * @ORM\OneToMany(targetEntity="ItemValue", mappedBy="entity", cascade={"persist", "remove"})
      */

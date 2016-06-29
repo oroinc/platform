@@ -1,4 +1,4 @@
-define(['underscore'], function(_) {
+define(['underscore', 'asap'], function(_, asap) {
     'use strict';
 
     _.mixin({
@@ -21,8 +21,30 @@ define(['underscore'], function(_) {
             return elem && (' ' + elem.className + ' ')
                 .replace(/[\t\r\n\f]/g, ' ')
                 .indexOf(' mobile-version ') !== -1;
+        },
+
+        /* This function is available in newer underscore/lodash versions */
+        findIndex: function(collection, predicate) {
+            for (var i = 0; i < collection.length; i++) {
+                var item = collection[i];
+                if (predicate(item)) {
+                    return i;
+                }
+            }
+        },
+
+        /* This function is available in newer underscore/lodash versions */
+        findLastIndex: function(collection, predicate) {
+            for (var i = collection.length - 1; i >= 0; i--) {
+                var item = collection[i];
+                if (predicate(item)) {
+                    return i;
+                }
+            }
         }
     });
+
+    _.defer = asap;
 
     return _;
 });

@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -85,7 +84,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     {
         $fieldMap   = array_flip($idFields);
         $normalized = [];
-        foreach (explode(RestRequest::ARRAY_DELIMITER, $entityId) as $item) {
+        foreach (explode(',', $entityId) as $item) {
             $val = explode('=', $item);
             if (count($val) !== 2) {
                 throw new \UnexpectedValueException(

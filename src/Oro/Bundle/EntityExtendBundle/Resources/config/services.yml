@@ -44,9 +44,11 @@ parameters:
     oro_entity_extend.dictionary_value_list_provider.enum.class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider
     oro_entity_extend.field_type_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider
 
+    validator.builder.factory.class: Oro\Bundle\EntityExtendBundle\Validator\Validation
+
 services:
     oro_entity_extend.entity.cache.warmer:
-        public: false
+        public: true
         class: Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
         arguments:
             - "@oro_entity_extend.tools.dumper"
@@ -405,6 +407,7 @@ services:
         arguments:
             - "@oro_entity_config.config_manager"
         tags:
+            - { name: oro_entity.exclusion_provider.default }
             - { name: oro_entity.exclusion_provider.api, priority: 10 }
 
     oro_entity_extend.exclusion_provider.enum:

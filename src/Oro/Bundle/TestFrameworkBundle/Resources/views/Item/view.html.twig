@@ -1,0 +1,19 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
+{% block content_data %}
+    {% set dataBlocks = [
+        {
+            'title': 'general',
+            'subblocks': [{'data' : [
+                dataGrid.renderGrid('items-values-grid')
+            ]}]
+        }
+    ] %}
+
+    {% set id = 'item-view' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}

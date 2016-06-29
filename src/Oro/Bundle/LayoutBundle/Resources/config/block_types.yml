@@ -1,4 +1,14 @@
 services:
+    oro_layout.block_type.abstract_configurable:
+        abstract: true
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType
+
+    oro_layout.block_type.abstract_configurable_container:
+        abstract: true
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setParent, ['container']]
+
     oro_layout.block_type.base:
         class: Oro\Component\Layout\Block\Type\BaseType
         tags:
@@ -10,12 +20,17 @@ services:
              - { name: layout.block_type, alias: container }
 
     oro_layout.block_type.root:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\RootType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{doctype: {default: ''}}]]
+            - [setName, ['root']]
         tags:
              - { name: layout.block_type, alias: root }
 
     oro_layout.block_type.head:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\HeadType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['head']]
         tags:
              - { name: layout.block_type, alias: head }
 
@@ -45,16 +60,23 @@ services:
              - { name: layout.block_type, alias: input }
 
     oro_layout.block_type.body:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\BodyType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['body']]
         tags:
              - { name: layout.block_type, alias: body }
 
     oro_layout.block_type.form:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType
+        tags:
+             - { name: layout.block_type, alias: form }
+
+    oro_layout.block_type.form_fields:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType
         arguments:
             - '@oro_layout.form_layout_builder'
         tags:
-             - { name: layout.block_type, alias: form }
+             - { name: layout.block_type, alias: form_fields }
 
     oro_layout.block_type.form_start:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType
@@ -72,12 +94,18 @@ services:
              - { name: layout.block_type, alias: form_field }
 
     oro_layout.block_type.fieldset:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FieldsetType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{title: {default: ''}}]]
+            - [setName, ['fieldset']]
         tags:
              - { name: layout.block_type, alias: fieldset }
 
     oro_layout.block_type.text:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\TextType
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{escape: {default: true}, text: {required: true}}]]
+            - [setName, ['text']]
         tags:
              - { name: layout.block_type, alias: text }
 
@@ -87,12 +115,26 @@ services:
              - { name: layout.block_type, alias: link }
 
     oro_layout.block_type.button:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ButtonType
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        type: {default: 'button'}
+                        action: {default: 'none'}
+                        name: ~
+                        value: ~
+                        text: ~
+                        icon: ~
+            - [setName, ['button']]
         tags:
              - { name: layout.block_type, alias: button }
 
     oro_layout.block_type.button_group:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ButtonGroupType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['button_group']]
         tags:
              - { name: layout.block_type, alias: button_group }
 
@@ -102,7 +144,9 @@ services:
              - { name: layout.block_type, alias: external_resource }
 
     oro_layout.block_type.list:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['list']]
         tags:
              - { name: layout.block_type, alias: list }
 
@@ -112,6 +156,9 @@ services:
              - { name: layout.block_type, alias: ordered_list }
 
     oro_layout.block_type.list_item:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListItemType
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setOptionsConfig, [{own_template: {default: true}}]]
+            - [setName, ['list_item']]
         tags:
              - { name: layout.block_type, alias: list_item }

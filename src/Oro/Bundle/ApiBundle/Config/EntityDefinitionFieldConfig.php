@@ -14,12 +14,32 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     use Traits\ExcludeTrait;
     use Traits\LabelTrait;
     use Traits\DescriptionTrait;
+    use Traits\DataTypeTrait;
+    use Traits\FormTrait;
 
     /** a human-readable representation of the field */
-    const LABEL = 'label';
+    const LABEL = EntityDefinitionConfig::LABEL;
 
     /** a human-readable description of the field */
-    const DESCRIPTION = 'description';
+    const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
+
+    /** the data type of the field value */
+    const DATA_TYPE = 'data_type';
+
+    /** the class name of a target entity */
+    const TARGET_CLASS = 'target_class';
+
+    /**
+     * the type of a target association, can be "to-one" or "to-many",
+     * also "collection" can be used in Resources/config/oro/api.yml file as an alias for "to-many"
+     */
+    const TARGET_TYPE = 'target_type';
+
+    /** the form type that should be used for the field */
+    const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;
+
+    /** the form options that should be used for the field */
+    const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
 
     /**
      * {@inheritdoc}
@@ -31,6 +51,80 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
         $this->removeItemWithDefaultValue($result, self::COLLAPSE);
 
         return $result;
+    }
+
+    /**
+     * Gets the class name of a target entity.
+     *
+     * @return string|null
+     */
+    public function getTargetClass()
+    {
+        return array_key_exists(self::TARGET_CLASS, $this->items)
+            ? $this->items[self::TARGET_CLASS]
+            : null;
+    }
+
+    /**
+     * Sets the class name of a target entity.
+     *
+     * @param string|null $className
+     */
+    public function setTargetClass($className)
+    {
+        if ($className) {
+            $this->items[self::TARGET_CLASS] = $className;
+        } else {
+            unset($this->items[self::TARGET_CLASS]);
+        }
+    }
+
+    /**
+     * Indicates whether a target association represents "to-many" or "to-one" relationship.
+     *
+     * @return bool|null TRUE if a target association represents "to-many" relationship
+     */
+    public function isCollectionValuedAssociation()
+    {
+        return array_key_exists(self::TARGET_TYPE, $this->items)
+            ? 'to-many' === $this->items[self::TARGET_TYPE]
+            : null;
+    }
+
+    /**
+     * Indicates whether the type of a target association is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasTargetType()
+    {
+        return array_key_exists(self::TARGET_TYPE, $this->items);
+    }
+
+    /**
+     * Gets the type of a target association.
+     *
+     * @return string|null Can be "to-one" or "to-many"
+     */
+    public function getTargetType()
+    {
+        return array_key_exists(self::TARGET_TYPE, $this->items)
+            ? $this->items[self::TARGET_TYPE]
+            : null;
+    }
+
+    /**
+     * Sets the type of a target association.
+     *
+     * @param string|null $targetType Can be "to-one" or "to-many"
+     */
+    public function setTargetType($targetType)
+    {
+        if ($targetType) {
+            $this->items[self::TARGET_TYPE] = $targetType;
+        } else {
+            unset($this->items[self::TARGET_TYPE]);
+        }
     }
 
     /**
@@ -99,6 +193,16 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function hasPropertyPath()
     {
         return array_key_exists(self::PROPERTY_PATH, $this->items);
+    }
+
+    /**
+     * Whether at least one data transformer exists.
+     *
+     * @return bool
+     */
+    public function hasDataTransformers()
+    {
+        return !empty($this->items[self::DATA_TRANSFORMER]);
     }
 
     /**

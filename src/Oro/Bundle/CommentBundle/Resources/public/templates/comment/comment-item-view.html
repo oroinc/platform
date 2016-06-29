@@ -23,7 +23,28 @@
     <% if (attachmentURL) { %>
     <div class="comment-attachments">
         <div class="attachment-item">
-            <i class="icon-paper-clip"></i> <a href="<%= attachmentURL %>" class="no-hash" title="<%= attachmentFileName %>"><%= attachmentFileName %></a> (<%= attachmentSize %>)
+            <div class="thumbnail">
+            <% if (attachmentThumbnail) { %>
+                <a href="<%= attachmentURL %>" data-gallery="comment-view-<%= relationId %>" class="no-hash" title="<%= attachmentFileName %>">
+                    <span class="thumbnail" style="background: url('<%= attachmentThumbnail %>') 50% 50% no-repeat;"></span>
+                </a>
+            <% } else { %>
+                    <i class="fa <%= attachmentIcon %> fa-3x"></i>
+            <% } %>
+            </div>
+            <div class="dropdown link-to-record">
+                <a class="no-hash dropdown-toggle file-menu" href="javascript: void(0);" data-toggle="dropdown">
+                    <i class="fa <%= attachmentIcon %>"></i> <%= attachmentFileName %>
+                </a>
+                <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="dropdownMenu">
+                    <a class="no-hash" tabindex="-1" href="<%= attachmentURL %>">
+                        <%= _.__('oro.comment.attachment.download') %><span>(<%= attachmentSize %>)</span>
+                    </a>
+                    <% if (attachmentThumbnail) { %>
+                        <a class="view-image no-hash" tabindex="-1" data-gallery="comment-view-<%= relationId %>" href="<%= attachmentURL %>"><%= _.__('oro.comment.attachment.view') %></a>
+                    <% } %>
+                </ul>
+            </div>
         </div>
     </div>
     <% } %>

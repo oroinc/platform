@@ -53,7 +53,8 @@ define(function(require) {
                 collection: this.collection,
                 el: options._sourceElement,
                 listSelector: '#' + options.containerId,
-                inputName: options.inputName
+                inputName: options.inputName,
+                fileIcons: options.fileIcons
             });
 
             this.$uploadNewButton = this.findControlElement(options._sourceElement, options.uploadNewButton);

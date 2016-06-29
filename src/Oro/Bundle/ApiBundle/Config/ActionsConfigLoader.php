@@ -9,6 +9,11 @@ class ActionsConfigLoader extends AbstractConfigLoader
         ActionConfig::EXCLUDE => 'setExcluded',
     ];
 
+    /** @var array */
+    protected $fieldMethodMap = [
+        ActionFieldConfig::EXCLUDE => 'setExcluded',
+    ];
+
     /** @var StatusCodesConfigLoader */
     private $statusCodesConfigLoader;
 
@@ -38,6 +43,8 @@ class ActionsConfigLoader extends AbstractConfigLoader
         foreach ($config as $key => $value) {
             if (ActionConfig::STATUS_CODES === $key) {
                 $this->loadStatusCodes($action, $value);
+            } elseif (ActionConfig::FIELDS === $key) {
+                $this->loadFields($action, $value);
             } else {
                 $this->loadConfigValue($action, $key, $value, $this->methodMap);
             }
@@ -58,5 +65,35 @@ class ActionsConfigLoader extends AbstractConfigLoader
             }
             $action->setStatusCodes($this->statusCodesConfigLoader->load($statusCodes));
         }
+    }
+
+    /**
+     * @param ActionConfig $action
+     * @param array|null   $fields
+     */
+    protected function loadFields(ActionConfig $action, array $fields = null)
+    {
+        if (!empty($fields)) {
+            foreach ($fields as $name => $config) {
+                $action->addField($name, $this->loadField($config));
+            }
+        }
+    }
+
+    /**
+     * @param array|null $config
+     *
+     * @return FilterFieldConfig
+     */
+    protected function loadField(array $config = null)
+    {
+        $field = new ActionFieldConfig();
+        if (!empty($config)) {
+            foreach ($config as $key => $value) {
+                $this->loadConfigValue($field, $key, $value, $this->fieldMethodMap);
+            }
+        }
+
+        return $field;
     }
 }

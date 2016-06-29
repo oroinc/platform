@@ -200,7 +200,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetValueThrowsExceptionForInvalidPropertyPathType()
     {
-        $this->propertyAccessor->setValue(new \stdClass(), 123, 'Updated');
+        $testObject = new \stdClass();
+
+        $this->propertyAccessor->setValue($testObject, 123, 'Updated');
     }
 
     /**
@@ -238,7 +240,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetValueThrowsExceptionIfNotArrayAccess()
     {
-        $this->propertyAccessor->setValue(new \stdClass(), 'index', 'Updated');
+        $testObject = new \stdClass();
+
+        $this->propertyAccessor->setValue($testObject, 'index', 'Updated');
     }
 
     /**
@@ -266,7 +270,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetValueThrowsExceptionIfThereAreMissingParameters()
     {
-        $this->propertyAccessor->setValue(new TestClass('John'), 'publicAccessorWithMoreRequiredParameters', 'Updated');
+        $testObject = new TestClass('John');
+
+        $this->propertyAccessor->setValue($testObject, 'publicAccessorWithMoreRequiredParameters', 'Updated');
     }
 
     /**
@@ -325,7 +331,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveThrowsExceptionForInvalidPropertyPathType()
     {
-        $this->propertyAccessor->remove(new \stdClass(), 123);
+        $testObject = new \stdClass();
+
+        $this->propertyAccessor->remove($testObject, 123);
     }
 
     /**
@@ -360,7 +368,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveThrowsExceptionIfNotArrayAccess()
     {
-        $this->propertyAccessor->remove(new \stdClass(), 'index');
+        $testObject = new \stdClass();
+
+        $this->propertyAccessor->remove($testObject, 'index');
     }
 
     /**
@@ -388,7 +398,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveThrowsExceptionIfThereAreMissingParameters()
     {
-        $this->propertyAccessor->remove(new TestClass('John'), 'publicAccessorWithMoreRequiredParameters');
+        $testObject = new TestClass('John');
+
+        $this->propertyAccessor->remove($testObject, 'publicAccessorWithMoreRequiredParameters');
     }
 
     /**
@@ -396,7 +408,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveThrowsExceptionIfPublicPropertyHasNoUnsetter()
     {
-        $this->propertyAccessor->remove(new TestClass('John'), 'publicProperty');
+        $testObject = new TestClass('John');
+
+        $this->propertyAccessor->remove($testObject, 'publicProperty');
     }
 
     /**
@@ -404,7 +418,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveThrowsExceptionIfProtectedProperty()
     {
-        $this->propertyAccessor->remove(new TestClass('John'), 'protectedProperty');
+        $testObject = new TestClass('John');
+
+        $this->propertyAccessor->remove($testObject, 'protectedProperty');
     }
 
     /**
@@ -412,7 +428,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveThrowsExceptionIfPrivateProperty()
     {
-        $this->propertyAccessor->remove(new TestClass('John'), 'privateProperty');
+        $testObject = new TestClass('John');
+
+        $this->propertyAccessor->remove($testObject, 'privateProperty');
     }
 
     /**

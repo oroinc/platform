@@ -13,6 +13,7 @@ class ActionConfig
     use Traits\DescriptionTrait;
     use Traits\MaxResultsTrait;
     use Traits\StatusCodesTrait;
+    use Traits\FormTrait;
 
     /** a flag indicates whether the action should not be available for the entity */
     const EXCLUDE = ConfigUtil::EXCLUDE;
@@ -29,8 +30,20 @@ class ActionConfig
     /** the maximum number of items in the result */
     const STATUS_CODES = EntityDefinitionConfig::STATUS_CODES;
 
+    /** the form type that should be used for the entity */
+    const FORM_TYPE = 'form_type';
+
+    /** the form options that should be used for the entity */
+    const FORM_OPTIONS = 'form_options';
+
+    /** a list of fields */
+    const FIELDS = EntityDefinitionConfig::FIELDS;
+
     /** @var array */
     protected $items = [];
+
+    /** @var ActionFieldConfig[] */
+    protected $fields = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
@@ -48,6 +61,12 @@ class ActionConfig
                 $result[$key] = $value->toArray();
             }
         }
+        if (!empty($this->fields)) {
+            foreach ($this->fields as $fieldName => $field) {
+                $fieldConfig                      = $field->toArray();
+                $result[self::FIELDS][$fieldName] = !empty($fieldConfig) ? $fieldConfig : null;
+            }
+        }
 
         return $result;
     }
@@ -59,7 +78,9 @@ class ActionConfig
      */
     public function isEmpty()
     {
-        return empty($this->items);
+        return
+            empty($this->items)
+            && empty($this->fields);
     }
 
     /**
@@ -73,5 +94,103 @@ class ActionConfig
             },
             $this->items
         );
+        $this->fields = array_map(
+            function ($field) {
+                return clone $field;
+            },
+            $this->fields
+        );
+    }
+
+    /**
+     * Checks whether the configuration of at least one field exists.
+     *
+     * @return bool
+     */
+    public function hasFields()
+    {
+        return !empty($this->fields);
+    }
+
+    /**
+     * Gets the configuration for all fields.
+     *
+     * @return ActionFieldConfig[] [field name => config, ...]
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * Checks whether the configuration of the field exists.
+     *
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    public function hasField($fieldName)
+    {
+        return isset($this->fields[$fieldName]);
+    }
+
+    /**
+     * Gets the configuration of the field.
+     *
+     * @param string $fieldName
+     *
+     * @return ActionFieldConfig|null
+     */
+    public function getField($fieldName)
+    {
+        return isset($this->fields[$fieldName])
+            ? $this->fields[$fieldName]
+            : null;
+    }
+
+    /**
+     * Gets the configuration of existing field or adds new field.
+     *
+     * @param string $fieldName
+     *
+     * @return ActionFieldConfig
+     */
+    public function getOrAddField($fieldName)
+    {
+        $field = $this->getField($fieldName);
+        if (null === $field) {
+            $field = $this->addField($fieldName);
+        }
+
+        return $field;
+    }
+
+    /**
+     * Adds the configuration of the field.
+     *
+     * @param string                 $fieldName
+     * @param ActionFieldConfig|null $field
+     *
+     * @return ActionFieldConfig
+     */
+    public function addField($fieldName, $field = null)
+    {
+        if (null === $field) {
+            $field = new ActionFieldConfig();
+        }
+
+        $this->fields[$fieldName] = $field;
+
+        return $field;
+    }
+
+    /**
+     * Removes the configuration of the field.
+     *
+     * @param string $fieldName
+     */
+    public function removeField($fieldName)
+    {
+        unset($this->fields[$fieldName]);
     }
 }

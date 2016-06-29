@@ -1,0 +1,17 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+
+{% block content_data %}
+    {% set dataBlocks = [
+        {
+            'title': 'general',
+            'subblocks': [{'data' : [
+                form_widget(form)
+            ]}]
+        }
+    ] %}
+
+    {% set id = 'item-edit' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}

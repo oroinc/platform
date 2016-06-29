@@ -4,7 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
@@ -19,21 +19,21 @@ class Manager implements FunctionProviderInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var EntityHierarchyProvider */
+    /** @var EntityHierarchyProviderInterface */
     protected $entityHierarchyProvider;
 
     /**
      * Constructor
      *
-     * @param array                   $config
-     * @param ConfigurationResolver   $resolver
-     * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param TranslatorInterface     $translator
+     * @param array                            $config
+     * @param ConfigurationResolver            $resolver
+     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
+     * @param TranslatorInterface              $translator
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
-        EntityHierarchyProvider $entityHierarchyProvider,
+        EntityHierarchyProviderInterface $entityHierarchyProvider,
         TranslatorInterface $translator
     ) {
         $resolver->resolve($config);

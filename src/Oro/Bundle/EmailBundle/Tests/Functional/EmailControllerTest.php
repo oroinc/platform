@@ -87,14 +87,40 @@ class EmailControllerTest extends WebTestCase
 
     public function testAttachment()
     {
-        $this->markTestIncomplete('Skipped. Need attachment fixture');
-
+        $attachment = $this->getReference('emailAttachment_1');
         $url = $this->getUrl('oro_email_attachment', [
-            'id' => 1
+            'id' => $attachment->getId()
         ]);
-        $this->client->request('GET', $url);
+        $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertResponseStatusCodeEquals($result, 200);
+        $this->assertResponseContentTypeEquals($result, $attachment->getContentType());
+    }
+
+    public function testGetResizedAttachmentImage()
+    {
+        $attachment = $this->getReference('emailAttachment_1');
+        $url = $this->getUrl('oro_resize_email_attachment', [
+            'id' => $attachment->getId(),
+            'width' => 10,
+            'height' => 10
+        ]);
+        $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
+        $result = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($result, 200);
+        $this->assertResponseContentTypeEquals($result, $attachment->getContentType());
+    }
+
+    public function testDownloadAttachments()
+    {
+        $emailBody = $this->getReference('emailBody_1');
+        $url = $this->getUrl('oro_email_body_attachments', [
+            'id' => $emailBody->getId(),
+        ]);
+        $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
+        $result = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($result, 200);
+        $this->assertResponseContentTypeEquals($result, 'application/zip');
     }
 
     public function testEmails()
@@ -206,7 +232,9 @@ class EmailControllerTest extends WebTestCase
         $this->assertEquals(1, $crawler->filter('div.widget-content input[name=\'oro_email_email[cc]\']')->count());
         $this->assertEquals(
             1,
-            $crawler->filter('div.widget-content input[value=\'' . $email->getFromName() . '\']')->count()
+            $crawler->filter('div.widget-content input[value=\''
+                . base64_encode($email->getFromName())
+                . '\']')->count()
         );
         $cc = $email->getCc()->first()->getEmailAddress()->getEmail();
         $this->assertEquals(
@@ -232,12 +260,14 @@ class EmailControllerTest extends WebTestCase
         $this->assertEquals(1, $crawler->filter('div.widget-content input[name=\'oro_email_email[cc]\']')->count());
         $this->assertEquals(
             1,
-            $crawler->filter('div.widget-content input[value=\'' . $email->getFromName() . '\']')->count()
+            $crawler->filter('div.widget-content input[value=\''
+                . base64_encode($email->getFromName())
+                . '\']')->count()
         );
         $cc = $email->getCc()->first()->getEmailAddress()->getEmail();
         $this->assertEquals(
             1,
-            $crawler->filter('div.widget-content input[value=\'' . $cc . '\']')->count()
+            $crawler->filter('div.widget-content input[value=\'' . base64_encode($cc) . '\']')->count()
         );
         $bcc = $email->getBcc()->first()->getEmailAddress()->getEmail();
         $this->assertEquals(

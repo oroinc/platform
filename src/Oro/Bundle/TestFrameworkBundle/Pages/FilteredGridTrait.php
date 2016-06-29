@@ -28,7 +28,7 @@ trait FilteredGridTrait
             . "[*[contains(@class,'filter-criteria-selector')][contains(.,'{$filterName}')]]"
             . "/div[contains(@class, 'dropdown-menu')]"
         );
-        $input = $criteria->element($this->test->using('xpath')->value("div/div/input[@name='value']"));
+        $input = $criteria->element($this->test->using('xpath')->value("div/div//input[@name='value']"));
 
         $input->clear();
         $input->value($value);

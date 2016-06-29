@@ -23,6 +23,7 @@ define(function(require) {
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var util = require('./util');
 
     /**
      * Basic grid class.
@@ -172,12 +173,13 @@ define(function(require) {
             this._initProperties(opts);
 
             // use columns collection as event bus since there is no alternatives
-            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
-                this.trigger('afterMakeCell', row, cell);
-            });
             if (this.themeOptionsConfigurator) {
                 this.listenTo(this.columns, 'configureInitializeOptions', this.themeOptionsConfigurator);
             }
+
+            this.filteredColumns = util.createFilteredColumnCollection(this.columns);
+
+            options.filteredColumns = this.filteredColumns;
 
             this.trigger('beforeBackgridInitialize');
             this.backgridInitialize(options);
@@ -269,8 +271,8 @@ define(function(require) {
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
-                if ('selectState' in this.header.row.cells[0]) {
-                    this.selectState = this.header.row.cells[0].selectState;
+                if ('selectState' in this.header.row.subviews[0]) {
+                    this.selectState = this.header.row.subviews[0].selectState;
                 }
             }
             if (this.selectState === null) {
@@ -416,8 +418,13 @@ define(function(require) {
             _.each(this.columns.models, function(column) {
                 column.dispose();
             });
+
+            this.filteredColumns.dispose();
+            delete this.filteredColumns;
+
             this.columns.dispose();
             delete this.columns;
+
             delete this.refreshAction;
             delete this.resetAction;
             delete this.exportAction;
@@ -1083,7 +1090,7 @@ define(function(require) {
             for (var i = 0; i < rows.length; i++) {
                 var row = rows[i];
                 if (row.model === model) {
-                    var cells = row.cells;
+                    var cells = row.subviews;
                     for (var j = 0; j < cells.length; j++) {
                         var cell = cells[j];
                         if (cell.column === column) {
@@ -1104,7 +1111,7 @@ define(function(require) {
          */
         findCellByIndex: function(modelI, columnI) {
             try {
-                return _.findWhere(this.body.rows[modelI].cells, {
+                return _.findWhere(this.body.rows[modelI].subviews, {
                     column: this.columns.at(columnI)
                 });
             } catch (e) {
@@ -1123,7 +1130,7 @@ define(function(require) {
                 return null;
             }
             try {
-                return _.findWhere(this.header.row.cells, {
+                return _.findWhere(this.header.row.subviews, {
                     column: this.columns.at(columnI)
                 });
             } catch (e) {

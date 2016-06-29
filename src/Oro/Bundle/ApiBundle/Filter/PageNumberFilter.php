@@ -9,7 +9,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 /**
  * A filter that can be used to specify the page number.
  */
-class PageNumberFilter extends StandaloneFilter
+class PageNumberFilter extends StandaloneFilterWithDefaultValue
 {
     /**
      * {@inheritdoc}

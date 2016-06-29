@@ -198,7 +198,10 @@ define(function(require) {
         },
 
         isCurrentTagSelected: function() {
-            var select2Data = this.$('.select2-container').select2('data');
+            var select2Data = this.$('.select2-container').inputWidget('data');
+            if (!select2Data) {
+                return false;
+            }
             for (var i = 0; i < select2Data.length; i++) {
                 var tag = select2Data[i];
                 if (tag.label === this.currentTerm) {
@@ -300,7 +303,7 @@ define(function(require) {
         },
 
         getValue: function() {
-            return this.$('.select2-container').select2('data');
+            return this.$('.select2-container').inputWidget('data');
         },
 
         getServerUpdateData: function() {

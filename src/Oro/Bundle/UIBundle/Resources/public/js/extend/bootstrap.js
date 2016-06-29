@@ -157,54 +157,56 @@ define([
         // jscs:enable
         /* jshint ignore:end */
 
-        /*
-         * SCROLL support
-         */
-        var adjustmentLeft = scrollHelper.scrollIntoView(this.$tip[0]);
+        if (!this.$element.data('noscroll')) {
+            /*
+             * SCROLL support
+             */
+            var adjustmentLeft = scrollHelper.scrollIntoView(this.$tip[0]);
 
-        /*
-         * SHIFT support
-         */
-        var visibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
+            /*
+             * SHIFT support
+             */
+            var visibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
 
-        if (placement === 'right' || placement === 'left') {
-            var outerHeight = this.$tip.outerHeight();
-            var visibleHeight = visibleRect.bottom - visibleRect.top;
-            if (visibleHeight < outerHeight - /* fixes floating pixel calculation */ 1) {
-                // still doesn't match, decrease height and move into visible area
-                this.$tip.css({
-                    height: this.$tip.outerHeight()
-                });
-                //find adjustment to move tooltip
-                var adjustment = outerHeight - visibleHeight;
-                //change adjustemnt direction if needed
-                if (adjustmentLeft.vertical < 0) {
-                    adjustment = -adjustment;
-                }
+            if (placement === 'right' || placement === 'left') {
+                var outerHeight = this.$tip.outerHeight();
+                var visibleHeight = visibleRect.bottom - visibleRect.top;
+                if (visibleHeight < outerHeight - /* fixes floating pixel calculation */ 1) {
+                    // still doesn't match, decrease height and move into visible area
+                    this.$tip.css({
+                        height: this.$tip.outerHeight()
+                    });
+                    //find adjustment to move tooltip
+                    var adjustment = outerHeight - visibleHeight;
+                    //change adjustemnt direction if needed
+                    if (adjustmentLeft.vertical < 0) {
+                        adjustment = -adjustment;
+                    }
 
-                this.$tip.css({
-                    top: parseFloat(this.$tip.css('top')) + adjustment
-                });
-                if (!scrollHelper.isCompletelyVisible(this.$tip[0]) && adjustment < 0) {
-                    /**
-                     * make a second attempt to move tooltip up
-                     * to fix the issue when unnecessary scroll is done by scrollIntoView
-                     */
                     this.$tip.css({
                         top: parseFloat(this.$tip.css('top')) + adjustment
                     });
-                    adjustment += adjustment;
+                    if (!scrollHelper.isCompletelyVisible(this.$tip[0]) && adjustment < 0) {
+                        /**
+                         * make a second attempt to move tooltip up
+                         * to fix the issue when unnecessary scroll is done by scrollIntoView
+                         */
+                        this.$tip.css({
+                            top: parseFloat(this.$tip.css('top')) + adjustment
+                        });
+                        adjustment += adjustment;
+                    }
+                    //check visible area after move, update arrow position and height
+                    var newVisibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
+                    var newVisibleHeight = newVisibleRect.bottom - newVisibleRect.top;
+                    this.$tip.css({
+                        maxHeight: newVisibleHeight
+                    });
+                    var centerChange = (outerHeight - newVisibleHeight) / 2;
+                    this.$arrow.css({
+                        top: 'calc(50% + ' + (centerChange - adjustment) + 'px)'
+                    });
                 }
-                //check visible area after move, update arrow position and height
-                var newVisibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
-                var newVisibleHeight = newVisibleRect.bottom - newVisibleRect.top;
-                this.$tip.css({
-                    maxHeight: newVisibleHeight
-                });
-                var centerChange = (outerHeight - newVisibleHeight) / 2;
-                this.$arrow.css({
-                    top: 'calc(50% + ' + (centerChange - adjustment) + 'px)'
-                });
             }
         }
     };

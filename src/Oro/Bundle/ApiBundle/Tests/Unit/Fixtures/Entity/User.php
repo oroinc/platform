@@ -26,7 +26,7 @@ class User
 
     /**
      * @ORM\ManyToOne(targetEntity="Category")
-     * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
+     * @ORM\JoinColumn(name="category_name", referencedColumnName="name", nullable=false)
      **/
     protected $category;
 
@@ -43,6 +43,12 @@ class User
      * @ORM\OneToMany(targetEntity="Product", mappedBy="owner")
      */
     protected $products;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=false)
+     **/
+    protected $owner;
 
     public function __construct()
     {
@@ -99,13 +105,19 @@ class User
     }
 
     /**
-     * Gets the groups related to contact
-     *
      * @return Group[]|Collection
      */
     public function getGroups()
     {
         return $this->groups;
+    }
+
+    /**
+     * @param Group[]|Collection $groups
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
     }
 
     /**
@@ -156,6 +168,22 @@ class User
             $this->products->removeElement($product);
             $product->setOwner(null);
         }
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param User|null $owner
+     */
+    public function setOwner(User $owner = null)
+    {
+        $this->owner = $owner;
     }
 
     /**

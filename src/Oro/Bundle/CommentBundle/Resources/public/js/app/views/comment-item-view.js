@@ -21,10 +21,10 @@ define(function(require) {
             'click .item-edit-button': 'onEditCommentClick',
 
             // open/close dropdown on hover
-            'mouseover .dropdown-toggle': function(e) {
+            'mouseover .dropdown-toggle:not(.file-menu)': function(e) {
                 $(e.target).trigger('click');
             },
-            'mouseleave .dropdown-menu': function(e) {
+            'mouseleave .dropdown-menu:not(.file-menu)': function(e) {
                 $(e.target).parent().find('a.dropdown-toggle').trigger('click');
             }
         },
