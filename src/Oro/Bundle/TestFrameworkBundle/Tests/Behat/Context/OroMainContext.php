@@ -108,8 +108,9 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
+     * @When /^(?:|I )fill form with:$/
      */
-    public function iFillFormWith($formName, TableNode $table)
+    public function iFillFormWith(TableNode $table, $formName = "OroForm")
     {
         /** @var Form $form */
         $form = $this->createElement($formName);
