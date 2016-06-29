@@ -214,7 +214,11 @@ class Processor
 
         //In case when 'useremailorigin' origin doesn't have folder, get folder from internal origin
         if (!$folder && $origin instanceof UserEmailOrigin) {
-            $origin = $this->emailOriginHelper->getEmailOrigin($email, null, InternalEmailOrigin::BAP, false);
+            $originKey = InternalEmailOrigin::BAP.$email;
+            if (array_key_exists($originKey, $this->origins)) {
+                unset($this->origins[$originKey]);
+            }
+            $origin = $this->getEmailOrigin($email, null, InternalEmailOrigin::BAP, false);
             return $origin->getFolder(FolderType::SENT);
         }
 
