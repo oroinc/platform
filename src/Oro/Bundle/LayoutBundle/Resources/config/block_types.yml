@@ -12,14 +12,6 @@ services:
     oro_layout.block_type.extension.abstract_configurable:
         abstract: true
         class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigurableTypeExtension
-        calls:
-            - [setExtendedType, ['block']]
-
-    oro_layout.block_type.extension.abstract_configurable_container:
-        abstract: true
-        parent: oro_layout.block_type.extension.abstract_configurable
-        calls:
-            - [setExtendedType, ['container']]
 
     oro_layout.block_type.base:
         class: Oro\Component\Layout\Block\Type\BaseType
@@ -199,6 +191,7 @@ services:
         parent: oro_layout.block_type.extension.abstract_configurable
         calls:
             - [setOptionsConfig, [{visible: {default: true}}]]
+            - [setExtendedType, ['block']]
         tags:
             - { name: layout.block_type_extension, alias: block }
 
@@ -206,6 +199,7 @@ services:
         parent: oro_layout.block_type.extension.abstract_configurable
         calls:
             - [setOptionsConfig, [{hidden: {default: false}}]]
+            - [setExtendedType, ['block']]
         tags:
             - { name: layout.block_type_extension, alias: block }
 
@@ -213,5 +207,6 @@ services:
         parent: oro_layout.block_type.extension.abstract_configurable
         calls:
             - [setOptionsConfig, [{attr_renderer: ~}]]
+            - [setExtendedType, ['block']]
         tags:
             - { name: layout.block_type_extension, alias: block }
