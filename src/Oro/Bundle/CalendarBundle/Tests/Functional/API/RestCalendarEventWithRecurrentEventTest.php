@@ -104,7 +104,8 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
             $this->getUrl('oro_api_put_calendarevent', ['id' => $data['id']]),
             $recurringEventParameters
         );
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertFalse($result['notifiable']);
 
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->findOneBy(['id' => $data['id']]);
@@ -230,7 +231,8 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
             self::$recurringEventExceptionParameters
         );
 
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertFalse($result['notifiable']);
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->find($data['id']);
         $this->assertEquals(self::$recurringEventExceptionParameters['isCancelled'], $event->isCancelled());

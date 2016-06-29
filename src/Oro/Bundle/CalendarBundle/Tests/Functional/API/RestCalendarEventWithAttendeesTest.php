@@ -20,7 +20,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->client->enableProfiler();
         $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
     }
 
@@ -253,7 +252,8 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             $request
         );
 
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertTrue($result['notifiable']);
 
         return $id;
     }
@@ -378,7 +378,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                     'parentEventId'    => null,
                     'editable'         => true,
                     'removable'        => true,
-                    'notifiable'       => false,
+                    'notifiable'       => true,
                     'calendarAlias'    => 'user',
                     'attendees'        => [
                         [
@@ -776,7 +776,8 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             $request
         );
 
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertFalse($result['notifiable']);
 
         return $id;
     }
