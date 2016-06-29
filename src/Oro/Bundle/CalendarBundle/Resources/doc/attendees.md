@@ -66,7 +66,7 @@ GET /api/rest/latest/calendarevents/1
         {
             "displayName": "John Doe",
             "email": "john.doe@example.com",
-            "user_id": 1,
+            "userId": 1,
             "createdAt": "2016-06-29T01:16:40+00:00",
             "updatedAt": "2016-06-29T01:16:40+00:00",
             "status": "accepted",
@@ -75,7 +75,7 @@ GET /api/rest/latest/calendarevents/1
         {
             "displayName": "Jack Smith",
             "email": "jack.smith@example.com",
-            "user_id": null,
+            "userId": null,
             "createdAt": "2016-06-29T01:16:40+00:00",
             "updatedAt": "2016-06-29T01:16:40+00:00",
             "status": "none",
