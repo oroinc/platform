@@ -97,7 +97,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         foreach ($this->templates as $index => $template) {
             $owner = $this->getReference('simple_user');
             $simpleUser2 = $this->getReference('simple_user2');
-            $origin = $this->emailOriginHelper->getEmailOrigin($owner->getEmail());
+            $origin = $this->processor->getEmailOrigin($owner->getEmail());
 
             $emailUser = $this->emailEntityBuilder->emailUser(
                 $template['Subject'],
