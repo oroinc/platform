@@ -118,7 +118,7 @@ class RecurrenceFormType extends AbstractType
                 ]
             )
             ->add(
-                'timezone',
+                'timeZone',
                 'timezone',
                 [
                     'required' => true,

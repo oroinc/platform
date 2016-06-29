@@ -232,7 +232,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
 
                 //set timezone for all datetime values,
                 // to make sure all occurrences are calculated in the time zone in which the recurrence is created
-                $recurrenceTimezone = new \DateTimeZone($recurrence->getTimezone());
+                $recurrenceTimezone = new \DateTimeZone($recurrence->getTimeZone());
                 $recurrence->getStartTime()->setTimezone($recurrenceTimezone);
                 $recurrence->getCalculatedEndTime()->setTimezone($recurrenceTimezone);
                 $start->setTimezone($recurrenceTimezone);
@@ -240,6 +240,9 @@ class UserCalendarProvider extends AbstractCalendarProvider
 
                 $occurrenceDates = $this->recurrenceModel->getOccurrences($recurrence, $start, $end);
                 $newStartDate = new \DateTime($item['start']);
+                $calendarEvent = new Entity\CalendarEvent();
+                $calendarEvent->setStart(clone $newStartDate);
+                $recurrence->setCalendarEvent($calendarEvent);
                 $newStartDate->setTimezone($recurrenceTimezone);
                 $itemEndDate = new \DateTime($item['end']);
                 $itemEndDate->setTimezone($recurrenceTimezone);
@@ -247,7 +250,6 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 $timeZone = new \DateTimeZone('UTC');
                 foreach ($occurrenceDates as $occurrenceDate) {
                     $newItem = $item;
-                    $newItem['recurrencePattern'] = $this->recurrenceModel->getTextValue($recurrence);
                     $newStartDate->setTimezone($recurrenceTimezone);
                     $newStartDate->setDate(
                         $occurrenceDate->format('Y'),
@@ -256,6 +258,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
                     );
                     $newStartDate->setTimezone($timeZone);
                     $newItem['start'] = $newStartDate->format('c');
+                    $newItem['recurrencePattern'] = $this->recurrenceModel->getTextValue($recurrence);
                     $endDate = new \DateTime(
                         sprintf(
                             '+%s minute +%s hour +%s day +%s month +%s year %s',

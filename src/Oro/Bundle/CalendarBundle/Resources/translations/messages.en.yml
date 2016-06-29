@@ -201,13 +201,14 @@ oro:
             patterns:
                 occurrences: "{1} , end after 1 occurrence|]1,Inf[ , end after %count% occurrences"
                 end_date: ", end by %date%"
-                daily: "{1} Daily every 1 day|]1,Inf[ Daily every %count% days%occurrences%%end_date%"
-                weekly: "{1} Weekly every 1 week on %days%|]1,Inf[ Weekly every %count% weeks on %days%%occurrences%%end_date%"
-                monthly: "{1} Monthly day %day% of every 1 month|]1,Inf[ Monthly day %day% of every %count% months%occurrences%%end_date%"
-                monthnth: "{1} Monthly the %instance% %day% of every 1 month|]1,Inf[ Monthly the %instance% %day% of every %count% months%occurrences%%end_date%"
-                yearly: "{1} Yearly every 1 year on %day%|]1,Inf[ Yearly every %count% years on %day%%occurrences%%end_date%"
-                yearnth: "{1} Yearly every 1 year on the %instance% %day% of %month%|]1,Inf[ Yearly every %count% years on the %instance% %day% of %month%%occurrences%%end_date%"
-                weekday: "Daily, every weekday%occurrences%%end_date%"
+                timezone: '(%timezone% GMT%timezone_offset%)'
+                daily: "{1} Daily every 1 day%occurrences%%end_date%%timezone_info%|]1,Inf[ Daily every %count% days%occurrences%%end_date%%timezone_info%"
+                weekly: "{1} Weekly every 1 week on %days%%occurrences%%end_date%%timezone_info%|]1,Inf[ Weekly every %count% weeks on %days%%occurrences%%end_date%%timezone_info%"
+                monthly: "{1} Monthly day %day% of every 1 month%occurrences%%end_date%%timezone_info%|]1,Inf[ Monthly day %day% of every %count% months%occurrences%%end_date%%timezone_info%"
+                monthnth: "{1} Monthly the %instance% %day% of every 1 month%occurrences%%end_date%%timezone_info%|]1,Inf[ Monthly the %instance% %day% of every %count% months%occurrences%%end_date%%timezone_info%"
+                yearly: "{1} Yearly every 1 year on %day%%occurrences%%end_date%%timezone_info%|]1,Inf[ Yearly every %count% years on %day%%occurrences%%end_date%%timezone_info%"
+                yearnth: "{1} Yearly every 1 year on the %instance% %day% of %month%%occurrences%%end_date%%timezone_info%|]1,Inf[ Yearly every %count% years on the %instance% %day% of %month%%occurrences%%end_date%%timezone_info%"
+                weekday: "Daily, every weekday%occurrences%%end_date%%timezone_info%"
 
             types:
                 daily:              Daily

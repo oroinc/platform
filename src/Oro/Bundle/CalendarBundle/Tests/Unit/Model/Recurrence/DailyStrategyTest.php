@@ -7,6 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\DailyStrategy;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DailyStrategyTest extends AbstractTestStrategy
 {
@@ -44,7 +45,16 @@ class DailyStrategyTest extends AbstractTestStrategy
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new DailyStrategy($translator, $dateTimeFormatter);
+        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()
+            ->setMethods(['getTimezone'])
+            ->getMock();
+        $localeSettings->expects($this->any())
+            ->method('getTimezone')
+            ->will($this->returnValue('UTC'));
+
+        $this->strategy = new DailyStrategy($translator, $dateTimeFormatter, $localeSettings);
     }
 
     public function testGetName()
@@ -92,6 +102,7 @@ class DailyStrategyTest extends AbstractTestStrategy
         $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
             ->setInterval($recurrenceData['interval'])
             ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setTimeZone('UTC')
             ->setOccurrences($recurrenceData['occurrences']);
 
         if (!empty($recurrenceData['endTime'])) {

@@ -191,7 +191,7 @@ class Recurrence
      *
      * @ORM\Column(name="timezone", type="string", length=255)
      */
-    protected $timezone;
+    protected $timeZone;
 
     /**
      * Gets id
@@ -460,26 +460,26 @@ class Recurrence
     }
 
     /**
-     * Sets timezone.
+     * Sets time zone.
      *
-     * @param string $timezone
+     * @param string $timeZone
      *
      * @return self
      */
-    public function setTimezone($timezone)
+    public function setTimeZone($timeZone)
     {
-        $this->timezone = $timezone;
+        $this->timeZone = $timeZone;
 
         return $this;
     }
 
     /**
-     * Gets timezone.
+     * Gets time zone.
      *
      * @return string
      */
-    public function getTimezone()
+    public function getTimeZone()
     {
-        return $this->timezone;
+        return $this->timeZone;
     }
 }
