@@ -14,6 +14,9 @@ class OroSelenium2Driver extends Selenium2Driver
      */
     private $xpathManipulator;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($browserName, $desiredCapabilities, $wdHost)
     {
         $this->xpathManipulator = new Manipulator();
@@ -30,10 +33,9 @@ class OroSelenium2Driver extends Selenium2Driver
         $elementName = strtolower($element->name());
 
         if ('input' === $elementName) {
-
             $classes = explode(' ', $element->attribute('class'));
 
-            if (in_array('select2-offscreen', $classes, true)) {
+            if (true === in_array('select2-offscreen', $classes, true)) {
                 $this->fillSelect2Entity($xpath, $value);
 
                 return;
@@ -42,20 +44,21 @@ class OroSelenium2Driver extends Selenium2Driver
 
                 return;
             }
-        } elseif ('textarea' === $elementName) {
-            if ('true' === $element->attribute('aria-hidden')) {
-                $this->fillTinyMce($element, $value);
+        } elseif ('textarea' === $elementName && 'true' === $element->attribute('aria-hidden')) {
+            $this->fillTinyMce($element, $value);
 
-                return;
-            }
+            return;
         }
 
         parent::setValue($xpath, $value);
     }
 
     /**
-     * @param Element $element
-     * @param string $value
+     * Set content tinymce editor with value
+     *
+     * @param Element $element Form element that was replaced by TinyMCE
+     * @param string  $value   Text for set into tiny
+     *
      * @throws ExpectationException
      */
     protected function fillTinyMce(Element $element, $value)
@@ -77,6 +80,7 @@ class OroSelenium2Driver extends Selenium2Driver
             sprintf('tinyMCE.get("%s").setContent("%s");', $fieldId, $value)
         );
     }
+
 
     /**
      * @param Element $element
