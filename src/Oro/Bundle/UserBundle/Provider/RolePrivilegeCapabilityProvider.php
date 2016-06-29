@@ -35,7 +35,8 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
                 'unselected_access_level' => RolePrivilegeAbstractProvider::UNSELECTED_ACCESS_LEVEL
             ];
         }
-        
+        $capabilitiesData = $this->filterUnusedCategories($capabilitiesData);
+
         return array_values($capabilitiesData);
     }
 
@@ -54,6 +55,20 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
                 'items' => []
             ];
         }
+
+        return $capabilitiesData;
+    }
+
+    /**
+     * @param $capabilitiesData
+     *
+     * @return array
+     */
+    protected function filterUnusedCategories($capabilitiesData)
+    {
+        $capabilitiesData = array_filter($capabilitiesData, function ($data) {
+            return count($data['items']) > 0;
+        });
 
         return $capabilitiesData;
     }

@@ -92,19 +92,22 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
      */
     protected function preparePermissions(AclPrivilege $privilege, $item)
     {
+        $orders = [];
         foreach ($privilege->getPermissions() as $permissionName => $permission) {
             /** @var AclPermission $permission */
             $permissionEntity = $this->permissionManager->getPermissionByName($permission->getName());
             if ($permissionEntity) {
-                $item['permissions'][] = $this->setPrivilegePermission(
+                $privilegePermission = $this->getPrivilegePermission(
                     $privilege,
                     $permissionEntity,
                     $permissionName,
                     $permission
                 );
-
+                $item['permissions'][] = $privilegePermission;
+                $orders[] = $privilegePermission['label'];
             }
         }
+        array_multisort($orders, $item['permissions']);
 
         return $item;
     }
@@ -117,7 +120,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
      *
      * @return array
      */
-    protected function setPrivilegePermission(
+    protected function getPrivilegePermission(
         AclPrivilege $privilege,
         Permission $permissionEntity,
         $permissionName,

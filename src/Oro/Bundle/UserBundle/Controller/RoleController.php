@@ -126,11 +126,11 @@ class RoleController extends Controller
             ];
         }, $categoryProvider->getTabbedCategories());
 
-        return array(
+        return [
             'entity' => $role,
             'form' => $form,
             'tabsOptions' => [
-                'data' => $tabs
+                'data' => array_values($tabs)
             ],
             'capabilitySetOptions' => [
                 'data' => $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilities($role),
@@ -144,6 +144,6 @@ class RoleController extends Controller
                 !$this->get('doctrine.orm.entity_manager')
                     ->getRepository('OroUserBundle:Role')
                     ->hasAssignedUsers($role)
-        );
+        ];
     }
 }

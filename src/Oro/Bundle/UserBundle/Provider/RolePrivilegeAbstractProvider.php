@@ -75,8 +75,8 @@ abstract class RolePrivilegeAbstractProvider
          * @var string $type
          * @var ArrayCollection $sortedPrivileges
          */
-        foreach ($this->aclRoleHandler->getAllPriveleges($role) as $privelegeType => $sortedPrivileges) {
-            if ($privelegeType === $type) {
+        foreach ($this->aclRoleHandler->getAllPrivileges($role) as $privilegeType => $sortedPrivileges) {
+            if ($privilegeType === $type) {
                 $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
             }
         }

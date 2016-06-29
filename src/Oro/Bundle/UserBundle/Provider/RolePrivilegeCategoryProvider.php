@@ -97,14 +97,6 @@ class RolePrivilegeCategoryProvider
         
         return $this->categoryList;
     }
-    
-    protected function getPredefinedCategories()
-    {
-        $categoryList = [];
-        $categoryList[] = new PrivilegeCategory('sales_data', 'oro.user.role.category.sales_data.label', true, 7);
-        
-        return $categoryList;
-    }
 
     /**
      * Get categories market as tabbed
