@@ -23,6 +23,8 @@ class AddFieldsFilter implements ProcessorInterface
     const FILTER_KEY          = 'fields';
     const FILTER_KEY_TEMPLATE = 'fields[%s]';
 
+    const FILTER_DESCRIPTION_TEMPLATE = 'A list of fields for the \'%s\' entity to be returned.';
+
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
@@ -86,7 +88,7 @@ class AddFieldsFilter implements ProcessorInterface
         if ($entityType) {
             $filter = new FieldsFilter(
                 DataType::STRING,
-                sprintf('A list of fields for the \'%s\' entity to be returned.', $entityType)
+                sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)
             );
             $filter->setArrayAllowed(true);
 

@@ -107,6 +107,11 @@ class Transition
     protected $scheduleFilter;
 
     /**
+     * @var bool
+     */
+    protected $scheduleCheckConditions = false;
+
+    /**
      * Set label.
      *
      * @param string $label
@@ -554,6 +559,25 @@ class Transition
     public function getScheduleFilter()
     {
         return $this->scheduleFilter;
+    }
+
+    /**
+     * @param bool $scheduleCheckConditions
+     * @return $this
+     */
+    public function setScheduleCheckConditions($scheduleCheckConditions)
+    {
+        $this->scheduleCheckConditions = $scheduleCheckConditions;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isScheduleCheckConditions()
+    {
+        return $this->scheduleCheckConditions;
     }
 
     /**

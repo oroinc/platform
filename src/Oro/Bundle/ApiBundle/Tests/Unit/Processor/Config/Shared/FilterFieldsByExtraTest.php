@@ -74,14 +74,62 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessForNotManageableEntity()
     {
         $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
-                'field1' => null
+            'identifier_field_names' => ['id'],
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'           => null,
+                'field1'       => null,
+                'field2'       => null,
+                'association1' => [
+                    'identifier_field_names' => ['id'],
+                    'target_class'           => 'Test\Association1Target',
+                    'exclusion_policy'       => 'all',
+                    'fields'                 => [
+                        'id'     => null,
+                        'field1' => null,
+                        'field2' => null,
+                    ]
+                ],
+                'association2' => [
+                    'identifier_field_names' => ['id'],
+                    'target_class'           => 'Test\Association2Target',
+                    'exclusion_policy'       => 'all',
+                    'property_path'          => 'realAssociation2',
+                    'fields'                 => [
+                        'id'     => null,
+                        'field1' => null,
+                        'field2' => null,
+                    ]
+                ],
+                'association3' => [
+                    'identifier_field_names' => ['id'],
+                    'target_class'           => 'Test\Association3Target',
+                    'exclusion_policy'       => 'all',
+                    'fields'                 => [
+                        'id'     => null,
+                        'field1' => null,
+                    ]
+                ],
             ]
         ];
+
+        $this->context->setExtras(
+            [
+                new FilterFieldsConfigExtra(
+                    [
+                        'primary_entity'       => ['field1', 'association1', 'association2', 'association3'],
+                        'association_1_entity' => ['id', 'field1'],
+                        'association_2_entity' => ['field2'],
+                    ]
+                )
+            ]
+        );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -90,8 +138,85 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityMetadataForClass');
 
+        $this->valueNormalizer->expects($this->exactly(3))
+            ->method('normalizeValue')
+            ->willReturnMap(
+                [
+                    [
+                        'primary_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        self::TEST_CLASS_NAME
+                    ],
+                    [
+                        'association_1_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        'Test\Association1Target'
+                    ],
+                    [
+                        'association_2_entity',
+                        DataType::ENTITY_CLASS,
+                        $this->context->getRequestType(),
+                        false,
+                        'Test\Association2Target'
+                    ],
+                ]
+            );
+
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'fields'                 => [
+                    'id'           => null,
+                    'field1'       => null,
+                    'field2'       => [
+                        'exclude' => true
+                    ],
+                    'association1' => [
+                        'identifier_field_names' => ['id'],
+                        'target_class'           => 'Test\Association1Target',
+                        'exclusion_policy'       => 'all',
+                        'fields'                 => [
+                            'id'     => null,
+                            'field1' => null,
+                            'field2' => [
+                                'exclude' => true
+                            ],
+                        ]
+                    ],
+                    'association2' => [
+                        'identifier_field_names' => ['id'],
+                        'target_class'           => 'Test\Association2Target',
+                        'exclusion_policy'       => 'all',
+                        'property_path'          => 'realAssociation2',
+                        'fields'                 => [
+                            'id'     => null,
+                            'field1' => [
+                                'exclude' => true
+                            ],
+                            'field2' => null,
+                        ]
+                    ],
+                    'association3' => [
+                        'identifier_field_names' => ['id'],
+                        'target_class'           => 'Test\Association3Target',
+                        'exclusion_policy'       => 'all',
+                        'fields'                 => [
+                            'id'     => null,
+                            'field1' => null,
+                        ]
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
     }
 
     /**
@@ -123,6 +248,13 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         'field2' => null,
                     ]
                 ],
+                'association3' => [
+                    'exclusion_policy'       => 'all',
+                    'fields'                 => [
+                        'id'     => null,
+                        'field1' => null,
+                    ]
+                ],
             ]
         ];
 
@@ -130,7 +262,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             [
                 new FilterFieldsConfigExtra(
                     [
-                        'primary_entity'       => ['field1', 'association1', 'association2'],
+                        'primary_entity'       => ['field1', 'association1', 'association2', 'association3'],
                         'association_1_entity' => ['id', 'field1'],
                         'association_2_entity' => ['field2'],
                     ]
@@ -142,20 +274,22 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $rootEntityMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects($this->exactly(2))
+        $rootEntityMetadata->expects($this->exactly(3))
             ->method('hasAssociation')
             ->willReturnMap(
                 [
                     ['association1', true],
                     ['realAssociation2', true],
+                    ['association3', true],
                 ]
             );
-        $rootEntityMetadata->expects($this->exactly(2))
+        $rootEntityMetadata->expects($this->exactly(3))
             ->method('getAssociationTargetClass')
             ->willReturnMap(
                 [
                     ['association1', 'Test\Association1Target'],
                     ['realAssociation2', 'Test\Association2Target'],
+                    ['association3', 'Test\Association3Target'],
                 ]
             );
 
@@ -169,17 +303,22 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
+        $association3Metadata = $this->getClassMetadataMock('Test\Association3Target');
+        $association3Metadata->expects($this->never())
+            ->method('getIdentifierFieldNames');
+
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(3))
+        $this->doctrineHelper->expects($this->exactly(4))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
                     ['Test\Association1Target', true, $association1Metadata],
                     ['Test\Association2Target', true, $association2Metadata],
+                    ['Test\Association3Target', true, $association3Metadata],
                 ]
             );
 
@@ -243,6 +382,13 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                                 'exclude' => true
                             ],
                             'field2' => null,
+                        ]
+                    ],
+                    'association3' => [
+                        'exclusion_policy'       => 'all',
+                        'fields'                 => [
+                            'id'     => null,
+                            'field1' => null,
                         ]
                     ],
                 ]

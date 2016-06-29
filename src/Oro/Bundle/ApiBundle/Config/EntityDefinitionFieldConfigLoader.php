@@ -15,12 +15,13 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
 
     /** @var array */
     protected $targetEntityMethodMap = [
-        EntityDefinitionConfig::EXCLUSION_POLICY     => 'setExclusionPolicy',
-        EntityDefinitionConfig::DISABLE_PARTIAL_LOAD => ['disablePartialLoad', 'enablePartialLoad'],
-        EntityDefinitionConfig::ORDER_BY             => 'setOrderBy',
-        EntityDefinitionConfig::MAX_RESULTS          => 'setMaxResults',
-        EntityDefinitionConfig::HINTS                => 'setHints',
-        EntityDefinitionConfig::POST_SERIALIZE       => 'setPostSerializeHandler',
+        EntityDefinitionConfig::EXCLUSION_POLICY       => 'setExclusionPolicy',
+        EntityDefinitionConfig::DISABLE_PARTIAL_LOAD   => ['disablePartialLoad', 'enablePartialLoad'],
+        EntityDefinitionConfig::ORDER_BY               => 'setOrderBy',
+        EntityDefinitionConfig::MAX_RESULTS            => 'setMaxResults',
+        EntityDefinitionConfig::HINTS                  => 'setHints',
+        EntityDefinitionConfig::POST_SERIALIZE         => 'setPostSerializeHandler',
+        EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES => 'setIdentifierFieldNames',
     ];
 
     /** @var ConfigLoaderFactory */

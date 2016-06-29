@@ -24,7 +24,7 @@ class ValidateNormalizedResultExistsTest extends GetProcessorTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The result does not exist.
      */
     public function testProcessWhenResultDoesNotExist()

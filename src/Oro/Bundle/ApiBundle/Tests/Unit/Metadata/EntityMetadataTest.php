@@ -119,7 +119,11 @@ class EntityMetadataTest extends OrmRelatedTestCase
             $this->assertFalse($entityMetadata->hasField($fieldName));
             $this->assertNull($entityMetadata->getField($fieldName));
 
-            $entityMetadata->addField($this->getMetadata('Field', $fieldName));
+            $fieldMetadata = $this->getMetadata('Field', $fieldName);
+            $this->assertSame(
+                $fieldMetadata,
+                $entityMetadata->addField($fieldMetadata)
+            );
 
             $this->assertCount(++$index, $entityMetadata->getFields());
         }
@@ -167,7 +171,11 @@ class EntityMetadataTest extends OrmRelatedTestCase
             $this->assertFalse($entityMetadata->hasAssociation($associationName));
             $this->assertNull($entityMetadata->getAssociation($associationName));
 
-            $entityMetadata->addAssociation($this->getMetadata('Association', $associationName));
+            $associationMetadata = $this->getMetadata('Association', $associationName);
+            $this->assertSame(
+                $associationMetadata,
+                $entityMetadata->addAssociation($associationMetadata)
+            );
 
             $this->assertCount(++$index, $entityMetadata->getAssociations());
         }
