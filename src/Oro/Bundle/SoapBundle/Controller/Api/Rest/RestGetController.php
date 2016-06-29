@@ -47,7 +47,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
             if ($manager->isSerializerConfigured()) {
                 $result = $manager->serialize($qb);
             } elseif ($qb instanceof QueryBuilder) {
-                $result = $this->getPreparedItems($qb->getQuery()->getResult());
+                $result = $this->getPreparedItems($this->get('oro_security.acl_helper')->apply($qb)->getResult());
             } elseif ($qb instanceof SqlQueryBuilder) {
                 $result = $this->getPreparedItems($qb->getQuery()->getResult());
             } elseif ($qb instanceof SearchQuery) {
@@ -181,8 +181,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                 $voteObject = $this->get('oro_entity.doctrine_helper')->createEntityInstance($entity['entity']);
 
                 foreach ($entity as $field => $value) {
-                    $isForbidden = !$securityFacade->isGranted('VIEW', new FieldVote($voteObject, $field));
-                    if ($isForbidden) {
+                    if (!$securityFacade->isGranted('VIEW', new FieldVote($voteObject, $field))) {
                         continue;
                     }
 

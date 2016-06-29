@@ -191,6 +191,20 @@ services:
         class: %oro_security.acl.provider.class%
         arguments:
             - '@oro_security.acl.object_identity_factory'
+        calls:
+            - [setUnderlyingCache, ["@security.acl.underlying.cache"]]
+
+    security.acl.underlying.cache:
+        public: false
+        class: Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache
+        arguments:
+            - "@security.acl.underlying.cache.doctrine.cache_impl"
+
+    security.acl.underlying.cache.doctrine.cache_impl:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_acl_underlying' ]]
 
     oro_security.acl.voter_link:
         tags:
@@ -577,7 +591,6 @@ services:
           calls:
               - [setRequest, ["@?request="]]
           tags:
-              - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
 
     oro_security.listener.refresh_context_listener:
@@ -672,12 +685,18 @@ services:
 
     oro_security.acl.extension.field:
         public: false
-        parent: oro_security.acl.extension.entity
         class: %oro_security.acl.extension.field.class%
         arguments:
+            - '@oro_security.acl.object_id_accessor'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_security.entity_security_metadata_provider'
+            - '@oro_security.owner.metadata_provider.chain'
+            - '@oro_security.owner.ownership_decision_maker.chain'
+            - '@oro_security.acl.permission_manager'
+            - '@oro_security.acl.group_provider.chain'
             - '@oro_entity.doctrine_helper'
-        calls:
-            - [setEntityOwnerAccessor, ['@oro_security.owner.entity_owner_accessor']]
+            - '@oro_security.owner.entity_owner_accessor'
+            - '@oro_entity_config.provider.security'
         tags:
             - { name: oro_security.acl.extension, priority: 15 } # should be before EntityAclExtension
 

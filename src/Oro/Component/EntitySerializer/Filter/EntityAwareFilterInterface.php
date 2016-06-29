@@ -3,7 +3,7 @@
 namespace Oro\Component\EntitySerializer\Filter;
 
 /**
- * Filters fields values or fields itself from being showed/returned to the user
+ * Filters fields from being showed/returned to the user
  */
 interface EntityAwareFilterInterface
 {
@@ -19,11 +19,4 @@ interface EntityAwareFilterInterface
      * @return int FILTER_ALL|FILTER_VALUE|FILTER_NOTHING
      */
     public function checkField($entity, $entityClass, $field);
-
-    /**
-     * @param object $entity
-     *
-     * @return int FILTER_NOTHING|FILTER_ALL
-     */
-    public function checkEntity($entity);
 }
