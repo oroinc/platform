@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class CalendarEventRepository extends EntityRepository
@@ -43,7 +44,8 @@ class CalendarEventRepository extends EntityRepository
     public function getUserEventListQueryBuilder($filters = [], $extraFields = [])
     {
         $qb = $this->getEventListQueryBuilder($extraFields)
-            ->addSelect('status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId, c.id as calendar')
+            ->addSelect(sprintf('COALESCE(status.id, \'%s\') AS invitationStatus', Attendee::STATUS_NONE))
+            ->addSelect('IDENTITY(e.parent) AS parentEventId, c.id as calendar')
             ->addSelect('IDENTITY(e.recurringEvent) AS recurringEventId, e.originalStart, e.cancelled AS isCancelled')
             ->leftJoin('e.relatedAttendee', 'relatedAttendee')
             ->leftJoin('e.parent', 'parent')

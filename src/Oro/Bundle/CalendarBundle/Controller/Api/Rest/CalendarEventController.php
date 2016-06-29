@@ -332,7 +332,9 @@ class CalendarEventController extends RestController implements ClassResourceInt
             try {
                 $entity = $this->processForm($entity);
                 if ($entity) {
-                    $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+                    $response = $this->createResponseData($entity);
+                    unset($response['id']);
+                    $view = $this->view($response, Codes::HTTP_OK);
                 } else {
                     $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
                 }
@@ -437,5 +439,17 @@ class CalendarEventController extends RestController implements ClassResourceInt
             },
             $configs
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createResponseData($entity)
+    {
+        $response = parent::createResponseData($entity);
+        $serializedEvent = $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvent($entity);
+        $response['notifiable'] = $serializedEvent['notifiable'];
+
+        return $response;
     }
 }

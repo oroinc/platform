@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailSendProcessor
 {
@@ -35,16 +36,22 @@ class EmailSendProcessor
      */
     protected $emailNotifications = [];
 
+    /** @var SecurityFacade  */
+    protected $securityFacade;
+
     /**
      * @param EmailNotificationProcessor $emailNotificationProcessor
      * @param ObjectManager              $objectManager
+     * @param SecurityFacade             $securityFacade
      */
     public function __construct(
         EmailNotificationProcessor $emailNotificationProcessor,
-        ObjectManager $objectManager
+        ObjectManager $objectManager,
+        SecurityFacade $securityFacade
     ) {
         $this->emailNotificationProcessor = $emailNotificationProcessor;
         $this->em = $objectManager;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -91,9 +98,12 @@ class EmailSendProcessor
             );
             $this->process();
         }
+
         // Send notification to new invitees
         foreach ($childAttendees as $attendee) {
-            if (false === $originalAttendees->contains($attendee)) {
+            if (false === $originalAttendees->contains($attendee)
+                && $attendee->getEmail() !== $this->getCurrentUserEmail()
+            ) {
                 $this->addEmailNotification(
                     $attendee->getCalendarEvent(),
                     [$attendee->getEmail()],
@@ -101,8 +111,11 @@ class EmailSendProcessor
                 );
             }
         }
+
         foreach ($originalAttendees as $attendee) {
-            if (false === $childAttendees->contains($attendee)) {
+            if (false === $childAttendees->contains($attendee)
+                && $attendee->getEmail() !== $this->getCurrentUserEmail()
+            ) {
                 $this->addEmailNotification(
                     $attendee->getCalendarEvent(),
                     [$attendee->getEmail()],
@@ -110,6 +123,7 @@ class EmailSendProcessor
                 );
             }
         }
+
         if (count($this->emailNotifications) > 0) {
             $this->process();
         }
@@ -236,5 +250,15 @@ class EmailSendProcessor
         $emailNotification->setCalendarEvent($entity);
         $emailNotification->setTemplateName($templateName);
         $this->emailNotifications[] = $emailNotification;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCurrentUserEmail()
+    {
+        $currentUser = $this->securityFacade->getLoggedUser();
+
+        return $currentUser->getEmail();
     }
 }

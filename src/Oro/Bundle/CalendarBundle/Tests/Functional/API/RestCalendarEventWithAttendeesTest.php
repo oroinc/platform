@@ -29,7 +29,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
             'start'       => date(DATE_RFC3339, strtotime('-1 day')),
             'end'         => date(DATE_RFC3339, strtotime('+1 day')),
-            'subordinate' => false
+            'subordinate' => false,
         ];
 
         $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
@@ -44,7 +44,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
      *
      * @return int
      */
-    public function testPostOriginClient()
+    public function testPost()
     {
         $user = $this->getReference('simple_user');
 
@@ -61,8 +61,9 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'backgroundColor' => '#FF0000',
             'attendees'       => [
                 [
-                    'email'       => $adminUser->getEmail(),
-                    'status'      => null,
+                    'email'  => $adminUser->getEmail(),
+                    'status' => null,
+                    'type'   => Attendee::TYPE_ORGANIZER,
                 ],
                 [
                     'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
@@ -71,8 +72,23 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 ],
                 [
                     'displayName' => 'attendee without email',
+                    'type'        => Attendee::TYPE_OPTIONAL,
                 ],
-            ]
+                [
+                    'displayName' => 'attendee with email and with unknown type',
+                    'email'       => 'unknown-type@email.com',
+                    'type'        => 'unknown_type',
+                ],
+                [
+                    'displayName' => 'attendee with email and with type = null',
+                    'email'       => 'type-null@email.com',
+                    'type'        => null,
+                ],
+                [
+                    'displayName' => 'attendee without email and with type = null',
+                    'type'        => null,
+                ],
+            ],
         ];
         $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
 
@@ -85,7 +101,9 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
     }
 
     /**
-     * @depends testPostOriginClient
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @depends testPost
      *
      * @param int $id
      */
@@ -102,14 +120,11 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
-        unset(
-            $result['attendees'][0]['createdAt'],
-            $result['attendees'][0]['updatedAt'],
-            $result['attendees'][1]['createdAt'],
-            $result['attendees'][1]['updatedAt'],
-            $result['attendees'][2]['createdAt'],
-            $result['attendees'][2]['updatedAt']
-        );
+
+        foreach ($result['attendees'] as &$attendee) {
+            unset($attendee['createdAt'], $attendee['updatedAt']);
+        }
+
         $this->assertEquals(
             [
                 'id'               => $id,
@@ -131,21 +146,42 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'email'       => 'simple_user@example.com',
                         'status'      => 'none',
                         'type'        => 'required',
-                        'user_id'     => $user->getId()
+                        'user_id'     => $user->getId(),
                     ],
                     [
                         'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
                         'email'       => 'admin@example.com',
                         'status'      => 'accepted',
-                        'type'        => 'required',
-                        'user_id'     => $adminUser->getId()
+                        'type'        => Attendee::TYPE_ORGANIZER,
+                        'user_id'     => $adminUser->getId(),
+                    ],
+                    [
+                        'displayName' => 'attendee with email and with type = null',
+                        'email'       => 'type-null@email.com',
+                        'type'        => null,
+                        'user_id'     => null,
+                        'status'      => 'none',
+                    ],
+                    [
+                        'displayName' => 'attendee with email and with unknown type',
+                        'email'       => 'unknown-type@email.com',
+                        'user_id'     => null,
+                        'status'      => 'none',
+                        'type'        => null,
                     ],
                     [
                         'displayName' => 'attendee without email',
                         'email'       => null,
                         'user_id'     => null,
                         'status'      => 'none',
-                        'type'        => 'required',
+                        'type'        => Attendee::TYPE_OPTIONAL,
+                    ],
+                    [
+                        'displayName' => 'attendee without email and with type = null',
+                        'type'        => null,
+                        'email'       => null,
+                        'user_id'     => null,
+                        'status'      => 'none',
                     ],
                 ],
             ],
@@ -157,7 +193,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             ->find($id);
 
         $attendees = $calendarEvent->getAttendees();
-        $this->assertCount(3, $attendees);
+        $this->assertCount(6, $attendees);
 
         $admin = $attendees->filter(
             function ($element) {
@@ -178,7 +214,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
     }
 
     /**
-     * @depends testPostOriginClient
+     * @depends testPost
      *
      * @param int $id
      *
@@ -207,7 +243,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                     'email'       => 'ext@example.com',
                     'status'      => 'tentative',
                     'type'        => 'organizer',
-                ]
+                ],
             ],
         ];
         $this->client->request(
@@ -216,7 +252,8 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             $request
         );
 
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertTrue($result['notifiable']);
 
         return $id;
     }
@@ -238,12 +275,11 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
-        unset(
-            $result['attendees'][0]['createdAt'],
-            $result['attendees'][0]['updatedAt'],
-            $result['attendees'][1]['createdAt'],
-            $result['attendees'][1]['updatedAt']
-        );
+
+        foreach ($result['attendees'] as &$attendee) {
+            unset($attendee['createdAt'], $attendee['updatedAt']);
+        }
+
         $this->assertEquals(
             [
                 'id'               => $id,
@@ -265,14 +301,14 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'email'       => 'ext@example.com',
                         'status'      => 'tentative',
                         'type'        => 'organizer',
-                        'user_id'     => null
+                        'user_id'     => null,
                     ],
                     [
                         'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
                         'email'       => $adminUser->getEmail(),
                         'status'      => 'accepted',
                         'type'        => 'required',
-                        'user_id'     => $adminUser->getId()
+                        'user_id'     => $adminUser->getId(),
                     ],
                 ],
             ],
@@ -286,12 +322,16 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
         $attendees = $calendarEvent->getAttendees();
         $this->assertCount(2, $attendees);
 
-        $boundAttendees = array_values(array_filter(array_map(
-            function (Attendee $attendee) {
-                return $attendee->getUser() ? $attendee : null;
-            },
-            $attendees->toArray()
-        )));
+        $boundAttendees = array_values(
+            array_filter(
+                array_map(
+                    function (Attendee $attendee) {
+                        return $attendee->getUser() ? $attendee : null;
+                    },
+                    $attendees->toArray()
+                )
+            )
+        );
 
         $this->assertCount(1, $boundAttendees);
         $this->assertEquals('admin@example.com', $boundAttendees[0]->getEmail());
@@ -308,20 +348,20 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
             'start'       => '2016-05-03T11:29:46+00:00',
             'end'         => '2016-05-05T11:29:46+00:00',
-            'subordinate' => false
+            'subordinate' => false,
         ];
 
         $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(1, $result);
-        unset(
-            $result[0]['id'],
-            $result[0]['attendees'][0]['createdAt'],
-            $result[0]['attendees'][0]['updatedAt'],
-            $result[0]['attendees'][1]['createdAt'],
-            $result[0]['attendees'][1]['updatedAt']
-        );
+
+        foreach ($result[0]['attendees'] as &$attendee) {
+            unset($attendee['createdAt'], $attendee['updatedAt']);
+        }
+
+        unset($result[0]['id']);
+
         $adminUser = $this->getAdminUser();
 
         $this->assertEquals(
@@ -338,7 +378,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                     'parentEventId'    => null,
                     'editable'         => true,
                     'removable'        => true,
-                    'notifiable'       => false,
+                    'notifiable'       => true,
                     'calendarAlias'    => 'user',
                     'attendees'        => [
                         [
@@ -347,7 +387,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                             'status'      => 'tentative',
                             'type'        => 'organizer',
                             'fullName'    => '',
-                            'userId'      => null
+                            'userId'      => null,
                         ],
                         [
                             'displayName' => 'John Doe',
@@ -355,7 +395,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                             'status'      => 'accepted',
                             'type'        => 'required',
                             'fullName'    => 'John Doe ',
-                            'userId'      => $adminUser->getId()
+                            'userId'      => $adminUser->getId(),
                         ],
                     ],
                 ],
@@ -396,7 +436,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
             'start'       => '2016-05-03T11:29:46+00:00',
             'end'         => '2016-05-05T11:29:46+00:00',
-            'subordinate' => true
+            'subordinate' => true,
         ];
         $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
 
@@ -415,12 +455,12 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
             'page'        => 1,
             'limit'       => 10,
-            'subordinate' => false
+            'subordinate' => false,
         ];
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_calendarevents', $request)
-            . '&createdAt>' . urlencode('2014-03-04T20:00:00+0000')
+            .'&createdAt>'.urlencode('2014-03-04T20:00:00+0000')
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -430,7 +470,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_calendarevents', $request)
-            . '&createdAt>' . urlencode('2050-03-04T20:00:00+0000')
+            .'&createdAt>'.urlencode('2050-03-04T20:00:00+0000')
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -504,122 +544,6 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
     }
 
     /**
-     * Create new event
-     *
-     * @return int
-     */
-    public function testPostOriginServer()
-    {
-        $user      = $this->getReference('simple_user');
-        $adminUser = $this->getAdminUser();
-
-        $request = [
-            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
-            'id'              => null,
-            'title'           => "Test Event",
-            'description'     => "Test Description",
-            'start'           => '2016-05-04T11:29:46+00:00',
-            'end'             => '2016-05-04T11:29:46+00:00',
-            'allDay'          => true,
-            'backgroundColor' => '#FF0000',
-            'attendees'       => [
-                [
-                    'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
-                    'email'       => $adminUser->getEmail(),
-                    'status'      => null,
-                ],
-                [
-                    'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
-                    'email'       => $user->getEmail(),
-                    'status'      => null,
-                ],
-            ]
-        ];
-        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
-
-        $this->assertNotEmpty($result);
-        $this->assertTrue(isset($result['id']));
-
-        return $result['id'];
-    }
-
-    /**
-     * @depends testPostOriginServer
-     *
-     * @param int $id
-     */
-    public function testGetAfterPostOriginServer($id)
-    {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
-        );
-
-        $user      = $this->getReference('simple_user');
-        $adminUser = $this->getAdminUser();
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-        unset(
-            $result['attendees'][0]['createdAt'],
-            $result['attendees'][0]['updatedAt'],
-            $result['attendees'][1]['createdAt'],
-            $result['attendees'][1]['updatedAt']
-        );
-        $this->assertEquals(
-            [
-                'id'               => $id,
-                'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
-                'title'            => 'Test Event',
-                'description'      => 'Test Description',
-                'start'            => '2016-05-04T11:29:46+00:00',
-                'end'              => '2016-05-04T11:29:46+00:00',
-                'allDay'           => true,
-                'backgroundColor'  => '#FF0000',
-                'invitationStatus' => 'accepted',
-                'parentEventId'    => null,
-                'editable'         => true,
-                'removable'        => true,
-                'notifiable'       => true,
-                'attendees'        => [
-                    [
-                        'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
-                        'email'       => 'simple_user@example.com',
-                        'status'      => 'none',
-                        'type'        => 'required',
-                        'user_id'     => $user->getId()
-                    ],
-                    [
-                        'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
-                        'email'       => 'admin@example.com',
-                        'status'      => 'accepted',
-                        'type'        => 'required',
-                        'user_id'     => $adminUser->getId()
-                    ],
-                ],
-            ],
-            $this->extractInterestingResponseData($result)
-        );
-
-        $calendarEvent = $this->getContainer()->get('doctrine')
-            ->getRepository('OroCalendarBundle:CalendarEvent')
-            ->find($id);
-
-        $attendees = $calendarEvent->getAttendees();
-        $this->assertCount(2, $attendees);
-
-        foreach ($attendees as $attendee) {
-            if ($attendee->getEmail() === 'admin@example.com') {
-                $this->assertEquals($attendee, $calendarEvent->getRelatedAttendee());
-            }
-        }
-    }
-
-
-    /**
      * Create new event with invitedUsers field
      *
      * @return int
@@ -639,7 +563,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             'end'             => '2016-05-04T11:29:46+00:00',
             'allDay'          => true,
             'backgroundColor' => '#FF0000',
-            'invitedUsers'    => [$user->getId()]
+            'invitedUsers'    => [$user->getId()],
         ];
         $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
 
@@ -652,7 +576,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
     }
 
     /**
-     * @depends testPostInvitedUsers
+     * @depends    testPostInvitedUsers
      *
      * @param int $id
      *
@@ -670,12 +594,10 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
-        unset(
-            $result['attendees'][0]['createdAt'],
-            $result['attendees'][0]['updatedAt'],
-            $result['attendees'][1]['createdAt'],
-            $result['attendees'][1]['updatedAt']
-        );
+
+        foreach ($result['attendees'] as &$attendee) {
+            unset($attendee['createdAt'], $attendee['updatedAt']);
+        }
 
         $this->assertCount(1, $result['attendees']);
         $this->assertCount(1, $result['invitedUsers']);
@@ -702,12 +624,249 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                         'email'       => $user->getEmail(),
                         'status'      => 'none',
                         'type'        => 'required',
-                        'user_id'     => $user->getId()
+                        'user_id'     => $user->getId(),
                     ],
                 ],
             ],
             $this->extractInterestingResponseData($result)
         );
+    }
+
+    /**
+     * Create new event
+     *
+     * @return int
+     */
+    public function testPostRemoveAttendees()
+    {
+        $user = $this->getReference('simple_user');
+
+        $adminUser = $this->getAdminUser();
+
+        $request = [
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'id'              => null,
+            'title'           => 'Test Event',
+            'description'     => 'Test Description',
+            'start'           => '2016-05-04T11:29:46+00:00',
+            'end'             => '2016-05-04T11:29:46+00:00',
+            'allDay'          => true,
+            'backgroundColor' => '#FF0000',
+            'attendees'       => [
+                [
+                    'email'  => $adminUser->getEmail(),
+                    'status' => null,
+                    'type'   => Attendee::TYPE_ORGANIZER,
+                ],
+                [
+                    'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
+                    'email'       => $user->getEmail(),
+                    'status'      => null,
+                ],
+            ],
+        ];
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->assertNotEmpty($result);
+        $this->assertTrue(isset($result['id']));
+
+        return $result['id'];
+    }
+
+    /**
+     * @depends testPostRemoveAttendees
+     *
+     * @param int $id
+     */
+    public function testGetAfterPostRemoveAttendees($id)
+    {
+        $user      = $this->getReference('simple_user');
+        $adminUser = $this->getAdminUser();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+
+        foreach ($result['attendees'] as &$attendee) {
+            unset($attendee['createdAt'], $attendee['updatedAt']);
+        }
+
+        $this->assertEquals(
+            [
+                'id'               => $id,
+                'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
+                'title'            => 'Test Event',
+                'description'      => 'Test Description',
+                'start'            => '2016-05-04T11:29:46+00:00',
+                'end'              => '2016-05-04T11:29:46+00:00',
+                'allDay'           => true,
+                'backgroundColor'  => '#FF0000',
+                'attendees'        => [
+                    [
+                        'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
+                        'email'       => $user->getEmail(),
+                        'status'      => 'none',
+                        'type'        => Attendee::TYPE_REQUIRED,
+                        'user_id'     => $user->getId(),
+                    ],
+                    [
+                        'email'       => $adminUser->getEmail(),
+                        'status'      => 'accepted',
+                        'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                        'type'        => Attendee::TYPE_ORGANIZER,
+                        'user_id'     => $adminUser->getId(),
+                    ],
+                ],
+                'invitationStatus' => 'accepted',
+                'parentEventId'    => null,
+                'editable'         => true,
+                'removable'        => true,
+                'notifiable'       => true,
+            ],
+            $this->extractInterestingResponseData($result)
+        );
+
+        $calendarEvent = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->find($id);
+
+        $attendees = $calendarEvent->getAttendees();
+        $this->assertCount(2, $attendees);
+
+        $admin = $attendees->filter(
+            function ($element) {
+                return $element->getEmail() && $element->getEmail() === 'admin@example.com';
+            }
+        )->first();
+        $this->assertEquals('admin@example.com', $admin->getEmail());
+        $this->assertEquals('admin', $admin->getUser()->getUsername());
+        $this->assertEquals($admin, $calendarEvent->getRelatedAttendee());
+
+        $simpleUser = $attendees->filter(
+            function ($element) {
+                return $element->getEmail() && $element->getEmail() === 'simple_user@example.com';
+            }
+        )->first();
+        $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
+        $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
+    }
+
+    /**
+     * @depends testPostRemoveAttendees
+     *
+     * @param int $id
+     *
+     * @return int
+     */
+    public function testPutRemoveAttendees($id)
+    {
+        $request = [
+            'attendees' => [],
+        ];
+        $this->client->request(
+            'PUT',
+            $this->getUrl('oro_api_put_calendarevent', ['id' => $id]),
+            $request
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertFalse($result['notifiable']);
+
+        return $id;
+    }
+
+    /**
+     * @depends testPutRemoveAttendees
+     *
+     * @param int $id
+     */
+    public function testGetAfterPutRemoveAttendees($id)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+
+        foreach ($result['attendees'] as &$attendee) {
+            unset($attendee['createdAt'], $attendee['updatedAt']);
+        }
+
+        $this->assertEquals(
+            [
+                'id'               => $id,
+                'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
+                'title'            => 'Test Event',
+                'description'      => 'Test Description',
+                'start'            => '2016-05-04T11:29:46+00:00',
+                'end'              => '2016-05-04T11:29:46+00:00',
+                'allDay'           => true,
+                'backgroundColor'  => '#FF0000',
+                'invitationStatus' => 'none',
+                'parentEventId'    => null,
+                'editable'         => true,
+                'removable'        => true,
+                'notifiable'       => false,
+                'attendees'        => [],
+            ],
+            $this->extractInterestingResponseData($result)
+        );
+
+        $calendarEvent = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->find($id);
+
+        $attendees = $calendarEvent->getAttendees();
+        $this->assertCount(0, $attendees);
+    }
+
+    public function testBindUserToAttendeeIsCaseInsensitive()
+    {
+        $this->getReference('simple_user')->setEmail('simple_uSer@example.com');
+        $this->getContainer()->get('doctrine.orm.entity_manager')->flush();
+
+        $user = $this->getReference('simple_user');
+
+        $request = [
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'id'              => null,
+            'title'           => 'Test Event',
+            'description'     => 'Test Description',
+            'start'           => '2016-05-04T11:29:46+00:00',
+            'end'             => '2016-05-04T11:29:46+00:00',
+            'allDay'          => true,
+            'backgroundColor' => '#FF0000',
+            'attendees'       => [
+                [
+                    'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
+                    'email'       => 'sImple_user@example.com',
+                    'status'      => null,
+                ],
+            ]
+        ];
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->assertNotEmpty($result);
+        $this->assertTrue(isset($result['id']));
+
+        $calendarEvent = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->find($result['id']);
+
+        $attendee = $calendarEvent->getAttendees()->first();
+        $this->assertEquals($user->getId(), $attendee->getUser()->getId());
     }
 
     /**
