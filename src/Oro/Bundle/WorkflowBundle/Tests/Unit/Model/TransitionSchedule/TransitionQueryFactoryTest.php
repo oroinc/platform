@@ -92,7 +92,7 @@ class TransitionQueryFactoryTest extends \PHPUnit_Framework_TestCase
                 $relatedEntity,
                 'e',
                 Join::WITH,
-                'wi.entityId = e.id'
+                'wi.entityId = CAST(e.id as text)'
             )->willReturnSelf();
 
         $queryBuilder->expects($this->at(4))->method('expr')

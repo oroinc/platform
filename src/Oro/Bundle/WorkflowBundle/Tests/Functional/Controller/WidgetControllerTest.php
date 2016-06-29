@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\DomCrawler\Crawler;
+
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -84,26 +86,7 @@ class WidgetControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $this->assertNotEmpty($crawler->html());
-
-        $form = $crawler->selectButton('Submit')->form();
-
-        $this->client->followRedirects(true);
-        $crawler = $this->client->submit($form);
-
-        $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-
-        $this->assertContains((string)$workflowItem->getId(), $crawler->html());
-        $this->assertContains($workflowItem->getWorkflowName(), $crawler->html());
-        $this->assertContains((string)$workflowItem->getEntityId() . '', $crawler->html());
-
-        $workflowItemNew = $this->getWorkflowItem($this->entity, LoadWorkflowDefinitions::MULTISTEP);
-
-        $this->assertNotEquals(
-            $workflowItem->getCurrentStep()->getName(),
-            $workflowItemNew->getCurrentStep()->getName()
-        );
-        $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
+        $this->assertTransitionFromSubmit($crawler, $workflowItem);
     }
 
     public function testTransitionFormAction()
@@ -124,7 +107,15 @@ class WidgetControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $this->assertNotEmpty($crawler->html());
+        $this->assertTransitionFromSubmit($crawler, $workflowItem);
+    }
 
+    /**
+     * @param Crawler $crawler
+     * @param WorkflowItem $workflowItem
+     */
+    protected function assertTransitionFromSubmit(Crawler $crawler, WorkflowItem $workflowItem)
+    {
         $form = $crawler->selectButton('Submit')->form();
 
         $this->client->followRedirects(true);
@@ -161,8 +152,8 @@ class WidgetControllerTest extends WebTestCase
         );
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
-        $this->assertContains('transition-test_multistep_flow-starting_point_transition',$crawler->html());
-        $this->assertContains('transition-test_start_step_flow-start_transition',$crawler->html());
+        $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
+        $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
     }
 
     /**
@@ -171,7 +162,7 @@ class WidgetControllerTest extends WebTestCase
     protected function createNewEntity()
     {
         $testEntity = new WorkflowAwareEntity();
-        $testEntity->setName('test_' . uniqid());
+        $testEntity->setName('test_' . uniqid('test', true));
         $this->entityManager->persist($testEntity);
         $this->entityManager->flush($testEntity);
 

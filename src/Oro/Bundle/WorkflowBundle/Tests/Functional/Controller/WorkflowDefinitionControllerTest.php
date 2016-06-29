@@ -105,7 +105,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
             'GET',
             $this->getUrl('oro_workflow_definition_activate_from_widget', [
                 '_widgetContainer' => 'dialog',
-                '_wid' => uniqid(),
+                '_wid' => uniqid('test', true),
                 'name' => LoadWorkflowDefinitions::MULTISTEP,
             ]),
             [],

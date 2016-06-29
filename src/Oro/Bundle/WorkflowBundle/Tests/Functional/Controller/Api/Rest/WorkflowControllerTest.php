@@ -19,17 +19,12 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 class WorkflowControllerTest extends WebTestCase
 {
     const CONFIG_PROVIDER_NAME = 'workflow';
-
     const CONFIG_KEY = 'active_workflows';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
     protected function setUp()
@@ -128,7 +123,7 @@ class WorkflowControllerTest extends WebTestCase
     protected function createNewEntity()
     {
         $testEntity = new WorkflowAwareEntity();
-        $testEntity->setName('test_' . uniqid());
+        $testEntity->setName('test_' . uniqid('test', true));
         $this->entityManager->persist($testEntity);
         $this->entityManager->flush($testEntity);
 
@@ -171,17 +166,10 @@ class WorkflowControllerTest extends WebTestCase
      */
     protected function assertActiveWorkflow($entityClass, $workflowName)
     {
-        $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entityClass);
+        $activeWorkflowNames = $this->getActiveWorkflowNames($entityClass);
 
-        $this->assertNotEmpty($activeWorkflows);
-
-        $activeWorkflowsNames = array_map(
-            function (Workflow $workflow) {
-                return $workflow->getName();
-            },
-            $activeWorkflows);
-
-        $this->assertContains($workflowName, $activeWorkflowsNames);
+        $this->assertNotEmpty($activeWorkflowNames);
+        $this->assertContains($workflowName, $activeWorkflowNames);
     }
 
     /**
@@ -190,15 +178,7 @@ class WorkflowControllerTest extends WebTestCase
      */
     protected function assertInactiveWorkflow($entityClass, $workflowName)
     {
-        $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entityClass);
-
-        $activeWorkflowsNames = array_map(
-            function (Workflow $workflow) {
-                return $workflow->getName();
-            },
-            $activeWorkflows);
-
-        $this->assertNotContains($workflowName, $activeWorkflowsNames);
+        $this->assertNotContains($workflowName, $this->getActiveWorkflowNames($entityClass));
     }
 
     /**
@@ -253,7 +233,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEmpty($result);
     }
 
-    public function testStartWorkflowItem()
+    public function testStartWorkflow()
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::NO_START_STEP);
         $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::NO_START_STEP);
@@ -284,17 +264,6 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
     }
 
-    /**
-     * @param string|WorkflowAwareEntity $entity
-     * @param string|Workflow $workflowName
-     *
-     * @return null|WorkflowItem
-     */
-    protected function getWorkflowItem($entity, $workflowName)
-    {
-        return $this->getWorkflowManager()->getWorkflowItem($entity, $workflowName);
-    }
-
     public function testTransitAction()
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
@@ -322,8 +291,37 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowItem->getEntityId(), $result['workflowItem']['entity_id']);
         $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
 
-        $workflowItemNew = $this->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')->find($workflowItem->getId());
+        $workflowItemNew = $this->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+            ->find($workflowItem->getId());
+
         $this->assertNotEquals($workflowItem->getCurrentStep(), $workflowItemNew->getCurrentStep());
         $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
+    }
+
+    /**
+     * @param string|WorkflowAwareEntity $entity
+     * @param string|Workflow $workflowName
+     *
+     * @return null|WorkflowItem
+     */
+    protected function getWorkflowItem($entity, $workflowName)
+    {
+        return $this->getWorkflowManager()->getWorkflowItem($entity, $workflowName);
+    }
+
+    /**
+     * @param string $entityClass
+     * @return array
+     */
+    protected function getActiveWorkflowNames($entityClass)
+    {
+        $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entityClass);
+
+        return array_map(
+            function (Workflow $workflow) {
+                return $workflow->getName();
+            },
+            $activeWorkflows
+        );
     }
 }

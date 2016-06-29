@@ -56,8 +56,11 @@ class WorkflowDefinitionControllerTest extends WebTestCase
             )
         );
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertEquals($this->getTestConfiguration()['name'], $result['name']);
-        $this->assertEquals($this->getTestConfiguration()['entity'], $result['related_entity']);
+
+        $config = $this->getTestConfiguration();
+
+        $this->assertEquals($config['name'], $result['name']);
+        $this->assertEquals($config['entity'], $result['related_entity']);
     }
 
     /**
@@ -69,7 +72,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\Workflow', $workflow);
 
         $updated = $this->getTestConfiguration();
-        $updated['label'] = self::TEST_DEFINITION_NAME . uniqid();
+        $updated['label'] = self::TEST_DEFINITION_NAME . uniqid('test', true);
         $this->client->request(
             'PUT',
             $this->getUrl(
@@ -102,7 +105,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
-        $this->assertEmpty($this->getDefinition(self::TEST_DEFINITION_NAME));
+        $this->assertNull($this->getDefinition(self::TEST_DEFINITION_NAME));
     }
 
     /**

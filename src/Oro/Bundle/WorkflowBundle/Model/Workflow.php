@@ -320,7 +320,7 @@ class Workflow
             'entityClass' => $this->doctrineHelper->getEntityClass($entity),
         ]);
 
-        if(!$workflowItem){
+        if (!$workflowItem) {
             $workflowItem = new WorkflowItem();
             $workflowItem
                 ->setWorkflowName($this->getName())

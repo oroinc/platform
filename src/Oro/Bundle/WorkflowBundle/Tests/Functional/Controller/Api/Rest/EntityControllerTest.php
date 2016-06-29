@@ -22,9 +22,27 @@ class EntityControllerTest extends WebTestCase
     {
         $this->client->request('GET', $this->getUrl('oro_api_workflow_entity_get'));
 
-        $this->assertEquals(
-            array_keys($this->provider->getFields()),
-            array_keys($this->getJsonResponseContent($this->client->getResponse(), 200))
+        $actual = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals($this->getExpectedData(), $actual);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExpectedData()
+    {
+        return array_map(
+            function (array $data) {
+                foreach ($data as $key => $value) {
+                    if (null === $value) {
+                        unset($data[$key]);
+                    }
+                }
+
+                return $data;
+            },
+            $this->provider->getFields()
         );
     }
 }

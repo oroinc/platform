@@ -14,45 +14,49 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
 {
     const COUNT = 20;
 
+    /** @var int */
+    private $lastEntityId = 1;
+
+    /** @var int */
+    private $lastItemId = 1;
+
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
-        $this->generateEntities($manager);
+        $this->generateEntities($manager, [LoadWorkflowDefinitions::NO_START_STEP, LoadWorkflowDefinitions::MULTISTEP]);
+        $this->generateEntities($manager, [LoadWorkflowDefinitions::WITH_START_STEP]);
     }
 
     /**
      * @param ObjectManager $manager
+     * @param array $workflowNames
      */
-    protected function generateEntities(ObjectManager $manager)
+    protected function generateEntities(ObjectManager $manager, array $workflowNames)
     {
         // load entities
         /** @var WorkflowAwareEntity[] $entities */
         $entities = [];
         for ($i = 1; $i <= self::COUNT; $i++) {
             $entity = new WorkflowAwareEntity();
-            $entity->setName('workflow_aware_entity_' . $i);
+            $entity->setName('workflow_aware_entity_' . $this->lastEntityId);
             $entities[$i] = $entity;
             $manager->persist($entity);
 
-            $this->setReference('workflow_aware_entity.' . $i, $entity);
+            $this->setReference('workflow_aware_entity.' . $this->lastEntityId, $entity);
+
+            $this->lastEntityId++;
         }
         $manager->flush();
 
         $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
 
-        $workflowNames = [
-            LoadWorkflowDefinitions::NO_START_STEP,
-            LoadWorkflowDefinitions::WITH_START_STEP,
-            LoadWorkflowDefinitions::MULTISTEP,
-        ];
-
         // create workflow items manually (to make it faster)
         foreach ($workflowNames as $workflowName) {
             $definition = $workflowDefinitionRepository->find($workflowName);
             if ($definition instanceof WorkflowDefinition) {
-                foreach ($entities as $i => $entity) {
+                foreach ($entities as $entity) {
                     $workflowItem = new WorkflowItem();
                     $workflowItem->setDefinition($definition)
                         ->setWorkflowName($definition->getName())
@@ -62,7 +66,9 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
                         ->setCurrentStep($definition->getSteps()->first());
                     $manager->persist($workflowItem);
 
-                    $this->setReference('workflow_item.' . $i, $workflowItem);
+                    $this->setReference($workflowName . '_item.' . $this->lastItemId, $workflowItem);
+
+                    $this->lastItemId++;
                 }
             }
         }

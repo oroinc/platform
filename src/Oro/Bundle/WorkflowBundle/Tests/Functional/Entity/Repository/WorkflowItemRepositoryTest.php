@@ -38,14 +38,14 @@ class WorkflowItemRepositoryTest extends WebTestCase
         $entity = $this->getReference('workflow_aware_entity.15');
 
         /** @var WorkflowItem $item */
-        $item = $this->getReference('workflow_item.15');
+        $item = $this->getReference('test_flow_item.15');
 
         $actual = $this->repository->findByEntityMetadata(
             'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
             $entity->getId()
         );
 
-        $this->assertNotEmpty($actual);
+        $this->assertNotEmpty([$item], $actual);
     }
 
     public function testFindAllByEntityMetadata()
@@ -66,12 +66,13 @@ class WorkflowItemRepositoryTest extends WebTestCase
         $entityIds = $this->getEntityIdsByWorkflow();
         $entityId = reset($entityIds[LoadWorkflowDefinitions::NO_START_STEP]);
 
-        $this->assertNull($this->repository->findOneByEntityMetadata(
-                'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
-                $entityId,
-                'SOME_NON_EXISTING_WORKFLOW'
-            )
+        $item = $this->repository->findOneByEntityMetadata(
+            'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
+            $entityId,
+            'SOME_NON_EXISTING_WORKFLOW'
         );
+
+        $this->assertNull($item);
 
         $this->assertInstanceOf(
             'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
@@ -85,8 +86,10 @@ class WorkflowItemRepositoryTest extends WebTestCase
 
     public function testGetGroupedWorkflowNameAndWorkflowStepName()
     {
-        $entities = [$this->getReference('workflow_aware_entity.15')];
-        $entities[] = $this->getReference('workflow_aware_entity.16');
+        $entities = [
+            $this->getReference('workflow_aware_entity.15'),
+            $this->getReference('workflow_aware_entity.16')
+        ];
 
         $workflowNames = [
             LoadWorkflowDefinitions::WITH_START_STEP,
@@ -100,12 +103,17 @@ class WorkflowItemRepositoryTest extends WebTestCase
         foreach ($entities as $entity) {
             foreach ($workflowNames as $workflowName) {
                 /** @var WorkflowItem $workflowItem */
-                $workflowItem = $this->getContainer()->get('oro_workflow.manager')->getWorkflowItem($entity, $workflowName);
-                $expectedData[$entity->getId()][] = [
-                    'entityId' => $entity->getId(),
-                    'workflowName' => $workflowItem->getDefinition()->getLabel(),
-                    'stepName' => $workflowItem->getCurrentStep()->getLabel()
-                ];
+                $workflowItem = $this->getContainer()
+                    ->get('oro_workflow.manager')
+                    ->getWorkflowItem($entity, $workflowName);
+
+                if ($workflowItem) {
+                    $expectedData[$entity->getId()][] = [
+                        'entityId' => $entity->getId(),
+                        'workflowName' => $workflowItem->getDefinition()->getLabel(),
+                        'stepName' => $workflowItem->getCurrentStep()->getLabel()
+                    ];
+                }
             }
         }
 
@@ -129,7 +137,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
     public function testGetEntityIdsByEntityClassAndWorkflowStepIds()
     {
         /** @var WorkflowItem $workflowItem */
-        $workflowItem = $this->getReference('workflow_item.1');
+        $workflowItem = $this->getReference('test_flow_item.1');
 
         $result = $this->repository->getEntityIdsByEntityClassAndWorkflowStepIds(
             'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
@@ -148,7 +156,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
     public function testGetEntityIdsByEntityClassAndWorkflowNames()
     {
         /** @var WorkflowItem $workflowItem */
-        $workflowItem = $this->getReference('workflow_item.1');
+        $workflowItem = $this->getReference('test_flow_item.1');
 
         $result = $this->repository->getEntityIdsByEntityClassAndWorkflowNames(
             'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
@@ -164,19 +172,80 @@ class WorkflowItemRepositoryTest extends WebTestCase
         }
     }
 
+    public function testResetWorkflowData()
+    {
+        // assert input state
+        // - no entities without workflow items
+        // - 20 entities with NO_START_STEP workflow item
+        // - 20 entities with WITH_START_STEP workflow item
+        $inputEntityIds = $this->getEntityIdsByWorkflow();
+        $this->assertEntityIdsByWorkflow(
+            $inputEntityIds,
+            0,
+            LoadWorkflowAwareEntities::COUNT,
+            LoadWorkflowAwareEntities::COUNT
+        );
+        $noStartStepEntityIds = $inputEntityIds[LoadWorkflowDefinitions::NO_START_STEP];
+        $withStartStepEntityIds = $inputEntityIds[LoadWorkflowDefinitions::WITH_START_STEP];
+
+        // reset only WITH_START_STEP workflow data with more than one batch
+        $this->repository->resetWorkflowData(
+            $this->getWorkflowDefinitionByName(LoadWorkflowDefinitions::WITH_START_STEP),
+            LoadWorkflowAwareEntities::COUNT - 1
+        );
+
+        // assert state: NO_START_STEP workflow entities weren't changed, WITH_START_STEP workflow entities were reset
+        // - 20 entities without workflow items
+        // - 20 entities with NO_START_STEP workflow item
+        // - no entities with WITH_START_STEP workflow item
+        $updatedEntityIds = $this->getEntityIdsByWorkflow();
+        $this->assertEntityIdsByWorkflow(
+            $updatedEntityIds,
+            LoadWorkflowAwareEntities::COUNT,
+            LoadWorkflowAwareEntities::COUNT,
+            0,
+            array_merge($withStartStepEntityIds),
+            $noStartStepEntityIds,
+            []
+        );
+
+        // reset only NO_START_STEP workflow data with single execution
+        $this->repository->resetWorkflowData(
+            $this->getWorkflowDefinitionByName(LoadWorkflowDefinitions::NO_START_STEP)
+        );
+        $this->repository->resetWorkflowData(
+            $this->getWorkflowDefinitionByName(LoadWorkflowDefinitions::MULTISTEP)
+        );
+
+        // assert state: both NO_START_STEP and WITH_START_STEP workflow entities were reset
+        // - 60 entities without workflow items
+        // - no entities with NO_START_STEP workflow item
+        // - no entities with WITH_START_STEP workflow item
+        $emptyEntityIds = $this->getEntityIdsByWorkflow();
+        $this->assertEntityIdsByWorkflow(
+            $emptyEntityIds,
+            LoadWorkflowAwareEntities::COUNT * 2,
+            0,
+            0,
+            array_merge($noStartStepEntityIds, $withStartStepEntityIds),
+            [],
+            []
+        );
+    }
+
     /**
      * @return array
      */
     protected function getEntityIdsByWorkflow()
     {
         $registry = $this->getContainer()->get('doctrine');
-        $registry->getManager()->clear();
+        $registry->getManagerForClass('OroTestFrameworkBundle:WorkflowAwareEntity')->clear();
 
         /** @var EntityRepository $repository */
         $repository = $registry->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity');
 
         $qb = $repository->createQueryBuilder('e');
-        $qb->select('e.id AS entityId', 'wi.workflowName AS workflowName')
+        $qb->select('e.id AS entityId', 'wi.workflowName AS workflowName, wi.id as id')
             ->leftJoin(
                 'OroWorkflowBundle:WorkflowItem',
                 'wi',
@@ -215,8 +284,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
         array $noneEntityIds = null,
         array $noStartStepEntityIds = null,
         array $withStartStepEntityIds = null
-    )
-    {
+    ) {
         if ($noneEntitiesCount > 0) {
             $actualAllEntities = $allEntityIds['none'];
             $this->assertCount($noneEntitiesCount, $actualAllEntities);
