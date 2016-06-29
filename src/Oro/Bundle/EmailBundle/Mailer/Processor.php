@@ -74,6 +74,9 @@ class Processor
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
+    /** @var array */
+    protected $origins = [];
+
     /**
      * @param DoctrineHelper           $doctrineHelper
      * @param DirectMailer             $mailer
@@ -127,6 +130,9 @@ class Processor
         $parentMessageId = $this->getParentMessageId($model);
         $message = $this->prepareMessage($model, $parentMessageId, $messageDate);
 
+        if ($origin === null && $persist) {
+            $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
+        }
         $this->processSend($message, $origin);
 
         $emailUser = $this->prepareEmailUser($model, $origin, $message, $messageDate, $parentMessageId);
