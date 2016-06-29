@@ -61,10 +61,10 @@ class RendererTest extends LayoutTestCase
         $context->set('body_class', 'test-body');
 
         $result   = $this->getCoreBlocksTestLayout($context)->setRenderer('php')->render();
+
         $expected = $this->getCoreBlocksTestLayoutResult(
             $this->getPhpFormLayoutResult()
         );
-
         $this->assertHtmlEquals($expected, $result);
     }
 
@@ -175,7 +175,10 @@ class RendererTest extends LayoutTestCase
                 'body',
                 [
                     'class_prefix' => 'content',
-                    'attr' => ['class' => '{{ class_prefix }}-body']
+                    'attr' => [
+                        'class' => '{{ class_prefix }}-body',
+                        'data-json' => ['test1'],
+                    ],
                 ]
             )
             ->add('list', 'content', 'list')
@@ -241,7 +244,7 @@ class RendererTest extends LayoutTestCase
             ->add(
                 'form',
                 'content',
-                'form',
+                'form_fields',
                 [
                     'preferred_fields' => ['jobTitle', 'user.lastName'],
                     'groups'           => [
@@ -258,7 +261,7 @@ class RendererTest extends LayoutTestCase
             )
             // swap 'general' and 'additional' groups to check that a layout update
             // can be applied for items added by a block type
-            ->move('form:group_general', null, 'form:group_additional')
+            ->move('form_fields:group_general', null, 'form_fields:group_additional')
             // test 'visible' option
             ->add('invisible_container', 'root', 'head', ['visible' => false])
             ->add('invisible_child', 'invisible_container', 'meta', ['charset' => 'invisible'])
@@ -362,7 +365,7 @@ class RendererTest extends LayoutTestCase
         </script>
         <link rel="stylesheet" href="test.css"/>
     </head>
-<body class="content-body test-body class2">
+<body class="content-body test-body class2" data-json="{&quot;0&quot;:&quot;test1&quot;}">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
     <input type="text" name="search"/>
     <input type="submit" name="btn2" value="Btn2"/>

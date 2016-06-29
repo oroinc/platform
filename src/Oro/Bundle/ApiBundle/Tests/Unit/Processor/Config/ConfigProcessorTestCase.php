@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfigExtension;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
@@ -37,6 +38,7 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->configExtensionRegistry = new ConfigExtensionRegistry();
         $this->configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $this->configExtensionRegistry->addExtension(new SortersConfigExtension());
+        $this->configExtensionRegistry->addExtension(new ActionsConfigExtension());
 
         $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);
     }

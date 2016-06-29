@@ -26,7 +26,6 @@ full:
                 property_path: path1
                 data_type: string
                 allow_array: true
-                default_value: val1
                 description: description1
                 extra1: true
             field2:
@@ -49,12 +48,6 @@ full:
                 allow_array: true
             field11:
                 allow_array: false
-            field12:
-                default_value: val1
-            field13:
-                default_value: ~
-            field14:
-                default_value: ""
             field15:
                 description: description1
             field16:
@@ -73,7 +66,6 @@ full:
                 property_path: path1
                 data_type: string
                 allow_array: true
-                default_value: val1
                 description: description1
                 extra1: true
             field2:
@@ -90,11 +82,6 @@ full:
             field10:
                 allow_array: true
             field11: ~
-            field12:
-                default_value: val1
-            field13: ~
-            field14:
-                default_value: ""
             field15:
                 description: description1
             field16: ~

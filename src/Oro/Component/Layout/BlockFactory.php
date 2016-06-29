@@ -52,6 +52,9 @@ class BlockFactory implements BlockFactoryInterface
     {
         $this->initializeState($rawLayout, $context);
         try {
+            if ($rootId === null) {
+                $rootId = $context->getOr('root_id');
+            }
             $rootId = $rootId
                 ? $this->rawLayout->resolveId($rootId)
                 : $this->rawLayout->getRootId();

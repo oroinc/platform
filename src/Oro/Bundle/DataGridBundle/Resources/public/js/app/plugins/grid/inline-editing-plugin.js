@@ -8,9 +8,9 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var CellIterator = require('../../../datagrid/cell-iterator');
-    var gridViewsBuilder = require('../../../inline-editing/builder');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var Modal = require('oroui/js/modal');
+    var SplitEventList = require('./inline-editing-plugin/split-event-list');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
@@ -27,21 +27,21 @@ define(function(require) {
 
         initialize: function(main, options) {
             this.activeEditorComponents = [];
+            this.patchCellConstructor = _.bind(this.patchCellConstructor, this);
             InlineEditingPlugin.__super__.initialize.apply(this, arguments);
         },
 
         enable: function() {
             this.main.$el.addClass('grid-editable');
-            this.listenTo(this.main, {
-                afterMakeCell: this.onAfterMakeCell
-            });
+
             this.listenTo(this.main.collection, {
                 beforeFetch: this.beforeGridCollectionFetch
             });
+
             if (this.main.columns) {
-                this.listenColumnEvents();
+                this.processColumnsAndListenEvents();
             } else {
-                this.listenToOnce(this.main, 'columns:ready', this.listenColumnEvents);
+                this.listenToOnce(this.main, 'columns:ready', this.processColumnsAndListenEvents);
             }
             this.listenTo(mediator, {
                 'page:beforeChange': this.removeActiveEditorComponents,
@@ -61,16 +61,23 @@ define(function(require) {
             $(window).on('beforeunload.' + this.cid, _.bind(this.onWindowUnload, this));
         },
 
-        listenColumnEvents: function() {
+        processColumnsAndListenEvents: function() {
+            this.processColumns();
             this.listenTo(this.main.columns, {
                 'change:renderable': this.onColumnStateChange
             });
+            this.main.columns.trigger('change:columnEventList');
+        },
+
+        processColumns: function() {
+            this.main.columns.each(this.patchCellConstructor);
         },
 
         disable: function() {
             $(window).off('.' + this.cid);
             this.removeActiveEditorComponents();
             if (!this.manager.disposing) {
+                this.main.columns.each(this.removePatchForCellConstructor);
                 this.main.$el.removeClass('grid-editable');
                 this.main.body.refresh();
             }
@@ -144,36 +151,73 @@ define(function(require) {
             }
         },
 
-        onAfterMakeCell: function(row, cell) {
-            var _this = this;
-            function enterEditModeIfNeeded(e) {
-                if (_this.isEditable(cell)) {
-                    _this.enterEditMode(cell);
+        patchCellConstructor: function(column) {
+            var Cell = column.get('cell');
+            var inlineEditingPlugin = this;
+            var oldClassName = Cell.prototype.className;
+            var splitEventsList = new SplitEventList(Cell, 'isEditable', {
+                'dblclick': 'enterEditModeIfNeeded',
+                'mousedown [data-role=edit]': 'enterEditModeIfNeeded',
+                'click': _.noop,
+                'mouseenter': 'delayedIconRender'
+            });
+            var extended = Cell.extend({
+                constructor: function(options) {
+                    // column should be initialized to valid work of className generation
+                    this.column = options.column;
+                    Cell.apply(this, arguments);
+                },
+                className: _.isFunction(oldClassName) ?
+                    function() {
+                        var calculatedClassName = oldClassName.call(this);
+                        var addClassName = inlineEditingPlugin.isEditable(this) ?
+                            'editable view-mode prevent-text-selection-on-dblclick' :
+                            '';
+                        return (calculatedClassName ? calculatedClassName + ' ' : '') + addClassName;
+                    } :
+                    function() {
+                        var addClassName = inlineEditingPlugin.isEditable(this) ?
+                            'editable view-mode prevent-text-selection-on-dblclick' :
+                            '';
+                        return (oldClassName ? oldClassName + ' ' : '') + addClassName;
+                    },
+                events: splitEventsList.generateDeclaration(),
+
+                delayedIconRender: function() {
+                    if (!this.$el.find('> [data-role="edit"]').length) {
+                        this.$el.append('<i data-role="edit" ' +
+                            'class="icon-pencil skip-row-click hide-text inline-editor__edit-action"' +
+                            'title="' + __('Edit') + '">' + __('Edit') + '</i>');
+                        this.$el.attr('title', inlineEditingPlugin.helpMessage);
+                    }
+                },
+
+                isEditable: function() {
+                    return inlineEditingPlugin.isEditable(this);
+                },
+
+                enterEditModeIfNeeded: function(e) {
+                    if (this.isEditable()) {
+                        inlineEditingPlugin.enterEditMode(this);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
                 }
-                e.preventDefault();
-                e.stopPropagation();
+            });
+
+            column.set({
+                cell: extended,
+                oldCell: Cell
+            });
+        },
+
+        removePatchForCellConstructor: function(column) {
+            if (column.get('oldCell')) {
+                column.set({
+                    cell: column.get('oldCell'),
+                    oldCell: false
+                });
             }
-            var originalRender = cell.render;
-            cell.render = function() {
-                var cell = this;
-                originalRender.apply(cell, arguments);
-                var originalEvents = cell.events;
-                if (_this.isEditable(cell)) {
-                    cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    cell.$el.append('<i data-role="edit" ' +
-                        'class="icon-pencil skip-row-click hide-text inline-editor__edit-action"' +
-                        'title="' + __('Edit') + '">' + __('Edit') + '</i>');
-                    cell.$el.attr('title', _this.helpMessage);
-                    cell.events = _.extend(Object.create(cell.events), {
-                        'dblclick': enterEditModeIfNeeded,
-                        'mousedown [data-role=edit]': enterEditModeIfNeeded,
-                        'click': _.noop
-                    });
-                }
-                cell.delegateEvents();
-                cell.events = originalEvents;
-                return cell;
-            };
         },
 
         hasChanges: function() {
@@ -187,65 +231,57 @@ define(function(require) {
             if (!columnMetadata || !cell.column.get('renderable')) {
                 return false;
             }
-            var editable;
-            var enableConfigValue = columnMetadata.inline_editing && columnMetadata.inline_editing.enable;
-            // validateUrlParameters
-            switch (this.options.metadata.inline_editing.behaviour) {
-                case 'enable_all':
-                    if (enableConfigValue !== false) {
-                        editable = (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
-                            (columnMetadata.type || gridViewsBuilder.DEFAULT_COLUMN_TYPE) in
-                                this.options.metadata.inline_editing.default_editors;
-                    } else {
-                        editable = false;
-                    }
-                    break;
-                case 'enable_selected':
-                    editable = enableConfigValue === true;
-                    break;
-                default:
-                    throw new Error('Unknown behaviour');
+            var fieldName = cell.column.get('name');
+            var fullRestriction = _.find(cell.model.get('entity_restrictions'), function(restriction) {
+                return restriction.field === fieldName && restriction.mode === 'full';
+            });
+            if (fullRestriction) {
+                return false;
             }
-            return editable ?
-                this.getCellEditorOptions(cell).save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
+            return columnMetadata.inline_editing && columnMetadata.inline_editing.enable ?
+                this.getCellEditorOptions(cell)
+                    .save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
                 false;
         },
 
         getCellEditorOptions: function(cell) {
-            var columnMetadata = cell.column.get('metadata');
-            var editor = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
-            var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
+            var cellEditorOptions = cell.column.get('cellEditorOptions');
+            if (!cellEditorOptions) {
+                var columnMetadata = cell.column.get('metadata');
+                cellEditorOptions = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
+                var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
 
-            if (!editor.component_options) {
-                editor.component_options = {};
-            }
-
-            if (saveApiAccessor) {
-                if (!(saveApiAccessor instanceof ApiAccessor)) {
-                    var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
-                        saveApiAccessor);
-                    var ConcreteApiAccessor = saveApiOptions.class;
-                    saveApiAccessor = new ConcreteApiAccessor(_.omit(saveApiOptions, 'class'));
+                if (!cellEditorOptions.component_options) {
+                    cellEditorOptions.component_options = {};
                 }
-                editor.save_api_accessor = saveApiAccessor;
-            } else {
-                // use main
-                editor.save_api_accessor = this.saveApiAccessor;
+
+                if (saveApiAccessor) {
+                    if (!(saveApiAccessor instanceof ApiAccessor)) {
+                        var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
+                            saveApiAccessor);
+                        var ConcreteApiAccessor = saveApiOptions.class;
+                        saveApiAccessor = new ConcreteApiAccessor(_.omit(saveApiOptions, 'class'));
+                    }
+                    cellEditorOptions.save_api_accessor = saveApiAccessor;
+                } else {
+                    // use main
+                    cellEditorOptions.save_api_accessor = this.saveApiAccessor;
+                }
+
+                var validationRules = _.result(columnMetadata.inline_editing, 'validation_rules') || {};
+
+                _.each(validationRules, function(params, ruleName) {
+                    // normalize rule's params, in case is it was defined as 'NotBlank: ~'
+                    validationRules[ruleName] = params || {};
+                });
+
+                cellEditorOptions.viewOptions = $.extend(true, {}, cellEditorOptions.view_options || {}, {
+                    validationRules: validationRules
+                });
+
+                cell.column.set('cellEditorOptions', cellEditorOptions);
             }
-
-            var validationRules = _.result(columnMetadata.inline_editing, 'validation_rules') || {};
-
-            _.each(validationRules, function(params, ruleName) {
-                // normalize rule's params, in case is it was defined as 'NotBlank: ~'
-                validationRules[ruleName] = params || {};
-            });
-
-            editor.viewOptions = $.extend(true, {}, editor.view_options || {}, {
-                className: this.buildClassNames(editor, cell).join(' '),
-                validationRules: validationRules
-            });
-
-            return editor;
+            return cellEditorOptions;
         },
 
         getOpenedEditor: function(cell) {
@@ -273,6 +309,8 @@ define(function(require) {
             this.main.ensureCellIsVisible(cell);
 
             var editor = this.getCellEditorOptions(cell);
+            editor.viewOptions.className = this.buildClassNames(editor, cell).join(' ');
+
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 

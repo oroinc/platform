@@ -12,8 +12,6 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  */
 class SetDefaultMaxRelatedEntities implements ProcessorInterface
 {
-    const DEFAULT_MAX_RELATED_ENTITIES = 100;
-
     /**
      * {@inheritdoc}
      */
@@ -23,8 +21,16 @@ class SetDefaultMaxRelatedEntities implements ProcessorInterface
 
         if (!$context->hasConfigExtra(MaxRelatedEntitiesConfigExtra::NAME)) {
             $context->addConfigExtra(
-                new MaxRelatedEntitiesConfigExtra(self::DEFAULT_MAX_RELATED_ENTITIES)
+                new MaxRelatedEntitiesConfigExtra($this->getDefaultRelatedEntitiesLimit())
             );
         }
+    }
+
+    /**
+     * @return int
+     */
+    protected function getDefaultRelatedEntitiesLimit()
+    {
+        return 100;
     }
 }

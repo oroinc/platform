@@ -5,14 +5,11 @@
     "keywords": ["ORO", "BAP", "Routing"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9",
+        "php": ">=5.5.9",
         "symfony/config": "~2.3",
         "symfony/http-kernel": "~2.3",
         "symfony/routing": "~2.3",
         "oro/php-utils": "dev-master"
-    },
-    "require-dev": {
-        "nelmio/api-doc-bundle": "~2.8"
     },
     "autoload": {
         "psr-0": { "Oro\\Component\\Routing": "" }

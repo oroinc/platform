@@ -10,8 +10,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDeleteLimit implements ProcessorInterface
 {
-    const DEFAULT_MAX_ENTITIES_TO_DELETE = 100;
-
     /**
      * {@inheritdoc}
      */
@@ -25,12 +23,25 @@ class SetDeleteLimit implements ProcessorInterface
         }
 
         $criteria = $context->getCriteria();
+        if (null === $criteria) {
+            // the criteria object does not exist
+            return;
+        }
+
         if (null === $criteria->getMaxResults()) {
             $limit = $context->getConfig()->getMaxResults();
             if (null === $limit) {
-                $limit = self::DEFAULT_MAX_ENTITIES_TO_DELETE;
+                $limit = $this->getDefaultDeleteLimit();
             }
             $criteria->setMaxResults($limit);
         }
+    }
+
+    /**
+     * @return int
+     */
+    protected function getDefaultDeleteLimit()
+    {
+        return 100;
     }
 }

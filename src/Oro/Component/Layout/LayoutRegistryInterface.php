@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 /**
  * The central registry of the Layout component.
@@ -51,10 +51,10 @@ interface LayoutRegistryInterface
     /**
      * Sets the default options for a block type.
      *
-     * @param string                   $name     The block type name
-     * @param OptionsResolverInterface $resolver The resolver for the options.
+     * @param string $name The block type name
+     * @param OptionsResolver $resolver The resolver for the options.
      */
-    public function setDefaultOptions($name, OptionsResolverInterface $resolver);
+    public function configureOptions($name, OptionsResolver $resolver);
 
     /**
      * Builds the block.

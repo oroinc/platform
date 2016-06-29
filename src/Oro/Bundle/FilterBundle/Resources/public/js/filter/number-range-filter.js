@@ -203,14 +203,15 @@ define([
                     }
                 } else {
                     if (value.value || value.value_end) {
+                        var type = parseInt(value.type);
                         //if only one value is filled, replace filter type to less than or more than
                         if (value.value_end) {
-                            value.type = value.type == this.typeValues.between ?
+                            value.type = type === this.typeValues.between ?
                                 this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
                             value.value = value.value_end;
                             value.value_end = '';
                         } else {
-                            value.type = value.type == this.typeValues.between ?
+                            value.type = type === this.typeValues.between ?
                                 this.fallbackTypeValues.moreThan : this.fallbackTypeValues.lessThan;
                         }
                     }
@@ -228,7 +229,7 @@ define([
         _writeDOMValue: function(data) {
             this._setInputValue(this.criteriaValueSelectors.value_end, data.value_end);
             var $typeInput = this.$(this.criteriaValueSelectors.type);
-            if ($typeInput.length && data.type != $typeInput.val()) {
+            if ($typeInput.length && data.type !== $typeInput.val()) {
                 this._setInputValue(this.criteriaValueSelectors.type, data.type);
                 this._updateTypeDropdown(data.type);
             }
@@ -244,7 +245,7 @@ define([
          */
         _updateTypeDropdown: function(value) {
             var a = this.$('.dropdown-menu:eq(0) a').filter(function() {
-                return $(this).data('value') == value
+                return $(this).data('value') === value;
             });
             a.parent().parent().find('li').each(function() {
                 $(this).removeClass('active');

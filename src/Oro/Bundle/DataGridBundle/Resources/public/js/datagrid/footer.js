@@ -52,9 +52,7 @@ define([
             }
 
             this.columns = options.columns;
-            if (!(this.columns instanceof Backbone.Collection)) {
-                this.columns = new Backgrid.Columns(this.columns);
-            }
+            this.filteredColumns = options.filteredColumns;
 
             state = options.collection.state || {};
             if (state.totals && Object.keys(state.totals).length) {
@@ -62,7 +60,8 @@ define([
                 _.each(state.totals, function(total, rowName) {
                     this.rows[this.rows.length] = new this.row({
                         columns: this.columns,
-                        collection: this.collection,
+                        collection: this.filteredColumns,
+                        dataCollection: this.collection,
                         footerCell: this.footerCell,
                         rowName: rowName
                     });
@@ -82,6 +81,7 @@ define([
             });
             delete this.rows;
             delete this.columns;
+            delete this.filteredColumns;
             Footer.__super__.dispose.call(this);
         },
 
@@ -91,7 +91,8 @@ define([
         render: function() {
             if (this.renderable) {
                 _.each(this.rows, function(row) {
-                    this.$el.append(row.render().$el);
+                    row.render();
+                    this.$el.append(row.$el);
                 }, this);
             }
             this.delegateEvents();

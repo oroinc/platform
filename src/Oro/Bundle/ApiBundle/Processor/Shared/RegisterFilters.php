@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
@@ -41,7 +42,7 @@ class RegisterFilters implements ProcessorInterface
 
         if (!$configOfFilters->isExcludeAll()) {
             // it seems that filters' configuration was not normalized
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'Expected "all" exclusion policy for filters. Got: %s.',
                     $configOfFilters->getExclusionPolicy()
@@ -72,13 +73,10 @@ class RegisterFilters implements ProcessorInterface
     {
         $filter = $this->filterFactory->createFilter($field->getDataType());
         if (null !== $filter) {
+            $filter->setArrayAllowed($field->isArrayAllowed());
+            $filter->setDescription($field->getDescription());
             if ($filter instanceof ComparisonFilter) {
                 $filter->setField($field->getPropertyPath() ?: $fieldName);
-            }
-            if ($filter instanceof StandaloneFilter) {
-                $filter->setArrayAllowed($field->isArrayAllowed());
-                $filter->setDescription($field->getDescription());
-                $filter->setDefaultValue($field->getDefaultValue());
             }
         }
 

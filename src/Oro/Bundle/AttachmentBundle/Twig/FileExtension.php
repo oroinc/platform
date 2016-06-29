@@ -8,6 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -52,6 +53,9 @@ class FileExtension extends \Twig_Extension
             new \Twig_SimpleFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
+            new \Twig_SimpleFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
+            new \Twig_SimpleFunction('oro_is_preview_available', [$this, 'isPreviewAvailable']),
+            new \Twig_SimpleFunction('oro_file_icons_config', [$this, 'getFileIconsConfig']),
             new \Twig_SimpleFunction(
                 'oro_file_view',
                 [$this, 'getFileView'],
@@ -126,11 +130,11 @@ class FileExtension extends \Twig_Extension
     /**
      * Get attachment icon class
      *
-     * @param File $attachment
+     * @param FileExtensionInterface $attachment
      *
      * @return string
      */
-    public function getAttachmentIcon(File $attachment)
+    public function getAttachmentIcon(FileExtensionInterface $attachment)
     {
         return $this->manager->getAttachmentIconClass($attachment);
     }
@@ -142,6 +146,7 @@ class FileExtension extends \Twig_Extension
      * @param object            $parentEntity
      * @param string            $fieldName
      * @param File              $attachment
+     * @param array             $additional
      *
      * @return string
      */
@@ -149,7 +154,8 @@ class FileExtension extends \Twig_Extension
         \Twig_Environment $environment,
         $parentEntity,
         $fieldName,
-        $attachment = null
+        $attachment = null,
+        $additional = null
     ) {
         /**
          * @todo: should be refactored in BAP-5637
@@ -160,9 +166,11 @@ class FileExtension extends \Twig_Extension
         if ($attachment && $attachment->getFilename()) {
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
-                    'iconClass' => $this->manager->getAttachmentIconClass($attachment),
-                    'url'       => $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
-                    'fileName'  => $attachment->getOriginalFilename()
+                    'iconClass'  => $this->manager->getAttachmentIconClass($attachment),
+                    'url'        => $this->manager
+                        ->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'fileName'   => $attachment->getOriginalFilename(),
+                    'additional' => $additional
                 ]
             );
         }
@@ -253,6 +261,39 @@ class FileExtension extends \Twig_Extension
     public function getFilteredImageUrl(File $attachment, $filterName)
     {
         return $this->manager->getFilteredImageUrl($attachment, $filterName);
+    }
+
+    /**
+     * Checks if file type is an image
+     *
+     * @param  string $type
+     * @return bool
+     */
+    public function getTypeIsImage($type)
+    {
+        return $this->manager->isImageType($type);
+    }
+
+    /**
+     * Check if we can show preview for file type
+     * Currently only images preview is supported
+     *
+     * @param  string $type
+     * @return bool
+     */
+    public function isPreviewAvailable($type)
+    {
+        return $this->getTypeIsImage($type);
+    }
+
+    /**
+     * Get config array of file icons
+     *
+     * @return array
+     */
+    public function getFileIconsConfig()
+    {
+        return $this->manager->getFileIcons();
     }
 
     /**

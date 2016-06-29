@@ -6,6 +6,8 @@ use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\UIBundle\Route\Router;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -62,12 +64,13 @@ class ControllersRoleTest extends WebTestCase
             $this->getUrl('oro_user_role_clone', array('id' => $result['id']))
         );
 
+        $saveButton = $crawler->selectButton('Save and Close');
         /** @var Form $form */
-        $form = $crawler->selectButton('Save and Close')->form();
+        $form = $saveButton->form();
         $form['oro_user_role_form[label]'] = 'clonedRole';
 
         $this->client->followRedirects(true);
-        $crawler = $this->client->submit($form);
+        $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);

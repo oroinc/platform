@@ -7,14 +7,6 @@ null_actions_action:
         get: ~
     expected: []
 
-null_actions_action_exclude_property:
-    config:
-        get:
-            exclude: ~
-    expected:
-        get:
-            exclude: false
-
 empty_status_codes:
     config:
         get:
@@ -61,3 +53,97 @@ full:
             exclude: false
             acl_resource: delete_action_acl_resource
 
+field_exclude:
+    config:
+        create:
+            fields:
+                field1:
+                    exclude: true
+                field2:
+                    exclude: false
+    expected:
+        create:
+            fields:
+                field1:
+                    exclude: true
+                field2: ~
+
+entity_null_form_type:
+    config:
+        create:
+            form_type: ~
+    expected: []
+
+entity_empty_form_type:
+    config:
+        create:
+            form_type: ""
+    expected: []
+
+entity_form_type:
+    config:
+        create:
+            form_type: integer
+    expected:
+        create:
+            form_type: integer
+
+entity_null_form_options:
+    config:
+        create:
+            form_options: ~
+    expected: []
+
+entity_empty_form_options:
+    config:
+        create:
+            form_options: []
+    expected: []
+
+entity_form:
+    config:
+        create:
+            form_type: integer
+            form_options:
+                option1: value1
+    expected:
+        create:
+            form_type: integer
+            form_options:
+                option1: value1
+
+field_form:
+    config:
+        create:
+            fields:
+                field1:
+                    form_type: ~
+                field2:
+                    form_type: ""
+                field3:
+                    form_type: integer
+                field4:
+                    form_type: integer
+                    form_options: ~
+                field5:
+                    form_type: integer
+                    form_options: []
+                field6:
+                    form_type: integer
+                    form_options:
+                        option1: value1
+    expected:
+        create:
+            fields:
+                field1: ~
+                field2: ~
+                field3:
+                    form_type: integer
+                field4:
+                    form_type: integer
+                field5:
+                    form_type: integer
+                field6:
+                    form_type: integer
+                    form_options:
+                        option1: value1

@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\EntityNotFoundException;
 
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 

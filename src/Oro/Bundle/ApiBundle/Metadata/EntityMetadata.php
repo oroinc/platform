@@ -12,6 +12,9 @@ class EntityMetadata extends ParameterBag
     /** entity inheritance flag */
     const INHERITED = 'inherited';
 
+    /** a flag indicates whether the entity has some strategy to generate identifier value */
+    const HAS_IDENTIFIER_GENERATOR = 'has_identifier_generator';
+
     /** @var string[] */
     private $identifiers = [];
 
@@ -20,6 +23,31 @@ class EntityMetadata extends ParameterBag
 
     /** @var AssociationMetadata[] */
     private $associations = [];
+
+    /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        $this->items = array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $this->items
+        );
+        $this->fields = array_map(
+            function ($field) {
+                return clone $field;
+            },
+            $this->fields
+        );
+        $this->associations = array_map(
+            function ($association) {
+                return clone $association;
+            },
+            $this->associations
+        );
+    }
 
     /**
      * Gets FQCN of an entity.
@@ -62,7 +90,27 @@ class EntityMetadata extends ParameterBag
     }
 
     /**
-     * Checks whether an entity is inherited object.
+     * Whether the entity has some strategy to generate identifier value.
+     *
+     * @return bool
+     */
+    public function hasIdentifierGenerator()
+    {
+        return (bool)$this->get(self::HAS_IDENTIFIER_GENERATOR);
+    }
+
+    /**
+     * Sets a flag indicates whether the entity has some strategy to generate identifier value.
+     *
+     * @param bool $hasIdentifierGenerator
+     */
+    public function setHasIdentifierGenerator($hasIdentifierGenerator)
+    {
+        $this->set(self::HAS_IDENTIFIER_GENERATOR, $hasIdentifierGenerator);
+    }
+
+    /**
+     * Whether an entity is inherited object.
      * It can be an entity implemented by Doctrine table inheritance
      * or by another feature, for example by associations provided by OroPlatform.
      *
@@ -127,7 +175,7 @@ class EntityMetadata extends ParameterBag
     /**
      * Gets metadata for all fields.
      *
-     * @return FieldMetadata[]
+     * @return FieldMetadata[] [field name => FieldMetadata, ...]
      */
     public function getFields()
     {
@@ -164,10 +212,14 @@ class EntityMetadata extends ParameterBag
      * Adds metadata of a field.
      *
      * @param FieldMetadata $field
+     *
+     * @return FieldMetadata
      */
     public function addField(FieldMetadata $field)
     {
         $this->fields[$field->getName()] = $field;
+
+        return $field;
     }
 
     /**
@@ -199,7 +251,7 @@ class EntityMetadata extends ParameterBag
     /**
      * Gets metadata for all associations.
      *
-     * @return AssociationMetadata[]
+     * @return AssociationMetadata[] [association name => AssociationMetadata, ...]
      */
     public function getAssociations()
     {
@@ -236,10 +288,14 @@ class EntityMetadata extends ParameterBag
      * Adds metadata of an association.
      *
      * @param AssociationMetadata $association
+     *
+     * @return AssociationMetadata
      */
     public function addAssociation(AssociationMetadata $association)
     {
         $this->associations[$association->getName()] = $association;
+
+        return $association;
     }
 
     /**

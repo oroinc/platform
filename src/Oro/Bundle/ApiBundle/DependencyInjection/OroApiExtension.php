@@ -4,61 +4,83 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
-class OroApiExtension extends Extension
+class OroApiExtension extends Extension implements PrependExtensionInterface
 {
     const CONFIG_EXTENSION_REGISTRY_SERVICE_ID = 'oro_api.config_extension_registry';
     const CONFIG_EXTENSION_TAG                 = 'oro_api.config_extension';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('data_transformers.yml');
+        $loader->load('form.yml');
         $loader->load('processors.normalize_value.yml');
         $loader->load('processors.collect_resources.yml');
+        $loader->load('processors.collect_subresources.yml');
         $loader->load('processors.get_config.yml');
         $loader->load('processors.get_metadata.yml');
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
         $loader->load('processors.delete.yml');
         $loader->load('processors.delete_list.yml');
+        $loader->load('processors.create.yml');
+        $loader->load('processors.update.yml');
+        $loader->load('processors.get_subresource.yml');
+        $loader->load('processors.get_relationship.yml');
+        $loader->load('processors.delete_relationship.yml');
+        $loader->load('processors.add_relationship.yml');
+        $loader->load('processors.update_relationship.yml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');
-            $this->registerDebugService(
+            DependencyInjectionUtil::registerDebugService(
                 $container,
                 'oro_api.action_processor_bag',
                 'Oro\Bundle\ApiBundle\Debug\TraceableActionProcessorBag'
             );
-            $this->registerDebugService(
+            DependencyInjectionUtil::registerDebugService(
+                $container,
+                'oro_api.processor_bag',
+                'Oro\Component\ChainProcessor\Debug\TraceableProcessorBag'
+            );
+            DependencyInjectionUtil::registerDebugService(
                 $container,
                 'oro_api.processor_factory',
                 'Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory'
             );
-            $this->registerDebugService($container, 'oro_api.collect_resources.processor');
-            $this->registerDebugService($container, 'oro_api.customize_loaded_data.processor');
-            $this->registerDebugService($container, 'oro_api.get_config.processor');
-            $this->registerDebugService($container, 'oro_api.get_relation_config.processor');
-            $this->registerDebugService($container, 'oro_api.get_metadata.processor');
-            $this->registerDebugService($container, 'oro_api.normalize_value.processor');
+            DependencyInjectionUtil::registerDebugService(
+                $container,
+                'oro_api.processor_applicable_checker_factory',
+                'Oro\Component\ChainProcessor\Debug\TraceableProcessorApplicableCheckerFactory'
+            );
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.collect_resources.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.collect_subresources.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.customize_loaded_data.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.get_config.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.get_relation_config.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.get_metadata.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.normalize_value.processor');
         }
 
         /**
          * To load configuration we need fully configured config tree builder, that's why all configuration extensions
          *   should be registered before.
          */
-        $this->registerTaggedServices(
+        DependencyInjectionUtil::registerTaggedServices(
             $container,
             self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
             self::CONFIG_EXTENSION_TAG,
@@ -69,30 +91,28 @@ class OroApiExtension extends Extension
     }
 
     /**
-     * Replaces a regular service with the debug one
-     *
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     * @param string           $debugServiceClassName
+     * {@inheritdoc}
      */
-    protected function registerDebugService(
-        ContainerBuilder $container,
-        $serviceId,
-        $debugServiceClassName = 'Oro\Component\ChainProcessor\Debug\TraceableActionProcessor'
-    ) {
-        $definition = $container->findDefinition($serviceId);
-        $definition->setPublic(false);
-        $container->setDefinition($serviceId . '.debug.parent', $definition);
-        $debugDefinition = new Definition(
-            $debugServiceClassName,
-            [
-                new Reference($serviceId . '.debug.parent'),
-                new Reference('oro_api.profiler.logger')
-            ]
-        );
-        $debugDefinition->setPublic(false);
-        $container->setDefinition($serviceId . '.debug', $debugDefinition);
-        $container->setAlias($serviceId, $serviceId . '.debug');
+    public function prepend(ContainerBuilder $container)
+    {
+        if ($container instanceof ExtendedContainerBuilder) {
+            $configs = $container->getExtensionConfig('fos_rest');
+            foreach ($configs as $key => $config) {
+                if (isset($config['format_listener']['rules']) && is_array($config['format_listener']['rules'])) {
+                    array_unshift(
+                        $configs[$key]['format_listener']['rules'],
+                        [
+                            'path'             => '^/api/(?!(soap|rest|doc)(/|$)+)',
+                            'priorities'       => ['json'],
+                            'fallback_format'  => 'json',
+                            'prefer_extension' => false
+                        ]
+                    );
+                    break;
+                }
+            }
+            $container->setExtensionConfig('fos_rest', $configs);
+        }
     }
 
     /**
@@ -115,49 +135,18 @@ class OroApiExtension extends Extension
             $config
         );
 
-        $exclusions = $config['exclusions'];
-        unset($config['exclusions']);
+        $exclusions = $config[ApiConfiguration::EXCLUSIONS_SECTION];
+        unset($config[ApiConfiguration::EXCLUSIONS_SECTION]);
+        $inclusions = $config[ApiConfiguration::INCLUSIONS_SECTION];
+        unset($config[ApiConfiguration::INCLUSIONS_SECTION]);
 
         $configBagDef = $container->getDefinition('oro_api.config_bag');
         $configBagDef->replaceArgument(0, $config);
 
         $exclusionProviderDef = $container->getDefinition('oro_api.entity_exclusion_provider.config');
         $exclusionProviderDef->replaceArgument(1, $exclusions);
-    }
 
-
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $chainServiceId
-     * @param string           $tagName
-     * @param string           $addMethodName
-     */
-    protected function registerTaggedServices(ContainerBuilder $container, $chainServiceId, $tagName, $addMethodName)
-    {
-        $chainServiceDef = $container->hasDefinition($chainServiceId)
-            ? $container->getDefinition($chainServiceId)
-            : null;
-
-        if (null !== $chainServiceDef) {
-            // find services
-            $services       = [];
-            $taggedServices = $container->findTaggedServiceIds($tagName);
-            foreach ($taggedServices as $id => $attributes) {
-                $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-                $services[$priority][] = new Reference($id);
-            }
-            if (empty($services)) {
-                return;
-            }
-
-            // sort by priority and flatten
-            krsort($services);
-            $services = call_user_func_array('array_merge', $services);
-
-            // register
-            foreach ($services as $service) {
-                $chainServiceDef->addMethodCall($addMethodName, [$service]);
-            }
-        }
+        $chainProviderDef = $container->getDefinition('oro_api.entity_exclusion_provider');
+        $chainProviderDef->replaceArgument(1, $inclusions);
     }
 }

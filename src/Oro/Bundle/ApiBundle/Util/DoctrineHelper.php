@@ -3,43 +3,29 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 
 class DoctrineHelper extends BaseHelper
 {
-    /**
-     * Adds criteria to the query.
-     *
-     * @param QueryBuilder $qb
-     * @param Criteria     $criteria
-     */
-    public function applyCriteria(QueryBuilder $qb, Criteria $criteria)
-    {
-        $joins = $criteria->getJoins();
-        if (!empty($joins)) {
-            $basePlaceholders = [];
-            foreach ($joins as $path => $join) {
-                $basePlaceholders[sprintf(Criteria::PLACEHOLDER_TEMPLATE, $path)] = $join->getAlias();
-            }
-            $basePlaceholders[Criteria::ROOT_ALIAS_PLACEHOLDER] = QueryUtils::getSingleRootAlias($qb);
-            foreach ($joins as $join) {
-                $alias        = $join->getAlias();
-                $placeholders = array_merge($basePlaceholders, [Criteria::ENTITY_ALIAS_PLACEHOLDER => $alias]);
-                $joinExpr     = strtr($join->getJoin(), $placeholders);
-                $condition    = $join->getCondition();
-                if ($condition) {
-                    $condition = strtr($condition, $placeholders);
-                }
+    /** @var array */
+    protected $manageableEntityClasses = [];
 
-                $method = strtolower($join->getJoinType()) . 'Join';
-                $qb->{$method}($joinExpr, $alias, $join->getConditionType(), $condition, $join->getIndexBy());
-            }
+    /**
+     * {@inheritdoc}
+     */
+    public function isManageableEntityClass($entityClass)
+    {
+        if (isset($this->manageableEntityClasses[$entityClass])) {
+            return $this->manageableEntityClasses[$entityClass];
         }
-        $qb->addCriteria($criteria);
+
+        $isManageable = null !== $this->registry->getManagerForClass($entityClass);
+        $this->manageableEntityClasses[$entityClass] = $isManageable;
+
+        return $isManageable;
     }
 
     /**
@@ -52,14 +38,19 @@ class DoctrineHelper extends BaseHelper
      */
     public function findEntityMetadataByPath($entityClass, array $associationPath)
     {
-        $metadata = $this->getEntityMetadataForClass($entityClass, false);
+        $manager = $this->registry->getManagerForClass($entityClass);
+        if (null === $manager) {
+            return null;
+        }
+
+        $metadata = $manager->getClassMetadata($entityClass);
         if (null !== $metadata) {
             foreach ($associationPath as $associationName) {
                 if (!$metadata->hasAssociation($associationName)) {
                     $metadata = null;
                     break;
                 }
-                $metadata = $this->getEntityMetadataForClass($metadata->getAssociationTargetClass($associationName));
+                $metadata = $manager->getClassMetadata($metadata->getAssociationTargetClass($associationName));
             }
         }
 
@@ -158,5 +149,54 @@ class DoctrineHelper extends BaseHelper
         }
 
         return $relations;
+    }
+
+    /**
+     * Sets the identifier values for a given entity.
+     *
+     * @param object             $entity
+     * @param mixed              $entityId
+     * @param ClassMetadata|null $metadata
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setEntityIdentifier($entity, $entityId, ClassMetadata $metadata = null)
+    {
+        if (null === $metadata) {
+            $metadata = $this->getEntityMetadata($entity);
+        }
+
+        if (!is_array($entityId)) {
+            $idFieldNames = $metadata->getIdentifierFieldNames();
+            if (count($idFieldNames) > 1) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Unexpected identifier value "%s" for composite primary key of the entity "%s".',
+                        $entityId,
+                        $metadata->getName()
+                    )
+                );
+            }
+            $entityId = [reset($idFieldNames) => $entityId];
+        }
+
+        $reflClass = new \ReflectionClass($entity);
+        foreach ($entityId as $fieldName => $value) {
+            $property = ReflectionUtil::getProperty($reflClass, $fieldName);
+            if (null === $property) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'The entity "%s" does not have the "%s" property.',
+                        get_class($entity),
+                        $fieldName
+                    )
+                );
+            }
+
+            if (!$property->isPublic()) {
+                $property->setAccessible(true);
+            }
+            $property->setValue($entity, $value);
+        }
     }
 }

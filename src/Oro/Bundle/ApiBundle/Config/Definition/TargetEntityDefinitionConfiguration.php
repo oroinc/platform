@@ -5,11 +5,10 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 
-class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection implements
-    ConfigurationSectionInterface
+class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 {
     /** @var string */
     protected $parentSectionName;
@@ -58,12 +57,8 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
     /**
      * {@inheritdoc}
      */
-    public function configure(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    public function configure(NodeBuilder $node)
+    {
         $sectionName = $this->sectionName;
         if (!empty($this->parentSectionName)) {
             $sectionName = $this->parentSectionName . '.' . $sectionName;
@@ -71,33 +66,24 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        $parentNode
-            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
-            ->beforeNormalization()
-                ->always(
-                    function ($value) use ($preProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
-                    }
-                );
-        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
+        $this->callConfigureCallbacks($node, $sectionName);
+        $this->addPreProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks(
+            $parentNode,
+            $sectionName,
+            function ($value) {
+                return $this->postProcessConfig($value);
+            }
+        );
+
         $this->configureEntityNode($node);
         $fieldNode = $node
             ->arrayNode(EntityDefinitionConfig::FIELDS)
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->children();
-        $this->configureFieldNode($fieldNode, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
-        $parentNode
-            ->validate()
-                ->always(
-                    function ($value) use ($postProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks(
-                            $this->postProcessConfig($value),
-                            $postProcessCallbacks,
-                            $sectionName
-                        );
-                    }
-                );
+        $this->configureFieldNode($fieldNode);
     }
 
     /**
@@ -115,6 +101,12 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
         }
         if (empty($config[EntityDefinitionConfig::POST_SERIALIZE])) {
             unset($config[EntityDefinitionConfig::POST_SERIALIZE]);
+        }
+        if (empty($config[EntityDefinitionConfig::FORM_TYPE])) {
+            unset($config[EntityDefinitionConfig::FORM_TYPE]);
+        }
+        if (empty($config[EntityDefinitionConfig::FORM_OPTIONS])) {
+            unset($config[EntityDefinitionConfig::FORM_OPTIONS]);
         }
         if (empty($config[EntityDefinitionConfig::FIELDS])) {
             unset($config[EntityDefinitionConfig::FIELDS]);
@@ -161,21 +153,21 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
                     ->end()
                 ->end()
             ->end()
-            ->variableNode(EntityDefinitionConfig::POST_SERIALIZE)->end();
+            ->variableNode(EntityDefinitionConfig::POST_SERIALIZE)->end()
+            ->scalarNode(EntityDefinitionConfig::FORM_TYPE)->end()
+            ->arrayNode(EntityDefinitionConfig::FORM_OPTIONS)
+                ->useAttributeAsKey('name')
+                ->performNoDeepMerging()
+                ->prototype('variable')
+                ->end()
+            ->end();
     }
 
     /**
      * @param NodeBuilder $node
-     * @param array       $configureCallbacks
-     * @param array       $preProcessCallbacks
-     * @param array       $postProcessCallbacks
      */
-    protected function configureFieldNode(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    protected function configureFieldNode(NodeBuilder $node)
+    {
         $sectionName = $this->sectionName . '.field';
         if (!empty($this->parentSectionName)) {
             $sectionName = $this->parentSectionName . '.' . $sectionName;
@@ -183,33 +175,36 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        $parentNode
-            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
-            ->beforeNormalization()
-                ->always(
-                    function ($value) use ($preProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
-                    }
-                );
-        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
+        $this->callConfigureCallbacks($node, $sectionName);
+        $this->addPreProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks(
+            $parentNode,
+            $sectionName,
+            function ($value) {
+                return $this->postProcessFieldConfig($value);
+            }
+        );
+
         $node
             ->booleanNode(EntityDefinitionFieldConfig::EXCLUDE)->end()
             ->scalarNode(EntityDefinitionFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
+            ->scalarNode(EntityDefinitionFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
+            ->scalarNode(EntityDefinitionFieldConfig::TARGET_CLASS)->end()
+            ->enumNode(EntityDefinitionFieldConfig::TARGET_TYPE)
+                ->values(['to-many', 'to-one', 'collection'])
+            ->end()
             ->booleanNode(EntityDefinitionFieldConfig::COLLAPSE)->end()
             ->variableNode(EntityDefinitionFieldConfig::DATA_TRANSFORMER)->end()
             ->scalarNode(EntityDefinitionFieldConfig::LABEL)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionFieldConfig::DESCRIPTION)->cannotBeEmpty()->end();
-        $parentNode
-            ->validate()
-                ->always(
-                    function ($value) use ($postProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks(
-                            $this->postProcessFieldConfig($value),
-                            $postProcessCallbacks,
-                            $sectionName
-                        );
-                    }
-                );
+            ->scalarNode(EntityDefinitionFieldConfig::DESCRIPTION)->cannotBeEmpty()->end()
+            ->scalarNode(EntityDefinitionFieldConfig::FORM_TYPE)->end()
+            ->arrayNode(EntityDefinitionFieldConfig::FORM_OPTIONS)
+                ->useAttributeAsKey('name')
+                ->performNoDeepMerging()
+                ->prototype('variable')
+                ->end()
+            ->end();
     }
 
     /**
@@ -221,6 +216,19 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
     {
         if (empty($config[EntityDefinitionFieldConfig::DATA_TRANSFORMER])) {
             unset($config[EntityDefinitionFieldConfig::DATA_TRANSFORMER]);
+        }
+        if (empty($config[EntityDefinitionFieldConfig::FORM_TYPE])) {
+            unset($config[EntityDefinitionFieldConfig::FORM_TYPE]);
+        }
+        if (empty($config[EntityDefinitionFieldConfig::FORM_OPTIONS])) {
+            unset($config[EntityDefinitionFieldConfig::FORM_OPTIONS]);
+        }
+        if (!empty($config[EntityDefinitionFieldConfig::TARGET_TYPE])) {
+            if ('collection' === $config[EntityDefinitionFieldConfig::TARGET_TYPE]) {
+                $config[EntityDefinitionFieldConfig::TARGET_TYPE] = 'to-many';
+            }
+        } elseif (!empty($config[EntityDefinitionFieldConfig::TARGET_CLASS])) {
+            $config[EntityDefinitionFieldConfig::TARGET_TYPE] = 'to-one';
         }
 
         return $config;

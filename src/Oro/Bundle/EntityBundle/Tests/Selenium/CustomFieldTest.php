@@ -87,7 +87,7 @@ class CustomFieldTest extends Selenium2TestCase
         $login->save()
             ->assertMessage('User saved');
         foreach ($this->fields as $field) {
-            $login->checkEntityFieldData(strtolower($field['type']).'_field', $field['value']);
+            $login->checkEntityFieldData(strtolower($field['type']).'_field', $field['value'], $field['type']);
         }
     }
 }

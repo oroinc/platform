@@ -200,7 +200,7 @@ class EmailRepository extends EntityRepository
      *
      * @return QueryBuilder[]
      */
-    protected function createEmailsByOwnerEntityQbs($entity, $ownerColumnName)
+    public function createEmailsByOwnerEntityQbs($entity, $ownerColumnName)
     {
         return [
             $this

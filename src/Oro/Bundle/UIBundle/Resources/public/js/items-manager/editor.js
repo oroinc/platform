@@ -5,11 +5,7 @@ define([
     'use strict';
 
     function setValue($elem, value) {
-        if ($elem.data('select2')) {
-            $elem.select2('val', value);
-        } else {
-            $elem.val(value);
-        }
+        $elem.inputWidget('val', value);
         $elem.trigger('change');
     }
 

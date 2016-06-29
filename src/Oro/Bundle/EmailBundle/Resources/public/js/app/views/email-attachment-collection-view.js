@@ -21,6 +21,7 @@ define(function(require) {
             BaseCollectionView.__super__.initialize.apply(this, arguments);
             this.itemView = this.itemView.extend({
                 inputName: options.inputName,
+                fileIcons: options.fileIcons,
                 collectionView: this
             });
 

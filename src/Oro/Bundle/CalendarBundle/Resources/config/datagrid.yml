@@ -6,7 +6,7 @@ datagrid:
             query:
                 select:
                     - event.id
-                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT(owner.firstName, ' ',owner.lastName) END, '') AS name
+                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT_WS(' ', owner.firstName, owner.lastName) END, '') AS name
                     - event.title
                     - event.start
                     - event.end
@@ -278,13 +278,13 @@ datagrid:
                     type: string
                     data_name: u.lastName
                 enabled:
-                    type: choice
+                    type: boolean
                     data_name: u.enabled
                     options:
                         field_options:
                             choices:
-                                'false': Inactive
-                                'true':  Active
+                                2: Inactive
+                                1: Active
 
     base-system-calendar-event-grid:
         source:
@@ -482,7 +482,7 @@ datagrid:
             query:
                 select:
                     - event.id
-                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT(owner.firstName, ' ',owner.lastName) END, '') AS name
+                    - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT_WS(' ', owner.firstName, owner.lastName) END, '') AS name
                     - event.title
                     - event.start
                     - event.end

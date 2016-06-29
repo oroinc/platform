@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 
 /**
  * @dbIsolation
  */
-class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
+class GetRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
 {
     /**
      * FQCN of the entity being used for testing.
@@ -21,25 +19,9 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
      */
     protected function setUp()
     {
-        $this->initClient(
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
-        );
-
         parent::setUp();
 
         $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadTableInheritanceData']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getRequestType()
-    {
-        return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -62,27 +44,16 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
 
         }
 
-        $entityAlias = $this->valueNormalizer->normalizeValue(
-            self::ENTITY_CLASS,
-            DataType::ENTITY_TYPE,
-            $this->getRequestType()
-        );
+        $entityType = $this->getEntityType(self::ENTITY_CLASS);
 
         // test get list request
-        $this->client->request(
+        $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1]),
-            $params,
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1]),
+            $params
         );
 
-        $response = $this->client->getResponse();
-
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
+        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
         $this->assertEquals($expects, json_decode($response->getContent(), true));
     }
 
@@ -95,7 +66,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
             'Related entity with table inheritance'            => [
                 'params'  => [
                     'fields' => [
-                        'testdepartments' => 'id,name,staff'
+                        'testdepartments' => 'id,title,staff'
                     ],
                     'sort'   => '-id'
                 ],
@@ -105,7 +76,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
                 'params'  => [
                     'include' => 'staff',
                     'fields'  => [
-                        'testdepartments' => 'id,name,staff',
+                        'testdepartments' => 'id,title,staff',
                         'testemployees'   => 'id,name'
                     ],
                     'sort'    => '-id'

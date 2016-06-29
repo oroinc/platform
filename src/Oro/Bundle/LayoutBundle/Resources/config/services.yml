@@ -108,6 +108,13 @@ services:
         tags:
             - { name: layout.context_configurator }
 
+    oro_layout.layout_context_configurator.root_id:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\RootIdContextConfigurator
+        arguments:
+            - '@request_stack'
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.block_type_extension.config_expression:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension
         arguments:
@@ -164,6 +171,11 @@ services:
             - '@assets.packages'
         tags:
             - { name: oro_layout.expression, alias: asset }
+
+    oro_layout.provider.image_type:
+        class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
+        arguments:
+            - @oro_layout.theme_manager
 
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper

@@ -36,3 +36,6 @@ oro:
             apply_segment:              Apply %s segment
             criteria.segment_condition: Apply segment
             choose_entity_segment:      Choose segment
+
+        refresh_dialog:
+            success: Segment successfully processed.

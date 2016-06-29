@@ -2,12 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
-use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -22,17 +19,12 @@ class NormalizeFilterKeys implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param TranslatorInterface $translator
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, TranslatorInterface $translator)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->translator     = $translator;
     }
 
     /**
@@ -54,14 +46,14 @@ class NormalizeFilterKeys implements ProcessorInterface
         }
 
         $filterCollection = $context->getFilters();
-        $idFieldName      = $this->getIdFieldName($context->getClassName());
+        $idFieldName = $this->getIdFieldName($context->getClassName());
 
         $filters = $filterCollection->all();
         foreach ($filters as $filterKey => $filter) {
             $filterCollection->remove($filterKey);
             if ($filter instanceof ComparisonFilter && $filter->getField() === $idFieldName) {
                 $filterKey = 'id';
-                $filter->setDescription($this->getIdFieldDescription());
+                $filter->setDescription('The identifier of an entity');
             }
             $filterCollection->add(
                 sprintf(self::FILTER_KEY_TEMPLATE, $filterKey),
@@ -84,15 +76,5 @@ class NormalizeFilterKeys implements ProcessorInterface
         $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
 
         return reset($idFieldNames);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getIdFieldDescription()
-    {
-        $label = new Label('oro.entity.identifier_field');
-
-        return $label->trans($this->translator);
     }
 }

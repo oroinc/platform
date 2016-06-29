@@ -10,12 +10,15 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * Class EmailOriginHelper
@@ -32,12 +35,34 @@ class EmailOriginHelper
     /** @var EntityManager */
     protected $em;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var  EmailOwnerProvider */
+    protected $emailOwnerProvider;
+
+    /** @var EmailAddressHelper */
+    protected $emailAddressHelper;
+
+    /** @var array */
+    protected $origins = [];
+
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param ServiceLink $serviceLink
+     * @param EmailOwnerProvider $emailOwnerProvider
+     * @param EmailAddressHelper $emailAddressHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ServiceLink $serviceLink,
+        EmailOwnerProvider $emailOwnerProvider,
+        EmailAddressHelper $emailAddressHelper
+    ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->securityFacade = $serviceLink->getService();
+        $this->emailOwnerProvider = $emailOwnerProvider;
+        $this->emailAddressHelper = $emailAddressHelper;
     }
 
     /**
@@ -68,12 +93,42 @@ class EmailOriginHelper
                 ->findOneBy(['internalName' => $originName]);
         }
 
-        if ($this->isEmptyOrigin($origin)) {
-            $user   = $this->emailModel->getCampaignOwner();
-            $origin = $this->getPreferredOrigin($user, $organization, $enableUseUserEmailOrigin);
+        return $origin;
+    }
+    
+    /**
+     * Find existing email origin entity by email string or create and persist new one.
+     *
+     * @param string                $email
+     * @param OrganizationInterface $organization
+     * @param string                $originName
+     * @param boolean               $enableUseUserEmailOrigin
+     *
+     * @return EmailOrigin
+     */
+    public function getEmailOrigin(
+        $email,
+        OrganizationInterface $organization = null,
+        $originName = InternalEmailOrigin::BAP,
+        $enableUseUserEmailOrigin = true
+    ) {
+        $originKey = $originName . $email;
+        if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
+            $organization = $this->securityFacade->getOrganization();
+        }
+        if (!array_key_exists($originKey, $this->origins)) {
+            $emailOwner = $this->emailOwnerProvider->findEmailOwner(
+                $this->getEntityManager(),
+                $this->emailAddressHelper->extractPureEmailAddress($email)
+            );
+
+            $origin = $this
+                ->findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin);
+
+            $this->origins[$originKey] = $origin;
         }
 
-        return $origin;
+        return $this->origins[$originKey];
     }
 
     /**

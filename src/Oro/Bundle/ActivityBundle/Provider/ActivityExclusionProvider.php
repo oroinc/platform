@@ -5,15 +5,15 @@ namespace Oro\Bundle\ActivityBundle\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\EntityBundle\Provider\AbstractExclusionProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * The implementation of ExclusionProviderInterface that can be used to ignore
  * relations which are an activity associations.
  */
-class ActivityExclusionProvider implements ExclusionProviderInterface
+class ActivityExclusionProvider extends AbstractExclusionProvider
 {
     /** @var ConfigManager */
     protected $configManager;
@@ -24,22 +24,6 @@ class ActivityExclusionProvider implements ExclusionProviderInterface
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isIgnoredEntity($className)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
-    {
-        return false;
     }
 
     /**

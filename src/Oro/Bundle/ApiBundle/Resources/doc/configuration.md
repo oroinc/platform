@@ -5,7 +5,7 @@ Table of Contents
 -----------------
  - [Overview](#overview)
  - [Configuration structure](#configuration-structure)
- - ["exclusions" configuration section & "exclude" flag](#exclusions-configuration-section--exclude-flag)
+ - ["exclude" option](#exclude-option)
  - ["entities" configuration section](#entities-configuration-section)
  - ["relations" configuration section](#relations-configuration-section)
  - ["actions" configuration section](#actions-configuration-section)
@@ -22,6 +22,8 @@ oro_api:
     entities:
         Acme\Bundle\ProductBundle\Product: ~
 ```
+
+Do not forget to run `oro:api:cache:clear` CLI command to immediately make an entity accessible through Data API. Also please see other [debug commands](./debug_commands.md) that may be helpful.
 
 Configuration structure
 -----------------------
@@ -48,7 +50,6 @@ parameters:
 
 The first level sections of configuration are:
 
-* [exclusions](#exclusions-configuration-section--exclude-flag) - describes entities and fields that should be excluded from Data API. This can be useful for example to exclude security specific data from being accessible via Data API.
 * [entities](#entities-configuration-section)   - describes the configuration of entities.
 * [relations](#relations-configuration-section)  - describes the configuration of relationships.
 
@@ -56,11 +57,9 @@ Top level configuration example:
 
 ```yaml
 oro_api:
-    exclusions:
-        ...
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
-            exclude: ~
+            exclude:
             ...
             fields:
                 ...
@@ -87,41 +86,25 @@ oro_api:
         ...
 ```
 
-"exclusions" configuration section & "exclude" flag
----------------------------------------------------
+"exclude" option
+----------------
 
-The `exclusions` configuration section describes whether whole entity or some of its fields should be excluded from Data API.
-
-Each item has next properties:
-
-* **entity** *string* The fully-Qualified Class Name of an entity.
-* **field** *string* The name of a field. This is optional property.
+The `exclude` configuration option describes whether an entity or some of its fields should be excluded from Data API.
 
 Example:
 
 ```yaml
 oro_api:
-    exclusions:
-        # whole entity exclusion
-        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1 }
-        # exclude field1 of Acme\Bundle\AcmeBundle\Entity\Entity2 entity
-        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
-```
-
-The same behavior can be reached using the `exclude` property under the  configuration of an entity, e.g.
-
-```yaml
-oro_api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
-            exclude: true
+            exclude: true # exclude the entity from Data API
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity2:
             fields:
                 field1:
-                    exclude: true
+                    exclude: true # exclude the field from Data API
 ```
 
-Also the `exclude` property can be used to indicate whether filtering or sorting for certain field should be disabled. Please note that filtering and sorting for the excluded field are disabled automatically, so it's not possible to filter or sort by excluded field.
+Also the `exclude` option can be used to indicate whether filtering or sorting for certain field should be disabled. Please note that filtering and sorting for the excluded field are disabled automatically, so it's not possible to filter or sort by excluded field.
 
 Example:
 
@@ -139,7 +122,7 @@ oro_api:
                         exclude: true
 ```
 
-Please note that `oro_api.exclusions` rules are applicable only for Data API. In case if an entity or its' field(s) should be excluded globally use `Resources/config/oro/entity.yml`, e.g.:
+Please note that `exclude` option are applicable only for Data API. In case if an entity or its' field(s) should be excluded globally use `Resources/config/oro/entity.yml`, e.g.:
 
 ```yaml
 oro_entity:
@@ -163,8 +146,11 @@ Each entity can have next properties:
 * **inherit** *boolean* By default `true`. The flag indicates that the configuration for certain entity should be merged with the configuration of a parent entity. If a derived entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`.
 * **exclusion_policy** *string* - Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used for the entity. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
 * **disable_partial_load** *boolean* The flag indicates whether usage of Doctrine partial objects is disabled. By default `false`. It can be helpful for entities with table inheritance mapping.
-* **max_results** *integer* The maximum number of entities in the result. Set -1 (it means unlimited), zero or positive value to set the limit. Can be used to set the limit for both root and related entities.
+* **page_size** *integer* The default page size. Set a positive number or -1 if a pagination should be disabled. Default value is `10`.
+* **max_results** *integer* The maximum number of entities in the result. Set -1 (it means unlimited), zero or positive number to set the limit. Can be used to set the limit for both root and related entities.
 * **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
+* **disable_sorting** *boolean* The flag indicates whether a sorting is disabled. By default `false`.
+* **identifier_field_names** *string[]* The names of identifier fields of the entity. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity. For ORM entities a value of this option is retrieved from an entity metadata.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
 * **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
@@ -200,12 +186,47 @@ oro_api:
                 ...
 ```
 
+* **form_type** *string* The form type that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default the `form` form type is used.
+* **form_options** *array* The form options that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default the following options is set:
+
+| Option Name | Option Value |
+| --- | --- |
+| data_class | The class name of the entity |
+| validation_groups | ['Default', 'api'] |
+| extra_fields_message | This form should not contain extra fields: "{{ extra_fields }}" |
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            form_type: acme_entity.api_form
+            form_options:
+                validation_groups: ['Default', 'api', 'my_group']
+```
+
 * **fields** - This section describes entity fields' configuration.
 
 Each field can have next properties:
 
 * **label** *string* A human-readable representation of the field. Used in auto generated documentation only.
 * **description** *string* A human-readable description of the field. Used in auto generated documentation only.
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+            fields:
+                field1:
+                    data_type:   time
+                    label:       "Acme name"
+                    description: "Acme description"
+```
+
 * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
 
 Example:
@@ -258,7 +279,7 @@ oro_api:
                     fields: targetField1
 ```
 
-* **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclusions" configuration section & "exclude" flag](#exclusions-configuration-section--exclude-flag).
+* **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclude" option](#exclude-option).
 
 Example:
 
@@ -269,11 +290,49 @@ oro_api:
             ...
             fields:
                 field1:
-                    label:            "Acme name"
-                    description:      "Acme name description"
-                    property_path:    "firstName"
-                field2:
                     exclude: true
+```
+
+* **form_type** *string* The form type that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+* **form_options** *array* The form options that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+            fields:
+                field1:
+                    form_type: text
+                    form_options:
+                        trim: false
+```
+
+* **data_type** *string* The data type of the field value. Can be `boolean`, `integer`, `string`, etc. If a field represents an association the data type should be a type of an identity field of the target entity.
+* **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
+* **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
+
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Api\Model\AcmeEntity:
+            ...
+            identifier_field_names: [field1]
+            fields:
+                field1: # identity field
+                    data_type: string
+                field2: # to-one association
+                    data_type: integer # the data type of an identifier field of the target
+                    target_class: Acme\Bundle\AcmeBundle\Api\Model\AcmeTargetEntity
+                field3: # to-many association
+                    data_type: integer # the data type of an identifier field of the target
+                    target_class: Acme\Bundle\AcmeBundle\Api\Model\AcmeTargetEntity
+                    target_type: collection
 ```
 
 * **filters** - This section describes fields by which the result data can be filtered. It contains two properties: `exclusion_policy` and `fields`.
@@ -284,9 +343,8 @@ oro_api:
         * **property_path** *string* The property path to reach the fields' value. The same way as above in `fields` configuration section.
         * **data_type** *string* The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
         * **allow_array** *boolean* A flag indicates whether the filter can contains several values. By default `false`.
-        * **default_value** - The default value for the filter.
 
-The example:
+Example:
 
 ```yaml
 oro_api:
@@ -305,7 +363,6 @@ oro_api:
                     field3:
                         data_type: boolean
                         allow_array: false
-                        default_value: true
 ```
 
 * **sorters** - This section describes fields by which the result data can be sorted. It contains two properties: `exclusion_policy` and `fields`.
@@ -338,12 +395,21 @@ The `relations` configuration section describes a configuration of an entity if 
 
 The `actions` configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration. Now `get`, `get_list` and `delete` actions are supported.
 
-Each action can have next parameters:
+Each action can have next properties:
 
 * **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
 * **description** *string* The entity description for the action.
 * **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
 * **status_codes** *array* The possible response status codes for the action.
+* **form_type** *string* The form type that should be used for the entity. This option overrides **form_type** option defined in ["entities" configuration section](#entities-configuration-section).
+* **form_options** *array* The form options that should be used for the entity. These options override options defined in ["entities" configuration section](#entities-configuration-section).
+* **fields** - This section describes entity fields' configuration specific for a particular action. These options override options defined in ["entities" configuration section](#entities-configuration-section).
+
+Each field can have next properties:
+
+* **exclude** *boolean* Indicates whether the field should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
+* **form_type** *string* The form type that should be used for the field.
+* **form_options** *array* The form options that should be used for the field.
 
 By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
 
@@ -447,5 +513,18 @@ oro_api:
                 delete:
                     status_codes:
                         '417':
+                            exclude: true
+```
+
+Exclude a field for `update` action:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                update:
+                    fields:
+                        field1:
                             exclude: true
 ```

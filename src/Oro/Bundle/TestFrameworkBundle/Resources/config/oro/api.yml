@@ -1,4 +1,57 @@
 oro_api:
     entities:
-        Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment: ~
-        Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee: ~
+        Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+            filters:
+                fields:
+                    name:
+                        exclude: false
+                    email:
+                        exclude: false
+            sorters:
+                fields:
+                    email:
+                        exclude: false
+        Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment:
+            fields:
+                title:
+                    exclude: false
+                    property_path: name
+            filters:
+                fields:
+                    name:
+                        exclude: false
+        Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee:
+            filters:
+                fields:
+                    name:
+                        exclude: false
+            sorters:
+                fields:
+                    position:
+                        exclude: false
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+            fields:
+                renamedId:
+                    property_path: id
+                renamedName:
+                    property_path: name
+            filters:
+                fields:
+                    renamedName:
+                        exclude: false
+            sorters:
+                fields:
+                    renamedName:
+                        exclude: false
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProductType:
+            fields:
+                renamedName:
+                    property_path: name
+            filters:
+                fields:
+                    renamedName:
+                        exclude: false
+            sorters:
+                fields:
+                    renamedName:
+                        exclude: false

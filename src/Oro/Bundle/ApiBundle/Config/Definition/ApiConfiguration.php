@@ -12,13 +12,14 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class ApiConfiguration implements ConfigurationInterface
 {
     const EXCLUSIONS_SECTION = 'exclusions';
+    const INCLUSIONS_SECTION = 'inclusions';
     const ENTITY_ATTRIBUTE   = 'entity';
     const FIELD_ATTRIBUTE    = 'field';
     const ENTITIES_SECTION   = 'entities';
     const RELATIONS_SECTION  = 'relations';
 
-    /** @var ConfigExtensionRegistry */
-    protected $extensionRegistry = [];
+    /** @var ConfigurationSettingsInterface */
+    protected $settings;
 
     /** @var int */
     protected $maxNestingLevel;
@@ -29,10 +30,10 @@ class ApiConfiguration implements ConfigurationInterface
      */
     public function __construct(ConfigExtensionRegistry $extensionRegistry, $maxNestingLevel = null)
     {
-        $this->extensionRegistry = $extensionRegistry;
-        $this->maxNestingLevel   = null !== $maxNestingLevel
+        $this->settings = $extensionRegistry->getConfigurationSettings();
+        $this->maxNestingLevel = null !== $maxNestingLevel
             ? $maxNestingLevel
-            : $this->extensionRegistry->getMaxNestingLevel();
+            : $extensionRegistry->getMaxNestingLevel();
     }
 
     /**
@@ -44,40 +45,15 @@ class ApiConfiguration implements ConfigurationInterface
         $rootNode    = $treeBuilder->root('oro_api');
         $children    = $rootNode->children();
 
-        list(
-            $extraSections,
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-            ) = $this->extensionRegistry->getConfigurationSettings();
-
-        $this->addExclusionsSection($children);
-
         $entityNode = $this->addEntitySection(
             $children,
-            new EntityConfiguration(
-                self::ENTITIES_SECTION,
-                new EntityDefinitionConfiguration(),
-                $extraSections,
-                $this->maxNestingLevel
-            ),
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
+            $this->createEntityConfiguration(self::ENTITIES_SECTION, new EntityDefinitionConfiguration())
         );
         $entityNode->booleanNode(ConfigUtil::EXCLUDE);
 
         $this->addEntitySection(
             $children,
-            new EntityConfiguration(
-                self::RELATIONS_SECTION,
-                new RelationDefinitionConfiguration(),
-                $extraSections,
-                $this->maxNestingLevel
-            ),
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
+            $this->createEntityConfiguration(self::RELATIONS_SECTION, new RelationDefinitionConfiguration())
         );
 
         $rootNode
@@ -92,43 +68,37 @@ class ApiConfiguration implements ConfigurationInterface
     }
 
     /**
-     * @param NodeBuilder $parentNode
+     * @param string                              $sectionName
+     * @param TargetEntityDefinitionConfiguration $definitionSection
+     *
+     * @return EntityConfiguration
      */
-    protected function addExclusionsSection(NodeBuilder $parentNode)
-    {
-        $parentNode
-            ->arrayNode(self::EXCLUSIONS_SECTION)
-                ->prototype('array')
-                ->children()
-                    ->scalarNode(self::ENTITY_ATTRIBUTE)
-                        ->isRequired()
-                        ->cannotBeEmpty()
-                    ->end()
-                    ->scalarNode(self::FIELD_ATTRIBUTE)->end();
+    protected function createEntityConfiguration(
+        $sectionName,
+        TargetEntityDefinitionConfiguration $definitionSection
+    ) {
+        return new EntityConfiguration(
+            $sectionName,
+            $definitionSection,
+            $this->settings,
+            $this->maxNestingLevel
+        );
     }
 
     /**
      * @param NodeBuilder         $parentNode
-     * @param EntityConfiguration $entityConfiguration
-     * @param array               $configureCallbacks
-     * @param array               $preProcessCallbacks
-     * @param array               $postProcessCallbacks
+     * @param EntityConfiguration $configuration
      *
      * @return NodeBuilder
      */
-    protected function addEntitySection(
-        NodeBuilder $parentNode,
-        EntityConfiguration $entityConfiguration,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    protected function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration)
+    {
         $node = $parentNode
-            ->arrayNode($entityConfiguration->getSectionName())
+            ->arrayNode($configuration->getSectionName())
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                 ->children();
-        $entityConfiguration->configure($node, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
+        $configuration->configure($node);
 
         return $node;
     }
@@ -140,41 +110,35 @@ class ApiConfiguration implements ConfigurationInterface
      */
     protected function postProcessConfig(array $config)
     {
+        $config[self::EXCLUSIONS_SECTION] = [];
+        $config[self::INCLUSIONS_SECTION] = [];
         if (!empty($config[self::ENTITIES_SECTION])) {
             foreach ($config[self::ENTITIES_SECTION] as $entityClass => &$entityConfig) {
-                if (!empty($entityConfig) && array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
-                    if ($entityConfig[ConfigUtil::EXCLUDE]
-                        && !$this->hasEntityExclusion($config[self::EXCLUSIONS_SECTION], $entityClass)
-                    ) {
-                        $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
+                if (!empty($entityConfig)) {
+                    if (array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
+                        if ($entityConfig[ConfigUtil::EXCLUDE]) {
+                            $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
+                        } else {
+                            $config[self::INCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
+                        }
+                        unset($entityConfig[ConfigUtil::EXCLUDE]);
                     }
-                    unset($entityConfig[ConfigUtil::EXCLUDE]);
+                    if (!empty($entityConfig[ConfigUtil::FIELDS])) {
+                        foreach ($entityConfig[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
+                            if (array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
+                                && !$fieldConfig[ConfigUtil::EXCLUDE]
+                            ) {
+                                $config[self::INCLUSIONS_SECTION][] = [
+                                    self::ENTITY_ATTRIBUTE => $entityClass,
+                                    self::FIELD_ATTRIBUTE  => $fieldName
+                                ];
+                            }
+                        }
+                    }
                 }
             }
         }
 
         return $config;
-    }
-
-    /**
-     * @param array  $exclusions
-     * @param string $entityClass
-     *
-     * @return bool
-     */
-    protected function hasEntityExclusion($exclusions, $entityClass)
-    {
-        $result = false;
-        foreach ($exclusions as $exclusion) {
-            if (array_key_exists(self::ENTITY_ATTRIBUTE, $exclusion)
-                && $exclusion[self::ENTITY_ATTRIBUTE] === $entityClass
-                && count($exclusion) === 1
-            ) {
-                $result = true;
-                break;
-            }
-        }
-
-        return $result;
     }
 }

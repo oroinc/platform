@@ -291,13 +291,23 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
                 );
 
             /** @var $query \PHPUnit_Framework_MockObject_MockObject */
-            $this->query->expects($this->once())
+            $this->query->expects($this->at(0))
                 ->method('setHint')
                 ->with(
                     Query::HINT_CUSTOM_OUTPUT_WALKER,
                     'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
                 );
+
+            /** @var $query \PHPUnit_Framework_MockObject_MockObject */
+            $this->query->expects($this->at(1))
+                ->method('setHint')
+                ->with(
+                    Query::HINT_INCLUDE_META_COLUMNS,
+                    true
+                );
         }
+
+
 
         $resolver = new OptionsResolver();
         $this->type->setDefaultOptions($resolver);
