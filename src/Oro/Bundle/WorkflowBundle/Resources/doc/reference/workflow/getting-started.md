@@ -54,7 +54,7 @@ but it can be referred by Workflow Items.
 Those values can be entered by user directly or assigned via Actions.
 
 * **Workflow Item** - associated with Workflow and indirectly associated with Steps, Transitions and
-Attributes. Has it's own state in Workflow Data, current Step and other data. Workflow Item stored in entity that has
+Attributes. Has it's own state in Workflow Data, current Step and other data. Workflow Item stores entity identifier and entity class that has
 associated workflow.
 
 How it works?
@@ -74,79 +74,20 @@ allowed.
 
 Workflow Item stores all collected data and current step, so, user can stop his progress on Workflow at any moment and
 then return to it, and Workflow will have exactly the same state. Each Workflow Item represents workflow
-started for some specific entity - this entity stores links to Workflow Item and current Step.
+started for some specific entity.
 
-Workflow Fields
----------------
-
-Each entity that has workflow must also have special fields to store Workflow Item and Workflow Step entities.
-These fields must be named as $workflowItem and $workflowStep. Here is example of their configuration:
-
-```php
-/**
- * @var WorkflowItem
- *
- * @ORM\OneToOne(targetEntity="Oro\Bundle\WorkflowBundle\Entity\WorkflowItem")
- * @ORM\JoinColumn(name="workflow_item_id", referencedColumnName="id", onDelete="SET NULL")
- */
-protected $workflowItem;
-
-/**
- * @var WorkflowStep
- *
- * @ORM\ManyToOne(targetEntity="Oro\Bundle\WorkflowBundle\Entity\WorkflowStep")
- * @ORM\JoinColumn(name="workflow_step_id", referencedColumnName="id", onDelete="SET NULL")
- */
-protected $workflowStep;
-
-/**
- * @param WorkflowItem $workflowItem
- * @return Opportunity
- */
-public function setWorkflowItem($workflowItem)
-{
-    $this->workflowItem = $workflowItem;
-
-    return $this;
-}
-
-/**
- * @return WorkflowItem
- */
-public function getWorkflowItem()
-{
-    return $this->workflowItem;
-}
-
-/**
- * @param WorkflowItem $workflowStep
- * @return Opportunity
- */
-public function setWorkflowStep($workflowStep)
-{
-    $this->workflowStep = $workflowStep;
-
-    return $this;
-}
-
-/**
- * @return WorkflowStep
- */
-public function getWorkflowStep()
-{
-    return $this->workflowStep;
-}
-
-```
-
-Also workflow can be assigned to any extended or custom entities - if this case these fields
-will be created automatically when first workflow for this entity will be created.
+Entity Limitations
+==================
+To be able to attach an entity to specific workflow (e.g. make entity workflow related) a few criteria should be met. 
+- Entity can not have composite fields as its primary keys.
+- Entity primary key can be integer or string (for doctrine types it is: BIGINT, DECIMAL, INTEGER, SMALLINT, STRING, TEXT). In other words - all types that can be casted by SQL CAST to text representation.
+- Entity should be configurable see [Annotation](./#annotation) section.
 
 Activation State
 ----------------
 
 By default all new workflow created in inactive state - it means that there will be no steps and transition
-on entity view page. Only one workflow for each entity can be active in one time.
+on entity view page. Multiple workflows for each entity can be active in one time.
 
 Activation of workflow can be performed in several ways.
 
@@ -171,7 +112,7 @@ Here is example of such configuration:
  *  defaultValues={
  *      ...
  *      "workflow"={
- *          "active_workflow"="example_user_flow"
+ *          "active_workflows"={"example_user_flow", "another_flow"}
  *      }
  *  }
  * )
@@ -192,7 +133,7 @@ Activation URL attributes:
 
 Deactivation URL attributes:
 * **route:** oro_api_workflow_deactivate
-* **parameter:** entityClass - entity which workflow should be deactivated
+* **parameter:** workflowDefinition - name of the appropriate workflow
 
 ### Workflow Manager
 
@@ -200,7 +141,7 @@ WorkflowBundle has WorkflowManager service (oro_workflow.manager) that provides 
 workflows:
 * **activateWorkflow(workflowIdentifier)** - activate workflow by workflow name, Workflow instance,
     WorkflowItem instance or WorkflowDefinition instance;
-* **deactivateWorkflow(entityClass)** - deactivate workflow by entity class.
+* **deactivateWorkflow(workflowIdentifier)** - deactivate workflow by workflow name, Workflow instance (same as above).
 
 Configuration
 -------------
