@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
@@ -103,6 +104,9 @@ class WorkflowControllerTest extends WebTestCase
 
         $this->assertEmpty($this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP));
 
+        $this->createWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
+        $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
+
         $this->client->request(
             'GET',
             $this->getUrl(
@@ -115,6 +119,8 @@ class WorkflowControllerTest extends WebTestCase
 
         $this->assertActivationResult($result);
         $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::WITH_START_STEP);
+
+        $this->assertEmpty($this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP));
     }
 
     /**
@@ -184,13 +190,21 @@ class WorkflowControllerTest extends WebTestCase
     /**
      * @param string $entityClass
      *
+     * @return ObjectManager
+     */
+    protected function getObjectManager($entityClass)
+    {
+        return $this->getContainer()->get('doctrine')->getManagerForClass($entityClass);
+    }
+
+    /**
+     * @param string $entityClass
+     *
      * @return ObjectRepository
      */
     protected function getRepository($entityClass)
     {
-        return $this->getContainer()->get('doctrine')
-            ->getManagerForClass($entityClass)
-            ->getRepository($entityClass);
+        return $this->getObjectManager($entityClass)->getRepository($entityClass);
     }
 
     public function testGetValidWorkflowItem()
@@ -307,6 +321,22 @@ class WorkflowControllerTest extends WebTestCase
     protected function getWorkflowItem($entity, $workflowName)
     {
         return $this->getWorkflowManager()->getWorkflowItem($entity, $workflowName);
+    }
+
+    /**
+     * @param string|WorkflowAwareEntity $entity
+     * @param string|Workflow $workflowName
+     *
+     * @return null|WorkflowItem
+     */
+    protected function createWorkflowItem($entity, $workflowName)
+    {
+        $workflow = $this->getWorkflowManager()->getWorkflow($workflowName);
+        $workflowItem = $workflow->createWorkflowItem($entity);
+
+        $manager = $this->getObjectManager('OroWorkflowBundle:ProcessDefinition');
+        $manager->persist($workflowItem);
+        $manager->flush();
     }
 
     /**

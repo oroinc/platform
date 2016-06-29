@@ -247,7 +247,7 @@ class WorkflowController extends FOSRestController
     {
         $workflowManager = $this->get('oro_workflow.manager');
 
-//        $workflowManager->resetWorkflowData($workflowDefinition);
+        $workflowManager->resetWorkflowData($workflowDefinition);
         $workflowManager->activateWorkflow($workflowDefinition);
 
         return $this->handleView(

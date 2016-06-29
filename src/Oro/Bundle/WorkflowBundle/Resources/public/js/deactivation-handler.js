@@ -12,7 +12,7 @@ function($, __, Modal, Messenger, Error) {
         var el = this;
         var confirmDeactivation = new Modal({
             title:   __('oro.workflow.workflowdefinition.deactivate', {label: label}),
-            content: __('oro.workflow.workflowdefinition.deactivate_message'),
+            content: __('oro.workflow.workflowdefinition.reset_workflow_data_message'),
             okText:  __('oro.workflow.workflowdefinition.deactivate_button_text')
         });
 
