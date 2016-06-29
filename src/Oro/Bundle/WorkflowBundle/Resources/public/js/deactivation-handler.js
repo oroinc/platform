@@ -12,8 +12,8 @@ function($, __, Modal, Messenger, Error) {
         var el = this;
         var confirmDeactivation = new Modal({
             title:   __('oro.workflow.workflowdefinition.deactivate', {label: label}),
-            content: __('Attention: This action will reset all workflow data for this entity.'),
-            okText:  __('Yes, Deactivate')
+            content: __('oro.workflow.workflowdefinition.deactivate_message'),
+            okText:  __('oro.workflow.workflowdefinition.deactivate_button_text')
         });
 
         confirmDeactivation.on('ok', function() {

@@ -79,10 +79,14 @@ abstract class ApiTestCase extends WebTestCase
         $this->initClient();
 
         $result = [];
+        $doctrineHelper = $this->getContainer()->get('oro_api.doctrine_helper');
         $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
         $resources = $resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
+            if (!$doctrineHelper->isManageableEntityClass($entityClass)) {
+                continue;
+            }
             $result[$entityClass] = [$entityClass, $resource->getExcludedActions()];
         }
 

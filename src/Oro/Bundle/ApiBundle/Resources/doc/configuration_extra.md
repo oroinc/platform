@@ -48,7 +48,6 @@ There are a list of existing configuration extras that implement this interface:
 
 - [FiltersConfigExtra](../../Config/FiltersConfigExtra.php)
 - [SortersConfigExtra](../../Config/SortersConfigExtra.php)
-- [ActionsConfigExtra](../../Config/ActionsConfigExtra.php)
 
 Example of configuration extra
 ------------------------------
@@ -103,12 +102,19 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
  * Sets an initial list of requests for configuration data.
+ * It is supposed that the list was initialized if
+ * the EntityDefinitionConfigExtra is already exist in the Context.
  */
 class InitializeConfigExtras implements ProcessorInterface
 {
     public function process(ContextInterface $context)
     {
         /** @var Context $context */
+
+        if ($context->hasConfigExtra(EntityDefinitionConfigExtra::NAME)) {
+            // config extras are already initialized
+            return;
+        }
 
         $context->addConfigExtra(new EntityDefinitionConfigExtra($context->getAction()));
         $context->addConfigExtra(new FiltersConfigExtra());

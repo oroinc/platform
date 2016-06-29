@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -86,18 +87,22 @@ class WorkflowRegistry
      * Get Active Workflows that applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow[]
+     * @return Workflow[] named array of active Workflow instances
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
-        return array_filter(
-            array_map(
-                function ($activeWorkflowName) {
-                    return $this->getWorkflow($activeWorkflowName, false);
-                },
-                $this->configManager->getActiveWorkflowNamesByEntity($entityClass)
-            )
-        );
+        $class = ClassUtils::getRealClass($entityClass);
+
+        $workflows = [];
+
+        foreach ($this->configManager->getActiveWorkflowNamesByEntity($entityClass) as $activeWorkflow) {
+            $workflow = $this->getWorkflow($activeWorkflow, false);
+            if ($workflow instanceof Workflow && $workflow->getDefinition()->getRelatedEntity() === $class) {
+                $workflows[$activeWorkflow] = $workflow;
+            }
+        }
+
+        return $workflows;
     }
 
     /**

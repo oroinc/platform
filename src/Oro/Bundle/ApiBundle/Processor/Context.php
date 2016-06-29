@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
@@ -161,6 +162,16 @@ class Context extends ApiContext implements ContextInterface
     public function setResponseStatusCode($statusCode)
     {
         $this->set(self::RESPONSE_STATUS_CODE, $statusCode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSuccessResponse()
+    {
+        $statusCode = $this->getResponseStatusCode();
+
+        return $statusCode>= 200 && $statusCode < 300;
     }
 
     /**
@@ -474,7 +485,9 @@ class Context extends ApiContext implements ContextInterface
      */
     public function hasConfigOf($configSection)
     {
-        $this->assertConfigSection($configSection);
+        if (!$this->isKnownConfigSection($configSection)) {
+            return false;
+        }
 
         return $this->has(self::CONFIG_PREFIX . $configSection);
     }
@@ -484,7 +497,9 @@ class Context extends ApiContext implements ContextInterface
      */
     public function getConfigOf($configSection)
     {
-        $this->assertConfigSection($configSection);
+        if (!$this->isKnownConfigSection($configSection)) {
+            return null;
+        }
 
         $key = self::CONFIG_PREFIX . $configSection;
         if (!$this->has($key)) {
@@ -503,7 +518,9 @@ class Context extends ApiContext implements ContextInterface
      */
     public function setConfigOf($configSection, $config)
     {
-        $this->assertConfigSection($configSection);
+        if (!$this->isKnownConfigSection($configSection)) {
+            throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
+        }
 
         $this->set(self::CONFIG_PREFIX . $configSection, $config);
 
@@ -534,7 +551,7 @@ class Context extends ApiContext implements ContextInterface
         if (empty($entityClass)) {
             $this->processLoadedConfig(null);
 
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'A class name must be set in the context before a configuration is loaded.'
             );
         }
@@ -602,21 +619,21 @@ class Context extends ApiContext implements ContextInterface
     /**
      * @param string $configSection
      *
+     * @return bool
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    protected function assertConfigSection($configSection)
+    protected function isKnownConfigSection($configSection)
     {
-        $valid = false;
+        $result = false;
         $configExtras = $this->getConfigExtras();
         foreach ($configExtras as $configExtra) {
             if ($configExtra instanceof ConfigExtraSectionInterface && $configSection === $configExtra->getName()) {
-                $valid = true;
+                $result = true;
                 break;
             }
         }
-        if (!$valid) {
-            throw new \InvalidArgumentException(sprintf('Undefined configuration section: "%s".', $configSection));
-        }
+
+        return $result;
     }
 
     /**

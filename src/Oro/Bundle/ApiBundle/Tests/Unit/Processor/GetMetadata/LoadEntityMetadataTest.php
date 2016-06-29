@@ -89,7 +89,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $this->assertSame($metadata, $this->context->getResult());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntityWithoutConfig()
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -99,6 +99,84 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $this->processor->process($this->context);
 
         $this->assertNull($this->context->getResult());
+    }
+
+    public function testProcessForNotManageableEntityWithoutFieldsInConfig()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNull($this->context->getResult());
+    }
+
+    public function testProcessForNotManageableEntity()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['field1'],
+            'fields'                 => [
+                'field1'       => [
+                    'data_type' => 'integer'
+                ],
+                'field2'       => [
+                    'data_type' => 'string',
+                    'exclude'   => true
+                ],
+                'field3'       => [
+                    'data_type'     => 'string',
+                    'property_path' => 'realField3'
+                ],
+                'association1' => [
+                    'target_class'           => 'Test\Association1Target',
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'integer'
+                        ]
+                    ]
+                ],
+                'association2' => [
+                    'target_class' => 'Test\Association2Target',
+                    'exclude'      => true
+                ],
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->addField($this->createFieldMetadata('field1', 'integer'))->setIsNullable(false);
+        $expectedMetadata->addField($this->createFieldMetadata('field3', 'string'))->setIsNullable(true);
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                false,
+                'integer',
+                ['Test\Association1Target']
+            )
+        );
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     public function testProcessForManageableEntityWithoutConfig()

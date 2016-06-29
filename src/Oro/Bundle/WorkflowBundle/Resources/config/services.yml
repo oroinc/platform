@@ -228,12 +228,19 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_workflow.repository.workflow_item:
+        class: Doctrine\ORM\EntityRepository
+        factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+        arguments:
+            - '%oro_workflow.workflow_item.entity.class%'
+
     oro_workflow.transition_schedule.items_fetcher:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher
         public: true
         arguments:
             - '@oro_workflow.transition_schedule.query_factory'
             - '@oro_workflow.manager'
+            - '@oro_workflow.repository.workflow_item'
 
     oro_workflow.validator_expression.dql_expression_verifier:
         class: Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier

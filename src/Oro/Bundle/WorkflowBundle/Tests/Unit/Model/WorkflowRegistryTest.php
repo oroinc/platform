@@ -53,16 +53,16 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->entityRepository);
 
         $this->managerRegistry->expects($this->any())
-                ->method('getManagerForClass')
-                ->with(WorkflowDefinition::class)
-                ->willReturn($this->entityManager);
+            ->method('getManagerForClass')
+            ->with(WorkflowDefinition::class)
+            ->willReturn($this->entityManager);
 
         $this->configManager = $this->getMockBuilder(WorkflowSystemConfigManager::class)
             ->disableOriginalConstructor()->getMock();
 
         $this->assembler = $this->getMockBuilder(WorkflowAssembler::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
+            ->setMethods(['assemble'])
             ->getMock();
 
         $this->registry = new WorkflowRegistry($this->managerRegistry, $this->assembler, $this->configManager);
@@ -113,7 +113,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         // run twice to test cache storage inside registry
         $this->assertEquals($workflow, $this->registry->getWorkflow($workflowName));
         $this->assertEquals($workflow, $this->registry->getWorkflow($workflowName));
-        $this->assertAttributeEquals(array($workflowName => $workflow), 'workflowByName', $this->registry);
+        $this->assertAttributeEquals([$workflowName => $workflow], 'workflowByName', $this->registry);
     }
 
     public function testGetWorkflowWithDbEntitiesUpdate()
@@ -144,7 +144,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($workflow, $this->registry->getWorkflow($workflowName));
         $this->assertEquals($newDefinition, $workflow->getDefinition());
-        $this->assertAttributeEquals(array($workflowName => $workflow), 'workflowByName', $this->registry);
+        $this->assertAttributeEquals([$workflowName => $workflow], 'workflowByName', $this->registry);
     }
 
     /**
@@ -175,7 +175,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'testEntityClass';
         $workflowName = 'test_workflow';
-        $workflow = $this->createWorkflow($workflowName);
+        $workflow = $this->createWorkflow($workflowName, $entityClass);
         $workflowDefinition = $workflow->getDefinition();
 
         $this->configManager
@@ -191,7 +191,10 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $this->prepareAssemblerMock($workflowDefinition, $workflow);
         $this->setUpEntityManagerMock($workflowDefinition);
 
-        $this->assertEquals([$workflow], $this->registry->getActiveWorkflowsByEntityClass($entityClass));
+        $this->assertEquals(
+            ['test_workflow' => $workflow],
+            $this->registry->getActiveWorkflowsByEntityClass($entityClass)
+        );
     }
 
     /**
@@ -204,7 +207,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'testEntityClass';
         $workflowName = 'test_workflow';
-        $workflow = $this->createWorkflow($workflowName);
+        $workflow = $this->createWorkflow($workflowName, $entityClass);
         $workflowDefinition = $canAssemble ? $workflow->getDefinition() : null;
 
         $this->prepareAssemblerMock($workflowDefinition, $workflow);
@@ -216,11 +219,10 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($entityClass)
             ->willReturn($notEmptyList ? [$workflowName] : []);
 
-        $this->entityRepository->expects($this->exactly((int) $notEmptyList))
+        $this->entityRepository->expects($this->exactly((int)$notEmptyList))
             ->method('find')
             ->with($workflowName)
             ->willReturn($workflowDefinition);
-
 
         $this->assertEquals($expected, $this->registry->hasActiveWorkflowsByEntityClass($entityClass));
     }
@@ -241,11 +243,11 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
                 'canAssemble' => false,
                 'expected' => false,
             ],
-            'can assemble' => [
+            'can assemble without expected entity class' => [
                 'notEmptyList' => true,
                 'canAssemble' => true,
                 'expected' => true,
-            ],
+            ]
         ];
     }
 
@@ -268,12 +270,17 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $workflowName
      *
+     * @param string|null $relatedEntity
      * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createWorkflow($workflowName)
+    protected function createWorkflow($workflowName, $relatedEntity = null)
     {
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName($workflowName);
+
+        if ($relatedEntity) {
+            $workflowDefinition->setRelatedEntity($relatedEntity);
+        }
 
         /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
