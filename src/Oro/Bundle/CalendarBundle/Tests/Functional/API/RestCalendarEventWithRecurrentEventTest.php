@@ -128,8 +128,6 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
     /**
      * Deletes recurring event.
      * Dependency for testPostRecurringEvent is not injected to work with own new recurring event.
-     *
-     * @TODO add test when recurring event with exception is deleted.
      */
     public function testDeleteRecurringEvent()
     {
@@ -267,5 +265,48 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
             ->find(['id' => $data['recurringEventId']]);
         $registry->getManager()->remove($recurringEvent);
         $registry->getManager()->flush();
+    }
+
+    /**
+     * Deletes recurring event with exception to ensure that all related entities are cascade removed.
+     * Dependencies where not injected to handle with new objects.
+     */
+    public function testDeleteRecurringEventWithException()
+    {
+        // creates new recurring event
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), self::$recurringEventParameters);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+        $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
+            ->find($result['id']);
+        $data['id'] = $event->getId();
+        $data['recurrenceId'] = $event->getRecurrence()->getId();
+
+        // creates new recurring event exception
+        self::$recurringEventExceptionParameters['recurringEventId'] = $data['id'];
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_api_post_calendarevent'),
+            self::$recurringEventExceptionParameters
+        );
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+        $data['exceptionId'] = $result['id'];
+
+        // deletes recurring events and all related entities
+        $this->client->request(
+            'DELETE',
+            $this->getUrl('oro_api_delete_calendarevent', ['id' => $data['id']])
+        );
+
+        // ensures that all related entities are deleted
+        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
+            ->findOneBy(['id' => $data['id']]); // do not use 'load' method to avoid proxy object loading.
+        $this->assertNull($event);
+        $recurrence = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:Recurrence')
+            ->findOneBy(['id' => $data['recurrenceId']]);
+        $this->assertNull($recurrence);
+        $exception = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
+            ->findOneBy(['id' => $data['exceptionId']]);
+        $this->assertNull($exception);
     }
 }
