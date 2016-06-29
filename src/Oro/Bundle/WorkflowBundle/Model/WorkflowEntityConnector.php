@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Cache;
+
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 class WorkflowEntityConnector
@@ -86,12 +87,15 @@ class WorkflowEntityConnector
 
         $identifier = $metadata->getIdentifierFieldNames();
 
+        $type = $metadata->getTypeOfField($identifier[0]);
+
         /*
          * Not supports composed Primary Keys (more than one identifier field)
          * Supports only list of specified in $supportedIdentifierTypes
          */
+
         return count($identifier) === 1 && in_array(
-            (string)$metadata->getTypeOfField($identifier[0]),
+            is_object($type) && method_exists($type, 'getName') ? $type->getName() : (string)$type,
             $this->supportedIdentifierTypes,
             true
         );
