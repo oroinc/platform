@@ -20,7 +20,11 @@ define([
          * @constructor
          */
         initialize: function() {
+            var self = this;
             this.$form = this.$el.closest('form');
+            this.$form.on('select2-data-loaded', function() {
+                self.formInitialState = self.getFormState();
+            });
             this.formInitialState = this.getFormState();
             this.isModalShown = false;
 
