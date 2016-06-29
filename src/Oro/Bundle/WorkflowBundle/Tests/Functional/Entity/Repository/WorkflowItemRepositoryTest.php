@@ -93,6 +93,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
             LoadWorkflowDefinitions::MULTISTEP,
             LoadWorkflowDefinitions::NO_START_STEP
         ];
+
         $expectedData = [];
 
         /** @var WorkflowAwareEntity $entity */
@@ -114,6 +115,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
                 return $entity->getId();
             }, $entities)
         );
+
         /** @var WorkflowAwareEntity $entity */
         foreach ($entities as $entity) {
             $this->assertContains($entity->getId(), array_keys($result));

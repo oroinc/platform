@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
@@ -42,32 +43,6 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertContains(LoadWorkflowDefinitions::WITH_START_STEP, $crawler->html());
     }
 
-//    public function testUpdateAction()
-//    {
-//        $crawler = $this->client->request(
-//            'GET',
-//            $this->getUrl('oro_workflow_definition_update', [
-//                'name' => LoadWorkflowDefinitions::MULTISTEP,
-//            ]),
-//            [],
-//            [],
-//            $this->generateBasicAuthHeader()
-//        );
-//        $response = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($response, 200);
-//
-//        $this->assertNotEmpty($crawler->html());
-//
-//        $form = $crawler->selectButton('Save and Close')->form();
-//
-//        $this->client->followRedirects(true);
-//        $crawler = $this->client->submit($form);
-//
-//        $result = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-//        $this->assertNotEmpty($crawler->html());
-//    }
-
     public function testUpdateActionForSystem()
     {
         $this->client->request(
@@ -82,26 +57,6 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($response, 403);
     }
-
-//    /**
-//     * @depends testUpdateAction
-//     */
-//    public function testCloneAction()
-//    {
-//        $crawler = $this->client->request(
-//            'GET',
-//            $this->getUrl('oro_workflow_definition_clone',['name' => LoadWorkflowDefinitions::MULTISTEP]),
-//            [],
-//            [],
-//            $this->generateBasicAuthHeader()
-//        );
-//        $response = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($response, 200);
-//
-//        $this->assertNotEmpty($crawler->html());
-//        $this->assertContains(LoadWorkflowDefinitions::MULTISTEP, $crawler->html());
-//        $this->assertContains(LoadWorkflowDefinitions::WITH_START_STEP_SYSTEM, $crawler->html());
-//    }
 
     public function testViewAction()
     {

@@ -35,10 +35,11 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
             $entity->setName('workflow_aware_entity_' . $i);
             $entities[$i] = $entity;
             $manager->persist($entity);
-            
+
             $this->setReference('workflow_aware_entity.' . $i, $entity);
         }
         $manager->flush();
+
         $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
 
         $workflowNames = [
@@ -46,20 +47,23 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
             LoadWorkflowDefinitions::WITH_START_STEP,
             LoadWorkflowDefinitions::MULTISTEP,
         ];
-        foreach($workflowNames as $workflowName){
-            $definition = $workflowDefinitionRepository->find($workflowName);
-            // create workflow item manually (to make it faster)
-            foreach ($entities as $i => $entity) {
-                $workflowItem = new WorkflowItem();
-                $workflowItem->setDefinition($definition)
-                    ->setWorkflowName($definition->getName())
-                    ->setEntity($entity)
-                    ->setEntityId($entity->getId())
-                    ->setEntityClass($definition->getRelatedEntity())
-                    ->setCurrentStep($definition->getSteps()->first());
-                $manager->persist($workflowItem);
 
-                $this->setReference('workflow_item.' . $i, $workflowItem);
+        // create workflow items manually (to make it faster)
+        foreach ($workflowNames as $workflowName) {
+            $definition = $workflowDefinitionRepository->find($workflowName);
+            if ($definition instanceof WorkflowDefinition) {
+                foreach ($entities as $i => $entity) {
+                    $workflowItem = new WorkflowItem();
+                    $workflowItem->setDefinition($definition)
+                        ->setWorkflowName($definition->getName())
+                        ->setEntity($entity)
+                        ->setEntityId($entity->getId())
+                        ->setEntityClass($definition->getRelatedEntity())
+                        ->setCurrentStep($definition->getSteps()->first());
+                    $manager->persist($workflowItem);
+
+                    $this->setReference('workflow_item.' . $i, $workflowItem);
+                }
             }
         }
 
