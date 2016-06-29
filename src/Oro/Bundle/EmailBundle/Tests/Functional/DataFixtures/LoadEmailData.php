@@ -9,7 +9,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -27,9 +27,9 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
     protected $emailEntityBuilder;
 
     /**
-     * @var EmailOriginHelper
+     * @var Processor
      */
-    protected $emailOriginHelper;
+    protected $processor;
 
     /**
      * @var ContainerInterface
@@ -55,7 +55,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 
         $this->container = $container;
         $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
-        $this->emailOriginHelper = $container->get('oro_email.tools.email_origin_helper');
+        $this->processor = $container->get('oro_email.mailer.processor');
     }
 
     /**
