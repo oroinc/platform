@@ -217,7 +217,6 @@ datagrid:
         columns:
             label:
                 label: oro.user.role.label.label
-
         properties:
             id: ~
             update_link:
