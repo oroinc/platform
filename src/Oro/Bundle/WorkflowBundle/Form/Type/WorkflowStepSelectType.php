@@ -52,8 +52,8 @@ class WorkflowStepSelectType extends AbstractType
                         $workflowName = $options['workflow_name'];
                         $workflows = [$this->workflowManager->getWorkflow($workflowName)];
                     } elseif (isset($options['workflow_entity_class'])) {
-                        $workflows = $this->workflowManager->getApplicableWorkflows(
-                            $options['workflow_entity_class']
+                        $workflows = array_values(
+                            $this->workflowManager->getApplicableWorkflows($options['workflow_entity_class'])
                         );
                     } else {
                         throw new \InvalidArgumentException(
@@ -68,7 +68,7 @@ class WorkflowStepSelectType extends AbstractType
                             function (Workflow $workflow) {
                                 return $workflow->getDefinition();
                             },
-                            array_values($workflows)
+                            $workflows
                         )
                     );
                 }

@@ -203,10 +203,10 @@ oro:
                 deactivate: Deactivate
 
             placeholder:
-                select_replacement: Select Replacement
+                select_replacement: Select Workflows
 
             form:
-                replace_message: "Please, select workflows that should be replaced."
+                replace_message: "You may also select workflows to be deactivated."
 
         workflowitem:
             entity_label:             Workflow Item
