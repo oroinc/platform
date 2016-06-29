@@ -257,7 +257,8 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *     targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee",
      *     mappedBy="calendarEvent",
      *     cascade={"all"},
-     *     orphanRemoval=true
+     *     orphanRemoval=true,
+     *     fetch="EAGER"
      * )
      * @ORM\OrderBy({"displayName"="ASC"})
      */
@@ -269,7 +270,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @var Attendee
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee", cascade={"persist"}, fetch="EAGER")
      * @ORM\JoinColumn(name="related_attendee_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $relatedAttendee;
