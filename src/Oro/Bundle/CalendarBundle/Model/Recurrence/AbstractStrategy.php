@@ -223,7 +223,7 @@ abstract class AbstractStrategy implements StrategyInterface
     {
         $result = '';
 
-        if ($recurrence->getCalendarEvent()) {
+        if ($recurrence->getCalendarEvent() && $recurrence->getCalendarEvent()->getStart() !== null) {
             $originalStart = clone $recurrence->getCalendarEvent()->getStart();
             $originalStart->setTimezone(new \DateTimeZone($recurrence->getTimeZone()));
             $currentStart = clone $recurrence->getCalendarEvent()->getStart();
