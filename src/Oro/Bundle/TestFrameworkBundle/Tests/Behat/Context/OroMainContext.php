@@ -37,7 +37,7 @@ class OroMainContext extends MinkContext implements
             $this->getSession()->getDriver()->waitPageToLoad();
 
             return;
-        } elseif (false === strpos($url, 'http://')) {
+        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
         }
 
