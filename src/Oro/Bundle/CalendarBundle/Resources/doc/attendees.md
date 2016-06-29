@@ -1,111 +1,175 @@
 # Attendee
 
-Main responsibility of Attendee entity is to store Calendar events guests and their connection with users (if attendee's email matches on user email).
-Matching works only in organisation scope. If user does not have permission to see other users information, he (user) will not see Attendee->User relation on view.
-Attendee could have email and/or displayName.
-
+Attendee entity represents guest of `OroCalendarEvent:Event` and association with with related entity.
+The only supported related entity at the moment is `OroUserBundle:User`. Attendee is associated with `OroUserBundle:User` based on 
+matching logic. On UI attendees of event are shown with label `Guests`.
 
 #### Fields
 
-Attendee entity has next fields: `email`, `displayName`, `user`, `calendarEvent`, `status`, `type`, `updatedAt`, `createdAt`.
+Attendee entity has next fields:
 
-* `email` - attendee email
-* `displayName` - attendee name
-* `user` - relation with `Oro\Bundle\UserBundle\Entity\User`
-* `calendarEvent` - attendee association with the calendar event. This filed is required. 
-* `status` - attendee current status (`none`, `accepted`, `declined`, `tentative`).
-* `type` - attendee current type (`organizer`, `optional`, `required`) (at this moment there is no logic around this)
+* `email` - String. Email of attendee. Cannot be blank in API request if `displayName` is empty.
+* `displayName` - String. Name of attendee used to display it on the view. Cannot be blank in API request if `email` is empty.
+* `user` - Relation with `OroUserBundle:User`. Not available in API create/update requests.
+* `calendarEvent` - Relation with `OroCalendarEvent:Event`. Required in persistence and not available in API. 
+* `status` - Enum. Default values are: `none`, `accepted`, `declined`, `tentative`. Besides API this value could be changed by user from view page of `OroCalendarEvent:Event`.
+* `type` - Enum. Default values are: `organizer`, `optional`, `required`. At the moment there is no business logic related to this field.
 
-`status` and `type` are enum fields. They could be changed via UI on Entity Management page.
+#### Matching Logic
 
-Create or update request should contain `email` and/or `displayName`. One of these fields are required.
-
+This logic uses email of `OroCalendarEvent:Attendee` to find `OroUserBundle:User` with the same email and same Organization.
 
 #### Notification logic
 
-* ORO CRM is responsible for sending notification only if user create/update/delete calendar event on CRM side.
-* for sending notification in CRM side after event deleting, should use additional parameter in url: `notifyInvitedUsers` (example: DELETE /api/rest/latest/calendarevents/458?notifyInvitedUsers=true)
-* via API should send parameter `notifyInvitedUsers` to false
+When event is updated in UI user is asked to confirm notification of attendees.
+ 
+In API POST or PUT request it's possible to pass property `notifyInvitedUsers`. For example:
 
+```
+PUT /api/rest/latest/calendarevents/1
+{
+    "title" : "Test Event",
+    "notifyInvitedUsers" : false
+}
+```
 
-#### AtendeeRelationManager
+In API DELETE request it's possible to pass parameter `notifyInvitedUsers`. For example:
 
-In case it is desired to have additional entity relations with attendees (similar to users), this manager is place to update.
+```
+DELETE /api/rest/latest/calendarevents/1?notifyInvitedUsers=true
+```
 
+#### AttendeeRelationManager
+
+Class `Oro\Bundle\CalendarBundle\Manager\AttendeeManager` is responsible to maintain relation of entity with other entities like `OroUserBundle:User`.
 
 ##API Example:
 
-Via API for Attendee you could use next fields: `email`, `status`,  `type`, `displayName`.
-Bellow examples in json and array format. 
-
+In API PUT/POST requests next fields are supported for Attendee: `email`, `status`,  `type`, `displayName`.
+In GET responses next fields are exposed additionally: `user_id`, `createdAt`, `updatedAt`.
+ 
 ##### GET query example
 
-For getting calendar events with attendees from server you should send GET request to `/api/rest/latest/calendarevents/{id}` 
+For getting calendar events with attendees from server you should send GET request to `/api/rest/latest/calendarevents/{id}`.
+
+In GET response attendees are exposed in property `attendees` which contain an array. Each element of array contains a JSON object 
+with supported fields. 
+
+For example:
+
+```
+GET /api/rest/latest/calendarevents/1
+{
+    "id": 1,
+    ...
+    "attendees": [
+        {
+            "displayName": "John Doe",
+            "email": "john.doe@example.com",
+            "user_id": 1,
+            "createdAt": "2016-06-29T01:16:40+00:00",
+            "updatedAt": "2016-06-29T01:16:40+00:00",
+            "status": "accepted",
+            "type": "organizer"
+        },
+        {
+            "displayName": "Jack Smith",
+            "email": "jack.smith@example.com",
+            "user_id": null,
+            "createdAt": "2016-06-29T01:16:40+00:00",
+            "updatedAt": "2016-06-29T01:16:40+00:00",
+            "status": "none",
+            "type": "required"
+        }
+    ],
+    "invitedUsers": [
+        1
+    ]
+}
+```
+
+Note in this example first attendee `John Doe` has property `user_id`. It means this instance of `OroCalendarEvent:Attendee` bound to `OroUserBundle:User` in the application.
+In the meantime second attendee `Jack Smith` is not bound to any user in the application.
+
+Note, property `invitedUsers` is deprecated and will be removed. 
 
 
 ##### POST query example 
 
-POST request you should send to `/api/rest/latest/calendarevents` in json format. Below written option as an array:
+POST request should be send to `/api/rest/latest/calendarevents` in JSON format. For example:
 
-    [
-        'calendar'    => 1, # In which calendar event should be saved 
-        'title'       => 'test title', # calendar event title
-        'description' => 'test description', # calendar event description
-        'allDay'      => false, # response on All-Day Event or not.
-        'start'       => '2016-05-04T11:29:46+00:00',
-        'end'         => '2016-05-04T11:29:46+00:00',
-        'reminders'   => [
-            ['method' => 'web_socket', 'interval' => ['number' => 15, 'unit' => 'M']], # add reminder in 5 min interval
-        ],
-        'isCancelled' => false, # does this calendar event is canceled
-        'recurrence'  => [ # create reccurring event, if 'recurrence' is null recurring event will be converted to simple calendar event
-            "recurrenceType": "weekly",
-            "interval": 1,
-            "dayOfWeek": [
-                "friday"
-            ],
-            "dayOfMonth": null,
-            "monthOfYear": null,
-            "startTime": "2015-06-19T06:00:00+00:00",
-            "endTime": "2015-06-27T06:00:00+00:00",
-            "occurrences": 5,
-            "instance": null,
-        ],
-        'attendees'   => [ # add event guests
-            ['email' => 'admin@example.com', 'status' => 'none', 'type' => 'organizer'],
-            ['email' => 'sales_man@user.com', 'displayName'=>'test name', 'status' => 'none'],
-            ['email' => 'user@user.com', 'type' => 'required', 'status' => 'none'],
-        ],
-    ];
+```
+POST /api/rest/latest/calendarevents
+{
+    "start": "2016-05-04T11:29:46+00:00",
+    "end": "2016-05-04T11:29:46+00:00",
+    "calendar": 1,
+    "title":" Test Event",
+    "attendees": [
+        {
+            "displayName": "John Doe",
+            "email":"admin@example.com",
+            "status": "none",
+            "type": "organizer"
+        },
+        {
+            "email": "sales_man@user.com",
+            "displayName": "test name", 
+            "status": "none"
+        },
+        {
+            "email": "user@user.com",
+            "displayName": "test name", 
+            "type": "required",
+            "status": "none"
+        }
+    ]
+}
+```
 
-Response on this will be json: `{"id":1}` where `1` is a calendar event id that was created.
+Response on this will be json: `{"id": 1}` where `1` is a calendar event id that was created.
 
-Server tries to find users for emails `admin@example.com`, `sales_man@user.com`, `user@user.com` and assign them
-to attendees with the email via `user` property + creates CalendarEvent entity for each found user so that the user
-can see the event in his/her calendar.
+Note, there is no `user_id` property for attendee in this request. Instead property `email` is used to matched existing user in same organization.
+So in this case server tries to find users for emails `admin@example.com`, `sales_man@user.com`, `user@user.com` and associate them
+with corresponding attendees using `user` property. 
 
+If user was matched additional instance of `OroCalendarEvent:Event` is created in calendar of matched user.
 
 ##### PUT query example
 
-PUT request you should send to `/api/rest/latest/calendarevents/{id}` in json format where `{id}` is calendar event id that you want to update. Below written option as an array:
+PUT request should be send to `/api/rest/latest/calendarevents/{id}` in JSON format where `{id}` is id of calendar event to update.
+For example:
 
-    [
-        'title'=>'test title',
-        'description'=>'test description',
-        'attendees' => [ # this will remove all previous attendees, if they exist. And in result you will have only this one attendee
-            ['displayName'=>'test name', 'status'=>'tentative'],
-        ]
-    ];
+```
+PUT /api/rest/latest/calendarevents/1
+{
+    "title": "Test Event",
+    "attendees": [
+        {
+            "displayName": "Jack Smith", 
+            "status": "tentative"
+        }
+    ]   
+}
+```
 
-If this query successfully send you will not receive any body but response status will have `204` 
+This request will remove all previous attendees, if they were existed before. As result event will have only one attendee `Jack Smith`.
+
+Response for this request has no content and response code is `204` for success. 
 
 
 ##### DELETE query example 
 
-If you want to remove Attendees from event you should send PUT request see  **PUT query example**
+To remove Attendees from event you should send PUT request see [PUT query example](#PUT query example). For example:
 
-    [
-        'attendees' => []
-    ];
+```
+PUT /api/rest/latest/calendarevents/1
+{
+    "attendees": []
+}
+```
+Otherwise it's possible to remove calendar event of attendee user. For example:
 
-Or you could delete calendar event. For deleting calendar event you should send DELETE to `/api/rest/latest/calendarevents/{id}`
+```
+DELETE to `/api/rest/latest/calendarevents/{id}`
+```
