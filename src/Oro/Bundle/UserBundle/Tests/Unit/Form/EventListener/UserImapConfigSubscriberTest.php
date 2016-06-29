@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 
@@ -84,6 +85,23 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         );
         $this->requestStack->push($request);
 
+        $token = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
+            ->disableOriginalConstructor()
+            ->setMethods(['getOrganizationContext'])
+            ->getMock();
+
+        $token->expects($this->never())->method('getUser');
+
+        $organization = new Organization();
+        $token->expects($this->any())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
         $this->manager->expects($this->once())->method('find')->with('OroUserBundle:User', $id)
             ->will($this->returnValue($user));
 
@@ -107,13 +125,20 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->expects($this->never())->method('find');
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
+        $token = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
             ->disableOriginalConstructor()
+            ->setMethods(['getUser', 'getOrganizationContext'])
             ->getMock();
 
         $token->expects($this->any())
             ->method('getUser')
             ->will($this->returnValue($user));
+
+        $organization = new Organization();
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
 
         $this->securityContext->expects($this->once())
             ->method('getToken')
@@ -124,6 +149,8 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($user));
 
         $this->subscriber->preSetData($this->eventMock);
+
+        $this->assertSame($organization, $user->getCurrentOrganization());
     }
 
     public function testPreSubmit()

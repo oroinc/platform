@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserImapConfigSubscriber implements EventSubscriberInterface
@@ -26,7 +27,6 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
 
     /** @var RequestStack */
     protected $requestStack;
-
 
     /**
      * @param ObjectManager $manager
@@ -56,6 +56,8 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Save user with new imap configuration
+     *
      * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
@@ -85,6 +87,8 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Pass currenlty configured user to the form
+     *
      * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
@@ -104,15 +108,19 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     {
         $request = $this->getRequest();
         $user = null;
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->security->getToken();
         if ($request) {
             $currentRoute = $request->attributes->get('_route');
             if ($currentRoute === 'oro_user_config') {
                 $id = $request->attributes->getInt('id');
                 $user = $this->manager->find('OroUserBundle:User', $id);
             } elseif ($currentRoute === 'oro_user_profile_configuration') {
-                $token = $this->security->getToken();
                 $user = $token ? $token->getUser() : null;
             }
+        }
+        if ($user && $user->getCurrentOrganization() === null) {
+            $user->setCurrentOrganization($token->getOrganizationContext());
         }
 
         return $user;

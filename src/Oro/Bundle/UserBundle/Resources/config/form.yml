@@ -97,6 +97,8 @@ services:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
+        calls:
+            - [setUserConfigManager, ["@oro_config.user"]]
         tags:
             - { name: form.type, alias: user }
 
@@ -214,7 +216,6 @@ services:
             - '@session.flash_bag'
             - '@translator'
             - '@logger'
-            - '@oro_security.security_facade'
         calls:
             - [setBusinessUnitManager, ["@oro_organization.business_unit_manager"]]
 

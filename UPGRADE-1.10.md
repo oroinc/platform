@@ -267,4 +267,5 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 - The constructor of the `Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool` class was changed. Before: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass)`. After: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass, EventDispatcherInterface $eventDispatcher)`.
 
 ####UserBundle:
-- The constructor of the `Oro\Bundle\UserBundle\Form\Type\UserType` class was changed. Before: `__construct(SecurityContextInterface $security, SecurityFacade $securityFacade, Request $request, ConfigManager $userConfigManager)`. After: `__construct(SecurityContextInterface $security, SecurityFacade $securityFacade, Request $request)`.
+- The constructor of the `Oro\Bundle\UserBundle\Form\Type\UserType` class was changed. Removed argument: `ConfigManager $userConfigManager`.
+- The constructor of the `Oro\Bundle\UserBundle\Form\Handler\UserHandler` class was changed. Removed argument: `SecurityFacade $securityFacade = null`.

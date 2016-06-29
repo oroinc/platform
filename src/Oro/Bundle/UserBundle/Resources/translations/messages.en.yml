@@ -181,14 +181,14 @@ oro:
                 label: Manage passwords
                 description: Reset or change passwords of other users
             update_profile:
-                label: Update Profile
-                description: Update own user profile
+                label: Update User Profile
+                description: Allows the user to update their own profile regardless of Edit permissions for User entity.
             update_configuration:
-                label: Update Configuration
-                description: Update own user configuration
+                label: Access personal configuration
+                description: Enables access to personal application configurations, such as language, locale, email settings, etc. regardless of Configure permissions for User entity.
         permission:
             update_configuration:
-                label: Update Configuration Settings
+                label: Configure
 
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email

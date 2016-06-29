@@ -12,7 +12,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -46,9 +45,6 @@ class UserHandler extends AbstractUserHandler
     /** @var ConfigManager */
     protected $userConfigManager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     /**
      * @param FormInterface $form
      * @param Request $request
@@ -59,7 +55,6 @@ class UserHandler extends AbstractUserHandler
      * @param FlashBagInterface $flashBag
      * @param TranslatorInterface $translator
      * @param LoggerInterface $logger
-     * @param SecurityFacade $securityFacade
      */
     public function __construct(
         FormInterface $form,
@@ -70,8 +65,7 @@ class UserHandler extends AbstractUserHandler
         \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,
         TranslatorInterface $translator = null,
-        LoggerInterface $logger = null,
-        SecurityFacade $securityFacade = null
+        LoggerInterface $logger = null
     ) {
         parent::__construct($form, $request, $manager);
         $this->userConfigManager = $userConfigManager;
@@ -80,7 +74,6 @@ class UserHandler extends AbstractUserHandler
         $this->flashBag = $flashBag;
         $this->translator = $translator;
         $this->logger = $logger;
-        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -88,9 +81,6 @@ class UserHandler extends AbstractUserHandler
      */
     public function process(User $user)
     {
-        if ($this->securityFacade !== null && $user->getCurrentOrganization() === null) {
-            $user->setCurrentOrganization($this->securityFacade->getOrganization());
-        }
         $this->form->setData($user);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
