@@ -404,27 +404,29 @@ class WorkflowManager
     }
 
     /**
+     * Ensures that workflow is currently active
      * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
      */
     public function activateWorkflow($workflowIdentifier)
     {
-        $definition = $workflowIdentifier instanceof WorkflowDefinition
-            ? $workflowIdentifier
-            : $this->getWorkflow($workflowIdentifier)->getDefinition();
+        $definition = $this->getDefinition($workflowIdentifier);
 
-        $this->config->setWorkflowActive($definition);
+        if (!$this->config->isActiveWorkflow($definition)) {
+            $this->config->setWorkflowActive($definition);
+        }
     }
 
     /**
+     * Ensures that workflow is currently inactive
      * @param string|WorkflowDefinition $workflowIdentifier
      */
     public function deactivateWorkflow($workflowIdentifier)
     {
-        $definition = $workflowIdentifier instanceof WorkflowDefinition
-            ? $workflowIdentifier
-            : $this->getWorkflow($workflowIdentifier)->getDefinition();
+        $definition = $this->getDefinition($workflowIdentifier);
 
-        $this->config->setWorkflowInactive($definition);
+        if ($this->config->isActiveWorkflow($definition)) {
+            $this->config->setWorkflowInactive($definition);
+        }
     }
 
     /**
@@ -433,11 +435,20 @@ class WorkflowManager
      */
     public function isActiveWorkflow($workflowIdentifier)
     {
-        $definition = $workflowIdentifier instanceof WorkflowDefinition
-            ? $workflowIdentifier
-            : $this->getWorkflow($workflowIdentifier)->getDefinition();
+        $definition = $this->getDefinition($workflowIdentifier);
 
         return $this->config->isActiveWorkflow($definition);
+    }
+
+    /**
+     * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
+     * @return WorkflowDefinition
+     */
+    protected function getDefinition($workflowIdentifier)
+    {
+        return $workflowIdentifier instanceof WorkflowDefinition
+            ? $workflowIdentifier
+            : $this->getWorkflow($workflowIdentifier)->getDefinition();
     }
 
     /**
