@@ -111,16 +111,17 @@ class AttendeeRelationManager
     protected function bindUsersToAttendees(array $users, array $unboundAttendeesByEmail)
     {
         foreach ($users as $user) {
-            if (isset($unboundAttendeesByEmail[$user->getEmail()])) {
-                $this->bindUser($user, $unboundAttendeesByEmail[$user->getEmail()]);
-                unset($unboundAttendeesByEmail[$user->getEmail()]);
+            $normalizedEmail = $this->normalizeEmail($user->getEmail());
+            if (isset($unboundAttendeesByEmail[$normalizedEmail])) {
+                $this->bindUser($user, $unboundAttendeesByEmail[$normalizedEmail]);
+                unset($unboundAttendeesByEmail[$normalizedEmail]);
             }
 
             foreach ($user->getEmails() as $emailEntity) {
-                $email = $emailEntity->getEmail();
-                if (isset($unboundAttendeesByEmail[$email])) {
-                    $this->bindUser($user, $unboundAttendeesByEmail[$email]);
-                    unset($unboundAttendeesByEmail[$email]);
+                $normalizedEmail = $this->normalizeEmail($emailEntity->getEmail());
+                if (isset($unboundAttendeesByEmail[$normalizedEmail])) {
+                    $this->bindUser($user, $unboundAttendeesByEmail[$normalizedEmail]);
+                    unset($unboundAttendeesByEmail[$normalizedEmail]);
                 }
             }
         }
@@ -151,9 +152,23 @@ class AttendeeRelationManager
                 continue;
             }
 
-            $unbound[$attendee->getEmail()] = $attendee;
+            $unbound[$this->normalizeEmail($attendee->getEmail())] = $attendee;
         }
 
         return $unbound;
+    }
+
+    /**
+     * @param string|null $email
+     *
+     * @return string|null
+     */
+    protected function normalizeEmail($email)
+    {
+        if (!$email) {
+            return $email;
+        }
+
+        return strtolower($email);
     }
 }
