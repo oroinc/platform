@@ -156,14 +156,16 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             return [];
         }
 
+        $lowerEmails = array_map('strtolower', $emails);
+
         $qb = $this->createQueryBuilder('u');
 
         return $qb
             ->select('u')
             ->leftJoin('u.emails', 'e')
             ->where($qb->expr()->orX(
-                $qb->expr()->in('LOWER(e.email)', $emails),
-                $qb->expr()->in('LOWER(u.email)', $emails)
+                $qb->expr()->in('LOWER(e.email)', $lowerEmails),
+                $qb->expr()->in('LOWER(u.email)', $lowerEmails)
             ))
             ->getQuery()
             ->getResult();
