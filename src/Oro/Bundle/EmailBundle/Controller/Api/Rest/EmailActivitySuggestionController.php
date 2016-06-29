@@ -38,6 +38,14 @@ class EmailActivitySuggestionController extends RestGetController
      *      nullable=true,
      *      description="Number of items per page. Defaults to 10."
      * )
+     * @QueryParam(
+     *      name="exclude-current-user",
+     *      requirements="true|false",
+     *      nullable=true,
+     *      strict=true,
+     *      default="false",
+     *      description="Indicates whether the current user should be excluded from the result."
+     * )
      *
      * @ApiDoc(
      *      description="Suggests entities associated with the email activity",
@@ -50,8 +58,9 @@ class EmailActivitySuggestionController extends RestGetController
     {
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $excludeCurrentUser = filter_var($this->getRequest()->get('exclude-current-user'), FILTER_VALIDATE_BOOLEAN);
 
-        $data = $this->getManager()->getSuggestionResult($id, $page, $limit);
+        $data = $this->getManager()->getSuggestionResult($id, $page, $limit, $excludeCurrentUser);
 
         return $this->buildResponse($data['result'], self::ACTION_LIST, $data);
     }

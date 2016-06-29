@@ -60,6 +60,10 @@ oro.locale:
 
     date_format:
         day: "MMM d"
+        month: "MMMM Y"
+        quarter: "QQQ Y"
+        year: "'Year' Y"
+
     address_format:
         region_name_type:
             parish: "parish"

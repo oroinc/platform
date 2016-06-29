@@ -273,9 +273,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
-        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorObject($error, $metadata);
+        $this->documentBuilder->setErrorObject($error);
         $this->assertEquals(
             [
                 [
@@ -295,9 +294,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
-        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorCollection([$error], $metadata);
+        $this->documentBuilder->setErrorCollection([$error]);
         $this->assertEquals(
             [
                 [

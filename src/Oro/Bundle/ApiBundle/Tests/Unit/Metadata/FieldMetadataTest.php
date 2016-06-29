@@ -21,12 +21,18 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($objValue, $fieldMetadataClone->get('test_object'));
     }
 
+    public function testConstructor()
+    {
+        $fieldMetadata = new FieldMetadata('fieldName');
+        $this->assertEquals('fieldName', $fieldMetadata->getName());
+    }
+
     public function testGetName()
     {
         $fieldMetadata = new FieldMetadata();
 
         $this->assertNull($fieldMetadata->getName());
-        $fieldMetadata->setName('fieldName');
+        $this->assertSame($fieldMetadata, $fieldMetadata->setName('fieldName'));
         $this->assertEquals('fieldName', $fieldMetadata->getName());
     }
 
@@ -35,7 +41,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $fieldMetadata = new FieldMetadata();
 
         $this->assertNull($fieldMetadata->getDataType());
-        $fieldMetadata->setDataType('fieldType');
+        $this->assertSame($fieldMetadata, $fieldMetadata->setDataType('fieldType'));
         $this->assertEquals('fieldType', $fieldMetadata->getDataType());
     }
 
@@ -44,7 +50,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $fieldMetadata = new FieldMetadata();
 
         $this->assertFalse($fieldMetadata->isNullable());
-        $fieldMetadata->setIsNullable(true);
+        $this->assertSame($fieldMetadata, $fieldMetadata->setIsNullable(true));
         $this->assertTrue($fieldMetadata->isNullable());
     }
 

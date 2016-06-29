@@ -47,6 +47,12 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($associationMetadataClone->getTargetMetadata());
     }
 
+    public function testConstructor()
+    {
+        $fieldMetadata = new AssociationMetadata('associationName');
+        $this->assertEquals('associationName', $fieldMetadata->getName());
+    }
+
     public function testGetName()
     {
         $associationMetadata = new AssociationMetadata();

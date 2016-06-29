@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Route;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
@@ -92,15 +93,16 @@ class RestDocHandler implements HandlerInterface
             }
             if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
                 if ($associationName) {
-                    $this->addIdRequirement($annotation, $actionContext->getParentMetadata());
+                    $this->addIdRequirement($annotation, $route, $actionContext->getParentMetadata());
                 } else {
-                    $this->addIdRequirement($annotation, $actionContext->getMetadata());
+                    $this->addIdRequirement($annotation, $route, $actionContext->getMetadata());
                 }
             }
             $filters = $actionContext->getFilters();
             if (!$filters->isEmpty()) {
                 $this->addFilters($annotation, $filters, $actionContext->getMetadata());
             }
+            $this->sortFilters($annotation);
         }
     }
 
@@ -236,14 +238,28 @@ class RestDocHandler implements HandlerInterface
 
     /**
      * @param ApiDoc         $annotation
+     * @param Route          $route
      * @param EntityMetadata $metadata
      */
-    protected function addIdRequirement(ApiDoc $annotation, EntityMetadata $metadata)
+    protected function addIdRequirement(ApiDoc $annotation, Route $route, EntityMetadata $metadata)
     {
         $idFields = $metadata->getIdentifierFieldNames();
-        $dataType = count($idFields) === 1
-            ? $metadata->getField(reset($idFields))->getDataType()
-            : DataType::STRING;
+        $dataType = DataType::STRING;
+        if (count($idFields) === 1) {
+            $field = $metadata->getField(reset($idFields));
+            if (!$field) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'The metadata for "%s" entity does not contains "%s" identity field. Resource: %s %s',
+                        $metadata->getClassName(),
+                        reset($idFields),
+                        implode(' ', $route->getMethods()),
+                        $route->getPath()
+                    )
+                );
+            }
+            $dataType = $field->getDataType();
+        }
 
         $annotation->addRequirement(
             self::ID_ATTRIBUTE,
@@ -341,6 +357,21 @@ class RestDocHandler implements HandlerInterface
 
                 $annotation->addFilter($key, $options);
             }
+        }
+    }
+
+    /**
+     * @param ApiDoc $annotation
+     */
+    protected function sortFilters(ApiDoc $annotation)
+    {
+        $filters = $annotation->getFilters();
+        if (!empty($filters)) {
+            ksort($filters);
+            // unfortunately there is no other way to update filters except to use the reflection
+            $filtersProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'filters');
+            $filtersProperty->setAccessible(true);
+            $filtersProperty->setValue($annotation, $filters);
         }
     }
 
