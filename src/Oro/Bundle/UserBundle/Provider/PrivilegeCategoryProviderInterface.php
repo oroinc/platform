@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
+use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
+
 interface PrivilegeCategoryProviderInterface
 {
     const DEFAULT_ACTION_CATEGORY = 'account_management';

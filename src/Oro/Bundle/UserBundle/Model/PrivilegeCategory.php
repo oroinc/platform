@@ -20,6 +20,11 @@ class PrivilegeCategory
     protected $tab;
 
     /**
+     * @var bool
+     */
+    protected $visible;
+
+    /**
      * @var int
      */
     protected $priority;
@@ -36,6 +41,7 @@ class PrivilegeCategory
         $this->label = $label;
         $this->tab = $tab;
         $this->priority = $priority;
+        $this->visible = true;
     }
 
     /**
@@ -81,7 +87,7 @@ class PrivilegeCategory
     /**
      * @return bool
      */
-    public function getTab()
+    public function isTab()
     {
         return $this->tab;
     }
@@ -94,6 +100,26 @@ class PrivilegeCategory
     public function setTab($tab)
     {
         $this->tab = $tab;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param bool $visible
+     *
+     * @return PrivilegeCategory
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
 
         return $this;
     }
