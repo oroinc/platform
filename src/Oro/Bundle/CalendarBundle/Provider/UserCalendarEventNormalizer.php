@@ -196,7 +196,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             $extraValues['attendees'][] = $this->transformEntity([
                 'displayName' => $attendee->getDisplayName(),
                 'email'       => $attendee->getEmail(),
-                'user_id'     => $this->getObjectValue($attendee, 'user.id'),
+                'userId'      => $this->getObjectValue($attendee, 'user.id'),
                 'createdAt'   => $attendee->getCreatedAt(),
                 'updatedAt'   => $attendee->getUpdatedAt(),
                 'status'      => $this->getObjectValue($attendee, 'status.id'),
