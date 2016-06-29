@@ -17,8 +17,12 @@ define(function(require) {
             dropdownAutoWidth: true,
             minimumInputLength: 0,
             minimumResultsForSearch: 7,
-            adaptContainerCssClass: function() {
-                return false;
+            adaptContainerCssClass: function(className) {
+                var containerCssClass = this.initializeOptions.containerCssClass;
+                if (!containerCssClass) {
+                    return false;
+                }
+                return className.indexOf(containerCssClass) === 0;
             }
         },
 
@@ -35,6 +39,16 @@ define(function(require) {
                 var data = this.$el.data(this.widgetFunctionName);
                 data.container.data('inputWidget', this);
                 data.dropdown.data('inputWidget', this);
+            }
+        },
+
+        resolveOptions: function(options) {
+            Select2InputWidget.__super__.resolveOptions.apply(this, arguments);
+            if (this.initializeOptions.adaptContainerCssClass) {
+                this.initializeOptions.adaptContainerCssClass = _.bind(
+                    this.initializeOptions.adaptContainerCssClass,
+                    this
+                );
             }
         },
 
