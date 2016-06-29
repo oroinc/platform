@@ -164,7 +164,9 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
                     'monthOfYear' => null,
                     'startTime' => '2016-05-04T11:29:46+00:00',
                     'endTime' => null,
+                    'calculatedEndTime' => Recurrence::MAX_END_DATE,
                     'occurrences' => null,
+                    'timeZone' => 'UTC'
                 ],
             ],
         ];
@@ -183,6 +185,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
                     'startTime' => '2016-05-04T11:29:46+00:00',
                     'endTime' => null,
                     'occurrences' => null,
+                    'timeZone' => 'UTC'
                 ],
                 'recurrencePattern' => null,
                 'removable' => false,
@@ -203,6 +206,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
                     'startTime' => '2016-05-04T11:29:46+00:00',
                     'endTime' => null,
                     'occurrences' => null,
+                    'timeZone' => 'UTC'
                 ],
                 'recurrencePattern' => null,
                 'removable' => false,

@@ -107,7 +107,7 @@ class MonthNthStrategy extends AbstractStrategy
      */
     protected function getNextOccurrence($interval, $daysOfWeek, $instance, \DateTime $date)
     {
-        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}", $this->getTimeZone());
+        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
         $instanceRelativeValue = $this->getInstanceRelativeValue($instance);
         $month = $occurrenceDate->format('M');
@@ -118,7 +118,7 @@ class MonthNthStrategy extends AbstractStrategy
             foreach ($daysOfWeek as $day) {
                 $nextDays[] = new \DateTime(
                     "{$instanceRelativeValue} {$day} of {$month} {$year} {$time}",
-                    $this->getTimeZone()
+                    $occurrenceDate->getTimezone()
                 );
             }
 
@@ -132,7 +132,7 @@ class MonthNthStrategy extends AbstractStrategy
             foreach ($daysOfWeek as $day) {
                 $days[] = new \DateTime(
                     "{$instanceRelativeValue} {$day} of {$month} {$year} {$time}",
-                    $this->getTimeZone()
+                    $occurrenceDate->getTimezone()
                 );
             }
             $currentInstance++;

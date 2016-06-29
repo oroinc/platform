@@ -5,7 +5,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial event.{ id, recurrence }
+                    - partial event.{ id, start, recurrence }
                     - event.id
                     - CONCAT(CASE WHEN calendar.name IS NOT NULL THEN calendar.name ELSE CONCAT_WS(' ', owner.firstName, owner.lastName) END, '') AS name
                     - event.title

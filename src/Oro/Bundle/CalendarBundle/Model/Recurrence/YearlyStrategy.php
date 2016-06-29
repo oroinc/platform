@@ -24,7 +24,7 @@ class YearlyStrategy extends MonthlyStrategy
     public function getTextValue(Entity\Recurrence $recurrence)
     {
         $interval = (int)($recurrence->getInterval() / 12);
-        $currentDate = new \DateTime('now', $this->getTimeZone());
+        $currentDate = new \DateTime('now', $recurrence->getStartTime()->getTimezone());
         $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $recurrence->getDayOfMonth());
         $date = $this->dateTimeFormatter->formatDay($currentDate);
 
@@ -79,7 +79,7 @@ class YearlyStrategy extends MonthlyStrategy
             return "Parameter 'monthOfYear' can't be empty for Yearly recurrence pattern.";
         }
 
-        $currentDate = new \DateTime('now', $this->getTimeZone());
+        $currentDate = new \DateTime('now', $recurrence->getStartTime()->getTimezone());
         $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), 1);
         $daysInMonth = (int)$currentDate->format('t');
 
