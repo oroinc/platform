@@ -160,7 +160,7 @@ Response for this request has no content and response code is `204` for success.
 
 ##### DELETE query example 
 
-To remove Attendees from event you should send PUT request see [PUT query example](#PUT query example). For example:
+To remove Attendees from event you should send PUT request see [PUT query example](#put-query-example). For example:
 
 ```
 PUT /api/rest/latest/calendarevents/1
