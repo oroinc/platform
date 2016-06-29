@@ -151,6 +151,7 @@ services:
     oro_api.get_relationship.initialize_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
         arguments:
+            - '@oro_api.doctrine_helper'
             - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro.api.processor, action: get_relationship, group: build_query, priority: 100 }
