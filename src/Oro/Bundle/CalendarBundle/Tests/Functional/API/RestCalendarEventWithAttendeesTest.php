@@ -252,7 +252,8 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             $request
         );
 
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertTrue($result['notifiable']);
 
         return $id;
     }
@@ -775,7 +776,8 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
             $request
         );
 
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertFalse($result['notifiable']);
 
         return $id;
     }
