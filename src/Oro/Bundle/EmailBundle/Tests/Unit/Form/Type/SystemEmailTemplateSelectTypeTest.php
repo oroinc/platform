@@ -9,8 +9,6 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
