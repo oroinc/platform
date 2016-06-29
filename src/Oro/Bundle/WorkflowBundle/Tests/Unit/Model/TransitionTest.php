@@ -45,6 +45,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             'dialog_template' => array('dialogTemplate', 'Workflow:Test:dialog_template.html.twig'),
             'schedule_cron' => array('scheduleCron', '1 * * * *'),
             'schedule_filter' => array('scheduleFilter', "e.field < DATE_ADD(NOW(), 1, 'day')"),
+            'schedule_check_conditions' => array('scheduleCheckConditions', true),
             'pre_condition' => array(
                 'preCondition',
                 $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface')

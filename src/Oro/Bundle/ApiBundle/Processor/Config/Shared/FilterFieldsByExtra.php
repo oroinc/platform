@@ -35,7 +35,7 @@ class FilterFieldsByExtra implements ProcessorInterface
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
-        $this->doctrineHelper  = $doctrineHelper;
+        $this->doctrineHelper = $doctrineHelper;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -52,17 +52,17 @@ class FilterFieldsByExtra implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
-        $this->filterFields(
-            $definition,
-            $entityClass,
-            $this->normalizeFieldFilters($context->get(FilterFieldsConfigExtra::NAME), $context->getRequestType())
+        $normalizedFieldFilters = $this->normalizeFieldFilters(
+            $context->get(FilterFieldsConfigExtra::NAME),
+            $context->getRequestType()
         );
+
+        $entityClass = $context->getClassName();
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            $this->filterEntityFields($definition, $entityClass, $normalizedFieldFilters);
+        } else {
+            $this->filterObjectFields($definition, $entityClass, $normalizedFieldFilters);
+        }
     }
 
     /**
@@ -97,7 +97,7 @@ class FilterFieldsByExtra implements ProcessorInterface
      * @param string                 $entityClass
      * @param array                  $fieldFilters
      */
-    protected function filterFields(
+    protected function filterEntityFields(
         EntityDefinitionConfig $definition,
         $entityClass,
         array $fieldFilters
@@ -107,7 +107,7 @@ class FilterFieldsByExtra implements ProcessorInterface
         $allowedFields = $this->getAllowedFields($metadata, $fieldFilters);
         if (null !== $allowedFields) {
             $idFieldNames = $metadata->getIdentifierFieldNames();
-            $fields       = $definition->getFields();
+            $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 if (!$field->isExcluded()
                     && !in_array($fieldName, $allowedFields, true)
@@ -124,12 +124,49 @@ class FilterFieldsByExtra implements ProcessorInterface
             if ($field->hasTargetEntity()) {
                 $propertyPath = $field->getPropertyPath() ?: $fieldName;
                 if ($metadata->hasAssociation($propertyPath)) {
-                    $this->filterFields(
+                    $this->filterEntityFields(
                         $field->getTargetEntity(),
                         $metadata->getAssociationTargetClass($propertyPath),
                         $fieldFilters
                     );
                 }
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param array                  $fieldFilters
+     */
+    protected function filterObjectFields(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        array $fieldFilters
+    ) {
+        if (empty($fieldFilters[$entityClass])) {
+            return;
+        }
+
+        $allowedFields = $fieldFilters[$entityClass];
+        if (null !== $allowedFields) {
+            $idFieldNames = $definition->getIdentifierFieldNames();
+            $fields = $definition->getFields();
+            foreach ($fields as $fieldName => $field) {
+                if (!$field->isExcluded()
+                    && !in_array($fieldName, $allowedFields, true)
+                    && !in_array($fieldName, $idFieldNames, true)
+                ) {
+                    $field->setExcluded();
+                }
+            }
+        }
+
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $targetClass = $field->getTargetClass();
+            if ($targetClass && $field->hasTargetEntity()) {
+                $this->filterObjectFields($field->getTargetEntity(), $targetClass, $fieldFilters);
             }
         }
     }
