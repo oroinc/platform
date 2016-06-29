@@ -28,33 +28,6 @@ class Form extends Element
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function selectFieldOption($locator, $value, $multiple = false)
-    {
-        $field = $this->findField($locator);
-
-        if (null !== $field) {
-            $field->selectOption($value, $multiple);
-            return;
-        }
-
-        $label = $this->findLabel($locator);
-
-        if (null === $label) {
-            throw new ElementNotFoundException($this->getDriver(), 'label', 'text', $locator);
-        }
-
-        $field = $this->findElementInParents($label, 'select');
-
-        if (null === $field) {
-            throw new ElementNotFoundException($this->getDriver(), 'select field', 'label', $locator);
-        }
-
-        $field->selectOption($value);
-    }
-
-    /**
      * @param string $locator
      */
     public function pressEntitySelectEntityButton($locator)
@@ -83,6 +56,8 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('CollectionField', $sndParent);
             } elseif ($sndParent->hasClass('control-group-oro_file')) {
                 return $this->elementFactory->wrapElement('FileField', $sndParent);
+            } elseif ($select = $sndParent->find('css', 'select')) {
+                return $select;
             } else {
                 throw new ExpectationException(
                     sprintf('Find label "%s", but can\'t detemine field type', $locator),
