@@ -1,7 +1,7 @@
 {% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% macro getStat(count, total) %}
-    ({{ count }} of {{ total }}, {{ (count / total * 100)|round }}%)
+    ({{ count }} of {{ total }}, about {{ (count / total * 100)|round }}%)
 {% endmacro %}
 
 {% block toolbar %}
