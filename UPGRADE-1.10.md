@@ -109,18 +109,6 @@ UPGRADE FROM 1.9 to 1.10
     **IMPORTANT**: Changing of process cron triggers configuration will not keep all old cron triggers in database. E.g. old triggers would be removed and new created.
 - Added class `Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler` (`oro_workflow.handler.workflow_definition` service) for single point of `WorkflowDefinition` entity management. 
     All manipulations with `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity persistence should be provided through the handler. 
-- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` construction signature was changed: now it takes `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` and `Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager` as arguments.
-- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager` with service `oro_workflow.manager.system_config` was added. Its general purpose is to eliminate points of workflow configuration management as single entry for those purpose.
-- Repository `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository` signature was changed for method `resetWorkflowData` :
-    * it requires instance of `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` as first argument
-    * argument `excludedWorkflows` was removed;
-- Changed signature of `@transit_workflow` action. Added `workflow_name` parameter as a third parameter in inline call. **Be aware** previously third parameter was `data` parameter. Now `data` is fourth one.
-- Service `oro_workflow.entity_connector` (`Oro\Bundle\WorkflowBundle\Model\EntityConnector.php`) removed;
-- Parameter `oro_workflow.entity_connector.class` removed;
-- Removed parameter `EntityConnector $entityConnector` from constructor of `Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener`;
-- Removed parameter `EntityConnector $entityConnector` from constructor of `Oro\Bundle\WorkflowBundle\Model\TriggerScheduleOptionsVerifier`;
-- Removed form type `Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType`;
-- Now entity can have more than one active workflows.
 
 ####CronBundle
 - Added action `@create_job` for instance of `JMS\JobQueueBundle\Entity\Job` creation and persistence through actions (Class `Oro\Bundle\CronBundle\Action\CreateJobAction`).

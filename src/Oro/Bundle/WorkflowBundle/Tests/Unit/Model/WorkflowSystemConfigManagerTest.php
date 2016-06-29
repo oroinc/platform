@@ -5,16 +5,18 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Component\EntitySerializer\EntityConfig;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
-
-use Oro\Component\EntitySerializer\EntityConfig;
 
 class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -101,6 +103,23 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->setWorkflowActive($definition);
     }
 
+    public function testExceptionSetWorkflowActiveAlready()
+    {
+        $definition = (new WorkflowDefinition())
+            ->setName('workflow_name')
+            ->setRelatedEntity('stdClass');
+        //->getEntityConfig
+        $entityConfig = $this->emulateGetEntityConfig('stdClass');
+        $entityConfig->expects($this->once())->method('get')->willReturn(['workflow_name2', 'workflow_name']);
+
+        $this->setExpectedException(
+            WorkflowActivationException::class,
+            'Can not activate workflow `workflow_name` again. Already activated.'
+        );
+
+        $this->manager->setWorkflowActive($definition);
+    }
+
     public function testSetWorkflowInactive()
     {
         $definition = (new WorkflowDefinition())
@@ -125,6 +144,23 @@ class WorkflowSystemConfigManagerTest extends \PHPUnit_Framework_TestCase
                     $this->attributeEqualTo('definition', $definition)
                 )
             );
+
+        $this->manager->setWorkflowInactive($definition);
+    }
+
+    public function testExceptionSetWorkflowInactiveAlready()
+    {
+        $definition = (new WorkflowDefinition())
+            ->setName('workflow_name')
+            ->setRelatedEntity('stdClass');
+        //->getEntityConfig
+        $entityConfig = $this->emulateGetEntityConfig('stdClass');
+        $entityConfig->expects($this->once())->method('get')->willReturn(['workflow_name2']);
+
+        $this->setExpectedException(
+            WorkflowActivationException::class,
+            'Can not deactivate workflow `workflow_name`. It is currently not active.'
+        );
 
         $this->manager->setWorkflowInactive($definition);
     }
