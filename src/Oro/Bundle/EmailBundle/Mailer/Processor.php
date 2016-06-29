@@ -78,6 +78,8 @@ class Processor
     protected $origins = [];
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     *
      * @param DoctrineHelper           $doctrineHelper
      * @param DirectMailer             $mailer
      * @param EmailAddressHelper       $emailAddressHelper
