@@ -214,13 +214,6 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('where')
             ->with('e.entityName IS NULL')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
-            ->method('andWhere')
-            ->with('e.isSystem = :isSystem')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())
-            ->method('setParameter')
-            ->with('isSystem', true);
 
         $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
