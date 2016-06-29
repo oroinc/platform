@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Model\Recurrence;
-
 /**
  * @dbIsolation
  *
@@ -74,7 +71,8 @@ class RestCalendarEventWithRegularEventTest extends AbstractCalendarEventTest
             self::$regularEventParameters
         );
 
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertFalse($result['notifiable']);
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->find($id);
         $this->assertEquals(self::$regularEventParameters['title'], $event->getTitle());

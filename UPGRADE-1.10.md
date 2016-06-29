@@ -13,10 +13,12 @@ UPGRADE FROM 1.9 to 1.10
 
 ####EntityConfigBundle
 - Entity config class metadata now allows any `route*` options, that can be used for CRUD routes configuration - as well as already existing `routeName`, `routeView` and `routeCreate` options.
+- Added `Oro\Bundle\EntityConfigBundle\Migration\RemoveManyToOneRelationQuery` as an automated way to remove ManyToOne relation
 
 ####DashboardBundle
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
 - Added new class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter`.
+- `oro_type_widget_user_multiselect` form type was renamed to `oro_type_widget_user_select` and moved to UserBundle.
 
 ####DataGridBundle
 - Events `Oro\Bundle\DataGridBundle\Event\OrmResultBefore` second constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
@@ -29,6 +31,7 @@ UPGRADE FROM 1.9 to 1.10
 
 ####ImportExportBundle
 - ACL resource (capability) `oro_importexport` was removed. Please, use `oro_importexport_import` or `oro_importexport_export` instead.
+- Added parameter `NewEntitiesHelper $newEntitiesHelper` to constructor of `Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy`
 
 ####SecurityBundle
 - **IMPORTANT**: The behaviour of the [Access Decision Manager](http://symfony.com/doc/current/components/security/authorization.html#access-decision-manager) was changed. Now the `allowIfAllAbstainDecisions` flag is set to `true` by default. It means that an access to a resource is denied as soon as there is one voter denying access. The goal of this change is to grant access when all voters abstain.
@@ -149,7 +152,7 @@ was responsible to pass redirect data in arguments, for example:
     );
 ```
 These routes were used to make redirect when user clicked on one of 2 buttons on UI rendered using 2 Twig macroses: saveAndCloseButton and saveAndStayButton.
-Now controller's action is not responsible to configure redirect data at all. 
+Now controller's action is not responsible to configure redirect data at all.
 ```
     return $this->get('oro_ui.router')->redirect($entity);
 ```
@@ -224,9 +227,14 @@ Now:
 - The constructor of the `Oro\Bundle\EmailBundle\Mailer\Processor` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailOwnerProvider $emailOwnerProvider, EmailActivityManager $emailActivityManager, ServiceLink $serviceLink, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`. After: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailActivityManager $emailActivityManager, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`.
 - `Oro\Bundle\EmailBundle\Mailer\Processor::getEmailOrigin` marked as deprecated. Use method `Oro\Bundle\EmailBundle\Tools\EmailOriginHelper::getEmailOrigin` instead.
 - Additional you should use origin as second parameter for `Oro\Bundle\EmailBundle\Mailer\Processor::process` if you want use specific transport different from system.
+- Visibility of method `recipientsFromResult` in `Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper` was changed from `protected` to `public`. This can bring a `backward compatibility break` if you have own implementation of this class.
 
 ####PlatformBundle
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
+
+####AttachmentBundle:
+- Fixed `Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser` to avoid PHP notices on file upload in some cases
+- Added translation strategies to dynamically handle translation fallbacks
 
 ####CalendarBundle
 - The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
@@ -239,19 +247,26 @@ Now:
 - All email templates of events notifications were updated: `Migrations/Data/ORM/data/emails/invitation`. 
 - Field `invitedUsers` in `Oro\Bundle\CalendarBundle\Form\Type\CalendarEvent[Api]Type` was deprecated. Use new field `attendees`. 
 - Field `invitationStatus` in `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` was removed. Use new field `relatedAttendee.status`.
+- Field `doctrineHelper` in `Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer` was removed. This can bring a `backward compatibility break` if you have own implementation of this class.
 - Signature of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType::__construct` method was changed. Before: `__construct()`. After: `__construct(ManagerRegistry $registry, SecurityFacade $securityFacade)`. This can bring a `backward compatibility break` if you have own implementation of this class.
 - Methods of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType` were removed: `subscribeOnChildEvents`, `preSubmit`, `postSubmitChildEvents`, `postSubmit`, `setDefaultEventStatus`, `preSetData`. Separate subscriber classes were added to handle logic of event listeners. See classes in namespace `Oro\Bundle\CalendarBundle\Form\EventListeners`. This can bring a `backward compatibility break` if you have own implementation of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType` class. 
 - Method `setInvitationStatus` in `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` was removed. Use new method `getRelatedAttendee.setStatus`.
 - Signature of `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType::__construct` method was changed. Before: `__construct(CalendarEventManager $calendarEventManager)`. After: `__construct(CalendarEventManager $calendarEventManager, ManagerRegistry $registry, SecurityFacade $securityFacade, RequestStack $requestStack, AttendeeRelationManager $attendeeRelationManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
 - Signature of `Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler::__construct` method was changed. Before: `__construct(FormInterface $form, Request $request, ObjectManager $manager, EmailSendProcessor $emailSendProcessor, ActivityManager $activityManager)`. After: `__construct(FormInterface $form, Request $request, ObjectManager $manager, EmailSendProcessor $emailSendProcessor, ActivityManager $activityManager, AttendeeRelationManager $attendeeRelationManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler::onSuccess` method was changed. Before: `onSuccess(CalendarEvent $entity, ArrayCollection $originalChildren)`. After: `onSuccess(CalendarEvent $entity, ArrayCollection $originalAttendees)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler::onSuccess` method was changed. Before: `onSuccess(CalendarEvent $entity, ArrayCollection $originalChildren, $notify)`. After: `onSuccess(CalendarEvent $entity, ArrayCollection $originalAttendees, $notify)`. This can bring a `backward compatibility break` if you have own implementation of this class.
 - `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType::postSubmitData` method was moved to `Oro\Bundle\CalendarBundle\Form\EventListener\CalendarEventApiTypeSubscriber::postSubmitData`. This can bring a `backward compatibility break` if you have own implementation of this class.
 - `Oro\Bundle\CalendarBundle\Form\Type\CalendarEventInviteesType` was removed. This can bring a `backward compatibility break` if you have own implementation of this class.
+- `Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer` was removed. This can bring a `backward compatibility break` if you have own implementation of this class.
 - `Oro\Bundle\CalendarBundle\Model\Email\EmailNotification` and `Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor` were updated to support entity `Oro\Bundle\CalendarBundle\Entity\Attendee` additionally to `Oro\Bundle\CalendarBundle\Entity\CalendarEvent`.  
 - Signature of `Oro\Bundle\CalendarBundle\Provider\AbstractCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager)`. After: `__construct(ReminderManager $reminderManager, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
 - Signature of `Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
 - Signature of `Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
-- Signature of `Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer::__construct` method was changed. Before: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, DoctrineHelper $doctrineHelper)`. After: `__construct(ReminderManager $reminderManager, SecurityFacade $securityFacade, AttendeeManager $attendeeManager)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\EventListener\EntityListener::__construct` method was changed. Before: `__construct(ServiceLink $securityContextLink)`. After: `__construct(ServiceLink $securityContextLink, Recurrence $recurrenceModel)`. This can bring a `backward compatibility break` if you have own implementation of this class.
+- Signature of `Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider::__construct` method was changed. Before: `__construct(DoctrineHelper $doctrineHelper, EntityNameResolver $entityNameResolver, AbstractCalendarEventNormalizer $calendarEventNormalizer)`. After: `__construct(DoctrineHelper $doctrineHelper, EntityNameResolver $entityNameResolver, AbstractCalendarEventNormalizer $calendarEventNormalizer, Recurrence $recurrenceModel)`. This can bring a `backward compatibility break` if you have own implementation of this class.
 - Route name for `Oro\Bundle\CalendarBundle\ControllerAjaxCalendarEventController::changeStatus` has been changed, according to status changes, form `oro_calendar_event_tentatively_accepted` to `oro_calendar_event_tentative`
+- Url for `Oro\Bundle\CalendarBundle\ControllerAjaxCalendarEventController::changeStatus` has been changed from "/accept/{id}" to "/accepted/{id}" and from "/tentatively/{id}" to "/tentative/{id}"
 
 ####LayoutBundle:
 - Added possibility to create layout block types using only DI configuration, for details please check out documentation at
@@ -259,6 +274,10 @@ Now:
 - BlockType classes replaced with DI configuration for listed block types: `root`, `head`, `body`, `fieldset`, `list`, `listitem`, `text`, `button` and `button_group`.
 Corresponding block type classes was removed.
 - Renamed `setDefaultOptions` to `configureOptions` method at `Oro\Component\Layout\BlockTypeInterface\BlockTypeInterface` and `Oro\Component\Layout\BlockTypeInterface\BlockTypeExtensionInterface`.
+- Defined image types configuration section for theme config
+- Added `oro_layout.provider.image_type` service to get image types available across all themes
+- The class Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType was renamed to FormFieldsType
+- New `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` block type was added. This block type creates three child blocks in buildBlock method: `FormStartType`, `FormType`, `FormEndType`.
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.

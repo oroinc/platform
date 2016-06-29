@@ -297,7 +297,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      * In that case there will be 3 entities: 1 for recurring event and 2 for exceptions.
      *
      * Only original recurring event might have this collection not empty.
-     * Only exception event uses these properties: $recurringEvent, $originalStart and $isCancelled.
+     * Only exception event uses these properties: $recurringEvent, $originalStart and $cancelled.
      * At the same time exception cannot use these properties: $recurrence, $recurringEventExceptions.
      *
      * @var ArrayCollection
@@ -339,7 +339,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @ORM\Column(name="is_cancelled", type="boolean", options={"default"=false})
      */
-    protected $isCancelled = false;
+    protected $cancelled = false;
 
     /**
      * CalendarEvent constructor.
@@ -881,27 +881,27 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
-     * Sets isCancelled flag.
+     * Sets cancelled flag.
      *
-     * @param bool $isCancelled
+     * @param bool $cancelled
      *
      * @return CalendarEvent
      */
-    public function setIsCancelled($isCancelled = false)
+    public function setCancelled($cancelled = false)
     {
-        $this->isCancelled = $isCancelled;
+        $this->cancelled = $cancelled;
 
         return $this;
     }
 
     /**
-     * Gets isCancelled flag.
+     * Gets cancelled flag.
      *
      * @return bool
      */
-    public function getIsCancelled()
+    public function isCancelled()
     {
-        return $this->isCancelled;
+        return $this->cancelled;
     }
     
     /**

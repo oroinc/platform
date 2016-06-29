@@ -30,6 +30,24 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new DateFormatExtension($this->formatter);
     }
 
+    public function testGetFunctions()
+    {
+        $this->assertEquals(
+            [
+                'calendar_date_range' => new \Twig_Function_Method(
+                    $this->extension,
+                    'formatCalendarDateRange'
+                )
+            ],
+            $this->extension->getFunctions()
+        );
+    }
+
+    public function testGetName()
+    {
+        $this->assertEquals('oro_calendar', $this->extension->getName());
+    }
+
     /**
      * @dataProvider formatCalendarDateRangeProvider
      */

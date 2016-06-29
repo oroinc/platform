@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Manager;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository;
 use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
@@ -80,7 +82,18 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
         $this->attendeeManager->loadAttendeesByCalendarEventId(1);
     }
 
-    public function testCreateAttendeeExclusions()
+    /**
+     * @dataProvider createAttendeeExclusionsProvider
+     */
+    public function testCreateAttendeeExclusions($attendees, $expectedResult)
+    {
+        $this->assertEquals(
+            $expectedResult,
+            $this->attendeeManager->createAttendeeExclusions($attendees)
+        );
+    }
+
+    public function createAttendeeExclusionsProvider()
     {
         $attendees = [
             (new Attendee(1))
@@ -97,8 +110,20 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
             'entityId' => 1
         ]);
 
-        $result = $this->attendeeManager->createAttendeeExclusions($attendees);
-        $this->assertEquals([$key => $val], $result);
+        return [
+            'no attendees' => [
+                [],
+                [],
+            ],
+            'array of attendees' => [
+                $attendees,
+                [$key => $val],
+            ],
+            'collection of attendees' => [
+                new ArrayCollection($attendees),
+                [$key => $val],
+            ],
+        ];
     }
 
     /**
@@ -132,13 +157,16 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($qb));
 
         $this->attendeeRelationManager->expects($this->once())
-            ->method('addRelatedUserInfo')
+            ->method('addRelatedEntityInfo')
             ->with($qb);
 
         $result = $this->attendeeManager->getAttendeeListsByCalendarEventIds($calendarEventIds);
         $this->assertEquals($expectedResult, $result);
     }
 
+    /**
+     * @return array
+     */
     public function getAttendeeListsByCalendarEventIdsDataProvider()
     {
         return [

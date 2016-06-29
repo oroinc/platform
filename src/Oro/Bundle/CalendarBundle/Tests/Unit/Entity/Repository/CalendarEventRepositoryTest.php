@@ -65,10 +65,10 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
-            . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' COALESCE(status.id, \'none\') AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
-            . ' e.originalStart, e.isCancelled,'
+            . ' e.originalStart, e.cancelled AS isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -108,10 +108,10 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
-            . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' COALESCE(status.id, \'none\') AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
-            . ' e.originalStart, e.isCancelled,'
+            . ' e.originalStart, e.cancelled AS isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -155,10 +155,10 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
-            . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' COALESCE(status.id, \'none\') AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
-            . ' e.originalStart, e.isCancelled,'
+            . ' e.originalStart, e.cancelled AS isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -203,10 +203,10 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt, e.status,'
-            . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' COALESCE(status.id, \'none\') AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
-            . ' e.originalStart, e.isCancelled,'
+            . ' e.originalStart, e.cancelled AS isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"

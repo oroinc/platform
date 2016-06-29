@@ -100,7 +100,7 @@ class AttendeeManager
         /** @var AttendeeRepository $attendeeRepository */
         $attendeeRepository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Attendee');
         $qb = $attendeeRepository->createAttendeeListsQb(array_keys($parentToChildren));
-        $this->attendeeRelationManager->addRelatedUserInfo($qb);
+        $this->attendeeRelationManager->addRelatedEntityInfo($qb);
 
         $queryResult = $qb
             ->getQuery()
