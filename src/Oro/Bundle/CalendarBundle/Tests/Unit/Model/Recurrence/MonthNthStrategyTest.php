@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\MonthNthStrategy;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class MonthNthStrategyTest extends AbstractTestStrategy
 {
@@ -42,7 +43,16 @@ class MonthNthStrategyTest extends AbstractTestStrategy
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new MonthNthStrategy($translator, $dateTimeFormatter);
+        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()
+            ->setMethods(['getTimezone'])
+            ->getMock();
+        $localeSettings->expects($this->any())
+            ->method('getTimezone')
+            ->will($this->returnValue('UTC'));
+
+        $this->strategy = new MonthNthStrategy($translator, $dateTimeFormatter, $localeSettings);
     }
 
     public function testGetName()
@@ -74,6 +84,7 @@ class MonthNthStrategyTest extends AbstractTestStrategy
             ->setInstance($recurrenceData['instance'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setTimeZone('UTC')
             ->setEndTime($recurrenceData['endTime'] === null
                 ? null
                 : new \DateTime($recurrenceData['endTime'], $this->getTimeZone()))
@@ -96,6 +107,7 @@ class MonthNthStrategyTest extends AbstractTestStrategy
             ->setInstance($recurrenceData['instance'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setTimeZone('UTC')
             ->setOccurrences($recurrenceData['occurrences']);
 
         if (!empty($recurrenceData['endTime'])) {

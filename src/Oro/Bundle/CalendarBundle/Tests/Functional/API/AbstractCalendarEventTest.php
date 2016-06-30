@@ -68,6 +68,7 @@ abstract class AbstractCalendarEventTest extends WebTestCase
                 'startTime' => gmdate(DATE_RFC3339),
                 'endTime' => null,
                 'occurrences' => null,
+                'timeZone' => 'UTC'
             ],
         ];
         self::$recurringEventExceptionParameters = [

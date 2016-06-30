@@ -99,6 +99,10 @@ Each calendar event has `recurrence` field. This is a dictionary containing fiel
     <td>occurrences</td>
     <td colspan="6">Range of recurrence - End after X occurrences (optional)</td>
 </tr>
+<tr>
+    <td>timeZone</td>
+    <td colspan="6">The time zone in which the time is specified (mandatory)</td>
+</tr>
 </table>
 
 In common case for recurring event only one entity of OroCalendarBundle:CalendarEvent is created with reference to 

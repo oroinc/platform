@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
@@ -19,16 +20,24 @@ abstract class AbstractStrategy implements StrategyInterface
     /** @var \DateTimeZone */
     protected $timeZone;
 
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
     /**
+     * AbstractStrategy constructor.
+     *
      * @param TranslatorInterface $translator
      * @param DateTimeFormatter $formatter
+     * @param LocaleSettings $localeSettings
      */
     public function __construct(
         TranslatorInterface $translator,
-        DateTimeFormatter $formatter
+        DateTimeFormatter $formatter,
+        LocaleSettings $localeSettings
     ) {
         $this->translator = $translator;
         $this->dateTimeFormatter = $formatter;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -97,6 +106,7 @@ abstract class AbstractStrategy implements StrategyInterface
     ) {
         $translationParameters['%occurrences%'] = $this->getOccurrencesPattern($recurrence);
         $translationParameters['%end_date%'] = $this->getEndDatePattern($recurrence);
+        $translationParameters['%timezone_info%'] = $this->getTimezoneInfo($recurrence);
 
         $result = $this->translator->transChoice(
             $translationId,
@@ -118,7 +128,10 @@ abstract class AbstractStrategy implements StrategyInterface
         if (!empty($currentEndTime)) {
             $result = $currentEndTime;
         } elseif (!empty($occurrences)) {
+            $recurrenceTimezone = new \DateTimeZone($recurrence->getTimeZone());
+            $recurrence->getStartTime()->setTimezone($recurrenceTimezone);
             $result = $this->getLastOccurrence($recurrence);
+            $result->setTimezone(new \DateTimeZone('UTC'));
         } else {
             $result = new \DateTime(Recurrence::MAX_END_DATE, $this->getTimeZone());
         }
@@ -194,5 +207,35 @@ abstract class AbstractStrategy implements StrategyInterface
         }
 
         return $this->timeZone;
+    }
+
+    /**
+     * Returns time zone info, if the date in time zone that was used for recurring event creation differs
+     * from date in time zone that currently is used by Oro system.
+     *
+     * @param Entity\Recurrence $recurrence
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getTimezoneInfo(Entity\Recurrence $recurrence)
+    {
+        $result = '';
+
+        if ($recurrence->getCalendarEvent() && $recurrence->getCalendarEvent()->getStart() !== null) {
+            $originalStart = clone $recurrence->getCalendarEvent()->getStart();
+            $originalStart->setTimezone(new \DateTimeZone($recurrence->getTimeZone()));
+            $currentStart = clone $recurrence->getCalendarEvent()->getStart();
+            $currentStart->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
+            if ($originalStart->format('Y-m-d') != $currentStart->format('Y-m-d')) {
+                $result = $this->translator->trans(
+                    'oro.calendar.recurrence.patterns.timezone',
+                    ['%timezone%' => $recurrence->getTimeZone(), '%timezone_offset%' => $originalStart->format('P')]
+                );
+            }
+        }
+
+        return $result;
     }
 }

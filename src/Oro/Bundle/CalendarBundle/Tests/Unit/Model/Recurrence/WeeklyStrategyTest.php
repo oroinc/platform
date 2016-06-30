@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\WeeklyStrategy;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class WeeklyStrategyTest extends AbstractTestStrategy
 {
@@ -42,7 +43,16 @@ class WeeklyStrategyTest extends AbstractTestStrategy
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new WeeklyStrategy($translator, $dateTimeFormatter);
+        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()
+            ->setMethods(['getTimezone'])
+            ->getMock();
+        $localeSettings->expects($this->any())
+            ->method('getTimezone')
+            ->will($this->returnValue('UTC'));
+
+        $this->strategy = new WeeklyStrategy($translator, $dateTimeFormatter, $localeSettings);
     }
 
     public function testGetName()
@@ -94,6 +104,7 @@ class WeeklyStrategyTest extends AbstractTestStrategy
             ->setInterval($recurrenceData['interval'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setTimeZone('UTC')
             ->setOccurrences($recurrenceData['occurrences']);
 
         if (!empty($recurrenceData['endTime'])) {
