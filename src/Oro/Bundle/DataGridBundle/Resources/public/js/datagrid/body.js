@@ -123,10 +123,12 @@ define([
          * @inheritDoc
          */
         render: function() {
+            this._deferredRender();
             Body.__super__.render.apply(this, arguments);
             if (this.rowClassName) {
                 this.$('> *').addClass(this.rowClassName);
             }
+            this._resolveDeferredRender();
             return this;
         },
 
