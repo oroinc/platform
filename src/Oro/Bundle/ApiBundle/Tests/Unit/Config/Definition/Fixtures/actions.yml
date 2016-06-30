@@ -306,6 +306,18 @@ invalid_entity_form_options:
     expected: []
     error: 'Invalid type for path "entity.actions.create.form_options". Expected array, but got string'
 
+field_dash_in_field_name:
+    config:
+        actions:
+            create:
+                fields:
+                    test-field: ~
+    expected:
+        actions:
+            create:
+                fields:
+                    test-field: []
+
 field_form:
     config:
         actions:

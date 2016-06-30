@@ -46,7 +46,7 @@ class InitializeConfigExtrasTest extends DeleteListProcessorTestCase
         $this->assertEquals(
             [
                 new TestConfigExtra('test'),
-                new EntityDefinitionConfigExtra($this->context->getAction()),
+                new EntityDefinitionConfigExtra($this->context->getAction(), true),
                 new FiltersConfigExtra()
             ],
             $this->context->getConfigExtras()
