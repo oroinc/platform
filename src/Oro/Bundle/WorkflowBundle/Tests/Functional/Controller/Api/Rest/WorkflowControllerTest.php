@@ -334,7 +334,7 @@ class WorkflowControllerTest extends WebTestCase
         $workflow = $this->getWorkflowManager()->getWorkflow($workflowName);
         $workflowItem = $workflow->createWorkflowItem($entity);
 
-        $manager = $this->getObjectManager('OroWorkflowBundle:ProcessDefinition');
+        $manager = $this->getObjectManager('OroWorkflowBundle:WorkflowItem');
         $manager->persist($workflowItem);
         $manager->flush();
     }
