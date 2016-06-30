@@ -80,7 +80,7 @@ Entity Limitations
 ==================
 To be able to attach an entity to specific workflow (e.g. make entity workflow related) a few criteria should be met. 
 - Entity can not have composite fields as its primary keys.
-- Entity primary key can be integer or string (for doctrine types it is: BIGINT, DECIMAL, INTEGER, SMALLINT, STRING, TEXT). In other words - all types that can be casted by SQL CAST to text representation.
+- Entity primary key can be integer or string (for doctrine types it is: BIGINT, DECIMAL, INTEGER, SMALLINT, STRING). In other words - all types that can be casted by SQL CAST to text representation.
 - Entity should be configurable see [Annotation](./#annotation) section.
 
 Activation State
