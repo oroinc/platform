@@ -49,6 +49,16 @@ invalid_exclusion_policy:
     expected: []
     error: 'The value "invalid" is not allowed for path "entity.sorters.exclusion_policy". Permissible values: "all", "none"'
 
+dash_in_field_name:
+    config:
+        sorters:
+            fields:
+                test-field: ~
+    expected:
+        sorters:
+            fields:
+                test-field: []
+
 full:
     config:
         sorters:

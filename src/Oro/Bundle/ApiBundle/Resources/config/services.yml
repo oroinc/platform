@@ -175,6 +175,12 @@ services:
         tags:
             - { name: oro_api.config_extension }
 
+    oro_api.config_extension.subresources:
+        class: Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension
+        public: false
+        tags:
+            - { name: oro_api.config_extension }
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false

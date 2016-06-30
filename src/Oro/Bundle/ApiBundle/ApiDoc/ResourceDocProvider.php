@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig as EntityConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig as FieldConfig;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -13,49 +14,49 @@ class ResourceDocProvider implements ResourceDocProviderInterface
     const ID_DESCRIPTION = 'The identifier of an entity';
 
     protected $templates = [
-        'get'                 => [
+        ApiActions::GET                 => [
             'description'          => 'Get {name}',
             'fallback_description' => 'Get {class}'
         ],
-        'get_list'            => [
+        ApiActions::GET_LIST            => [
             'description'          => 'Get {name}',
             'fallback_description' => 'Get a list of {class}',
             'is_collection'        => true
         ],
-        'delete'              => [
+        ApiActions::DELETE              => [
             'description'          => 'Delete {name}',
             'fallback_description' => 'Delete {class}'
         ],
-        'delete_list'         => [
+        ApiActions::DELETE_LIST         => [
             'description'          => 'Delete {name}',
             'fallback_description' => 'Delete a list of {class}',
             'is_collection'        => true
         ],
-        'create'              => [
+        ApiActions::CREATE              => [
             'description'          => 'Create {name}',
             'fallback_description' => 'Create {class}'
         ],
-        'update'              => [
+        ApiActions::UPDATE              => [
             'description'          => 'Update {name}',
             'fallback_description' => 'Update {class}'
         ],
-        'get_subresource'     => [
+        ApiActions::GET_SUBRESOURCE     => [
             'description'   => 'Get {association}',
             'documentation' => 'Get related entities'
         ],
-        'get_relationship'    => [
+        ApiActions::GET_RELATIONSHIP    => [
             'description'   => 'Get "{association}" relationship',
             'documentation' => 'Get the relationship data'
         ],
-        'delete_relationship' => [
+        ApiActions::DELETE_RELATIONSHIP => [
             'description'   => 'Delete members from "{association}" relationship',
             'documentation' => 'Delete the specified members from the relationship'
         ],
-        'add_relationship'    => [
+        ApiActions::ADD_RELATIONSHIP    => [
             'description'   => 'Add members to "{association}" relationship',
             'documentation' => 'Delete the specified members to the relationship'
         ],
-        'update_relationship' => [
+        ApiActions::UPDATE_RELATIONSHIP => [
             'description'   => [
                 'single_item' => 'Update "{association}" relationship',
                 'collection'  => 'Replace "{association}" relationship',

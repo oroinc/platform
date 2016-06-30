@@ -9,8 +9,8 @@ class ActionConfig
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;
-    use Traits\AclResourceTrait;
     use Traits\DescriptionTrait;
+    use Traits\AclResourceTrait;
     use Traits\MaxResultsTrait;
     use Traits\StatusCodesTrait;
     use Traits\FormTrait;
@@ -18,23 +18,23 @@ class ActionConfig
     /** a flag indicates whether the action should not be available for the entity */
     const EXCLUDE = ConfigUtil::EXCLUDE;
 
-    /** the name of ACL resource */
-    const ACL_RESOURCE = EntityDefinitionConfig::ACL_RESOURCE;
-
     /** the entity description for the action  */
     const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
+
+    /** the name of ACL resource that should be used to protect the entity */
+    const ACL_RESOURCE = EntityDefinitionConfig::ACL_RESOURCE;
 
     /** the maximum number of items in the result */
     const MAX_RESULTS = EntityDefinitionConfig::MAX_RESULTS;
 
-    /** the maximum number of items in the result */
+    /** additional response status codes for the entity */
     const STATUS_CODES = EntityDefinitionConfig::STATUS_CODES;
 
     /** the form type that should be used for the entity */
-    const FORM_TYPE = 'form_type';
+    const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;
 
     /** the form options that should be used for the entity */
-    const FORM_OPTIONS = 'form_options';
+    const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
 
     /** a list of fields */
     const FIELDS = EntityDefinitionConfig::FIELDS;
@@ -52,20 +52,10 @@ class ActionConfig
      */
     public function toArray()
     {
-        $result = $this->items;
-
-        $keys = array_keys($result);
-        foreach ($keys as $key) {
-            $value = $result[$key];
-            if (is_object($value) && method_exists($value, 'toArray')) {
-                $result[$key] = $value->toArray();
-            }
-        }
-        if (!empty($this->fields)) {
-            foreach ($this->fields as $fieldName => $field) {
-                $fieldConfig                      = $field->toArray();
-                $result[self::FIELDS][$fieldName] = !empty($fieldConfig) ? $fieldConfig : null;
-            }
+        $result = $this->convertItemsToArray();
+        $fields = ConfigUtil::convertObjectsToArray($this->fields, true);
+        if (!empty($fields)) {
+            $result[self::FIELDS] = $fields;
         }
 
         return $result;
@@ -84,22 +74,12 @@ class ActionConfig
     }
 
     /**
-     * Make a deep copy of object.
+     * Makes a deep copy of the object.
      */
     public function __clone()
     {
-        $this->items = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->items
-        );
-        $this->fields = array_map(
-            function ($field) {
-                return clone $field;
-            },
-            $this->fields
-        );
+        $this->cloneItems();
+        $this->fields = ConfigUtil::cloneObjects($this->fields);
     }
 
     /**
