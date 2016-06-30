@@ -50,14 +50,18 @@ class BusinessUnitType extends AbstractType
             )
             ->add(
                 'parentBusinessUnit',
-                'oro_business_unit_select_autocomplete',
+                'oro_type_business_unit_select_autocomplete',
                 [
                     'required' => false,
                     'label' => 'oro.organization.businessunit.parent.label',
                     'autocomplete_alias' => 'business_units_owner_search_handler',
                     'empty_value' => 'oro.business_unit.form.none_business_user',
                     'configs' => [
-                        'multiple' => false
+                        'multiple' => false,
+                        'component'   => 'tree-autocomplete',
+                        'width'       => '400px',
+                        'placeholder' => 'oro.dashboard.form.choose_business_unit',
+                        'allowClear'  => true
                     ]
                 ]
             )
