@@ -141,7 +141,9 @@ define([
         },
 
         getInvitationStatus: function() {
-            return this.get('invitationStatus');
+            var invitationStatus = this.get('invitationStatus');
+
+            return invitationStatus === '' ? null : invitationStatus;
         }
     });
 
