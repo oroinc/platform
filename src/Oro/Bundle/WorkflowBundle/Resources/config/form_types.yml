@@ -77,6 +77,13 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_workflow_replacement, acl_resource: oro_workflow_definition_view }
 
+    oro_workflow.form.type.applicable_entities:
+        class: Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType
+        arguments:
+            - '@oro_workflow.entity_connector'
+        tags:
+            - { name: form.type, alias: oro_workflow_applicable_entities}
+
     oro_workflow.form.type.workflow_definition:
         class: %oro_workflow.form.type.workflow_definition.class%
         tags:
@@ -84,8 +91,7 @@ services:
 
     oro_workflow.form.workflow_definition:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', 'createNamed']
         arguments: ["oro_workflow_definition_form", "oro_workflow_definition", null]
 
     oro_workflow.form.extension.restriction:

@@ -70,6 +70,12 @@ services:
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-deactivate }
 
+    oro_workflow.entity_connector:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector
+        arguments:
+            - '@doctrine'
+            - '@oro_workflow.manager.system_config'
+
     oro_workflow.manager.system_config:
         class: Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager
         arguments:

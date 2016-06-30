@@ -7,7 +7,7 @@ services:
     oro_workflow.datagrid.action_permission_provider:
         class: %oro_workflow.datagrid.action_permission_provider.class%
         arguments:
-            - '@oro_entity_config.provider.workflow'
+            - '@oro_workflow.manager.system_config'
 
     oro_workflow.datagrid.abstract_entity_name_provider:
         class: %oro_workflow.datagrid.entity_name_provider.class%
