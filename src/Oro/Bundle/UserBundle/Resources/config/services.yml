@@ -362,9 +362,9 @@ services:
     oro_user.provider.user_config_form_provider:
         class: %oro_user.provider.user_configuration.form_provider.class%
         arguments:
-            - "@oro_config.config_bag"
-            - "@form.factory"
-            - "@oro_security.security_facade"
+            - '@oro_config.config_bag'
+            - '@form.factory'
+            - '@oro_security.security_facade'
         tags:
             -  { name: oro_config.configuration_provider }
         lazy: true
@@ -372,6 +372,6 @@ services:
     oro_user.imap_configuration.subscriber:
         class: %oro_user.imap_configuration.subscriber.class%
         arguments:
-            - "@doctrine.orm.entity_manager"
+            - '@doctrine.orm.entity_manager'
             - '@request_stack'
             - '@security.context'
