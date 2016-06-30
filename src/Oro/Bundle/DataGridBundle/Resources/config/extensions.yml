@@ -92,6 +92,7 @@ services:
             - '@translator'
             - '@doctrine'
             - '@oro_security.acl_helper'
+            - '@oro_datagrid.grid_view.manager'
         tags:
             - { name: oro_datagrid.extension }
 

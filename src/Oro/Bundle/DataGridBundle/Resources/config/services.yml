@@ -143,6 +143,7 @@ services:
             - '@oro_security.security_facade'
             - '@oro_security.acl_helper'
             - '@translator'
+            - '@oro_datagrid.grid_view.manager'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.grid_views_load, method: onViewsLoad }
 

@@ -7,13 +7,14 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -43,6 +44,9 @@ class GridViewsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var GridViewManager */
+    protected $gridViewManager;
+
     /** @var array  */
     protected $systemViews = [];
 
@@ -51,23 +55,26 @@ class GridViewsExtension extends AbstractExtension
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
-     * @param SecurityFacade           $securityFacade
-     * @param TranslatorInterface      $translator
-     * @param ManagerRegistry          $registry
-     * @param AclHelper                $aclHelper
+     * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface $translator
+     * @param ManagerRegistry $registry
+     * @param AclHelper $aclHelper
+     * @param GridViewManager $gridViewManager
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         SecurityFacade $securityFacade,
         TranslatorInterface $translator,
         ManagerRegistry $registry,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        GridViewManager $gridViewManager
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->securityFacade  = $securityFacade;
         $this->translator      = $translator;
         $this->registry        = $registry;
         $this->aclHelper       = $aclHelper;
+        $this->gridViewManager = $gridViewManager;
     }
 
     /**
@@ -101,10 +108,6 @@ class GridViewsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
-        if ($list) {
-            $this->systemViews = $list->getList()->getValues();
-        }
         $currentViewId = $this->getCurrentViewId($config->getName());
         // need to set [initialState][filters] from [state][filters]
         // before [state][filters] will be set from default grid view
@@ -119,11 +122,8 @@ class GridViewsExtension extends AbstractExtension
             $systemGridView->setLabel($this->translator->trans($config['options']['gridViews']['allLabel']));
         }
 
-        $gridViews = [$systemGridView->getMetadata()];
-
-        if ($list !== false) {
-            $gridViews = array_merge($gridViews, $list->getMetadata());
-        }
+        $currentUser = $this->getCurrentUser();
+        $gridViews = $this->gridViewManager->getAllGridViews($currentUser, $config->getName());
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
             $event = new GridViewsLoadEvent($config->getName(), $gridViews);
@@ -198,43 +198,10 @@ class GridViewsExtension extends AbstractExtension
     protected function getDefaultView($gridName)
     {
         if ($this->defaultGridView === false) {
-            if (!$currentUser = $this->securityFacade->getLoggedUser()) {
+            if (!$currentUser = $this->getCurrentUser()) {
                 return null;
             }
-
-            $repository      = $this->registry->getRepository('OroDataGridBundle:GridView');
-            $defaultGridView = $repository->findDefaultGridView(
-                $this->aclHelper,
-                $currentUser,
-                $gridName
-            );
-
-            if (!$defaultGridView) {
-                $repository      = $this->registry->getRepository('OroDataGridBundle:GridViewUser');
-                $defaultGridView = $repository->findDefaultGridView(
-                    $this->aclHelper,
-                    $currentUser,
-                    $gridName
-                );
-                if ($defaultGridView) {
-                    $defaultGridView = ArrayUtil::find(
-                        function ($systemView) use ($defaultGridView) {
-                            return $defaultGridView->getAlias() == $systemView->getName();
-                        },
-                        $this->systemViews
-                    );
-                }
-            }
-
-            if (!$defaultGridView) {
-                $defaultGridView = ArrayUtil::find(
-                    function ($systemView) {
-                        return $systemView->isDefault();
-                    },
-                    $this->systemViews
-                );
-            }
-            $this->defaultGridView = $defaultGridView;
+            $this->defaultGridView = $this->gridViewManager->getDefaultView($currentUser, $gridName);
         }
 
         return $this->defaultGridView;
@@ -300,5 +267,18 @@ class GridViewsExtension extends AbstractExtension
         }
 
         parent::setParameters($parameters);
+    }
+
+    /**
+     * @return User
+     */
+    protected function getCurrentUser()
+    {
+        $user = $this->securityFacade->getLoggedUser();
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        return null;
     }
 }

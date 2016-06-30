@@ -134,9 +134,9 @@ class GridViewController extends RestController
     {
         /** @var GridView $gridView */
         $manager  = $this->getManager();
-        $gridView = $manager->getView($id, $gridName);
+        $gridView = $manager->getView($id, $default, $gridName);
         if ($gridView) {
-            $manager->setDefaultGridView($this->getUser(), $gridView, $default, $gridName);
+            $manager->setDefaultGridView($this->getUser(), $gridView, $default);
             $view = $this->view(null, Codes::HTTP_NO_CONTENT);
         } else {
             $view = $this->view(null, Codes::HTTP_NOT_FOUND);

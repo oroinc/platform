@@ -21,6 +21,12 @@ interface ViewInterface
      */
     public function setColumnsData(array $columnsData = []);
 
+    /**
+     * @param string $gridName
+     * @return mixed
+     */
+    public function setGridName($gridName);
+
     /** @return array */
     public function getSortersData();
 
@@ -29,4 +35,7 @@ interface ViewInterface
 
     /** @return array */
     public function getColumnsData();
+
+    /** @return string */
+    public function getGridName();
 }

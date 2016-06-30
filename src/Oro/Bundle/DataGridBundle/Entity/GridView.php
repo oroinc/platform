@@ -189,7 +189,7 @@ class GridView implements ViewInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getGridName()
     {
@@ -281,9 +281,7 @@ class GridView implements ViewInterface
     }
 
     /**
-     * @param string $gridName
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setGridName($gridName)
     {

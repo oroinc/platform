@@ -19,6 +19,9 @@ class View implements ViewInterface
     /** @var string */
     protected $type = 'system';
 
+    /** @var string */
+    protected $gridName;
+
     /** @var bool */
     protected $editable = false;
 
@@ -230,6 +233,24 @@ class View implements ViewInterface
     public function setSharedBy($sharedBy)
     {
         $this->sharedBy = $sharedBy;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setGridName($gridName)
+    {
+        $this->gridName = $gridName;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridName()
+    {
+        return $this->gridName;
     }
 
     /**
