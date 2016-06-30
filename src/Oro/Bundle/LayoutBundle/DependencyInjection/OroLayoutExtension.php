@@ -48,6 +48,7 @@ class OroLayoutExtension extends Extension
         $loader->load('services.yml');
         $loader->load('block_types.yml');
         $loader->load('config_expressions.yml');
+        $loader->load('collectors.yml');
 
         if ($config['view']['annotations']) {
             $loader->load('view_annotations.yml');

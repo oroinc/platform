@@ -1,0 +1,43 @@
+{% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <span class="icon">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAYAAACOGPReAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAbElEQVRIx2NgGAXUBowMDAwMaWlp/6ll4KxZsxhZYJy0tDRqGMjAwMDAwEQL77OgCxSXlJBsSG9PDwqfJi6lj/fRvTJ4XYocUTBXE4q8oRtRRBnKwsw8RFw6fA0lKkd1dnYOIpfCCthRMIIAAI0IFu9Hxh7ZAAAAAElFTkSuQmCC"/>
+        </span>
+        <span class="sf-toolbar-status">{{ 'oro.layout.profiler.title'|trans }}</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>layout tree</b>
+        </div>
+        {% for dump in collector.tree %}
+            <div class="sf-toolbar-info-piece">
+                {{ dump.data|raw }}
+            </div>
+        {% endfor %}
+    {% endset %}
+
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAbklEQVRIx2NgGAVDHTDCGGlpaf9pZcmsWbPg9rAgS6SlpdHCMhQ+E72DlAWbYHFJCcUG9/b0YBWnuw9HLaRPosEV4cPHh9iyBczXxGaZ0WxBfBwwM4/mw1ELRy0c4MK7s7NzCPsQvYU1CkYBNgAAV5UW+fU+ZL4AAAAASUVORK5CYII="/>
+        </span>
+        <strong>{{ 'oro.layout.profiler.title'|trans }}</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>{{ 'oro.layout.profiler.tree'|trans }}</h2>
+    <ul class="alt">
+        {% for dump in collector.tree %}
+            <li class="sf-dump sf-reset">
+                {{ dump.data|raw }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

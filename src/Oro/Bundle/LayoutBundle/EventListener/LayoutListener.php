@@ -12,6 +12,7 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\LogicException;
 
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
+use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 
 /**
@@ -30,13 +31,23 @@ class LayoutListener
     protected $layoutManager;
 
     /**
+     * @var LayoutDataCollector
+     */
+    protected $layoutDataCollector;
+
+    /**
      * @param LayoutHelper $layoutHelper
      * @param LayoutManager $layoutManager
+     * @param LayoutDataCollector $layoutDataCollector
      */
-    public function __construct(LayoutHelper $layoutHelper, LayoutManager $layoutManager)
-    {
+    public function __construct(
+        LayoutHelper $layoutHelper,
+        LayoutManager $layoutManager,
+        LayoutDataCollector $layoutDataCollector
+    ) {
         $this->layoutHelper = $layoutHelper;
         $this->layoutManager = $layoutManager;
+        $this->layoutDataCollector = $layoutDataCollector;
     }
 
     /**
@@ -83,6 +94,8 @@ class LayoutListener
         } else {
             return;
         }
+        
+        $this->layoutDataCollector->setLayout($layout);
 
         $response = new Response();
         $response->setContent($layout->render());
