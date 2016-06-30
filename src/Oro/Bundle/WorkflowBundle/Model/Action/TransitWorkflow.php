@@ -105,7 +105,7 @@ class TransitWorkflow extends ComponentAbstractAction
         } elseif (isset($options[self::OPTION_INDEX_WORKFLOW])) {
             $this->workflow = $options[self::OPTION_INDEX_WORKFLOW];
         } else {
-            throw new InvalidParameterException('Option "workflow" is required.'); //todo update doc
+            throw new InvalidParameterException('Option "workflow" is required.');
         }
 
         if (isset($options['data'])) {

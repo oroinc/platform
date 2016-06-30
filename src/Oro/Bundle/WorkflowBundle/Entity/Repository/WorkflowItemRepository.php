@@ -93,7 +93,7 @@ class WorkflowItemRepository extends EntityRepository
      */
     public function getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition $definition)
     {
-        //TODO: refactor or remove this method in story for CRM improvements
+        //TODO: refactor or remove this method in BAP-10979
         $queryBuilder = $this->getByDefinitionQueryBuilder($definition);
 
         return $this->getEntityManager()->createQueryBuilder()
