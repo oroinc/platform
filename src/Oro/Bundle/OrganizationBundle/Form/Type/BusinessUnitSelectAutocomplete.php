@@ -5,11 +5,11 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
 /**
@@ -28,20 +28,30 @@ class BusinessUnitSelectAutocomplete extends AbstractType
         return self::NAME;
     }
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @var string
-     */
+    /** @var BusinessUnitManager */
+    protected $businessUnitManager;
+
+    /** @var string */
     protected $entityClass;
 
-    public function __construct(EntityManager $entityManager, $entityClass)
-    {
+    /**
+     * BusinessUnitSelectAutocomplete constructor.
+     *
+     * @param EntityManager $entityManager
+     * @param $entityClass
+     * @param BusinessUnitManager $businessUnitManager
+     */
+    public function __construct(
+        EntityManager $entityManager,
+        $entityClass,
+        BusinessUnitManager $businessUnitManager
+    ) {
         $this->entityManager = $entityManager;
         $this->entityClass = $entityClass;
+        $this->businessUnitManager = $businessUnitManager;
     }
 
     /**
@@ -49,18 +59,16 @@ class BusinessUnitSelectAutocomplete extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
-                $value = $event->getData();
-                if (empty($value)) {
-                    $event->setData(array());
-                }
-            }
-        );
-        $builder->addModelTransformer(
-            new EntitiesToIdsTransformer($this->entityManager, $this->entityClass)
-        );
+        if (isset($options['config']['multiple']) &&  $options['config']['multiple'] === true) {
+            $builder->addModelTransformer(
+                new EntitiesToIdsTransformer($this->entityManager, $this->entityClass)
+            );
+        } else {
+            $builder->resetModelTransformers();
+            $builder->addModelTransformer(
+                new BusinessUnitTreeTransformer($this->businessUnitManager)
+            );
+        }
     }
 
     /**

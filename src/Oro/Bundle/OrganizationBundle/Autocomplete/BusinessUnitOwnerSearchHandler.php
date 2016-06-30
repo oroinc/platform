@@ -47,11 +47,8 @@ class BusinessUnitOwnerSearchHandler extends SearchHandler
         $owner = $businessUnit->getOwner();
         if ($owner) {
             $path = $this->getPath($owner, $path);
-        } else {
-            array_unshift($path, ['name'=> $businessUnit->getOrganization()->getName()]);
-
         }
-
+        
         return $path;
     }
 }

@@ -399,7 +399,7 @@ class OwnerFormExtension extends AbstractTypeExtension
              */
             $builder->add(
                 $this->fieldName,
-                'oro_business_unit_select_autocomplete',
+                'oro_type_business_unit_select_autocomplete',
                 [
                     'required' => false,
                     'label' => $this->fieldLabel,
@@ -407,7 +407,9 @@ class OwnerFormExtension extends AbstractTypeExtension
                     'empty_value' => $emptyValueLabel,
                     'configs' => [
                         'multiple' => false,
-                        'allowClear'  => false
+                        'allowClear'  => false,
+                        'autocomplete_alias' => 'business_units_owner_search_handler',
+                        'component'   => 'tree-autocomplete',
                     ]
                 ]
             );
