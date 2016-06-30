@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
+use Symfony\Component\HttpKernel\Kernel;
 
 class LayoutHelper
 {
@@ -15,11 +16,18 @@ class LayoutHelper
     protected $requestStack;
 
     /**
-     * @param RequestStack $requestStack
+     * @var string
      */
-    public function __construct(RequestStack $requestStack)
+    protected $environment;
+
+    /**
+     * @param RequestStack $requestStack
+     * @param string|null $environment
+     */
+    public function __construct(RequestStack $requestStack, $environment = null)
     {
         $this->requestStack = $requestStack;
+        $this->environment = $environment;
     }
 
     /**
@@ -51,5 +59,13 @@ class LayoutHelper
     public function isTemplateRequest(Request $request = null)
     {
         return !$this->isLayoutRequest($request);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isProfilerEnabled()
+    {
+        return $this->environment && in_array($this->environment, ['dev']);
     }
 }

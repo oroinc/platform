@@ -92,6 +92,18 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(!(bool)$annotation, $this->helper->isTemplateRequest($request));
     }
 
+    public function testIsProfilerEnabledTrue()
+    {
+        $helper = new LayoutHelper($this->requestStack, 'dev');
+        $this->assertTrue($helper->isProfilerEnabled());
+    }
+
+    public function testIsProfilerEnabledFalse()
+    {
+        $helper = new LayoutHelper($this->requestStack, 'prod');
+        $this->assertFalse($helper->isProfilerEnabled());
+    }
+
     /**
      * @return LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject
      */
