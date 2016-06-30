@@ -613,11 +613,11 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 'end'              => '2016-05-04T11:29:46+00:00',
                 'allDay'           => true,
                 'backgroundColor'  => '#FF0000',
-                'invitationStatus' => 'none',
+                'invitationStatus' => null,
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
-                'notifiable'       => true,
+                'notifiable'       => false,
                 'attendees'        => [
                     [
                         'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
@@ -812,7 +812,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 'end'              => '2016-05-04T11:29:46+00:00',
                 'allDay'           => true,
                 'backgroundColor'  => '#FF0000',
-                'invitationStatus' => 'none',
+                'invitationStatus' => null,
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
