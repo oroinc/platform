@@ -112,10 +112,7 @@ class AclPrivilegeRepository
 
             foreach ($oids as $oid) {
                 if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-                    $name = self::ROOT_PRIVILEGE_NAME;
-                    $group = '';
-                    $description = '';
-                    $category = '';
+                    continue;
                 } else {
                     /** @var AclClassInfo $class */
                     $class = $classes[$oid->getType()];

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
-use Oro\Bundle\UserBundle\Model\PrivilegeCategoryProviderInterface;
 
 class RolePrivilegeCategoryProvider
 {
@@ -65,13 +64,27 @@ class RolePrivilegeCategoryProvider
     {
         return array_key_exists($name, $this->providers);
     }
-    
+
     /**
-     * Get all categories
-     * 
-     * @return PrivilegeCategory[]
+     * Remove category from list
+     *
+     * @param string $categoryName
+     *
+     * @return PrivilegeCategory|null
      */
-    public function getPermissionCategories()
+    public function getCategory($categoryName)
+    {
+        foreach ($this->getAllCategories() as $category) {
+            if ($category->getId() === $categoryName) {
+                return $category;
+            }
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllCategories()
     {
         if ($this->categoryList) {
             return $this->categoryList;
@@ -86,23 +99,30 @@ class RolePrivilegeCategoryProvider
             }
             $categoryList = array_merge(array_values($categoryList), array_values($categories));
         }
+        $this->categoryList = $categoryList;
+
+        return $this->categoryList;
+    }
+
+    /**
+     * Get all categories
+     * 
+     * @return PrivilegeCategory[]
+     */
+    public function getPermissionCategories()
+    {
+        $categoryList = $this->getAllCategories();
 
         $orderedCategoryList = [];
         /** @var PrivilegeCategory $category */
         foreach ($categoryList as $category) {
-            $priority = $category->getPriority();
-            $orderedCategoryList[$priority][] = $category;
+            if ($category->isVisible()) {
+                $priority = $category->getPriority();
+                $orderedCategoryList[$priority][] = $category;
+            }
         }
         ksort($orderedCategoryList);
-        $this->categoryList = call_user_func_array('array_merge', $orderedCategoryList);
-        
-        return $this->categoryList;
-    }
-    
-    protected function getPredefinedCategories()
-    {
-        $categoryList = [];
-        $categoryList[] = new PrivilegeCategory('sales_data', 'oro.user.role.category.sales_data.label', true, 7);
+        $categoryList = call_user_func_array('array_merge', $orderedCategoryList);
         
         return $categoryList;
     }
@@ -131,7 +151,7 @@ class RolePrivilegeCategoryProvider
     {
         return array_filter(array_map(function ($category) {
             /** @var PrivilegeCategory $category */
-            return $category->getTab() ? $category->getId() : null;
+            return $category->isTab() ? $category->getId() : null;
         }, $this->getPermissionCategories()));
     }
 }
