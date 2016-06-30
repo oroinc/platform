@@ -77,7 +77,7 @@ services:
     oro_api.get_config.complete_status_codes:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteStatusCodes
         tags:
-            - { name: oro.api.processor, action: get_config, extra: status_codes, requestType: rest, priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: descriptions&definition, requestType: rest, priority: -160 }
 
     oro_api.get_config.set_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities
