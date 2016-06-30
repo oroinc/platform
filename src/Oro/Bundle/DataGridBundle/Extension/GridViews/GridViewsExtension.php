@@ -4,10 +4,10 @@ namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;

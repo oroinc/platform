@@ -61,9 +61,8 @@ class GridViewUserRepository extends EntityRepository
         $qb = $this->createQueryBuilder('gvu');
         $qb->where('gvu.user = :user')
             ->andWhere('gvu.gridName = :gridName');
-
         $qb->setParameters($parameters);
-        $qb->getQuery()->getSql();
+
         return $qb;
     }
 }

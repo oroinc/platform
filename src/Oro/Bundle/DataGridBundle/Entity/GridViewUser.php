@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\UserBundle\Entity\User;
