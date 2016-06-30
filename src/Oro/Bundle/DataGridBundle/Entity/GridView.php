@@ -5,11 +5,10 @@ namespace Oro\Bundle\DataGridBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -37,7 +36,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *      message="oro.datagrid.gridview.unique"
  * )
  */
-class GridView
+class GridView implements ViewInterface
 {
     const TYPE_PRIVATE = 'private';
     const TYPE_PUBLIC  = 'public';
@@ -127,12 +126,14 @@ class GridView
      *
      * @var ArrayCollection|User[]
      *
-     * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\UserBundle\Entity\User"
+     * @ORM\OneToMany(
+     *      targetEntity="Oro\Bundle\DataGridBundle\Entity\GridViewUser",
+     *      mappedBy="gridView",
+     *      cascade={"ALL"},
+     *      fetch="EXTRA_LAZY"
      * )
      * @ORM\JoinTable(name="oro_grid_view_user",
-     *     joinColumns={@ORM\JoinColumn(name="grid_view_id", referencedColumnName="id", onDelete="CASCADE")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *     joinColumns={@ORM\JoinColumn(name="id", referencedColumnName="grid_view_id", onDelete="CASCADE")}
      * )
      */
     protected $users;
@@ -170,7 +171,7 @@ class GridView
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getFiltersData()
     {
@@ -178,7 +179,7 @@ class GridView
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSortersData()
     {
@@ -238,9 +239,7 @@ class GridView
     }
 
     /**
-     * @param array $filtersData
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setFiltersData(array $filtersData = [])
     {
@@ -250,9 +249,7 @@ class GridView
     }
 
     /**
-     * @param array $sortersData
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setSortersData(array $sortersData = [])
     {
@@ -262,7 +259,7 @@ class GridView
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getColumnsData()
     {
@@ -274,7 +271,7 @@ class GridView
     }
 
     /**
-     * @param array $columnsData
+     * {@inheritdoc}
      */
     public function setColumnsData(array $columnsData = [])
     {

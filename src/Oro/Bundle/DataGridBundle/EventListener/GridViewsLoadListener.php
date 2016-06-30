@@ -67,7 +67,7 @@ class GridViewsLoadListener
             $view->setEditable($this->securityFacade->isGranted('EDIT', $gridView));
             $view->setDeletable($this->securityFacade->isGranted('DELETE', $gridView));
             $view->setDefault($defaultGridView === $gridView);
-            if ($gridView->getOwner()->getId() !== $currentUser->getId()) {
+            if ($gridView->getOwner() && $gridView->getOwner()->getId() !== $currentUser->getId()) {
                 $view->setSharedBy($gridView->getOwner()->getUsername());
             }
             $views[]   = $view->getMetadata();

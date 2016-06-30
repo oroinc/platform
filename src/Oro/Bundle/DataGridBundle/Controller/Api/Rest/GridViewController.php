@@ -105,19 +105,21 @@ class GridViewController extends RestController
      *
      * @param int  $id
      * @param bool $default
+     * @param null $gridName
      *
      * @return Response
      * @Post(
-     *     "/gridviews/{id}/default/{default}",
-     *     requirements={"id"="\d+", "default"="\d+"},
-     *     defaults={"default"=false}
+     *     "/gridviews/{id}/default/{default}/gridName/{gridName}",
+     *     requirements={"id"=".+", "default"="\d+", "grid_name"=".+"},
+     *     defaults={"default"=false, "gridName"=null}
      *)
      * @ApiDoc(
      *      description="Set/unset grid view as default for current user",
      *      resource=true,
      *      requirements={
-     *          {"name"="id", "dataType"="integer"},
+     *          {"name"="id", "dataType"="string"},
      *          {"name"="default", "dataType"="boolean"},
+     *          {"name"="gridName", "dataType"="string"}
      *      },
      *     defaults={"default"="false"}
      * )
@@ -128,13 +130,13 @@ class GridViewController extends RestController
      *     permission="VIEW"
      * )
      */
-    public function defaultAction($id, $default = false)
+    public function defaultAction($id, $default = false, $gridName = null)
     {
         /** @var GridView $gridView */
         $manager  = $this->getManager();
-        $gridView = $manager->find($id);
+        $gridView = $manager->getView($id, $gridName);
         if ($gridView) {
-            $manager->setDefaultGridView($this->getUser(), $gridView, $default);
+            $manager->setDefaultGridView($this->getUser(), $gridView, $default, $gridName);
             $view = $this->view(null, Codes::HTTP_NO_CONTENT);
         } else {
             $view = $this->view(null, Codes::HTTP_NOT_FOUND);

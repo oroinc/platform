@@ -161,6 +161,7 @@ services:
         arguments:
             - '@oro_security.acl_helper'
             - '@doctrine'
+            - '@oro_datagrid.datagrid.manager'
 
     oro_datagrid.grid_view.manager.api:
         class: %oro_datagrid.grid_view.manager.api.class%

@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -41,6 +42,9 @@ class GridViewsExtension extends AbstractExtension
 
     /** @var AclHelper */
     protected $aclHelper;
+
+    /** @var array  */
+    protected $systemViews = [];
 
     /** @var GridView|null|bool */
     protected $defaultGridView = false;
@@ -97,10 +101,14 @@ class GridViewsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
+        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
+        if ($list) {
+            $this->systemViews = $list->getList()->getValues();
+        }
         $currentViewId = $this->getCurrentViewId($config->getName());
         // need to set [initialState][filters] from [state][filters]
         // before [state][filters] will be set from default grid view
-        $filtersState        = $data->offsetGetByPath('[state][filters]', []);
+        $filtersState = $data->offsetGetByPath('[state][filters]', []);
         $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID, 'filters' => $filtersState]);
         $this->setDefaultParams($config->getName(), $data);
         $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
@@ -112,8 +120,7 @@ class GridViewsExtension extends AbstractExtension
         }
 
         $gridViews = [$systemGridView->getMetadata()];
-        /** @var AbstractViewsList $list */
-        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
+
         if ($list !== false) {
             $gridViews = array_merge($gridViews, $list->getMetadata());
         }
@@ -145,7 +152,12 @@ class GridViewsExtension extends AbstractExtension
     {
         $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         if (isset($params[self::VIEWS_PARAM_KEY])) {
-            return (int)$params[self::VIEWS_PARAM_KEY];
+            $viewKey = $params[self::VIEWS_PARAM_KEY];
+            if (is_numeric($viewKey)) {
+                return (int)$viewKey;
+            } else {
+                return $viewKey;
+            }
         } else {
             $defaultViewId = $this->getDefaultViewId($gridName);
 
@@ -162,9 +174,18 @@ class GridViewsExtension extends AbstractExtension
      */
     protected function getDefaultViewId($gridName)
     {
+        $defaultGridViewId = null;
         $defaultGridView = $this->getDefaultView($gridName);
 
-        return $defaultGridView ? $defaultGridView->getId() : null;
+        if ($defaultGridView) {
+            if ($defaultGridView->getType() == 'system') {
+                $defaultGridViewId = $defaultGridView->getName();
+            } else {
+                $defaultGridViewId = $defaultGridView->getId();
+            }
+        }
+
+        return $defaultGridViewId;
     }
 
     /**
@@ -188,6 +209,31 @@ class GridViewsExtension extends AbstractExtension
                 $gridName
             );
 
+            if (!$defaultGridView) {
+                $repository      = $this->registry->getRepository('OroDataGridBundle:GridViewUser');
+                $defaultGridView = $repository->findDefaultGridView(
+                    $this->aclHelper,
+                    $currentUser,
+                    $gridName
+                );
+                if ($defaultGridView) {
+                    $defaultGridView = ArrayUtil::find(
+                        function ($systemView) use ($defaultGridView) {
+                            return $defaultGridView->getAlias() == $systemView->getName();
+                        },
+                        $this->systemViews
+                    );
+                }
+            }
+
+            if (!$defaultGridView) {
+                $defaultGridView = ArrayUtil::find(
+                    function ($systemView) {
+                        return $systemView->isDefault();
+                    },
+                    $this->systemViews
+                );
+            }
             $this->defaultGridView = $defaultGridView;
         }
 
