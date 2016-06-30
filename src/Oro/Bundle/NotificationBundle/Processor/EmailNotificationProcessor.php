@@ -101,7 +101,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
 
         foreach ($notifications as $notification) {
             $emailTemplate = $notification->getTemplate();
-
+            $params['recipient'] = $notification->getRecipient();
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
                     $emailTemplate,

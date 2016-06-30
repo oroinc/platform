@@ -10,6 +10,7 @@ use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterfac
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailNotification implements SenderAwareEmailNotificationInterface
 {
@@ -91,6 +92,16 @@ class EmailNotification implements SenderAwareEmailNotificationInterface
     public function getRecipientEmails()
     {
         return [$this->getReminder()->getRecipient()->getEmail()];
+    }
+
+    /**
+     * Get email recipient
+     *
+     * @return User
+     */
+    public function getRecipient()
+    {
+        return $this->getReminder()->getRecipient();
     }
 
     /**

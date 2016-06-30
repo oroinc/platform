@@ -39,7 +39,8 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
                     'oro_format_time',
                     'oro_format_datetime',
                     'oro_format_name',
-                    'date'
+                    'date',
+                    'oro_format_datetime_user',
                 ]
             );
             $securityPolicyDef->replaceArgument(1, $filters);
