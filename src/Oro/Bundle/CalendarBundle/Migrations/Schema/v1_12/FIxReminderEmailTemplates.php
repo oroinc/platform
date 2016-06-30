@@ -33,7 +33,7 @@ EOF;
 calendar_date_range(entity.start, entity.end, entity.allDay, 'F j, Y', 1)
 EOF;
         $replacementCalendar = <<<EOF
-|oro_format_datetime_user({'user': entity.calendar.organization.id})
+|oro_format_datetime_user({'user': recipient})
 EOF;
         $replacementCalendarRange = <<<EOF
 calendar_date_range_user(entity.start, entity.end, entity.allDay, 1, null, null, null, recipient)
