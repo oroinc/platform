@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
+use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
@@ -21,9 +22,35 @@ class ConfigApiManager
         $this->configProvider = $configProvider;
     }
 
-    public function addConfigManager($scope, $manager)
+    /**
+     * @param string        $scope
+     * @param ConfigManager $manager
+     */
+    public function addConfigManager($scope, ConfigManager $manager)
     {
         $this->configManagers[$scope] = $manager;
+    }
+
+    /**
+     * @param string $scope
+     *
+     * @return ConfigManager|null
+     */
+    public function getConfigManager($scope)
+    {
+        return isset($this->configManagers[$scope])
+            ? $this->configManagers[$scope]
+            : null;
+    }
+
+    /**
+     * Gets all configuration scopes
+     *
+     * @return string[]
+     */
+    public function getScopes()
+    {
+        return array_keys($this->configManagers);
     }
 
     /**
@@ -44,9 +71,28 @@ class ConfigApiManager
     }
 
     /**
-     * Gets all configuration data of the specified section
+     * Checks whether a section with a given path exists
      *
      * @param string $path The path to API section. For example: look-and-feel/grid
+     *
+     * @return bool
+     */
+    public function hasSection($path)
+    {
+        $section = null;
+        try {
+            $section = $this->configProvider->getApiTree($path);
+        } catch (ItemNotFoundException $e) {
+            // ignore this exception
+        }
+
+        return null !== $section;
+    }
+
+    /**
+     * Gets all configuration data of the specified section
+     *
+     * @param string $path  The path to API section. For example: look-and-feel/grid
      * @param string $scope The configuration scope
      *
      * @return array
@@ -70,6 +116,35 @@ class ConfigApiManager
         }
 
         return $result;
+    }
+
+    /**
+     * Gets a configuration variable data from the specified section
+     *
+     * @param string $key   The key of a configuration variable
+     * @param string $path  The path to API section. For example: look-and-feel/grid
+     * @param string $scope The configuration scope
+     *
+     * @return array|null
+     */
+    public function getDataItem($key, $path, $scope = 'user')
+    {
+        $variable = $this->configProvider->getApiTree($path)->getVariable($key);
+        if (null === $variable) {
+            return null;
+        }
+
+        $configManager = $this->configManagers[$scope];
+        $value = $configManager->get($variable->getKey());
+        $dataTransformer = $this->configProvider->getDataTransformer($variable->getKey());
+        if ($dataTransformer !== null) {
+            $value = $dataTransformer->transform($value);
+        }
+        $var          = $variable->toArray();
+        $var['value'] = $this->getTypedValue($variable->getType(), $value);
+        $var          = array_merge($var, $configManager->getInfo($variable->getKey()));
+
+        return $var;
     }
 
     /**

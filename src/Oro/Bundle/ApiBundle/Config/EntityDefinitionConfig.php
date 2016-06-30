@@ -30,6 +30,15 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /** a human-readable description of the entity */
     const DESCRIPTION = 'description';
 
+    /** the default page size */
+    const PAGE_SIZE = 'page_size';
+
+    /** a flag indicates whether a sorting is disabled */
+    const DISABLE_SORTING = 'disable_sorting';
+
+    /** the names of identifier fields of the entity */
+    const IDENTIFIER_FIELD_NAMES = 'identifier_field_names';
+
     /** the name of ACL resource */
     const ACL_RESOURCE = 'acl_resource';
 
@@ -44,6 +53,41 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /** the form options that should be used for the entity */
     const FORM_OPTIONS = 'form_options';
+
+    /**
+     * A string that unique identify this instance of entity definition config.
+     * This value is set by config providers and is used by a metadata provider
+     * to build a metadata cache key. It allows to avoid loading the same metadata
+     * several times and as result it improves a performance.
+     * @see Oro\Bundle\ApiBundle\Provider\MetadataProvider
+     * @see Oro\Bundle\ApiBundle\Provider\ConfigProvider
+     * @see Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
+     *
+     * @var string|null
+     */
+    protected $key;
+
+    /**
+     * Gets a string that unique identify this instance of entity definition config.
+     *
+     * @return string|null
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
+     * Sets a string that unique identify this instance of entity definition config.
+     * Do not set this value in your code.
+     * @see Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig::id
+     *
+     * @param string|null $key
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+    }
 
     /**
      * {@inheritdoc}
@@ -161,6 +205,103 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function setExclusionPolicy($exclusionPolicy)
     {
         $this->items[self::EXCLUSION_POLICY] = $exclusionPolicy;
+    }
+
+    /**
+     * Indicates whether the default page size is set.
+     *
+     * @return bool
+     */
+    public function hasPageSize()
+    {
+        return array_key_exists(EntityDefinitionConfig::PAGE_SIZE, $this->items);
+    }
+
+    /**
+     * Gets the default page size.
+     *
+     * @return int|null A positive number
+     *                  NULL if the default page size should be set be a processor
+     *                  -1 if the pagination should be disabled
+     */
+    public function getPageSize()
+    {
+        return array_key_exists(self::PAGE_SIZE, $this->items)
+            ? $this->items[self::PAGE_SIZE]
+            : null;
+    }
+
+    /**
+     * Sets the default page size.
+     * Set NULL if the default page size should be set be a processor.
+     * Set -1 if the pagination should be disabled.
+     * Set a positive number to set own page size that should be used as a default one.
+     *
+     * @param int|null $pageSize A positive number, NULL or -1
+     */
+    public function setPageSize($pageSize = null)
+    {
+        if (null === $pageSize) {
+            unset($this->items[self::PAGE_SIZE]);
+        } else {
+            $pageSize = (int)$pageSize;
+
+            $this->items[self::PAGE_SIZE] = $pageSize >= 0 ? $pageSize : -1;
+        }
+    }
+
+    /**
+     * Indicates whether a sorting is enabled.
+     *
+     * @return bool
+     */
+    public function isSortingEnabled()
+    {
+        return array_key_exists(self::DISABLE_SORTING, $this->items)
+            ? !$this->items[self::DISABLE_SORTING]
+            : true;
+    }
+
+    /**
+     * Enables a sorting.
+     */
+    public function enableSorting()
+    {
+        unset($this->items[self::DISABLE_SORTING]);
+    }
+
+    /**
+     * Disables a sorting.
+     */
+    public function disableSorting()
+    {
+        $this->items[self::DISABLE_SORTING] = true;
+    }
+
+    /**
+     * Gets the names of identifier fields of the entity.
+     *
+     * @return string[]
+     */
+    public function getIdentifierFieldNames()
+    {
+        return array_key_exists(self::IDENTIFIER_FIELD_NAMES, $this->items)
+            ? $this->items[self::IDENTIFIER_FIELD_NAMES]
+            : [];
+    }
+
+    /**
+     * Sets the names of identifier fields of the entity.
+     *
+     * @param string[] $fields
+     */
+    public function setIdentifierFieldNames(array $fields)
+    {
+        if (empty($fields)) {
+            unset($this->items[self::IDENTIFIER_FIELD_NAMES]);
+        } else {
+            $this->items[self::IDENTIFIER_FIELD_NAMES] = $fields;
+        }
     }
 
     /**

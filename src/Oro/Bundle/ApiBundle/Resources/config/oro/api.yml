@@ -1,0 +1,27 @@
+oro_api:
+    entities:
+        Oro\Bundle\ApiBundle\Model\EntityDescriptor:
+            identifier_field_names: [id]
+            fields:
+                # this is a predefined field name that is used to provide
+                # the class name of the target entity
+                # @see Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
+                # @see Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
+                __class__:
+                    data_type: string
+                    property_path: class
+                # the identifier of the target entity
+                id:
+                    data_type: string
+                # a human-readable representation of the target entity
+                title:
+                    data_type: string
+            # this entity does not have own Data API resource
+            # and should be used as a sub-resource of other entities
+            actions:
+                get: false
+                get_list: false
+                update: false
+                create: false
+                delete: false
+                delete_list: false

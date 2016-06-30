@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
-use Oro\Bundle\ApiBundle\Config\ActionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
@@ -18,6 +17,7 @@ use Oro\Bundle\ApiBundle\Config\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
 /**
@@ -50,8 +50,8 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     protected function saveConfig(ConfigContext $context, array $config)
     {
         $targetAction = $context->getTargetAction();
-        if ($targetAction && !empty($config[ActionsConfigExtra::NAME][$targetAction])) {
-            $actionConfig = $config[ActionsConfigExtra::NAME][$targetAction];
+        if ($targetAction && !empty($config[ConfigUtil::ACTIONS][$targetAction])) {
+            $actionConfig = $config[ConfigUtil::ACTIONS][$targetAction];
             if (array_key_exists(ActionConfig::STATUS_CODES, $actionConfig)
                 && $context->hasExtra(DescriptionsConfigExtra::NAME)
             ) {

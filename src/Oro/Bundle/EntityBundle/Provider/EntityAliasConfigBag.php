@@ -60,4 +60,14 @@ class EntityAliasConfigBag
     {
         return isset($this->exclusions[$entityClass]);
     }
+
+    /**
+     * Returns class names for all entities that have an alias configuration.
+     *
+     * @return string[]
+     */
+    public function getClassNames()
+    {
+        return array_keys($this->entityAliases);
+    }
 }
