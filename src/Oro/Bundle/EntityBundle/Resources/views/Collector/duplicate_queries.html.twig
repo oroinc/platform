@@ -1,9 +1,5 @@
 {% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
-{% macro getStat(count, total) %}
-    ({{ count }} of {{ total }}, about {{ (count / total * 100)|round }}%)
-{% endmacro %}
-
 {% block toolbar %}
     {% if collector.identicalQueriesCount > 0 or collector.identicalQueriesCount > 0 %}
         {% set icon %}
@@ -57,7 +53,7 @@
         .highlight .error     { color: #C82829; }
     </style>
 
-    <h2>Identical Queries {{ _self.getStat(collector.identicalQueriesCount, collector.queriesCount) }}</h2>
+    <h2>Queries with identical parameters ({{ collector.identicalQueriesCount }})</h2>
     {% for connection, identicalQueries in collector.identicalQueries %}
         {% if identicalQueries is not empty %}
             <h3>Connection <em>{{ connection }}</em></h3>
@@ -80,7 +76,7 @@
         {% endif %}
     {% endfor %}
 
-    <h2>Similar Queries {{ _self.getStat(collector.identicalQueriesCount, collector.queriesCount) }}</h2>
+    <h2>Queries with different parameters ({{ collector.similarQueriesCount }})</h2>
     {% for connection, similarQueries in collector.similarQueries %}
         {% if similarQueries is not empty %}
             <h3>Connection <em>{{ connection }}</em></h3>
