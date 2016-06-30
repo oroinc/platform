@@ -6,29 +6,14 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     PermissionReadOnlyView = BaseView.extend({
+        ACCESS_LEVEL_NONE: 0,
         tagName: 'li',
         className: 'action-permissions__item dropdown',
         template: require('tpl!orouser/templates/datagrid/cell/permission/permission-readonly-view.html'),
-        id: function() {
-            return 'ActionPermissionsCell-' + this.cid;
-        },
-
-        /**
-         * @type {AccessLevelsCollection}
-         */
-        accessLevels: null,
-
-        initialize: function(options) {
-            _.extend(this, _.pick(options, ['accessLevels']));
-            PermissionReadOnlyView.__super__.initialize.call(this, options);
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            delete this.accessLevels;
-            PermissionReadOnlyView.__super__.dispose.call(this);
+        getTemplateData: function() {
+            var data = PermissionReadOnlyView.__super__.getTemplateData.apply(this, arguments);
+            data.noAccess = this.ACCESS_LEVEL_NONE === this.model.get('access_level');
+            return data;
         }
     });
 

@@ -1,4 +1,4 @@
-<div class="action-permissions__item-wrapper">
+<div class="action-permissions__item-wrapper<% if (noAccess) { %> action-permissions__item-wrapper--no-access<% } %>">
     <span class="action-permissions__label" title="<%- label %>"><%- label %></span>
     -
     <span class="action-permissions__value"><%- access_level_label %></span>
