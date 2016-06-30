@@ -27,11 +27,16 @@ define(function(require) {
         initialize: function(options) {
             _.extend(this, _.pick(options, ['tabIds']));
             var groups = _.map(options.data, function(group) {
+                group.items = _.map(group.items, function(item) {
+                    item.editable = !options.readonly;
+                    return item;
+                });
                 var itemsCollection = new BaseCollection(group.items, {
                     model: PermissionModel
                 });
                 this.listenTo(itemsCollection, 'change', _.bind(this.onAccessLevelChange, this, group.group));
                 return _.extend({}, group, {
+                    editable: !options.readonly,
                     items: itemsCollection
                 });
             }, this);
