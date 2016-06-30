@@ -49,6 +49,9 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  * )
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
 {
