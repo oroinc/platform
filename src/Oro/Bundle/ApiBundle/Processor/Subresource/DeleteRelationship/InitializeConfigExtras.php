@@ -27,7 +27,14 @@ class InitializeConfigExtras implements ProcessorInterface
             return;
         }
 
-        $context->addConfigExtra(new EntityDefinitionConfigExtra($context->getAction()));
+        $context->addConfigExtra(
+            new EntityDefinitionConfigExtra(
+                $context->getAction(),
+                $context->isCollection(),
+                $context->getParentClassName(),
+                $context->getAssociationName()
+            )
+        );
         $context->addConfigExtra(new FilterIdentifierFieldsConfigExtra());
     }
 }

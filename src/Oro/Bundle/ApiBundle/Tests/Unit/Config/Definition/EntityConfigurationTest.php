@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 
 /**
@@ -38,6 +39,7 @@ class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
         $configExtensionRegistry->addExtension(new ActionsConfigExtension());
+        $configExtensionRegistry->addExtension(new SubresourcesConfigExtension());
         $configExtensionRegistry->addExtension(new TestConfigExtension());
 
         $configuration = new EntityConfiguration(
