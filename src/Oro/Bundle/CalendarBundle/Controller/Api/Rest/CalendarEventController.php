@@ -446,9 +446,11 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     protected function createResponseData($entity)
     {
-        $response = parent::createResponseData($entity);
+        $response        = parent::createResponseData($entity);
         $serializedEvent = $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvent($entity);
-        $response['notifiable'] = $serializedEvent['notifiable'];
+
+        $response['notifiable']       = $serializedEvent['notifiable'];
+        $response['invitationStatus'] = $serializedEvent['invitationStatus'];
 
         return $response;
     }
