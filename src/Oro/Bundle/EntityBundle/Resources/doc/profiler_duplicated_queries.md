@@ -1,4 +1,4 @@
-Duplicate queries profiler
+Profiler of duplicated queries
 ===============
 
 ## About
