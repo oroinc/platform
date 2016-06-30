@@ -22,6 +22,30 @@ class Form extends Element
         }
     }
 
+    /**
+     * Find last embed form in collection of fieldset
+     * See collection address in Contact (CRM) form for example
+     *
+     * @return Form|null
+     */
+    public function getLastSet()
+    {
+        $maxSet = 10;
+        $prevSet = $this->find('css', 'div[data-content="0"]');
+
+        for ($i = 2; $i <= $maxSet; $i++) {
+            $set = $this->find('css', sprintf('div[data-content="%s"]', $i));
+
+            if (!$set) {
+                return $this->elementFactory->wrapElement('OroForm', $prevSet);
+            }
+
+            $prevSet = $set;
+        }
+
+        return null;
+    }
+
     public function saveAndClose()
     {
         $this->pressButton('Save and Close');
@@ -58,6 +82,8 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('FileField', $sndParent);
             } elseif ($select = $sndParent->find('css', 'select')) {
                 return $select;
+            } elseif ($sndParent->hasClass('control-group-checkbox')) {
+                return $sndParent->find('css', 'input[type=checkbox]');
             } else {
                 throw new ExpectationException(
                     sprintf('Find label "%s", but can\'t detemine field type', $locator),
@@ -91,20 +117,6 @@ class Form extends Element
     protected function findFieldSetLabel($locator)
     {
         $labelSelector = sprintf("h5.user-fieldset:contains('%s')", $locator);
-
-        return $this->find('css', $labelSelector);
-    }
-
-    /**
-     * Finds label with specified locator.
-     *
-     * @param string $locator label text
-     *
-     * @return NodeElement|null
-     */
-    protected function findLabel($locator)
-    {
-        $labelSelector = sprintf("label:contains('%s')", $locator);
 
         return $this->find('css', $labelSelector);
     }

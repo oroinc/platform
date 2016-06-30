@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
+use Behat\Mink\Exception\ExpectationException;
+use Behat\Mink\Element\NodeElement;
+
 class CollectionField extends Element
 {
     /**
@@ -9,10 +12,8 @@ class CollectionField extends Element
      */
     public function setValue(array $values)
     {
-        $removeRawButtons = $this->findAll('css', '.removeRow');
-
         /** @var Element $removeRawButton */
-        foreach ($removeRawButtons as $removeRawButton) {
+        while ($removeRawButton = $this->find('css', '.removeRow')) {
             $removeRawButton->click();
         }
 
@@ -20,7 +21,48 @@ class CollectionField extends Element
             $this->clickLink('Add');
         });
 
-        $inputs = $this->findAll(
+        $inputs = $inputs = $this->findAllTextFields();
+
+        foreach ($values as $value) {
+            $input = array_shift($inputs);
+            $input->setValue(trim($value));
+        }
+    }
+
+    /**
+     * Collection field has radio button for set on field as primary.
+     * See phones, emails fields in Contact (CRM) create page
+     *
+     * @param string $value
+     * @throws ExpectationException
+     */
+    public function setFieldAsPrimary($value)
+    {
+        $inputs = $this->findAllTextFields();
+
+        /** @var Element $input */
+        foreach ($inputs as $input) {
+            if ($input->getValue() == $value) {
+                $input->getParent()->find('css', 'input[type=radio]')->click();
+
+                return;
+            }
+        }
+
+        throw new ExpectationException(
+            sprintf('Not found "%s" value', $value),
+            $this->getDriver()
+        );
+    }
+
+    /**
+     * Find any text inputs. Type can be text, email, password etc.
+     *
+     * @return NodeElement[]
+     */
+    protected function findAllTextFields()
+    {
+        return $this->findAll(
             'css',
             'input:not([type=button])'
             .':not([type=checkbox])'
@@ -30,10 +72,5 @@ class CollectionField extends Element
             .':not([type=reset])'
             .':not([type=submit])'
         );
-
-        foreach ($values as $value) {
-            $input = array_shift($inputs);
-            $input->setValue(trim($value));
-        }
     }
 }

@@ -118,6 +118,16 @@ JS;
         $results = $this->findElementXpaths('//ul[contains(@class, "select2-results")]/li');
 
         if (1 < count($results)) {
+            foreach ($results as $result) {
+                $element = $this->findElement($result);
+
+                if ($element->text() == $value) {
+                    $element->click();
+
+                    return;
+                }
+            }
+
             throw new ExpectationException(sprintf('Too many results for "%s"', $value), $this);
         }
 
