@@ -16,7 +16,6 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
  *
  * @todo: it's a temporary workaround to fix dates in reminder emails CRM-5745 until improvement CRM-5758 is implemented
  */
-
 class DateTimeUserExtension extends DateTimeExtension
 {
     /**
