@@ -32,7 +32,8 @@ class UnitTestGenerator extends AbstractTestGenerator
                 'testedClassName' => $testedClassName,
                 'testedClassNameVariable' => lcfirst($testedClassName),
                 'dependenciesData' => $dependenciesData,
-                'methodsData' => $methodsData
+                'methodsData' => $methodsData,
+                'phpVersion' => $this->getPhpVersion()
             ]
         );
         $this->createFile($testPath, $content);
