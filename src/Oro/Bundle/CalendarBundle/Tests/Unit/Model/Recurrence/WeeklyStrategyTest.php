@@ -83,10 +83,15 @@ class WeeklyStrategyTest extends AbstractTestStrategy
             ->setInterval($recurrenceData['interval'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setTimeZone($recurrenceData['timeZone'])
             ->setEndTime($recurrenceData['endTime'] === null
                 ? null
                 : new \DateTime($recurrenceData['endTime'], $this->getTimeZone()))
             ->setOccurrences($recurrenceData['occurrences']);
+
+        $calendarEvent = new Entity\CalendarEvent();
+        $calendarEvent->setStart(new \DateTime($recurrenceData['startTime']));
+        $recurrence->setCalendarEvent($calendarEvent);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
     }
@@ -357,6 +362,7 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => null,
                     'occurrences' => null,
+                    'timeZone' => 'UTC'
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.weekly2oro.calendar.recurrence.days.monday'
             ],
@@ -367,6 +373,7 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => null,
                     'occurrences' => 3,
+                    'timeZone' => 'UTC'
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.weekly2oro.calendar.recurrence.days'
                     . '.mondayoro.calendar.recurrence.patterns.occurrences3'
@@ -378,6 +385,7 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
+                    'timeZone' => 'UTC'
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.weekly2oro.calendar.recurrence.days'
                     . '.mondayoro.calendar.recurrence.patterns.end_date'
@@ -389,9 +397,22 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
+                    'timeZone' => 'UTC'
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.weekdayoro.calendar.recurrence.patterns.end_date'
-            ]
+            ],
+            'with_timezone' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['monday'],
+                    'startTime' => '2016-04-28 04:00:00',
+                    'endTime' => null,
+                    'occurrences' => null,
+                    'timeZone' => 'America/Los_Angeles'
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.weekly2oro.calendar.recurrence.days.monday'
+                    . 'oro.calendar.recurrence.patterns.timezone'
+            ],
         ];
     }
 
