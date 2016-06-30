@@ -233,20 +233,6 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
     }
 
-    public function testGetInvalidWorkflowItem()
-    {
-        $this->client->request(
-            'GET',
-            $this->getUrl(
-                'oro_workflow_api_rest_workflow_get',
-                ['workflowItemId' => 99999]
-            )
-        );
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 302);
-        $this->assertEmpty($result);
-    }
-
     public function testStartWorkflow()
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::NO_START_STEP);

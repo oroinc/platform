@@ -49,6 +49,5 @@ class ProcessDefinitionControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $result = $response->getContent();
         $this->assertContains(LoadProcessEntities::FIRST_DEFINITION, $result);
-        $this->assertContains('href="/admin/api/rest/latest/process/deactivate/first"', $result);
     }
 }

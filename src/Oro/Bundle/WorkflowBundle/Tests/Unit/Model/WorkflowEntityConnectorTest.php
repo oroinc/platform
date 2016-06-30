@@ -117,7 +117,7 @@ class WorkflowEntityConnectorTest extends \PHPUnit_Framework_TestCase
             [Type::INTEGER, true],
             [Type::SMALLINT, true],
             [Type::STRING, true],
-            [Type::TEXT, true],
+            [Type::TEXT, false],
             [Type::BINARY, false],
             ['other', false],
             'type object to string conversion' => [Type::getType(Type::SMALLINT), true]

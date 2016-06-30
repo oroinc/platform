@@ -1,7 +1,5 @@
-UPGRADE FROM 1.x to 2.0 
-=======================
-(todo - replace 1.x with corresponding previous release version of platform)
-
+UPGRADE FROM 1.10 to 2.0 
+========================
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` construction signature was changed: now it takes `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` and `Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager` as arguments.
@@ -28,4 +26,5 @@ UPGRADE FROM 1.x to 2.0
 - Removed form type `Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType`;
 - Service `oro_workflow.entity_connector` (`Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector`) was added with purpose to check whether entity can be used in workflow as related.
 - Now entity can have more than one active workflows.
- 
+- Added class `Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler` (`oro_workflow.handler.workflow_definition` service) for single point of `WorkflowDefinition` entity management.
+     All manipulations with `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity persistence should be provided through the handler. 

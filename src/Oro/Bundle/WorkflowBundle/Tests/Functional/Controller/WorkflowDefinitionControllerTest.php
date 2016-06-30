@@ -55,7 +55,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
             $this->generateBasicAuthHeader()
         );
         $response = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($response, 403);
+        $this->assertEquals(403, $response->getStatusCode());
     }
 
     public function testViewAction()

@@ -22,8 +22,7 @@ class WorkflowEntityConnector
         Type::DECIMAL,
         Type::INTEGER,
         Type::SMALLINT,
-        Type::STRING,
-        Type::TEXT
+        Type::STRING
     ];
 
     /** @var array|bool[] */
