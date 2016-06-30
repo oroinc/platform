@@ -10,7 +10,7 @@ class CollectionField extends Element
     /**
      * {@inheritdoc}
      */
-    public function setValue(array $values)
+    public function setValue($values)
     {
         /** @var Element $removeRawButton */
         while ($removeRawButton = $this->find('css', '.removeRow')) {
