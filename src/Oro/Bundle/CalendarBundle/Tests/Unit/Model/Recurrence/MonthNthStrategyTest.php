@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\MonthNthStrategy;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class MonthNthStrategyTest extends AbstractTestStrategy
 {
@@ -42,7 +43,16 @@ class MonthNthStrategyTest extends AbstractTestStrategy
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new MonthNthStrategy($translator, $dateTimeFormatter);
+        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()
+            ->setMethods(['getTimezone'])
+            ->getMock();
+        $localeSettings->expects($this->any())
+            ->method('getTimezone')
+            ->will($this->returnValue('UTC'));
+
+        $this->strategy = new MonthNthStrategy($translator, $dateTimeFormatter, $localeSettings);
     }
 
     public function testGetName()
@@ -74,10 +84,15 @@ class MonthNthStrategyTest extends AbstractTestStrategy
             ->setInstance($recurrenceData['instance'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setTimeZone($recurrenceData['timeZone'])
             ->setEndTime($recurrenceData['endTime'] === null
                 ? null
                 : new \DateTime($recurrenceData['endTime'], $this->getTimeZone()))
             ->setOccurrences($recurrenceData['occurrences']);
+
+        $calendarEvent = new Entity\CalendarEvent();
+        $calendarEvent->setStart(new \DateTime($recurrenceData['startTime']));
+        $recurrence->setCalendarEvent($calendarEvent);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
     }
@@ -96,6 +111,7 @@ class MonthNthStrategyTest extends AbstractTestStrategy
             ->setInstance($recurrenceData['instance'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setTimeZone('UTC')
             ->setOccurrences($recurrenceData['occurrences']);
 
         if (!empty($recurrenceData['endTime'])) {
@@ -303,6 +319,7 @@ class MonthNthStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => null,
                     'occurrences' => null,
+                    'timeZone' => 'UTC',
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthnth2oro.calendar.recurrence.days'
                     . '.sundayoro.calendar.recurrence.instances.third'
@@ -315,6 +332,7 @@ class MonthNthStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => null,
                     'occurrences' => 3,
+                    'timeZone' => 'UTC',
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthnth2oro.calendar.recurrence.days'
                     . '.sundayoro.calendar.recurrence.instances.thirdoro.calendar.recurrence.patterns.occurrences3'
@@ -327,10 +345,24 @@ class MonthNthStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
+                    'timeZone' => 'UTC',
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthnth2oro.calendar.recurrence.days.'
                     . 'sundayoro.calendar.recurrence.instances.thirdoro.calendar.recurrence.patterns.end_date'
-            ]
+            ],
+            'with_timezone' => [
+                'params' => [
+                    'interval' => 2,
+                    'instance' => 3,
+                    'dayOfWeek' => ['sunday'],
+                    'startTime' => '2016-04-28 04:00:00',
+                    'endTime' => null,
+                    'occurrences' => null,
+                    'timeZone' => 'America/Los_Angeles',
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.monthnth2oro.calendar.recurrence.days'
+                    . '.sundayoro.calendar.recurrence.instances.thirdoro.calendar.recurrence.patterns.timezone'
+            ],
         ];
     }
 

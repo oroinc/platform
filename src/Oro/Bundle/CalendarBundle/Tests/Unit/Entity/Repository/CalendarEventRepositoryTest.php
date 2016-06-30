@@ -74,6 +74,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
             . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
             . "r.instance as {$key}Instance, r.id as recurrenceId,"
+            . ' r.timeZone as recurrenceTimeZone,'
             . " r.calculatedEndTime as {$key}calculatedEndTime"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' LEFT JOIN e.relatedAttendee relatedAttendee'
@@ -117,6 +118,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
             . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
             . "r.instance as {$key}Instance, r.id as recurrenceId,"
+            . ' r.timeZone as recurrenceTimeZone,'
             . " r.calculatedEndTime as {$key}calculatedEndTime"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' LEFT JOIN e.relatedAttendee relatedAttendee'
@@ -164,6 +166,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
             . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
             . "r.instance as {$key}Instance, r.id as recurrenceId,"
+            . ' r.timeZone as recurrenceTimeZone,'
             . " r.calculatedEndTime as {$key}calculatedEndTime"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' LEFT JOIN e.relatedAttendee relatedAttendee'
@@ -212,6 +215,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
             . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
             . "r.instance as {$key}Instance, r.id as recurrenceId,"
+            . ' r.timeZone as recurrenceTimeZone,'
             . " r.calculatedEndTime as {$key}calculatedEndTime"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' LEFT JOIN e.relatedAttendee relatedAttendee'

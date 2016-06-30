@@ -85,7 +85,7 @@ class MonthlyStrategy extends AbstractStrategy
         $currentDate = clone $date;
         $currentDate->setDate($currentDate->format('Y'), $currentDate->format('m'), 1);
 
-        $result = new \DateTime("+{$interval} month {$currentDate->format('c')}", $this->getTimeZone());
+        $result = new \DateTime("+{$interval} month {$currentDate->format('c')}");
         $daysInMonth = (int)$result->format('t');
         $dayOfMonth = ($daysInMonth < $dayOfMonth) ? $daysInMonth : $dayOfMonth;
         $result->setDate($result->format('Y'), $result->format('m'), $dayOfMonth);

@@ -56,6 +56,7 @@ class LoadCalendarEventData extends AbstractFixture implements DependentFixtureI
                 $recurrence->setRecurrenceType($item['recurrence']['type'])
                     ->setInterval($item['recurrence']['interval'])
                     ->setOccurrences($item['recurrence']['occurrences'])
+                    ->setTimeZone($item['recurrence']['timeZone'])
                     ->setStartTime(
                         new \DateTime(gmdate(DATE_RFC3339, strtotime($item['recurrence']['startTime'])))
                     );

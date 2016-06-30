@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class MonthlyStrategyTest extends AbstractTestStrategy
 {
@@ -42,7 +43,16 @@ class MonthlyStrategyTest extends AbstractTestStrategy
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new MonthlyStrategy($translator, $dateTimeFormatter);
+        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()
+            ->setMethods(['getTimezone'])
+            ->getMock();
+        $localeSettings->expects($this->any())
+            ->method('getTimezone')
+            ->will($this->returnValue('UTC'));
+
+        $this->strategy = new MonthlyStrategy($translator, $dateTimeFormatter, $localeSettings);
     }
 
     public function testGetName()
@@ -73,10 +83,15 @@ class MonthlyStrategyTest extends AbstractTestStrategy
             ->setInterval($recurrenceData['interval'])
             ->setDayOfMonth($recurrenceData['dayOfMonth'])
             ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setTimeZone($recurrenceData['timeZone'])
             ->setEndTime($recurrenceData['endTime'] === null
                 ? null
                 : new \DateTime($recurrenceData['endTime'], $this->getTimeZone()))
             ->setOccurrences($recurrenceData['occurrences']);
+
+        $calendarEvent = new Entity\CalendarEvent();
+        $calendarEvent->setStart(new \DateTime($recurrenceData['startTime']));
+        $recurrence->setCalendarEvent($calendarEvent);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
     }
@@ -94,6 +109,7 @@ class MonthlyStrategyTest extends AbstractTestStrategy
             ->setInterval($recurrenceData['interval'])
             ->setDayOfMonth($recurrenceData['dayOfMonth'])
             ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setTimeZone('UTC')
             ->setOccurrences($recurrenceData['occurrences']);
 
         if (!empty($recurrenceData['endTime'])) {
@@ -288,6 +304,7 @@ class MonthlyStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => null,
                     'occurrences' => null,
+                    'timeZone' => 'UTC',
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthly210'
             ],
@@ -298,6 +315,7 @@ class MonthlyStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => null,
                     'occurrences' => 3,
+                    'timeZone' => 'UTC',
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthly210oro.calendar.recurrence.patterns.occurrences3'
             ],
@@ -308,9 +326,21 @@ class MonthlyStrategyTest extends AbstractTestStrategy
                     'startTime' => '2016-04-28',
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
+                    'timeZone' => 'UTC',
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthly210oro.calendar.recurrence.patterns.end_date'
-            ]
+            ],
+            'with_timezone' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 10,
+                    'startTime' => '2016-04-28 04:00:00',
+                    'endTime' => null,
+                    'occurrences' => null,
+                    'timeZone' => 'America/Los_Angeles',
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.monthly210oro.calendar.recurrence.patterns.timezone'
+            ],
         ];
     }
 

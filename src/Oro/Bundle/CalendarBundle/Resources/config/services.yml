@@ -345,6 +345,7 @@ services:
         arguments:
             - '@translator'
             - '@oro_locale.formatter.date_time'
+            - '@oro_locale.settings'
 
     oro_calendar.recurrence.strategy.delegate:
         class: '%oro_calendar.strategy.delegate.class%'

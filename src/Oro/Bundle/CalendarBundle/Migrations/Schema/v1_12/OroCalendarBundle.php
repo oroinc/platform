@@ -76,6 +76,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
         $table->addColumn('end_time', 'datetime', ['notnull' => false]);
         $table->addColumn('calculated_end_time', 'datetime', []);
         $table->addColumn('occurrences', 'integer', ['notnull' => false]);
+        $table->addColumn('timezone', 'string', ['notnull' => true, 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['start_time'], 'oro_calendar_r_start_time_idx', []);
         $table->addIndex(['end_time'], 'oro_calendar_r_end_time_idx', []);

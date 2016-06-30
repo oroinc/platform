@@ -321,7 +321,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         [
                             'displayName' => 'user',
                             'email'       => 'user@example.com',
-                            'user_id'     => null,
+                            'userId'      => null,
                             'createdAt'   => null,
                             'updatedAt'   => null,
                             'status'      => Attendee::STATUS_NONE,

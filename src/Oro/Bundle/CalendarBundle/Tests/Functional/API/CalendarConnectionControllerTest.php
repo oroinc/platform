@@ -70,6 +70,7 @@ class CalendarConnectionControllerTest extends WebTestCase
                 'startTime' => '2016-05-04T11:29:46+00:00',
                 'endTime' => null,
                 'occurrences' => null,
+                'timeZone' => 'UTC'
             ],
         ];
         $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
@@ -138,6 +139,7 @@ class CalendarConnectionControllerTest extends WebTestCase
                     'startTime' => '2016-05-04T11:29:46+00:00',
                     'endTime' => null,
                     'occurrences' => null,
+                    'timeZone' => 'UTC'
                 ],
             ],
             $this->extractInterestingResponseData($result[0])
@@ -220,6 +222,7 @@ class CalendarConnectionControllerTest extends WebTestCase
                 'startTime' => '2016-05-04T11:29:46+00:00',
                 'endTime' => null,
                 'occurrences' => null,
+                'timeZone' => 'UTC'
             ],
         ];
 
