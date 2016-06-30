@@ -22,7 +22,6 @@ class DumpConfigCommand extends AbstractDebugCommand
      * @var array
      */
     protected $knownExtras = [
-        'Oro\Bundle\ApiBundle\Config\ActionsConfigExtra',
         'Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra',
         'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
         'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',

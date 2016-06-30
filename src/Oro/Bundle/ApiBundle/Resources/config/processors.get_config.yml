@@ -27,14 +27,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: 20 }
 
-    oro_api.get_config.load_actions_from_config_bag:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadActionsFromConfigBag
-        arguments:
-            - '@oro_api.config_loader_factory'
-            - '@oro_api.config_bag'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: actions&!definition, priority: 10 }
-
     oro_api.get_config.complete_definition.associations.by_config:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfAssociationsByConfig
         arguments:

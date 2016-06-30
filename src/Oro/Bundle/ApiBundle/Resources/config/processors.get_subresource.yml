@@ -230,6 +230,30 @@ services:
     # normalize_data
     #
 
+    oro_api.get_subresource.initialize_entity_proxy.collection:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\InitializeEntityProxy
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: true, priority: 10 }
+
+    oro_api.get_subresource.initialize_entity_proxy.single_item:
+        class: Oro\Bundle\ApiBundle\Processor\Get\InitializeEntityProxy
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: false, priority: 10 }
+
+    oro_api.get_subresource.normalize_data.collection:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\NormalizeData
+        arguments:
+            - '@oro_api.object_normalizer'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: true, priority: -10 }
+
+    oro_api.get_subresource.normalize_data.single_item:
+        class: Oro\Bundle\ApiBundle\Processor\Get\NormalizeData
+        arguments:
+            - '@oro_api.object_normalizer'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: false, priority: -10 }
+
     #
     # finalize
     #
