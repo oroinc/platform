@@ -66,7 +66,7 @@ class RolePrivilegeCategoryProvider
     }
 
     /**
-     * Remove category from list
+     * Get category by name
      *
      * @param string $categoryName
      *
@@ -82,6 +82,8 @@ class RolePrivilegeCategoryProvider
     }
 
     /**
+     * Get all categories
+     *
      * @return array
      */
     public function getAllCategories()
@@ -106,7 +108,7 @@ class RolePrivilegeCategoryProvider
 
     /**
      * Get all categories
-     * 
+     *
      * @return PrivilegeCategory[]
      */
     public function getPermissionCategories()

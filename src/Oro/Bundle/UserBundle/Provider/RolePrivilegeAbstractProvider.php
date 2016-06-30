@@ -83,5 +83,4 @@ abstract class RolePrivilegeAbstractProvider
 
         return $allPrivileges;
     }
-
 }
