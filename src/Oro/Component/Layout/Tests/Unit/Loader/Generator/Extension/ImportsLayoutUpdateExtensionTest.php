@@ -32,7 +32,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
             $class = new \ReflectionClass(
                 'Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateVisitor'
             );
-            $property = $class->getProperty('import');
+            $property = $class->getProperty('imports');
             $property->setAccessible(true);
             $this->assertContains($property->getValue($visitor), $expectedData);
         }
@@ -50,13 +50,13 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'source' => [
-                    ImportsLayoutUpdateExtension::NODE_CONDITIONS => []
+                    ImportsLayoutUpdateExtension::NODE_IMPORTS => []
                 ],
                 'expectedData' => [],
             ],
             [
                 'source' => [
-                    ImportsLayoutUpdateExtension::NODE_CONDITIONS => [
+                    ImportsLayoutUpdateExtension::NODE_IMPORTS => [
                         'id' => 'import_id',
                         'root' => 'root_block_id',
                         'namespace' => 'import_namespace',
@@ -64,9 +64,9 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedData' => [
                     [
-                    'id' => 'import_id',
-                    'root' => 'root_block_id',
-                    'namespace' => 'import_namespace',
+                        'id' => 'import_id',
+                        'root' => 'root_block_id',
+                        'namespace' => 'import_namespace',
                     ]
                 ],
             ]

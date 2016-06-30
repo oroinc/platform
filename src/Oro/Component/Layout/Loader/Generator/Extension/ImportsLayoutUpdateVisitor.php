@@ -12,14 +12,14 @@ class ImportsLayoutUpdateVisitor implements VisitorInterface
     /**
      * @var array
      */
-    protected $import;
+    protected $imports;
 
     /**
-     * @param $import
+     * @param $imports
      */
-    public function __construct($import)
+    public function __construct($imports)
     {
-        $this->import = $import;
+        $this->imports = $imports;
     }
 
     /**
@@ -31,7 +31,7 @@ class ImportsLayoutUpdateVisitor implements VisitorInterface
         $class  = $visitContext->getClass();
         $class->addInterfaceName('Oro\Component\Layout\ImportsAwareLayoutUpdateInterface');
         $setFactoryMethod = PhpMethod::create('getImports');
-        $setFactoryMethod->setBody($writer->write('return '.var_export($this->import, true).';')->getContent());
+        $setFactoryMethod->setBody($writer->write('return '.var_export($this->imports, true).';')->getContent());
         $class->setMethod($setFactoryMethod);
     }
 

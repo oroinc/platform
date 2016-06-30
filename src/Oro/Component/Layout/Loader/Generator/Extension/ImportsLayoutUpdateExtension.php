@@ -8,7 +8,7 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
-    const NODE_CONDITIONS = 'imports';
+    const NODE_IMPORTS = 'imports';
 
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensi
     {
         $source = $data->getSource();
 
-        if (!empty($source[self::NODE_CONDITIONS])) {
-            $visitorCollection->append(new ImportsLayoutUpdateVisitor($source[self::NODE_CONDITIONS]));
+        if (!empty($source[self::NODE_IMPORTS])) {
+            $visitorCollection->append(new ImportsLayoutUpdateVisitor($source[self::NODE_IMPORTS]));
         }
     }
 }
