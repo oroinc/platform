@@ -10,9 +10,9 @@ Right now the bundle generates statistical information about:
 - Queries with identical parameters
 - Queries with different parameters
 
-![alt text](./Resources/doc/images/profiler_tab.png "Profiler tab screenshot")
+![alt text](./images/profiler_tab.png "Profiler tab screenshot")
 
-![alt text](./Resources/doc/images/profiler_panel.png "Profiler panel screenshot")
+![alt text](./images/profiler_panel.png "Profiler panel screenshot")
 
 ## License
 
