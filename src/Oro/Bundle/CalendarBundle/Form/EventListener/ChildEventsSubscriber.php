@@ -61,7 +61,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if (!empty($data['attendees']) && count($data['attendees']) > 0) {
+        if (!empty($data['attendees']) && is_array($data['attendees'])) {
             $attendees = &$data['attendees'];
 
             foreach ($attendees as &$attendee) {
