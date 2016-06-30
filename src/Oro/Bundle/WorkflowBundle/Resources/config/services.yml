@@ -135,6 +135,7 @@ services:
         class: Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider
         public: false
         tags:
+            - { name: oro_entity.exclusion_provider.default }
             - { name: oro_entity.exclusion_provider.api }
 
     oro_workflow.provider.virtual_relation.workflow:
