@@ -10,7 +10,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
  * Apply range filters for numerical fields in grids
  * Manage field tooltips from the UI
  * Override calendar-view.js in customizations
- * Duplicate queries profiler
+ * Profiler of duplicated queries
 
 CHANGELOG for 1.8.0
 ===================
