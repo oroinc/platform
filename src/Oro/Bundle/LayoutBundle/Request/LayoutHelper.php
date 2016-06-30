@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
-use Symfony\Component\HttpKernel\Kernel;
 
 class LayoutHelper
 {
