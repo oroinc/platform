@@ -58,7 +58,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
                 'label' => 'oro.workflow.workflowstep.entity_label',
                 'relation_type' => 'OneToMany',
                 'related_entity_name' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep',
-            ],
+            ]
         ];
     }
 
@@ -88,7 +88,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
                     ],
                     [
                         'join' => sprintf('%s.currentStep', self::ITEMS_RELATION_NAME),
-                        'alias' => self::STEPS_RELATION_NAME,
+                        'alias' => self::STEPS_RELATION_NAME
                     ]
                 ]
             ]

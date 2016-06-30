@@ -250,7 +250,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
                 'OroWorkflowBundle:WorkflowItem',
                 'wi',
                 Join::WITH,
-                'CAST(e.id as text) = wi.entityId AND wi.entityClass = ?1'
+                'CAST(e.id as string) = CAST(wi.entityId as string) AND wi.entityClass = ?1'
             )
             ->setParameter(1, 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity', \PDO::PARAM_STR)
             ->orderBy('e.id', 'ASC');

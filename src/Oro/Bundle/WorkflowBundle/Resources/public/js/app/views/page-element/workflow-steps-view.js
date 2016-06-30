@@ -43,8 +43,8 @@ define(function(require) {
             var $lists = this.$('.workflow-step-container');
             $container.width(10000);
             var maxListWidth = $lists.width();
-            _.each($lists, function($list){
-                if((this.$($list).width()+1)>maxListWidth){
+            _.each($lists, function($list) {
+                if ((this.$($list).width() + 1) > maxListWidth) {
                     maxListWidth = this.$($list).width();
                 }
             }, this);

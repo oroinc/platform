@@ -1,4 +1,4 @@
-{% if entity is defined %}
+{% if entity is defined and entity is not empty %}
     {% set entity_class = oro_class_name(entity) %}
 {% endif %}
 {% if entity_class is defined and has_workflows(entity_class) and resource_granted('oro_workflow') %}
