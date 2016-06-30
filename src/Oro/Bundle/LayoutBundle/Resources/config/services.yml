@@ -103,6 +103,13 @@ services:
         tags:
             - { name: layout.block_type_extension, alias: block }
 
+    oro_layout.block_type_extension.profiler:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ProfilerExtension
+        arguments:
+            - '@oro_layout.helper'
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
     oro_layout.layout_context_configurator.config_expression:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionContextConfigurator
         tags:
