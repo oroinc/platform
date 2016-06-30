@@ -1,16 +1,16 @@
 <?php
 
-namespace Oro\Bundle\AsseticBundle\Tests\Unit\Command;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Command;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-use Oro\Bundle\AsseticBundle\Command\AssetsDumpCommand;
+use Oro\Bundle\LayoutBundle\Command\AssetsThemeDumpCommand;
 
-class AssetsDumpCommandTest extends \PHPUnit_Framework_TestCase
+class AssetsThemeDumpCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var AssetsDumpCommand
+     * @var AssetsThemeDumpCommand
      */
     private $command;
 
@@ -21,7 +21,7 @@ class AssetsDumpCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->command = new AssetsDumpCommand();
+        $this->command = new AssetsThemeDumpCommand();
 
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $this->command->setContainer($this->container);
@@ -63,10 +63,10 @@ class AssetsDumpCommandTest extends \PHPUnit_Framework_TestCase
                 'name' => ''
             ],
             'valid name' => [
-                'name' => '.scss'
+                'name' => 'default'
             ],
             'invalid name' => [
-                'name' => 'txt'
+                'name' => 'sometest'
             ],
         ];
     }

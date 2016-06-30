@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AsseticBundle\Command;
+namespace Oro\Bundle\LayoutBundle\Command;
 
 use Symfony\Bundle\AsseticBundle\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
