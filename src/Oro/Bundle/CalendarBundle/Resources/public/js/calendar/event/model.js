@@ -141,12 +141,7 @@ define([
         },
 
         getInvitationStatus: function() {
-            var invitationStatus = this.get('invitationStatus');
-            if (!invitationStatus) {
-                return 'none';
-            }
-
-            return invitationStatus;
+            return this.get('invitationStatus');
         }
     });
 
