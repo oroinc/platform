@@ -24,6 +24,10 @@ class JSON
             return null;
         }
 
+        if (is_object($string)) {
+            throw new \InvalidArgumentException(sprintf('Object is not valid json. class: "%s"', get_class($string)));
+        }
+
         $decoded = json_decode($string, true);
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new \InvalidArgumentException(sprintf(
