@@ -176,6 +176,7 @@ class DateFormatExtension extends \Twig_Extension
             $startDate,
             $endDate,
             $skipTime,
+            null,
             $dateType,
             $timeType,
             $locale,
