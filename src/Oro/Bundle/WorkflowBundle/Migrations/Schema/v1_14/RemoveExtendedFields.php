@@ -9,14 +9,23 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class RemoveExtendedFields implements Migration, ContainerAwareInterface
+class RemoveExtendedFields implements Migration, ContainerAwareInterface, OrderedMigrationInterface
 {
     use ContainerAwareTrait;
 
     const PROPERTY_WORKFLOW_ITEM = 'workflowItem';
     const PROPERTY_WORKFLOW_STEP = 'workflowStep';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 2;
+    }
 
     /**
      * {@inheritdoc}
