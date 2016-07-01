@@ -147,8 +147,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             ($item['calendar'] === $calendarId)
             && $this->securityFacade->isGranted('oro_calendar_event_delete');
         $item['notifiable'] =
-            !empty($item['invitationStatus'])
-            && empty($item['parentEventId'])
+            empty($item['parentEventId'])
             && !empty($item['attendees'])
             && empty($item['recurrence']);
     }

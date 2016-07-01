@@ -106,6 +106,10 @@ define([
                 _.partial(_.pick, _, 'displayName', 'email', 'status', 'type')
             );
 
+            if (!this.get('id')) {
+                modelData.notifyInvitedUsers = true;
+            }
+
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);
 
