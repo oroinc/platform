@@ -10,7 +10,6 @@ use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterfac
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailNotification implements SenderAwareEmailNotificationInterface
 {
