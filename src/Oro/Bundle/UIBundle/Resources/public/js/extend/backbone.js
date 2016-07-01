@@ -6,8 +6,73 @@ define([
 ], function($, _, Backbone, componentContainerMixin) {
     'use strict';
 
+    var OriginalBackboneView = Backbone.View;
+    Backbone.View = _.wrap(Backbone.View, function(original) {
+        this.subviews = [];
+        this.subviewsByName = {};
+        original.apply(this, _.rest(arguments));
+    });
+    _.extend(Backbone.View, OriginalBackboneView);
+    Backbone.View.prototype = OriginalBackboneView.prototype;
+
     // Backbone.View
+    Backbone.View.prototype.subviews = null;
+    Backbone.View.prototype.subviewsByName = null;
     _.extend(Backbone.View.prototype, componentContainerMixin);
+
+    Backbone.View.prototype.subview = function(name, view) {
+        var subviews = this.subviews;
+        var byName = this.subviewsByName;
+        if (name && view) {
+            this.removeSubview(name);
+            subviews.push(view);
+            byName[name] = view;
+            return view;
+        } else if (name) {
+            return byName[name];
+        }
+    };
+
+    Backbone.View.prototype.removeSubview = function(nameOrView) {
+        var byName;
+        var index;
+        var name;
+        var otherName;
+        var otherView;
+        var subviews;
+        var view;
+        if (!nameOrView) {
+            return;
+        }
+        subviews = this.subviews;
+        byName = this.subviewsByName;
+        if (typeof nameOrView === 'string') {
+            name = nameOrView;
+            view = byName[name];
+        } else {
+            view = nameOrView;
+            for (otherName in byName) {
+                if (byName.hasOwnProperty(otherName)) {
+                    otherView = byName[otherName];
+                    if (otherView !== view) {
+                        continue;
+                    }
+                    name = otherName;
+                    break;
+                }
+            }
+        }
+        if (!(name && view && view.dispose)) {
+            return;
+        }
+        view.dispose();
+        index = _.indexOf(subviews, view);
+        if (index !== -1) {
+            subviews.splice(index, 1);
+        }
+        return delete byName[name];
+    };
+
     Backbone.View.prototype.disposed = false;
     Backbone.View.prototype.dispose = function() {
         var prop;
@@ -76,9 +141,21 @@ define([
      * @protected
      */
     Backbone.View.prototype._resolveDeferredRender = function() {
+        var self = this;
         if (this.deferredRender) {
-            this.deferredRender.resolve(this);
-            delete this.deferredRender;
+            var promises = [];
+
+            if (this.subviews.length) {
+                _.each(this.subviews, function(subview) {
+                    if (subview.deferredRender) {
+                        promises.push(subview.deferredRender.promise());
+                    }
+                });
+            }
+            $.when.apply($, promises).done(function() {
+                self.deferredRender.resolve(self);
+                delete self.deferredRender;
+            });
         }
     };
 

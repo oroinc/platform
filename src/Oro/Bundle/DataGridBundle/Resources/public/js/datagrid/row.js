@@ -289,6 +289,7 @@ define([
         },
 
         render: function() {
+            this._deferredRender();
             if (this.template) {
                 this.renderCustomTemplate();
             } else {
@@ -303,7 +304,11 @@ define([
                 if (this.$el.data('layout-model')) {
                     options[this.$el.data('layout-model')] = this.model;
                 }
-                this.initLayout(options);
+                this.initLayout(options).always(_.bind(function() {
+                    this._resolveDeferredRender();
+                }, this));
+            } else {
+                this._resolveDeferredRender();
             }
 
             return this;

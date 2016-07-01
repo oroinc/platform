@@ -411,7 +411,6 @@ datagrid:
                 role-premissions:
                     type: frontend
                     frontend_type: role-permissions
-                    rowAction: true
             filters: ~
             sorters: ~
             options:
