@@ -243,7 +243,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => null,
+                    'invitationStatus' => '',
                     'invitedUsers'     => [],
                     'attendees'        => [],
                     'recurringEventId' => null,
@@ -263,7 +263,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => CalendarEvent::STATUS_NONE,
+                    'invitationStatus' => null,
                     'editable'         => true,
                     'removable'        => true,
                     'notifiable'       => false,
@@ -287,7 +287,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => CalendarEvent::STATUS_NONE,
+                    'invitationStatus' => null,
                     'attendees'        => [
                         [
                             'displayName' => 'user',
@@ -312,10 +312,10 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => CalendarEvent::STATUS_NONE,
+                    'invitationStatus' => null,
                     'editable'         => true,
                     'removable'        => true,
-                    'notifiable'       => true,
+                    'notifiable'       => false,
                     'invitedUsers'     => [],
                     'attendees'        => [
                         [
@@ -361,7 +361,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => CalendarEvent::STATUS_NONE,
+                    'invitationStatus' => null,
                     'attendees'        => [],
                     'editable'         => false,
                     'removable'        => false,

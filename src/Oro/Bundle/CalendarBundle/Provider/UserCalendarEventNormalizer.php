@@ -103,7 +103,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'backgroundColor'  => $event->getBackgroundColor(),
                 'createdAt'        => $event->getCreatedAt(),
                 'updatedAt'        => $event->getUpdatedAt(),
-                'invitationStatus' => $event->getInvitationStatus(),
+                'invitationStatus' => $this->getEventStatus($event),
                 'parentEventId'    => $event->getParent() ? $event->getParent()->getId() : null,
                 'calendar'         => $event->getCalendar() ? $event->getCalendar()->getId() : null,
                 'recurringEventId' => $event->getRecurringEvent() ? $event->getRecurringEvent()->getId() : null,
@@ -112,6 +112,26 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             ],
             $this->prepareExtraValues($event, $extraValues)
         );
+    }
+
+    /**
+     * @param CalendarEvent $event
+     *
+     * @return string
+     */
+    protected function getEventStatus(CalendarEvent $event)
+    {
+        $relatedAttendee = $event->getRelatedAttendee();
+
+        if ($relatedAttendee) {
+            $status = $relatedAttendee->getStatus();
+
+            if ($status) {
+                return $status->getId();
+            }
+        }
+
+        return null;
     }
 
     /**

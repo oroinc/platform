@@ -142,11 +142,8 @@ define([
 
         getInvitationStatus: function() {
             var invitationStatus = this.get('invitationStatus');
-            var attendees = this.get('attendees');
-            if (!invitationStatus && attendees && attendees.length) {
-                invitationStatus = 'accepted';
-            }
-            return invitationStatus;
+
+            return invitationStatus === '' ? null : invitationStatus;
         }
     });
 

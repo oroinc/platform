@@ -65,7 +65,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
-            . ' COALESCE(status.id, \'none\') AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
             . ' e.originalStart, e.cancelled AS isCancelled,'
@@ -109,7 +109,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
-            . ' COALESCE(status.id, \'none\') AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
             . ' e.originalStart, e.cancelled AS isCancelled,'
@@ -157,7 +157,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
-            . ' COALESCE(status.id, \'none\') AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
             . ' e.originalStart, e.cancelled AS isCancelled,'
@@ -206,7 +206,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt, e.status,'
-            . ' COALESCE(status.id, \'none\') AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' status.id AS invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
             . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
             . ' e.originalStart, e.cancelled AS isCancelled,'
