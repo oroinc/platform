@@ -20,6 +20,11 @@ class LocalizationHelper
     protected $entityClass;
 
     /**
+     * @var Localization[]
+     */
+    protected $locales;
+
+    /**
      * LocaleHelper constructor.
      * @param ManagerRegistry $registry
      */
@@ -41,16 +46,20 @@ class LocalizationHelper
      */
     public function getCurrentLocalization()
     {
-        $items = $this->getRepository()->findBy([], ['id' => 'ASC']);
+        if (!$this->locales) {
+            $items = $this->getRepository()->findBy([], ['id' => 'ASC']);
 
-        $withEnglish = array_filter(
-            $items,
-            function (Localization $localization) {
-                return $localization->getLanguageCode() === 'en';
-            }
-        );
+            $withEnglish = array_filter(
+                $items,
+                function (Localization $localization) {
+                    return $localization->getLanguageCode() === 'en';
+                }
+            );
 
-        return $withEnglish ? reset($withEnglish) : reset($items);
+            $this->locales = $withEnglish ? reset($withEnglish) : reset($items);
+        }
+
+        return $this->locales;
     }
 
     /**
