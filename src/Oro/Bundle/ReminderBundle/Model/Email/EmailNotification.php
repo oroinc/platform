@@ -95,16 +95,6 @@ class EmailNotification implements SenderAwareEmailNotificationInterface
     }
 
     /**
-     * Get email recipient
-     *
-     * @return User
-     */
-    public function getRecipient()
-    {
-        return $this->getReminder()->getRecipient();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getSenderEmail()
