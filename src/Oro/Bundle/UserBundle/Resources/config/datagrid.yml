@@ -419,6 +419,7 @@ datagrid:
                 toolbarOptions:
                     placement:
                         top: false
+                        bottom: false
 
     group-users-grid:
         extends: user-relation-grid
