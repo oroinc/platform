@@ -255,3 +255,12 @@ services:
             - @oro_locale.dql.formatter.name.link
         tags:
             - { name: oro_entity.name_provider, priority: -90 }
+
+    oro_locale.twig.date_time_user:
+        class: Oro\Bundle\LocaleBundle\Twig\DateTimeUserExtension
+        arguments:
+            - '@oro_locale.formatter.date_time'
+        calls:
+            - [setConfigManager, ['@oro_config.manager']]
+        tags:
+            - { name: twig.extension }
