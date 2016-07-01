@@ -95,6 +95,7 @@ define(function(require) {
         }),
 
         onItemClick: function(e) {
+            e.preventDefault();
             var subview = _.find(this.subviews, function(subview) {
                 return subview.el === e.currentTarget;
             });
