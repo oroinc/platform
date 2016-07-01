@@ -25,7 +25,6 @@ class OroDataGridBundleInstaller implements Installation
     {
         $this->createOroGridViewTable($schema);
         $this->createOroGridViewUserTable($schema);
-        DefaultGridViewUsersRelation::createOroDefaultGridViewUsersTable($schema);
     }
 
     /**
