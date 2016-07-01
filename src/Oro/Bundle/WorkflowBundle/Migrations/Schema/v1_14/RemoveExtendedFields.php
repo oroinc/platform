@@ -39,8 +39,6 @@ class RemoveExtendedFields implements Migration, ContainerAwareInterface
                 $fieldConfigStep = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_STEP);
                 $fieldConfigStep->set('state', ExtendScope::STATE_DELETE);
                 $configManager->persist($fieldConfigStep);
-
-                $configManager->flush();
             }
         }
 
