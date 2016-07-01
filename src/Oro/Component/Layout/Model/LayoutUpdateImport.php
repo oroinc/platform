@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout\Model;
 
+use Oro\Component\Layout\Exception\LogicException;
+use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
+
 class LayoutUpdateImport
 {
     /**
@@ -53,5 +56,40 @@ class LayoutUpdateImport
     public function getNamespace()
     {
         return $this->namespace;
+    }
+
+    /**
+     * @param array $importProperties
+     * @return static
+     */
+    public static function createFromArray(array $importProperties)
+    {
+        if (!array_key_exists(ImportsAwareLayoutUpdateInterface::ID_KEY, $importProperties)) {
+            throw new LogicException(sprintf(
+                'Import id should be provided, array with "%s" keys given',
+                implode(', ', array_keys($importProperties))
+            ));
+        }
+        $importProperties = array_merge([
+            ImportsAwareLayoutUpdateInterface::ROOT_KEY => null,
+            ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,
+        ], $importProperties);
+        return new static(
+            $importProperties[ImportsAwareLayoutUpdateInterface::ID_KEY],
+            $importProperties[ImportsAwareLayoutUpdateInterface::ROOT_KEY],
+            $importProperties[ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY]
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            ImportsAwareLayoutUpdateInterface::ID_KEY => $this->getId(),
+            ImportsAwareLayoutUpdateInterface::ROOT_KEY => $this->getRoot(),
+            ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => $this->getNamespace(),
+        ];
     }
 }
