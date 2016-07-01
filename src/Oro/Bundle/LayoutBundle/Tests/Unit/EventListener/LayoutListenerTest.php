@@ -318,6 +318,9 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
                     $layout->expects($this->once())
                         ->method('render')
                         ->willReturn('Test Layout');
+                    $layout->expects($this->any())
+                        ->method('getView')
+                        ->will($this->returnValue($this->getMock('Oro\Component\Layout\BlockView')));
 
                     return $layout;
                 }
