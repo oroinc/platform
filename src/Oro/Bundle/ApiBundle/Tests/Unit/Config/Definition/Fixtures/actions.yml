@@ -22,6 +22,13 @@ description:
             delete:
                 description: test
 
+not_permissible_action:
+    config:
+        actions:
+            undefined_action: false
+    expected: []
+    error: 'Invalid configuration for path "entity.actions": The section "actions.action" contains not permissible actions: "undefined_action". Permissible actions: "get, get_list, update, create, delete, delete_list, get_subresource, get_relationship, update_relationship, add_relationship, delete_relationship".'
+
 null_description:
     config:
         actions:

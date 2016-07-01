@@ -49,13 +49,19 @@ class CompleteDescriptions implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
+        $targetAction = $context->getTargetAction();
+        if (!$targetAction) {
+            // descriptions cannot be set for undefined target action
+            return;
+        }
+
         $entityClass = $context->getClassName();
         $definition = $context->getResult();
 
         $this->setDescriptionForEntity(
             $definition,
             $entityClass,
-            $context->getTargetAction(),
+            $targetAction,
             $context->isCollection(),
             $context->getAssociationName()
         );

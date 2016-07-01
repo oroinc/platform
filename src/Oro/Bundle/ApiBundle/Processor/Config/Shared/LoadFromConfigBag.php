@@ -31,6 +31,9 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     /** @var NodeInterface */
     private $configurationTree;
 
+    /** @var array */
+    private $configCache = [];
+
     /**
      * @param ConfigExtensionRegistry          $configExtensionRegistry
      * @param ConfigLoaderFactory              $configLoaderFactory
@@ -101,6 +104,24 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      * @return array
      */
     protected function loadConfig($entityClass, $version)
+    {
+        $cacheKey = $entityClass . '|' . $version;
+        if (isset($this->configCache[$cacheKey])) {
+            return $this->configCache[$cacheKey];
+        }
+
+        $config = $this->buildConfig($entityClass, $version);
+        $this->configCache[$cacheKey] = $config;
+
+        return $config;
+    }
+    /**
+     * @param string $entityClass
+     * @param string $version
+     *
+     * @return array
+     */
+    protected function buildConfig($entityClass, $version)
     {
         $config = $this->getConfig($entityClass, $version);
         $isInherit = true;

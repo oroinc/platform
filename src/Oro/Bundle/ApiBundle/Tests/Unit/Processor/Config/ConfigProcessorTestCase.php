@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -36,11 +37,30 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
+        $actionProcessorBag = $this->getMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
+        $actionProcessorBag->expects($this->any())
+            ->method('getActions')
+            ->willReturn(
+                [
+                    ApiActions::GET,
+                    ApiActions::GET_LIST,
+                    ApiActions::UPDATE,
+                    ApiActions::CREATE,
+                    ApiActions::DELETE,
+                    ApiActions::DELETE_LIST,
+                    ApiActions::GET_SUBRESOURCE,
+                    ApiActions::GET_RELATIONSHIP,
+                    ApiActions::UPDATE_RELATIONSHIP,
+                    ApiActions::ADD_RELATIONSHIP,
+                    ApiActions::DELETE_RELATIONSHIP,
+                ]
+            );
+
         $this->configExtensionRegistry = new ConfigExtensionRegistry();
         $this->configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $this->configExtensionRegistry->addExtension(new SortersConfigExtension());
-        $this->configExtensionRegistry->addExtension(new ActionsConfigExtension());
-        $this->configExtensionRegistry->addExtension(new SubresourcesConfigExtension());
+        $this->configExtensionRegistry->addExtension(new ActionsConfigExtension($actionProcessorBag));
+        $this->configExtensionRegistry->addExtension(new SubresourcesConfigExtension($actionProcessorBag));
 
         $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);
     }

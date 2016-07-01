@@ -52,17 +52,22 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
         $action = $context->getTargetAction();
         if ($action) {
             if (!empty($config[ConfigUtil::ACTIONS][$action])) {
-                $actionConfig = $config[ConfigUtil::ACTIONS][$action];
-                $actionConfig[ActionConfig::STATUS_CODES] = $this->loadStatusCodes($context, $actionConfig);
-                $config = $this->mergeActionConfig($config, $actionConfig);
+                $config = $this->mergeActionConfig(
+                    $config,
+                    $config[ConfigUtil::ACTIONS][$action],
+                    $context
+                );
             }
             $association = $context->getAssociationName();
-            if ($association
-                && !empty($config[ConfigUtil::SUBRESOURCES][$association][ConfigUtil::ACTIONS][$action])
-            ) {
-                $subresourceConfig = $config[ConfigUtil::SUBRESOURCES][$association][ConfigUtil::ACTIONS][$action];
-                $subresourceConfig[ActionConfig::STATUS_CODES] = $this->loadStatusCodes($context, $subresourceConfig);
-                $config = $this->mergeActionConfig($config, $subresourceConfig);
+            if ($association) {
+                $parentConfig = $this->loadConfig($context->getParentClassName(), $context->getVersion());
+                if (!empty($parentConfig[ConfigUtil::SUBRESOURCES][$association][ConfigUtil::ACTIONS][$action])) {
+                    $config = $this->mergeActionConfig(
+                        $config,
+                        $parentConfig[ConfigUtil::SUBRESOURCES][$association][ConfigUtil::ACTIONS][$action],
+                        $context
+                    );
+                }
             }
         }
 
@@ -70,36 +75,33 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     }
 
     /**
-     * @param ConfigContext $context
-     * @param array         $actionConfig
+     * @param array $statusCodesConfig
      *
-     * @return StatusCodesConfig|null
+     * @return StatusCodesConfig
      */
-    protected function loadStatusCodes(ConfigContext $context, array $actionConfig)
+    protected function loadStatusCodes(array $statusCodesConfig)
     {
-        $statusCodes = null;
-        if (array_key_exists(ActionConfig::STATUS_CODES, $actionConfig)
-            && $context->hasExtra(DescriptionsConfigExtra::NAME)
-        ) {
-            $statusCodesLoader = new StatusCodesConfigLoader();
-            $statusCodes = $statusCodesLoader->load($actionConfig[ActionConfig::STATUS_CODES]);
-        }
+        $statusCodesLoader = new StatusCodesConfigLoader();
 
-        return $statusCodes;
+        return $statusCodesLoader->load($statusCodesConfig);
     }
 
     /**
-     * @param array $config
-     * @param array $actionConfig
+     * @param array         $config
+     * @param array         $actionConfig
+     * @param ConfigContext $context
      *
      * @return array
      */
-    protected function mergeActionConfig(array $config, array $actionConfig)
+    protected function mergeActionConfig(array $config, array $actionConfig, ConfigContext $context)
     {
-        if (array_key_exists(ActionConfig::STATUS_CODES, $actionConfig)
-            && null !== $actionConfig[ActionConfig::STATUS_CODES]
+        if (!empty($actionConfig[ActionConfig::STATUS_CODES])
+            && $context->hasExtra(DescriptionsConfigExtra::NAME)
         ) {
-            $config = $this->mergeStatusCodes($config, $actionConfig[ActionConfig::STATUS_CODES]);
+            $config = $this->mergeStatusCodes(
+                $config,
+                $this->loadStatusCodes($actionConfig[ActionConfig::STATUS_CODES])
+            );
         }
         unset($actionConfig[ActionConfig::STATUS_CODES]);
 

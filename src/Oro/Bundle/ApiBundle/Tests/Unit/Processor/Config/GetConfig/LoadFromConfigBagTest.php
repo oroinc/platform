@@ -417,7 +417,9 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         ],
                     ]
                 ]
-            ],
+            ]
+        ];
+        $parentConfig = [
             'subresources' => [
                 'testSubresource' => [
                     'actions' => [
@@ -445,15 +447,23 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->configBag->expects($this->once())
+        $this->configBag->expects($this->exactly(2))
             ->method('getConfig')
-            ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
-            ->willReturn($config);
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
 
-        $this->entityHierarchyProvider->expects($this->once())
+        $this->entityHierarchyProvider->expects($this->exactly(2))
             ->method('getHierarchyForClassName')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn([]);
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
 
         $this->context->setTargetAction('create');
         $this->context->setParentClassName('Test\ParentClass');
@@ -524,7 +534,9 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         ],
                     ]
                 ]
-            ],
+            ]
+        ];
+        $parentConfig = [
             'subresources' => [
                 'testSubresource' => [
                     'actions' => [
@@ -552,15 +564,23 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->configBag->expects($this->once())
+        $this->configBag->expects($this->exactly(2))
             ->method('getConfig')
-            ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
-            ->willReturn($config);
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
 
-        $this->entityHierarchyProvider->expects($this->once())
+        $this->entityHierarchyProvider->expects($this->exactly(2))
             ->method('getHierarchyForClassName')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn([]);
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
 
         $this->context->setExtras([new DescriptionsConfigExtra()]);
         $this->context->setTargetAction('create');

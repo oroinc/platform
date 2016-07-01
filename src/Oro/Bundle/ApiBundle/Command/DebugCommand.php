@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -70,9 +71,12 @@ class DebugCommand extends AbstractDebugCommand
      */
     protected function dumpActions(OutputInterface $output)
     {
+        /** @var ActionProcessorBagInterface $processorBag */
+        $actionProcessorBag = $this->getContainer()->get('oro_api.action_processor_bag');
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
 
+        $output->writeln('<info>All Actions:</info>');
         $table = new Table($output);
         $table->setHeaders(['Action', 'Groups']);
 
@@ -86,6 +90,11 @@ class DebugCommand extends AbstractDebugCommand
         }
 
         $table->render();
+
+        $output->writeln('<info>Public Actions:</info>');
+        foreach ($actionProcessorBag->getActions() as $action) {
+            $output->writeln('  ' . $action);
+        }
 
         $output->writeln('');
         $output->writeln(

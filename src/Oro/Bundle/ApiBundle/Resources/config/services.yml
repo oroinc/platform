@@ -172,12 +172,16 @@ services:
     oro_api.config_extension.actions:
         class: Oro\Bundle\ApiBundle\Config\ActionsConfigExtension
         public: false
+        arguments:
+            - '@oro_api.action_processor_bag'
         tags:
             - { name: oro_api.config_extension }
 
     oro_api.config_extension.subresources:
         class: Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension
         public: false
+        arguments:
+            - '@oro_api.action_processor_bag'
         tags:
             - { name: oro_api.config_extension }
 
