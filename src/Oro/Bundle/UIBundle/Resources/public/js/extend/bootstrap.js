@@ -101,13 +101,43 @@ define([
     Popover.prototype.tip = function() {
         if (!this.$tip) {
             this.$tip = $(this.options.template);
-            var addClass = this.$element.data('class');
+
+            var addClass = this.options.class || '';
             if (addClass && !this.$tip.hasClass(addClass)) {
                 this.$tip.addClass(addClass);
             }
+
+            var addCloseButton = this.options.closeButton || false;
+            if (!addCloseButton) {
+                this.$tip.find('.popover-close').hide();
+            }
+
+            this.$tip.find('.popover-close').on('click', _.bind(function () {
+                this.hide();
+            }, this));
         }
         return this.$tip;
     };
+
+    $.fn.popover.defaults = $.extend({} , $.fn.popover.defaults, {
+        template: [
+            '<div class="popover">',
+                '<div class="arrow"></div>',
+                '<h3 class="popover-title"></h3>',
+                '<button class="popover-close"><i class="icon-remove"></i></button>',
+                '<div class="popover-content"></div>',
+            '</div>'
+        ].join('')
+    });
+
+    Popover.prototype.setContent = _.wrap(Popover.prototype.setContent, function(oroginal) {
+        oroginal.apply(this, _.rest(arguments));
+        if (this.getTitle().length > 0) {
+            this.$tip.find('.popover-title').show();
+        } else {
+            this.$tip.find('.popover-title').hide();
+        }
+    });
 
     Popover.prototype.applyPlacement = function(offset, placement) {
         /** Following snippet was copied from original Bootstrap method to fix bug with offset correction.

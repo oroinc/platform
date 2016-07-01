@@ -5,7 +5,7 @@ parameters:
     oro_address.provider.address.class:     Oro\Bundle\AddressBundle\Provider\AddressProvider
     oro_address.provider.phone.class:       Oro\Bundle\AddressBundle\Provider\PhoneProvider
     oro_address.validator.valid_region.class: Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator
-
+    oro_address.extension.action.type.map.class: Oro\Bundle\AddressBundle\Extension\Action\Actions\MapAction
 
 services:
     oro_address.address.manager:
@@ -29,3 +29,9 @@ services:
         class: %oro_address.validator.valid_region.class%
         tags:
             - { name: validator.constraint_validator, alias: oro_address_valid_region }
+
+    oro_address.extension.action.type.map:
+        class: '%oro_address.extension.action.type.map.class%'
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: map }
