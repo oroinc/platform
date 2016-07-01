@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
@@ -14,6 +15,9 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowManager;
+
+    /** @var WorkflowEntityConnector|\PHPUnit_Framework_MockObject_MockObject */
+    protected $entityConnector;
 
     /** @var WorkflowItemListener */
     protected $listener;
@@ -28,9 +32,14 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->listener = new WorkflowItemListener(
             $this->doctrineHelper,
-            $this->workflowManager
+            $this->workflowManager,
+            $this->entityConnector
         );
     }
 
@@ -124,6 +133,11 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityConnector->expects($this->once())
+            ->method('isApplicableEntity')
+            ->with($entity)
+            ->willReturn(true);
+
         $this->workflowManager->expects($this->once())
             ->method('getWorkflowItemsByEntity')
             ->with($entity)
@@ -161,6 +175,26 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
                 'hasWorkflowItem' => true,
             ),
         );
+    }
+
+    public function testPreRemoveWithUnsupportedEntity()
+    {
+        $entity = new \DateTime();
+
+        $this->entityConnector->expects($this->once())
+            ->method('isApplicableEntity')
+            ->with($entity)
+            ->willReturn(false);
+
+        $this->workflowManager->expects($this->never())->method($this->anything());
+
+        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event->expects($this->once())->method('getEntity')->willReturn($entity);
+        $event->expects($this->never())->method('getEntityManager');
+
+        $this->listener->preRemove($event);
     }
 
     public function testScheduleStartWorkflowForNewEntityNoWorkflow()
