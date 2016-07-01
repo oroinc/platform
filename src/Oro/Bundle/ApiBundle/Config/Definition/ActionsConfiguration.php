@@ -11,6 +11,17 @@ use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 
 class ActionsConfiguration extends AbstractConfigurationSection
 {
+    /** @var string */
+    protected $sectionName;
+
+    /**
+     * @param string $sectionName
+     */
+    public function __construct($sectionName = 'actions.action')
+    {
+        $this->sectionName = $sectionName;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -42,7 +53,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
      */
     protected function configureActionNode(NodeBuilder $node)
     {
-        $sectionName = 'actions.action';
+        $sectionName = $this->sectionName;
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
@@ -87,6 +98,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $fieldNode = $node
             ->arrayNode(ActionConfig::FIELDS)
                 ->useAttributeAsKey('name')
+                ->normalizeKeys(false)
                 ->prototype('array')
                     ->children();
         $this->configureFieldNode($fieldNode);
@@ -123,7 +135,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
      */
     protected function configureStatusCodeNode(NodeBuilder $node)
     {
-        $sectionName = 'actions.action.status_code';
+        $sectionName = $this->sectionName . '.status_code';
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
@@ -138,7 +150,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
      */
     protected function configureFieldNode(NodeBuilder $node)
     {
-        $sectionName = 'actions.action.field';
+        $sectionName = $this->sectionName . '.field';
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();

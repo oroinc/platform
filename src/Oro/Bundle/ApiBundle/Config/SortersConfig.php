@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Component\EntitySerializer\EntityConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Represents a configuration of all sorters for an entity.
@@ -38,14 +39,11 @@ class SortersConfig implements EntityConfigInterface
      */
     public function toArray()
     {
-        $result = $this->items;
+        $result = $this->convertItemsToArray();
         $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
-
-        if (!empty($this->fields)) {
-            foreach ($this->fields as $fieldName => $field) {
-                $fieldConfig                      = $field->toArray();
-                $result[self::FIELDS][$fieldName] = !empty($fieldConfig) ? $fieldConfig : null;
-            }
+        $fields = ConfigUtil::convertObjectsToArray($this->fields, true);
+        if (!empty($fields)) {
+            $result[self::FIELDS] = $fields;
         }
 
         return $result;
@@ -64,22 +62,12 @@ class SortersConfig implements EntityConfigInterface
     }
 
     /**
-     * Make a deep copy of object.
+     * Makes a deep copy of the object.
      */
     public function __clone()
     {
-        $this->items = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->items
-        );
-        $this->fields = array_map(
-            function ($field) {
-                return clone $field;
-            },
-            $this->fields
-        );
+        $this->cloneItems();
+        $this->fields = ConfigUtil::cloneObjects($this->fields);
     }
 
     /**

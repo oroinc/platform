@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -39,6 +40,7 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $this->configExtensionRegistry->addExtension(new SortersConfigExtension());
         $this->configExtensionRegistry->addExtension(new ActionsConfigExtension());
+        $this->configExtensionRegistry->addExtension(new SubresourcesConfigExtension());
 
         $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);
     }

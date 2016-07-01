@@ -53,7 +53,7 @@ interface ResourceDocProviderInterface
     );
 
     /**
-     * Gets a description of API sub resource.
+     * Gets a description of API sub-resource.
      *
      * @param string      $action
      * @param string      $version
@@ -74,7 +74,7 @@ interface ResourceDocProviderInterface
     );
 
     /**
-     * Gets a detailed documentation of API sub resource.
+     * Gets a detailed documentation of API sub-resource.
      *
      * @param string      $action
      * @param string      $version

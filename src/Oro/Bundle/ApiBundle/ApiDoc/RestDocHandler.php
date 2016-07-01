@@ -148,9 +148,7 @@ class RestDocHandler implements HandlerInterface
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
         $context = $processor->createContext();
-        $context->removeConfigExtra(SortersConfigExtra::NAME);
         $context->addConfigExtra(new DescriptionsConfigExtra($action));
-        $context->addConfigExtra(new StatusCodesConfigExtra($action));
         $context->getRequestType()->set($this->docViewDetector->getRequestType()->toArray());
         $context->setLastGroup('initialize');
         if ($associationName) {

@@ -87,47 +87,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
 }
 ```
 
-This configuration extra is added to the Context by the [InitializeConfigExtras](../../Processor/Get/InitializeConfigExtras.php) processor which belongs to `initialize` group:
-
-```php
-<?php
-
-namespace Oro\Bundle\ApiBundle\Processor\Get;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\Context;
-
-/**
- * Sets an initial list of requests for configuration data.
- * It is supposed that the list was initialized if
- * the EntityDefinitionConfigExtra is already exist in the Context.
- */
-class InitializeConfigExtras implements ProcessorInterface
-{
-    public function process(ContextInterface $context)
-    {
-        /** @var Context $context */
-
-        if ($context->hasConfigExtra(EntityDefinitionConfigExtra::NAME)) {
-            // config extras are already initialized
-            return;
-        }
-
-        $context->addConfigExtra(new EntityDefinitionConfigExtra($context->getAction()));
-        $context->addConfigExtra(new FiltersConfigExtra());
-    }
-}
-```
-
-```yaml
-    oro_api.get.initialize_config_extras:
-        class: Oro\Bundle\ApiBundle\Processor\Get\InitializeConfigExtras
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
-```
+Usually configuration extras are added to the Context by `InitializeConfigExtras` processors which belong to `initialize` group, e.g. [InitializeConfigExtras](../../Processor/Get/InitializeConfigExtras.php) processor for `get` action. But human-readable descriptions are required only for generation a documentation for Data API. So, [DescriptionsConfigExtra](../../Config/DescriptionsConfigExtra.php) is added by [RestDocHandler](../../ApiDoc/RestDocHandler.php).
 
 There are a couple of processors that add descriptions for entity, fields and filters:
 
