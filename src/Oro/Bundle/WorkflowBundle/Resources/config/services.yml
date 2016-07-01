@@ -89,6 +89,12 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.manager.system_config'
 
+    oro_workflow.abstract.workflow_aware_manager:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager
+        abstract: true
+        arguments:
+            - '@oro_workflow.manager'
+
     oro_workflow.process.process_factory:
         class: %oro_workflow.process.process_factory.class%
         arguments:

@@ -19,6 +19,24 @@ class WorkflowAwareManager implements WorkflowAwareInterface
     }
 
     /**
+     * @return Workflow
+     * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     */
+    public function getWorkflow()
+    {
+        return $this->workflowManager->getWorkflow($this->workflowName);
+    }
+
+    /**
+     * @param object $entity
+     * @return \Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
+     */
+    public function startWorkflow($entity)
+    {
+        return $this->workflowManager->startWorkflow($this->workflowName, $entity);
+    }
+
+    /**
      * @param $entity
      * @return null|\Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
      */
@@ -27,11 +45,17 @@ class WorkflowAwareManager implements WorkflowAwareInterface
         return $this->workflowManager->getWorkflowItem($entity, $this->workflowName);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setWorkflowName($workflowName)
     {
         $this->workflowName = $workflowName;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getWorkflowName()
     {
         return $this->workflowName;
