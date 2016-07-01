@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Command;
 
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
-
 use Oro\Bundle\LayoutBundle\Command\AssetsThemeDumpCommand;
 
 class AssetsThemeDumpCommandTest extends \PHPUnit_Framework_TestCase
