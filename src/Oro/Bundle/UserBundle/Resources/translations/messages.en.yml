@@ -159,7 +159,7 @@ oro:
             action.label: Capabilities
         privilege:
             category:
-                account_management.label: Account Managment
+                account_management.label: Account Management
                 address.label: Address
                 application.label: Application
                 calendar.label: Calendar

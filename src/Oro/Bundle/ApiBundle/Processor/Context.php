@@ -167,6 +167,16 @@ class Context extends ApiContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function isSuccessResponse()
+    {
+        $statusCode = $this->getResponseStatusCode();
+
+        return $statusCode>= 200 && $statusCode < 300;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFilters()
     {
         if (!$this->has(self::FILTERS)) {

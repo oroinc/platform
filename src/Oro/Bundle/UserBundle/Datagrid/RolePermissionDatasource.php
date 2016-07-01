@@ -30,6 +30,9 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     /** @var AbstractRole */
     protected $role;
 
+    /** @var string[] Exclude share permissions in platform application because it is enterprise feature */
+    protected static $excludePermissions = ['SHARE'];
+
     /**
      * RolePermissionDatasource constructor.
      *
@@ -66,7 +69,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     public function getResults()
     {
         $gridData = [];
-        $allPrivileges = $this->preparePriveleges($this->role, 'entity');
+        $allPrivileges = $this->preparePrivileges($this->role, 'entity');
         $categories = $this->categoryProvider->getPermissionCategories();
 
         foreach ($allPrivileges as $key => $privilege) {
@@ -74,7 +77,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
             $item = [
                 'identity' => $privilege->getIdentity()->getId(),
                 'entity' => $this->translator->trans($privilege->getIdentity()->getName()),
-                'group' => $this->getPrivelegeCategory($privilege, $categories),
+                'group' => $this->getPrivilegeCategory($privilege, $categories),
                 'permissions' => [],
             ];
             $item = $this->preparePermissions($privilege, $item);
@@ -92,32 +95,48 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
      */
     protected function preparePermissions(AclPrivilege $privilege, $item)
     {
+        $orders = [];
         foreach ($privilege->getPermissions() as $permissionName => $permission) {
             /** @var AclPermission $permission */
             $permissionEntity = $this->permissionManager->getPermissionByName($permission->getName());
-            if ($permissionEntity) {
-                $item['permissions'][] = $this->setPrivilegePermission(
+            if ($permissionEntity && $this->isSupportedPermission($permissionName)) {
+                $privilegePermission = $this->getPrivilegePermission(
                     $privilege,
                     $permissionEntity,
                     $permissionName,
                     $permission
                 );
-
+                $item['permissions'][] = $privilegePermission;
+                $orders[] = $privilegePermission['label'];
             }
         }
+        array_multisort($orders, $item['permissions']);
 
         return $item;
     }
 
     /**
-     * @param AclPrivilege$privilege
+     * Filter some permissions like SHARE in platform. Should be fixed by - CRM-5781
+     * Should be fixed in PermissionCollectionType too.
+     *
+     * @param string $permissionName
+     *
+     * @return bool
+     */
+    protected function isSupportedPermission($permissionName)
+    {
+        return !in_array($permissionName, static::$excludePermissions, true);
+    }
+
+    /**
+     * @param AclPrivilege $privilege
      * @param Permission $permissionEntity
      * @param string $permissionName
      * @param AclPermission $permission
      *
      * @return array
      */
-    protected function setPrivilegePermission(
+    protected function getPrivilegePermission(
         AclPrivilege $privilege,
         Permission $permissionEntity,
         $permissionName,

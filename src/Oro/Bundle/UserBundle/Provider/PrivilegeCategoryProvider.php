@@ -3,11 +3,11 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
-use Oro\Bundle\UserBundle\Model\PrivilegeCategoryProviderInterface;
 
 class PrivilegeCategoryProvider implements PrivilegeCategoryProviderInterface
 {
     const NAME = 'platform';
+
     /**
      * {@inheritdoc}
      */

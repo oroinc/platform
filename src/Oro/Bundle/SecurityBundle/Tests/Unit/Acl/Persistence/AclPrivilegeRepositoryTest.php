@@ -319,39 +319,29 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->repository->getPrivileges($sid);
 
-        $this->assertCount(count($classes) + 1, $result);
-        $this->assertEquals('test:(root)', $result[0]->getIdentity()->getId());
-        $this->assertEquals(AclPrivilegeRepository::ROOT_PRIVILEGE_NAME, $result[0]->getIdentity()->getName());
-        $this->assertEquals('', $result[0]->getGroup());
+        $this->assertCount(count($classes), $result);
+        $this->assertEquals('test:Acme\Class1', $result[0]->getIdentity()->getId());
+        $this->assertEquals('Class 1', $result[0]->getIdentity()->getName());
+        $this->assertEquals('SomeGroup', $result[0]->getGroup());
+        $this->assertEquals('Desc 1', $result[0]->getDescription());
+        $this->assertEquals('Category 1', $result[0]->getCategory());
         $this->assertEquals($extensionKey, $result[0]->getExtensionKey());
-        $this->assertEquals('test:Acme\Class1', $result[1]->getIdentity()->getId());
-        $this->assertEquals('Class 1', $result[1]->getIdentity()->getName());
+        $this->assertEquals('test:Acme\Class2', $result[1]->getIdentity()->getId());
+        $this->assertEquals('Class 2', $result[1]->getIdentity()->getName());
         $this->assertEquals('SomeGroup', $result[1]->getGroup());
-        $this->assertEquals('Desc 1', $result[1]->getDescription());
-        $this->assertEquals('Category 1', $result[1]->getCategory());
+        $this->assertEquals('Desc 2', $result[1]->getDescription());
+        $this->assertEquals('Category 2', $result[1]->getCategory());
         $this->assertEquals($extensionKey, $result[1]->getExtensionKey());
-        $this->assertEquals('test:Acme\Class2', $result[2]->getIdentity()->getId());
-        $this->assertEquals('Class 2', $result[2]->getIdentity()->getName());
-        $this->assertEquals('SomeGroup', $result[2]->getGroup());
-        $this->assertEquals('Desc 2', $result[2]->getDescription());
-        $this->assertEquals('Category 2', $result[2]->getCategory());
-        $this->assertEquals($extensionKey, $result[2]->getExtensionKey());
 
         $this->assertEquals(3, $result[0]->getPermissionCount());
-        $this->assertEquals(3, $result[1]->getPermissionCount());
-        $this->assertEquals(2, $result[2]->getPermissionCount());
+        $this->assertEquals(2, $result[1]->getPermissionCount());
 
         $p = $result[0]->getPermissions();
-        $this->assertEquals(AccessLevel::GLOBAL_LEVEL, $p['VIEW']->getAccessLevel());
-        $this->assertEquals(AccessLevel::DEEP_LEVEL, $p['CREATE']->getAccessLevel());
-        $this->assertEquals(AccessLevel::LOCAL_LEVEL, $p['EDIT']->getAccessLevel());
-
-        $p = $result[1]->getPermissions();
         $this->assertEquals(AccessLevel::BASIC_LEVEL, $p['VIEW']->getAccessLevel());
         $this->assertEquals(AccessLevel::BASIC_LEVEL, $p['CREATE']->getAccessLevel());
         $this->assertEquals(AccessLevel::NONE_LEVEL, $p['EDIT']->getAccessLevel());
 
-        $p = $result[2]->getPermissions();
+        $p = $result[1]->getPermissions();
         $this->assertEquals(AccessLevel::SYSTEM_LEVEL, $p['VIEW']->getAccessLevel());
         $this->assertEquals(AccessLevel::SYSTEM_LEVEL, $p['CREATE']->getAccessLevel());
         $this->assertFalse($p->containsKey('EDIT'));
