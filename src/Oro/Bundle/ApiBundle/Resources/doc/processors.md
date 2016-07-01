@@ -60,6 +60,20 @@ Please note that:
 - A processor must be a public service because it is loaded on demand.
 - The `priority` attribute is used to control the order in which processors are executed. The highest the priority, the earlier a processor is executed. Default value is 0. The possible range is from -255 to 255. But for some types of processors the range can be different. More details you can find in the [documentation of the ChainProcessor](../../../../Component/ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority the order they are executed is unpredictable.
 - Each processor should check whether its' work is already done, because there can be a processor with higher priority which does the same but in another way. For example such processors can be created for customization purposes.
+- As Data API resources can be created for any type of objects, not only ORM entities, it is always a good idea to check whether a processor is applicable for ORM entities. This check is very fast and allows to avoid possible logic issues and performance impact. Please use the `oro_api.doctrine_helper` service to get an instance of [Oro\Bundle\ApiBundle\Util\DoctrineHelper](../../Util/DoctrineHelper.php) as this class is optimized to be used in Data API stack. An example:
+
+```php
+    public function process(ContextInterface $context)
+    {
+        $entityClass = $context->getClassName();
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // only manageable entities are supported
+            return;
+        }
+
+        // do some work
+    }
+```
 
 The list of all existing processors you can find in the [Processor](../../Processor) folder.
 
@@ -84,9 +98,9 @@ This allows to build conditions based on any attribute from the context.
 
 The types of conditions depend on registered [Applicable Checkers](../../../../Component/ChainProcessor/README.md#applicable-checkers). By default the following checkers are registered:
 
-- [GroupRangeApplicableChecker](../../../../Component/ChainProcessor/GroupRangeApplicableChecker.php)
-- [SkipGroupApplicableChecker](../../../../Component/ChainProcessor/SkipGroupApplicableChecker.php)
-- [MatchApplicableChecker](../../../../Component/ChainProcessor/MatchApplicableChecker.php)
+- [MatchApplicableChecker](../../Processor/MatchApplicableChecker.php)
+
+Also, by performance reasons, the functionality of [SkipGroupApplicableChecker](../../../../Component/ChainProcessor/SkipGroupApplicableChecker.php) and [GroupRangeApplicableChecker](../../../../Component/ChainProcessor/GroupRangeApplicableChecker.php) was implemented as part of [OptimizedProcessorIterator](../../Processor/OptimizedProcessorIterator.php).
 
 Examples of processor conditions
 --------------------------------
@@ -152,7 +166,14 @@ Examples of processor conditions
 
 ```yaml
     tags:
-        - { name: oro.api.processor, action: get_list, group: initialize, class: "Oro\Bundle\UserBundle\Entity\User" }
+        - { name: oro.api.processor, action: get_list, group: initialize, class: 'Oro\Bundle\UserBundle\Entity\User' }
+```
+
+- A processor is executed only for entities that implement some interface or extend some base class. Currently there are two attributes that being compared by **instance of** instead of **equal** operator. These attributes are **class** and **parentClass**.
+
+```yaml
+    tags:
+        - { name: oro.api.processor, action: get_list, group: initialize, class: 'Oro\Bundle\UserBundle\Entity\AbstractUser' }
 ```
 
 More examples you can find in [configuration of existing processors](../config). See `processors.*.yml` files.
@@ -214,6 +235,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
@@ -263,7 +285,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
         } elseif (count($result) === 1) {
             $result = reset($result);
         } else {
-            throw new \RuntimeException('The result must have one or zero items.');
+            throw new RuntimeException('The result must have one or zero items.');
         }
 
         $context->setResult($result);

@@ -1,96 +1,48 @@
 <?php
-namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Oro\Bundle\ApiBundle\Request\RequestType;
+namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 interface ResourceDocProviderInterface
 {
     /**
-     * Gets a description of an identifier field.
+     * Gets a short, human-readable description of API resource.
      *
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
-    public function getIdentifierDescription(RequestType $requestType);
-
-    /**
-     * Gets a description of API resource.
-     *
-     * @param string      $action
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param array       $config
-     * @param string|null $entityClass
+     * @param string $action
+     * @param string $entityDescription
      *
      * @return string|null
      */
-    public function getResourceDescription(
-        $action,
-        $version,
-        RequestType $requestType,
-        array $config,
-        $entityClass = null
-    );
+    public function getResourceDescription($action, $entityDescription);
 
     /**
      * Gets a detailed documentation of API resource.
      *
-     * @param string      $action
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param array       $config
-     * @param string|null $entityClass
+     * @param string $action
+     * @param string $entityDescription
      *
      * @return string|null
      */
-    public function getResourceDocumentation(
-        $action,
-        $version,
-        RequestType $requestType,
-        array $config,
-        $entityClass = null
-    );
+    public function getResourceDocumentation($action, $entityDescription);
 
     /**
-     * Gets a description of API sub resource.
+     * Gets a short, human-readable description of API sub-resource.
      *
-     * @param string      $action
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param array       $config
-     * @param string      $entityClass
-     * @param string      $associationName
+     * @param string $action
+     * @param string $associationDescription
+     * @param string $isCollection
      *
      * @return string|null
      */
-    public function getSubresourceDescription(
-        $action,
-        $version,
-        RequestType $requestType,
-        array $config,
-        $entityClass,
-        $associationName
-    );
+    public function getSubresourceDescription($action, $associationDescription, $isCollection);
 
     /**
-     * Gets a detailed documentation of API sub resource.
+     * Gets a detailed documentation of API sub-resource.
      *
-     * @param string      $action
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param array       $config
-     * @param string      $entityClass
-     * @param string      $associationName
+     * @param string $action
+     * @param string $associationDescription
+     * @param string $isCollection
      *
      * @return string|null
      */
-    public function getSubresourceDocumentation(
-        $action,
-        $version,
-        RequestType $requestType,
-        array $config,
-        $entityClass,
-        $associationName
-    );
+    public function getSubresourceDocumentation($action, $associationDescription, $isCollection);
 }

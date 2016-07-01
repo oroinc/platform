@@ -111,6 +111,18 @@ define(function(require) {
         /**
          * @property
          */
+        typeDefinedValues: {
+            today:        7,
+            this_week:    8,
+            this_month:   9,
+            this_quarter: 10,
+            this_year:    11,
+            all_time:     12
+        },
+
+        /**
+         * @property
+         */
         dateParts: [],
 
         /**
@@ -231,7 +243,19 @@ define(function(require) {
             if (!isNaN(type)) {
                 // it's type
                 this.$('.filter-separator, .filter-start-date, .filter-end-date').css('display', '');
-                if (this.typeValues.moreThan === type) {
+                var typeDefinedValues = [
+                    this.typeDefinedValues.today,
+                    this.typeDefinedValues.this_week,
+                    this.typeDefinedValues.this_month,
+                    this.typeDefinedValues.this_quarter,
+                    this.typeDefinedValues.this_year,
+                    this.typeDefinedValues.all_time,
+                ];
+                if (typeDefinedValues.indexOf(type) > -1) {
+                    this.$('.filter-separator, .filter-start-date, .filter-end-date').hide();
+                    this.subview('start').setValue('');
+                    this.subview('end').setValue('');
+                } else if (this.typeValues.moreThan === type) {
                     this.$('.filter-separator, .filter-end-date').hide();
                     this.subview('end').setValue('');
                 } else if (this.typeValues.lessThan === type) {

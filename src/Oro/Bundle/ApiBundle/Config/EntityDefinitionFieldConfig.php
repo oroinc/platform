@@ -12,19 +12,25 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;
-    use Traits\LabelTrait;
     use Traits\DescriptionTrait;
     use Traits\DataTypeTrait;
+    use Traits\AssociationTargetTrait;
     use Traits\FormTrait;
-
-    /** a human-readable representation of the field */
-    const LABEL = EntityDefinitionConfig::LABEL;
 
     /** a human-readable description of the field */
     const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
 
     /** the data type of the field value */
     const DATA_TYPE = 'data_type';
+
+    /** the class name of a target entity */
+    const TARGET_CLASS = 'target_class';
+
+    /**
+     * the type of a target association, can be "to-one" or "to-many",
+     * also "collection" can be used in Resources/config/oro/api.yml file as an alias for "to-many"
+     */
+    const TARGET_TYPE = 'target_type';
 
     /** the form type that should be used for the field */
     const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;

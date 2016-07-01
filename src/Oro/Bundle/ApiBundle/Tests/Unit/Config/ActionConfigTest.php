@@ -18,13 +18,15 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($config->isEmpty());
         $this->assertEmpty($config->toArray());
 
-        $attrName = 'test';
-        $config->set($attrName, 'value');
+        $config->set('test', 'value');
+        $objValue = new \stdClass();
+        $objValue->someProp = 123;
+        $config->set('test_object', $objValue);
 
         $configClone = clone $config;
 
         $this->assertEquals($config, $configClone);
-
+        $this->assertNotSame($objValue, $configClone->get('test_object'));
     }
 
     public function testExcluded()
@@ -88,6 +90,29 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
         $config->setDescription('');
         $this->assertFalse($config->hasDescription());
         $this->assertNull($config->getDescription());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testDocumentation()
+    {
+        $config = new ActionConfig();
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+
+        $config->setDocumentation('text');
+        $this->assertTrue($config->hasDocumentation());
+        $this->assertEquals('text', $config->getDocumentation());
+        $this->assertEquals(['documentation' => 'text'], $config->toArray());
+
+        $config->setDocumentation(null);
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setDocumentation('text');
+        $config->setDocumentation('');
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
         $this->assertEquals([], $config->toArray());
     }
 }

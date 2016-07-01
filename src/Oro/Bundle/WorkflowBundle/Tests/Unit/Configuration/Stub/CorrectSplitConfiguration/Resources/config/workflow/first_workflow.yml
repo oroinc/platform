@@ -46,6 +46,7 @@ workflows:
                 schedule:
                     cron: 1 * * * *
                     filter: e.field < DATE_ADD(NOW(), 1, 'day')
+                    check_conditions_before_job_creation: true
         transition_definitions:
             first_transition_definition:
                 pre_conditions:
