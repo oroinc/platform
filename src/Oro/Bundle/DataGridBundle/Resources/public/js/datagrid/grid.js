@@ -594,6 +594,7 @@ define(function(require) {
             };
             _.defaults(toolbarOptions, options);
 
+            this.columns.trigger('configureInitializeOptions', this.toolbar, toolbarOptions);
             this.trigger('beforeToolbarInit', toolbarOptions);
             toolbar = new this.toolbar(toolbarOptions);
             this.trigger('afterToolbarInit', toolbar);
