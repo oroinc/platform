@@ -49,9 +49,6 @@ class Indexer
     /** @var bool */
     protected $isAllowedApplyAcl = true;
 
-    /** @var string */
-    protected $searchHandlerState;
-
     /**
      * @param ObjectManager       $em
      * @param EngineInterface     $engine
@@ -241,14 +238,6 @@ class Indexer
     }
 
     /**
-     * @param string $value
-     */
-    public function setSearchHandlerState($value)
-    {
-        $this->searchHandlerState = $value;
-    }
-
-    /**
      * Do query manipulations such as ACL apply etc.
      *
      * @param Query $query
@@ -256,10 +245,6 @@ class Indexer
     protected function prepareQuery(Query $query)
     {
         $this->applyModesBehavior($query);
-
-//        $event = new IndexerPrepareQueryEvent($query, $this->searchHandlerState);
-//        $this->dispatcher->dispatch(IndexerPrepareQueryEvent::EVENT_NAME, $event);
-//        $query = $event->getQuery();
 
         if ($this->isAllowedApplyAcl) {
             $this->searchAclHelper->apply($query);
