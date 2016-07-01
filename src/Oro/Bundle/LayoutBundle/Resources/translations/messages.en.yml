@@ -3,5 +3,7 @@ oro:
         profiler:
             title: Layout
             tree: Layout Tree
-            context:
-                items: Context Items
+            context.items: Context Items
+            messages:
+                tree: Views tree is not found.
+                context.items: Context items is not found.

@@ -10,21 +10,21 @@
         <span class="sf-toolbar-status">{{ 'oro.layout.profiler.title'|trans }}</span>
     {% endset %}
 
-    {% set text %}
-        <style type="text/css">
-            .oro-layout-toolbar-info-piece-title {
-                max-width: 110px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+    {% if collector.items|length %}
+        {% set text %}
+            <style type="text/css">
+                .oro-layout-toolbar-info-piece-title {
+                    max-width: 110px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
 
-            .oro-layout-toolbar-info-piece-value {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 340px;
-            }
-        </style>
-        {% if collector.items|length %}
+                .oro-layout-toolbar-info-piece-value {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 340px;
+                }
+            </style>
             <div class="sf-toolbar-info-piece">
                 <b>
                     {{ 'oro.layout.profiler.context.items'|trans }}:
@@ -35,12 +35,12 @@
                 <div class="sf-toolbar-info-piece">
                     <b class="oro-layout-toolbar-info-piece-title">{{ key }}</b>
                     <span class="sf-toolbar-info-class oro-layout-toolbar-info-piece-value">
-                        {{ value|default('(null)') }}
+                        {{ value|default('NULL') }}
                     </span>
                 </div>
             {% endfor %}
-        {% endif %}
-    {% endset %}
+        {% endset %}
+    {% endif %}
 
     {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
@@ -122,7 +122,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p><em>Views tree is not found.</em></p>
+        <p><em>{{ 'oro.layout.profiler.messages.tree'|trans }}</em></p>
     {% endif %}
 
     <h2>{{ 'oro.layout.profiler.context.items'|trans }}</h2>
@@ -136,7 +136,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p><em>Context items is not found.</em></p>
+        <p><em>{{ 'oro.layout.profiler.messages.context.items'|trans }}</em></p>
     {% endif %}
 {% endblock %}
 
