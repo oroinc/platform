@@ -327,3 +327,9 @@ services:
             - @doctrine
         tags:
             - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
+
+    oro_user.dashboard.owner_helper:
+        class: Oro\Bundle\UserBundle\Dashboard\OwnerHelper
+        arguments:
+          - '@doctrine'
+          - '@security.token_storage'

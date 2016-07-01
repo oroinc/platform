@@ -53,12 +53,10 @@ datagrid:
                     data_name: dashboard.owner
                     autocomplete_alias: users
                     renderedPropertyName: 'fullName'
-                    className: 'Oro\Bundle\UserBundle\Entity\User'
                 businessUnitId:
                     label: oro.business_unit.label
                     type: choice-business-unit
                     data_name: dashboard.owner
-                    className: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
                 createdAt:
                     type:      datetime
                     data_name: dashboard.createdAt
