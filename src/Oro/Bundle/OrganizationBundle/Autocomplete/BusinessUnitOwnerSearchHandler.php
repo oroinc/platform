@@ -48,7 +48,7 @@ class BusinessUnitOwnerSearchHandler extends SearchHandler
         if ($owner) {
             $path = $this->getPath($owner, $path);
         }
-        
+
         return $path;
     }
 }
