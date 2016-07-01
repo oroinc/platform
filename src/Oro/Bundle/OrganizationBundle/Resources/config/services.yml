@@ -133,13 +133,6 @@ services:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
             - { name: doctrine.event_listener, event: onClear }
 
-    oro_organization.listener.indexer_prepare_query_listener:
-        class: Oro\Bundle\OrganizationBundle\EventListener\IndexerPrepareQueryListener
-        arguments:
-            - '@oro_security.security_facade'
-        tags:
-            - { name: kernel.event_listener, event: oro_search.indexed_prepare_query, method: updateQuery }
-
     #
     # DataGrid
     #

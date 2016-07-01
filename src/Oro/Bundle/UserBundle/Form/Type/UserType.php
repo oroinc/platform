@@ -121,7 +121,7 @@ class UserType extends AbstractType
                 [
                     'required' => false,
                     'label' => 'oro.user.form.access_settings.label',
-                    'autocomplete_alias' => 'business_units_search_handler'
+                    'autocomplete_alias' => 'business_units_owner_search_handler'
                 ]
             );
         }
