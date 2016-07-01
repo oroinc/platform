@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Provider;
 
-use Doctrine\ORM\Query\Expr\Join;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterface
@@ -71,28 +70,14 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
             return [];
         }
 
-        return [
-            'join' => [
-                'left' => [
-                    [
-                        'join' => 'OroWorkflowBundle:WorkflowItem',
-                        'alias' => self::ITEMS_RELATION_NAME,
-                        'conditionType' => Join::WITH,
-                        'condition' => sprintf(
-                            'entity.%s = %s.entityId AND %s.entityClass = \'%s\'',
-                            $this->getEntityIdentifier($className),
-                            self::ITEMS_RELATION_NAME,
-                            self::ITEMS_RELATION_NAME,
-                            $className
-                        )
-                    ],
-                    [
-                        'join' => sprintf('%s.currentStep', self::ITEMS_RELATION_NAME),
-                        'alias' => self::STEPS_RELATION_NAME
-                    ]
-                ]
-            ]
-        ];
+        return WorkflowQueryHelper::addDatagridQuery(
+            [],
+            'entity',
+            $className,
+            $this->getEntityIdentifier($className),
+            self::STEPS_RELATION_NAME,
+            self::ITEMS_RELATION_NAME
+        );
     }
 
     /**
