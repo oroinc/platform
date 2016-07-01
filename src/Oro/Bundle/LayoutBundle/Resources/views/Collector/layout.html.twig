@@ -1,5 +1,7 @@
 {% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
+{% from _self import view_tree %}
+
 {% block toolbar %}
     {% set icon %}
         <span class="icon">
@@ -9,14 +11,35 @@
     {% endset %}
 
     {% set text %}
-        <div class="sf-toolbar-info-piece">
-            <b>layout tree</b>
-        </div>
-        {% for dump in collector.tree %}
+        <style type="text/css">
+            .oro-layout-toolbar-info-piece-title {
+                max-width: 110px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .oro-layout-toolbar-info-piece-value {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 340px;
+            }
+        </style>
+        {% if collector.items|length %}
             <div class="sf-toolbar-info-piece">
-                {{ dump.data|raw }}
+                <b>
+                    {{ 'oro.layout.profiler.context.items'|trans }}:
+                </b>
             </div>
-        {% endfor %}
+
+            {% for key, value in collector.items %}
+                <div class="sf-toolbar-info-piece">
+                    <b class="oro-layout-toolbar-info-piece-title">{{ key }}</b>
+                    <span class="sf-toolbar-info-class oro-layout-toolbar-info-piece-value">
+                        {{ value|default('(null)') }}
+                    </span>
+                </div>
+            {% endfor %}
+        {% endif %}
     {% endset %}
 
     {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
@@ -32,12 +55,101 @@
 {% endblock %}
 
 {% block panel %}
+    <style type="text/css">
+        .tree,
+        .tree ul {
+            padding: 0;
+            list-style: none;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .tree ul {
+            margin-left: .5em
+        }
+
+        .tree:before,
+        .tree ul:before {
+            content: "";
+            display: block;
+            width: 0;
+            position: absolute;
+            top: 0;
+            bottom: 14px;
+            left: 0;
+            border-left: 1px solid;
+        }
+
+        ul.tree:before {
+            content: none;
+        }
+
+        ul.tree > li:before {
+            content: none;
+        }
+
+        .tree li {
+            margin: 0;
+            padding: 0 1.5em;
+            line-height: 2em;
+            position: relative;
+        }
+
+        .tree li:before {
+            content: "";
+            display: block;
+            width: 10px;
+            height: 0;
+            border-top: 1px solid;
+            margin-top: -1px;
+            position: absolute;
+            top: 1em;
+            left: 0;
+        }
+
+        .tree li:last-child:before {
+            background: white;
+            height: auto;
+        }
+    </style>
+
     <h2>{{ 'oro.layout.profiler.tree'|trans }}</h2>
-    <ul class="alt">
-        {% for dump in collector.tree %}
-            <li class="sf-dump sf-reset">
-                {{ dump.data|raw }}
-            </li>
-        {% endfor %}
-    </ul>
+
+    {% if collector.views|length %}
+        <ul class="tree">
+            {% for viewId, viewChild in collector.views %}
+                {{ view_tree(viewId, viewChild) }}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p><em>Views tree is not found.</em></p>
+    {% endif %}
+
+    <h2>{{ 'oro.layout.profiler.context.items'|trans }}</h2>
+
+    {% if collector.items|length %}
+        <ul class="tree">
+            {% for key, value in collector.items %}
+                <li>
+                    <span>{{ key }} = {{ value|default('(null)') }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p><em>Context items is not found.</em></p>
+    {% endif %}
 {% endblock %}
+
+{% macro view_tree(id, view) %}
+    {% import _self as tree %}
+    <li>
+        <span>{{ id }}</span>
+        {% if view is iterable %}
+            <ul>
+                {% for viewId, viewChild in view %}
+                    {{ tree.view_tree(viewId, viewChild) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}

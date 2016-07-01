@@ -3,3 +3,5 @@ oro:
         profiler:
             title: Layout
             tree: Layout Tree
+            context:
+                items: Context Items

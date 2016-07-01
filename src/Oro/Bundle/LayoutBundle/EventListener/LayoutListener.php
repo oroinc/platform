@@ -80,9 +80,11 @@ class LayoutListener
             }
             $this->configureContext($context, $layoutAnnotation);
             $layout = $this->getLayout($context, $layoutAnnotation);
+            $this->layoutDataCollector->collectContextItems($context);
         } elseif ($parameters instanceof ContextInterface) {
             $this->configureContext($parameters, $layoutAnnotation);
             $layout = $this->getLayout($parameters, $layoutAnnotation);
+            $this->layoutDataCollector->collectContextItems($parameters);
         } elseif ($parameters instanceof Layout) {
             if (!$layoutAnnotation->isEmpty()) {
                 throw new LogicException(
@@ -95,7 +97,7 @@ class LayoutListener
             return;
         }
         
-        $this->layoutDataCollector->setLayout($layout);
+        $this->layoutDataCollector->collectViews($layout->getView());
 
         $response = new Response();
         $response->setContent($layout->render());

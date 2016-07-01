@@ -4,12 +4,12 @@ namespace Oro\Bundle\LayoutBundle\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\ContextItemInterface;
 
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 
@@ -18,9 +18,14 @@ class LayoutDataCollector extends DataCollector
     const NAME = 'layout';
 
     /**
-     * @var Layout
+     * @var array
      */
-    protected $layout;
+    protected $views = [];
+
+    /**
+     * @var array
+     */
+    protected $contextItems = [];
 
     /**
      * {@inheritdoc}
@@ -31,47 +36,56 @@ class LayoutDataCollector extends DataCollector
     }
 
     /**
-     * @param $layout
-     */
-    public function setLayout(Layout $layout)
-    {
-        $this->layout = $layout;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->data['views'] = [];
+        $this->data['views'] = $this->views;
+        $this->data['items'] = $this->contextItems;
+    }
 
-        if ($this->layout) {
-            $this->buildFinalViewTree($this->layout->getView());
+    /**
+     * @param BlockView $rootView
+     */
+    public function collectViews(BlockView $rootView)
+    {
+        $this->buildFinalViewTree($rootView);
+    }
+
+    /**
+     * @param LayoutContext $context
+     */
+    public function collectContextItems(LayoutContext $context)
+    {
+        $class = new \ReflectionClass(LayoutContext::class);
+        $property = $class->getProperty('items');
+        $property->setAccessible(true);
+
+        foreach ($property->getValue($context) as $key => $value) {
+            if (is_array($value)) {
+                $this->contextItems[$key] = json_encode($value);
+            } elseif ($value instanceof ContextItemInterface) {
+                $this->contextItems[$key] = $value->toString();
+            } else {
+                $this->contextItems[$key] = $value;
+            }
         }
     }
 
     /**
      * @return array
      */
-    public function getTree()
+    public function getViews()
     {
-        $data = fopen('php://memory', 'r+b');
+        return $this->data['views'];
+    }
 
-        $dumper = new HtmlDumper($data, 'UTF-8');
-        $dumper->setStyles([
-            'compact' => 'display: inline;',
-            'note' => 'display: none;',
-            'ref' => 'display: none;'
-        ]);
-
-        $cloner = new VarCloner();
-        $dumper->dump($cloner->cloneVar($this->data['views']));
-
-        rewind($data);
-
-        return [
-            ['data' => stream_get_contents($data)]
-        ];
+    /**
+     * @return array
+     */
+    public function getItems()
+    {
+        return $this->data['items'];
     }
 
     /**
@@ -79,9 +93,9 @@ class LayoutDataCollector extends DataCollector
      */
     protected function buildFinalViewTree(BlockView $view)
     {
-        $this->data['views'][$view->vars['id']] = [];
+        $this->views[$view->vars['id']] = [];
 
-        $this->recursiveBuildFinalViewTree($view, $this->data['views'][$view->vars['id']]);
+        $this->recursiveBuildFinalViewTree($view, $this->views[$view->vars['id']]);
     }
 
     /**
@@ -95,8 +109,6 @@ class LayoutDataCollector extends DataCollector
                 $output[$childView->vars['id']] = [];
                 $this->recursiveBuildFinalViewTree($childView, $output[$childView->vars['id']]);
             }
-        } else {
-            $output = "~";
         }
     }
 }
