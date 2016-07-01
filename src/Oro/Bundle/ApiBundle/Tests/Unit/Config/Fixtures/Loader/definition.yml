@@ -82,26 +82,6 @@ empty_post_serialize:
         post_serialize: ~
     expected: []
 
-null_label:
-    config:
-        label: ~
-    expected: []
-
-empty_label:
-    config:
-        label: ""
-    expected: []
-
-null_plural_label:
-    config:
-        plural_label: ~
-    expected: []
-
-empty_plural_label:
-    config:
-        plural_label: ""
-    expected: []
-
 null_description:
     config:
         description: ~
@@ -110,6 +90,16 @@ null_description:
 empty_description:
     config:
         description: ""
+    expected: []
+
+null_documentation:
+    config:
+        documentation: ~
+    expected: []
+
+empty_documentation:
+    config:
+        documentation: ""
     expected: []
 
 default_collapse:
@@ -130,9 +120,8 @@ all_attributes:
             - hint1
             - {name: hint2, value: hint_val2}
         post_serialize: [class, method]
-        label: label1
-        plural_label: plural_label1
         description: description1
+        documentation: documentation1
         collapse: true
         extra1: true
     expected:
@@ -147,9 +136,8 @@ all_attributes:
             - hint1
             - {name: hint2, value: hint_val2}
         post_serialize: [class, method]
-        label: label1
-        plural_label: plural_label1
         description: description1
+        documentation: documentation1
         collapse: true
         extra1: true
 
@@ -214,22 +202,6 @@ field_data_transformer:
                 data_transformer: [service1]
             field4:
                 data_transformer: [service1, [class, method]]
-
-field_label:
-    config:
-        fields:
-            field1:
-                label: ~
-            field2:
-                label: ""
-            field3:
-                label: label1
-    expected:
-        fields:
-            field1: ~
-            field2: ~
-            field3:
-                label: label1
 
 field_description:
     config:
@@ -365,7 +337,7 @@ empty_extra_sections:
 extra_sections_with_default_value_of_attribute:
     config:
         test_section:
-            label: ""
+            description: ""
     expected: []
 
 extra_sections:

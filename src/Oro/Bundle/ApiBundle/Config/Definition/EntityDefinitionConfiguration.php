@@ -15,9 +15,6 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
     {
         parent::configureEntityNode($node);
         $node
-            ->scalarNode(EntityDefinitionConfig::LABEL)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionConfig::PLURAL_LABEL)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionConfig::DESCRIPTION)->cannotBeEmpty()->end()
             ->integerNode(EntityDefinitionConfig::PAGE_SIZE)
                 ->min(-1)
             ->end()

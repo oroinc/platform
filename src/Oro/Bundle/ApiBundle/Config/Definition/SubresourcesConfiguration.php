@@ -12,9 +12,15 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
     /** @var ActionsConfiguration */
     protected $actionsConfiguration;
 
-    public function __construct()
+    /**
+     * @param string[] $permissibleActions
+     */
+    public function __construct($permissibleActions)
     {
-        $this->actionsConfiguration = new ActionsConfiguration('subresources.subresource.action');
+        $this->actionsConfiguration = new ActionsConfiguration(
+            $permissibleActions,
+            'subresources.subresource.action'
+        );
     }
 
     /**

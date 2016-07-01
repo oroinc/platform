@@ -11,14 +11,19 @@ use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 
 class ActionsConfiguration extends AbstractConfigurationSection
 {
+    /** @var string[] */
+    protected $permissibleActions;
+
     /** @var string */
     protected $sectionName;
 
     /**
-     * @param string $sectionName
+     * @param string[] $permissibleActions
+     * @param string   $sectionName
      */
-    public function __construct($sectionName = 'actions.action')
+    public function __construct($permissibleActions, $sectionName = 'actions.action')
     {
+        $this->permissibleActions = $permissibleActions;
         $this->sectionName = $sectionName;
     }
 
@@ -30,6 +35,23 @@ class ActionsConfiguration extends AbstractConfigurationSection
         /** @var NodeBuilder $actionNode */
         $actionNode = $node->end()
             ->useAttributeAsKey('name')
+            ->validate()
+                ->always(function ($value) {
+                    $unknownActions = array_diff(array_keys($value), $this->permissibleActions);
+                    if (!empty($unknownActions)) {
+                        throw new \InvalidArgumentException(
+                            sprintf(
+                                'The section "%s" contains not permissible actions: "%s". Permissible actions: "%s".',
+                                $this->sectionName,
+                                implode(', ', $unknownActions),
+                                implode(', ', $this->permissibleActions)
+                            )
+                        );
+                    }
+
+                    return $value;
+                })
+            ->end()
             ->prototype('array')
                 ->treatFalseLike([ActionConfig::EXCLUDE => true])
                 ->treatTrueLike([ActionConfig::EXCLUDE => false])
@@ -82,8 +104,9 @@ class ActionsConfiguration extends AbstractConfigurationSection
         );
 
         $node
+            ->scalarNode(ActionConfig::DESCRIPTION)->cannotBeEmpty()->end()
+            ->scalarNode(ActionConfig::DOCUMENTATION)->cannotBeEmpty()->end()
             ->scalarNode(ActionConfig::ACL_RESOURCE)->end()
-            ->scalarNode(ActionConfig::DESCRIPTION)->end()
             ->integerNode(ActionConfig::MAX_RESULTS)
                 ->min(-1)
             ->end()

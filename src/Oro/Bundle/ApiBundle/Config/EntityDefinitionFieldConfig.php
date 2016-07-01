@@ -12,14 +12,10 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;
-    use Traits\LabelTrait;
     use Traits\DescriptionTrait;
     use Traits\DataTypeTrait;
     use Traits\AssociationTargetTrait;
     use Traits\FormTrait;
-
-    /** a human-readable representation of the field */
-    const LABEL = EntityDefinitionConfig::LABEL;
 
     /** a human-readable description of the field */
     const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;

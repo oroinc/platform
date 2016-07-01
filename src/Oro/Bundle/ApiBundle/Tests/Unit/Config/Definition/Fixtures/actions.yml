@@ -12,6 +12,65 @@ null_actions:
         actions: ~
     expected: []
 
+description:
+    config:
+        actions:
+            delete:
+                description: test
+    expected:
+        actions:
+            delete:
+                description: test
+
+not_permissible_action:
+    config:
+        actions:
+            undefined_action: false
+    expected: []
+    error: 'Invalid configuration for path "entity.actions": The section "actions.action" contains not permissible actions: "undefined_action". Permissible actions: "get, get_list, update, create, delete, delete_list, get_subresource, get_relationship, update_relationship, add_relationship, delete_relationship".'
+
+null_description:
+    config:
+        actions:
+            delete:
+                description: ~
+    expected: []
+    error: 'The path "entity.actions.delete.description" cannot contain an empty value, but got null.'
+
+empty_description:
+    config:
+        actions:
+            delete:
+                description: ""
+    expected: []
+    error: 'The path "entity.actions.delete.description" cannot contain an empty value, but got "".'
+
+documentation:
+    config:
+        actions:
+            delete:
+                documentation: test
+    expected:
+        actions:
+            delete:
+                documentation: test
+
+null_documentation:
+    config:
+        actions:
+            delete:
+                documentation: ~
+    expected: []
+    error: 'The path "entity.actions.delete.documentation" cannot contain an empty value, but got null.'
+
+empty_documentation:
+    config:
+        actions:
+            delete:
+                documentation: ""
+    expected: []
+    error: 'The path "entity.actions.delete.documentation" cannot contain an empty value, but got "".'
+
 null_action_default_exclude:
     config:
         actions:
