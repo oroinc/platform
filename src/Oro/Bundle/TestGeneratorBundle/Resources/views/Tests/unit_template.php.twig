@@ -25,13 +25,14 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
 {% for dependencyData in dependenciesData %}
+{% set fullClassName = phpVersion > 5.3 ? dependencyData.class~'::class' : "'"~dependencyData.fullClassName~"'" %}
 {% if dependencyData.has_constructor is defined %}
 {% if dependencyData.has_constructor %}
-        $this->{{ dependencyData.variable }} = $this->getMockBuilder('{{ dependencyData.fullClassName }}')
+        $this->{{ dependencyData.variable }} = $this->getMockBuilder({{ fullClassName|raw }})
             ->disableOriginalConstructor()
             ->getMock();
 {% else %}
-        $this->{{ dependencyData.variable }} = $this->getMock('{{ dependencyData.fullClassName }}');
+        $this->{{ dependencyData.variable }} = $this->getMock({{ fullClassName|raw }});
 {% endif %}
 {% endif %}
 {% endfor %}
