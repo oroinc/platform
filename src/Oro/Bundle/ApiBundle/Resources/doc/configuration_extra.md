@@ -48,7 +48,6 @@ There are a list of existing configuration extras that implement this interface:
 
 - [FiltersConfigExtra](../../Config/FiltersConfigExtra.php)
 - [SortersConfigExtra](../../Config/SortersConfigExtra.php)
-- [ActionsConfigExtra](../../Config/ActionsConfigExtra.php)
 
 Example of configuration extra
 ------------------------------
