@@ -529,7 +529,15 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 array(
                     '--process-isolation' => true,
                 )
-            );
+            )
+            ->runCommand(
+                'oro:message-queue:create-queues',
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+        ;
+
         if (!$skipAssets) {
             $commandExecutor->runCommand(
                 'fos:js-routing:dump',
