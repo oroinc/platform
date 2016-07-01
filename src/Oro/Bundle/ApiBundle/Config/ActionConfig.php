@@ -10,6 +10,7 @@ class ActionConfig
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;
     use Traits\DescriptionTrait;
+    use Traits\DocumentationTrait;
     use Traits\AclResourceTrait;
     use Traits\MaxResultsTrait;
     use Traits\StatusCodesTrait;
@@ -18,8 +19,11 @@ class ActionConfig
     /** a flag indicates whether the action should not be available for the entity */
     const EXCLUDE = ConfigUtil::EXCLUDE;
 
-    /** the entity description for the action  */
+    /** a short, human-readable description of API resource */
     const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
+
+    /** a detailed documentation of API resource */
+    const DOCUMENTATION = EntityDefinitionConfig::DOCUMENTATION;
 
     /** the name of ACL resource that should be used to protect the entity */
     const ACL_RESOURCE = EntityDefinitionConfig::ACL_RESOURCE;

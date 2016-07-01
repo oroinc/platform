@@ -1,27 +1,24 @@
 oro_api:
     entities:
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
-            label: System Configuration
-            plural_label: System Configuration
-            description: System configuration data
             page_size: -1 # disable pagination
             disable_sorting: true
             identifier_field_names: [id]
             fields:
                 id:
-                    label: Section path
                     description: The path to a configuration section
                     data_type: string
                 options:
-                    label: Configuration Options
                     description: The list of configuration options
                     target_class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption
                     target_type: collection
                     max_results: -1 # no limit for the number of configuration options
             actions:
                 get:
+                    description: Get System Configuration Section
                     acl_resource: oro_config_system
                 get_list:
+                    description: Get System Configuration Sections
                     acl_resource: oro_config_system
                 create: false
                 update: false
@@ -31,33 +28,27 @@ oro_api:
                 get_relationship: false
 
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
-            label: System Configuration Option
-            plural_label: System Configuration Options
-            description: Represents system configuration option
             page_size: -1 # disable pagination
             disable_sorting: true
             identifier_field_names: [key]
             fields:
                 key:
-                    label: Key
                     description: An unique identifier of a configuration option
                     data_type: string
                 scope:
-                    label: Configuration Scope
+                    description: Configuration Scope
                     data_type: string
                 dataType:
-                    label: Data Type
+                    description: Data Type
                     data_type: string
                 value:
-                    label: Value
+                    description: Value
                     data_type: string
                 createdAt:
-                    label: Created At
-                    description: A date and time a configuration value was created
+                    description: Created At
                     data_type: datetime
                 updatedAt:
-                    label: Updated At
-                    description: A date and time a configuration value was updated
+                    description: Updated At
                     data_type: datetime
             actions:
                 get: false

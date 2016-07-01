@@ -64,12 +64,16 @@ class SetTypeForTableInheritanceRelations implements ProcessorInterface
                 continue;
             }
 
-            $mapping        = $metadata->getAssociationMapping($propertyPath);
-            $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
+            $mapping = $metadata->getAssociationMapping($propertyPath);
+            $targetClass = $mapping['targetEntity'];
+            $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
             if ($targetMetadata->inheritanceType === ClassMetadata::INHERITANCE_TYPE_NONE) {
                 continue;
             }
 
+            if (!$field->getTargetClass()) {
+                $field->setTargetClass($targetClass);
+            }
             $targetEntity = $field->getOrCreateTargetEntity();
             if (!$targetEntity->hasField(ConfigUtil::CLASS_NAME)) {
                 $targetEntity->addField(ConfigUtil::CLASS_NAME);

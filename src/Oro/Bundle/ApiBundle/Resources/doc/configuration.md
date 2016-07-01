@@ -140,9 +140,6 @@ The `entities` section describes a configuration of entities.
 
 Each entity can have next properties:
 
-* **label** *string* A human-readable representation of the entity. Used in auto generated documentation only.
-* **plural_label** *string* A human-readable representation in plural of the entity. Used in auto generated documentation only.
-* **description** *string* A human-readable description of the entity. Used in auto generated documentation only.
 * **inherit** *boolean* By default `true`. The flag indicates that the configuration for certain entity should be merged with the configuration of a parent entity. If a derived entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`.
 * **exclusion_policy** *string* - Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used for the entity. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
 * **disable_partial_load** *boolean* The flag indicates whether usage of Doctrine partial objects is disabled. By default `false`. It can be helpful for entities with table inheritance mapping.
@@ -161,9 +158,6 @@ Example:
 oro_api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
-            label:                "Acme Entity"
-            plural_label:         "Acme Entities"
-            description:          "Acme Entities description"
             inherit:              false
             exclusion_policy:     all
             disable_partial_load: false
@@ -210,7 +204,6 @@ oro_api:
 
 Each field can have next properties:
 
-* **label** *string* A human-readable representation of the field. Used in auto generated documentation only.
 * **description** *string* A human-readable description of the field. Used in auto generated documentation only.
 
 Example:
@@ -222,9 +215,7 @@ oro_api:
             ...
             fields:
                 field1:
-                    data_type:   time
-                    label:       "Acme name"
-                    description: "Acme description"
+                    description: Some Field
 ```
 
 * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
@@ -398,11 +389,18 @@ The `actions` configuration section allows to specify action-specific options. T
 Each action can have next properties:
 
 * **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
-* **description** *string* The entity description for the action.
+* **description** *string* A short, human-readable description of API resource. Used in auto generated documentation only.
+* **documentation** *string* A detailed documentation of API resource. Used in auto generated documentation only.
 * **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
-* **status_codes** *array* The possible response status codes for the action.
 * **form_type** *string* The form type that should be used for the entity. This option overrides **form_type** option defined in ["entities" configuration section](#entities-configuration-section).
 * **form_options** *array* The form options that should be used for the entity. These options override options defined in ["entities" configuration section](#entities-configuration-section).
+* **status_codes** *array* The possible response status codes for the action.
+
+Each status code can have next properties:
+
+* **exclude** *boolean* Indicates whether the status code should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
+* **description** *string* A human-readable description of the status code. Used in auto generated documentation only.
+
 * **fields** - This section describes entity fields' configuration specific for a particular action. These options override options defined in ["entities" configuration section](#entities-configuration-section).
 
 Each field can have next properties:

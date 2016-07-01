@@ -61,52 +61,6 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testLabel()
-    {
-        $config = new EntityDefinitionConfig();
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-
-        $config->setLabel('text');
-        $this->assertTrue($config->hasLabel());
-        $this->assertEquals('text', $config->getLabel());
-        $this->assertEquals(['label' => 'text'], $config->toArray());
-
-        $config->setLabel(null);
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-
-        $config->setLabel('text');
-        $config->setLabel('');
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-    }
-
-    public function testPluralLabel()
-    {
-        $config = new EntityDefinitionConfig();
-        $this->assertFalse($config->hasPluralLabel());
-        $this->assertNull($config->getPluralLabel());
-
-        $config->setPluralLabel('text');
-        $this->assertTrue($config->hasPluralLabel());
-        $this->assertEquals('text', $config->getPluralLabel());
-        $this->assertEquals(['plural_label' => 'text'], $config->toArray());
-
-        $config->setPluralLabel(null);
-        $this->assertFalse($config->hasPluralLabel());
-        $this->assertNull($config->getPluralLabel());
-        $this->assertEquals([], $config->toArray());
-
-        $config->setPluralLabel('text');
-        $config->setPluralLabel('');
-        $this->assertFalse($config->hasPluralLabel());
-        $this->assertNull($config->getPluralLabel());
-        $this->assertEquals([], $config->toArray());
-    }
-
     public function testDescription()
     {
         $config = new EntityDefinitionConfig();
@@ -127,6 +81,29 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $config->setDescription('');
         $this->assertFalse($config->hasDescription());
         $this->assertNull($config->getDescription());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testDocumentation()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+
+        $config->setDocumentation('text');
+        $this->assertTrue($config->hasDocumentation());
+        $this->assertEquals('text', $config->getDocumentation());
+        $this->assertEquals(['documentation' => 'text'], $config->toArray());
+
+        $config->setDocumentation(null);
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setDocumentation('text');
+        $config->setDocumentation('');
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
         $this->assertEquals([], $config->toArray());
     }
 

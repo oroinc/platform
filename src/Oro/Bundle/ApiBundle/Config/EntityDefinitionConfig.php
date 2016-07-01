@@ -13,22 +13,18 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 {
     use Traits\ConfigTrait;
     use Traits\FindFieldTrait;
-    use Traits\LabelTrait;
-    use Traits\PluralLabelTrait;
     use Traits\DescriptionTrait;
+    use Traits\DocumentationTrait;
     use Traits\FormTrait;
     use Traits\AclResourceTrait;
     use Traits\MaxResultsTrait;
     use Traits\StatusCodesTrait;
 
-    /** a human-readable representation of the entity */
-    const LABEL = 'label';
-
-    /** a human-readable representation in plural of the entity */
-    const PLURAL_LABEL = 'plural_label';
-
-    /** a human-readable description of the entity */
+    /** a short, human-readable description of API resource */
     const DESCRIPTION = 'description';
+
+    /** a detailed documentation of API resource */
+    const DOCUMENTATION = 'documentation';
 
     /** the default page size */
     const PAGE_SIZE = 'page_size';

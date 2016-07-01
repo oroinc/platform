@@ -197,7 +197,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->end()
             ->booleanNode(EntityDefinitionFieldConfig::COLLAPSE)->end()
             ->variableNode(EntityDefinitionFieldConfig::DATA_TRANSFORMER)->end()
-            ->scalarNode(EntityDefinitionFieldConfig::LABEL)->cannotBeEmpty()->end()
             ->scalarNode(EntityDefinitionFieldConfig::DESCRIPTION)->cannotBeEmpty()->end()
             ->scalarNode(EntityDefinitionFieldConfig::FORM_TYPE)->end()
             ->arrayNode(EntityDefinitionFieldConfig::FORM_OPTIONS)

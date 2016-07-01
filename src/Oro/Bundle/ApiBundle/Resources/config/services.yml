@@ -352,7 +352,6 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
-            - '@oro_api.resource_doc_provider'
             - '@oro_api.value_normalizer'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
@@ -376,11 +375,18 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
 
+    oro_api.entity_description_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider
+        public: false
+        arguments:
+            - '@oro_entity.entity_class_name_provider'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_api.doctrine_helper'
+            - '@translator'
+
     oro_api.resource_doc_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
         public: false
-        arguments:
-            - '@oro_api.subresources_provider'
 
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory

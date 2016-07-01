@@ -115,8 +115,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithDescriptions()
     {
         $config = [
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'form_type'    => 'test_form',
             'form_options' => ['option' => 'value'],
             'fields'       => [
@@ -140,6 +138,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         123 => ['description' => 'status 123'],
                         456 => ['exclude' => true]
                     ],
+                    'description'  => 'Action Description',
                     'form_type'    => 'action_form',
                     'form_options' => ['action_option' => 'action_value'],
                 ]
@@ -162,8 +161,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'label'        => 'Test Entity',
-                'plural_label' => 'Test Entities',
+                'description'  => 'Action Description',
                 'form_type'    => 'action_form',
                 'form_options' => ['action_option' => 'action_value'],
                 'status_codes' => [
@@ -193,8 +191,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithoutInheritance()
     {
         $config = [
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'form_type'    => 'test_form',
             'form_options' => ['option' => 'value'],
             'fields'       => [
@@ -222,6 +218,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         123 => ['description' => 'status 123'],
                         456 => ['exclude' => true]
                     ],
+                    'description'  => 'Action Description',
                     'form_type'    => 'action_form',
                     'form_options' => ['action_option' => 'action_value'],
                     'fields'       => [
@@ -253,8 +250,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'label'        => 'Test Entity',
-                'plural_label' => 'Test Entities',
+                'description'  => 'Action Description',
                 'form_type'    => 'action_form',
                 'form_options' => ['action_option' => 'action_value'],
                 'fields'       => [
@@ -610,8 +606,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithInheritance()
     {
         $config = [
-            'label'        => 'Other Entity',
-            'plural_label' => 'Other Entities',
             'fields'       => [
                 'field1' => null,
                 'field2' => null,
@@ -663,8 +657,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $parentConfig3 = [
             'inherit'      => false,
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'order_by'     => [
                 'field3' => 'ASC'
             ],
@@ -723,8 +715,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'label'        => 'Other Entity',
-                'plural_label' => 'Other Entities',
                 'order_by'     => [
                     'field2' => 'ASC'
                 ],

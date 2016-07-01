@@ -190,41 +190,17 @@ post_serialize:
     expected:
         post_serialize: [class, method]
 
-null_label:
+description_cannot_be_set_in_config:
     config:
-        label: ~
+        description: test
     expected: []
-    error: 'The path "entity.label" cannot contain an empty value, but got null.'
+    error: 'Unrecognized option "description" under "entity"'
 
-empty_label:
+documentation_cannot_be_set_in_config:
     config:
-        label: ""
+        documentation: test
     expected: []
-    error: 'The path "entity.label" cannot contain an empty value, but got "".'
-
-null_plural_label:
-    config:
-        plural_label: ~
-    expected: []
-    error: 'The path "entity.plural_label" cannot contain an empty value, but got null.'
-
-empty_plural_label:
-    config:
-        plural_label: ""
-    expected: []
-    error: 'The path "entity.plural_label" cannot contain an empty value, but got "".'
-
-null_description:
-    config:
-        description: ~
-    expected: []
-    error: 'The path "entity.description" cannot contain an empty value, but got null.'
-
-empty_description:
-    config:
-        description: ""
-    expected: []
-    error: 'The path "entity.description" cannot contain an empty value, but got "".'
+    error: 'Unrecognized option "documentation" under "entity"'
 
 all_attributes:
     config:
@@ -239,9 +215,6 @@ all_attributes:
             - HINT_1
             - {name: HINT_2, value: hint_val2}
         post_serialize: [class, method]
-        label: label1
-        plural_label: plural_label1
-        description: description1
     expected:
         exclusion_policy: all
         disable_partial_load: true
@@ -254,9 +227,6 @@ all_attributes:
             - {name: HINT_1}
             - {name: HINT_2, value: hint_val2}
         post_serialize: [class, method]
-        label: label1
-        plural_label: plural_label1
-        description: description1
 
 empty_field:
     config:
@@ -356,32 +326,6 @@ field_data_transformer:
             field3: []
             field4:
                 data_transformer: [service1, [class, method]]
-
-field_label:
-    config:
-        fields:
-            field1:
-                label: path1
-    expected:
-        fields:
-            field1:
-                label: path1
-
-null_field_label:
-    config:
-        fields:
-            field1:
-                label: null
-    expected: []
-    error: 'The path "entity.fields.field1.label" cannot contain an empty value, but got null.'
-
-empty_field_label:
-    config:
-        fields:
-            field1:
-                label: ""
-    expected: []
-    error: 'The path "entity.fields.field1.label" cannot contain an empty value, but got "".'
 
 field_description:
     config:

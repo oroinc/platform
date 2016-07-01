@@ -92,4 +92,27 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($config->getDescription());
         $this->assertEquals([], $config->toArray());
     }
+
+    public function testDocumentation()
+    {
+        $config = new ActionConfig();
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+
+        $config->setDocumentation('text');
+        $this->assertTrue($config->hasDocumentation());
+        $this->assertEquals('text', $config->getDocumentation());
+        $this->assertEquals(['documentation' => 'text'], $config->toArray());
+
+        $config->setDocumentation(null);
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setDocumentation('text');
+        $config->setDocumentation('');
+        $this->assertFalse($config->hasDocumentation());
+        $this->assertNull($config->getDocumentation());
+        $this->assertEquals([], $config->toArray());
+    }
 }

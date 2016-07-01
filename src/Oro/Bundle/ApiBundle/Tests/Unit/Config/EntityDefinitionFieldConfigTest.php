@@ -70,29 +70,6 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testLabel()
-    {
-        $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-
-        $config->setLabel('text');
-        $this->assertTrue($config->hasLabel());
-        $this->assertEquals('text', $config->getLabel());
-        $this->assertEquals(['label' => 'text'], $config->toArray());
-
-        $config->setLabel(null);
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-
-        $config->setLabel('text');
-        $config->setLabel('');
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-    }
-
     public function testDescription()
     {
         $config = new EntityDefinitionFieldConfig();

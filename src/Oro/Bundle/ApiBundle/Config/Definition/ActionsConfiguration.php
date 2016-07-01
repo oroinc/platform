@@ -82,8 +82,9 @@ class ActionsConfiguration extends AbstractConfigurationSection
         );
 
         $node
+            ->scalarNode(ActionConfig::DESCRIPTION)->cannotBeEmpty()->end()
+            ->scalarNode(ActionConfig::DOCUMENTATION)->cannotBeEmpty()->end()
             ->scalarNode(ActionConfig::ACL_RESOURCE)->end()
-            ->scalarNode(ActionConfig::DESCRIPTION)->end()
             ->integerNode(ActionConfig::MAX_RESULTS)
                 ->min(-1)
             ->end()
