@@ -81,6 +81,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         $fieldNode = $node
             ->arrayNode(EntityDefinitionConfig::FIELDS)
                 ->useAttributeAsKey('name')
+                ->normalizeKeys(false)
                 ->prototype('array')
                     ->children();
         $this->configureFieldNode($fieldNode);

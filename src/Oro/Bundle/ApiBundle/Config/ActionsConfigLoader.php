@@ -15,7 +15,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
     ];
 
     /** @var StatusCodesConfigLoader */
-    private $statusCodesConfigLoader;
+    protected $statusCodesConfigLoader;
 
     /**
      * {@inheritdoc}
@@ -83,7 +83,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
     /**
      * @param array|null $config
      *
-     * @return FilterFieldConfig
+     * @return ActionFieldConfig
      */
     protected function loadField(array $config = null)
     {

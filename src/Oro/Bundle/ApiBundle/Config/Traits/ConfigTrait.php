@@ -69,4 +69,34 @@ trait ConfigTrait
             unset($config[$key]);
         }
     }
+
+    /**
+     * Gets a native PHP array representation of the configuration options.
+     *
+     * @return array
+     */
+    protected function convertItemsToArray()
+    {
+        $result = $this->items;
+        foreach ($this->items as $key => $value) {
+            if (is_object($value) && method_exists($value, 'toArray')) {
+                $result[$key] = $value->toArray();
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Makes a deep copy of the configuration options.
+     */
+    protected function cloneItems()
+    {
+        $this->items = array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $this->items
+        );
+    }
 }

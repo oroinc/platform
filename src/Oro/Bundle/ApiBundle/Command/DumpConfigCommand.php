@@ -26,7 +26,6 @@ class DumpConfigCommand extends AbstractDebugCommand
         'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
         'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',
         'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra',
-        'Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra',
         'Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra',
         'Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra',
     ];
