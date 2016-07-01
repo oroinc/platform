@@ -27,25 +27,31 @@ class RemoveExtendedFields implements Migration, ContainerAwareInterface
         $configManager = $this->container->get('oro_entity_config.config_manager');
         $configProvider = $configManager->getProvider('extend');
 
-        foreach ($entityProvider->getEntities() as $entity) {
-            $entityName = $entity['name'];
-            if ($configProvider->hasConfig($entityName, self::PROPERTY_WORKFLOW_ITEM) &&
-                $configProvider->hasConfig($entityName, self::PROPERTY_WORKFLOW_STEP)
-            ) {
-                $fieldConfigItem = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_ITEM);
-                $fieldConfigItem->set('state', ExtendScope::STATE_DELETE);
-                $configManager->persist($fieldConfigItem);
+        try {
+            foreach ($entityProvider->getEntities() as $entity) {
+                $entityName = $entity['name'];
+                if ($configProvider->hasConfig($entityName, self::PROPERTY_WORKFLOW_ITEM) &&
+                    $configProvider->hasConfig($entityName, self::PROPERTY_WORKFLOW_STEP)
+                ) {
+                    $fieldConfigItem = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_ITEM);
+                    $fieldConfigItem->set('state', ExtendScope::STATE_DELETE);
+                    $configManager->persist($fieldConfigItem);
 
-                $fieldConfigStep = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_STEP);
-                $fieldConfigStep->set('state', ExtendScope::STATE_DELETE);
-                $configManager->persist($fieldConfigStep);
+                    $fieldConfigStep = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_STEP);
+                    $fieldConfigStep->set('state', ExtendScope::STATE_DELETE);
+                    $configManager->persist($fieldConfigStep);
+                }
             }
+
+            $configManager->flush();
+
+            $this->container
+                ->get('oro_entity_extend.extend.entity_processor')
+                ->updateDatabase(true, true);
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+
+            throw $e;
         }
-
-        $configManager->flush();
-
-        $this->container
-            ->get('oro_entity_extend.extend.entity_processor')
-            ->updateDatabase(true, true);
     }
 }
