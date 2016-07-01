@@ -14,10 +14,10 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class GridViewsExtension extends AbstractExtension
 {
@@ -44,8 +44,8 @@ class GridViewsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var GridViewManager */
-    protected $gridViewManager;
+    /** @var ServiceLink */
+    protected $managerLink;
 
     /** @var array  */
     protected $systemViews = [];
@@ -59,7 +59,7 @@ class GridViewsExtension extends AbstractExtension
      * @param TranslatorInterface $translator
      * @param ManagerRegistry $registry
      * @param AclHelper $aclHelper
-     * @param GridViewManager $gridViewManager
+     * @param ServiceLink $managerLink
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -67,14 +67,14 @@ class GridViewsExtension extends AbstractExtension
         TranslatorInterface $translator,
         ManagerRegistry $registry,
         AclHelper $aclHelper,
-        GridViewManager $gridViewManager
+        ServiceLink $managerLink
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->securityFacade  = $securityFacade;
         $this->translator      = $translator;
         $this->registry        = $registry;
         $this->aclHelper       = $aclHelper;
-        $this->gridViewManager = $gridViewManager;
+        $this->managerLink = $managerLink;
     }
 
     /**
@@ -123,7 +123,7 @@ class GridViewsExtension extends AbstractExtension
         }
 
         $currentUser = $this->getCurrentUser();
-        $gridViews = $this->gridViewManager->getAllGridViews($currentUser, $config->getName());
+        $gridViews = $this->managerLink->getService()->getAllGridViews($currentUser, $config->getName());
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
             $event = new GridViewsLoadEvent($config->getName(), $gridViews);
@@ -201,7 +201,7 @@ class GridViewsExtension extends AbstractExtension
             if (!$currentUser = $this->getCurrentUser()) {
                 return null;
             }
-            $this->defaultGridView = $this->gridViewManager->getDefaultView($currentUser, $gridName);
+            $this->defaultGridView = $this->managerLink->getService()->getDefaultView($currentUser, $gridName);
         }
 
         return $this->defaultGridView;

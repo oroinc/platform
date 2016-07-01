@@ -164,6 +164,10 @@ services:
             - '@doctrine'
             - '@oro_datagrid.datagrid.manager'
 
+    oro_datagrid.grid_view.manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_datagrid.grid_view.manager }
+
     oro_datagrid.grid_view.manager.api:
         class: %oro_datagrid.grid_view.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract

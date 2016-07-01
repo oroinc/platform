@@ -74,7 +74,7 @@ class ApiEntityManager
     }
 
     /**
-     * Sets a event dispatcher
+     * Sets a event 
      *
      * @param EventDispatcherInterface $eventDispatcher
      */

@@ -121,7 +121,7 @@ class GridViewManager
     {
         if (!isset($this->cacheData[self::SYSTEM_VIEWS_KEY])) {
             $config = $this->gridManager->getConfigurationForGrid($gridName);
-            $list = $config->offsetGetOr('views_list', false);
+            $list = $config->offsetGetOr(GridViewsExtension::VIEWS_LIST_KEY, false);
             $gridViews[] = new View(GridViewsExtension::DEFAULT_VIEW_ID);
             if ($list) {
                 $gridViews = array_merge($gridViews, $list->getList()->getValues());
@@ -189,5 +189,31 @@ class GridViewManager
         }
 
         return $this->cacheData[self::DEFAULT_VIEW_KEY];
+    }
+
+    /**
+     * @param $id
+     * @param $default (if $default=0 all views will unset as default and __all__ view will be set
+     * @param $gridName
+     * @return null|View
+     */
+    public function getView($id, $default, $gridName)
+    {
+        if (!$default) {
+            $gridView = new View(GridViewsExtension::DEFAULT_VIEW_ID);
+        } else {
+            $gridView = $this->getSystemView($id, $gridName);
+            if (!$gridView) {
+                $gridView = $this->registry
+                    ->getRepository('OroDataGridBundle:GridView')
+                    ->find($id);
+            }
+        }
+
+        if ($gridView instanceof ViewInterface) {
+            $gridView->setGridName($gridName);
+        }
+
+        return $gridView;
     }
 }
