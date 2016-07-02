@@ -303,10 +303,10 @@ services:
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
-    oro_locale.twig.date_time_user:
-        class: Oro\Bundle\LocaleBundle\Twig\DateTimeUserExtension
+    oro_locale.twig.date_time_organization:
+        class: Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension
         parent: oro_locale.twig.date_time
         calls:
-            - [setConfigManager, ['@oro_config.manager']]
+            - [setConfigManager, ['@oro_config.scope.global']]
         tags:
             - { name: twig.extension }

@@ -40,7 +40,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
                     'oro_format_date',
                     'oro_format_time',
                     'oro_format_datetime',
-                    'oro_format_datetime_user',
+                    'oro_format_datetime_organization',
                     'oro_format_name',
                     'date'
                 ]

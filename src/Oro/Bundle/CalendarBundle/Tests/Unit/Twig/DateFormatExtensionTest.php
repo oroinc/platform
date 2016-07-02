@@ -95,12 +95,18 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
      * @param array $config
      * @param string|null $locale
      * @param string|null $timeZone
-     * @param User $user
+     * @param Organization $organization
      *
-     * @dataProvider formatCalendarDateRangeUserProvider
+     * @dataProvider formatCalendarDateRangeOrganizationProvider
      */
-    public function testFormatCalendarDateRangeUser($start, $end, array $config, $locale, $timeZone, $user)
-    {
+    public function testFormatCalendarDateRangeOrganization(
+        $start,
+        $end,
+        array $config,
+        $locale,
+        $timeZone,
+        $organization
+    ) {
         $startDate = new \DateTime($start);
         $endDate = $end === null ? null : new \DateTime($end);
 
@@ -115,7 +121,7 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->extension->formatCalendarDateRangeUser(
+        $this->extension->formatCalendarDateRangeOrganization(
             $startDate,
             $endDate,
             false,
@@ -123,13 +129,13 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
             null,
             $locale,
             $timeZone,
-            $user
+            $organization
         );
 
         $this->configManager->expects($this->never())
             ->method('get');
 
-        $this->extension->formatCalendarDateRangeUser(
+        $this->extension->formatCalendarDateRangeOrganization(
             $startDate,
             $endDate,
             false,
@@ -140,10 +146,9 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function formatCalendarDateRangeUserProvider()
+    public function formatCalendarDateRangeOrganizationProvider()
     {
         $organization = new Organization(1);
-        $user = new User(1, null, $organization);
 
         return [
             'Localization settings from global scope' => [
@@ -152,7 +157,7 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
                 ['locale' => 'en_US', 'timeZone' => 'UTC'], // config global scope
                 null,
                 null,
-                $user
+                $organization
             ],
             'Localization settings from params values' => [
             '2016-05-01T10:30:15+00:00',
