@@ -535,6 +535,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
         $result->setSubject($this->getTitle());
         $result->setExpireAt($this->getStart());
         $result->setRecipient($this->getCalendar()->getOwner());
+        $result->setOrganization($this->getCalendar()->getOrganization());
 
         return $result;
     }
