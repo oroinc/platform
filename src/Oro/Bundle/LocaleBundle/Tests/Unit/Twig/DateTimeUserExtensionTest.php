@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
-use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeUserExtension;
 
 class DateTimeUserExtensionTest extends \PHPUnit_Framework_TestCase
@@ -17,30 +14,24 @@ class DateTimeUserExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $localeSettings;
+    protected $formatter;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $configManager;
 
-    /**
-     * @var DateTimeFormatter
-     */
-    protected $formatter;
-
     protected function setUp()
     {
+        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->formatter = new DateTimeFormatter($this->localeSettings, $translator);
+
         $this->extension = new DateTimeUserExtension($this->formatter);
         $this->extension->setConfigManager($this->configManager);
     }
@@ -55,77 +46,60 @@ class DateTimeUserExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_format_datetime_user', $filters[4]->getName());
     }
 
-    /**
-     * @param string $value
-     * @param string $expected
-     * @param array $options
-     * @param string|null $locale
-     * @param string|null $timeZone
-     *
-     * @dataProvider formatDateTimeUserDataProvider
-     */
-    public function testFormatDateTimeUser($value, $expected, array $options, $locale = null, $timeZone = null)
+    public function testFormatDateTimeUserShouldUseConfigurationTimezoneIfUserAndOrganizationProvided()
     {
-        $this->configManager->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['oro_locale.locale', false, false, $locale],
-                        ['oro_locale.timezone', false, false, $timeZone],
-                    ]
-                )
-            );
+        $date = new \DateTime('2016-05-31 00:00:00');
+        $expected = 'May 30, 2016, 4:00 PM';
 
-        $this->assertEquals($expected, $this->extension->formatDateTimeUser($value, $options));
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\UserInterface');
+
+        $userLocale = 'en_US';
+        $userTimezone = 'America/Los_Angeles';
+        $this->configManager->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['oro_locale.locale', false, false, $userLocale],
+                    ['oro_locale.timezone', false, false, $userTimezone],
+                ]
+            );
+        $this->formatter->expects($this->once())
+            ->method('format')
+            ->with($date, null, null, $userLocale, $userTimezone)
+            ->willReturn($expected);
+
+        $options = [
+            'locale'   => 'fr_FR',
+            'timeZone' => 'Europe/Athens',
+            'user'     => $user
+        ];
+        $actual = $this->extension->formatDateTimeUser($date, $options);
+
+        $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function formatDateTimeUserDataProvider()
+    public function testFormatDateTimeUserShouldUseTimezonePassedInOptionsIfUserNotProvided()
     {
-        $organization = new Organization(1);
-        $user = new User(1, null, $organization);
+        $date = new \DateTime('2016-05-31 00:00:00');
+        $expected = 'May 30, 2016, 4:00 PM';
 
-        return [
-            'options without User negative shift' => [
-                'value' => new \DateTime('2016-05-31 00:00:00', new \DateTimeZone('UTC')),
-                'expected' => 'May 30, 2016, 5:00 PM',
-                'options' => [
-                    'locale' => 'en_US',
-                    'timeZone' => 'America/Los_Angeles',
-                ],
-            ],
-            'options without User positive shift' => [
-                'value' => new \DateTime('2016-05-31 00:00:00', new \DateTimeZone('UTC')),
-                'expected' => 'May 31, 2016, 3:00 AM',
-                'options' => [
-                    'locale' => 'en_US',
-                    'timeZone' => 'Europe/Athens',
-                ],
-                'locale' => 'en_US',
-                'timeZone' => 'Europe/Athens',
-            ],
-            'user scope timeZone positive shift' => [
-                'value' => new \DateTime('2016-05-31 00:00:00', new \DateTimeZone('UTC')),
-                'expected' => 'May 31, 2016, 3:00 AM',
-                'options' => [
-                    'user' => $user
-                ],
-                'locale' => 'en_US',
-                'timeZone' => 'Europe/Athens',
-            ],
-            'user scope timeZone negative shift' => [
-                'value' => new \DateTime('2016-05-31 00:00:00', new \DateTimeZone('UTC')),
-                'expected' => 'May 30, 2016, 6:00 PM',
-                'options' => [
-                    'user' => $user
-                ],
-                'locale' => 'en_US',
-                'timeZone' => 'Pacific/Easter',
-            ],
+        $this->configManager->expects($this->never())
+            ->method('get');
+
+        $locale = 'en_US';
+        $timezone = 'America/Los_Angeles';
+        $this->formatter->expects($this->once())
+            ->method('format')
+            ->with($date, null, null, $locale, $timezone)
+            ->willReturn($expected);
+
+        $options = [
+            'locale'   => $locale,
+            'timeZone' => $timezone
         ];
+        $actual = $this->extension->formatDateTimeUser($date, $options);
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function testGetName()
