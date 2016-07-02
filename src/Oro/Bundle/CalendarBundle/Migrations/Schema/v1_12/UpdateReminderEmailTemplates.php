@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class FixReminderEmailTemplates extends ParametrizedMigrationQuery
+class UpdateReminderEmailTemplates extends ParametrizedMigrationQuery
 {
     /**
      * {@inheritdoc}

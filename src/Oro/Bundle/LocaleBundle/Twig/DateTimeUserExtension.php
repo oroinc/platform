@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 
 /**
  * DateTimeUserExtension allows get formatted date and calendar date range by user localization settings
@@ -74,7 +72,7 @@ class DateTimeUserExtension extends DateTimeExtension
         $user = $this->getOption($options, 'user');
 
         /** Get locale and datetime settings from local configuration if user set */
-        if ($user) {
+        if ($user instanceof UserInterface) {
             $locale = $this->configManager->get('oro_locale.locale');
             $timeZone = $this->configManager->get('oro_locale.timezone');
         } else {

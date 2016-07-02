@@ -43,6 +43,8 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->extension = new DateFormatExtension($this->formatter, $this->configManager);
     }
 
     /**
@@ -64,7 +66,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter->expects($this->any())
             ->method('formatTime')
             ->will($this->returnValue('Time'));
-        $this->extension = new DateFormatExtension($this->formatter);
 
         $startDate = new \DateTime($start);
         $endDate = $end === null ? null : new \DateTime($end);
@@ -103,8 +104,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $startDate = new \DateTime($start);
         $endDate = $end === null ? null : new \DateTime($end);
 
-        $this->extension = new DateFormatExtension($this->formatter);
-        $this->extension->setConfigManager($this->configManager);
         $this->configManager->expects($this->any())
             ->method('get')
             ->will(

@@ -305,8 +305,7 @@ services:
 
     oro_locale.twig.date_time_user:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeUserExtension
-        arguments:
-            - '@oro_locale.formatter.date_time'
+        parent: oro_locale.twig.date_time
         calls:
             - [setConfigManager, ['@oro_config.manager']]
         tags:
