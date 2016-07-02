@@ -95,7 +95,7 @@ class EmailSendProcessor implements SendProcessorInterface
                     $this->emailNotification->getEntity(),
                     [$this->emailNotification],
                     null,
-                    ['recipient' => $reminder->getRecipient()]
+                    ['organization' => $reminder->getRecipient()->getOrganization()]
                 );
             $reminder->setState(Reminder::STATE_SENT);
         } catch (\Exception $exception) {

@@ -71,7 +71,21 @@ class DateTimeOrganizationExtension extends DateTimeExtension
         $timeType = $this->getOption($options, 'timeType');
         $organization = $this->getOption($options, 'organization');
 
-        /** Get locale and datetime settings from local configuration if user set */
+        list($locale, $timeZone) = $this->getLocaleSettings($organization, $options);
+
+        $result = $this->formatter->format($date, $dateType, $timeType, $locale, $timeZone);
+
+        return $result;
+    }
+
+    /**
+     * @param OrganizationInterface|null $organization
+     * @param array                      $options
+     *
+     * @return array ['locale', 'timezone']
+     */
+    protected function getLocaleSettings($organization, array $options)
+    {
         if ($organization instanceof OrganizationInterface) {
             $locale = $this->configManager->get('oro_locale.locale');
             $timeZone = $this->configManager->get('oro_locale.timezone');
@@ -80,9 +94,7 @@ class DateTimeOrganizationExtension extends DateTimeExtension
             $timeZone = $this->getOption($options, 'timeZone');
         }
 
-        $result = $this->formatter->format($date, $dateType, $timeType, $locale, $timeZone);
-
-        return $result;
+        return [$locale, $timeZone];
     }
 
     /**
