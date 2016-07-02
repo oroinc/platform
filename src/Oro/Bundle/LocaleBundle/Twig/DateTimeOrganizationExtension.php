@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
  * DateTimeUserExtension allows get formatted date and calendar date range by user localization settings
@@ -14,7 +14,7 @@ use Oro\Bundle\UserBundle\Entity\UserInterface;
  *
  * @todo: it's a temporary workaround to fix dates in reminder emails CRM-5745 until improvement CRM-5758 is implemented
  */
-class DateTimeUserExtension extends DateTimeExtension
+class DateTimeOrganizationExtension extends DateTimeExtension
 {
     /**
      * @var DateTimeFormatter
@@ -41,8 +41,8 @@ class DateTimeUserExtension extends DateTimeExtension
     {
         $filters = parent::getFilters();
         $filters[] = new \Twig_SimpleFilter(
-            'oro_format_datetime_user',
-            [$this, 'formatDateTimeUser'],
+            'oro_format_datetime_organization',
+            [$this, 'formatDateTimeOrganization'],
             ['is_safe' => ['html']]
         );
         return $filters;
@@ -65,14 +65,14 @@ class DateTimeUserExtension extends DateTimeExtension
      * @param array $options
      * @return string
      */
-    public function formatDateTimeUser($date, array $options = [])
+    public function formatDateTimeOrganization($date, array $options = [])
     {
         $dateType = $this->getOption($options, 'dateType');
         $timeType = $this->getOption($options, 'timeType');
-        $user = $this->getOption($options, 'user');
+        $organization = $this->getOption($options, 'organization');
 
         /** Get locale and datetime settings from local configuration if user set */
-        if ($user instanceof UserInterface) {
+        if ($organization instanceof OrganizationInterface) {
             $locale = $this->configManager->get('oro_locale.locale');
             $timeZone = $this->configManager->get('oro_locale.timezone');
         } else {
@@ -90,6 +90,6 @@ class DateTimeUserExtension extends DateTimeExtension
      */
     public function getName()
     {
-        return 'oro_locale_datetime_user';
+        return 'oro_locale_datetime_organization';
     }
 }

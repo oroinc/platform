@@ -4,7 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Twig;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 class DateFormatExtension extends \Twig_Extension
 {
@@ -36,9 +36,9 @@ class DateFormatExtension extends \Twig_Extension
                 $this,
                 'formatCalendarDateRange'
             ),
-            'calendar_date_range_user' => new \Twig_Function_Method(
+            'calendar_date_range_organization' => new \Twig_Function_Method(
                 $this,
-                'formatCalendarDateRangeUser'
+                'formatCalendarDateRangeOrganization'
             )
         ];
     }
@@ -140,18 +140,18 @@ class DateFormatExtension extends \Twig_Extension
      *          Thu Oct 17, 2013 5:00pm – Thu Oct 18, 2013 5:00pm - when $skipTime = false
      *          Thu Oct 17, 2013 – Thu Oct 18, 2013 - when $skipTime = true
      *
-     * @param \DateTime|null     $startDate
-     * @param \DateTime|null     $endDate
-     * @param bool               $skipTime
-     * @param string|int|null    $dateType \IntlDateFormatter constant or it's string name
-     * @param string|int|null    $timeType \IntlDateFormatter constant or it's string name
-     * @param string|null        $locale
-     * @param string|null        $timeZone
-     * @param UserInterface|null $user
+     * @param \DateTime|null             $startDate
+     * @param \DateTime|null             $endDate
+     * @param bool                       $skipTime
+     * @param string|int|null            $dateType \IntlDateFormatter constant or it's string name
+     * @param string|int|null            $timeType \IntlDateFormatter constant or it's string name
+     * @param string|null                $locale
+     * @param string|null                $timeZone
+     * @param OrganizationInterface|null $organization
      *
      * @return string
      */
-    public function formatCalendarDateRangeUser(
+    public function formatCalendarDateRangeOrganization(
         \DateTime $startDate = null,
         \DateTime $endDate = null,
         $skipTime = false,
@@ -159,10 +159,10 @@ class DateFormatExtension extends \Twig_Extension
         $timeType = null,
         $locale = null,
         $timeZone = null,
-        UserInterface $user = null
+        OrganizationInterface $organization = null
     ) {
         // Get localization settings from user scope
-        if ($user instanceof UserInterface) {
+        if ($organization instanceof OrganizationInterface) {
             $locale = $this->configManager->get('oro_locale.locale');
             $timeZone = $this->configManager->get('oro_locale.timezone');
         }
