@@ -163,8 +163,7 @@ class DateFormatExtension extends \Twig_Extension
     ) {
         // Get localization settings from user scope
         if ($organization instanceof OrganizationInterface) {
-            $locale = $this->configManager->get('oro_locale.locale');
-            $timeZone = $this->configManager->get('oro_locale.timezone');
+            list($locale, $timeZone) = $this->getOrganizationLocaleSettings($organization);
         }
 
         return $this->formatCalendarDateRange(
@@ -177,7 +176,20 @@ class DateFormatExtension extends \Twig_Extension
             $timeZone
         );
     }
-    
+
+    /**
+     * @param OrganizationInterface $organization
+     *
+     * @return array ['locale', 'timezone']
+     */
+    protected function getOrganizationLocaleSettings(OrganizationInterface $organization)
+    {
+        $locale = $this->configManager->get('oro_locale.locale');
+        $timeZone = $this->configManager->get('oro_locale.timezone');
+
+        return [$locale, $timeZone];
+    }
+
     /**
      * {@inheritdoc}
      */
