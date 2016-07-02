@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_10;
+namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_12;
 
 use Doctrine\DBAL\ConnectionException;
 
@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class FixReminderEmailTemplates extends ParametrizedMigrationQuery
+class UpdateReminderEmailTemplates extends ParametrizedMigrationQuery
 {
     /**
      * {@inheritdoc}
