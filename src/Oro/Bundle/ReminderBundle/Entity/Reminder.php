@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\ReminderBundle\Model\OrganizationAwareReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\SenderAwareReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ExtendReminder;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
@@ -180,7 +182,15 @@ class Reminder extends ExtendReminder
      * @ORM\Column(name="failure_exception", type="array", nullable=true)
      */
     protected $failureException;
-
+    
+    /**
+     * @var OrganizationInterface
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+    
     public function __construct()
     {
         parent::__construct();
@@ -439,6 +449,26 @@ class Reminder extends ExtendReminder
     }
 
     /**
+     * @return OrganizationInterface
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * @param OrganizationInterface $organization
+     *
+     * @return Reminder
+     */
+    public function setOrganization(OrganizationInterface $organization)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+    
+    /**
      * Sets reminder data
      *
      * @param ReminderDataInterface $data
@@ -452,6 +482,10 @@ class Reminder extends ExtendReminder
 
         if ($data instanceof SenderAwareReminderDataInterface) {
             $this->setSender($data->getSender());
+        }
+        
+        if ($data instanceof OrganizationAwareReminderDataInterface) {
+            $this->setOrganization($data->getOrganization());
         }
         
         return $this;

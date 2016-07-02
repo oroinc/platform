@@ -307,6 +307,6 @@ services:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension
         parent: oro_locale.twig.date_time
         calls:
-            - [setConfigManager, ['@oro_config.scope.global']]
+            - [setConfigManager, ['@oro_config.global']]
         tags:
             - { name: twig.extension }
