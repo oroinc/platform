@@ -31,6 +31,11 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $eventDispatcher;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityOwnerAccessor;
+
     protected function setUp()
     {
         $this->emailNotificationProcessor = $this

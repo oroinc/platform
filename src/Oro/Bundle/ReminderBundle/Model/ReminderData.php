@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ReminderBundle\Model;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Represents entity that provides information about reminder.
  */
-class ReminderData implements ReminderDataInterface
+class ReminderData implements ReminderDataInterface, OrganizationAwareReminderDataInterface
 {
     /**
      * @var string
@@ -24,6 +25,11 @@ class ReminderData implements ReminderDataInterface
      */
     protected $recipient;
 
+    /**
+     * @var OrganizationInterface
+     */
+    protected $organization;
+    
     /**
      * @param string $subject
      * @return ReminderData
@@ -79,5 +85,25 @@ class ReminderData implements ReminderDataInterface
     public function getRecipient()
     {
         return $this->recipient;
+    }
+
+    /**
+     * @param OrganizationInterface|null $organization
+     *
+     * @return ReminderData
+     */
+    public function setOrganization(OrganizationInterface $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+    
+    /**
+     * @return OrganizationInterface|null
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

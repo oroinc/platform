@@ -14,6 +14,7 @@ oro:
         state.label:                      State
         subject.label:                    Subject
         sender.label:                     Sender
+        organization.label:               Organization
 
         entity_label:        Reminder
         entity_plural_label: Reminders
