@@ -79,29 +79,14 @@ class WorkflowItemRepository extends EntityRepository
      * @param WorkflowDefinition $definition
      * @return QueryBuilder
      */
-    protected function getByDefinitionQueryBuilder(WorkflowDefinition $definition)
-    {
-        return $this->createQueryBuilder('workflowItem')
-            ->select('workflowItem.id')
-            ->where('workflowItem.definition = :definition')
-            ->setParameter('definition', $definition);
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @return QueryBuilder
-     */
     public function getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition $definition)
     {
-        //TODO: refactor or remove this method in BAP-10979
-        $queryBuilder = $this->getByDefinitionQueryBuilder($definition);
-
         return $this->getEntityManager()->createQueryBuilder()
-            ->update($definition->getRelatedEntity(), 'entity')
-            ->set('entity.workflowStep', $definition->getStartStep()->getId())
-            ->where('entity.workflowStep IS NULL')
-            ->andWhere('entity.workflowItem IS NULL OR entity.workflowItem IN (' . $queryBuilder->getDQL() . ')')
-            ->setParameters($queryBuilder->getParameters());
+            ->update(WorkflowItem::class, 'workflowItem')
+            ->set('workflowItem.currentStep', $definition->getStartStep()->getId())
+            ->where('workflowItem.currentStep IS NULL')
+            ->andWhere('workflowItem.definition = :definition')
+            ->setParameter('definition', $definition);
     }
 
     /**
