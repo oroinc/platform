@@ -158,9 +158,17 @@ services:
     oro_layout.provider.image_type:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
-            - @oro_layout.theme_manager
+            - '@oro_layout.theme_manager'
 
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:
             - '@request_stack'
+
+    oro_layout.provider.image_filter:
+        class: Oro\Bundle\LayoutBundle\Provider\ImageFilterProvider
+        arguments:
+            - '@oro_layout.provider.image_type'
+            - '@liip_imagine.filter.configuration'
+
+

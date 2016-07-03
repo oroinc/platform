@@ -110,6 +110,7 @@ class FileController extends Controller
         $binary         = $this->get('liip_imagine')->load(
             $this->get('oro_attachment.manager')->getContent($attachment)
         );
+        $this->get('oro_layout.provider.image_filter')->load();
         $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filter);
         $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
 

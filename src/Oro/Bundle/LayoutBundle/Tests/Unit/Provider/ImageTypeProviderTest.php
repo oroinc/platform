@@ -110,15 +110,8 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function assertHasDimension(ThemeImageType $imageType, $width, $height)
     {
-        $hasDimension = false;
+        $dimensionKey = sprintf('%dx%d', $width, $height);
 
-        foreach ($imageType->getDimensions() as $dimension) {
-            if ($dimension->getWidth() === $width && $dimension->getHeight() === $height) {
-                $hasDimension = true;
-                break;
-            }
-        }
-
-        $this->assertTrue($hasDimension, sprintf('Image type does not contain dimension %dx%d', $width, $height));
+        $this->assertArrayHasKey($dimensionKey, $imageType->getDimensions());
     }
 }

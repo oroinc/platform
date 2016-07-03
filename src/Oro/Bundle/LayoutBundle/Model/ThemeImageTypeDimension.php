@@ -25,15 +25,6 @@ class ThemeImageTypeDimension
     }
 
     /**
-     * @return string
-     */
-    function __toString()
-    {
-        return sprintf('%d_%d', $this->width, $this->height);
-    }
-
-
-    /**
      * @return int
      */
     public function getWidth()
@@ -47,5 +38,13 @@ class ThemeImageTypeDimension
     public function getHeight()
     {
         return $this->height;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%dx%d', $this->width, $this->height);
     }
 }
