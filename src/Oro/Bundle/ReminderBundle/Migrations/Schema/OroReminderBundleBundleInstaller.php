@@ -50,12 +50,10 @@ class OroReminderBundleBundleInstaller implements Installation
         $table->addColumn('sent_at', 'datetime', ['notnull' => false]);
         $table->addColumn('failure_exception', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('sender_id', 'integer', ['notnull' => false]);
-        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['recipient_id'], 'IDX_2F4F9F57E92F8F78', []);
         $table->addIndex(['state'], 'reminder_state_idx', []);
         $table->addIndex(['sender_id'], 'idx_2f4f9f57f624b39d', []);
-        $table->addIndex(['organization_id'], 'IDX_2F4F9F5732C8A3DE', []);
         /** End of generate table oro_reminder **/
 
         /** Generate foreign keys for table oro_reminder **/
@@ -71,12 +69,6 @@ class OroReminderBundleBundleInstaller implements Installation
             ['sender_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'SET NULL']
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_organization'),
-            ['organization_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_reminder **/
     }
