@@ -7,8 +7,13 @@ Table of Contents
  - [Configuration structure](#configuration-structure)
  - ["exclude" option](#exclude-option)
  - ["entities" configuration section](#entities-configuration-section)
+   - ["fields" configuration section](#fields-configuration-section)
+   - ["filters" configuration section](#filters-configuration-section)
+   - ["sorters" configuration section](#sorters-configuration-section)
  - ["relations" configuration section](#relations-configuration-section)
  - ["actions" configuration section](#actions-configuration-section)
+   - [action "status_codes" configuration section](#action-status_codes-configuration-section)
+   - [action "fields" configuration section](#action-fields-configuration-section)
  - ["subresources" configuration section](#subresources-configuration-section)
 
 Overview
@@ -141,7 +146,7 @@ oro_entity:
 
 The `entities` section describes a configuration of entities.
 
-Each entity can have next properties:
+Each entity can have the next options:
 
 * **inherit** *boolean* By default `true`. The flag indicates that the configuration for certain entity should be merged with the configuration of a parent entity. If a derived entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`.
 * **exclusion_policy** *string* - Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used for the entity. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
@@ -201,11 +206,10 @@ oro_api:
                 validation_groups: ['Default', 'api', 'my_group']
 ```
 
+### "fields" configuration section
+
 * **fields** - This section describes entity fields' configuration.
-
-Each field can have next properties:
-
-* **description** *string* A human-readable description of the field. Used in auto generated documentation only.
+    * **description** *string* A human-readable description of the field. Used in auto generated documentation only.
 
 Example:
 
@@ -219,7 +223,7 @@ oro_api:
                     description: Some Field
 ```
 
-* **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
+    * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
 
 Example:
 
@@ -238,7 +242,7 @@ oro_api:
 
 ```
 
-* **data_transformer** - The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name.
+    * **data_transformer** - The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name.
 
 ```yaml
 oro_api:
@@ -253,7 +257,7 @@ oro_api:
                         - ["Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer", "transform"]
 ```
 
-* **collapse** *boolean* Indicates whether the entity should be collapsed. It is applicable for associations only. It means that target entity should be returned as a value, instead of an array with values of entity fields. Usually this property is set by [get_relation_config](./actions.md#get_relation_config-action) processors to get identifier of the related entity.
+    * **collapse** *boolean* Indicates whether the entity should be collapsed. It is applicable for associations only. It means that target entity should be returned as a value, instead of an array with values of entity fields. Usually this property is set by [get_relation_config](./actions.md#get_relation_config-action) processors to get identifier of the related entity.
 
 Example:
 
@@ -271,7 +275,7 @@ oro_api:
                     fields: targetField1
 ```
 
-* **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclude" option](#exclude-option).
+    * **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclude" option](#exclude-option).
 
 Example:
 
@@ -285,8 +289,8 @@ oro_api:
                     exclude: true
 ```
 
-* **form_type** *string* The form type that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
-* **form_options** *array* The form options that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+    * **form_type** *string* The form type that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+    * **form_options** *array* The form options that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 
 Example:
 
@@ -302,10 +306,10 @@ oro_api:
                         trim: false
 ```
 
-* **data_type** *string* The data type of the field value. Can be `boolean`, `integer`, `string`, etc. If a field represents an association the data type should be a type of an identity field of the target entity.
-* **meta_property** *boolean* A flag indicates whether the field represents a meta information. For JSON.API such fields will be returned in [meta](http://jsonapi.org/format/#document-meta) section. By default `false`.
-* **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
-* **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
+    * **data_type** *string* The data type of the field value. Can be `boolean`, `integer`, `string`, etc. If a field represents an association the data type should be a type of an identity field of the target entity.
+    * **meta_property** *boolean* A flag indicates whether the field represents a meta information. For JSON.API such fields will be returned in [meta](http://jsonapi.org/format/#document-meta) section. By default `false`.
+    * **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
+    * **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
 
 Example:
 
@@ -326,6 +330,8 @@ oro_api:
                     target_class: Acme\Bundle\AcmeBundle\Api\Model\AcmeTargetEntity
                     target_type: collection
 ```
+
+### "filters" configuration section
 
 * **filters** - This section describes fields by which the result data can be filtered. It contains two properties: `exclusion_policy` and `fields`.
     * **exclusion_policy** *string* Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
@@ -357,6 +363,8 @@ oro_api:
                         allow_array: false
 ```
 
+### "sorters" configuration section
+
 * **sorters** - This section describes fields by which the result data can be sorted. It contains two properties: `exclusion_policy` and `fields`.
     * **exclusion_policy** *string* Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
     * **fields** - This section describes a configuration of each field that can be used to sort the result data. Each sorter can have the following properties:
@@ -387,7 +395,7 @@ The `relations` configuration section describes a configuration of an entity if 
 
 The `actions` configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration.
 
-Each action can have next properties:
+Each action can have the next options:
 
 * **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
 * **description** *string* A short, human-readable description of API resource. Used in auto generated documentation only.
@@ -401,20 +409,19 @@ Each action can have next properties:
 * **disable_fieldset** *boolean* The flag indicates whether a requesting of a restricted set of fields is disabled. In JSON.API an [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) can be used to customize which fields should be returned. By default `false`.
 * **form_type** *string* The form type that should be used for the entity.
 * **form_options** *array* The form options that should be used for the entity.
+
+### action "status_codes" configuration section
+
 * **status_codes** *array* The possible response status codes for the action.
+    * **exclude** *boolean* Indicates whether the status code should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
+    * **description** *string* A human-readable description of the status code. Used in auto generated documentation only.
 
-Each status code can have next properties:
-
-* **exclude** *boolean* Indicates whether the status code should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
-* **description** *string* A human-readable description of the status code. Used in auto generated documentation only.
+### action "fields" configuration section
 
 * **fields** - This section describes entity fields' configuration specific for a particular action.
-
-Each field can have next properties:
-
-* **exclude** *boolean* Indicates whether the field should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
-* **form_type** *string* The form type that should be used for the field.
-* **form_options** *array* The form options that should be used for the field.
+    * **exclude** *boolean* Indicates whether the field should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
+    * **form_type** *string* The form type that should be used for the field.
+    * **form_options** *array* The form options that should be used for the field.
 
 By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
 
@@ -541,12 +548,13 @@ oro_api:
 
 The `subresources` configuration section allows to provide options for sub-resources.
 
-Each subresource can have next properties:
+Each subresource can have the next options:
 
 * **exclude** *boolean* Indicates whether the sub-resource is disabled for entity. By default `false`.
 * **target_class** *string* The class name of a target entity.
 * **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default.
 * **actions** *array* The actions supported by the sub-resource. This section has the same options as [entity **actions** section](#actions-configuration-section). If an option exists in both [entity **actions** section](#actions-configuration-section) and sub-resource **actions** section the sub-resource option wins.
+* **filters** - The filters supported by the sub-resource. This section has the same options as [entity **filters** section](#filters-configuration-section). If an option exists in both [entity **filters** section](#filters-configuration-section) and sub-resource **filters** section the sub-resource option wins.
 
 Example:
 
@@ -565,4 +573,9 @@ oro_api:
                         update_relationship: false
                         add_relationship: false
                         delete_relationship: false
+                    filters:
+                        fields:
+                            exclude-current-user:
+                                description: Indicates whether the current user should be excluded from the result.
+                                data_type: boolean
 ```
