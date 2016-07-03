@@ -13,8 +13,12 @@ class ActionConfig
     use Traits\DocumentationTrait;
     use Traits\AclResourceTrait;
     use Traits\MaxResultsTrait;
-    use Traits\StatusCodesTrait;
+    use Traits\PageSizeTrait;
+    use Traits\SortingTrait;
+    use Traits\InclusionTrait;
+    use Traits\FieldsetTrait;
     use Traits\FormTrait;
+    use Traits\StatusCodesTrait;
 
     /** a flag indicates whether the action should not be available for the entity */
     const EXCLUDE = ConfigUtil::EXCLUDE;
@@ -31,14 +35,29 @@ class ActionConfig
     /** the maximum number of items in the result */
     const MAX_RESULTS = EntityDefinitionConfig::MAX_RESULTS;
 
-    /** additional response status codes for the entity */
-    const STATUS_CODES = EntityDefinitionConfig::STATUS_CODES;
+    /** the default page size */
+    const PAGE_SIZE = EntityDefinitionConfig::PAGE_SIZE;
+
+    /** the default ordering of the result */
+    const ORDER_BY = EntityDefinitionConfig::ORDER_BY;
+
+    /** a flag indicates whether a sorting is disabled */
+    const DISABLE_SORTING = EntityDefinitionConfig::DISABLE_SORTING;
+
+    /** a flag indicates whether an inclusion of related entities is disabled */
+    const DISABLE_INCLUSION = EntityDefinitionConfig::DISABLE_INCLUSION;
+
+    /** a flag indicates whether a requesting of a restricted set of fields is disabled */
+    const DISABLE_FIELDSET = EntityDefinitionConfig::DISABLE_FIELDSET;
 
     /** the form type that should be used for the entity */
     const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;
 
     /** the form options that should be used for the entity */
     const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
+
+    /** additional response status codes for the entity */
+    const STATUS_CODES = EntityDefinitionConfig::STATUS_CODES;
 
     /** a list of fields */
     const FIELDS = EntityDefinitionConfig::FIELDS;
@@ -176,5 +195,37 @@ class ActionConfig
     public function removeField($fieldName)
     {
         unset($this->fields[$fieldName]);
+    }
+
+    /**
+     * Gets the default ordering of the result.
+     * The direction can be "ASC" or "DESC".
+     * The Doctrine\Common\Collections\Criteria::ASC and Doctrine\Common\Collections\Criteria::DESC constants
+     * can be used.
+     *
+     * @return array [field name => direction, ...]
+     */
+    public function getOrderBy()
+    {
+        return array_key_exists(self::ORDER_BY, $this->items)
+            ? $this->items[self::ORDER_BY]
+            : [];
+    }
+
+    /**
+     * Sets the default ordering of the result.
+     * The direction can be "ASC" or "DESC".
+     * The Doctrine\Common\Collections\Criteria::ASC and Doctrine\Common\Collections\Criteria::DESC constants
+     * can be used.
+     *
+     * @param array $orderBy [field name => direction, ...]
+     */
+    public function setOrderBy(array $orderBy = [])
+    {
+        if (!empty($orderBy)) {
+            $this->items[self::ORDER_BY] = $orderBy;
+        } else {
+            unset($this->items[self::ORDER_BY]);
+        }
     }
 }

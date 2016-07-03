@@ -9,6 +9,7 @@ Table of Contents
  - ["entities" configuration section](#entities-configuration-section)
  - ["relations" configuration section](#relations-configuration-section)
  - ["actions" configuration section](#actions-configuration-section)
+ - ["subresources" configuration section](#subresources-configuration-section)
 
 Overview
 --------
@@ -70,6 +71,8 @@ oro_api:
                 fields:
                     ...
             actions:
+                ...
+            subresources:
                 ...
         ...
     relations:
@@ -142,13 +145,12 @@ Each entity can have next properties:
 
 * **inherit** *boolean* By default `true`. The flag indicates that the configuration for certain entity should be merged with the configuration of a parent entity. If a derived entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`.
 * **exclusion_policy** *string* - Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used for the entity. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
-* **disable_partial_load** *boolean* The flag indicates whether usage of Doctrine partial objects is disabled. By default `false`. It can be helpful for entities with table inheritance mapping.
-* **page_size** *integer* The default page size. Set a positive number or -1 if a pagination should be disabled. Default value is `10`.
-* **max_results** *integer* The maximum number of entities in the result. Set -1 (it means unlimited), zero or positive number to set the limit. Can be used to set the limit for both root and related entities.
-* **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
-* **disable_sorting** *boolean* The flag indicates whether a sorting is disabled. By default `false`.
-* **identifier_field_names** *string[]* The names of identifier fields of the entity. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity. For ORM entities a value of this option is retrieved from an entity metadata.
+* **max_results** *integer* The maximum number of entities in the result. Set `-1` (it means unlimited), zero or positive number to set the limit. Can be used to set the limit for both root and related entities.
+* **order_by** *array* The property can be used to configure default ordering of the result. The item key is the name of a field. The value can be `ASC` or `DESC`. By default the result is ordered by identifier field.
+* **disable_inclusion** *boolean* The flag indicates whether an inclusion of related entities is disabled. In JSON.API an [**include** request parameter](http://jsonapi.org/format/#fetching-includes) can be used to customize which related entities should be returned. By default `false`.
+* **disable_fieldset** *boolean* The flag indicates whether a requesting of a restricted set of fields is disabled. In JSON.API an [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) can be used to customize which fields should be returned. By default `false`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
+* **identifier_field_names** *string[]* The names of identifier fields of the entity. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity. For ORM entities a value of this option is retrieved from an entity metadata.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
 * **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
 
@@ -160,7 +162,6 @@ oro_api:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             inherit:              false
             exclusion_policy:     all
-            disable_partial_load: false
             max_results:          25
             order_by:
                 field1: DESC
@@ -302,9 +303,9 @@ oro_api:
 ```
 
 * **data_type** *string* The data type of the field value. Can be `boolean`, `integer`, `string`, etc. If a field represents an association the data type should be a type of an identity field of the target entity.
+* **meta_property** *boolean* A flag indicates whether the field represents a meta information. For JSON.API such fields will be returned in [meta](http://jsonapi.org/format/#document-meta) section. By default `false`.
 * **target_class** *string* The class name of a target entity if a field represents an association. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
 * **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity.
-
 
 Example:
 
@@ -384,7 +385,7 @@ The `relations` configuration section describes a configuration of an entity if 
 "actions" configuration section
 -------------------------------
 
-The `actions` configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration. Now `get`, `get_list` and `delete` actions are supported.
+The `actions` configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration.
 
 Each action can have next properties:
 
@@ -392,8 +393,14 @@ Each action can have next properties:
 * **description** *string* A short, human-readable description of API resource. Used in auto generated documentation only.
 * **documentation** *string* A detailed documentation of API resource. Used in auto generated documentation only.
 * **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
-* **form_type** *string* The form type that should be used for the entity. This option overrides **form_type** option defined in ["entities" configuration section](#entities-configuration-section).
-* **form_options** *array* The form options that should be used for the entity. These options override options defined in ["entities" configuration section](#entities-configuration-section).
+* **max_results** *integer* The maximum number of entities in the result. Set `-1` (it means unlimited), zero or positive number to set the limit. Can be used to set the limit for both root and related entities.
+* **order_by** *array* The property can be used to configure default ordering of the result. The item key is the name of a field. The value can be `ASC` or `DESC`. By default the result is ordered by identifier field.
+* **page_size** *integer* The default page size. Set a positive number or `-1` if a pagination should be disabled. Default value is `10`.
+* **disable_sorting** *boolean* The flag indicates whether a sorting is disabled. By default `false`.
+* **disable_inclusion** *boolean* The flag indicates whether an inclusion of related entities is disabled. In JSON.API an [**include** request parameter](http://jsonapi.org/format/#fetching-includes) can be used to customize which related entities should be returned. By default `false`.
+* **disable_fieldset** *boolean* The flag indicates whether a requesting of a restricted set of fields is disabled. In JSON.API an [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) can be used to customize which fields should be returned. By default `false`.
+* **form_type** *string* The form type that should be used for the entity.
+* **form_options** *array* The form options that should be used for the entity.
 * **status_codes** *array* The possible response status codes for the action.
 
 Each status code can have next properties:
@@ -401,7 +408,7 @@ Each status code can have next properties:
 * **exclude** *boolean* Indicates whether the status code should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
 * **description** *string* A human-readable description of the status code. Used in auto generated documentation only.
 
-* **fields** - This section describes entity fields' configuration specific for a particular action. These options override options defined in ["entities" configuration section](#entities-configuration-section).
+* **fields** - This section describes entity fields' configuration specific for a particular action.
 
 Each field can have next properties:
 
@@ -415,6 +422,8 @@ By default, the following permissions are used to restrict access to an entity i
 | --- | --- |
 | get | VIEW |
 | get_list | VIEW |
+| create | CREATE and VIEW |
+| update | EDIT and VIEW |
 | delete | DELETE |
 | delete_list | DELETE |
 
@@ -525,4 +534,35 @@ oro_api:
                     fields:
                         field1:
                             exclude: true
+```
+
+"subresources" configuration section
+------------------------------------
+
+The `subresources` configuration section allows to provide options for sub-resources.
+
+Each subresource can have next properties:
+
+* **exclude** *boolean* Indicates whether the sub-resource is disabled for entity. By default `false`.
+* **target_class** *string* The class name of a target entity.
+* **target_type** *string* The type of a target association. Can be **to-one** or **to-many**. Also **collection** can be used as an alias for **to-many**. **to-one** can be omitted as it is used by default.
+* **actions** *array* The actions supported by the sub-resource. This section has the same options as [entity **actions** section](#actions-configuration-section). If an option exists in both [entity **actions** section](#actions-configuration-section) and sub-resource **actions** section the sub-resource option wins.
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Oro\Bundle\EmailBundle\Entity\Email:
+            subresources:
+                suggestions:
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityDescriptor
+                    target_type: collection
+                    actions:
+                        get_subresource:
+                            description: Get entities that might be associated with the email
+                        get_relationship: false
+                        update_relationship: false
+                        add_relationship: false
+                        delete_relationship: false
 ```

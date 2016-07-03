@@ -93,6 +93,20 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testMetaProperty()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertFalse($config->isMetaProperty());
+
+        $config->setMetaProperty(true);
+        $this->assertTrue($config->isMetaProperty());
+        $this->assertEquals(['meta_property' => true], $config->toArray());
+
+        $config->setMetaProperty(false);
+        $this->assertFalse($config->isMetaProperty());
+        $this->assertEquals([], $config->toArray());
+    }
+
     public function testGetOrCreateTargetEntity()
     {
         $config = new EntityDefinitionFieldConfig();

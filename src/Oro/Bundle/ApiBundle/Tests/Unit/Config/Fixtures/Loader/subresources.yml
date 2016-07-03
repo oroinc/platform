@@ -10,14 +10,26 @@ null_subresources:
 all_options_except_actions:
     config:
         testSubresource:
-            exclude: false
+            exclude: true
             target_class: Test\Class
             target_type: to-many
     expected:
         testSubresource:
-            exclude: false
+            exclude: true
             target_class: Test\Class
             target_type: to-many
+
+exclude:
+    config:
+        testSubresource1:
+            exclude: true
+        testSubresource2:
+            exclude: false
+    expected:
+        testSubresource1:
+            exclude: true
+        testSubresource2:
+            exclude: false
 
 empty_actions:
     config:
@@ -78,6 +90,9 @@ actions:
             actions:
                 get: ~
                 create: []
+                get_list:
+                    order_by:
+                        id: DESC
                 update:
                     acl_resource: update_action_acl_resource
                 delete:
@@ -86,30 +101,56 @@ actions:
     expected:
         testSubresource:
             actions:
+                get_list:
+                    order_by:
+                        id: DESC
                 update:
                     acl_resource: update_action_acl_resource
                 delete:
                     exclude: false
                     acl_resource: delete_action_acl_resource
 
-action_field_exclude:
+action_empty_order_by:
     config:
         testSubresource:
             actions:
                 create:
-                    fields:
-                        field1:
-                            exclude: true
-                        field2:
-                            exclude: false
+                    order_by: []
+    expected: []
+
+action_exclude:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    exclude: true
+                update:
+                    exclude: false
     expected:
         testSubresource:
             actions:
                 create:
-                    fields:
-                        field1:
-                            exclude: true
-                        field2: ~
+                    exclude: true
+                update:
+                    exclude: false
+
+action_sorting:
+    config:
+        testSubresource:
+            actions:
+                actions:
+                    get_list:
+                        disable_sorting: false
+                    get_subresource:
+                        disable_sorting: true
+    expected:
+        testSubresource:
+            actions:
+                actions:
+                    get_list:
+                        disable_sorting: false
+                    get_subresource:
+                        disable_sorting: true
 
 action_null_form_type:
     config:
@@ -170,6 +211,25 @@ action_form:
                     form_type: integer
                     form_options:
                         option1: value1
+
+action_field_exclude:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    fields:
+                        field1:
+                            exclude: true
+                        field2:
+                            exclude: false
+    expected:
+        testSubresource:
+            actions:
+                create:
+                    fields:
+                        field1:
+                            exclude: true
+                        field2: ~
 
 action_field_form:
     config:

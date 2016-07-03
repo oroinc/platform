@@ -17,11 +17,6 @@ default_exclusion_policy:
         exclusion_policy: none
     expected: []
 
-default_disable_partial_load:
-    config:
-        disable_partial_load: false
-    expected: []
-
 empty_order_by:
     config:
         order_by: []
@@ -49,6 +44,30 @@ enable_sorting:
         disable_sorting: false
     expected:
         disable_sorting: false
+
+disable_inclusion:
+    config:
+        disable_inclusion: true
+    expected:
+        disable_inclusion: true
+
+enable_inclusion:
+    config:
+        disable_inclusion: false
+    expected:
+        disable_inclusion: false
+
+disable_fieldset:
+    config:
+        disable_fieldset: true
+    expected:
+        disable_fieldset: true
+
+enable_fieldset:
+    config:
+        disable_fieldset: false
+    expected:
+        disable_fieldset: false
 
 empty_identifier_field_names:
     config:
@@ -110,7 +129,6 @@ default_collapse:
 all_attributes:
     config:
         exclusion_policy: all
-        disable_partial_load: true
         order_by:
             id: DESC
         page_size: 20
@@ -126,7 +144,6 @@ all_attributes:
         extra1: true
     expected:
         exclusion_policy: all
-        disable_partial_load: true
         order_by:
             id: DESC
         page_size: 20
@@ -165,6 +182,19 @@ field_collapse:
         fields:
             field1:
                 collapse: true
+            field2: ~
+
+field_meta_property:
+    config:
+        fields:
+            field1:
+                meta_property: true
+            field2:
+                meta_property: false
+    expected:
+        fields:
+            field1:
+                meta_property: true
             field2: ~
 
 field_property_path:

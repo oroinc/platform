@@ -240,23 +240,6 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testPartialLoad()
-    {
-        $config = new EntityDefinitionConfig();
-        $this->assertFalse($config->hasPartialLoad());
-        $this->assertTrue($config->isPartialLoadEnabled());
-
-        $config->disablePartialLoad();
-        $this->assertTrue($config->hasPartialLoad());
-        $this->assertFalse($config->isPartialLoadEnabled());
-        $this->assertEquals(['disable_partial_load' => true], $config->toArray());
-
-        $config->enablePartialLoad();
-        $this->assertTrue($config->hasPartialLoad());
-        $this->assertTrue($config->isPartialLoadEnabled());
-        $this->assertEquals([], $config->toArray());
-    }
-
     public function testPageSize()
     {
         $config = new EntityDefinitionConfig();
@@ -295,6 +278,34 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
 
         $config->enableSorting();
         $this->assertTrue($config->isSortingEnabled());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testInclusionFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertTrue($config->isInclusionEnabled());
+
+        $config->disableInclusion();
+        $this->assertFalse($config->isInclusionEnabled());
+        $this->assertEquals(['disable_inclusion' => true], $config->toArray());
+
+        $config->enableInclusion();
+        $this->assertTrue($config->isInclusionEnabled());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testFieldsetFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertTrue($config->isFieldsetEnabled());
+
+        $config->disableFieldset();
+        $this->assertFalse($config->isFieldsetEnabled());
+        $this->assertEquals(['disable_fieldset' => true], $config->toArray());
+
+        $config->enableFieldset();
+        $this->assertTrue($config->isFieldsetEnabled());
         $this->assertEquals([], $config->toArray());
     }
 

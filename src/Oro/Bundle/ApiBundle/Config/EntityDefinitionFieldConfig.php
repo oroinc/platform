@@ -23,6 +23,9 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /** the data type of the field value */
     const DATA_TYPE = 'data_type';
 
+    /** a flag indicates whether the field represents a meta information */
+    const META_PROPERTY = 'meta_property';
+
     /** the class name of a target entity */
     const TARGET_CLASS = 'target_class';
 
@@ -48,6 +51,32 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
         $this->removeItemWithDefaultValue($result, self::COLLAPSE);
 
         return $result;
+    }
+
+    /**
+     * Indicates whether the field represents a meta information.
+     *
+     * @return bool
+     */
+    public function isMetaProperty()
+    {
+        return array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY, $this->items)
+            ? $this->items[EntityDefinitionFieldConfig::META_PROPERTY]
+            : false;
+    }
+
+    /**
+     * Sets a flag indicates whether the field represents a meta information.
+     *
+     * @param bool $isMetaProperty
+     */
+    public function setMetaProperty($isMetaProperty)
+    {
+        if ($isMetaProperty) {
+            $this->items[EntityDefinitionFieldConfig::META_PROPERTY] = $isMetaProperty;
+        } else {
+            unset($this->items[EntityDefinitionFieldConfig::META_PROPERTY]);
+        }
     }
 
     /**

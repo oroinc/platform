@@ -41,6 +41,25 @@ class EntityMetadataFactory
      * @param string        $fieldName
      * @param string|null   $fieldType
      *
+     * @return MetaPropertyMetadata
+     */
+    public function createMetaPropertyMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
+    {
+        if (!$fieldType) {
+            $fieldType = (string)$classMetadata->getTypeOfField($fieldName);
+        }
+        $fieldMetadata = new MetaPropertyMetadata();
+        $fieldMetadata->setName($fieldName);
+        $fieldMetadata->setDataType($fieldType);
+
+        return $fieldMetadata;
+    }
+
+    /**
+     * @param ClassMetadata $classMetadata
+     * @param string        $fieldName
+     * @param string|null   $fieldType
+     *
      * @return FieldMetadata
      */
     public function createFieldMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
