@@ -13,16 +13,16 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * Tag
+ * Taxonomy
  *
  * @ORM\Table(
- *     name="oro_tag_tag",
+ *     name="oro_tag_taxonomy",
  *    indexes={
  *        @ORM\Index(name="name_organization_idx", columns={"name", "organization_id"})
  *    }
  * )
  * @ORM\HasLifecycleCallbacks
- * @ORM\Entity(repositoryClass="Oro\Bundle\TagBundle\Entity\Repository\TagRepository")
+ * @ORM\Entity(repositoryClass="Oro\Bundle\TagBundle\Entity\Repository\TaxonomyRepository")
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -45,8 +45,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"="",
- *              "category"="account_management"
+ *              "group_name"=""
  *          },
  *          "note"={
  *              "immutable"=true
@@ -62,11 +61,15 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "tag"={
  *              "immutable"=true
- *          }
+ *          },
+ *          "form"={
+ *              "form_type"="oro_taxonomy_select",
+ *              "grid_name"="taxonomy-select-grid",
+ *          },
  *      }
  * )
  */
-class Tag extends ExtendTag
+class Taxonomy extends ExtendTag
 {
     /**
      * @var integer
@@ -112,15 +115,9 @@ class Tag extends ExtendTag
     protected $updated;
 
     /**
-     * @ORM\OneToMany(targetEntity="Tagging", mappedBy="tag", fetch="LAZY")
+     * @ORM\OneToMany(targetEntity="Tag", mappedBy="taxonomy", fetch="LAZY")
      */
-    protected $tagging;
-
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Taxonomy", inversedBy="tags", fetch="LAZY")
-     */
-    protected $taxonomy;
+    protected $tags;
 
     /**
      * @var User
@@ -136,6 +133,13 @@ class Tag extends ExtendTag
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="background_color", type="string", length=7, nullable=true)
+     */
+    protected $backgroundColor;
 
     /**
      * Constructor
@@ -323,33 +327,29 @@ class Tag extends ExtendTag
 
 
     /**
-     * @return Taxonomy
-     */
-    public function getTaxonomy()
-    {
-        return $this->taxonomy;
-    }
-
-    /**
-     * @param Taxonomy $taxonomy
-     */
-    public function setTaxonomy($taxonomy)
-    {
-        $this->taxonomy = $taxonomy;
-    }
-
-
-    /**
-     * @return string
+     * Gets a background color of this events.
+     * If this method returns null the background color should be calculated automatically on UI.
+     *
+     * @return string|null The color in hex format, e.g. #FF0000.
      */
     public function getBackgroundColor()
     {
-        if($this->getTaxonomy() === null)
-            return null;
-
-        return $this->getTaxonomy()->getBackgroundColor();
+        return $this->backgroundColor;
     }
 
+    /**
+     * Sets a background color of this events.
+     *
+     * @param string|null $backgroundColor The color in hex format, e.g. #FF0000.
+     *                                     Set it to null to allow UI to calculate the background color automatically.
+     *
+     * @return self
+     */
+    public function setBackgroundColor($backgroundColor)
+    {
+        $this->backgroundColor = $backgroundColor;
 
+        return $this;
+    }
 
 }

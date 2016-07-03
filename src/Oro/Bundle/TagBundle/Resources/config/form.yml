@@ -12,6 +12,11 @@ parameters:
 
     oro_tag.autocomplete.tag.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
 
+    oro_tag.tag.form.type.taxonomy.class: Oro\Bundle\TagBundle\Form\Type\TaxonomyType
+    oro_tag.tag.form.handler.taxonomy.class: Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler
+
+
+
 services:
     oro_tag.form.tag:
         class: Symfony\Component\Form\Form
@@ -146,3 +151,25 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_tags_report_filter }
+
+
+
+
+    oro_tag.form.taxonomy:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments: ["oro_tag_taxonomy_form", "oro_tag_taxonomy"]
+
+    oro_tag.form.handler.taxonomy:
+        class: %oro_tag.tag.form.handler.taxonomy.class%
+        scope: request
+        arguments:
+            - '@oro_tag.form.taxonomy'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
+
+    oro_tag.form.type.taxonomy:
+        class: %oro_tag.tag.form.type.taxonomy.class%
+        tags:
+            - { name: form.type, alias: oro_tag_taxonomy }
