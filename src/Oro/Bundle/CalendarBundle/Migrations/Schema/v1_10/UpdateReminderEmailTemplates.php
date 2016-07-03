@@ -23,24 +23,24 @@ class UpdateReminderEmailTemplates extends ParametrizedMigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
-        $pattern = <<<EOF
-|date('F j, Y, g:i A')
-EOF;
-        $patternCalendarRange[] = <<<EOF
-calendar_date_range(entity.start, entity.end, entity.allDay, 1)
-EOF;
-        $patternCalendarRange[] = <<<EOF
-calendar_date_range(entity.start, entity.end, entity.allDay, 'F j, Y', 1)
-EOF;
-        $replacementCalendar = <<<EOF
-|oro_format_datetime_organization({'organization': organization})
-EOF;
-        $replacementCalendarRange = <<<EOF
-calendar_date_range_organization(entity.start, entity.end, entity.allDay, 1, null, null, null, organization)
-EOF;
+        $pattern = "|date('F j, Y, g:i A')";
+        $patternCalendarRange[] = 'calendar_date_range(entity.start, entity.end, entity.allDay, 1)';
+        $patternCalendarRange[] = "calendar_date_range(entity.start, entity.end, entity.allDay, 'F j, Y', 1)";
+        $replacementCalendar = "|oro_format_datetime_organization({'organization': entity.calendar.organization})";
+        $replacementCalendarRange = 'calendar_date_range_organization(entity.start, entity.end,' .
+            ' entity.allDay, 1, null, null, null, entity.calendar.organization)';
+
         $this->updateReminderTemplates(
             $logger,
             'calendar_reminder',
+            $pattern,
+            $replacementCalendar,
+            $patternCalendarRange,
+            $replacementCalendarRange
+        );
+        $this->updateReminderTemplates(
+            $logger,
+            'calendar_invitation_%',
             $pattern,
             $replacementCalendar,
             $patternCalendarRange,
@@ -66,7 +66,7 @@ EOF;
         $patternCalendarRange,
         $replacementCalendarRange
     ) {
-        $sql = 'SELECT * FROM oro_email_template WHERE name = :name ORDER BY id';
+        $sql = 'SELECT * FROM oro_email_template WHERE name LIKE :name ORDER BY id';
         $parameters = ['name' => $templateName];
         $types = ['name' => 'string'];
 
