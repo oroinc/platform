@@ -6,12 +6,15 @@ oro:
             tag_list.description: Tags list
             all_tags: All tags
             my_tags: My tags
+            tags_management.label: Tags
 
         controller:
             tag.saved.message: "Tag saved"
         form:
             choose_tag: "Choose a tag"
+            choose_taxonomy: "Choose a taxonomy"
             choose_or_create_tag: "Select an existing tag or create a new one"
+
         datagrid:
             usage_count: Usage Count
             search:      Search by tag
@@ -50,4 +53,40 @@ oro:
         config:
             enabled: Enable tags
             disable.alert: Disabling Tags will irreversibly erase all existing tags
+
+        taxonomy:
+            owner.label:         Owner
+
+    taxonomy:
+        label: Taxonomy
+        menu:
+            shortcut_new_taxonomy.label: Create new taxonomy
+            shortcut_new_taxonomy.description: Create new taxonomy
+            taxonomy_list.description: Taxonomies list
+            all_taxonomies: All taxonomies
+            my_taxonomies: My taxonomies
+        controller:
+            taxonomy.saved.message: "Taxonomy saved"
+        form:
+            choose_taxonomy: "Choose a taxonomy"
+            choose_or_create_taxonomy: "Select an existing taxonomy or create a new one"
+        datagrid:
+            usage_count: Usage Count
+            search:      Search by taxonomy
+
+
+        created_by.label:    Created By
+        entity_label:        Taxonomy
+        entity_plural_label: Taxonomies
+        id.label:            Id
+        name.label:          Name
+        owner.label:         Owner
+        tagging.label:       Tagging
+        updated_by.label:    Updated By
+        organization.label:  Organization
+
+        background_color.label:  Color
+        no_color:             Use calendar color
+
+
 

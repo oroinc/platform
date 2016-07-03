@@ -306,6 +306,7 @@ class TagManager
             }
 
             $entry['moreOwners'] = $taggingCollection->count() > 1;
+            $entry['backgroundColor'] = $tag->getBackgroundColor();
 
             $result[] = $entry;
         }

@@ -11,3 +11,18 @@ Oro\Bundle\TagBundle\Entity\Tag:
             name:                   name
             target_type:            text
             target_fields:          [name]
+
+
+Oro\Bundle\TagBundle\Entity\Taxonomy:
+    alias:                          oro_taxonomy
+    title_fields:                   [name]
+    search_template:                OroTagBundle:Search:result.html.twig
+    route:
+        name:                       oro_taxonomy_search
+        parameters:
+            id:                     id
+    fields:
+        -
+            name:                   name
+            target_type:            text
+            target_fields:          [name]

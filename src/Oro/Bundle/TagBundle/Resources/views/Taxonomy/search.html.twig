@@ -1,0 +1,75 @@
+{% extends bap.layout %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
+{% set gridName = 'taxonomy-results-grid' %}
+{% oro_title_set({ params: { '%taxonomy.name%': taxonomy.name } }) %}
+
+{% block head_script %}
+    {{ parent() }}
+    <script type="text/javascript">
+        require(['jquery'],
+        function($) {
+            // hide header
+            $('div[data-type="datagrid"] thead').remove();
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid search-header clearfix">
+        <h2 style="width: auto">{{ 'oro.taxonomy.datagrid.search_result'|trans({'%name%': taxonomy.name|escape})|raw }}</h2>
+    </div>
+
+    {% if '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
+        <div class="oro-page collapsible-sidebar clearfix">
+            <div class="oro-page-sidebar search-entity-types-column dropdown">
+                <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="icon-filter"></i>
+                    {% if selectedResult.label is defined and selectedResult.count is defined%}
+                        {{ selectedResult.label|trans}}
+                        {% set selectedResultCount = selectedResult.count %}
+                    {% else %}
+                        {{ 'oro.search.result.all'|trans }}
+                        {% set selectedResultCount = groupedResults[''].count %}
+                    {% endif %}
+                    ({{ selectedResultCount }}) <i class="icon-sort-down"></i>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                {% for alias, type in groupedResults %}
+                    {% set selected = alias == from %}
+                    {% if type.class is defined %}
+                        {% set label = type.label %}
+                        {% set iconClass = type.icon %}
+                    {% else %}
+                        {% set label = 'oro.search.result.all' %}
+                        {% set iconClass = 'icon-search' %}
+                    {% endif %}
+
+                    {% if iconClass is empty %}
+                        {% set iconClass = 'icon-file' %}
+                    {% endif %}
+
+                    <li{% if selected %} class="selected"{% endif %}>
+                        <a href="{{ path('oro_taxonomy_edit', { from: alias, id: taxonomy.id }) }}">
+                            {% if selected %}<i class="icon-chevron-right pull-right"></i>{% endif %}
+                            <i class="{{ iconClass }}"></i>
+                            {{ label|trans }} ({{ type.count }})
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+            <div class="oro-page-body search-results-column">
+                <div id="taxonomy-search-results-grid">
+                    {{ dataGrid.renderGrid(gridName, {from: from, taxonomy_id: taxonomy.id}, { cssClass: 'taxonomy-search-grid' }) }}
+                </div>
+            </div>
+        </div>
+    {% else %}
+    <div class="search-no-results">
+        {% trans %}No results were found.{% endtrans %}
+        <br />
+        {% trans %}Try modifying your search criteria{% endtrans %}
+    </div>
+    {% endif %}
+{% endblock %}

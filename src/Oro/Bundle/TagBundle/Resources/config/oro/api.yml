@@ -1,4 +1,14 @@
 oro_api:
     entities:
-        # remove this exclusion when Tag entity will be ready to be enabled for Data API
-        Oro\Bundle\TagBundle\Entity\Tag: { exclude: true}
+        Oro\Bundle\TagBundle\Entity\Tag:
+            actions:
+                delete:
+                    exclude: false # set manually because this entity is marked as a dictionary
+                delete_list:
+                    exclude: false # set manually because this entity is marked as a dictionary
+        Oro\Bundle\TagBundle\Entity\Taxonomy:
+            actions:
+                delete:
+                    exclude: false # set manually because this entity is marked as a dictionary
+                delete_list:
+                    exclude: false # set manually because this entity is marked as a dictionary

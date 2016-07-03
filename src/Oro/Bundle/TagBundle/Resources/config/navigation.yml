@@ -1,26 +1,55 @@
 oro_menu_config:
     items:
+        tags_management:
+            label: 'oro.tag.menu.tags_management.label'
+            uri: '#'
+            extras:
+                position: 90
         oro_tag_list:
             label: 'oro.tag.entity_plural_label'
             route: 'oro_tag_index'
             extras:
-                position:    90
+                position:    10
                 routes:      ['oro_tag_*']
                 description: 'oro.tag.menu.tag_list.description'
+        oro_taxonomy_list:
+            label: 'oro.taxonomy.entity_plural_label'
+            route: 'oro_taxonomy_index'
+            extras:
+                position:    20
+                routes:      ['oro_taxonomy_*']
+                description: 'oro.taxonomy.menu.tag_list.description'
+
+
         shortcut_new_tag:
             label: 'oro.tag.menu.shortcut_new_tag.label'
             route: 'oro_tag_create'
             extras:
                 description: 'oro.tag.menu.shortcut_new_tag.description'
+
+        shortcut_new_taxonomy:
+            label: 'oro.taxonomy.menu.shortcut_new_taxonomy.label'
+            route: 'oro_taxonomy_create'
+            extras:
+                description: 'oro.taxonomy.menu.shortcut_new_taxonomy.description'
+
+
+
+
     tree:
         application_menu:
             children:
                 system_tab:
                     children:
-                        oro_tag_list: ~
+                        tags_management:
+                            children:
+                                oro_tag_list: ~
+                                oro_taxonomy_list: ~
+
         shortcuts:
             children:
                 shortcut_new_tag: ~
+                shortcut_new_taxonomy: ~
 
 oro_titles:
     oro_tag_index:  ~

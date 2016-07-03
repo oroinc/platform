@@ -29,6 +29,8 @@ class TagRepository extends EntityRepository
             ->select(
                 't.id',
                 't.name',
+                'tx.backgroundColor as backgroundColor',
+                'tx.name as taxonomyName',
                 't2.recordId AS entityId',
                 '(CASE WHEN t2.owner = :owner THEN true ELSE false END) AS owner'
             )
@@ -37,6 +39,12 @@ class TagRepository extends EntityRepository
                 't2',
                 Join::WITH,
                 't2.recordId IN (:entityIds) AND t2.entityName = :entityClassName'
+            )
+            ->join(
+                't.taxonomy',
+                'tx',
+                Join::WITH,
+                't.taxonomy  = tx.id'
             )
             ->orderBy('t.name', $direction)
             ->setParameter('entityIds', $entityIds)

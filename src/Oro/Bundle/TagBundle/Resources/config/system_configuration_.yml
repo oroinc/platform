@@ -1,0 +1,28 @@
+oro_system_configuration:
+    groups:
+        tag_settings:
+            title:       oro.tag.system_configuration.groups.tag_settings.title
+
+    fields:
+        oro_tag.taxonomy_colors:
+            data_type: array
+            type: oro_color_table
+            options:
+                label: oro.tag.system_configuration.fields.taxonomy.label
+
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    tag_settings:
+                                        children:
+                                            - oro_tag.taxonomy_colors
+
+    api_tree:
+        look-and-feel:
+            oro_tag.taxonomy_colors: ~

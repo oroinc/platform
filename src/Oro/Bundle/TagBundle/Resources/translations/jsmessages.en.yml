@@ -6,3 +6,9 @@ oro:
             existing_tag: "This tag is already added"
             loading: "Loading..."
             no_matches: "No matches found"
+    taxonomy:
+        inline_editing:
+            new_taxonomy: "New taxonomy"
+            existing_tag: "This taxonomy is already added"
+            loading: "Loading..."
+            no_matches: "No matches found"
