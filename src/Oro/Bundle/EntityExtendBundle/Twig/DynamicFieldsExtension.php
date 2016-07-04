@@ -83,7 +83,7 @@ class DynamicFieldsExtension extends \Twig_Extension
         }
 
         $fields = $this->extendProvider->filter([$this, 'filterFields'], $entityClass);
-        $dynamicRows = $this->createDynamicFeldRows($fields, $entity);
+        $dynamicRows = $this->createDynamicFieldRows($fields, $entity);
 
         ArrayUtil::sortBy($dynamicRows, true);
         foreach ($dynamicRows as &$row) {
@@ -141,7 +141,7 @@ class DynamicFieldsExtension extends \Twig_Extension
      * @param object $entity
      * @return array
      */
-    protected function createDynamicFeldRows($fields, $entity)
+    protected function createDynamicFieldRows($fields, $entity)
     {
         $dynamicRows = [];
         foreach ($fields as $field) {
