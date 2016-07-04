@@ -115,8 +115,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithDescriptions()
     {
         $config = [
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'form_type'    => 'test_form',
             'form_options' => ['option' => 'value'],
             'fields'       => [
@@ -140,6 +138,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         123 => ['description' => 'status 123'],
                         456 => ['exclude' => true]
                     ],
+                    'description'  => 'Action Description',
                     'form_type'    => 'action_form',
                     'form_options' => ['action_option' => 'action_value'],
                 ]
@@ -162,8 +161,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'label'        => 'Test Entity',
-                'plural_label' => 'Test Entities',
+                'description'  => 'Action Description',
                 'form_type'    => 'action_form',
                 'form_options' => ['action_option' => 'action_value'],
                 'status_codes' => [
@@ -193,8 +191,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithoutInheritance()
     {
         $config = [
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'form_type'    => 'test_form',
             'form_options' => ['option' => 'value'],
             'fields'       => [
@@ -222,6 +218,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         123 => ['description' => 'status 123'],
                         456 => ['exclude' => true]
                     ],
+                    'description'  => 'Action Description',
                     'form_type'    => 'action_form',
                     'form_options' => ['action_option' => 'action_value'],
                     'fields'       => [
@@ -253,8 +250,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'label'        => 'Test Entity',
-                'plural_label' => 'Test Entities',
+                'description'  => 'Action Description',
                 'form_type'    => 'action_form',
                 'form_options' => ['action_option' => 'action_value'],
                 'fields'       => [
@@ -421,7 +417,9 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         ],
                     ]
                 ]
-            ],
+            ]
+        ];
+        $parentConfig = [
             'subresources' => [
                 'testSubresource' => [
                     'actions' => [
@@ -449,15 +447,23 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->configBag->expects($this->once())
+        $this->configBag->expects($this->exactly(2))
             ->method('getConfig')
-            ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
-            ->willReturn($config);
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
 
-        $this->entityHierarchyProvider->expects($this->once())
+        $this->entityHierarchyProvider->expects($this->exactly(2))
             ->method('getHierarchyForClassName')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn([]);
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
 
         $this->context->setTargetAction('create');
         $this->context->setParentClassName('Test\ParentClass');
@@ -528,7 +534,9 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         ],
                     ]
                 ]
-            ],
+            ]
+        ];
+        $parentConfig = [
             'subresources' => [
                 'testSubresource' => [
                     'actions' => [
@@ -556,15 +564,23 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->configBag->expects($this->once())
+        $this->configBag->expects($this->exactly(2))
             ->method('getConfig')
-            ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
-            ->willReturn($config);
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
 
-        $this->entityHierarchyProvider->expects($this->once())
+        $this->entityHierarchyProvider->expects($this->exactly(2))
             ->method('getHierarchyForClassName')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn([]);
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
 
         $this->context->setExtras([new DescriptionsConfigExtra()]);
         $this->context->setTargetAction('create');
@@ -610,8 +626,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithInheritance()
     {
         $config = [
-            'label'        => 'Other Entity',
-            'plural_label' => 'Other Entities',
             'fields'       => [
                 'field1' => null,
                 'field2' => null,
@@ -663,8 +677,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $parentConfig3 = [
             'inherit'      => false,
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'order_by'     => [
                 'field3' => 'ASC'
             ],
@@ -723,8 +735,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'label'        => 'Other Entity',
-                'plural_label' => 'Other Entities',
                 'order_by'     => [
                     'field2' => 'ASC'
                 ],

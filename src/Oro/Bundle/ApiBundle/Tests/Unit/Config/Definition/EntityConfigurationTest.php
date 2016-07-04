@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 
 /**
@@ -35,11 +36,30 @@ class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
             );
         }
 
+        $actionProcessorBag = $this->getMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
+        $actionProcessorBag->expects($this->any())
+            ->method('getActions')
+            ->willReturn(
+                [
+                    ApiActions::GET,
+                    ApiActions::GET_LIST,
+                    ApiActions::UPDATE,
+                    ApiActions::CREATE,
+                    ApiActions::DELETE,
+                    ApiActions::DELETE_LIST,
+                    ApiActions::GET_SUBRESOURCE,
+                    ApiActions::GET_RELATIONSHIP,
+                    ApiActions::UPDATE_RELATIONSHIP,
+                    ApiActions::ADD_RELATIONSHIP,
+                    ApiActions::DELETE_RELATIONSHIP,
+                ]
+            );
+
         $configExtensionRegistry = new ConfigExtensionRegistry();
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
-        $configExtensionRegistry->addExtension(new ActionsConfigExtension());
-        $configExtensionRegistry->addExtension(new SubresourcesConfigExtension());
+        $configExtensionRegistry->addExtension(new ActionsConfigExtension($actionProcessorBag));
+        $configExtensionRegistry->addExtension(new SubresourcesConfigExtension($actionProcessorBag));
         $configExtensionRegistry->addExtension(new TestConfigExtension());
 
         $configuration = new EntityConfiguration(

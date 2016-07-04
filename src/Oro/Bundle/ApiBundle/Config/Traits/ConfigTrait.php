@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 /**
  * @property array $items
  */
@@ -92,11 +94,6 @@ trait ConfigTrait
      */
     protected function cloneItems()
     {
-        $this->items = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->items
-        );
+        $this->items = ConfigUtil::cloneItems($this->items);
     }
 }
