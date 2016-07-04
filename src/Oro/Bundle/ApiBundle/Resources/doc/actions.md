@@ -5,24 +5,24 @@ Table of Contents
 -----------------
  - [Overview](#overview)
  - Existing actions
-    - [**collect_resources** Action](#collect_resources-action)
-    - [**collect_subresources** Action](#collect_subresources-action)
-    - [**get** Action](#get-action)
-    - [**get_list** Action](#get_list-action)
-    - [**delete** Action](#delete-action)
-    - [**delete_list** Action](#delete_list-action)
-    - [**create** Action](#create-action)
-    - [**update** Action](#update-action)
-    - [**get_subresource** Action](#get_subresource-action)
-    - [**get_relationship** Action](#get_relationship-action)
-    - [**update_relationship** Action](#update_relationship-action)
-    - [**add_relationship** Action](#add_relationship-action)
-    - [**delete_relationship** Action](#delete_relationship-action)
-    - [**customize_loaded_data** Action](#customize_loaded_data-action)
-    - [**get_config** Action](#get_config-action)
-    - [**get_relation_config** Action](#get_relation_config-action)
-    - [**get_metadata** Action](#get_metadata-action)
-    - [**normalize_value** Action](#normalize_value-action)
+   - [**get** Action](#get-action)
+   - [**get_list** Action](#get_list-action)
+   - [**delete** Action](#delete-action)
+   - [**delete_list** Action](#delete_list-action)
+   - [**create** Action](#create-action)
+   - [**update** Action](#update-action)
+   - [**get_subresource** Action](#get_subresource-action)
+   - [**get_relationship** Action](#get_relationship-action)
+   - [**update_relationship** Action](#update_relationship-action)
+   - [**add_relationship** Action](#add_relationship-action)
+   - [**delete_relationship** Action](#delete_relationship-action)
+   - [**customize_loaded_data** Action](#customize_loaded_data-action)
+   - [**get_config** Action](#get_config-action)
+   - [**get_relation_config** Action](#get_relation_config-action)
+   - [**get_metadata** Action](#get_metadata-action)
+   - [**normalize_value** Action](#normalize_value-action)
+   - [**collect_resources** Action](#collect_resources-action)
+   - [**collect_subresources** Action](#collect_subresources-action)
  - [**Context** class](#context-class)
  - [**SubresourceContext** class](#subresourcecontext-class)
  - [Creating new action](#creating-new-action)
@@ -43,8 +43,6 @@ The following table shows all actions provided out of the box:
 
 | Action Name           | Description |
 | ---                   | --- |
-| [collect_resources](#collect_resources-action) | Returns a list of all resources accessible through Data API |
-| [collect_subresources](#collect_subresources-action) | Returns a list of all sub-resources accessible through Data API for a given entity type |
 | [get](#get-action) | Returns an entity by its identifier |
 | [get_list](#get_list-action) | Returns a list of entities |
 | [delete](#delete-action) | Deletes an entity by its identifier |
@@ -61,56 +59,12 @@ The following table shows all actions provided out of the box:
 | [get_relation_config](#get_relation_config-action) | Returns a configuration of an entity if it is used in a relationship |
 | [get_metadata](#get_metadata-action) | Returns a metadata of an entity |
 | [normalize_value](#normalize_value-action) | Converts a value to a requested data type |
+| [collect_resources](#collect_resources-action) | Returns a list of all resources accessible through Data API |
+| [collect_subresources](#collect_subresources-action) | Returns a list of all sub-resources accessible through Data API for a given entity type |
 
 Please see [processors](./processors.md) section for more details about how to create a processor.
 
 Also you can use the [oro:api:debug](./debug_commands.md#oroapidebug) command to see all actions and processors.
-
-collect_resources Action
-------------------------
-
-This action is intended to get a list of all resources accessible through Data API.
-
-The context class: [CollectResourcesContext](../../Processor/CollectResources/CollectResourcesContext.php).
-
-The main processor class: [CollectResourcesProcessor](../../Processor/CollectResourcesProcessor.php).
-
-Existing worker processors: [processors.collect_resources.yml](../../Resources/config/processors.collect_resources.yml) or run `php app/console oro:api:debug collect_resources`.
-
-Also [ResourcesProvider](../../Provider/ResourcesProvider.php) was created to make usage of this action as easy as possible.
-
-Example of usage:
-
-```php
-/** @var ResourcesProvider $resourcesProvider */
-$resourcesProvider = $container->get('oro_api.resources_provider');
-// get all Data API resources
-$resources = $resourcesProvider->getResources($version, $requestType);
-// check whether an entity type is accessible through Data API
-$isAccessible = $resourcesProvider->isResourceAccessible($entityClass, $version, $requestType);
-```
-
-collect_subresources Action
----------------------------
-
-This action is intended to get a list of all sub-resources accessible through Data API for a given entity type.
-
-The context class: [CollectSubresourcesContext](../../Processor/CollectSubresources/CollectSubresourcesContext.php).
-
-The main processor class: [CollectSubresourcesProcessor](../../Processor/CollectSubresourcesProcessor.php).
-
-Existing worker processors: [processors.collect_subresources.yml](../../Resources/config/processors.collect_subresources.yml) or run `php app/console oro:api:debug collect_subresources`.
-
-Also [SubresourcesProvider](../../Provider/SubresourcesProvider.php) was created to make usage of this action as easy as possible.
-
-Example of usage:
-
-```php
-/** @var SubresourcesProvider $subresourcesProvider */
-$subresourcesProvider = $container->get('oro_api.subresources_provider');
-// get all sub-resources for a given entity
-$entitySubresources = $subresourcesProvider->getSubresources($entityClass, $version, $requestType);
-```
 
 get Action
 ----------
@@ -605,6 +559,52 @@ Example of usage:
 /** @var ValueNormalizer $valueNormalizer */
 $valueNormalizer = $container->get('oro_api.metadata_provider');
 $normalizedValue = $valueNormalizer->normalizeValue($value, $dataType, $requestType);
+```
+
+collect_resources Action
+------------------------
+
+This action is intended to get a list of all resources accessible through Data API.
+
+The context class: [CollectResourcesContext](../../Processor/CollectResources/CollectResourcesContext.php).
+
+The main processor class: [CollectResourcesProcessor](../../Processor/CollectResourcesProcessor.php).
+
+Existing worker processors: [processors.collect_resources.yml](../../Resources/config/processors.collect_resources.yml) or run `php app/console oro:api:debug collect_resources`.
+
+Also [ResourcesProvider](../../Provider/ResourcesProvider.php) was created to make usage of this action as easy as possible.
+
+Example of usage:
+
+```php
+/** @var ResourcesProvider $resourcesProvider */
+$resourcesProvider = $container->get('oro_api.resources_provider');
+// get all Data API resources
+$resources = $resourcesProvider->getResources($version, $requestType);
+// check whether an entity type is accessible through Data API
+$isAccessible = $resourcesProvider->isResourceAccessible($entityClass, $version, $requestType);
+```
+
+collect_subresources Action
+---------------------------
+
+This action is intended to get a list of all sub-resources accessible through Data API for a given entity type.
+
+The context class: [CollectSubresourcesContext](../../Processor/CollectSubresources/CollectSubresourcesContext.php).
+
+The main processor class: [CollectSubresourcesProcessor](../../Processor/CollectSubresourcesProcessor.php).
+
+Existing worker processors: [processors.collect_subresources.yml](../../Resources/config/processors.collect_subresources.yml) or run `php app/console oro:api:debug collect_subresources`.
+
+Also [SubresourcesProvider](../../Provider/SubresourcesProvider.php) was created to make usage of this action as easy as possible.
+
+Example of usage:
+
+```php
+/** @var SubresourcesProvider $subresourcesProvider */
+$subresourcesProvider = $container->get('oro_api.subresources_provider');
+// get all sub-resources for a given entity
+$entitySubresources = $subresourcesProvider->getSubresources($entityClass, $version, $requestType);
 ```
 
 Context class
