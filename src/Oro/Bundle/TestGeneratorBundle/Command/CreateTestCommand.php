@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestGeneratorBundle\Command;
 
+use Oro\Bundle\TestGeneratorBundle\Generator\AbstractTestGenerator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,7 +29,8 @@ class CreateTestCommand extends ContainerAwareCommand
                 'type',
                 InputArgument::REQUIRED,
                 'Test type. Supported types are: unit, entity, functional'
-            );
+            )
+            ->addArgument('php_version', InputArgument::OPTIONAL, 'PHP version');
     }
 
     /**
@@ -42,8 +44,10 @@ class CreateTestCommand extends ContainerAwareCommand
                 sprintf('Type "%s" is not known. Supported types are: unit, entity, functional', $type)
             );
         }
-
-        $generator = $this->getContainer()->get('oro_test_generator.generator.test.' . $type);
+        $phpVersion = (float)$input->getArgument('php_version') ?: 5.3;
+        /** @var AbstractTestGenerator $generator */
+        $generator = $this->getContainer()->get('oro_test_generator.generator.test.'.$type);
+        $generator->setPhpVersion($phpVersion);
         $class = $input->getArgument('class');
         if (strpos($class, '\\') === false) {
             $class = str_replace('.php', '', $class);

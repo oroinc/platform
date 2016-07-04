@@ -1,0 +1,98 @@
+{% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.identicalQueriesCount > 0 or collector.similarQueriesCount > 0 %}
+        {% set icon %}
+            <img width="20" height="28" alt="Doctrine Stats" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAcppVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx4bXA6Q3JlYXRvclRvb2w+cGFpbnQubmV0IDQuMC41PC94bXA6Q3JlYXRvclRvb2w+CiAgICAgICAgIDx0aWZmOk9yaWVudGF0aW9uPjE8L3RpZmY6T3JpZW50YXRpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgqoHVAWAAADoUlEQVRIDe1VTUwTQRSe7XZrS39BDtZEj0oUPRhjojEcGwyGi4lXThz05NWDZ4/cuWAPxpumgVBSSsLFE8QE/AkFSdoGWhGatiy09Hf93qa7mdlurQaPTjJ5M2/e//tmRmJ9RjweX9c0bdXr9eb9fv+woii3sA9DTe6livOCJEk7Dofjc6PR+Ar6TeolbPCXlpbaUKxAMSvL8vu1tbVMLpe7jHPFkOlF2+12s1wuq8fHx2VnLyGODx+SF86ug3c3lUrdyGQyD2HEw8nYLpG9zkdWzGErITKbna2EEgy43e4QHPv+ZCaTSd/ExITP6XT6+jpCJm8RfR6GNUwafXWMOGdmZtjGxgaDDSb0yK7xrVbrNhSpTwFQ+eTkxFGpVAaw1h2enp6yo6Mjls/n2f7+vk7RE8OXSYUeIdo7OBmpVqvZer1OjY8BbWPYp+HgI87rBwcH92DoGhwLmSFrBjl2dnZmGucXgiMcUGmExiNaf61WI0iPYjZIGb0iuTZvyGg8+Gx2dvYTf4YK7FgdUeOJZzTeRYihSTxMFy1QTiLCSCQSjHqysLDApqenR+jQcA79ESF9RPxvGt9BJY86ISOkvY6yxBHMY9AQqB+TSiQEhH3XiMViXTwedYIjSL5EWZJwEh0cHFSBqBfYUzn1knVZ6sPgnQvw7jw3LZQwh4v5ZmhoiJ6el7hwVdhsY90CqtzFYvEiZGyz3NvbY3Nzc10hWDOCLYl4VwDXB9FotLG9vR0E6ugOaeA1MQkoZMgWdQScycnJLAkYQ1XVotWRhkM9Szi8AFjKHdQR77eoW1lZMVGHkg2TEw51w0L6KMcXzApkzvfc2KBO+FOmpqZUZFICADSXy/Vza2tLKRQKV7EXAqJorQOvOiuVSvq7Zpyhl/pbh69ChC2yeYYeqOjBIv6e1XA4/B1O9NtqKP8NJdSl02kGm/orYOqCcR8ZjYKRhoNF/KjV8fHxHfACcExZKeD7AA56pgTEGkYoeryRxtakAhhgkJQJYTebzeaP3d3d2ubm5iUEoH9ydI5s4VOmuyU44hrP5ufnP5gesEBQKcERGDoIQGDP4UHkCmzTJ2f+plQGmtaxvLxsoi4QCDy1ngtNhsEEBIpwpD/jlIBVodeef27sZISMYJjAMAb6BML04ZuZ2CnzPP654fnGWog4EomkcYvfIaPnoVDotcfjyRqC56VCQ3ljh4eHfjQ4At4jZOjH7CnL6yHIVDAYfMXz/q/PVYFfJewFJv3g478AAAAASUVORK5CYII=" />
+            <span class="sf-toolbar-info-piece-additional sf-toolbar-status sf-toolbar-status-yellow">{{ collector.identicalQueriesCount }}</span>
+            <span class="sf-toolbar-info-piece-additional sf-toolbar-status">{{ collector.similarQueriesCount }}</span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Identical Queries</b>
+                <span class="sf-toolbar-status">{{ collector.identicalQueriesCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Similar Queries</b>
+                <span class="sf-toolbar-status">{{ collector.similarQueriesCount }}</span>
+            </div>
+        {% endset %}
+
+        {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { link: profiler_url, status: status|default('') } %}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+    <span class="icon">
+        <img width="20" height="28" alt="Database" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAcppVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx4bXA6Q3JlYXRvclRvb2w+cGFpbnQubmV0IDQuMC41PC94bXA6Q3JlYXRvclRvb2w+CiAgICAgICAgIDx0aWZmOk9yaWVudGF0aW9uPjE8L3RpZmY6T3JpZW50YXRpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgqoHVAWAAADD0lEQVRIDe1VS28SURQ+lxkKtfZBxESjGBsT3bh255YFpDbRpXHZH6C/oPEPsHCBCxfuu2kb0jZNV8RoLEZDkL4SlDa2TVqqBChQGBi/M2XgzhQIE1248CZ37uO8z3fuGUG2sbS0dIqrjZGRkcPR0VG/2+2+o+v6ZUxhY+13rAohDhVF+Vqr1T5AdvWC8MrKCu51AuMZGD8lEolvBwcHAWh199PcjdZoNLRisVjI5/O/1G4MMEIw5sF6b2dnZ3J3d/cahC441U1WvkM2jGO9XieXTLDvYcjt9XqHce/C3vFYW1sT4XBYqKoqhB0TpOsBFCucPh6cx2az2Tca9hgpoqOjI8pkMrS5uUlIN01PT1MymaS9vT0Sdky2t7dv7u/vK/DCjxCUk5MTUalUuqbY8ET6IL1UKpWMWa1WJQqRoQAK25ik02n/1tYWQeg8JKK+0cjaZExYpzwsnoII3nMAsbdyylI99sCEIpEIxWIxikaj/EyMUS6XcyogyACDSWDDhSGwb5GdL2yEMWF8Z2ZmLplOA8NbLozPMPIKar9jrThX35FYWFigbDZL7CxnRK46jugxCFkYfD0xMZHTNO0NRB2nrWOus5MjbFcdyNrQ0ND78fHx22g/N3BW4JTOlQRHHBnO5XI0OzvbsYidXHUc3f25uTnf+vq6iZXgfA86JEw4dRYxe9UpqBALh13AIm07yFUXCoU0k4y3VWdDVXjtbV06isBUZK4yJouLi4oUocJV9xZebwCHU1QdT1PO8dqv6lww8BQRncJgAvNjIBBoOLbQQ0COUCwvL+swAFv6mcfj+YIWdBW9bRJRctUZb6KHnp7XhUKB4vG4hY7+bfQ5LgAv3tBd/H+0VCol/nqvQyRGKfKKyFT8erkV8f/H4tEgB7nq5ufnf5gy0J3lqsthXsGBNfP7cW6hpVHGZGxsjH//7aEiiidQ/gzrFG655Cxvq805wIarrtdwBYPBd/g7PkdEUz6f7yXaz89ezH9yb0nT8fHxdbyjF4juETAaxrTQBzXEmKBnPhyU/z/fv5GB33oWqtz/+AV9AAAAAElFTkSuQmCC" />
+    </span>
+    <strong>Doctrine Stats</strong>
+        <span class="count">
+                <span>{{ collector.identicalQueriesCount }}</span>
+                <span>{{ collector.similarQueriesCount }}</span>
+            </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <style>
+        .hidden { display: none; }
+        .queries-table td, .queries-table th { vertical-align: top; }
+        .queries-table td > div { margin-bottom: 6px; }
+        .highlight pre { margin: 0; white-space: pre-wrap; }
+        .highlight .keyword   { color: #8959A8; font-weight: bold; }
+        .highlight .word      { color: #222222; }
+        .highlight .variable  { color: #916319; }
+        .highlight .symbol    { color: #222222; }
+        .highlight .comment   { color: #999999; }
+        .highlight .backtick  { color: #718C00; }
+        .highlight .string    { color: #718C00; }
+        .highlight .number    { color: #F5871F; font-weight: bold; }
+        .highlight .error     { color: #C82829; }
+    </style>
+
+    <h2>Queries with identical parameters ({{ collector.identicalQueriesCount }})</h2>
+    {% for connection, identicalQueries in collector.identicalQueries %}
+        {% if identicalQueries is not empty %}
+            <h3>Connection <em>{{ connection }}</em></h3>
+            <table>
+                <tr>
+                    <th>Times called</th>
+                    <th>SQL</th>
+                    <th>Parameters</th>
+                </tr>
+
+                {% for identicalQuery in identicalQueries %}
+                    <tr>
+                        <td>{{ identicalQuery.count }}</td>
+                        <td>{{ identicalQuery.sql|doctrine_pretty_query(highlight_only = true) }}</td>
+
+                        <td>{{ identicalQuery.parameters|yaml_encode }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endfor %}
+
+    <h2>Queries with different parameters ({{ collector.similarQueriesCount }})</h2>
+    {% for connection, similarQueries in collector.similarQueries %}
+        {% if similarQueries is not empty %}
+            <h3>Connection <em>{{ connection }}</em></h3>
+            <table>
+                <tr>
+                    <th>Times called</th>
+                    <th>SQL</th>
+                </tr>
+
+                {% for similarQuery in similarQueries %}
+                    <tr>
+                        <td>{{ similarQuery.count }}</td>
+                        <td>{{ similarQuery.sql|doctrine_pretty_query(highlight_only = true) }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endfor%}
+{% endblock %}

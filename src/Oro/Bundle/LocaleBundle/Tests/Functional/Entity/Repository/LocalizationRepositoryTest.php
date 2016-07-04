@@ -9,6 +9,7 @@ use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -84,5 +85,35 @@ class LocalizationRepositoryTest extends WebTestCase
 
         $this->assertInternalType('int', $result);
         $this->assertEquals(4, $result);
+    }
+    
+    public function testGetBatchIterator()
+    {
+        $expectedLocalizations = [$this->getDefaultLocalization()->getTitle()];
+        foreach (LoadLocalizationData::getLocalizations() as $localization) {
+            $expectedLocalizations[] = $localization['title'];
+        }
+        
+        $localizations = [];
+        foreach ($this->repository->getBatchIterator() as $localization) {
+            $localizations[] = $localization->getTitle();
+        }
+        
+        $this->assertEquals($expectedLocalizations, $localizations);
+    }
+
+    /**
+     * @return Localization
+     */
+    protected function getDefaultLocalization()
+    {
+        $localeSettings = $this->getContainer()->get('oro_locale.settings');
+        $locale         = $localeSettings->getLocale();
+        list($language) = explode('_', $locale);
+        
+        return $this->repository->findOneBy([
+            'languageCode'   => $language,
+            'formattingCode' => $locale
+        ]);
     }
 }

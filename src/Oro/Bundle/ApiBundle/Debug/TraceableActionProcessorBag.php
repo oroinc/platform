@@ -42,4 +42,12 @@ class TraceableActionProcessorBag implements ActionProcessorBagInterface
     {
         return $this->processorBag->getProcessor($action);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActions()
+    {
+        return $this->processorBag->getActions();
+    }
 }

@@ -63,7 +63,12 @@ class AddFieldsFilter implements ProcessorInterface
         }
         */
 
-        if (count($context->getConfig()->getFields()) > 1) {
+        $config = $context->getConfig();
+        if (!$config->isFieldsetEnabled()) {
+            // the "fields" filter is disabled
+            return;
+        }
+        if (count($config->getFields()) > 1) {
             // the "fields" filter for the primary entity has sense only if it has more than one field
             $this->addFilter($filters, $context->getClassName(), $context->getRequestType());
         }

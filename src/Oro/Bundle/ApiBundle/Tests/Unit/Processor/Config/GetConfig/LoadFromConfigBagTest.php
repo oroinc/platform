@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class LoadFromConfigBagTest extends ConfigProcessorTestCase
 {
@@ -36,8 +37,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             $this->entityHierarchyProvider,
             $this->configBag
         );
-
-        $this->context->setTargetAction('create');
     }
 
     public function testProcessWhenConfigAlreadyExists()
@@ -116,8 +115,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithDescriptions()
     {
         $config = [
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'form_type'    => 'test_form',
             'form_options' => ['option' => 'value'],
             'fields'       => [
@@ -141,6 +138,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         123 => ['description' => 'status 123'],
                         456 => ['exclude' => true]
                     ],
+                    'description'  => 'Action Description',
                     'form_type'    => 'action_form',
                     'form_options' => ['action_option' => 'action_value'],
                 ]
@@ -157,13 +155,13 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME)
             ->willReturn([]);
 
+        $this->context->setTargetAction('create');
         $this->context->setExtras([new DescriptionsConfigExtra(), new FiltersConfigExtra()]);
         $this->processor->process($this->context);
 
         $this->assertConfig(
             [
-                'label'        => 'Test Entity',
-                'plural_label' => 'Test Entities',
+                'description'  => 'Action Description',
                 'form_type'    => 'action_form',
                 'form_options' => ['action_option' => 'action_value'],
                 'status_codes' => [
@@ -187,14 +185,12 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             $this->context->getFilters()
         );
         $this->assertFalse($this->context->hasSorters());
-        $this->assertFalse($this->context->has('actions'));
+        $this->assertFalse($this->context->has(ConfigUtil::ACTIONS));
     }
 
     public function testProcessWithoutInheritance()
     {
         $config = [
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'form_type'    => 'test_form',
             'form_options' => ['option' => 'value'],
             'fields'       => [
@@ -222,6 +218,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                         123 => ['description' => 'status 123'],
                         456 => ['exclude' => true]
                     ],
+                    'description'  => 'Action Description',
                     'form_type'    => 'action_form',
                     'form_options' => ['action_option' => 'action_value'],
                     'fields'       => [
@@ -247,13 +244,13 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME)
             ->willReturn([]);
 
+        $this->context->setTargetAction('create');
         $this->context->setExtras([new FiltersConfigExtra()]);
         $this->processor->process($this->context);
 
         $this->assertConfig(
             [
-                'label'        => 'Test Entity',
-                'plural_label' => 'Test Entities',
+                'description'  => 'Action Description',
                 'form_type'    => 'action_form',
                 'form_options' => ['action_option' => 'action_value'],
                 'fields'       => [
@@ -279,7 +276,348 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             $this->context->getFilters()
         );
         $this->assertFalse($this->context->hasSorters());
-        $this->assertFalse($this->context->has('actions'));
+        $this->assertFalse($this->context->has(ConfigUtil::ACTIONS));
+    }
+
+    public function testProcessForPrimaryResourceWithSubresourcesConfig()
+    {
+        $config = [
+            'description'  => 'Test Description',
+            'form_type'    => 'test_form',
+            'form_options' => ['option' => 'value'],
+            'fields'       => [
+                'field1' => null,
+                'field2' => null,
+                'field3' => null,
+                'field4' => [
+                    'exclude'      => true,
+                    'form_type'    => 'field_form',
+                    'form_options' => ['option' => 'value'],
+                ],
+            ],
+            'actions'      => [
+                'create' => [
+                    'status_codes' => [
+                        123 => ['description' => 'status 123'],
+                        456 => ['exclude' => true]
+                    ],
+                    'description'  => 'Action Description',
+                    'form_type'    => 'action_form',
+                    'form_options' => ['action_option' => 'action_value'],
+                    'fields'       => [
+                        'field2' => [
+                            'exclude' => true
+                        ],
+                        'field4' => [
+                            'form_type'    => 'action_field_form',
+                            'form_options' => ['action_option' => 'action_value'],
+                        ],
+                    ]
+                ]
+            ],
+            'subresources' => [
+                'testSubresource' => [
+                    'actions' => [
+                        'create' => [
+                            'status_codes' => [
+                                123 => ['description' => 'subresource status 123'],
+                                234 => ['description' => 'subresource status 234'],
+                                345 => ['exclude' => true]
+                            ],
+                            'description'  => 'Subresource Description',
+                            'form_type'    => 'subresource_form',
+                            'form_options' => ['subresource_option' => 'subresource_value'],
+                            'fields'       => [
+                                'field3' => [
+                                    'exclude' => true
+                                ],
+                                'field4' => [
+                                    'form_type'    => 'subresource_field_form',
+                                    'form_options' => ['subresource_option' => 'subresource_value'],
+                                ],
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects($this->once())
+            ->method('getConfig')
+            ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
+            ->willReturn($config);
+
+        $this->entityHierarchyProvider->expects($this->once())
+            ->method('getHierarchyForClassName')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn([]);
+
+        $this->context->setTargetAction('create');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'description'  => 'Action Description',
+                'form_type'    => 'action_form',
+                'form_options' => ['action_option' => 'action_value'],
+                'fields'       => [
+                    'field1' => null,
+                    'field2' => [
+                        'exclude' => true
+                    ],
+                    'field3' => null,
+                    'field4' => [
+                        'exclude'      => true,
+                        'form_type'    => 'action_field_form',
+                        'form_options' => ['action_option' => 'action_value'],
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+        $this->assertFalse($this->context->has(ConfigUtil::ACTIONS));
+        $this->assertFalse($this->context->has(ConfigUtil::SUBRESOURCES));
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessForSubresourceWithSubresourcesConfig()
+    {
+        $config = [
+            'description'  => 'Test Description',
+            'form_type'    => 'test_form',
+            'form_options' => ['option' => 'value'],
+            'fields'       => [
+                'field1' => null,
+                'field2' => null,
+                'field3' => null,
+                'field4' => [
+                    'exclude'      => true,
+                    'form_type'    => 'field_form',
+                    'form_options' => ['option' => 'value'],
+                ],
+            ],
+            'actions'      => [
+                'create' => [
+                    'status_codes' => [
+                        123 => ['description' => 'status 123'],
+                        456 => ['exclude' => true]
+                    ],
+                    'description'  => 'Action Description',
+                    'form_type'    => 'action_form',
+                    'form_options' => ['action_option' => 'action_value'],
+                    'fields'       => [
+                        'field2' => [
+                            'exclude' => true
+                        ],
+                        'field4' => [
+                            'form_type'    => 'action_field_form',
+                            'form_options' => ['action_option' => 'action_value'],
+                        ],
+                    ]
+                ]
+            ]
+        ];
+        $parentConfig = [
+            'subresources' => [
+                'testSubresource' => [
+                    'actions' => [
+                        'create' => [
+                            'status_codes' => [
+                                123 => ['description' => 'subresource status 123'],
+                                234 => ['description' => 'subresource status 234'],
+                                345 => ['exclude' => true]
+                            ],
+                            'description'  => 'Subresource Description',
+                            'form_type'    => 'subresource_form',
+                            'form_options' => ['subresource_option' => 'subresource_value'],
+                            'fields'       => [
+                                'field3' => [
+                                    'exclude' => true
+                                ],
+                                'field4' => [
+                                    'form_type'    => 'subresource_field_form',
+                                    'form_options' => ['subresource_option' => 'subresource_value'],
+                                ],
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects($this->exactly(2))
+            ->method('getConfig')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
+
+        $this->entityHierarchyProvider->expects($this->exactly(2))
+            ->method('getHierarchyForClassName')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
+
+        $this->context->setTargetAction('create');
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('testSubresource');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'description'  => 'Subresource Description',
+                'form_type'    => 'subresource_form',
+                'form_options' => ['subresource_option' => 'subresource_value'],
+                'fields'       => [
+                    'field1' => null,
+                    'field2' => [
+                        'exclude' => true
+                    ],
+                    'field3' => [
+                        'exclude' => true
+                    ],
+                    'field4' => [
+                        'exclude'      => true,
+                        'form_type'    => 'subresource_field_form',
+                        'form_options' => ['subresource_option' => 'subresource_value'],
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+        $this->assertFalse($this->context->has(ConfigUtil::ACTIONS));
+        $this->assertFalse($this->context->has(ConfigUtil::SUBRESOURCES));
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessForSubresourceWithSubresourcesConfigAndDescriptionsConfigExtra()
+    {
+        $config = [
+            'description'  => 'Test Description',
+            'form_type'    => 'test_form',
+            'form_options' => ['option' => 'value'],
+            'fields'       => [
+                'field1' => null,
+                'field2' => null,
+                'field3' => null,
+                'field4' => [
+                    'exclude'      => true,
+                    'form_type'    => 'field_form',
+                    'form_options' => ['option' => 'value'],
+                ],
+            ],
+            'actions'      => [
+                'create' => [
+                    'status_codes' => [
+                        123 => ['description' => 'status 123'],
+                        456 => ['exclude' => true]
+                    ],
+                    'description'  => 'Action Description',
+                    'form_type'    => 'action_form',
+                    'form_options' => ['action_option' => 'action_value'],
+                    'fields'       => [
+                        'field2' => [
+                            'exclude' => true
+                        ],
+                        'field4' => [
+                            'form_type'    => 'action_field_form',
+                            'form_options' => ['action_option' => 'action_value'],
+                        ],
+                    ]
+                ]
+            ]
+        ];
+        $parentConfig = [
+            'subresources' => [
+                'testSubresource' => [
+                    'actions' => [
+                        'create' => [
+                            'status_codes' => [
+                                123 => ['description' => 'subresource status 123'],
+                                234 => ['description' => 'subresource status 234'],
+                                345 => ['exclude' => true]
+                            ],
+                            'description'  => 'Subresource Description',
+                            'form_type'    => 'subresource_form',
+                            'form_options' => ['subresource_option' => 'subresource_value'],
+                            'fields'       => [
+                                'field3' => [
+                                    'exclude' => true
+                                ],
+                                'field4' => [
+                                    'form_type'    => 'subresource_field_form',
+                                    'form_options' => ['subresource_option' => 'subresource_value'],
+                                ],
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects($this->exactly(2))
+            ->method('getConfig')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
+
+        $this->entityHierarchyProvider->expects($this->exactly(2))
+            ->method('getHierarchyForClassName')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
+
+        $this->context->setExtras([new DescriptionsConfigExtra()]);
+        $this->context->setTargetAction('create');
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('testSubresource');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'status_codes' => [
+                    123 => ['description' => 'subresource status 123'],
+                    234 => ['description' => 'subresource status 234'],
+                    345 => ['exclude' => true],
+                    456 => ['exclude' => true]
+                ],
+                'description'  => 'Subresource Description',
+                'form_type'    => 'subresource_form',
+                'form_options' => ['subresource_option' => 'subresource_value'],
+                'fields'       => [
+                    'field1' => null,
+                    'field2' => [
+                        'exclude' => true
+                    ],
+                    'field3' => [
+                        'exclude' => true
+                    ],
+                    'field4' => [
+                        'exclude'      => true,
+                        'form_type'    => 'subresource_field_form',
+                        'form_options' => ['subresource_option' => 'subresource_value'],
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+        $this->assertFalse($this->context->has(ConfigUtil::ACTIONS));
+        $this->assertFalse($this->context->has(ConfigUtil::SUBRESOURCES));
     }
 
     /**
@@ -288,8 +626,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     public function testProcessWithInheritance()
     {
         $config = [
-            'label'        => 'Other Entity',
-            'plural_label' => 'Other Entities',
             'fields'       => [
                 'field1' => null,
                 'field2' => null,
@@ -341,8 +677,6 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
         $parentConfig3 = [
             'inherit'      => false,
-            'label'        => 'Test Entity',
-            'plural_label' => 'Test Entities',
             'order_by'     => [
                 'field3' => 'ASC'
             ],
@@ -395,13 +729,12 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(['Test\ParentClass1', 'Test\ParentClass2', 'Test\ParentClass3', 'Test\ParentClass4']);
 
+        $this->context->setTargetAction('create');
         $this->context->setExtras([new FiltersConfigExtra()]);
         $this->processor->process($this->context);
 
         $this->assertConfig(
             [
-                'label'        => 'Other Entity',
-                'plural_label' => 'Other Entities',
                 'order_by'     => [
                     'field2' => 'ASC'
                 ],

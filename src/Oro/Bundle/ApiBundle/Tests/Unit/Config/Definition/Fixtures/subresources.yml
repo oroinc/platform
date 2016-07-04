@@ -1,0 +1,840 @@
+empty:
+    config: []
+    expected: []
+
+empty_root:
+    config:
+        subresources: []
+    expected: []
+
+null_subresources:
+    config:
+        subresources: ~
+    expected: []
+
+dash_in_subresource_name:
+    config:
+        subresources:
+            test-subresource:
+                exclude: false
+    expected:
+        subresources:
+            test-subresource:
+                exclude: false
+
+underscore_in_subresource_name:
+    config:
+        subresources:
+            test_subresource:
+                exclude: false
+    expected:
+        subresources:
+            test_subresource:
+                exclude: false
+
+null_subresource_default_exclude:
+    config:
+        subresources:
+            testSubresource: ~
+    expected:
+        subresources:
+            testSubresource:
+                exclude: false
+
+exclude_false:
+    config:
+        subresources:
+            testSubresource:
+                exclude: false
+    expected:
+        subresources:
+            testSubresource:
+                exclude: false
+
+exclude_true:
+    config:
+        subresources:
+            testSubresource:
+                exclude: true
+    expected:
+        subresources:
+            testSubresource:
+                exclude: true
+
+empty_target_type:
+    config:
+        subresources:
+            testSubresource:
+                target_type: ""
+    expected: []
+    error: 'The value "" is not allowed for path "entity.subresources.testSubresource.target_type". Permissible values: "to-many", "to-one", "collection"'
+
+invalid_target_type:
+    config:
+        subresources:
+            testSubresource:
+                target_type: test
+    expected: []
+    error: 'The value "test" is not allowed for path "entity.subresources.testSubresource.target_type". Permissible values: "to-many", "to-one", "collection"'
+
+to_one_target_type:
+    config:
+        subresources:
+            testSubresource:
+                target_type: to-one
+    expected:
+        subresources:
+            testSubresource:
+                target_type: to-one
+
+to_many_target_type:
+    config:
+        subresources:
+            testSubresource:
+                target_type: to-many
+    expected:
+        subresources:
+            testSubresource:
+                target_type: to-many
+
+collection_target_type:
+    config:
+        subresources:
+            testSubresource:
+                target_type: collection
+    expected:
+        subresources:
+            testSubresource:
+                target_type: to-many
+
+target_class_without_target_type:
+    config:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+    expected:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: to-one
+
+target_class_with_target_type:
+    config:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: to-many
+    expected:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: to-many
+
+invalid_subresource_definition:
+    config:
+        subresources:
+            testSubresource:
+                invalidOption:
+                    exclude: true
+    expected: []
+    error: 'Unrecognized option "invalidOption" under "entity.subresources.testSubresource"'
+
+invalid_exclude_type:
+    config:
+        subresources:
+            testSubresource:
+                exclude: test
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.exclude". Expected boolean, but got string.'
+
+unknown_property:
+    config:
+        subresources:
+            testSubresource:
+                test: test
+    expected: []
+    error: 'Unrecognized option "test" under "entity.subresources.testSubresource"'
+
+null_actions:
+    config:
+        subresources:
+            testSubresource:
+                actions: ~
+    expected:
+        subresources:
+            testSubresource: []
+
+null_action_default_exclude:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: false
+
+action_exclude_false:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: false
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: false
+
+action_exclude_true:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: true
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: true
+
+action_null_acl_resource:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        acl_resource: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        acl_resource: ~
+
+action_null_acl_resource_and_null_exclude:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: ~
+                        acl_resource: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: true
+                        acl_resource: ~
+
+action_acl_resource_and_exclude:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: true
+                        acl_resource: test_acl_resource
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: true
+                        acl_resource: test_acl_resource
+
+invalid_actions_definition:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        delete:
+                            exclude: true
+                            acl_resource: test_acl_resource
+    expected: []
+    error: 'Unrecognized option "delete" under "entity.subresources.testSubresource.actions.delete"'
+
+invalid_actions_definition_exclude_flag_type:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        exclude: test
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.delete.exclude". Expected boolean, but got string.'
+
+invalid_actions_definition_unknown_property:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    delete:
+                        test: test
+    expected: []
+    error: 'Unrecognized option "test" under "entity.subresources.testSubresource.actions.delete"'
+
+default_page_size:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        page_size: ~
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.page_size". Expected int, but got NULL.'
+
+disable_pagination:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        page_size: -1
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        page_size: -1
+                        max_results: -1
+
+disable_pagination_but_custom_max_results:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        page_size: -1
+                        max_results: 100
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        page_size: -1
+                        max_results: 100
+
+invalid_page_size:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        page_size: -2
+    expected: []
+    error: 'The value -2 is too small for path "entity.subresources.testSubresource.actions.get_list.page_size". Should be greater than or equal to -1'
+
+empty_order_by:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        order_by: []
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list: []
+
+order_by:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        order_by:
+                            field1: ASC
+                            field2: DESC
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        order_by:
+                            field1: ASC
+                            field2: DESC
+
+invalid_direction_in_order_by:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        order_by:
+                            field1: other
+    expected: []
+    error: 'The value "other" is not allowed for path "entity.subresources.testSubresource.actions.get_list.order_by.field1". Permissible values: "ASC", "DESC"'
+
+enable_sorting:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_sorting: false
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_sorting: false
+
+disable_sorting:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_sorting: true
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_sorting: true
+
+invalid_value_for_disable_sorting:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_sorting: 123
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_sorting". Expected boolean, but got integer'
+
+enable_inclusion:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_inclusion: false
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_inclusion: false
+
+disable_inclusion:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_inclusion: true
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_inclusion: true
+
+invalid_value_for_disable_inclusion:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_inclusion: 123
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_inclusion". Expected boolean, but got integer'
+
+enable_fieldset:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_fieldset: false
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_fieldset: false
+
+disable_fieldset:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_fieldset: true
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_fieldset: true
+
+invalid_value_for_disable_fieldset:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_list:
+                        disable_fieldset: 123
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_fieldset". Expected boolean, but got integer'
+
+null_status_codes:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get: []
+
+empty_status_codes:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes: []
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get: []
+
+add_status_codes_short_syntax:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes:
+                            '417': 'Returned when expectations failed'
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes:
+                            '417':
+                                description: 'Returned when expectations failed'
+
+add_status_codes_full_syntax:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes:
+                            '417':
+                                description: 'Returned when expectations failed'
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes:
+                            '417':
+                                description: 'Returned when expectations failed'
+
+delete_status_codes_short_syntax:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes:
+                            '417': false
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes:
+                            '417':
+                                exclude: true
+
+delete_status_codes_full_syntax:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes:
+                            '417':
+                                exclude: true
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    get:
+                        status_codes:
+                            '417':
+                                exclude: true
+
+actions:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        exclude: true
+                        acl_resource: create_acl_resource
+                    get:
+                        exclude: false
+                        acl_resource: view_acl_resource
+                    delete:
+                        acl_resource: delete_acl_resource
+                    update: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        exclude: true
+                        acl_resource: create_acl_resource
+                    get:
+                        exclude: false
+                        acl_resource: view_acl_resource
+                    delete:
+                        acl_resource: delete_acl_resource
+                    update:
+                        exclude: false
+
+action_field_exclude:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                exclude: true
+                            field2:
+                                exclude: false
+                            field3:
+                                exclude: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                exclude: true
+                            field2:
+                                exclude: false
+                            field3:
+                                exclude: true
+
+action_invalid_field_exclude:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                exclude: 123
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.exclude". Expected boolean, but got integer.'
+
+action_null_form_type:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_type: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create: []
+
+action_empty_form_type:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_type: ""
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create: []
+
+action_form_type:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_type: integer
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_type: integer
+
+action_null_form_options:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_options: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create: []
+
+action_empty_form_options:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_options: []
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create: []
+
+action_form:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_type: integer
+                        form_options:
+                            option1: value1
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_type: integer
+                        form_options:
+                            option1: value1
+
+action_invalid_form_type:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_type: []
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.form_type". Expected scalar, but got array.'
+
+action_invalid_form_options:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        form_options: test
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.form_options". Expected array, but got string'
+
+action_field_dash_in_field_name:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            test-field: ~
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            test-field: []
+
+action_field_form:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                form_type: ~
+                            field2:
+                                form_type: ""
+                            field3:
+                                form_type: integer
+                            field4:
+                                form_type: integer
+                                form_options: ~
+                            field5:
+                                form_type: integer
+                                form_options: []
+                            field6:
+                                form_type: integer
+                                form_options:
+                                    option1: value1
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1: []
+                            field2: []
+                            field3:
+                                form_type: integer
+                            field4:
+                                form_type: integer
+                            field5:
+                                form_type: integer
+                            field6:
+                                form_type: integer
+                                form_options:
+                                    option1: value1
+
+action_invalid_field_form_type:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                form_type: []
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.form_type". Expected scalar, but got array.'
+
+action_invalid_field_form_options:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                form_options: test
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.form_options". Expected array, but got string'

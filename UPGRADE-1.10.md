@@ -237,6 +237,7 @@ Now:
 
 ####CalendarBundle
 - The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
+- Added method `formatCalendarDateRangeUser` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatUserExtension.php`. Method `calendar_date_range_user` get additional param 'user' and return sate range according to user organization localization settings.
 
 ####LayoutBundle:
 - Added possibility to create layout block types using only DI configuration, for details please check out documentation at
@@ -258,6 +259,14 @@ Classes `Oro/Bundle/EmbeddedFormBundle/Layout/Block/Type/EmbedFormSuccessType` a
 - Layout block types was replaced with DI only configuration for `abstract_configurable` block,
 class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was removed.
 
+#### LocaleBundle:
+- Added entity `Oro\Bundle\LocaleBundle\Entity\Localization` ([`see documentation`](./src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localization)).
+- Added entity `Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue` ([`see documentation`](./src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localizedfallbackvalue)) for translating strings in different localizations.
+- Added trait `Oro\Bundle\LocaleBundle\Entity\FallbackTrait` for retrieve translated value for the needed localization.
+- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter`  for displaying full title of the language by code.
+- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter`  for displaying full title of the formatting by code.
+- Added `oro_format_datetime_user` twig extension - allows get formatted date and calendar date range by user organization localization settings. Deprecated since 1.11. Will be removed after 1.13.
+
 ####Layout Component:
 - `\Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface::prepare()` signature was changed from `prepare(array $source, VisitorCollection $visitorCollection);` to `prepare(Oro\Component\Layout\Loader\Generator\GeneratorData $data, VisitorCollection $visitorCollection);`
 - `@addTree` layout update action is `\Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension` now
@@ -265,3 +274,7 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 
 ####NotificationBundle:
 - The constructor of the `Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool` class was changed. Before: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass)`. After: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass, EventDispatcherInterface $eventDispatcher)`.
+
+####Oro\Component\Config
+- `Oro\Component\Config\CumulativeResourceInfo::__construct` signature changed from
+`public function __construct($bundleClass, $name, $path, $data)` to `public function __construct($bundleClass, $name, $path, array $data = [])`
