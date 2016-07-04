@@ -32,6 +32,7 @@ parameters:
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
     oro_user.mailer.processor.class:              Oro\Bundle\UserBundle\Mailer\Processor
     oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
+    oro_user.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
 
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
     oro_user.provider.filter.user_choice_tree.class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
@@ -354,3 +355,10 @@ services:
         arguments:
           - '@doctrine'
           - '@security.token_storage'
+
+    oro_user.listener.choice_tree_filter_load_data_listener:
+        class: '%oro_user.listener.choice_tree_filter_load_data_listener.class%'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
