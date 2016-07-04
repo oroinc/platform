@@ -9,14 +9,23 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class RemoveExtendedFields implements Migration, ContainerAwareInterface
+class RemoveExtendedFields implements Migration, ContainerAwareInterface, OrderedMigrationInterface
 {
     use ContainerAwareTrait;
 
     const PROPERTY_WORKFLOW_ITEM = 'workflowItem';
     const PROPERTY_WORKFLOW_STEP = 'workflowStep';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 2;
+    }
 
     /**
      * {@inheritdoc}
@@ -27,27 +36,31 @@ class RemoveExtendedFields implements Migration, ContainerAwareInterface
         $configManager = $this->container->get('oro_entity_config.config_manager');
         $configProvider = $configManager->getProvider('extend');
 
-        foreach ($entityProvider->getEntities() as $entity) {
-            $entityName = $entity['name'];
-            if ($configProvider->hasConfig($entityName, self::PROPERTY_WORKFLOW_ITEM) &&
-                $configProvider->hasConfig($entityName, self::PROPERTY_WORKFLOW_STEP)
-            ) {
-                $fieldConfigItem = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_ITEM);
-                $fieldConfigItem->set('state', ExtendScope::STATE_DELETE);
-                $configManager->persist($fieldConfigItem);
+        try {
+            foreach ($entityProvider->getEntities() as $entity) {
+                $entityName = $entity['name'];
+                if ($configProvider->hasConfig($entityName, self::PROPERTY_WORKFLOW_ITEM) &&
+                    $configProvider->hasConfig($entityName, self::PROPERTY_WORKFLOW_STEP)
+                ) {
+                    $fieldConfigItem = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_ITEM);
+                    $fieldConfigItem->set('state', ExtendScope::STATE_DELETE);
+                    $configManager->persist($fieldConfigItem);
 
-                $fieldConfigStep = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_STEP);
-                $fieldConfigStep->set('state', ExtendScope::STATE_DELETE);
-                $configManager->persist($fieldConfigStep);
-
-                $configManager->flush();
+                    $fieldConfigStep = $configProvider->getConfig($entityName, self::PROPERTY_WORKFLOW_STEP);
+                    $fieldConfigStep->set('state', ExtendScope::STATE_DELETE);
+                    $configManager->persist($fieldConfigStep);
+                }
             }
+
+            $configManager->flush();
+
+            $this->container
+                ->get('oro_entity_extend.extend.entity_processor')
+                ->updateDatabase(true, true);
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+
+            throw $e;
         }
-
-        $configManager->flush();
-
-        $this->container
-            ->get('oro_entity_extend.extend.entity_processor')
-            ->updateDatabase(true, true);
     }
 }

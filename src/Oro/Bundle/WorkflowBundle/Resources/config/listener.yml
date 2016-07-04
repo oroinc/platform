@@ -29,6 +29,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.manager'
+            - '@oro_workflow.entity_connector'
         tags:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: preRemove }

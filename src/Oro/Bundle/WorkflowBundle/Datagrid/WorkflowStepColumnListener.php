@@ -80,8 +80,7 @@ class WorkflowStepColumnListener
         // get root entity
         list($rootEntity, $rootEntityAlias) = $this->getRootEntityNameAndAlias($config);
 
-        $groupBy = $config->offsetGetByPath('[source][query][groupBy]', null);
-        if (!$rootEntity || !$rootEntityAlias || $groupBy) {
+        if (!$rootEntity || !$rootEntityAlias) {
             return;
         }
 
@@ -128,7 +127,7 @@ class WorkflowStepColumnListener
     public function onResultAfter(OrmResultAfter $event)
     {
         $config = $event->getDatagrid()->getConfig();
-        
+
         if (!$this->isApplicable($config)) {
             return;
         }
@@ -151,14 +150,14 @@ class WorkflowStepColumnListener
 
         foreach ($records as $record) {
             $items = [];
-            
+
             $id = $record->getValue('id');
             if (array_key_exists($id, $workflowItems)) {
                 foreach ($workflowItems[$id] as $data) {
                     $items[] = $data;
                 }
             }
-            
+
             $record->addData([self::WORKFLOW_STEP_COLUMN => $items]);
         }
     }
@@ -302,7 +301,7 @@ class WorkflowStepColumnListener
     protected function isApplicable(DatagridConfiguration $config)
     {
         $columns = $config->offsetGetByPath('[columns]', []);
-        
+
         return count(array_intersect($this->workflowStepColumns, array_keys($columns))) > 0;
     }
 
@@ -335,7 +334,7 @@ class WorkflowStepColumnListener
 
             $qb = $datasource->getQueryBuilder();
             $param = $qb->getParameter('filteredWorkflowItemIds');
-            
+
             if ($param === null) {
                 $qb->andWhere($qb->expr()->in($rootEntityAlias, ':filteredWorkflowItemIds'))
                     ->setParameter('filteredWorkflowItemIds', $items);

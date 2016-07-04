@@ -326,22 +326,6 @@ class WorkflowManager
 
     /**
      * @param string $entityClass
-     *
-     * @return null|Workflow
-     *
-     * @throws \RuntimeException
-     * @deprecated use getApplicableWorkflows
-     */
-    public function getApplicableWorkflowByEntityClass($entityClass)
-    {
-        throw new \RuntimeException(
-            'No single workflow supported for an entity. ' .
-            'See \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflows'
-        );
-    }
-
-    /**
-     * @param string $entityClass
      * @return bool
      * @deprecated use hasApplicableWorkflows
      */

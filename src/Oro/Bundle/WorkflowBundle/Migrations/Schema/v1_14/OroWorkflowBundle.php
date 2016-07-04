@@ -11,12 +11,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 
-class OroWorkflowBundle implements Migration, ContainerAwareInterface
+class OroWorkflowBundle implements Migration, ContainerAwareInterface, OrderedMigrationInterface
 {
     use ContainerAwareTrait;
 
@@ -28,6 +29,14 @@ class OroWorkflowBundle implements Migration, ContainerAwareInterface
     const NEW_ITEMS_RELATION = WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME;
     const NEW_STEPS_RELATION = WorkflowVirtualRelationProvider::STEPS_RELATION_NAME;
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 1;
+    }
+    
     /**
      * {@inheritdoc}
      */

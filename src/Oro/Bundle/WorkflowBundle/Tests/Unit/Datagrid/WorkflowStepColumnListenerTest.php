@@ -181,20 +181,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                 'hasConfig' => true,
                 'isShowStep' => false,
             ],
-            'has group by' => [
-                'config' => [
-                    'source' => [
-                        'query' => [
-                            'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
-                            'groupBy' => self::ALIAS . '.id'
-                        ]
-                    ],
-                    'columns' => []
-                ],
-                'hasWorkflow' => true,
-                'hasConfig' => true,
-                'isShowStep' => true,
-            ],
         ];
     }
 
@@ -518,7 +504,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnBuildAfter()
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
-        
+
         $repository = $this->setUpWorkflowItemRepository();
         $repository->expects($this->once())
             ->method('getEntityIdsByEntityClassAndWorkflowNames')
@@ -567,7 +553,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             )
         );
-        
+
         $parameters = new ParameterBag(
             [
                 '_filter' => [
@@ -652,12 +638,12 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $metadata->expects($this->any())->method('getName')->willReturn($entityFullName);
-        
+
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $entityManager->expects($this->any())->method('getClassMetadata')->with($entity)->willReturn($metadata);
-        
+
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->with($entity)
@@ -672,12 +658,12 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with('OroWorkflowBundle:WorkflowItem')
             ->willReturn($repository);
-        
+
         return $repository;
     }
 

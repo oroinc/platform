@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+    var _ = require('underscore');
 
     return Select2AutocompleteComponent.extend({
         /**
@@ -31,10 +32,9 @@ define(function(require) {
          */
         preConfig: function(config) {
             config = Select2AutocompleteComponent.__super__.preConfig.apply(this, arguments);
-
             config.id = function(item) {
                 return item.name;
-            }
+            };
 
             return config;
         }
