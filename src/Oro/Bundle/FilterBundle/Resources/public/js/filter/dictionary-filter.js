@@ -379,7 +379,7 @@ define(function(require) {
 
             var data = this.$(this.elementSelector).inputWidget('data');
             if (!data || !data.length) {
-                data = this.previousData.length ? this.previousData : this.initialData
+                data = this.previousData.length ? this.previousData : this.initialData;
             }
 
             if (!criteriaRendered) {
