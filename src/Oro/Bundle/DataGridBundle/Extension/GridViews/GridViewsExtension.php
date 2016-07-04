@@ -47,9 +47,6 @@ class GridViewsExtension extends AbstractExtension
     /** @var ServiceLink */
     protected $managerLink;
 
-    /** @var array  */
-    protected $systemViews = [];
-
     /** @var GridView|null|bool */
     protected $defaultGridView = false;
 

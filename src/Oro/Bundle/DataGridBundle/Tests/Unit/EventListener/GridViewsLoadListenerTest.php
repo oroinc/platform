@@ -85,11 +85,6 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = new GridViewsLoadEvent('grid', $gridViews);
 
-//        $this->gridViewRepository
-//            ->expects($this->once())
-//            ->method('findGridViews')
-//            ->will($this->returnValue($gridViews));
-
         $expectedViews = [
             [
                 'name'       => 'first',

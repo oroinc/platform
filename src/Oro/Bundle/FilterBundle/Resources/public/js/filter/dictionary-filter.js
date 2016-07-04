@@ -171,7 +171,7 @@ define(function(require) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                    return (choice.value === value.type);
+                    return (parseInt(choice.value) === parseInt(value.type));
                 });
                 selectedChoiceLabel = foundChoice.label;
             }
