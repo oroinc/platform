@@ -5,16 +5,16 @@ Table of Contents
 -----------------
  - [Overview](#overview)
  - [Configuration structure](#configuration-structure)
- - ["exclude" option](#exclude-option)
- - ["entities" configuration section](#entities-configuration-section)
- - ["fields" configuration section](#fields-configuration-section)
- - ["filters" configuration section](#filters-configuration-section)
- - ["sorters" configuration section](#sorters-configuration-section)
- - ["actions" configuration section](#actions-configuration-section)
-   - ["status_codes" configuration section](#action-status_codes-configuration-section)
-   - ["fields" configuration section](#action-fields-configuration-section)
- - ["subresources" configuration section](#subresources-configuration-section)
- - ["relations" configuration section](#relations-configuration-section)
+ - [**exclude** option](#exclude-option)
+ - [**entities** configuration section](#entities-configuration-section)
+ - [**fields** configuration section](#fields-configuration-section)
+ - [**filters** configuration section](#filters-configuration-section)
+ - [**sorters** configuration section](#sorters-configuration-section)
+ - [**actions** configuration section](#actions-configuration-section)
+   - [**status_codes** configuration section](#action-status_codes-configuration-section)
+   - [**fields** configuration section](#action-fields-configuration-section)
+ - [**subresources** configuration section](#subresources-configuration-section)
+ - [**relations** configuration section](#relations-configuration-section)
 
 Overview
 --------
