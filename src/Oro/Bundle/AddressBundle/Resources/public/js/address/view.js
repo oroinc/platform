@@ -51,7 +51,7 @@ define([
         initialize: function(options) {
             this.options.map = _.defaults(options.map || {}, this.options.map);
             this.$el.attr('id', 'address-book-' + this.model.id);
-            this.template = _.template($('#template-addressbook-item').html());
+            this.template = _.template($(options.template || '#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:active', this.toggleActive);
         },

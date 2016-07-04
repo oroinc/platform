@@ -148,7 +148,8 @@ define([
             if (!this.$el.find('#address-book-' + address.id).length) {
                 var addressView = new AddressView({
                     model: address,
-                    map: this.options.addressMapOptions
+                    map: this.options.addressMapOptions,
+                    template: this.options.template
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);

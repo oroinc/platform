@@ -188,8 +188,7 @@
 
 {% block button_widget_button -%}
     <button{{ block('block_attributes') }}
-        {#{%- if action in ['submit', 'reset'] %} type="{{ action }}"{% endif %}#}
-        type="{{ type in ['submit', 'reset'] ? type : 'button' }}"
+        type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
         {%- if name is defined %} name="{{ name }}"{% endif %}
         {%- if value is defined %} value="{{ value }}"{% endif %}>
         {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
