@@ -257,9 +257,6 @@ define([
             this.trackPositionInterval = setInterval(function() {
                 var currentPos = el.getBoundingClientRect();
                 if (currentPos.left !== initialPos.left || currentPos.top !== initialPos.top) {
-                    if (typeof _this.options.hideOnScroll !== 'undefined' && !_this.options.hideOnScroll) {
-                        return;
-                    }
                     _this.hide();
                 }
             }, 300);
