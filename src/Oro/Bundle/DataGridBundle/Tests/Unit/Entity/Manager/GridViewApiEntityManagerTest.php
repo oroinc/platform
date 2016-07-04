@@ -78,5 +78,4 @@ class GridViewApiEntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($view, $systemAllView);
     }
-    
 }
