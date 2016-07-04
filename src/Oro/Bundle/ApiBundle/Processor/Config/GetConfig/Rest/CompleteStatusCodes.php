@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 
 /**
  * Adds possible status codes for the following actions executed in scope of REST API:
@@ -20,37 +21,37 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
     protected function addStatusCodes(StatusCodesConfig $statusCodes, $targetAction)
     {
         switch ($targetAction) {
-            case 'get_list':
+            case ApiActions::GET_LIST:
                 $this->addStatusCodesForGetList($statusCodes);
                 break;
-            case 'get':
+            case ApiActions::GET:
                 $this->addStatusCodesForGet($statusCodes);
                 break;
-            case 'update':
+            case ApiActions::UPDATE:
                 $this->addStatusCodesForUpdate($statusCodes);
                 break;
-            case 'create':
+            case ApiActions::CREATE:
                 $this->addStatusCodesForCreate($statusCodes);
                 break;
-            case 'delete':
+            case ApiActions::DELETE:
                 $this->addStatusCodesForDelete($statusCodes);
                 break;
-            case 'delete_list':
+            case ApiActions::DELETE_LIST:
                 $this->addStatusCodesForDeleteList($statusCodes);
                 break;
-            case 'get_subresource':
+            case ApiActions::GET_SUBRESOURCE:
                 $this->addStatusCodesForGetSubresource($statusCodes);
                 break;
-            case 'get_relationship':
+            case ApiActions::GET_RELATIONSHIP:
                 $this->addStatusCodesForGetRelationship($statusCodes);
                 break;
-            case 'update_relationship':
+            case ApiActions::UPDATE_RELATIONSHIP:
                 $this->addStatusCodesForUpdateRelationship($statusCodes);
                 break;
-            case 'add_relationship':
+            case ApiActions::ADD_RELATIONSHIP:
                 $this->addStatusCodesForAddRelationship($statusCodes);
                 break;
-            case 'delete_relationship':
+            case ApiActions::DELETE_RELATIONSHIP:
                 $this->addStatusCodesForDeleteRelationship($statusCodes);
                 break;
         }

@@ -9,7 +9,7 @@ use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType;
-use Oro\Bundle\LayoutBundle\Layout\Block\Extension\VisibleExtension;
+use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigurableTypeExtension;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class FormFieldTypeTest extends BlockTypeTestCase
@@ -19,10 +19,16 @@ class FormFieldTypeTest extends BlockTypeTestCase
      */
     protected function getExtensions()
     {
+        $visibleExtension = new ConfigurableTypeExtension();
+        $visibleExtension->setOptionsConfig([
+            'visible' => [
+                'default' => true,
+            ]
+        ]);
         return [
             new PreloadedExtension(
                 [],
-                ['block' => [new VisibleExtension()]]
+                ['block' => [$visibleExtension]]
             )
         ];
     }
@@ -54,7 +60,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($formView));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
@@ -87,7 +93,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, 123);
         $this->getBlockView(
             FormFieldType::NAME,
@@ -107,7 +113,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($formView));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
@@ -130,7 +136,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($formView));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
@@ -153,7 +159,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($formView));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,

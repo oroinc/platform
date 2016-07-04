@@ -21,6 +21,15 @@ class ConfigContext extends ApiContext
     /** the name of the action for which the configuration is built */
     const TARGET_ACTION = 'targetAction';
 
+    /** a flag indicates whether a configuration is requested for a list of entities or a single entity */
+    const COLLECTION = 'collection';
+
+    /** FQCN of the parent entity in case if a configuration is requested for a sub-resource */
+    const PARENT_CLASS_NAME = 'parentClass';
+
+    /** the association name in case if a configuration is requested for a sub-resource */
+    const ASSOCIATION = 'association';
+
     /** the maximum number of related entities that can be retrieved */
     const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
 
@@ -81,6 +90,66 @@ class ConfigContext extends ApiContext
         } else {
             $this->remove(self::TARGET_ACTION);
         }
+    }
+
+    /**
+     * Indicates whether a configuration is requested for a list of entities or a single entity.
+     *
+     * @return bool TRUE for a list of entities resource, FALSE for a single entity resource
+     */
+    public function isCollection()
+    {
+        return (bool)$this->get(self::COLLECTION);
+    }
+
+    /**
+     * Sets a flag indicates whether a configuration is requested for a list of entities or a single entity.
+     *
+     * @param bool $value TRUE for a list of entities resource, FALSE for a single entity resource
+     */
+    public function setIsCollection($value)
+    {
+        $this->set(self::COLLECTION, $value);
+    }
+
+    /**
+     * Gets FQCN of the parent entity in case if a configuration is requested for a sub-resource.
+     *
+     * @return string
+     */
+    public function getParentClassName()
+    {
+        return $this->get(self::PARENT_CLASS_NAME);
+    }
+
+    /**
+     * Sets FQCN of the parent entity in case if a configuration is requested for a sub-resource.
+     *
+     * @param string $parentClassName
+     */
+    public function setParentClassName($parentClassName)
+    {
+        $this->set(self::PARENT_CLASS_NAME, $parentClassName);
+    }
+
+    /**
+     * Gets the association name in case if a configuration is requested for a sub-resource.
+     *
+     * @return string
+     */
+    public function getAssociationName()
+    {
+        return $this->get(self::ASSOCIATION);
+    }
+
+    /**
+     * Sets the association name in case if a configuration is requested for a sub-resource.
+     *
+     * @param string $associationName
+     */
+    public function setAssociationName($associationName)
+    {
+        $this->set(self::ASSOCIATION, $associationName);
     }
 
     /**

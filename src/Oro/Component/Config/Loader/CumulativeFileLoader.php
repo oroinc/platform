@@ -92,8 +92,23 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
             $bundleClass,
             $this->resourceName,
             $realPath,
-            $this->loadFile($realPath)
+            $this->doLoad($realPath)
         );
+    }
+
+    /**
+     * @param string $realPath
+     * @return array
+     */
+    protected function doLoad($realPath)
+    {
+        $data = $this->loadFile($realPath);
+        
+        if (!is_array($data)) {
+            return [];
+        }
+        
+        return (array)$data;
     }
 
     /**
