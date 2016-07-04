@@ -102,7 +102,7 @@ class GridViewRepository extends EntityRepository
         $qb = $this->createQueryBuilder('gv');
         $qb->innerJoin('gv.users', 'u')
             ->where('gv.gridName = :gridName')
-            ->andWhere('u = :user');
+            ->andWhere('u.user = :user');
 
         if ($checkOwner) {
             $qb->andWhere(
