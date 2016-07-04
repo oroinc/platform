@@ -305,8 +305,6 @@ Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository
 
 **Methods:**
 * **findByEntityMetadata(entityClass, entityIdentifier)** - returns list of all Workflow Items related to input parameters;
-* **getByDefinitionQueryBuilder(WorkflowDefinition)** - returns instance of QueryBuilder based on input workflow
-definition parameters;
 * **getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition)** - returns instance of QueryBuilder for related Entity
 and herewith updated workflow step by input WorkflowDefinition start step;
 * **resetWorkflowData(WorkflowDefinition, batchSize)** - perform reset workflow items data for given definition.
