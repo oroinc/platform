@@ -24,12 +24,14 @@ class WorkflowQueryHelper
         list($entityIdentifier) = $queryBuilder->getEntityManager()->getClassMetadata($entityClass)
             ->getIdentifierFieldNames();
 
+        list($rootAlias) = $queryBuilder->getRootAliases();
+
         $queryBuilder
             ->leftJoin(
                 WorkflowItem::class,
                 $itemAlias,
                 Join::WITH,
-                self::getItemCondition($queryBuilder->getRootAlias(), $entityClass, $entityIdentifier, $itemAlias)
+                self::getItemCondition($rootAlias, $entityClass, $entityIdentifier, $itemAlias)
             )
             ->leftJoin(sprintf('%s.currentStep', $itemAlias), $stepAlias);
 
@@ -78,7 +80,7 @@ class WorkflowQueryHelper
     protected static function getItemCondition($entityAlias, $entityClass, $entityIdentifier, $itemAlias)
     {
         return sprintf(
-            '%s.%s = %s.entityId AND %s.entityClass = \'%s\'',
+            'CAST(%s.%s as text) = CAST(%s.entityId as text) AND %s.entityClass = \'%s\'',
             $entityAlias,
             $entityIdentifier,
             $itemAlias,
