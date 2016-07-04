@@ -164,7 +164,15 @@ define(function(require) {
             _.each(value.value.split(','), function(val) {
                 var item = _.findWhere(this.data, {id: parseInt(val)});
                 if (item !== void 0) {
-                    label.push(item[renderedPropertyName]);
+                    if (item.treePath) {
+                        var path = [];
+                        _.each(item.treePath, function(item) {
+                            path.push(item[renderedPropertyName]);
+                        });
+                        label.push(path.join(' / '));
+                    } else {
+                        label.push(item[renderedPropertyName]);
+                    }
                 }
             }, this);
 
