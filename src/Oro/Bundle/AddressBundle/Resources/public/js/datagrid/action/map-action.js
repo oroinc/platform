@@ -12,12 +12,10 @@ define(function(require) {
             mapView: GoogleMaps
         },
 
+        dispatched: true,
+
         initialize: function(options) {
             MapAction.__super__.initialize.apply(this, arguments);
-
-            this.launcherOptions = _.extend({
-                runAction: false
-            }, this.launcherOptions);
 
             this.$mapContainerFrame = $('<div class="map-popover__frame"/>');
             this.mapView = new this.options.mapView({
@@ -37,10 +35,15 @@ define(function(require) {
         },
 
         onGridRendered: function() {
+            if (!this.subviews.length) {
+                return;
+            }
+
             var $popoverTrigger = this.subviews[0].$el;
 
             $popoverTrigger.popover({
                 placement: 'left',
+                hideOnScroll: false,
                 container: 'body',
                 animation: false,
                 html: true,
