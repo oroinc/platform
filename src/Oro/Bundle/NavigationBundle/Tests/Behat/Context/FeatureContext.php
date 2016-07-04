@@ -32,7 +32,7 @@ class FeatureContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function menuMustBeOnLeftSide()
     {
-        expect($this->createElement('MainMenu')->hasClass('main-menu-top'))->toBe(false);
+        \PHPUnit_Framework_Assert::assertFalse($this->createElement('MainMenu')->hasClass('main-menu-top'));
     }
 
     /**
@@ -41,6 +41,6 @@ class FeatureContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function menuMustBeOnRightSide()
     {
-        expect($this->createElement('MainMenu')->hasClass('main-menu-top'))->toBe(true);
+        \PHPUnit_Framework_Assert::assertTrue($this->createElement('MainMenu')->hasClass('main-menu-top'));
     }
 }

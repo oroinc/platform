@@ -142,7 +142,7 @@ class Grid extends Element
 
     public function assertNoRecords()
     {
-        expect($this->getRows())->toHaveCount(0);
+        \PHPUnit_Framework_Assert::assertCount(0, $this->getRows());
     }
 
     /**

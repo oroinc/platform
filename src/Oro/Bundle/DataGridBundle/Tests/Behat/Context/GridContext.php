@@ -44,7 +44,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfRecordsShouldBe($number)
     {
-        expect($this->getGridPaginator()->getTotalRecordsCount())->toBe((int) $number);
+        \PHPUnit_Framework_Assert::assertEquals((int) $number, $this->getGridPaginator()->getTotalRecordsCount());
     }
 
     /**
@@ -52,7 +52,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfPagesShouldBe($number)
     {
-        expect($this->getGridPaginator()->getTotalPageCount())->toBe((int) $number);
+        \PHPUnit_Framework_Assert::assertEquals((int) $number, $this->getGridPaginator()->getTotalPageCount());
     }
 
     /**
@@ -94,8 +94,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsDecreasedBy($number)
     {
-        expect($this->gridRecordsNumber - $number)
-            ->toBeEqualTo($this->getGridPaginator()->getTotalRecordsCount());
+        \PHPUnit_Framework_Assert::assertEquals(
+            $this->gridRecordsNumber - $number,
+            $this->getGridPaginator()->getTotalRecordsCount()
+        );
     }
 
     /**
@@ -104,8 +106,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsRemainedTheSame()
     {
-        expect($this->gridRecordsNumber)
-            ->toBeEqualTo($this->getGridPaginator()->getTotalRecordsCount());
+        \PHPUnit_Framework_Assert::assertEquals(
+            $this->gridRecordsNumber,
+            $this->getGridPaginator()->getTotalRecordsCount()
+        );
     }
 
     /**
@@ -130,8 +134,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfPageShouldBe($number)
     {
-        expect($this->getGridPaginator()->find('css', 'input[type="number"]')->getAttribute('value'))
-            ->toBe($number);
+        \PHPUnit_Framework_Assert::assertEquals(
+            (int) $number,
+            (int) $this->getGridPaginator()->find('css', 'input[type="number"]')->getAttribute('value')
+        );
     }
 
     /**
@@ -162,13 +168,13 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
 
         switch ($comparison) {
             case 'lower':
-                expect($value1 < $value2)->toBe(true);
+                \PHPUnit_Framework_Assert::assertGreaterThan($value1, $value2);
                 break;
             case 'greater':
-                expect($value1 > $value2)->toBe(true);
+                \PHPUnit_Framework_Assert::assertLessThan($value1, $value2);
                 break;
             case 'equal':
-                expect($value1 == $value2)->toBe(true);
+                \PHPUnit_Framework_Assert::assertEquals($value1, $value2);
                 break;
         }
     }
@@ -179,7 +185,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function assertRowContent($content, $rowNumber)
     {
         $row = $this->getGrid()->getRowByNumber($this->getNumberFromString($rowNumber));
-        expect($row->getText())->toMatch(sprintf('/%s/i', $content));
+        \PHPUnit_Framework_Assert::assertRegExp(sprintf('/%s/i', $content), $row->getText());
     }
 
     /**
@@ -282,7 +288,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
 
 
         $regex = '/\d+ entities were deleted/';
-        expect($flashMessage->getText())->toMatch($regex);
+        \PHPUnit_Framework_Assert::assertRegExp($regex, $flashMessage->getText());
     }
 
     /**

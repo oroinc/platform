@@ -199,7 +199,7 @@ class OroMainContext extends MinkContext implements
             str_replace('Updated At: ', '', $records[1]->getText())
         );
 
-        expect($updatedDate > $createdDate)->toBe(true);
+        \PHPUnit_Framework_Assert::assertGreaterThan($updatedDate, $createdDate);
     }
 
     /**
@@ -207,8 +207,10 @@ class OroMainContext extends MinkContext implements
      */
     public function userShouldBeAnOwner($owner)
     {
-        expect($this->getSession()->getPage()->find('css', '.user-info-state li a')->getText())
-            ->toBe($owner);
+        \PHPUnit_Framework_Assert::assertEquals(
+            $owner,
+            $this->getSession()->getPage()->find('css', '.user-info-state li a')->getText()
+        );
     }
 
     /**
@@ -224,7 +226,7 @@ class OroMainContext extends MinkContext implements
         foreach ($labels as $label) {
             if (preg_match(sprintf('/%s/i', $fieldName), $label->getText())) {
                 $value = $label->getParent()->find('css', 'div.control-label')->getText();
-                expect($value)->toMatch(sprintf('/%s/i', $fieldValue));
+                \PHPUnit_Framework_Assert::assertRegExp(sprintf('/%s/i', $fieldValue), $value);
 
                 return;
             }
