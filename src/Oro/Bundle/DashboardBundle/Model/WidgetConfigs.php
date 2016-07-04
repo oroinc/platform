@@ -227,7 +227,10 @@ class WidgetConfigs
             return new WidgetOptionBag($this->widgetOptionsById[$widgetId]);
         }
 
-        $widget       = $this->findWidget($widgetId);
+        $widget = $this->findWidget($widgetId);
+        if (!$widget) {
+            return new WidgetOptionBag();
+        }
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
         $options      = $widget->getOptions();
 
