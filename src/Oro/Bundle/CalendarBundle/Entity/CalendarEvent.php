@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\CalendarBundle\Exception\NotUserCalendarEvent;
@@ -1032,5 +1033,17 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function getRecurrence()
     {
         return $this->recurrence;
+    }
+
+    /**
+     * @ORM\PreRemove
+     *
+     * @param LifecycleEventArgs $args
+     */
+    public function preRemove(LifecycleEventArgs $args)
+    {
+        if ($this->relatedAttendee) {
+            $args->getEntityManager()->remove($this->relatedAttendee);
+        }
     }
 }
