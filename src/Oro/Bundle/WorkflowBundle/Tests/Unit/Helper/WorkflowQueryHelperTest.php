@@ -51,8 +51,8 @@ class WorkflowQueryHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->entityManager);
 
         $this->queryBuilder->expects($this->at(2))
-            ->method('getRootAlias')
-            ->willReturn('rootAlias');
+            ->method('getRootAliases')
+            ->willReturn(['rootAlias']);
 
         $this->queryBuilder->expects($this->at(3))
             ->method('leftJoin')
@@ -60,7 +60,7 @@ class WorkflowQueryHelperTest extends \PHPUnit_Framework_TestCase
                 WorkflowItem::class,
                 'itemAlias',
                 Join::WITH,
-                sprintf('rootAlias.ident1 = itemAlias.entityId AND itemAlias.entityClass = \'entityClass1\'')
+                sprintf('CAST(rootAlias.ident1 as text) = CAST(itemAlias.entityId as text) AND itemAlias.entityClass = \'entityClass1\'')
             )
             ->willReturn($this->queryBuilder);
 
@@ -90,8 +90,8 @@ class WorkflowQueryHelperTest extends \PHPUnit_Framework_TestCase
                             'join' => WorkflowItem::class,
                             'alias' => 'itemAlias',
                             'conditionType' => Join::WITH,
-                            'condition' => 'entityAlias.entityIdent = itemAlias.entityId AND' .
-                                ' itemAlias.entityClass = \'entityClass\'',
+                            'condition' => 'CAST(entityAlias.entityIdent as text) = CAST(itemAlias.entityId as text)' .
+                                ' AND itemAlias.entityClass = \'entityClass\'',
                         ],
                         [
                             'join' => 'itemAlias.currentStep',
