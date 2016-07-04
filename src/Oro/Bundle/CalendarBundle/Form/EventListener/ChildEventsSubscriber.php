@@ -103,6 +103,16 @@ class ChildEventsSubscriber implements EventSubscriberInterface
                 ->setStart($parentEvent->getStart())
                 ->setEnd($parentEvent->getEnd())
                 ->setAllDay($parentEvent->getAllDay());
+
+            if ($parentEvent->getRecurringEvent() && $calendarEvent->getCalendar()) {
+                $calendarEvent
+                    ->setRecurringEvent(
+                        $parentEvent
+                            ->getRecurringEvent()
+                            ->getChildEventByCalendar($calendarEvent->getCalendar())
+                    )
+                    ->setOriginalStart($parentEvent->getOriginalStart());
+            }
         }
 
         foreach ($parentEvent->getChildAttendees() as $attendee) {
