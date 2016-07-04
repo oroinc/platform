@@ -17,11 +17,13 @@ trait RemoveWorkflowFieldsTrait
         ];
 
         foreach ($table->getForeignKeys() as $foreignKey) {
-            if (in_array($foreignKey->getForeignTableName(), $workflowTables, true)) {
-                $table->removeForeignKey($foreignKey->getName());
-                foreach ($foreignKey->getLocalColumns() as $column) {
-                    $table->dropColumn($column);
-                }
+            if (!in_array($foreignKey->getForeignTableName(), $workflowTables, true)) {
+                continue;
+            }
+
+            $table->removeForeignKey($foreignKey->getName());
+            foreach ($foreignKey->getLocalColumns() as $column) {
+                $table->dropColumn($column);
             }
         }
     }
