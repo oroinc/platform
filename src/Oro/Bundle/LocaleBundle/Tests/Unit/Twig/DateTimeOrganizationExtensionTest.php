@@ -26,8 +26,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-
-
+        
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
