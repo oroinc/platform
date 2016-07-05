@@ -8,27 +8,30 @@ UPGRADE FROM 1.9 to 1.10
 - Oro\Bundle\TestFrameworkBundle\Test\Client::startTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
 - Oro\Bundle\TestFrameworkBundle\Test\Client::rollbackTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
 
-####EntityBundle:
+####EntityBundle
 - The implementation of `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` was changed. Now the loaded entity aliases is saved into a cache that gives significant performance gain. Also, from now, you can implement `Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface` to create aliases for any entities not only for ORM entities.
 
-####EntityConfigBundle:
+####EntityConfigBundle
 - Entity config class metadata now allows any `route*` options, that can be used for CRUD routes configuration - as well as already existing `routeName`, `routeView` and `routeCreate` options.
+- Added `Oro\Bundle\EntityConfigBundle\Migration\RemoveManyToOneRelationQuery` as an automated way to remove ManyToOne relation
 
-####DashboardBundle:
+####DashboardBundle
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
 - Added new class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter`.
+- `oro_type_widget_user_multiselect` form type was renamed to `oro_type_widget_user_select` and moved to UserBundle.
 
-####DataGridBundle:
+####DataGridBundle
 - Events `Oro\Bundle\DataGridBundle\Event\OrmResultBefore` second constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
 - Event `Oro\Bundle\DataGridBundle\Event\OrmResultAfter` third constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
 
-####EntityBundle:
+####EntityBundle
 - The constructor of the `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` class was changed. Before: `__construct(ManagerRegistry $doctrine, $debug)`. After: `__construct(DoctrineHelper $doctrineHelper, ManagerBagInterface $managerBag, $debug)`.
 - The constructor of the `Oro\Bundle\EntityBundle\Provider\AllEntityHierarchyProvider` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, EntityManagerBag $entityManagerBag)`. After: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, ManagerBagInterface $managerBag)`.
 - Method `getAllShortMetadata` was added to `Oro\Bundle\EntityBundle\ORM\DoctrineHelper`. Using of this method instead of the `getAllMetadata` method can give significant performance gain.
 
 ####ImportExportBundle
 - ACL resource (capability) `oro_importexport` was removed. Please, use `oro_importexport_import` or `oro_importexport_export` instead.
+- Added parameter `NewEntitiesHelper $newEntitiesHelper` to constructor of `Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy`
 
 ####SecurityBundle
 - **IMPORTANT**: The behaviour of the [Access Decision Manager](http://symfony.com/doc/current/components/security/authorization.html#access-decision-manager) was changed. Now the `allowIfAllAbstainDecisions` flag is set to `true` by default. It means that an access to a resource is denied as soon as there is one voter denying access. The goal of this change is to grant access when all voters abstain.
@@ -116,12 +119,54 @@ UPGRADE FROM 1.9 to 1.10
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::mergeConfig` deprecated since 1.9. Will be removed after 1.11.
 - `Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener` is no longer requires `Oro\Bundle\SearchBundle\Engine\FulltextIndexManager` as an first argument
 
-####FormBundle:
+####FormBundle
 - 'Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension' was renamed to 'Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension'
 - 'oro_form.extension.random_id' service was renamed to 'oro_form.extension.additional_attr'
 - Form field identifier - 'data-name' attribute generation added to 'AdditionalAttrExtension'
+- Method `Oro\Bundle\FormBundle\Model\UpdateHandler::handleUpdate` marked as deprecated. Use `Oro\Bundle\FormBundle\Model\UpdateHandler::update` instead.
+- In previous version client of methods `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` and `Oro\Bundle\FormBundle\Model\UpdateHandler::handleUpdate`
+was responsible to pass redirect data in arguments, for example:
+```
+    return $this->get('oro_ui.router')->redirectAfterSave(
+        ['route' => 'oro_calendar_event_update', 'parameters' => ['id' => $entity->getId()]],
+        ['route' => 'oro_calendar_event_view', 'parameters' => ['id' => $entity->getId()]]
+    );
+```
+```
+    return $this->get('oro_form.model.update_handler')->handleUpdate(
+        $trackingWebsite,
+        $this->createForm($this->getFormType(), $trackingWebsite),
+        function (TrackingWebsite $entity) {
+            return [
+                'route' => 'oro_tracking_website_update',
+                'parameters' => ['id' => $entity->getId()]
+            ];
+        },
+        function (TrackingWebsite $entity) {
+            return [
+                'route' => 'oro_tracking_website_view',
+                'parameters' => ['id' => $entity->getId()]
+            ];
+        },
+        $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
+    );
+```
+These routes were used to make redirect when user clicked on one of 2 buttons on UI rendered using 2 Twig macroses: saveAndCloseButton and saveAndStayButton.
+Now controller's action is not responsible to configure redirect data at all.
+```
+    return $this->get('oro_ui.router')->redirect($entity);
+```
+```
+    return $this->get('oro_form.model.update_handler')->update(
+        $trackingWebsite,
+        $this->createForm($this->getFormType(), $trackingWebsite),
+        $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
+    );
+```
+Redirect data is now configured directly in the button rendered in Twig template using macroses: saveAndCloseButton, saveAndStayButton, saveAndNewButton and saveActionButton.
+See other related information in section `OroUIBundle` of this document.
 
-####TranslationBundle:
+####TranslationBundle
 - Added translation strategies to dynamically handle translation fallbacks
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
 
@@ -135,7 +180,7 @@ UPGRADE FROM 1.9 to 1.10
 - The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
 - The class Oro\Component\ConfigExpression\Condition\True was renamed to TrueCondition
 
-####UiBundle
+####UIBundle
 - Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) plugin by Sachin N.
 
 Gallery view for a group of `<a>` elements can be triggered by adding 'data-gallery' attribute with unique gallery id.
@@ -145,12 +190,54 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 <a href="sample2.jpg" data-gallery="unique-id"></a>
 ```
 
+- Method `Oro\Bundle\UIBundle\Route\Router::redirectAfterSave` marked as deprecated. Use method `Oro\Bundle\UIBundle\Route\Router::redirect` instead.
+- Use of Twig macroses `saveAndCloseButton` and `saveAndStayButton` was changed. In old version client was responsible to pass just a label of button.
+In this new version client responsible to specify route and parameters which will be used to make redirect if form will successfully saved.
+Before:
+```
+    {% set html = UI.saveAndCloseButton() %}
+    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+```
+Now:
+```
+    {% if resource_granted('oro_user_create') %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_user_create'
+        }) %}
+    {% endif %}
+    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_user_update',
+            'params': {'id': '$id'}
+        }) %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+```
+- New macros `saveAndNewButton` was added and used on most of pages with forms. By clicking on this button user redirects to page with form where a new record could be created.
+
+
 ####EmailBundle
 - Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
 - Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
+- The constructor of the `Oro\Bundle\EmailBundle\Mailer\Processor` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailOwnerProvider $emailOwnerProvider, EmailActivityManager $emailActivityManager, ServiceLink $serviceLink, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`. After: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailActivityManager $emailActivityManager, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`.
+- `Oro\Bundle\EmailBundle\Mailer\Processor::getEmailOrigin` marked as deprecated. Use method `Oro\Bundle\EmailBundle\Tools\EmailOriginHelper::getEmailOrigin` instead.
+- Additional you should use origin as second parameter for `Oro\Bundle\EmailBundle\Mailer\Processor::process` if you want use specific transport different from system.
 
 ####PlatformBundle
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
+
+####AttachmentBundle:
+- Fixed `Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser` to avoid PHP notices on file upload in some cases
+- Added translation strategies to dynamically handle translation fallbacks
+
+####CalendarBundle
+- The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
+- Added method `formatCalendarDateRangeUser` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatUserExtension.php`. Method `calendar_date_range_user` get additional param 'user' and return sate range according to user organization localization settings.
 
 ####LayoutBundle:
 - Added possibility to create layout block types using only DI configuration, for details please check out documentation at
@@ -158,6 +245,10 @@ Gallery view for a group of `<a>` elements can be triggered by adding 'data-gall
 - BlockType classes replaced with DI configuration for listed block types: `root`, `head`, `body`, `fieldset`, `list`, `listitem`, `text`, `button` and `button_group`.
 Corresponding block type classes was removed.
 - Renamed `setDefaultOptions` to `configureOptions` method at `Oro\Component\Layout\BlockTypeInterface\BlockTypeInterface` and `Oro\Component\Layout\BlockTypeInterface\BlockTypeExtensionInterface`.
+- Defined image types configuration section for theme config
+- Added `oro_layout.provider.image_type` service to get image types available across all themes
+- The class Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType was renamed to FormFieldsType
+- New `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` block type was added. This block type creates three child blocks in buildBlock method: `FormStartType`, `FormType`, `FormEndType`.
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
@@ -168,6 +259,14 @@ Classes `Oro/Bundle/EmbeddedFormBundle/Layout/Block/Type/EmbedFormSuccessType` a
 - Layout block types was replaced with DI only configuration for `abstract_configurable` block,
 class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was removed.
 
+#### LocaleBundle:
+- Added entity `Oro\Bundle\LocaleBundle\Entity\Localization` ([`see documentation`](./src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localization)).
+- Added entity `Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue` ([`see documentation`](./src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localizedfallbackvalue)) for translating strings in different localizations.
+- Added trait `Oro\Bundle\LocaleBundle\Entity\FallbackTrait` for retrieve translated value for the needed localization.
+- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter`  for displaying full title of the language by code.
+- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter`  for displaying full title of the formatting by code.
+- Added `oro_format_datetime_user` twig extension - allows get formatted date and calendar date range by user organization localization settings. Deprecated since 1.11. Will be removed after 1.13.
+
 ####Layout Component:
 - `\Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface::prepare()` signature was changed from `prepare(array $source, VisitorCollection $visitorCollection);` to `prepare(Oro\Component\Layout\Loader\Generator\GeneratorData $data, VisitorCollection $visitorCollection);`
 - `@addTree` layout update action is `\Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension` now
@@ -175,3 +274,7 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 
 ####NotificationBundle:
 - The constructor of the `Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool` class was changed. Before: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass)`. After: `__construct(EntityManager $em, EntityPool $entityPool, $entityClass, EventDispatcherInterface $eventDispatcher)`.
+
+####Oro\Component\Config
+- `Oro\Component\Config\CumulativeResourceInfo::__construct` signature changed from
+`public function __construct($bundleClass, $name, $path, $data)` to `public function __construct($bundleClass, $name, $path, array $data = [])`

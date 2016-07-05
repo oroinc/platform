@@ -61,7 +61,7 @@ class NormalizeRequestData implements ProcessorInterface
                 $targetEntityClass = $associationMetadata->getTargetClassName();
                 if ($associationMetadata->isCollection()) {
                     foreach ($data[$fieldName] as $key => &$value) {
-                        $value = $this->normalizeRelationId($fieldName . '/' . $key, $targetEntityClass, $value);
+                        $value = $this->normalizeRelationId($fieldName . '.' . $key, $targetEntityClass, $value);
                     }
                 } elseif (null === $data[$fieldName]) {
                     $data[$fieldName] = [];

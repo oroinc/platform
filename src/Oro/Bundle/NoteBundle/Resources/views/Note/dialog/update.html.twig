@@ -22,14 +22,22 @@
         <div class="form-container">
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="note-form">
                 <fieldset class="form-horizontal control-group">
-                    {{ form_widget(form.message) }}
-                    {{ form_errors(form.message) }}
+                    <label>
+                        {{ form_widget(form.message) }}
+                        {{ form_errors(form.message) }}
+                    </label>
+                    <div class="pull-left">
+                        {{ form_widget(form.attachment) }}
+                    </div>
                 </fieldset>
                 <fieldset class="form-horizontal">
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                        <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+
+                        <button class="btn btn-primary" type="submit">
+                                {{ submitLabel }}
+                        </button>
                     </div>
                 </fieldset>
             </form>

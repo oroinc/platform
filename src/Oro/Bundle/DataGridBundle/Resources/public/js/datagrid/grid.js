@@ -173,9 +173,6 @@ define(function(require) {
             this._initProperties(opts);
 
             // use columns collection as event bus since there is no alternatives
-            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
-                this.trigger('afterMakeCell', row, cell);
-            });
             if (this.themeOptionsConfigurator) {
                 this.listenTo(this.columns, 'configureInitializeOptions', this.themeOptionsConfigurator);
             }
@@ -217,7 +214,6 @@ define(function(require) {
          * @private
          */
         _initProperties: function(opts) {
-            this.subviews = [];
             this.collection = opts.collection;
 
             if (opts.columns.length === 0) {
@@ -271,9 +267,11 @@ define(function(require) {
 
             // must construct body first so it listens to backgrid:sort first
             this.body = new this.body(bodyOptions);
+            this.subview('body', this.body);
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
+                this.subview('header', this.header);
                 if ('selectState' in this.header.row.subviews[0]) {
                     this.selectState = this.header.row.subviews[0].selectState;
                 }
@@ -284,6 +282,7 @@ define(function(require) {
 
             if (this.footer) {
                 this.footer = new this.footer(footerOptions);
+                this.subview('footer', this.footer);
             }
 
             this.listenTo(this.columns, 'reset', function() {
@@ -938,6 +937,7 @@ define(function(require) {
             this.loadingMask = new LoadingMaskView({
                 container: this.$(this.selectors.loadingMaskContainer)
             });
+            this.subview('loadingMask', this.loadingMask);
         },
 
         /**

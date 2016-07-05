@@ -49,9 +49,99 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
         $this->processor->process($this->context);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessForNotManageableEntity()
     {
-        $config = [];
+        $config = [
+            'fields' => [
+                'field1'       => null,
+                'association1' => [
+                    'target_class' => 'Test\Association1Target'
+                ],
+                'association2' => [
+                    'target_class'  => 'Test\Association2Target',
+                    'property_path' => 'realAssociation2'
+                ],
+                'association3' => [
+                    'target_class' => 'Test\Association3Target'
+                ],
+                'association4' => [
+                    'target_class' => 'Test\Association4Target'
+                ],
+                'association5' => [
+                    'exclusion_policy' => 'all',
+                    'target_class'     => 'Test\Association5Target'
+                ],
+            ]
+        ];
+
+        $this->context->setExtras(
+            [
+                $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
+                new TestConfigSection('test_section')
+            ]
+        );
+
+        $this->relationConfigProvider->expects($this->exactly(4))
+            ->method('getRelationConfig')
+            ->willReturnMap(
+                [
+                    [
+                        'Test\Association1Target',
+                        $this->context->getVersion(),
+                        $this->context->getRequestType(),
+                        $this->context->getPropagableExtras(),
+                        $this->createRelationConfigObject(
+                            [
+                                'exclusion_policy' => 'all',
+                                'collapse'         => true,
+                                'fields'           => [
+                                    'id' => null
+                                ]
+                            ]
+                        )
+                    ],
+                    [
+                        'Test\Association2Target',
+                        $this->context->getVersion(),
+                        $this->context->getRequestType(),
+                        $this->context->getPropagableExtras(),
+                        $this->createRelationConfigObject(
+                            [
+                                'exclusion_policy' => 'all',
+                                'collapse'         => true,
+                                'fields'           => [
+                                    'id' => null
+                                ]
+                            ]
+                        )
+                    ],
+                    [
+                        'Test\Association3Target',
+                        $this->context->getVersion(),
+                        $this->context->getRequestType(),
+                        $this->context->getPropagableExtras(),
+                        $this->createRelationConfigObject(
+                            [
+                                'exclusion_policy' => 'all',
+                                'fields'           => [
+                                    'id' => null
+                                ]
+                            ],
+                            ['test']
+                        )
+                    ],
+                    [
+                        'Test\Association4Target',
+                        $this->context->getVersion(),
+                        $this->context->getRequestType(),
+                        $this->context->getPropagableExtras(),
+                        $this->createRelationConfigObject()
+                    ],
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -62,6 +152,47 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1'       => null,
+                    'association1' => [
+                        'target_class'     => 'Test\Association1Target',
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ],
+                    'association2' => [
+                        'target_class'     => 'Test\Association2Target',
+                        'property_path'    => 'realAssociation2',
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ],
+                    'association3' => [
+                        'target_class'     => 'Test\Association3Target',
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id' => null
+                        ],
+                        'test_section'     => ['test']
+                    ],
+                    'association4' => [
+                        'target_class' => 'Test\Association4Target'
+                    ],
+                    'association5' => [
+                        'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association5Target'
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
     }
 
     /**
@@ -186,6 +317,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                 'fields' => [
                     'association2' => [
                         'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association2Target',
                         'fields'           => [
                             'id' => null
                         ],
@@ -193,6 +325,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                     ],
                     'association3' => [
                         'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association3Target',
                         'collapse'         => true,
                         'fields'           => [
                             'id' => null
@@ -204,6 +337,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                     'association5' => [
                         'property_path'    => 'realAssociation5',
                         'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association5Target',
                         'collapse'         => true,
                         'fields'           => [
                             'id' => null

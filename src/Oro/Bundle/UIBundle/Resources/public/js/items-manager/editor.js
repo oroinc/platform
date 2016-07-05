@@ -5,7 +5,8 @@ define([
     'use strict';
 
     function setValue($elem, value) {
-        $elem.inputWidget('val', value).trigger('change');
+        $elem.inputWidget('val', value);
+        $elem.trigger('change');
     }
 
     $.widget('oroui.itemsManagerEditor', {

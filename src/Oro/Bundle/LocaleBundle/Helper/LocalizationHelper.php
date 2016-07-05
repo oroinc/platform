@@ -49,7 +49,7 @@ class LocalizationHelper
                 return $localization->getLanguageCode() === 'en';
             }
         );
-        
+
         return $withEnglish ? reset($withEnglish) : reset($items);
     }
 
@@ -58,7 +58,7 @@ class LocalizationHelper
      */
     public function getAll()
     {
-        return $this->getRepository()->findAll();
+        return $this->getRepository()->getBatchIterator();
     }
 
     /**

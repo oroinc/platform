@@ -89,9 +89,20 @@
     {% endif %}
 
     {% if form.type.vars.choices is not empty %}
-        {% set html = UI.saveAndCloseButton() %}
+        {% set html = UI.saveAndCloseButton({
+            'route': 'oro_integration_index',
+            'params': {'_enableContentProviders': 'mainMenu'}
+        }) %}
+        {% if resource_granted('oro_integration_create') %}
+            {% set html = html ~ UI.saveAndNewButton({
+                'route': 'oro_integration_create'
+            }) %}
+        {% endif %}
         {% if form.vars.value.id or resource_granted('oro_integration_update') %}
-            {% set html = html ~ UI.saveAndStayButton() %}
+            {% set html = html ~ UI.saveAndStayButton({
+                'route': 'oro_integration_update',
+                'params': {'id': '$id', '_enableContentProviders': 'mainMenu'}
+            }) %}
         {% endif %}
         {{ UI.dropdownSaveButton({'html': html}) }}
     {% endif %}

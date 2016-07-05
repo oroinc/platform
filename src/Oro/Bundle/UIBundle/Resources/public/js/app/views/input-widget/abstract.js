@@ -139,7 +139,8 @@ define(function(require) {
         },
 
         applyWidgetFunction: function(command, args) {
-            Array.prototype.unshift.call(args, command);
+            args = Array.prototype.slice.apply(args);
+            args.unshift(command);
             return this.widgetFunction.apply(this, args);
         },
 

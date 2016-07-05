@@ -1,9 +1,10 @@
 define([
     'underscore',
+    'backbone',
     'backgrid',
     './row',
     '../pageable-collection'
-], function(_, Backgrid, Row, PageableCollection) {
+], function(_, Backbone, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -89,7 +90,7 @@ define([
         },
 
         createRows: function() {
-            this.rows = this.collection.map(function(model) {
+            this.rows = this.collection.map(function(model, i) {
                 var rowOptions = {
                     collection: this.filteredColumns,
                     columns: this.columns,
@@ -97,6 +98,7 @@ define([
                 };
                 this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
                 var row = new this.row(rowOptions);
+                this.subview('row' + i, row);
                 this.attachListenerToSingleRow(row);
                 return row;
             }, this);
@@ -133,11 +135,37 @@ define([
          * @inheritDoc
          */
         insertRow: function(model, collection, options) {
-            Body.__super__.insertRow.apply(this, arguments);
+            if (this.rows[0] instanceof Backgrid.EmptyRow) {
+                this.rows.pop().remove();
+            }
+
+            // insertRow() is called directly
+            if (!(collection instanceof Backbone.Collection) && !options) {
+                this.collection.add(model, (options = collection));
+                return;
+            }
+
+            var row = new this.row({
+                collection: this.filteredColumns,
+                columns: this.columns,
+                model: model
+            });
+
             var index = collection.indexOf(model);
-            if (index < this.rows.length) {
+            this.rows.splice(index, 0, row);
+
+            var $el = this.$el;
+            var $children = $el.children();
+            var $rowEl = row.render().$el;
+
+            if (index >= $children.length) {
+                $el.append($rowEl);
+            } else {
+                $children.eq(index).before($rowEl);
                 this.attachListenerToSingleRow(this.rows[index]);
             }
+
+            return this;
         },
 
         /**
@@ -156,10 +184,12 @@ define([
          * @inheritDoc
          */
         render: function() {
+            this._deferredRender();
             Body.__super__.render.apply(this, arguments);
             if (this.rowClassName) {
                 this.$('> *').addClass(this.rowClassName);
             }
+            this._resolveDeferredRender();
             return this;
         },
 

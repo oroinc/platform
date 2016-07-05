@@ -9,6 +9,10 @@ services:
         calls:
             - [setParent, ['container']]
 
+    oro_layout.block_type.extension.abstract_configurable:
+        abstract: true
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigurableTypeExtension
+
     oro_layout.block_type.base:
         class: Oro\Component\Layout\Block\Type\BaseType
         tags:
@@ -68,10 +72,15 @@ services:
 
     oro_layout.block_type.form:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType
+        tags:
+             - { name: layout.block_type, alias: form }
+
+    oro_layout.block_type.form_fields:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType
         arguments:
             - '@oro_layout.form_layout_builder'
         tags:
-             - { name: layout.block_type, alias: form }
+             - { name: layout.block_type, alias: form_fields }
 
     oro_layout.block_type.form_start:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType
@@ -87,6 +96,14 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType
         tags:
              - { name: layout.block_type, alias: form_field }
+
+    oro_layout.block_type.form_errors:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{form: {required: true}}]]
+            - [setName, ['form_errors']]
+        tags:
+             - { name: layout.block_type, alias: form_errors }
 
     oro_layout.block_type.fieldset:
         parent: oro_layout.block_type.abstract_configurable_container
@@ -157,3 +174,39 @@ services:
             - [setName, ['list_item']]
         tags:
              - { name: layout.block_type, alias: list_item }
+
+    oro_layout.block_type_extension.class_attribute:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension
+        arguments:
+            - '@oro_layout.expression.encoder_registry'
+        tags:
+            - { name: layout.block_type_extension, alias: block, priority: 260 }
+
+    oro_layout.block_type_extension.option_value_bag:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension
+        tags:
+            - { name: layout.block_type_extension, alias: block, priority: 270 }
+
+    oro_layout.block_type.extension.visible:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{visible: {default: true}}]]
+            - [setExtendedType, ['block']]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type.extension.hidden:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{hidden: {default: false}}]]
+            - [setExtendedType, ['block']]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type.extension.attr_renderer:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{attr_renderer: ~}]]
+            - [setExtendedType, ['block']]
+        tags:
+            - { name: layout.block_type_extension, alias: block }
