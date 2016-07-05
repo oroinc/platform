@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 
@@ -21,11 +22,18 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected $requestStack;
 
+    /**
+     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $configManager;
+
     public function setUp()
     {
         $this->requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
 
-        $this->helper = new LayoutHelper($this->requestStack);
+        $this->configManager = $this->getMock('Oro\Bundle\ConfigBundle\Config\ConfigManager', [], [], '', false);
+
+        $this->helper = new LayoutHelper($this->requestStack, $this->configManager);
     }
 
     /**
@@ -94,14 +102,24 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testIsProfilerEnabledTrue()
     {
-        $helper = new LayoutHelper($this->requestStack, 'dev');
-        $this->assertTrue($helper->isProfilerEnabled());
+        $this->configManager
+            ->expects($this->once())
+            ->method('get')
+            ->with('oro_layout.debug_block_info')
+            ->will($this->returnValue(true));
+
+        $this->assertTrue($this->helper->isProfilerEnabled());
     }
 
     public function testIsProfilerEnabledFalse()
     {
-        $helper = new LayoutHelper($this->requestStack, 'prod');
-        $this->assertFalse($helper->isProfilerEnabled());
+        $this->configManager
+            ->expects($this->once())
+            ->method('get')
+            ->with('oro_layout.debug_block_info')
+            ->will($this->returnValue(false));
+
+        $this->assertFalse($this->helper->isProfilerEnabled());
     }
 
     /**
