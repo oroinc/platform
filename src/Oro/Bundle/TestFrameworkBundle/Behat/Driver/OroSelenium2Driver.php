@@ -116,7 +116,7 @@ JS;
             if ($element->displayed()) {
                 $element->postValue(['value' => [$value]]);
             }
-        };
+        }
 
         $this->wait(3000, "0 == $('ul.select2-results li.select2-searching').length");
         $results = $this->findElementXpaths('//ul[contains(@class, "select2-results")]/li');
