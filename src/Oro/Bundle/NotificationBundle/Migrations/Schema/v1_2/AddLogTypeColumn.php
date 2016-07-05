@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ReminderBundle\Migrations\Schema\v1_2;
+namespace Oro\Bundle\NotificationBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class AddLogEntityColumn implements Migration
+class AddLogTypeColumn implements Migration
 {
     /**
      * {@inheritdoc}
@@ -15,6 +15,6 @@ class AddLogEntityColumn implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_notification_email_spool');
-        $table->addColumn('log_type', 'string', ['length' => 255]);
+        $table->addColumn('log_type', 'string', ['notnull' => false, 'length' => 255]);
     }
 }

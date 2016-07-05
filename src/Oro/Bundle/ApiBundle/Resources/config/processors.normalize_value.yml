@@ -10,6 +10,20 @@ services:
     # common processors
     #
 
+    oro_api.normalize_value.entity_type:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityType
+        arguments:
+            - '@oro_entity.entity_alias_resolver'
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: entityType, priority: -5 }
+
+    oro_api.normalize_value.entity_class:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass
+        arguments:
+            - '@oro_entity.entity_alias_resolver'
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: entityClass, priority: -5 }
+
     oro_api.normalize_value.string:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeString
         tags:
@@ -44,34 +58,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: float, priority: -10 }
-
-    oro_api.normalize_value.entity_class:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass
-        arguments:
-            - '@oro_entity.entity_alias_resolver'
-        tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: entityClass, priority: -10 }
-
-    oro_api.normalize_value.entity_type:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityType
-        arguments:
-            - '@oro_entity.entity_alias_resolver'
-        tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: entityType, priority: -10 }
-
-    oro_api.normalize_value.entity_alias:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityAlias
-        arguments:
-            - '@oro_entity.entity_alias_resolver'
-        tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: entityAlias, priority: -10 }
-
-    oro_api.normalize_value.entity_plural_alias:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityPluralAlias
-        arguments:
-            - '@oro_entity.entity_alias_resolver'
-        tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: entityPluralAlias, priority: -10 }
 
     #
     # REST API processors

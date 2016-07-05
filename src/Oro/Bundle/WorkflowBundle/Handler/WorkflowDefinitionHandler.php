@@ -65,7 +65,6 @@ class WorkflowDefinitionHandler
             if ($existingDefinition) {
                 $workflowDefinition = $existingDefinition->import($workflowDefinition);
             } else {
-                $em->persist($workflowDefinition);
                 $created = true;
             }
         }
@@ -75,6 +74,8 @@ class WorkflowDefinitionHandler
             $created ? WorkflowEvents::WORKFLOW_BEFORE_CREATE : WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
             new WorkflowChangesEvent($workflowDefinition)
         );
+
+        $em->persist($workflowDefinition);
 
         $em->beginTransaction();
         try {

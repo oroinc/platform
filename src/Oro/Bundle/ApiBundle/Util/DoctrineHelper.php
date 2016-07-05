@@ -11,7 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 class DoctrineHelper extends BaseHelper
 {
     /** @var array */
-    private $manageableEntityClasses = [];
+    protected $manageableEntityClasses = [];
 
     /**
      * {@inheritdoc}
@@ -22,7 +22,7 @@ class DoctrineHelper extends BaseHelper
             return $this->manageableEntityClasses[$entityClass];
         }
 
-        $isManageable = null !== $this->getEntityManagerForClass($entityClass, false);
+        $isManageable = null !== $this->registry->getManagerForClass($entityClass);
         $this->manageableEntityClasses[$entityClass] = $isManageable;
 
         return $isManageable;
@@ -38,14 +38,19 @@ class DoctrineHelper extends BaseHelper
      */
     public function findEntityMetadataByPath($entityClass, array $associationPath)
     {
-        $metadata = $this->getEntityMetadataForClass($entityClass, false);
+        $manager = $this->registry->getManagerForClass($entityClass);
+        if (null === $manager) {
+            return null;
+        }
+
+        $metadata = $manager->getClassMetadata($entityClass);
         if (null !== $metadata) {
             foreach ($associationPath as $associationName) {
                 if (!$metadata->hasAssociation($associationName)) {
                     $metadata = null;
                     break;
                 }
-                $metadata = $this->getEntityMetadataForClass($metadata->getAssociationTargetClass($associationName));
+                $metadata = $manager->getClassMetadata($metadata->getAssociationTargetClass($associationName));
             }
         }
 

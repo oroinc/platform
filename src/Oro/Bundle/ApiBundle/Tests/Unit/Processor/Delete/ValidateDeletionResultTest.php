@@ -17,7 +17,7 @@ class ValidateDeletionResultTest extends DeleteProcessorTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The record was not deleted.
      */
     public function testProcessOnNotDeletedEntity()

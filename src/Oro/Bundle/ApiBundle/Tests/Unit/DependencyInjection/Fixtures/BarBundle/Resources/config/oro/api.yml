@@ -23,7 +23,7 @@ oro_api:
                         field51:
                             fields:
                                 field511:
-                                    disable_partial_load: true
+                                    hints: [HINT_TRANSLATABLE]
             filters:
                 fields:
                     field1: ~
