@@ -9,17 +9,17 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
 /**
- * Adds 'visible' option for all block types.
- * This option is optional and defaults to TRUE.
+ * Adds 'hidden' option for all block types.
+ * This option is optional and defaults to FALSE.
  */
-class VisibleExtension extends AbstractBlockTypeExtension
+class HiddenExtension extends AbstractBlockTypeExtension
 {
     /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefined(['visible']);
+        $resolver->setDefined(['hidden']);
     }
 
     /**
@@ -27,7 +27,7 @@ class VisibleExtension extends AbstractBlockTypeExtension
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $view->vars['visible'] = isset($options['visible']) ? $options['visible'] : true;
+        $view->vars['hidden'] = isset($options['hidden']) ? $options['hidden'] : false;
     }
 
     /**

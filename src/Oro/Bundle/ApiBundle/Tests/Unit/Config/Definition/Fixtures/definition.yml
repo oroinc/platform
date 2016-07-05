@@ -676,6 +676,14 @@ invalid_entity_form_options:
     expected: []
     error: 'Invalid type for path "entity.form_options". Expected array, but got string'
 
+dash_in_field_name:
+    config:
+        fields:
+            test-field: ~
+    expected:
+        fields:
+            test-field: []
+
 field_form:
     config:
         fields:

@@ -46,7 +46,7 @@ class DumpCommand extends AbstractDebugCommand
                 'sub-resources',
                 null,
                 InputOption::VALUE_NONE,
-                'Shows sub resources'
+                'Shows sub-resources'
             );
         parent::configure();
     }
@@ -100,7 +100,7 @@ class DumpCommand extends AbstractDebugCommand
         $result = '';
         $subresources = $entitySubresources->getSubresources();
         if (!empty($subresources)) {
-            $result .= '<comment> Sub resources:</comment>';
+            $result .= '<comment> Sub-resources:</comment>';
             foreach ($subresources as $associationName => $subresource) {
                 $result .= "\n  " . $associationName;
                 $subresourceExcludedActions = $subresource->getExcludedActions();

@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 
 class ConfigLoaderTest extends \PHPUnit_Framework_TestCase
@@ -24,6 +25,7 @@ class ConfigLoaderTest extends \PHPUnit_Framework_TestCase
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
         $configExtensionRegistry->addExtension(new ActionsConfigExtension());
+        $configExtensionRegistry->addExtension(new SubresourcesConfigExtension());
         $configExtensionRegistry->addExtension(new TestConfigExtension());
 
         $configLoaderFactory = new ConfigLoaderFactory($configExtensionRegistry);

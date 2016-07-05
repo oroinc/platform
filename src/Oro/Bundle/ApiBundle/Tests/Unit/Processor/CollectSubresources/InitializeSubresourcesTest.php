@@ -76,7 +76,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra('get_list')]
+                [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
         $this->metadataProvider->expects($this->once())
@@ -131,7 +131,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra('get_list')]
+                [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
         $this->metadataProvider->expects($this->once())
@@ -186,7 +186,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra('get_list')]
+                [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
         $this->metadataProvider->expects($this->once())
@@ -242,7 +242,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra('get_list')]
+                [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
         $this->metadataProvider->expects($this->once())
@@ -297,7 +297,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra('get_list')]
+                [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
         $this->metadataProvider->expects($this->once())
@@ -355,7 +355,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 $resource->getEntityClass(),
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra('get_list')]
+                [new EntityDefinitionConfigExtra()]
             )
             ->willReturn($resourceConfig);
         $this->metadataProvider->expects($this->once())

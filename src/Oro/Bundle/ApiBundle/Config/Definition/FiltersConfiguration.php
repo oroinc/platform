@@ -40,8 +40,9 @@ class FiltersConfiguration extends AbstractConfigurationSection
             ->end()
             ->arrayNode(FiltersConfig::FIELDS)
                 ->useAttributeAsKey('name')
-                    ->prototype('array')
-                        ->children();
+                ->normalizeKeys(false)
+                ->prototype('array')
+                    ->children();
         $this->configureFieldNode($fieldNode);
     }
 

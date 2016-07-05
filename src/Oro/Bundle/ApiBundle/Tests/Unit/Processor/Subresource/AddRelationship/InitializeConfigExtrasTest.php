@@ -40,12 +40,19 @@ class InitializeConfigExtrasTest extends ChangeRelationshipProcessorTestCase
         $this->context->addConfigExtra($existingExtra);
 
         $this->context->setAction('test_action');
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('test_association');
         $this->processor->process($this->context);
 
         $this->assertEquals(
             [
                 new TestConfigExtra('test'),
-                new EntityDefinitionConfigExtra($this->context->getAction()),
+                new EntityDefinitionConfigExtra(
+                    $this->context->getAction(),
+                    $this->context->isCollection(),
+                    $this->context->getParentClassName(),
+                    $this->context->getAssociationName()
+                ),
                 new FilterIdentifierFieldsConfigExtra()
             ],
             $this->context->getConfigExtras()
