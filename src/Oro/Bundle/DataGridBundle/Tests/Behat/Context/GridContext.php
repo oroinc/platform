@@ -324,6 +324,9 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * Check that mass action link is not available in grid mass actions
+     * Example: Then I shouldn't see Delete action
+     *
      * @Then /^(?:|I )shouldn't see (?P<action>(?:[^"]|\\")*) action$/
      */
     public function iShouldNotSeeDeleteAction($action)

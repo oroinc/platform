@@ -96,6 +96,10 @@ JS;
     }
 
     /**
+     * Fill select2entity field, like owner, country, state
+     * If more then 1 result found in search, then foreach results and click on the result that exactly matches
+     * If more then 1 result found and no one is exactly matches, then "Too many results" exception will thrown
+     *
      * @param string $xpath
      * @param string $value
      * @throws ExpectationException
