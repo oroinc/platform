@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
+ * Removes all sorters marked as excluded.
  * Updates the property path attribute for existing sorters.
  * Extracts sorters from the definitions of related entities.
  */
