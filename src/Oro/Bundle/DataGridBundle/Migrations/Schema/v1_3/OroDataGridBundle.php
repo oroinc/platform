@@ -33,13 +33,15 @@ class OroDataGridBundle implements Migration, OrderedMigrationInterface
             $schema->getTable('oro_grid_view'),
             ['grid_view_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
+            'FK_10ECBCA8BF53711B'
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
+            'FK_10ECBCA8A76ED395'
         );
     }
 }

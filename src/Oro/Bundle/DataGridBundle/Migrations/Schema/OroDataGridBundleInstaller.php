@@ -78,13 +78,15 @@ class OroDataGridBundleInstaller implements Installation
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null],
+            'FK_10ECBCA8A76ED395'
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_grid_view'),
             ['grid_view_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
+            'FK_10ECBCA8BF53711B'
         );
     }
 }
