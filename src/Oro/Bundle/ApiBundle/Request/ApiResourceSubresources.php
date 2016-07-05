@@ -29,7 +29,7 @@ class ApiResourceSubresources
     }
 
     /**
-     * Gets a list of all sub resources.
+     * Gets a list of all sub-resources.
      *
      * @return ApiSubresource[] [association name => ApiSubresource, ...]
      */
@@ -39,7 +39,7 @@ class ApiResourceSubresources
     }
 
     /**
-     * Gets a sub resource.
+     * Gets a sub-resource.
      *
      * @param string $associationName
      *
@@ -53,18 +53,25 @@ class ApiResourceSubresources
     }
 
     /**
-     * Adds a sub resource.
+     * Adds a sub-resource.
      *
-     * @param string         $associationName
-     * @param ApiSubresource $resource
+     * @param string              $associationName
+     * @param ApiSubresource|null $subresource
+     *
+     * @return ApiSubresource
      */
-    public function addSubresource($associationName, ApiSubresource $resource)
+    public function addSubresource($associationName, ApiSubresource $subresource = null)
     {
-        $this->subresources[$associationName] = $resource;
+        if (null === $subresource) {
+            $subresource = new ApiSubresource();
+        }
+        $this->subresources[$associationName] = $subresource;
+
+        return $subresource;
     }
 
     /**
-     * Removes a sub resource.
+     * Removes a sub-resource.
      *
      * @param string $associationName
      */

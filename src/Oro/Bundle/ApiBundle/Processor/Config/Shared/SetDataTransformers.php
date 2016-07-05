@@ -9,6 +9,10 @@ use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Registers data transformers for fields which data type requires
+ * an additional transformation, e.g. DateTime, Date, Time, etc.
+ */
 class SetDataTransformers implements ProcessorInterface
 {
     /** @var DataTransformerRegistry */

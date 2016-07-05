@@ -167,6 +167,9 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
             }
 
             $field = $definition->getOrAddField($fieldName);
+            if (!$field->getTargetClass()) {
+                $field->setTargetClass($targetClass);
+            }
             if ($targetEntity->isCollapsed()) {
                 $field->setCollapsed();
                 $targetEntity->setCollapsed(false);

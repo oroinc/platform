@@ -23,4 +23,11 @@ interface ActionProcessorBagInterface
      * @throws \InvalidArgumentException if a processor for the given action was not found
      */
     public function getProcessor($action);
+
+    /**
+     * Gets all actions registered in the bag.
+     *
+     * @return string[]
+     */
+    public function getActions();
 }
