@@ -64,7 +64,7 @@ class ChoiceTreeFilter extends AbstractFilter
 
         if ($this->getOr('className') && $this->state) {
             $data = $this->parseData($this->state);
-            
+
             $event = new ChoiceTreeFilterLoadDataEvent($this->getOr('className'), $data['value']);
             $this->eventDispatcher->dispatch(ChoiceTreeFilterLoadDataEvent::EVENT_NAME, $event);
             $entities = $event->getData();
@@ -72,13 +72,9 @@ class ChoiceTreeFilter extends AbstractFilter
 
         $metadata[FilterUtility::TYPE_KEY] = 'choice-tree';
         $metadata['data'] = $entities;
-        $metadata['autocomplete_alias'] = $this->getOr('autocomplete_alias') ?
-            $this->getOr('autocomplete_alias') : false;
-        $routeName = $this->getOr('autocomplete_url') ?
-            $this->getOr('autocomplete_url') : 'oro_form_autocomplete_search';
-        $metadata['autocomplete_url'] = $this->router->generate($routeName);
-        $metadata['renderedPropertyName'] = $this->getOr('renderedPropertyName') ?
-            $this->getOr('renderedPropertyName') : false;
+        $metadata['autocomplete_alias'] = $this->getAutocompleteAlias();
+        $metadata['autocomplete_url'] = $this->getAutocompleteUrl();
+        $metadata['renderedPropertyName'] = $this->getRenderedPropertyName();
 
         return $metadata;
     }
@@ -118,5 +114,34 @@ class ChoiceTreeFilter extends AbstractFilter
     {
         $data['value'] = explode(',', $data['value']);
         return $data;
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    protected function getAutocompleteAlias()
+    {
+        return $this->getOr('autocomplete_alias') ?
+            $this->getOr('autocomplete_alias') : false;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAutocompleteUrl()
+    {
+        $routeName = $this->getOr('autocomplete_url') ?
+            $this->getOr('autocomplete_url') : 'oro_form_autocomplete_search';
+
+        return $this->router->generate($routeName);
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    protected function getRenderedPropertyName()
+    {
+        return $this->getOr('renderedPropertyName') ?
+            $this->getOr('renderedPropertyName') : false;
     }
 }
