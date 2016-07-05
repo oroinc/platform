@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
@@ -61,12 +62,20 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
             $association = $context->getAssociationName();
             if ($association) {
                 $parentConfig = $this->loadConfig($context->getParentClassName(), $context->getVersion());
-                if (!empty($parentConfig[ConfigUtil::SUBRESOURCES][$association][ConfigUtil::ACTIONS][$action])) {
-                    $config = $this->mergeActionConfig(
-                        $config,
-                        $parentConfig[ConfigUtil::SUBRESOURCES][$association][ConfigUtil::ACTIONS][$action],
-                        $context
-                    );
+                if (!empty($parentConfig[ConfigUtil::SUBRESOURCES][$association])) {
+                    $subresourceConfig = $parentConfig[ConfigUtil::SUBRESOURCES][$association];
+                    if (!empty($subresourceConfig[ConfigUtil::ACTIONS][$action])) {
+                        $config = $this->mergeActionConfig(
+                            $config,
+                            $subresourceConfig[ConfigUtil::ACTIONS][$action],
+                            $context
+                        );
+                    }
+                    if ($context->hasExtra(FiltersConfigExtra::NAME)
+                        && !empty($subresourceConfig[ConfigUtil::FILTERS])
+                    ) {
+                        $config = $this->mergeFiltersConfig($config, $subresourceConfig[ConfigUtil::FILTERS]);
+                    }
                 }
             }
         }
@@ -162,6 +171,30 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
         }
 
         return $fields;
+    }
+
+    /**
+     * @param array $config
+     * @param array $filtersConfig
+     *
+     * @return array
+     */
+    protected function mergeFiltersConfig(array $config, array $filtersConfig)
+    {
+        if (ConfigUtil::isExcludeAll($filtersConfig) || !array_key_exists(ConfigUtil::FILTERS, $config)) {
+            $config[ConfigUtil::FILTERS] = $filtersConfig;
+        } elseif (!empty($filtersConfig[ConfigUtil::FIELDS])) {
+            if (!array_key_exists(ConfigUtil::FIELDS, $config[ConfigUtil::FILTERS])) {
+                $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS] = $filtersConfig[ConfigUtil::FIELDS];
+            } else {
+                $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS] = array_merge(
+                    $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS],
+                    $filtersConfig[ConfigUtil::FIELDS]
+                );
+            }
+        }
+
+        return $config;
     }
 
     /**

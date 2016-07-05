@@ -202,22 +202,6 @@ services:
             - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -80 }
             - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -80 }
 
-    oro_api.get_config.remove_excluded_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\RemoveExcludedFilters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -120 }
-            - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -120 }
-
-    oro_api.get_config.remove_excluded_sorters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\RemoveExcludedSorters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -120 }
-            - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -120 }
-
     oro_api.get_config.normalize_filters:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeFilters
         arguments:
