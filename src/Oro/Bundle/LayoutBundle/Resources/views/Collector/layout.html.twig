@@ -131,7 +131,7 @@
         <ul class="tree">
             {% for key, value in collector.items %}
                 <li>
-                    <span>{{ key }} = {{ value|default('(null)') }}</span>
+                    <span>{{ key }} = {{ value|default('NULL') }}</span>
                 </li>
             {% endfor %}
         </ul>

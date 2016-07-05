@@ -10,6 +10,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\ContextItemInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 
 class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +22,17 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dataCollector = new LayoutDataCollector();
+        $configs = [
+            'oro_layout.debug_developer_toolbar' => true
+        ];
+
+        $configManager = $this->getMockConfigManager();
+        $configManager->expects($this->any())
+            ->method('get')
+            ->will($this->returnCallback(function ($code) use ($configs) {
+                return $configs[$code];
+            }));
+        $this->dataCollector = new LayoutDataCollector($configManager);
     }
 
     public function testGetName()
@@ -140,6 +151,14 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
         $method->invokeArgs($this->dataCollector, [$view, &$result]);
 
         $this->assertEquals(['head' => []], $result);
+    }
+
+    /**
+     * @return ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getMockConfigManager()
+    {
+        return $this->getMock('Oro\Bundle\ConfigBundle\Config\ConfigManager', [], [], '', false);
     }
 
     /**

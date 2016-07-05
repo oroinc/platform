@@ -11,11 +11,17 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\ContextItemInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 
 class LayoutDataCollector extends DataCollector
 {
     const NAME = 'layout';
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
 
     /**
      * @var array
@@ -26,6 +32,14 @@ class LayoutDataCollector extends DataCollector
      * @var array
      */
     protected $contextItems = [];
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
 
     /**
      * {@inheritdoc}
@@ -49,7 +63,9 @@ class LayoutDataCollector extends DataCollector
      */
     public function collectViews(BlockView $rootView)
     {
-        $this->buildFinalViewTree($rootView);
+        if ($this->configManager->get('oro_layout.debug_developer_toolbar')) {
+            $this->buildFinalViewTree($rootView);
+        }
     }
 
     /**
