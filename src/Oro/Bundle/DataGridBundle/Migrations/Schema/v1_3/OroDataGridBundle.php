@@ -22,8 +22,6 @@ class OroDataGridBundle implements Migration, OrderedMigrationInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_grid_view_user');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->setPrimaryKey(['id']);
         $table->addColumn('alias', 'string', ['length' => 255]);
         $table->addColumn('grid_name', 'string', ['length' => 255]);
         $table->changeColumn('grid_view_id', ['notnull' => false]);
