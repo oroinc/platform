@@ -60,6 +60,7 @@ define([
                         column: column,
                         model: _this.model,
                         themeOptions: {
+                            optionPrefix: 'cell',
                             className: 'grid-cell grid-body-cell'
                         }
                     };

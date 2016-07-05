@@ -95,8 +95,12 @@ define([
             var opts = options || {};
             this.subviews = [];
 
-            if (!_.isEmpty(opts.actionsHideCount)) {
+            if (!_.isUndefined(opts.actionsHideCount)) {
                 this.actionsHideCount = opts.actionsHideCount;
+            }
+
+            if (!_.isUndefined(opts.themeOptions.actionsHideCount)) {
+                this.actionsHideCount = opts.themeOptions.actionsHideCount;
             }
 
             ActionCell.__super__.initialize.apply(this, arguments);
