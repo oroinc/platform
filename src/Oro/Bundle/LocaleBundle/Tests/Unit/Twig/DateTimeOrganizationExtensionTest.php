@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension;
 
-class DateTimeUserExtensionTest extends \PHPUnit_Framework_TestCase
+class DateTimeOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var DateTimeOrganizationExtension

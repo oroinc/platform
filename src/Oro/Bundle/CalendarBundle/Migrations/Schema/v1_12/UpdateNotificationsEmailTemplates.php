@@ -15,7 +15,8 @@ class UpdateNotificationsEmailTemplates extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return 'Update date format in reminder email templates using recipient organization localization settings';
+        return 'Update date format filter in reminder and notification ' .
+        'email templates using entity organization localization settings';
     }
 
     /**
