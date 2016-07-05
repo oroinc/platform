@@ -838,3 +838,192 @@ action_invalid_field_form_options:
                                 form_options: test
     expected: []
     error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.form_options". Expected array, but got string'
+
+empty_filters:
+    config:
+        subresources:
+            testSubresource:
+                filters: []
+    expected:
+        subresources:
+            testSubresource: []
+
+null_filters_fields:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields: ~
+    expected:
+        subresources:
+            testSubresource: []
+
+empty_filters_fields:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields: []
+    expected:
+        subresources:
+            testSubresource: []
+
+default_filters_exclusion_policy:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    exclusion_policy: none
+    expected:
+        subresources:
+            testSubresource:
+                filters:
+                    exclusion_policy: none
+
+filters_exclusion_policy:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    exclusion_policy: all
+    expected:
+        subresources:
+            testSubresource:
+                filters:
+                    exclusion_policy: all
+
+nullfilters__exclusion_policy:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    exclusion_policy: null
+    expected: []
+    error: 'The value null is not allowed for path "entity.subresources.testSubresource.filters.exclusion_policy". Permissible values: "all", "none"'
+
+invalid_filters_exclusion_policy:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    exclusion_policy: invalid
+    expected: []
+    error: 'The value "invalid" is not allowed for path "entity.subresources.testSubresource.filters.exclusion_policy". Permissible values: "all", "none"'
+
+dash_in_filters_field_name:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        test-field: ~
+    expected:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        test-field: []
+
+filters:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    exclusion_policy: all
+                    fields:
+                        field1: ~
+                        field2: []
+                        field3:
+                            exclude: true
+                            property_path: path1
+                            data_type: string
+                            allow_array: true
+                            description: description1
+                        field4:
+                            exclude: false
+                        field5:
+                            allow_array: false
+    expected:
+        subresources:
+            testSubresource:
+                filters:
+                    exclusion_policy: all
+                    fields:
+                        field1: []
+                        field2: []
+                        field3:
+                            exclude: true
+                            property_path: path1
+                            data_type: string
+                            allow_array: true
+                            description: description1
+                        field4:
+                            exclude: false
+                        field5:
+                            allow_array: false
+
+invalid_filters_field_exclude:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        field1:
+                            exclude: 123
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.exclude". Expected boolean, but got integer.'
+
+null_filters_field_property_path:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        field1:
+                            property_path: null
+    expected: []
+    error: 'The path "entity.subresources.testSubresource.filters.fields.field1.property_path" cannot contain an empty value, but got null.'
+
+null_filters_field_data_type:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        field1:
+                            data_type: null
+    expected: []
+    error: 'The path "entity.subresources.testSubresource.filters.fields.field1.data_type" cannot contain an empty value, but got null.'
+
+invalid_filters_field_allow_array:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        field1:
+                            allow_array: 123
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.allow_array". Expected boolean, but got integer.'
+
+null_filters_field_description:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        field1:
+                            description: null
+    expected: []
+    error: 'The path "entity.subresources.testSubresource.filters.fields.field1.description" cannot contain an empty value, but got null.'
+
+empty_filters_field_description:
+    config:
+        subresources:
+            testSubresource:
+                filters:
+                    fields:
+                        field1:
+                            description: ""
+    expected: []
+    error: 'The path "entity.subresources.testSubresource.filters.fields.field1.description" cannot contain an empty value, but got "".'

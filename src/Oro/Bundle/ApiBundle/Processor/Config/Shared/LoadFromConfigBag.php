@@ -61,10 +61,10 @@ abstract class LoadFromConfigBag implements ProcessorInterface
             return;
         }
 
-        $config = $this->loadConfig($context->getClassName(), $context->getVersion());
-        if (!empty($config)) {
-            $this->saveConfig($context, $config);
-        }
+        $this->saveConfig(
+            $context,
+            $this->loadConfig($context->getClassName(), $context->getVersion())
+        );
     }
 
     /**
@@ -92,9 +92,11 @@ abstract class LoadFromConfigBag implements ProcessorInterface
             unset($config[$sectionName]);
         }
 
-        $context->setResult(
-            $this->loadConfigObject(ConfigUtil::DEFINITION, $config)
-        );
+        if (!empty($config)) {
+            $context->setResult(
+                $this->loadConfigObject(ConfigUtil::DEFINITION, $config)
+            );
+        }
     }
 
     /**
