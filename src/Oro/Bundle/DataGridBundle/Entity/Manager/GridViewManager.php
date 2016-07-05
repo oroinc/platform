@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -141,9 +142,12 @@ class GridViewManager
     {
         if (!isset($this->cacheData[self::ALL_VIEWS_KEY])) {
             $systemViews = $this->getSystemViews($gridName);
-            $gridViews = $this->registry
-                ->getRepository('OroDataGridBundle:GridView')
-                ->findGridViews($this->aclHelper, $user, $gridName);
+            $gridViews = [];
+            if ($user instanceof UserInterface) {
+                $gridViews = $this->registry
+                    ->getRepository('OroDataGridBundle:GridView')
+                    ->findGridViews($this->aclHelper, $user, $gridName);
+            }
             $this->cacheData[self::ALL_VIEWS_KEY] = [
                 'system' => $systemViews,
                 'user' => $gridViews
