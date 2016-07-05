@@ -7,7 +7,7 @@ use CG\Generator\PhpMethod;
 use CG\Core\DefaultGeneratorStrategy;
 
 use Oro\Component\Layout\Loader\Generator\VisitContext;
-use Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateVisitor;
+use Oro\Component\Layout\Loader\Generator\Extension\ImportsAwareLayoutUpdateVisitor;
 
 class ImportsLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class ImportsLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
             'root' => 'root_block_id',
             'namespace' => 'import_namespace'
         ];
-        $condition    = new ImportsLayoutUpdateVisitor($import);
+        $condition    = new ImportsAwareLayoutUpdateVisitor($import);
         $phpClass = PhpClass::create('LayoutUpdateWithImport');
         $visitContext = new VisitContext($phpClass);
 

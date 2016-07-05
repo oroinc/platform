@@ -11,6 +11,7 @@ use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
+use Oro\Component\Layout\LayoutUpdateImportInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
@@ -33,28 +34,22 @@ class ThemeExtension extends AbstractExtension
     /** @var PathProviderInterface */
     protected $pathProvider;
 
-    /** @var Collection */
-    protected $importStorage;
-
     /**
      * @param array $resources
      * @param LayoutUpdateLoaderInterface $loader
      * @param DependencyInitializer $dependencyInitializer
      * @param PathProviderInterface $provider
-     * @param Collection $importStorage
      */
     public function __construct(
         array $resources,
         LayoutUpdateLoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
-        PathProviderInterface $provider,
-        Collection $importStorage
+        PathProviderInterface $provider
     ) {
         $this->resources = $resources;
         $this->loader = $loader;
         $this->dependencyInitializer = $dependencyInitializer;
         $this->pathProvider = $provider;
-        $this->importStorage = $importStorage;
     }
 
     /**
@@ -65,22 +60,35 @@ class ThemeExtension extends AbstractExtension
         $updates = [];
         if ($context->getOr(static::THEME_KEY)) {
             $files = $this->findApplicableResources($this->getProviderPaths($context));
-            $this->loadLayoutUpdatesWithImports($files, $context, $updates);
+            $this->loadLayoutUpdate($files, $context, $updates);
         }
         return $updates;
     }
 
     /**
-     * @param array $files
-     * @param ContextInterface $context
-     * @param array $updates
+     * @param array              $files
+     * @param ContextInterface   $context
+     * @param array              $updates
+     * @param LayoutUpdateImport $import
      */
-    protected function loadLayoutUpdatesWithImports(array $files, ContextInterface $context, array &$updates)
+    protected function loadLayoutUpdatesWithImports(array $files, ContextInterface $context, array &$updates, LayoutUpdateImport $import = null)
     {
+        // todo where is resource iterator
+
         foreach ($files as $file) {
-            $update = $this->loadLayoutUpdate($file);
+            $update = $this->loader->load($file);
             if ($update) {
-                $this->collectLayoutUpdates($update, $updates);
+                $this->dependencyInitializer->initialize($update);
+
+                if($update instanceof LayoutUpdateImportInterface) {
+                    $update->setImport($import);
+                }
+
+                $el = $update instanceof ElementDependentLayoutUpdateInterface
+                    ? $update->getElement()
+                    : 'root';
+                $updates[$el][] = $update;
+
                 $this->loadImports($update, $context, $updates);
             }
         }
@@ -102,10 +110,7 @@ class ThemeExtension extends AbstractExtension
                 $import = $this->createImport($importProperties);
                 $importPaths = $this->getPathsForImport($context, $import->getId());
                 $importFiles = $this->findApplicableResources($importPaths);
-                foreach ($importFiles as $importFile) {
-                    $this->importStorage->set($importFile, $import);
-                }
-                $this->loadLayoutUpdatesWithImports($importFiles, $context, $updates);
+                $this->loadLayoutUpdate($importFiles, $context, $updates, $import);
             }
         }
     }
@@ -156,7 +161,7 @@ class ThemeExtension extends AbstractExtension
      * @param string $file
      * @return null|LayoutUpdateInterface
      */
-    protected function loadLayoutUpdate($file)
+    protected function loadLayoutUpdateOld($file)
     {
         $update = $this->loader->load($file);
         if ($update) {

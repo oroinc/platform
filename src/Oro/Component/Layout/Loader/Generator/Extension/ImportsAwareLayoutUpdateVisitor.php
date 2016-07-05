@@ -7,7 +7,7 @@ use CG\Generator\PhpMethod;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
-class ImportsLayoutUpdateVisitor implements VisitorInterface
+class ImportsAwareLayoutUpdateVisitor implements VisitorInterface
 {
     /**
      * @var array
