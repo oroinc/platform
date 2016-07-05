@@ -69,7 +69,7 @@ class LocalizationHelper
      */
     public function getAll()
     {
-        return $this->getRepository()->findAll();
+        return $this->getRepository()->getBatchIterator();
     }
 
     /**

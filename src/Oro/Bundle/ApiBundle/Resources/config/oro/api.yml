@@ -2,6 +2,7 @@ oro_api:
     entities:
         Oro\Bundle\ApiBundle\Model\EntityDescriptor:
             identifier_field_names: [id]
+            disable_fieldset: true
             fields:
                 # this is a predefined field name that is used to provide
                 # the class name of the target entity
@@ -16,6 +17,7 @@ oro_api:
                 # a human-readable representation of the target entity
                 title:
                     data_type: string
+                    meta_property: true
             # this entity does not have own Data API resource
             # and should be used as a sub-resource of other entities
             actions:
