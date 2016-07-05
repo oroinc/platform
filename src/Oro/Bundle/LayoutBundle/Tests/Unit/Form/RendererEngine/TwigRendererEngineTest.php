@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form\RendererEngine;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine as BaseEngine;
 use Symfony\Component\Form\FormView;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 
@@ -20,9 +21,13 @@ class TwigRendererEngineTest extends RendererEngineTest
 
     public function testRenderBlock()
     {
-        $renderingEngine = $this->createRendererEngine();
+        $layoutHelper = $this->getMockLayoutHelper();
+        $layoutHelper->expects($this->once())
+            ->method('isProfilerEnabled')
+            ->will($this->returnValue(true));
 
-        $renderingEngine->setLayoutHelper($this->getMockLayoutHelper());
+        $renderingEngine = $this->createRendererEngine();
+        $renderingEngine->setLayoutHelper($layoutHelper);
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
         $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
@@ -46,8 +51,8 @@ class TwigRendererEngineTest extends RendererEngineTest
             $variables,
             [
                 'attr' => [
-                    'data-layout-debug-block-id' => 'root',
-                    'data-layout-debug-block-template' => 'theme'
+                    'data-layout-debug-block-id'        => 'root',
+                    'data-layout-debug-block-template'  => 'theme'
                 ]
             ]
         );
