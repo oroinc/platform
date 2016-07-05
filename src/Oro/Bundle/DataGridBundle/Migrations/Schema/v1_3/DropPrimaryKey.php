@@ -22,6 +22,8 @@ class DropPrimaryKey implements Migration, OrderedMigrationInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_grid_view_user');
+        $table->removeForeignKey('FK_10ECBCA8BF53711B');
+        $table->removeForeignKey('fk_oro_grid_view_user_user_id');
         $table->dropPrimaryKey();
     }
 }

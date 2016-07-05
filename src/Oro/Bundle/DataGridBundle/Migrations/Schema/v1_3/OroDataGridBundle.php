@@ -28,5 +28,18 @@ class OroDataGridBundle implements Migration, OrderedMigrationInterface
         $table->addColumn('grid_name', 'string', ['length' => 255]);
         $table->changeColumn('grid_view_id', ['notnull' => false]);
         $table->changeColumn('user_id', ['notnull' => false]);
+
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_grid_view'),
+            ['grid_view_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
     }
 }

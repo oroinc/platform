@@ -6,7 +6,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\DataGridBundle\Migrations\Schema\v1_2\DefaultGridViewUsersRelation;
 
 class OroDataGridBundleInstaller implements Installation
 {
