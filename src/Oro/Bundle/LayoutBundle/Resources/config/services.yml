@@ -181,4 +181,4 @@ services:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:
             - '@request_stack'
-            - '%kernel.environment%'
+            - '@oro_config.user'

@@ -1,0 +1,40 @@
+oro_system_configuration:
+    groups:
+        development_settings:
+            title: oro.layout.system_configuration.groups.development_settings.title
+            icon:  'icon-wrench'
+        development_layout_settings:
+            title: oro.layout.system_configuration.groups.development_layout_settings.title
+
+    fields:
+        oro_layout.debug_block_info:
+            data_type: boolean
+            type: choice
+            options:
+                label: oro.layout.system_configuration.fields.debug_block_info.label
+                choices:
+                    - oro.layout.system_configuration.fields.debug_block_info.choices.no
+                    - oro.layout.system_configuration.fields.debug_block_info.choices.yes
+        oro_layout.debug_developer_toolbar:
+            data_type: boolean
+            type: choice
+            options:
+                label: oro.layout.system_configuration.fields.debug_developer_toolbar.label
+                choices:
+                    - oro.layout.system_configuration.fields.debug_developer_toolbar.choices.no
+                    - oro.layout.system_configuration.fields.debug_developer_toolbar.choices.yes
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            development_settings:
+                                priority: -20
+                                children:
+                                    development_layout_settings:
+                                        priority: -10
+                                        children:
+                                            - oro_layout.debug_block_info
+                                            - oro_layout.debug_developer_toolbar

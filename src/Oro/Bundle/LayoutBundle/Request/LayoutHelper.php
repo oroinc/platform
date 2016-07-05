@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Request;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 
 class LayoutHelper
@@ -15,18 +16,18 @@ class LayoutHelper
     protected $requestStack;
 
     /**
-     * @var string
+     * @var ConfigManager
      */
-    protected $environment;
+    protected $configManager;
 
     /**
      * @param RequestStack $requestStack
-     * @param string|null $environment
+     * @param ConfigManager $configManager
      */
-    public function __construct(RequestStack $requestStack, $environment = null)
+    public function __construct(RequestStack $requestStack, ConfigManager $configManager)
     {
         $this->requestStack = $requestStack;
-        $this->environment = $environment;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -65,6 +66,6 @@ class LayoutHelper
      */
     public function isProfilerEnabled()
     {
-        return $this->environment && in_array($this->environment, ['dev']);
+        return $this->configManager->get('oro_layout.debug_block_info');
     }
 }
