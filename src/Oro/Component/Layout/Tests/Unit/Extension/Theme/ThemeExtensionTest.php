@@ -228,14 +228,14 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $this->importStorage);
         /** @var LayoutUpdateImport $import */
         $import = $this->importStorage->get('import-resource-gold.yml');
-        $this->assertEqualsImports($layoutUpdate->getImports()[0], $import);
+        $this->assertEquals($layoutUpdate->getImports()[0], $import->toArray());
         /** @var LayoutUpdateImport $secondLevelImport */
         $import = $this->importStorage->get('second-level-import-resource-gold.yml');
-        $this->assertEqualsImports([
+        $this->assertEquals([
             ImportsAwareLayoutUpdateInterface::ID_KEY => $importedLayoutUpdate->getImports()[0],
             ImportsAwareLayoutUpdateInterface::ROOT_KEY => null,
             ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,
-        ], $import);
+        ], $import->toArray());
     }
 
     public function testThemeUpdatesWithImportsContainedMultipleUpdates()
@@ -270,10 +270,10 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $this->importStorage);
         /** @var LayoutUpdateImport $import */
         $import = $this->importStorage->get('import-resource-gold.yml');
-        $this->assertEqualsImports($layoutUpdate->getImports()[0], $import);
+        $this->assertEquals($layoutUpdate->getImports()[0], $import->toArray());
         /** @var LayoutUpdateImport $secondLevelImport */
         $import = $this->importStorage->get('second-import-resource-gold.yml');
-        $this->assertEqualsImports($layoutUpdate->getImports()[0], $import);
+        $this->assertEquals($layoutUpdate->getImports()[0], $import->toArray());
     }
 
     /**
@@ -295,40 +295,51 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Import id should be provided, array with "root" keys given
-     */
-    public function testThemeUpdatesWithoutIdImportKey()
+    public function testThemeUpdatesWithSameImport()
     {
         $themeName = 'oro-import';
         $this->provider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
 
         $layoutUpdate = new LayoutUpdateWithImports([
             [
+                ImportsAwareLayoutUpdateInterface::ID_KEY => 'import_id',
                 ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
-            ]
+                ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace',
+            ],
+            [
+                ImportsAwareLayoutUpdateInterface::ID_KEY => 'import_id',
+                ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'second_root_block_id',
+                ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'second_import_namespace',
+            ],
         ]);
+        $importedLayoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $secondImportLayoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
-        $this->yamlDriver->expects($this->once())
+        $this->yamlDriver->expects($this->at(0))
             ->method('load')
             ->with('resource-gold.yml')
             ->willReturn($layoutUpdate);
 
-        $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
-    }
+        $this->yamlDriver->expects($this->at(1))
+            ->method('load')
+            ->with('import-resource-gold.yml')
+            ->willReturn($importedLayoutUpdate);
 
-    /**
-     * @param array $expected
-     * @param LayoutUpdateImport $actual
-     */
-    protected function assertEqualsImports(array $expected, LayoutUpdateImport $actual)
-    {
-        $this->assertEquals($expected, [
-            ImportsAwareLayoutUpdateInterface::ID_KEY => $actual->getId(),
-            ImportsAwareLayoutUpdateInterface::ROOT_KEY => $actual->getRoot(),
-            ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => $actual->getNamespace(),
-        ]);
+        $this->yamlDriver->expects($this->at(2))
+            ->method('load')
+            ->with('import-resource-gold.yml')
+            ->willReturn($secondImportLayoutUpdate);
+
+        $actualLayoutUpdates = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
+        $this->assertEquals(
+            [$layoutUpdate, $importedLayoutUpdate, $secondImportLayoutUpdate],
+            $actualLayoutUpdates
+        );
+
+        $this->assertCount(1, $this->importStorage);
+        /** @var LayoutUpdateImport $import */
+        $import = $this->importStorage->get('import-resource-gold.yml');
+        $this->assertEquals($layoutUpdate->getImports()[1], $import->toArray());
     }
 
     /**
