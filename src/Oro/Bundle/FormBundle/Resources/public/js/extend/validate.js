@@ -71,9 +71,11 @@ define([
         var $widgetContainer = $target.inputWidget('container');
         if ($widgetContainer) {
             $target = $widgetContainer;
-        } else if ($target.parent().is('.input-append, .input-prepend')) {
+        }
+        if ($target.parent().is('.input-append, .input-prepend')) {
             $target = $target.parent();
         }
+
         return $target;
     }
 

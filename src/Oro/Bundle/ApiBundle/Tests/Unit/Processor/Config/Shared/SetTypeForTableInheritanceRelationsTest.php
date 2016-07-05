@@ -183,12 +183,14 @@ class SetTypeForTableInheritanceRelationsTest extends ConfigProcessorTestCase
                     'association1' => null,
                     'association2' => [
                         'property_path' => 'realAssociation2',
+                        'target_class'  => 'Test\Association2Target',
                         'fields'        => [
                             '__class__' => null
                         ]
                     ],
                     'association3' => [
-                        'fields' => [
+                        'target_class' => 'Test\Association3Target',
+                        'fields'       => [
                             '__class__' => null
                         ]
                     ],

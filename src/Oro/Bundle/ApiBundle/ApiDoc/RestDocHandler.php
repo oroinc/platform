@@ -7,10 +7,10 @@ use Symfony\Component\Routing\Route;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
-use Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
@@ -27,33 +27,29 @@ class RestDocHandler implements HandlerInterface
     const ID_ATTRIBUTE   = 'id';
     const ID_PLACEHOLDER = '{id}';
 
+    const ID_DESCRIPTION = 'The identifier of an entity';
+
     /** @var RestDocViewDetector */
     protected $docViewDetector;
 
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
 
-    /** @var ResourceDocProviderInterface */
-    protected $resourceDocProvider;
-
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
     /**
-     * @param RestDocViewDetector          $docViewDetector
-     * @param ActionProcessorBagInterface  $processorBag
-     * @param ResourceDocProviderInterface $resourceDocProvider
-     * @param ValueNormalizer              $valueNormalizer
+     * @param RestDocViewDetector         $docViewDetector
+     * @param ActionProcessorBagInterface $processorBag
+     * @param ValueNormalizer             $valueNormalizer
      */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
-        ResourceDocProviderInterface $resourceDocProvider,
         ValueNormalizer $valueNormalizer
     ) {
         $this->docViewDetector = $docViewDetector;
         $this->processorBag = $processorBag;
-        $this->resourceDocProvider = $resourceDocProvider;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -85,22 +81,23 @@ class RestDocHandler implements HandlerInterface
             $actionContext = $this->getContext($action, $entityClass, $associationName);
             $config = $actionContext->getConfig();
 
-            $this->setDescription($annotation, $action, $actionContext);
+            $this->setDescription($annotation, $config);
             $statusCodes = $config->getStatusCodes();
             if ($statusCodes) {
                 $this->setStatusCodes($annotation, $statusCodes);
             }
             if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
                 if ($associationName) {
-                    $this->addIdRequirement($annotation, $actionContext->getParentMetadata());
+                    $this->addIdRequirement($annotation, $route, $actionContext->getParentMetadata());
                 } else {
-                    $this->addIdRequirement($annotation, $actionContext->getMetadata());
+                    $this->addIdRequirement($annotation, $route, $actionContext->getMetadata());
                 }
             }
             $filters = $actionContext->getFilters();
             if (!$filters->isEmpty()) {
                 $this->addFilters($annotation, $filters, $actionContext->getMetadata());
             }
+            $this->sortFilters($annotation);
         }
     }
 
@@ -146,9 +143,7 @@ class RestDocHandler implements HandlerInterface
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
         $context = $processor->createContext();
-        $context->removeConfigExtra(SortersConfigExtra::NAME);
         $context->addConfigExtra(new DescriptionsConfigExtra($action));
-        $context->addConfigExtra(new StatusCodesConfigExtra($action));
         $context->getRequestType()->set($this->docViewDetector->getRequestType()->toArray());
         $context->setLastGroup('initialize');
         if ($associationName) {
@@ -168,53 +163,16 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param ApiDoc  $annotation
-     * @param string  $action
-     * @param Context $actionContext
+     * @param ApiDoc                 $annotation
+     * @param EntityDefinitionConfig $config
      */
-    protected function setDescription(ApiDoc $annotation, $action, Context $actionContext)
+    protected function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config)
     {
-        if ($actionContext instanceof SubresourceContext) {
-            $parentEntityClass = $actionContext->getParentClassName();
-            $associationName = $actionContext->getAssociationName();
-            $parentConfig = $actionContext->getParentConfig()->toArray();
-            $description = $this->resourceDocProvider->getSubresourceDescription(
-                $action,
-                $this->docViewDetector->getVersion(),
-                $this->docViewDetector->getRequestType(),
-                $parentConfig,
-                $parentEntityClass,
-                $associationName
-            );
-            $documentation = $this->resourceDocProvider->getSubresourceDocumentation(
-                $action,
-                $this->docViewDetector->getVersion(),
-                $this->docViewDetector->getRequestType(),
-                $parentConfig,
-                $parentEntityClass,
-                $associationName
-            );
-        } else {
-            $entityClass = $actionContext->getClassName();
-            $config = $actionContext->getConfig()->toArray();
-            $description = $this->resourceDocProvider->getResourceDescription(
-                $action,
-                $this->docViewDetector->getVersion(),
-                $this->docViewDetector->getRequestType(),
-                $config,
-                $entityClass
-            );
-            $documentation = $this->resourceDocProvider->getResourceDocumentation(
-                $action,
-                $this->docViewDetector->getVersion(),
-                $this->docViewDetector->getRequestType(),
-                $config,
-                $entityClass
-            );
-        }
+        $description = $config->getDescription();
         if ($description) {
             $annotation->setDescription($description);
         }
+        $documentation = $config->getDocumentation();
         if ($documentation) {
             $annotation->setDocumentation($documentation);
         }
@@ -236,23 +194,35 @@ class RestDocHandler implements HandlerInterface
 
     /**
      * @param ApiDoc         $annotation
+     * @param Route          $route
      * @param EntityMetadata $metadata
      */
-    protected function addIdRequirement(ApiDoc $annotation, EntityMetadata $metadata)
+    protected function addIdRequirement(ApiDoc $annotation, Route $route, EntityMetadata $metadata)
     {
         $idFields = $metadata->getIdentifierFieldNames();
-        $dataType = count($idFields) === 1
-            ? $metadata->getField(reset($idFields))->getDataType()
-            : DataType::STRING;
+        $dataType = DataType::STRING;
+        if (count($idFields) === 1) {
+            $field = $metadata->getField(reset($idFields));
+            if (!$field) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'The metadata for "%s" entity does not contains "%s" identity field. Resource: %s %s',
+                        $metadata->getClassName(),
+                        reset($idFields),
+                        implode(' ', $route->getMethods()),
+                        $route->getPath()
+                    )
+                );
+            }
+            $dataType = $field->getDataType();
+        }
 
         $annotation->addRequirement(
             self::ID_ATTRIBUTE,
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
                 'requirement' => $this->getIdRequirement($metadata),
-                'description' => $this->resourceDocProvider->getIdentifierDescription(
-                    $this->docViewDetector->getRequestType()
-                )
+                'description' => self::ID_DESCRIPTION
             ]
         );
     }
@@ -341,6 +311,21 @@ class RestDocHandler implements HandlerInterface
 
                 $annotation->addFilter($key, $options);
             }
+        }
+    }
+
+    /**
+     * @param ApiDoc $annotation
+     */
+    protected function sortFilters(ApiDoc $annotation)
+    {
+        $filters = $annotation->getFilters();
+        if (!empty($filters)) {
+            ksort($filters);
+            // unfortunately there is no other way to update filters except to use the reflection
+            $filtersProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'filters');
+            $filtersProperty->setAccessible(true);
+            $filtersProperty->setValue($annotation, $filters);
         }
     }
 

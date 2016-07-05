@@ -17,11 +17,6 @@ default_exclusion_policy:
         exclusion_policy: none
     expected: []
 
-default_disable_partial_load:
-    config:
-        disable_partial_load: false
-    expected: []
-
 empty_order_by:
     config:
         order_by: []
@@ -50,6 +45,35 @@ enable_sorting:
     expected:
         disable_sorting: false
 
+disable_inclusion:
+    config:
+        disable_inclusion: true
+    expected:
+        disable_inclusion: true
+
+enable_inclusion:
+    config:
+        disable_inclusion: false
+    expected:
+        disable_inclusion: false
+
+disable_fieldset:
+    config:
+        disable_fieldset: true
+    expected:
+        disable_fieldset: true
+
+enable_fieldset:
+    config:
+        disable_fieldset: false
+    expected:
+        disable_fieldset: false
+
+empty_identifier_field_names:
+    config:
+        identifier_field_names: []
+    expected: []
+
 default_max_results:
     config:
         max_results: ~
@@ -77,26 +101,6 @@ empty_post_serialize:
         post_serialize: ~
     expected: []
 
-null_label:
-    config:
-        label: ~
-    expected: []
-
-empty_label:
-    config:
-        label: ""
-    expected: []
-
-null_plural_label:
-    config:
-        plural_label: ~
-    expected: []
-
-empty_plural_label:
-    config:
-        plural_label: ""
-    expected: []
-
 null_description:
     config:
         description: ~
@@ -107,6 +111,16 @@ empty_description:
         description: ""
     expected: []
 
+null_documentation:
+    config:
+        documentation: ~
+    expected: []
+
+empty_documentation:
+    config:
+        documentation: ""
+    expected: []
+
 default_collapse:
     config:
         collapse: false
@@ -115,34 +129,32 @@ default_collapse:
 all_attributes:
     config:
         exclusion_policy: all
-        disable_partial_load: true
         order_by:
             id: DESC
         page_size: 20
         max_results: 50
+        identifier_field_names: ['id']
         hints:
             - hint1
             - {name: hint2, value: hint_val2}
         post_serialize: [class, method]
-        label: label1
-        plural_label: plural_label1
         description: description1
+        documentation: documentation1
         collapse: true
         extra1: true
     expected:
         exclusion_policy: all
-        disable_partial_load: true
         order_by:
             id: DESC
         page_size: 20
         max_results: 50
+        identifier_field_names: ['id']
         hints:
             - hint1
             - {name: hint2, value: hint_val2}
         post_serialize: [class, method]
-        label: label1
-        plural_label: plural_label1
         description: description1
+        documentation: documentation1
         collapse: true
         extra1: true
 
@@ -170,6 +182,19 @@ field_collapse:
         fields:
             field1:
                 collapse: true
+            field2: ~
+
+field_meta_property:
+    config:
+        fields:
+            field1:
+                meta_property: true
+            field2:
+                meta_property: false
+    expected:
+        fields:
+            field1:
+                meta_property: true
             field2: ~
 
 field_property_path:
@@ -208,22 +233,6 @@ field_data_transformer:
             field4:
                 data_transformer: [service1, [class, method]]
 
-field_label:
-    config:
-        fields:
-            field1:
-                label: ~
-            field2:
-                label: ""
-            field3:
-                label: label1
-    expected:
-        fields:
-            field1: ~
-            field2: ~
-            field3:
-                label: label1
-
 field_description:
     config:
         fields:
@@ -239,6 +248,52 @@ field_description:
             field2: ~
             field3:
                 description: description1
+
+field_identifier_field_names:
+    config:
+        fields:
+            field1:
+                identifier_field_names: ['id']
+    expected:
+        fields:
+            field1:
+                identifier_field_names: ['id']
+
+field_target_class:
+    config:
+        fields:
+            field1:
+                target_class: ~
+            field2:
+                target_class: ""
+            field3:
+                target_class: Test\Class
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                target_class: Test\Class
+
+field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: ~
+            field2:
+                target_type: ""
+            field3:
+                target_type: to-one
+            field4:
+                target_type: to-many
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                target_type: to-one
+            field4:
+                target_type: to-many
 
 field_with_extra_attributes:
     config:
@@ -312,7 +367,7 @@ empty_extra_sections:
 extra_sections_with_default_value_of_attribute:
     config:
         test_section:
-            label: ""
+            description: ""
     expected: []
 
 extra_sections:

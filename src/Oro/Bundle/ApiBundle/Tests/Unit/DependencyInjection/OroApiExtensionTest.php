@@ -85,7 +85,7 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
                                     'field51' => [
                                         'fields' => [
                                             'field511' => [
-                                                'disable_partial_load' => true
+                                                'hints' => [['name' => 'HINT_TRANSLATABLE']]
                                             ]
                                         ]
                                     ]
