@@ -17,7 +17,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
     const NAME_FORMAT_EXTENSION_SERVICE_KEY = 'oro_entity.twig.extension.entity';
     const INTL_EXTENSION_SERVICE_KEY = 'twig.extension.intl';
     const LOCALE_ADDRESS = 'oro_locale.twig.address';
-    const DATETIME_USER_FORMAT_EXTENSION_SERVICE_KEY = 'oro_locale.twig.date_time_user';
+    const DATETIME_ORGANIZATION_FORMAT_EXTENSION_SERVICE_KEY = 'oro_locale.twig.date_time_organization';
 
     /**
      * {@inheritDoc}
@@ -28,7 +28,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
             && $container->hasDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY)
             && $container->hasDefinition(self::DATE_FORMAT_EXTENSION_SERVICE_KEY)
             && $container->hasDefinition(self::INTL_EXTENSION_SERVICE_KEY)
-            && $container->hasDefinition(self::DATETIME_USER_FORMAT_EXTENSION_SERVICE_KEY)
+            && $container->hasDefinition(self::DATETIME_ORGANIZATION_FORMAT_EXTENSION_SERVICE_KEY)
         ) {
             // register 'locale_date', 'locale_time' and 'locale_datetime' filters
             $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
@@ -40,7 +40,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
                     'oro_format_date',
                     'oro_format_time',
                     'oro_format_datetime',
-                    'oro_format_datetime_user',
+                    'oro_format_datetime_organization',
                     'oro_format_name',
                     'date'
                 ]
@@ -55,7 +55,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
             $rendererDef->addMethodCall('addExtension', [new Reference(self::INTL_EXTENSION_SERVICE_KEY)]);
             $rendererDef->addMethodCall(
                 'addExtension',
-                [new Reference(self::DATETIME_USER_FORMAT_EXTENSION_SERVICE_KEY)]
+                [new Reference(self::DATETIME_ORGANIZATION_FORMAT_EXTENSION_SERVICE_KEY)]
             );
         }
     }
