@@ -20,9 +20,9 @@ class LocalizationHelper
     protected $entityClass;
 
     /**
-     * @var Localization[]
+     * @var Localization
      */
-    protected $locales;
+    protected $currentLocalization;
 
     /**
      * LocaleHelper constructor.
@@ -46,7 +46,9 @@ class LocalizationHelper
      */
     public function getCurrentLocalization()
     {
-        if (!$this->locales) {
+        // TODO: should be fixed in BB-3367. getCurrentLocalization method should return correct value.
+
+        if (!$this->currentLocalization) {
             $items = $this->getRepository()->findBy([], ['id' => 'ASC']);
 
             $withEnglish = array_filter(
@@ -56,10 +58,10 @@ class LocalizationHelper
                 }
             );
 
-            $this->locales = $withEnglish ? reset($withEnglish) : reset($items);
+            $this->currentLocalization = $withEnglish ? reset($withEnglish) : reset($items);
         }
 
-        return $this->locales;
+        return $this->currentLocalization;
     }
 
     /**
