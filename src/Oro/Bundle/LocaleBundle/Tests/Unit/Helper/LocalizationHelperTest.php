@@ -92,12 +92,14 @@ class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAll()
     {
-        $items = [new Localization()];
+        $iterator = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\SingleObjectIterableResultDecorator')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->repository->expects($this->once())
-            ->method('findAll')
-            ->willReturn($items);
+            ->method('getBatchIterator')
+            ->willReturn($iterator);
 
-        $this->assertSame($items, $this->helper->getAll());
+        $this->assertSame($iterator, $this->helper->getAll());
     }
 }

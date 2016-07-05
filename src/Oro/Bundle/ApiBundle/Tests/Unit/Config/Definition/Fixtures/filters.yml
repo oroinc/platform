@@ -49,6 +49,16 @@ invalid_exclusion_policy:
     expected: []
     error: 'The value "invalid" is not allowed for path "entity.filters.exclusion_policy". Permissible values: "all", "none"'
 
+dash_in_field_name:
+    config:
+        filters:
+            fields:
+                test-field: ~
+    expected:
+        filters:
+            fields:
+                test-field: []
+
 full:
     config:
         filters:

@@ -85,6 +85,8 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                     $result[self::RELATIONSHIPS][$name][self::DATA] = $associationMetadata->isCollection()
                         ? $this->handleRelatedCollection($value, $associationMetadata)
                         : $this->handleRelatedObject($value, $associationMetadata);
+                } elseif ($metadata->hasMetaProperty($name)) {
+                    $result[self::META][$name] = $value;
                 } else {
                     $result[self::ATTRIBUTES][$name] = $value;
                 }
