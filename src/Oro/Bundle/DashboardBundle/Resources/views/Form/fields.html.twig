@@ -188,3 +188,45 @@
         })
     </script>
 {% endblock oro_type_widget_date_widget %}
+
+{% block oro_dashboard_query_filter_widget %}
+    {{ form_row(form.entity) }}
+    {{ form_row(form.definition) }}
+    {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
+    {{ segmentQD.query_designer_condition_builder({
+        'id': type ~ '-condition-builder',
+        'criteria_list_id': 'filter-criteria-list',
+        'entity_choice_id': widgetType ~ '_' ~ name ~ '_entity'
+        })
+    }}
+
+    {% set fieldsData = {} %}
+    {% if not form.entity.vars.value is empty %}
+        {% set encodedEntityName = form.entity.vars.value|replace({'\\': '_'}) %}
+        {% set routeParams       = {}|merge({'entityName': encodedEntityName}) %}
+
+        {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
+    {% endif %}
+
+    {% set widgetOptions = {
+        valueSource: '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_definition]',
+        fieldsLoader: {
+            entityChoice:      '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_entity]',
+            loadingMaskParent: '#' ~ form.vars.id,
+            router:            'oro_api_querydesigner_fields_entity',
+            routingParams:     {},
+            fieldsData:        fieldsData,
+            confirmMessage:    name|replace('_', '.') ~ '.change_entity_confirmation',
+        },
+        filters: {
+            criteriaList:     '#filter-criteria-list',
+            conditionBuilder: '#' ~ name ~ '-condition-builder'
+        },
+        entities:                     oro_query_filter_entities(),
+        metadata:                     oro_query_filter_metadata()
+    } %}
+    {% set widgetOptions = update_segment_widget_options(widgetOptions, name) %}
+
+    <div data-page-component-module="orosegment/js/app/components/segment-component"
+         data-page-component-options="{{ widgetOptions|json_encode }}"></div>
+{% endblock oro_dashboard_query_filter_widget %}

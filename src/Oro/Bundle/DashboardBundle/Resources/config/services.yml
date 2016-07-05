@@ -268,9 +268,16 @@ services:
             - '@oro_filter.utils.date_filter_modifier'
 
     # Twig extension
-    oro_dashboard.twig.filter_date_range_extension:
-        class: Oro\Bundle\DashboardBundle\Twig\FilterDateRangeExtension
+    oro_dashboard.twig.extension:
+        class: Oro\Bundle\DashboardBundle\Twig\DashboardExtension
         arguments:
             - '@oro_dashboard.widget_config_value.date_range.converter'
+            - '@oro_query_designer.query_designer.manager'
+            - '@oro_report.entity_provider'
         tags:
             - { name: twig.extension }
+
+    oro_dashboard.form.type.widget_filter:
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetFilterType
+        tags:
+            - { name: form.type, alias: oro_dashboard_query_filter }
