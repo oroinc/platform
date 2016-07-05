@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 
 /**
- * Collects resources for all entities configured in 'Resources/config/oro/api.yml'.
+ * Loads resources for all entities configured in "Resources/config/oro/api.yml".
  */
 class LoadFromConfigBag implements ProcessorInterface
 {

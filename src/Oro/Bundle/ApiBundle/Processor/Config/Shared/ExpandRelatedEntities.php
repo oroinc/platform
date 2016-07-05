@@ -187,7 +187,11 @@ class ExpandRelatedEntities implements ProcessorInterface
                     $targetEntity->set($sectionName, $config->get($sectionName));
                 }
             }
-            $definition->getOrAddField($fieldName)->setTargetEntity($targetEntity);
+            $field = $definition->getOrAddField($fieldName);
+            if (!$field->getTargetClass()) {
+                $field->setTargetClass($targetClass);
+            }
+            $field->setTargetEntity($targetEntity);
         }
     }
 
