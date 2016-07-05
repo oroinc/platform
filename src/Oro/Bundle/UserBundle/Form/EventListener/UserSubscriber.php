@@ -70,7 +70,8 @@ class UserSubscriber implements EventSubscriberInterface
     /**
      * @param FormEvent $event
      */
-    public function postSubmit(FormEvent $event) {
+    public function postSubmit(FormEvent $event)
+    {
         /** @var User $user */
         $user = $event->getData();
         $businessUnits = $user->getBusinessUnits();
