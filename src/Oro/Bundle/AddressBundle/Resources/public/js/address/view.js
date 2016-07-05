@@ -50,6 +50,7 @@ define([
 
         initialize: function(options) {
             this.options.map = _.defaults(options.map || {}, this.options.map);
+            this.options.allowToRemovePrimary = _.defaults(options.allowToRemovePrimary || {}, this.options.allowToRemovePrimary);
             this.$el.attr('id', 'address-book-' + this.model.id);
             this.template = _.template($(options.template || '#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
@@ -73,7 +74,7 @@ define([
         },
 
         close: function() {
-            if (this.model.get('primary')) {
+            if (this.model.get('primary') && !this.options.allowToRemovePrimary) {
                 mediator.execute('showErrorMessage', __('Primary address can not be removed'));
             } else {
                 this.model.destroy({wait: true});
