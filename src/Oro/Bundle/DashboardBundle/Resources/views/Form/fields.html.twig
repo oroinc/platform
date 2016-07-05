@@ -194,7 +194,7 @@
     {{ form_row(form.definition) }}
     {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
     {{ segmentQD.query_designer_condition_builder({
-        'id': type ~ '-condition-builder',
+        'id': name ~ '-condition-builder',
         'criteria_list_id': 'filter-criteria-list',
         'entity_choice_id': widgetType ~ '_' ~ name ~ '_entity'
         })
