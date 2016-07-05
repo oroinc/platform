@@ -116,6 +116,9 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         if (empty($config[SubresourceConfig::ACTIONS])) {
             unset($config[SubresourceConfig::ACTIONS]);
         }
+        if (empty($config[ConfigUtil::FILTERS])) {
+            unset($config[ConfigUtil::FILTERS]);
+        }
 
         return $config;
     }

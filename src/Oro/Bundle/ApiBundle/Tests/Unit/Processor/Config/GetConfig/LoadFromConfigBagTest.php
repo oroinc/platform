@@ -9,6 +9,9 @@ use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class LoadFromConfigBagTest extends ConfigProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -618,6 +621,208 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
         $this->assertFalse($this->context->has(ConfigUtil::ACTIONS));
         $this->assertFalse($this->context->has(ConfigUtil::SUBRESOURCES));
+    }
+
+    public function testProcessMergeSubresourceFilters()
+    {
+        $config = [
+            'filters' => [
+                'fields' => [
+                    'field1' => [
+                        'description' => 'filter 1'
+                    ],
+                    'field2' => [
+                        'description' => 'filter 2'
+                    ],
+                ]
+            ]
+        ];
+        $parentConfig = [
+            'subresources' => [
+                'testSubresource' => [
+                    'filters' => [
+                        'fields' => [
+                            'field2' => [
+                                'description' => 'Subresource filter 2'
+                            ],
+                            'field3' => [
+                                'description' => 'Subresource filter 3'
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects($this->exactly(2))
+            ->method('getConfig')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
+
+        $this->entityHierarchyProvider->expects($this->exactly(2))
+            ->method('getHierarchyForClassName')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
+
+        $this->context->setExtras([new DescriptionsConfigExtra()]);
+        $this->context->setExtras([new FiltersConfigExtra()]);
+        $this->context->setTargetAction('create');
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('testSubresource');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1' => [
+                        'description' => 'filter 1'
+                    ],
+                    'field2' => [
+                        'description' => 'Subresource filter 2'
+                    ],
+                    'field3' => [
+                        'description' => 'Subresource filter 3'
+                    ],
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testProcessSubresourceFiltersShouldCompletelyReplaceOwnFilters()
+    {
+        $config = [
+            'filters' => [
+                'fields' => [
+                    'field1' => [
+                        'description' => 'filter 1'
+                    ],
+                    'field2' => [
+                        'description' => 'filter 2'
+                    ],
+                ]
+            ]
+        ];
+        $parentConfig = [
+            'subresources' => [
+                'testSubresource' => [
+                    'filters' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'field2' => [
+                                'description' => 'Subresource filter 2'
+                            ],
+                            'field3' => [
+                                'description' => 'Subresource filter 3'
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects($this->exactly(2))
+            ->method('getConfig')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
+
+        $this->entityHierarchyProvider->expects($this->exactly(2))
+            ->method('getHierarchyForClassName')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
+
+        $this->context->setExtras([new DescriptionsConfigExtra()]);
+        $this->context->setExtras([new FiltersConfigExtra()]);
+        $this->context->setTargetAction('create');
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('testSubresource');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field2' => [
+                        'description' => 'Subresource filter 2'
+                    ],
+                    'field3' => [
+                        'description' => 'Subresource filter 3'
+                    ],
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testProcessMergeSubresourceFiltersWhenTargetEntityDoesNotHaveOwnFilters()
+    {
+        $config = [
+        ];
+        $parentConfig = [
+            'subresources' => [
+                'testSubresource' => [
+                    'filters' => [
+                        'fields' => [
+                            'field1' => [
+                                'description' => 'Subresource filter 1'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configBag->expects($this->exactly(2))
+            ->method('getConfig')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, $this->context->getVersion(), $config],
+                    ['Test\ParentClass', $this->context->getVersion(), $parentConfig],
+                ]
+            );
+
+        $this->entityHierarchyProvider->expects($this->exactly(2))
+            ->method('getHierarchyForClassName')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, []],
+                    ['Test\ParentClass', []],
+                ]
+            );
+
+        $this->context->setExtras([new DescriptionsConfigExtra()]);
+        $this->context->setExtras([new FiltersConfigExtra()]);
+        $this->context->setTargetAction('create');
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('testSubresource');
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1' => [
+                        'description' => 'Subresource filter 1'
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
     }
 
     /**
