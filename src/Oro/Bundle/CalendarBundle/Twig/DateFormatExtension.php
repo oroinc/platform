@@ -44,6 +44,8 @@ class DateFormatExtension extends \Twig_Extension
     }
 
     /**
+     * @deprecated Since 1.11, will be removed after 1.13.
+     *
      * Returns a string represents a range between $startDate and $endDate, formatted according the given parameters
      * Examples:
      *      $endDate is not specified
