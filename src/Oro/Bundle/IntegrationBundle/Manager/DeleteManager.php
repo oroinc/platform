@@ -53,6 +53,8 @@ class DeleteManager
                     $deleteProvider->deleteRelatedData($integration);
                 }
             }
+
+            $this->removeFromEntityByChannelId('OroIntegrationBundle:Status', $integration);
             $this->em->remove($integration);
             $this->em->flush();
             $this->em->getConnection()->commit();
@@ -62,5 +64,25 @@ class DeleteManager
         }
 
         return true;
+    }
+
+    /**
+     * Remove records from given entity type related to channel
+     *
+     * @param string $entityClassName
+     *
+     * @return $this
+     */
+    protected function removeFromEntityByChannelId($entityClassName, Integration $integration)
+    {
+        $this->em->getConnection()->executeQuery(
+            sprintf(
+                'DELETE FROM %s WHERE channel_id=%s',
+                $this->em->getClassMetadata($entityClassName)->getTableName(),
+                $integration->getId()
+            )
+        );
+
+        return $this;
     }
 }
