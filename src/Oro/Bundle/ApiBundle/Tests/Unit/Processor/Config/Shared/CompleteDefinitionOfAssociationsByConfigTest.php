@@ -317,6 +317,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                 'fields' => [
                     'association2' => [
                         'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association2Target',
                         'fields'           => [
                             'id' => null
                         ],
@@ -324,6 +325,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                     ],
                     'association3' => [
                         'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association3Target',
                         'collapse'         => true,
                         'fields'           => [
                             'id' => null
@@ -335,6 +337,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                     'association5' => [
                         'property_path'    => 'realAssociation5',
                         'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association5Target',
                         'collapse'         => true,
                         'fields'           => [
                             'id' => null

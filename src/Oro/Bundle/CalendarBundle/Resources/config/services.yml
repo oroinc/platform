@@ -89,6 +89,8 @@ services:
         class: %oro_calendar.twig.dateformat.class%
         arguments:
             - '@oro_locale.formatter.date_time'
+        calls:
+            - [setConfigManager, ['@oro_config.manager']]
         tags:
             - { name: twig.extension }
 

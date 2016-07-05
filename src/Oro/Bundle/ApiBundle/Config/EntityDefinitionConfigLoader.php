@@ -8,8 +8,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
 {
     /** @var array */
     protected $methodMap = [
-        EntityDefinitionConfig::DISABLE_PARTIAL_LOAD => ['disablePartialLoad', 'enablePartialLoad'],
-        EntityDefinitionConfig::POST_SERIALIZE       => 'setPostSerializeHandler',
+        EntityDefinitionConfig::POST_SERIALIZE => 'setPostSerializeHandler',
     ];
 
     /** @var ConfigLoaderFactory */

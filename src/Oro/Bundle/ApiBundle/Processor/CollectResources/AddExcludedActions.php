@@ -63,7 +63,7 @@ class AddExcludedActions implements ProcessorInterface
     }
 
     /**
-     * Loads configuration of the "actions" section from "Resources/config/oro/api.yml"
+     * Loads configuration from the "actions" section from "Resources/config/oro/api.yml"
      *
      * @param string $entityClass
      * @param string $version

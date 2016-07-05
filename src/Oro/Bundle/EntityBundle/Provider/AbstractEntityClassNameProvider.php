@@ -23,7 +23,7 @@ abstract class AbstractEntityClassNameProvider
     public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
     {
         $this->configManager = $configManager;
-        $this->translator    = $translator;
+        $this->translator = $translator;
     }
 
     /**
@@ -78,11 +78,12 @@ abstract class AbstractEntityClassNameProvider
      */
     protected function getLabelName($entityClass, $isPlural = false)
     {
-        $entityConfigProvider = $this->configManager->getProvider('entity');
+        if (!$this->configManager->hasConfig($entityClass)) {
+            return null;
+        }
 
-        return $entityConfigProvider->hasConfig($entityClass)
-            ? $entityConfigProvider->getConfig($entityClass)->get($isPlural ? 'plural_label' : 'label')
-            : null;
+        return $this->configManager->getEntityConfig('entity', $entityClass)
+            ->get($isPlural ? 'plural_label' : 'label');
     }
 
     /**
@@ -93,10 +94,11 @@ abstract class AbstractEntityClassNameProvider
      */
     protected function getFieldLabelName($entityClass, $fieldName)
     {
-        $entityConfigProvider = $this->configManager->getProvider('entity');
+        if (!$this->configManager->hasConfig($entityClass, $fieldName)) {
+            return null;
+        }
 
-        return $entityConfigProvider->hasConfig($entityClass, $fieldName)
-            ? $entityConfigProvider->getConfig($entityClass, $fieldName)->get('label')
-            : null;
+        return $this->configManager->getFieldConfig('entity', $entityClass, $fieldName)
+            ->get('label');
     }
 }

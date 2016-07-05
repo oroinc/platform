@@ -19,7 +19,7 @@ class SubresourceContext extends Context
     /** an identifier of the parent entity */
     const PARENT_ID = 'parentId';
 
-    /** the association name the sub resource is represented */
+    /** the association name the sub-resource represents */
     const ASSOCIATION = 'association';
 
     /** a flag indicates if an association represents "to-many" or "to-one" relation */
@@ -90,7 +90,7 @@ class SubresourceContext extends Context
     }
 
     /**
-     * Gets the association name the sub resource is represented.
+     * Gets the association name the sub-resource represents.
      *
      * @return string
      */
@@ -100,7 +100,7 @@ class SubresourceContext extends Context
     }
 
     /**
-     * Sets the association name the sub resource is represented.
+     * Sets the association name the sub-resource represents.
      *
      * @param string $associationName
      */

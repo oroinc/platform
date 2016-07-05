@@ -9,52 +9,82 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
     public function testClone()
     {
         $fieldMetadata = new FieldMetadata();
-        $fieldMetadata->setName('fieldName');
-        $fieldMetadata->set('test_scalar', 'value');
-        $objValue = new \stdClass();
-        $objValue->someProp = 123;
-        $fieldMetadata->set('test_object', $objValue);
+        $fieldMetadata->setName('testName');
+        $fieldMetadata->setDataType('testDataType');
+        $fieldMetadata->setIsNullable(true);
+        $fieldMetadata->setMaxLength(123);
 
         $fieldMetadataClone = clone $fieldMetadata;
 
         $this->assertEquals($fieldMetadata, $fieldMetadataClone);
-        $this->assertNotSame($objValue, $fieldMetadataClone->get('test_object'));
     }
 
-    public function testConstructor()
+    public function testToArray()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('testName');
+        $fieldMetadata->setDataType('testDataType');
+        $fieldMetadata->setIsNullable(true);
+        $fieldMetadata->setMaxLength(123);
+
+        $this->assertEquals(
+            [
+                'name'       => 'testName',
+                'data_type'  => 'testDataType',
+                'nullable'   => true,
+                'max_length' => 123,
+            ],
+            $fieldMetadata->toArray()
+        );
+    }
+
+    public function testToArrayWithRequiredPropertiesOnly()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('testName');
+
+        $this->assertEquals(
+            [
+                'name' => 'testName'
+            ],
+            $fieldMetadata->toArray()
+        );
+    }
+
+    public function testNameInConstructor()
     {
         $fieldMetadata = new FieldMetadata('fieldName');
         $this->assertEquals('fieldName', $fieldMetadata->getName());
     }
 
-    public function testGetName()
+    public function testName()
     {
         $fieldMetadata = new FieldMetadata();
 
         $this->assertNull($fieldMetadata->getName());
-        $this->assertSame($fieldMetadata, $fieldMetadata->setName('fieldName'));
+        $fieldMetadata->setName('fieldName');
         $this->assertEquals('fieldName', $fieldMetadata->getName());
     }
 
-    public function testGetDataType()
+    public function testDataType()
     {
         $fieldMetadata = new FieldMetadata();
 
         $this->assertNull($fieldMetadata->getDataType());
-        $this->assertSame($fieldMetadata, $fieldMetadata->setDataType('fieldType'));
+        $fieldMetadata->setDataType('fieldType');
         $this->assertEquals('fieldType', $fieldMetadata->getDataType());
     }
 
-    public function testIsNullable()
+    public function testNullable()
     {
         $fieldMetadata = new FieldMetadata();
 
         $this->assertFalse($fieldMetadata->isNullable());
-        $this->assertSame($fieldMetadata, $fieldMetadata->setIsNullable(true));
+        $fieldMetadata->setIsNullable(true);
         $this->assertTrue($fieldMetadata->isNullable());
     }
 
-    public function testGetMaxLength()
+    public function testMaxLength()
     {
         $fieldMetadata = new FieldMetadata();
 
