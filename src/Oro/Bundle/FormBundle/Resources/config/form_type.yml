@@ -64,6 +64,7 @@ services:
         class: '%oro_form.type.duration.class%'
         tags:
             - { name: form.type, alias: oro_duration }
+            - { name: oro.api.form.type, alias: oro_duration }
 
     oro_form.type.money:
         class: %oro_form.type.money.class%
