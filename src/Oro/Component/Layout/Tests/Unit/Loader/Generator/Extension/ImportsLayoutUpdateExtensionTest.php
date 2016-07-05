@@ -58,10 +58,10 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider emptyParametersDataProvider
+     * @dataProvider prepareWithoutImportsDataProvider
      * @param array $source
      */
-    public function testEmptyParameters(array $source)
+    public function testPrepareWithoutImports(array $source)
     {
         $collection = new VisitorCollection();
         $this->extension->prepare(new GeneratorData($source), $collection);
@@ -71,7 +71,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function emptyParametersDataProvider()
+    public function prepareWithoutImportsDataProvider()
     {
         return [
             [
