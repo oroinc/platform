@@ -3,7 +3,23 @@ oro_api:
         Oro\Bundle\EmailBundle\Entity\EmailTemplate: ~
         Oro\Bundle\EmailBundle\Entity\AutoResponseRule: ~
         Oro\Bundle\EmailBundle\Entity\AutoResponseRuleCondition: ~
-        Oro\Bundle\EmailBundle\Entity\Email: ~
+        Oro\Bundle\EmailBundle\Entity\Email:
+            subresources:
+                suggestions:
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityDescriptor
+                    target_type: collection
+                    actions:
+                        get_subresource:
+                            description: Get entities that might be associated with the email
+                        get_relationship: false
+                        update_relationship: false
+                        add_relationship: false
+                        delete_relationship: false
+                    filters:
+                        fields:
+                            exclude-current-user:
+                                description: Indicates whether the current user should be excluded from the result.
+                                data_type: boolean
         Oro\Bundle\EmailBundle\Entity\EmailAttachment: ~
         Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent: ~
         Oro\Bundle\EmailBundle\Entity\EmailBody: ~

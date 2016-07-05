@@ -198,6 +198,9 @@ class CompleteDefinition implements ProcessorInterface
             [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
         );
         if ($config->hasDefinition()) {
+            if (!$field->getTargetClass()) {
+                $field->setTargetClass($targetClass);
+            }
             if (!$targetEntity) {
                 $targetEntity = $field->createAndSetTargetEntity();
             }

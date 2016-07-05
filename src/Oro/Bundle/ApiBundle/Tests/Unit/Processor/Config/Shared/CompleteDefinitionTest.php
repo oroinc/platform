@@ -621,6 +621,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -689,6 +690,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -764,6 +766,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'property_path'          => 'realAssociation1',
                         'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -837,6 +840,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclude'                => true,
                         'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -909,6 +913,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -982,6 +987,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclude'                => true,
                         'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -1057,6 +1063,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'data_type'              => 'string',
                         'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -1132,6 +1139,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
                         'collapse'               => true,
                         'identifier_field_names' => ['id1', 'id2'],
                         'fields'                 => [
