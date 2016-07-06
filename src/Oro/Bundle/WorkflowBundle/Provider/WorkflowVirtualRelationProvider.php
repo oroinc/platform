@@ -79,7 +79,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
                         'alias' => self::ITEMS_RELATION_NAME,
                         'conditionType' => Join::WITH,
                         'condition' => sprintf(
-                            'entity.%s = %s.entityId AND %s.entityClass = \'%s\'',
+                            'CAST(entity.%s as string) = CAST(%s.entityId as string) AND %s.entityClass = \'%s\'',
                             $this->getEntityIdentifier($className),
                             self::ITEMS_RELATION_NAME,
                             self::ITEMS_RELATION_NAME,

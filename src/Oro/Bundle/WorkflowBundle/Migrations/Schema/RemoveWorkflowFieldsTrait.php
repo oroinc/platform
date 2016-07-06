@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Table;
 

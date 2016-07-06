@@ -163,7 +163,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
                             'alias' => WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME,
                             'conditionType' => Join::WITH,
                             'condition' => sprintf(
-                                'entity.%s = %s.entityId AND %s.entityClass = \'%s\'',
+                                'CAST(entity.%s as string) = CAST(%s.entityId as string) AND %s.entityClass = \'%s\'',
                                 'id',
                                 WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME,
                                 WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME,
