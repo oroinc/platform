@@ -37,7 +37,7 @@ You can create your list of accesses. For example, the string "VIEW;EDIT" will s
 
 **group_name** parameter is used to group entities by applications. It is used to split security into application scopes. 
 
-**category** parameter is used to categorise entity. It is used to split by section into role privilege edit.
+**category** parameter is used to categorise entity. It is used to split entities by section on the role privileges edit page.
 
 You can use @Acl and @AclAncestor annotations to protect controller actions.
 
