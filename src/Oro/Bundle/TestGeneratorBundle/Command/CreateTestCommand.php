@@ -44,7 +44,7 @@ class CreateTestCommand extends ContainerAwareCommand
                 sprintf('Type "%s" is not known. Supported types are: unit, entity, functional', $type)
             );
         }
-        $phpVersion = (float)$input->getArgument('php_version') ?: 5.3;
+        $phpVersion = (float)$input->getArgument('php_version') ?: 5.5;
         /** @var AbstractTestGenerator $generator */
         $generator = $this->getContainer()->get('oro_test_generator.generator.test.'.$type);
         $generator->setPhpVersion($phpVersion);

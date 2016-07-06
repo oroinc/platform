@@ -53,7 +53,8 @@
         .highlight .error     { color: #C82829; }
     </style>
 
-    <h2>Queries with identical parameters ({{ collector.identicalQueriesCount }})</h2>
+    <h2>Identical Queries ({{ collector.identicalQueriesCount }}) <br/><small>Queries with identical parameters</small></h2>
+
     {% for connection, identicalQueries in collector.identicalQueries %}
         {% if identicalQueries is not empty %}
             <h3>Connection <em>{{ connection }}</em></h3>
@@ -76,7 +77,7 @@
         {% endif %}
     {% endfor %}
 
-    <h2>Queries with different parameters ({{ collector.similarQueriesCount }})</h2>
+    <h2>Similar Queries ({{ collector.similarQueriesCount }}) <br/><small>Queries with different parameters</small></h2>
     {% for connection, similarQueries in collector.similarQueries %}
         {% if similarQueries is not empty %}
             <h3>Connection <em>{{ connection }}</em></h3>
