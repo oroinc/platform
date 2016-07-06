@@ -207,7 +207,7 @@ abstract class ApiTestCase extends WebTestCase
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $e = new \PHPUnit_Framework_ExpectationFailedException(
                 sprintf(
-                    'Wrong %s response for "%s" request for entity: "%s". Error message: %s',
+                    'Expects %s status code for "%s" request for entity: "%s". Error message: %s',
                     $statusCode,
                     $requestType,
                     $entityName,
@@ -238,12 +238,12 @@ abstract class ApiTestCase extends WebTestCase
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $e = new \PHPUnit_Framework_ExpectationFailedException(
                 sprintf(
-                    'Wrong %s response for "%s" request for entity: "%s". Error message: %s. Content: %s',
+                    'Expects %s status code for "%s" request for entity: "%s". Error message: %s. Content: %s',
                     $statusCode,
                     $requestType,
                     $entityName,
                     $e->getMessage(),
-                    is_array($content) ? json_encode($content): (string)$content
+                    is_array($content) ? json_encode($content) : (string)$content
                 ),
                 $e->getComparisonFailure()
             );
