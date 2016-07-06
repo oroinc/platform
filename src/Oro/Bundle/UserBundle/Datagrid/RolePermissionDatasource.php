@@ -30,7 +30,8 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     /** @var Role */
     protected $role;
 
-    /** @var string[] Exclude share permissions in platform application because it is enterprise feature */
+    /** @var string[] Exclude share permissions in platform application because it is enterprise feature
+     * Should be fixed by - CRM-5781 */
     protected static $excludePermissions = ['SHARE'];
 
     /**

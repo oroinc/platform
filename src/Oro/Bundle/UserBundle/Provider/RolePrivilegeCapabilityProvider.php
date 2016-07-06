@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\Role;
 
@@ -31,9 +32,8 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
                 'description'             => $description,
                 'name'                    => $permission->getName(),
                 'access_level'            => $permission->getAccessLevel(),
-                'selected_access_level'   => RolePrivilegeAbstractProvider::SELECTED_ACCESS_LEVEL,
-                'unselected_access_level' => RolePrivilegeAbstractProvider::UNSELECTED_ACCESS_LEVEL
-            ];
+                'selected_access_level'   => AccessLevel::SYSTEM_LEVEL,
+                'unselected_access_level' => AccessLevel::NONE_LEVEL            ];
         }
         $capabilitiesData = $this->filterUnusedCategories($capabilitiesData);
 

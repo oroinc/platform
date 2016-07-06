@@ -31,19 +31,24 @@ class Role extends AbstractPageEntity
     {
         foreach ($aclAction as $action) {
             $this->accessLevel = $this->test->byXpath(
-                "//td[normalize-space(text()) = '{$entityName}']/ancestor::tr".
+                "//td[normalize-space(text()) = '{$entityName}']/ancestor::tr" .
                 "//span[normalize-space(text()) = '$action']/following-sibling::a[@data-name='accessLevel']"
             );
 
             $this->accessLevel->click();
             $this->waitForAjax();
-            if ($accessLevel === 'System' && !$this->isElementPresent(
-                    "//li[contains(@class, 'action-permissions__item') and contains(@class, 'open')]".
-                    "//a[normalize-space(text()) = '{$accessLevel}']")) {
+            if ($accessLevel === 'System'
+                && !$this->isElementPresent(
+                    "//li[contains(@class, 'action-permissions__item') and contains(@class, 'open')]" .
+                    "//a[normalize-space(text()) = '{$accessLevel}']"
+                )
+            ) {
                 $accessLevel = 'Organization';
             }
-            $this->test->byXPath("//li[contains(@class, 'action-permissions__item') and contains(@class, 'open')]".
-                "//a[normalize-space(text()) = '{$accessLevel}']")->click();
+            $this->test->byXPath(
+                "//li[contains(@class, 'action-permissions__item') and contains(@class, 'open')]" .
+                "//a[normalize-space(text()) = '{$accessLevel}']"
+            )->click();
         }
 
         return $this;

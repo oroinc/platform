@@ -13,9 +13,6 @@ use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 
 abstract class RolePrivilegeAbstractProvider
 {
-    const UNSELECTED_ACCESS_LEVEL = 0;
-    const SELECTED_ACCESS_LEVEL = 5;
-
     /** @var TranslatorInterface */
     protected $translator;
 
