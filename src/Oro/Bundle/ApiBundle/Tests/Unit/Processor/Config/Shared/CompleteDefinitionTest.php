@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
