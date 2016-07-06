@@ -4,15 +4,15 @@ define(function(require) {
     var PermissionReadOnlyView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var accessLevels = require('orouser/js/constants/access-levels');
 
     PermissionReadOnlyView = BaseView.extend({
-        ACCESS_LEVEL_NONE: 0,
         tagName: 'li',
         className: 'action-permissions__item dropdown',
         template: require('tpl!orouser/templates/datagrid/cell/permission/permission-readonly-view.html'),
         getTemplateData: function() {
             var data = PermissionReadOnlyView.__super__.getTemplateData.apply(this, arguments);
-            data.noAccess = this.ACCESS_LEVEL_NONE === this.model.get('access_level');
+            data.noAccess = accessLevels.NONE === this.model.get('access_level');
             return data;
         }
     });

@@ -8,12 +8,10 @@ define(function(require) {
     var BaseCollection = require('oroui/js/app/models/base/collection');
     var PermissionModel = require('orouser/js/models/role/permission-model');
     var CapabilitiesView = require('orouser/js/views/role/capabilities-view');
+    var accessLevels = require('orouser/js/constants/access-levels');
+    var capabilityCategories = require('orouser/js/constants/capability-categories');
 
     CapabilitySetComponent = BaseComponent.extend({
-        GENERAL_CAPABILITIES_CATEGORY: 'system_capabilities',
-        COMMON_CATEGORY: 'all',
-        ACCESS_LEVEL_NONE: 0,
-
         /**
          * @type {Array<string>}
          */
@@ -27,7 +25,6 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['tabIds']));
-            var ACCESS_LEVEL_NONE = this.ACCESS_LEVEL_NONE;
             var groups = _.map(options.data, function(group) {
                 group.items = _.map(group.items, function(item) {
                     item.editable = !options.readonly;
@@ -36,7 +33,7 @@ define(function(require) {
                 if (options.readonly) {
                     group.items = _.filter(group.items, function(item) {
                         item.editable = !options.readonly;
-                        return item.access_level !== ACCESS_LEVEL_NONE;
+                        return item.access_level !== accessLevels.NONE;
                     });
                 }
                 var itemsCollection = new BaseCollection(group.items, {
@@ -50,7 +47,7 @@ define(function(require) {
             }, this);
 
             this.currentCategory = {
-                id: options.currentCategoryId || this.COMMON_CATEGORY
+                id: options.currentCategoryId || capabilityCategories.COMMON
             };
 
             this.view = new CapabilitiesView({
@@ -59,10 +56,10 @@ define(function(require) {
                 filterer: _.bind(function(model) {
                     var group = model.get('group');
                     var currentCategory = this.currentCategory;
-                    if (currentCategory.id === this.GENERAL_CAPABILITIES_CATEGORY) {
+                    if (currentCategory.id === capabilityCategories.GENERAL) {
                         return group && !_.contains(options.tabIds, group);
                     }
-                    return currentCategory.id === this.COMMON_CATEGORY || group === currentCategory.id;
+                    return currentCategory.id === capabilityCategories.COMMON || group === currentCategory.id;
                 }, this)
             });
 
@@ -93,7 +90,7 @@ define(function(require) {
         onAccessLevelChange: function(group, model) {
             var category = group;
             if (category && !_.contains(this.tabIds, category)) {
-                category = this.GENERAL_CAPABILITIES_CATEGORY;
+                category = capabilityCategories.GENERAL;
             }
             mediator.trigger('securityAccessLevelsComponent:link:click', {
                 accessLevel: model.get('access_level'),
