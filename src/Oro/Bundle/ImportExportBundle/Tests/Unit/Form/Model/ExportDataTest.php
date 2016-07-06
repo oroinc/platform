@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Model;
 
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ExportDataTest extends \PHPUnit_Framework_TestCase

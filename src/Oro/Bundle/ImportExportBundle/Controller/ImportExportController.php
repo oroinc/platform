@@ -160,7 +160,7 @@ class ImportExportController extends Controller
      *
      * @return array|Response
      */
-    public function exportConfigAction(Request $request)
+    public function configurableExportAction(Request $request)
     {
         $entityName = $request->get('entity');
 
@@ -199,7 +199,7 @@ class ImportExportController extends Controller
      * @param Request $request
      * @return array|Response
      */
-    public function templateExportConfigAction(Request $request)
+    public function configurableTemplateExportAction(Request $request)
     {
         $entityName = $request->get('entity');
 
