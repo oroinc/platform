@@ -148,18 +148,16 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     /* @var $staleImapEmails ImapEmail[] */
                     foreach ($staleImapEmails as $imapEmail) {
                         $email = $imapEmail->getEmail();
-                        $email->getEmailUsers()->forAll(function ($key, EmailUser $emailUser) use (
-                            $folder,
-                            $imapEmail
-                        ) {
-                            $existsEmails = $this->em->getRepository('OroImapBundle:ImapEmail')
-                                ->findBy(['email' => $imapEmail->getEmail()]);
+                        $email->getEmailUsers()
+                            ->forAll(function ($key, EmailUser $emailUser) use ($folder, $imapEmail) {
+                                $existsEmails = $this->em->getRepository('OroImapBundle:ImapEmail')
+                                    ->findBy(['email' => $imapEmail->getEmail()]);
 
-                            $emailUser->removeFolder($folder);
-                            if (count($existsEmails) <= 1 && !$emailUser->getFolders()->count()) {
-                                $this->em->remove($emailUser);
-                            }
-                        });
+                                $emailUser->removeFolder($folder);
+                                if (count($existsEmails) <= 1 && !$emailUser->getFolders()->count()) {
+                                    $this->em->remove($emailUser);
+                                }
+                            });
                         $this->em->remove($imapEmail);
                     }
                 });
