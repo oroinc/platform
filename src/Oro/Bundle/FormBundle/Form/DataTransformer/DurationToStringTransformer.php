@@ -99,8 +99,8 @@ class DurationToStringTransformer implements DataTransformerInterface
         $parts = array_pad(explode(':', $time), -3, 0);
 
         return [
-            'h' => round($parts[0]),
-            'm' => round($parts[1]),
+            'h' => (float)$parts[0],
+            'm' => (float)$parts[1],
             's' => round($parts[2]),
         ];
     }

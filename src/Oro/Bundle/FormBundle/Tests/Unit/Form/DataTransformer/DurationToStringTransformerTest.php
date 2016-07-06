@@ -110,7 +110,7 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
             ],
             'Column style extra trailing symbols' => [
                 '1a:2.5:3c',
-                3783, // '01:03:03' (minutes are rounded up)
+                3753, // '01:02:33'
             ],
             'Column style extra leading symbols' => [
                 'a1:2b:3c',
