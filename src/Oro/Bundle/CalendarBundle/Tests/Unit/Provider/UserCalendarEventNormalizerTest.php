@@ -179,7 +179,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'invitationStatus' => null,
                         'editable'         => true,
                         'removable'        => true,
-                        'notifiable'       => false,
+                        'notifiable'       => true,
                         'attendees'     => [
                             [
                                 'displayName' => 'user',
@@ -315,7 +315,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'invitationStatus' => null,
                     'editable'         => true,
                     'removable'        => true,
-                    'notifiable'       => false,
+                    'notifiable'       => true,
                     'invitedUsers'     => [],
                     'attendees'        => [
                         [

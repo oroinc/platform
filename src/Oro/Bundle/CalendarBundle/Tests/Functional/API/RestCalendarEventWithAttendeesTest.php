@@ -617,7 +617,7 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
-                'notifiable'       => false,
+                'notifiable'       => true,
                 'attendees'        => [
                     [
                         'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),

@@ -101,7 +101,7 @@ class CalendarEventApiHandler
                 $this->onSuccess(
                     $entity,
                     $originalAttendees,
-                    $this->form->get('notifyInvitedUsers')->getData()
+                    $this->shouldBeNotified()
                 );
                 return true;
             }
@@ -164,5 +164,15 @@ class CalendarEventApiHandler
                 );
             }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldBeNotified()
+    {
+        $notifyInvitedUsers = $this->form->get('notifyInvitedUsers')->getData();
+
+        return $notifyInvitedUsers === 'true' || $notifyInvitedUsers === true;
     }
 }
