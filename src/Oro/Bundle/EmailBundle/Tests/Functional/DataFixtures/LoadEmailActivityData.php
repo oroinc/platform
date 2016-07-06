@@ -10,12 +10,12 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 
 class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -28,8 +28,8 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
     /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
-    /** @var EmailOriginHelper */
-    protected $emailOriginHelper;
+    /** @var Processor */
+    protected $mailerProcessor;
 
     /**
      * {@inheritdoc}
@@ -37,7 +37,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
     public function setContainer(ContainerInterface $container = null)
     {
         $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
-        $this->emailOriginHelper = $container->get('oro_email.tools.email_origin_helper');
+        $this->mailerProcessor = $container->get('oro_email.mailer.processor');
     }
 
     /**
@@ -103,7 +103,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
      */
     protected function createEmail($subject, $messageId, $from, $to, $cc = null, $bcc = null)
     {
-        $origin = $this->emailOriginHelper->getEmailOrigin($this->getReference('simple_user')->getEmail());
+        $origin = $this->mailerProcessor->getEmailOrigin($this->getReference('simple_user')->getEmail());
         $folder = $origin->getFolder(FolderType::SENT);
         $date   = new \DateTime('now', new \DateTimeZone('UTC'));
 
