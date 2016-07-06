@@ -25,29 +25,9 @@ class OroWorkflowBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->updateColumns($schema, $queries);
         $this->updateReportsDefinitions($queries);
         $queries->addQuery(new UpdateEntityConfigsQuery());
         $queries->addQuery(new RemoveExtendedFieldsQuery());
-    }
-
-    /**
-     * @param Schema $schema
-     * @param QueryBag $queries
-     */
-    public function updateColumns(Schema $schema, QueryBag $queries)
-    {
-        $table = $schema->getTable('oro_workflow_item');
-        if (!$table->hasColumn('entity_class')) {
-            $table->addColumn('entity_class', 'string', ['length' => 255, 'notnull' => false]);
-        }
-
-        $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
-
-        $queries->addPostQuery(
-            'UPDATE oro_workflow_item AS wi SET entity_class = ' .
-            '(SELECT related_entity FROM oro_workflow_definition AS wd WHERE wd.name = wi.workflow_name LIMIT 1)'
-        );
     }
 
     /**

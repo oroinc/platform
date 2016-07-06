@@ -264,3 +264,8 @@ services:
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
             - '%oro_workflow.workflow_item.entity.class%'
+
+    oro_workflow.migration.post_up.listener:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\PostUpMigrationListener'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -70 }
