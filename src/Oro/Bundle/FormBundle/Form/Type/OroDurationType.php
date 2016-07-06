@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\DataTransformer\DurationToStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use Oro\Bundle\FormBundle\Form\DataTransformer\DurationToStringTransformer;
 
 /**
  * Duration field type
@@ -65,7 +66,9 @@ class OroDurationType extends AbstractType
         return preg_match($regexJIRAFormat, $value) || preg_match($regexColumnFormat, $value);
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -76,13 +79,17 @@ class OroDurationType extends AbstractType
         );
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return self::NAME;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'text';
