@@ -30,6 +30,7 @@ Table of Contents
    - [Workflow Entity Acl Identity Repository](#workflow-entity-acl-identity-repository)
  - [Support Entities](#support-entities)
    - [Workflow Manager](#workflow-manager)
+   - [Workflow Aware Manager](#workflow-aware-manager)
    - [Workflow Data](#workflow-data)
    - [Workflow Result](#workflow-result)
    - [Step Manager](#step-manager)
@@ -405,6 +406,41 @@ workflow itself;
 WorkflowItem instance or WorkflowDefinition instance;
 * **deactivateWorkflow(entityClass)** - perform deactivation workflow by entity class;
 * **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for given workflow definition;
+
+Workflow Aware Manager
+----------------------
+**Class:** `Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager`
+
+**Abstract Service:** `oro_workflow.abstract.workflow_aware_manager`
+
+**Description**
+With ability to have multiple workflows for an Entity there comes necessity to manage specific workflow.
+This class with a service is useful for cases when your functionality strictly rely on predefined workflow name.
+So you can define your own child of service with specified workflow name through `setWorkflowName` method to be sure that you are managing your specific instance of `Workflow` or its related entities.
+
+**Example of Service Definition:**
+```YAML
+services:
+    my_bundle.workflow.manager.my_special_flow:
+        parent: oro_workflow.abstract.workflow_aware_manager
+        calls:
+            - ['setWorkflowName', ['my_special_flow']]
+```
+
+**Predefined Workflow**
+
+To be able to manage specific `workflow` the manager should be configured by `setWorkflowName` method.
+Later, you can access this name from different parts of application by using your instance of manager and its `getWorkflowName` method.
+You should avoid to use name of workflow as a string at multiple code places. So for this purpose the manager can be helpful as well.
+
+**Methods:**
+* **startWorkflow(entity)** - simply starts workflow defined through `setWorkflowName` method for provided `entity`.
+* **getWorkflow()** - returns `Oro\Bundle\WorkflowBundle\Model\Workflow` instance of defined workflow.
+* **getWorkflowItem(entity)** - retrieves `Oro\Bundle\WorkflowBundle\Entity\WorkflowItem` instance for specified entity from predefined workflow.
+
+* **setWorkflowName(workflowName)** - configures the manager to manage specific workflow.
+* **getWorkflowName():string** - gets current configured name of workflow for the manager.
+
 
 Workflow Data
 -------------
