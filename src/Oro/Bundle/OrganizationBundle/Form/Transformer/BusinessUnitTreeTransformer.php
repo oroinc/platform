@@ -28,8 +28,8 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
         if (null == $value) {
             return 0;
         } elseif (is_array($value)) {
-            foreach($value as &$val) {
-                if ($val === "") {
+            foreach ($value as &$val) {
+                if ($val === '') {
                     $val = 0;
                 }
             }
