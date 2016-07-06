@@ -26,12 +26,13 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
     {
 {% for dependencyData in dependenciesData %}
 {% if dependencyData.has_constructor is defined %}
+{% set fullClassName = phpVersion > 5.4 ? dependencyData.class~'::class' : "'"~dependencyData.fullClassName~"'" %}
 {% if dependencyData.has_constructor %}
-        $this->{{ dependencyData.variable }} = $this->getMockBuilder('{{ dependencyData.fullClassName }}')
+        $this->{{ dependencyData.variable }} = $this->getMockBuilder({{ fullClassName|raw }})
             ->disableOriginalConstructor()
             ->getMock();
 {% else %}
-        $this->{{ dependencyData.variable }} = $this->getMock('{{ dependencyData.fullClassName }}');
+        $this->{{ dependencyData.variable }} = $this->getMock({{ fullClassName|raw }});
 {% endif %}
 {% endif %}
 {% endfor %}
@@ -45,13 +46,14 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
 {% if argument.class %}        /** @var {{ argument.class }}{% if argument.class|length !=0 %}|\PHPUnit_Framework_MockObject_MockObject{% endif %} ${{ argument.name }} **/
 {% endif %}
 {% if argument.has_constructor is defined %}
+{% set fullClassName = phpVersion > 5.4 ? argument.class~'::class' : "'"~argument.fullClass~"'" %}
 {% if argument.has_constructor %}
-        ${{ argument.name }} = $this->getMockBuilder('{{ argument.fullClass }}')
+        ${{ argument.name }} = $this->getMockBuilder({{ fullClassName|raw }})
             ->disableOriginalConstructor()
             ->getMock();
 
 {% else %}
-        ${{ argument.name }} = $this->getMock('{{ argument.fullClass }}');
+        ${{ argument.name }} = $this->getMock({{ fullClassName|raw }});
 
 {% endif %}
 {% else %}

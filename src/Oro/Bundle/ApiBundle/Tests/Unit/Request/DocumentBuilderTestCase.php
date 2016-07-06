@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 
 class DocumentBuilderTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -21,6 +22,19 @@ class DocumentBuilderTestCase extends \PHPUnit_Framework_TestCase
         $metadata->setIdentifierFieldNames($idFields);
 
         return $metadata;
+    }
+
+    /**
+     * @param string $fieldName
+     *
+     * @return MetaPropertyMetadata
+     */
+    protected function createMetaPropertyMetadata($fieldName)
+    {
+        $fieldMetadata = new MetaPropertyMetadata();
+        $fieldMetadata->setName($fieldName);
+
+        return $fieldMetadata;
     }
 
     /**
