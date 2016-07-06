@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var PermissionReadOnlyView;
-    var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var accessLevels = require('orouser/js/constants/access-levels');
 
