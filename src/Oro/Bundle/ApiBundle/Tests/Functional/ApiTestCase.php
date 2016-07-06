@@ -220,6 +220,38 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * @param Response   $response
+     * @param integer    $statusCode
+     * @param string     $entityName
+     * @param string     $requestType
+     * @param array|null $content
+     */
+    protected function assertUpdateApiResponseStatusCodeEquals(
+        Response $response,
+        $statusCode,
+        $entityName,
+        $requestType,
+        $content
+    ) {
+        try {
+            $this->assertResponseStatusCodeEquals($response, $statusCode);
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            $e = new \PHPUnit_Framework_ExpectationFailedException(
+                sprintf(
+                    'Wrong %s response for "%s" request for entity: "%s". Error message: %s. Content: %s',
+                    $statusCode,
+                    $requestType,
+                    $entityName,
+                    $e->getMessage(),
+                    is_array($content) ? json_encode($content): (string)$content
+                ),
+                $e->getComparisonFailure()
+            );
+            throw $e;
+        }
+    }
+
+    /**
      * Assert response status code equals
      *
      * @param Response $response
