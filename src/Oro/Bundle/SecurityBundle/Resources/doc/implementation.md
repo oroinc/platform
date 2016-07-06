@@ -19,6 +19,7 @@ To mark an entity as ACL protected, the next config to the @Configurable annotat
 *          "type"="ACL",
            "permissions"="All"
 *          "group_name"="SomeGroup"
+*          "category"="SomeCategory"
 *      }
     ...
 *  }
@@ -35,6 +36,8 @@ If it is not specified, or is "All", it is considered that the entity access to 
 You can create your list of accesses. For example, the string "VIEW;EDIT" will set the permissions parameters for the entity for viewing and editing.
 
 **group_name** parameter is used to group entities by applications. It is used to split security into application scopes. 
+
+**category** parameter is used to categorise entity. It is used to split by section into role privilege edit.
 
 You can use @Acl and @AclAncestor annotations to protect controller actions.
 
@@ -96,6 +99,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl; #required for Acl annotation
 *      type="action",
 *      label="Do something",
 *      group_name="Some Group"
+*      category="SomeCategory"
 * )
 */
 public function somethingAction()
@@ -108,6 +112,7 @@ can_do_something:
     label: Do something
     type: action
     group_name: "Some Group"
+    category: "SomeCategory"
     bindings: ~
 ```
 
@@ -134,6 +139,7 @@ can_do_something_specific:
     label: Do something
     type: action
     group_name: "Some Group"
+    category: "SomeCategory"
     bindings:
         - {  class: someClass, method: someMethod}
 ```
