@@ -2,28 +2,29 @@
 
 namespace Oro\Bundle\DataGridBundle\Migrations\Schema\v1_3;
 
+use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\PostgreSqlSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension;
-use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DropPrimaryKey implements Migration, OrderedMigrationInterface, ChangeTypeExtensionAwareInterface
+class DropPrimaryKey implements Migration, OrderedMigrationInterface, ContainerAwareInterface
 {
     /**
-     * @var ChangeTypeExtension
+     * @var ContainerInterface
      */
-    protected $changeTypeExtension;
+    protected $container;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function setChangeTypeExtension(ChangeTypeExtension $changeTypeExtension)
+    public function setContainer(ContainerInterface $container = null)
     {
-        $this->changeTypeExtension = $changeTypeExtension;
+        $this->container = $container;
     }
 
     /** {@inheritdoc} */
@@ -37,6 +38,7 @@ class DropPrimaryKey implements Migration, OrderedMigrationInterface, ChangeType
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $em    = $this->container->get('doctrine.orm.entity_manager');
         $table = $schema->getTable('oro_grid_view_user');
         $table->removeForeignKey('FK_10ECBCA8BF53711B');
         if ($table->hasForeignKey('FK_10ECBCA8A76ED395')) {
@@ -45,8 +47,12 @@ class DropPrimaryKey implements Migration, OrderedMigrationInterface, ChangeType
         if ($table->hasForeignKey('fk_oro_grid_view_user_user_id')) {
             $table->removeForeignKey('fk_oro_grid_view_user_user_id');
         }
-        $table->addColumn('id', 'integer');
-        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_grid_view_user', 'id', Type::INTEGER);
-        $table->dropPrimaryKey();
+        $schemaManager = $em->getConnection()->getSchemaManager();
+        if ($schemaManager instanceof PostgreSqlSchemaManager) {
+            $constraint = new Index('oro_grid_view_user_pkey', ['grid_view_id', 'user_id']);
+            $schemaManager->dropConstraint($constraint, $table);
+        } else {
+            $table->dropPrimaryKey();
+        }
     }
 }
