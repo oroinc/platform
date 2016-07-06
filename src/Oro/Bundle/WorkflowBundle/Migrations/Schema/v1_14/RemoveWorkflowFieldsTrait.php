@@ -11,7 +11,10 @@ trait RemoveWorkflowFieldsTrait
      */
     protected function removeWorkflowFields(Table $table)
     {
-        $workflowTables = ['oro_workflow_item', 'oro_workflow_step'];
+        $workflowTables = [
+            'oro_workflow_item',
+            'oro_workflow_step'
+        ];
 
         foreach ($table->getForeignKeys() as $foreignKey) {
             if (!in_array($foreignKey->getForeignTableName(), $workflowTables, true)) {
