@@ -3,6 +3,9 @@
   .more-bar-holder > ul {
     margin-bottom: 0;
   }
+  .grid-body-cell-entity {
+    font-weight: bold;
+  }
   table.grid, .grid-scrollable-container {
     overflow: visible;
   }
@@ -27,12 +30,30 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0 8px;
+    padding: 0 15px 0 8px;
     margin-left: -8px;
     max-width: 100%;
     box-sizing: content-box;
     float: left;
-    cursor: pointer;
+    &.dropdown-toggle {
+      cursor: pointer;
+      &:hover:after {
+        position: absolute;
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-top: 8px;
+        margin-left: 5px;
+        vertical-align: top;
+        border-top: 4px solid #000;
+        border-right: 4px solid transparent;
+        border-left: 4px solid transparent;
+        content: "";
+      }
+    }
+  }
+  & &__item-wrapper--no-access {
+    opacity: 0.4;
   }
   & &__item-wrapper_changed {
     background-color: #f5f5f5;

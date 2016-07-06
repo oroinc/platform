@@ -10,6 +10,11 @@ define(function(require) {
         listSelector: '[data-name="tabs-list"]',
         className: 'tab-collection oro-tabs clearfix',
         itemView: TabItemView,
+        events: {
+            'click a': function(e) {
+                e.preventDefault();
+            }
+        },
         listen: {
             'change collection': 'onChange'
         },
