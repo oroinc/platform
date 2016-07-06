@@ -75,6 +75,7 @@ class OroDurationType extends AbstractType
             [
                 'tooltip' => 'oro.form.oro_duration.tooltip',
                 'type' => 'text',
+                'validation_groups' => false, // disable frontend validators, we validate before submit
             ]
         );
     }
