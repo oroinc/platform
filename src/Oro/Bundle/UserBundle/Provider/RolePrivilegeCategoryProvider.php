@@ -15,7 +15,6 @@ class RolePrivilegeCategoryProvider
      * @var PrivilegeCategory[]
      */
     protected $categoryList = [];
-
     
     /**
      * Add provider to registry

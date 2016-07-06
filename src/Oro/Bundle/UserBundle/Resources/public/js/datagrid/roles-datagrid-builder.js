@@ -15,10 +15,14 @@ define(function(require) {
                 item.permissions = new BaseCollection(item.permissions, {
                     model: PermissionModel
                 });
+
+                var routeParameters = {oid: item.identity.replace(reg, '_')};
+                if (options.metadata.options.access_level_route) {
+                    routeParameters.routeName = options.metadata.options.access_level_route;
+                }
+
                 item.permissions.accessLevels = new AccessLevelsCollection([], {
-                    routeParameters: {
-                        oid: item.identity.replace(reg, '_')
-                    }
+                    routeParameters: routeParameters
                 });
             });
             deferred.resolve();

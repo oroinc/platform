@@ -3,16 +3,16 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
-use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\AbstractRole;
 
 class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
 {
     /**
-     * @param Role $role
+     * @param AbstractRole $role
      *
      * @return mixed
      */
-    public function getCapabilities(Role $role)
+    public function getCapabilities(AbstractRole $role)
     {
         $categories = $this->categoryProvider->getPermissionCategories();
         $capabilitiesData = $this->getCapabilitiesData($categories);

@@ -17,7 +17,7 @@ use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
-use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\AbstractRole;
 
 class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
@@ -27,7 +27,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     /** @var ConfigManager */
     protected $configEntityManager;
 
-    /** @var Role */
+    /** @var AbstractRole */
     protected $role;
 
     /** @var string[] Exclude share permissions in platform application because it is enterprise feature */
@@ -152,8 +152,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
 
         $accessLevel = $permission->getAccessLevel();
         $accessLevelName = AccessLevel::getAccessLevelName($accessLevel);
-        $valueText = AclAccessLevelSelectorType::TRANSLATE_KEY_ACCESS_LEVEL . '.'
-            . (empty($accessLevelName) ? 'NONE' : $accessLevelName);
+        $valueText = $this->getRoleTranslationPrefix() . (empty($accessLevelName) ? 'NONE' : $accessLevelName);
         $valueText = $this->translator->trans($valueText);
 
         return [
@@ -165,5 +164,13 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
             'access_level'       => $accessLevel,
             'access_level_label' => $valueText
         ];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRoleTranslationPrefix()
+    {
+        return AclAccessLevelSelectorType::TRANSLATE_KEY_ACCESS_LEVEL . '.';
     }
 }
