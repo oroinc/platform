@@ -238,6 +238,7 @@ Now:
 
 ####CalendarBundle
 - The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
+- Added method `formatCalendarDateRangeUser` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatUserExtension.php`. Method `calendar_date_range_user` get additional param 'user' and return sate range according to user organization localization settings.
 - Added method `formatCalendarDateRangeOrganization` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatOrganizationExtension.php`. Method `calendar_date_range_organization` get additional param 'organization' and return sate range according to organization localization settings.
 - `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::NOT_RESPONDED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_NONE`.
 - `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::TENTATIVELY_ACCEPTED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_TENTATIVE`.

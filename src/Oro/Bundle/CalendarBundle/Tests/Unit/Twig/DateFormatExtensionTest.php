@@ -3,7 +3,9 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\CalendarBundle\Twig\DateFormatExtension;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,6 +50,32 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new DateFormatExtension($this->formatter, $this->configManager);
     }
 
+    public function testGetFunctions()
+    {
+        $this->extension = new DateFormatExtension($this->formatter);
+
+        $this->assertEquals(
+            [
+                'calendar_date_range' => new \Twig_Function_Method(
+                    $this->extension,
+                    'formatCalendarDateRange'
+                ),
+                'calendar_date_range_user' => new \Twig_Function_Method(
+                    $this->extension,
+                    'formatCalendarDateRangeUser'
+                )
+            ],
+            $this->extension->getFunctions()
+        );
+    }
+
+    public function testGetName()
+    {
+        $this->extension = new DateFormatExtension($this->formatter);
+
+        $this->assertEquals('oro_calendar', $this->extension->getName());
+    }
+
     /**
      * @param string $start
      * @param string|bool $end
@@ -69,38 +97,14 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('Time'));
 
         $this->extension = new DateFormatExtension($this->formatter);
-    }
 
-    public function testGetFunctions()
-    {
-        $this->assertEquals(
-            [
-                'calendar_date_range' => new \Twig_Function_Method(
-                    $this->extension,
-                    'formatCalendarDateRange'
-                )
-            ],
-            $this->extension->getFunctions()
-        );
-    }
+        $startDate = new \DateTime($start);
+        $endDate = $end === null ? null : new \DateTime($end);
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_calendar', $this->extension->getName());
-    }
+        $result = $this->extension->formatCalendarDateRange($startDate, $endDate, $skipTime);
 
-//    /**
-//     * @dataProvider formatCalendarDateRangeProvider
-//     */
-//    public function testFormatCalendarDateRange($start, $end, $skipTime, $expected)
-//    {
-//        $startDate = new \DateTime($start);
-//        $endDate = $end === null ? null : new \DateTime($end);
-//
-//        $result = $this->extension->formatCalendarDateRange($startDate, $endDate, $skipTime);
-//
-//        $this->assertEquals($expected, $result);
-//    }
+        $this->assertEquals($expected, $result);
+    }
 
     public function formatCalendarDateRangeProvider()
     {
