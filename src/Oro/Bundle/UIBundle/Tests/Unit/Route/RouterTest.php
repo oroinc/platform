@@ -4,6 +4,10 @@ namespace Oro\Bundle\UIBundle\Tests\Route;
 
 use Oro\Bundle\UIBundle\Route\Router;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -280,6 +284,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return array
      */
     public function redirectDataProvider()
