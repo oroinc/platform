@@ -193,6 +193,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         var onSelect = prototype.onSelect;
         var updateResults = prototype.updateResults;
         var clear = prototype.clear;
+        var isPlaceholderOptionSelected = prototype.isPlaceholderOptionSelected;
 
         prototype.onSelect = function(data, options) {
             if (data.id === undefined && data.pagePath) {
@@ -208,6 +209,46 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
                 this.focusser.focus();
             }
+        };
+
+        // Overriding method to avoid bug with placeholder in version 3.4.1
+        // see https://github.com/select2/select2/issues/1542
+        // @todo remove after upgrade to version >= 3.4.2
+        prototype.updateSelection = function(data) {
+            var container = this.selection.find('.select2-chosen');
+            var formatted;
+            var cssClass;
+
+            this.selection.data('select2-data', data);
+
+            container.empty();
+            if (data !== null && data !== []) {
+                formatted = this.opts.formatSelection(data, container, this.opts.escapeMarkup);
+            }
+            if (formatted !== undefined) {
+                container.append(formatted);
+            }
+            cssClass = this.opts.formatSelectionCssClass(data, container);
+            if (cssClass !== undefined) {
+                container.addClass(cssClass);
+            }
+
+            this.selection.removeClass('select2-default');
+
+            if (this.opts.allowClear && this.getPlaceholder() !== undefined) {
+                this.container.addClass('select2-allowclear');
+            }
+        };
+
+        // Overriding method to avoid bug with placeholder in version 3.4.1
+        // see https://github.com/select2/select2/issues/1542
+        // @todo remove after upgrade to version >= 3.4.2
+        prototype.isPlaceholderOptionSelected = function() {
+            if (!this.getPlaceholder()) {
+                return false; // no placeholder specified so no option should be considered
+            }
+
+            return isPlaceholderOptionSelected.call(this);
         };
 
         prototype.updateResults = function(initial) {

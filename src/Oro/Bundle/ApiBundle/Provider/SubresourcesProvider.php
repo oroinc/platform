@@ -34,7 +34,7 @@ class SubresourcesProvider
     }
 
     /**
-     * Gets an entity sub resources available through a given Data API version.
+     * Gets an entity sub-resources available through a given Data API version.
      *
      * @param string      $entityClass The FQCN of an entity
      * @param string      $version     The Data API version

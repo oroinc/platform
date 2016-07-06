@@ -5,9 +5,10 @@ namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
-use Oro\Bundle\ApiBundle\Config\ActionsConfigExtra;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Adds info about actions which must not be available to resources.
@@ -17,15 +18,22 @@ class AddExcludedActions implements ProcessorInterface
     /** the name of the Context item to store the configuration of "actions" section */
     const ACTIONS_CONFIG_KEY = 'actions_config';
 
-    /** @var ConfigProvider */
-    protected $configProvider;
+    /** @var ConfigLoaderFactory */
+    protected $configLoaderFactory;
+
+    /** @var ConfigBag */
+    protected $configBag;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param ConfigLoaderFactory $configLoaderFactory
+     * @param ConfigBag           $configBag
      */
-    public function __construct(ConfigProvider $configProvider)
-    {
-        $this->configProvider = $configProvider;
+    public function __construct(
+        ConfigLoaderFactory $configLoaderFactory,
+        ConfigBag $configBag
+    ) {
+        $this->configLoaderFactory = $configLoaderFactory;
+        $this->configBag = $configBag;
     }
 
     /**
@@ -35,26 +43,43 @@ class AddExcludedActions implements ProcessorInterface
     {
         /** @var CollectResourcesContext $context */
 
-        $version = $context->getVersion();
-        $requestType = $context->getRequestType();
-        $configExtras = [new ActionsConfigExtra()];
-
         $actionsConfig = [];
+        $version = $context->getVersion();
+
         $resources = $context->getResult();
         /** @var ApiResource $resource */
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
-
-            $config = $this->configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
-            $actions = $config->getActions();
-            $actionsConfig[$entityClass] = $actions;
-
-            $excludedActions = $this->getExcludedActions($actions);
-            if (!empty($excludedActions)) {
-                $resource->setExcludedActions($excludedActions);
+            $actions = $this->getActionsConfig($entityClass, $version);
+            if (null !== $actions) {
+                $actionsConfig[$entityClass] = $actions;
+                $excludedActions = $this->getExcludedActions($actions);
+                if (!empty($excludedActions)) {
+                    $resource->setExcludedActions($excludedActions);
+                }
             }
         }
         $context->set(self::ACTIONS_CONFIG_KEY, $actionsConfig);
+    }
+
+    /**
+     * Loads configuration from the "actions" section from "Resources/config/oro/api.yml"
+     *
+     * @param string $entityClass
+     * @param string $version
+     *
+     * @return ActionsConfig|null
+     */
+    protected function getActionsConfig($entityClass, $version)
+    {
+        $actions = null;
+        $config = $this->configBag->getConfig($entityClass, $version);
+        if (null !== $config && !empty($config[ConfigUtil::ACTIONS])) {
+            $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS);
+            $actions = $actionsLoader->load($config[ConfigUtil::ACTIONS]);
+        }
+
+        return $actions;
     }
 
     /**
