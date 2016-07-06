@@ -7,6 +7,8 @@ UPGRADE FROM 1.9 to 1.10
 - Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::cleanUpConnections method was removed.
 - Oro\Bundle\TestFrameworkBundle\Test\Client::startTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
 - Oro\Bundle\TestFrameworkBundle\Test\Client::rollbackTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
+- `\Oro\Bundle\TestFrameworkBundle\Fixtures\LoadUserData` is deprecated, use `\Oro\Bundle\TestFrameworkBundle\Migrations\Data\ORM\LoadUserData` instead
+- No need to load fixtures after test environment setup using `doctrine:fixture:load`
 
 ####EntityBundle
 - The implementation of `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` was changed. Now the loaded entity aliases is saved into a cache that gives significant performance gain. Also, from now, you can implement `Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface` to create aliases for any entities not only for ORM entities.
