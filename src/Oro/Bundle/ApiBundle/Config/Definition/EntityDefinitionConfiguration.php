@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 
 class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 {
@@ -15,40 +16,34 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
     {
         parent::configureEntityNode($node);
         $node
-            ->scalarNode(EntityDefinitionConfig::LABEL)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionConfig::PLURAL_LABEL)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionConfig::DESCRIPTION)->cannotBeEmpty()->end()
-            ->integerNode(EntityDefinitionConfig::PAGE_SIZE)
-                ->min(-1)
+            ->arrayNode(EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES)
+                ->prototype('scalar')->end()
             ->end()
-            ->booleanNode(EntityDefinitionConfig::DISABLE_SORTING)->end()
-            ->arrayNode(EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES)->prototype('scalar')->end()->end()
+            ->booleanNode(EntityDefinitionConfig::DISABLE_INCLUSION)->end()
+            ->booleanNode(EntityDefinitionConfig::DISABLE_FIELDSET)->end()
             ->scalarNode(EntityDefinitionConfig::DELETE_HANDLER)->cannotBeEmpty()->end();
     }
 
     /**
-     * @param array $config
-     *
-     * @return array
+     * {@inheritdoc}
      */
     protected function postProcessConfig(array $config)
     {
         $config = parent::postProcessConfig($config);
-        if (array_key_exists(EntityDefinitionConfig::PAGE_SIZE, $config)
-            && -1 === $config[EntityDefinitionConfig::PAGE_SIZE]
-            && !array_key_exists(EntityDefinitionConfig::MAX_RESULTS, $config)
-        ) {
-            $config[EntityDefinitionConfig::MAX_RESULTS] = -1;
-        }
-        if (array_key_exists(EntityDefinitionConfig::DISABLE_SORTING, $config)
-            && !$config[EntityDefinitionConfig::DISABLE_SORTING]
-        ) {
-            unset($config[EntityDefinitionConfig::DISABLE_SORTING]);
-        }
         if (empty($config[EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES])) {
             unset($config[EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES]);
         }
 
         return $config;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function configureFieldNode(NodeBuilder $node)
+    {
+        parent::configureFieldNode($node);
+        $node
+            ->booleanNode(EntityDefinitionFieldConfig::META_PROPERTY)->end();
     }
 }

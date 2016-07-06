@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadEntityMetadata;
 
 class LoadEntityMetadataTest extends MetadataProcessorTestCase
@@ -31,6 +32,21 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             $this->doctrineHelper,
             new EntityMetadataFactory($this->doctrineHelper)
         );
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $dataType
+     *
+     * @return MetaPropertyMetadata
+     */
+    protected function createMetaPropertyMetadata($fieldName, $dataType)
+    {
+        $metaPropertyMetadata = new MetaPropertyMetadata();
+        $metaPropertyMetadata->setName($fieldName);
+        $metaPropertyMetadata->setDataType($dataType);
+
+        return $metaPropertyMetadata;
     }
 
     /**
@@ -124,18 +140,32 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['field1'],
             'fields'                 => [
-                'field1'       => [
+                'field1'        => [
                     'data_type' => 'integer'
                 ],
-                'field2'       => [
+                'field2'        => [
                     'data_type' => 'string',
                     'exclude'   => true
                 ],
-                'field3'       => [
+                'field3'        => [
                     'data_type'     => 'string',
                     'property_path' => 'realField3'
                 ],
-                'association1' => [
+                'metaProperty1' => [
+                    'meta_property' => true,
+                    'data_type'     => 'integer'
+                ],
+                'metaProperty2' => [
+                    'meta_property' => true,
+                    'data_type'     => 'string',
+                    'exclude'       => true
+                ],
+                'metaProperty3' => [
+                    'meta_property' => true,
+                    'data_type'     => 'string',
+                    'property_path' => 'realMetaProperty3'
+                ],
+                'association1'  => [
                     'target_class'           => 'Test\Association1Target',
                     'identifier_field_names' => ['id'],
                     'fields'                 => [
@@ -144,7 +174,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
                         ]
                     ]
                 ],
-                'association2' => [
+                'association2'  => [
                     'target_class' => 'Test\Association2Target',
                     'exclude'      => true
                 ],
@@ -166,6 +196,8 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setIdentifierFieldNames(['field1']);
         $expectedMetadata->addField($this->createFieldMetadata('field1', 'integer'))->setIsNullable(false);
         $expectedMetadata->addField($this->createFieldMetadata('field3', 'string'))->setIsNullable(true);
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1', 'integer'));
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty3', 'string'));
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata(
                 'association1',
@@ -241,18 +273,29 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field1'       => null,
-                'field2'       => [
+                'field1'        => null,
+                'field2'        => [
                     'exclude' => true
                 ],
-                'field3'       => [
+                'field3'        => [
                     'property_path' => 'realField3'
                 ],
-                'association1' => null,
-                'association2' => [
+                'metaProperty1' => [
+                    'meta_property' => true
+                ],
+                'metaProperty2' => [
+                    'meta_property' => true,
+                    'exclude'       => true
+                ],
+                'metaProperty3' => [
+                    'meta_property' => true,
+                    'property_path' => 'realMetaProperty3'
+                ],
+                'association1'  => null,
+                'association2'  => [
                     'exclude' => true
                 ],
-                'association3' => [
+                'association3'  => [
                     'property_path' => 'realAssociation3'
                 ],
             ]
@@ -273,14 +316,19 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
                     'field1',
                     'field2',
                     'realField3',
+                    'metaProperty1',
+                    'metaProperty2',
+                    'realMetaProperty3',
                 ]
             );
-        $classMetadata->expects($this->exactly(2))
+        $classMetadata->expects($this->exactly(4))
             ->method('getTypeOfField')
             ->willReturnMap(
                 [
                     ['field1', 'integer'],
                     ['realField3', 'string'],
+                    ['metaProperty1', 'integer'],
+                    ['realMetaProperty3', 'string'],
                 ]
             );
         $classMetadata->expects($this->once())
@@ -318,9 +366,9 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             ->with('id')
             ->willReturn('integer');
 
-        $association3ClassMetadata                  = $this->getClassMetadataMock('Test\Association3Target');
+        $association3ClassMetadata = $this->getClassMetadataMock('Test\Association3Target');
         $association3ClassMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
-        $association3ClassMetadata->subClasses      = [
+        $association3ClassMetadata->subClasses = [
             'Test\Association3Target1',
             'Test\Association3Target2',
         ];
@@ -356,6 +404,8 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setHasIdentifierGenerator(true);
         $expectedMetadata->addField($this->createFieldMetadata('field1', 'integer'));
         $expectedMetadata->addField($this->createFieldMetadata('field3', 'string'));
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1', 'integer'));
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty3', 'string'));
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata(
                 'association1',
@@ -383,7 +433,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'renamedId'       => [
+                'renamedId' => [
                     'property_path' => 'realId'
                 ],
             ]
@@ -435,7 +485,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields' => [
+            'fields'           => [
                 'someField' => null
             ]
         ];

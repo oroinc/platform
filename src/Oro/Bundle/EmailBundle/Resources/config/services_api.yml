@@ -1,0 +1,12 @@
+services:
+
+    #
+    # get_subresource
+    #
+
+    oro_email.get_subresource.load_email_suggestions:
+        class: Oro\Bundle\EmailBundle\Api\Processor\GetSubresource\LoadEmailSuggestions
+        arguments:
+            - '@oro_email.manager.email_activity_suggestion.api'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: load_data, parentClass: Oro\Bundle\EmailBundle\Entity\Email, association: suggestions }

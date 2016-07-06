@@ -48,7 +48,6 @@ There are a list of existing configuration extras that implement this interface:
 
 - [FiltersConfigExtra](../../Config/FiltersConfigExtra.php)
 - [SortersConfigExtra](../../Config/SortersConfigExtra.php)
-- [ActionsConfigExtra](../../Config/ActionsConfigExtra.php)
 
 Example of configuration extra
 ------------------------------
@@ -88,68 +87,6 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
 }
 ```
 
-This configuration extra is added to the Context by the [InitializeConfigExtras](../../Processor/Get/InitializeConfigExtras.php) processor which belongs to `initialize` group:
+Usually configuration extras are added to the Context by `InitializeConfigExtras` processors which belong to `initialize` group, e.g. [InitializeConfigExtras](../../Processor/Get/InitializeConfigExtras.php) processor for `get` action. But human-readable descriptions are required only for generation a documentation for Data API. So, [DescriptionsConfigExtra](../../Config/DescriptionsConfigExtra.php) is added by [RestDocHandler](../../ApiDoc/RestDocHandler.php).
 
-```php
-<?php
-
-namespace Oro\Bundle\ApiBundle\Processor\Get;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\Context;
-
-/**
- * Sets an initial list of requests for configuration data.
- * It is supposed that the list was initialized if
- * the EntityDefinitionConfigExtra is already exist in the Context.
- */
-class InitializeConfigExtras implements ProcessorInterface
-{
-    public function process(ContextInterface $context)
-    {
-        /** @var Context $context */
-
-        if ($context->hasConfigExtra(EntityDefinitionConfigExtra::NAME)) {
-            // config extras are already initialized
-            return;
-        }
-
-        $context->addConfigExtra(new EntityDefinitionConfigExtra($context->getAction()));
-        $context->addConfigExtra(new FiltersConfigExtra());
-    }
-}
-```
-
-```yaml
-    oro_api.get.initialize_config_extras:
-        class: Oro\Bundle\ApiBundle\Processor\Get\InitializeConfigExtras
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
-```
-
-There are a couple of processors that add descriptions for entity, fields and filters:
-
- - [SetDescriptionForEntity](../../Processor/Config/GetConfig/SetDescriptionForEntity.php)
- - [SetDescriptionForFields](../../Processor/Config/Shared/SetDescriptionForFields.php)
- - [SetDescriptionForFilters](../../Processor/Config/Shared/SetDescriptionForFilters.php)
-
-All those processors registered as services in [processors.get_config.yml](../config/processors.get_config.yml).
-
-For example
-
-```yaml
-    ...
-    oro_api.get_config.set_description_for_entity:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDescriptionForEntity
-        arguments:
-            - @oro_entity.entity_class_name_provider
-            - @oro_entity_config.provider.entity
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: definition&descriptions, priority: -200 }
-    ...
-```
-
-Please note, the processor tag contains the `extra` attribute with `definition&descriptions` value. This means that the processor will be executed only if the extra configuration (in this case `definition` and `description`) were requested. For more details see [processor conditions](./processors.md#processor-conditions).
+The processor which adds descriptions for entity, fields and filters is [CompleteDescriptions](../../Processor/Config/Shared/CompleteDescriptions.php). This processor is registered as services in [processors.get_config.yml](../config/processors.get_config.yml). Please note, the processor tag contains the `extra` attribute with `descriptions&definition` value. This means that the processor will be executed only if the extra configuration (in this case `description` and `definition`) were requested. For more details see [processor conditions](./processors.md#processor-conditions).
