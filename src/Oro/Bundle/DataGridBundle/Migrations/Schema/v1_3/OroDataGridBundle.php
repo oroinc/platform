@@ -40,7 +40,7 @@ class OroDataGridBundle implements Migration, OrderedMigrationInterface
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_10ECBCA8A76ED395'
         );
     }
