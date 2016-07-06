@@ -269,7 +269,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->fieldMetadata->isCollection());
     }
 
-    public function testOneToManySouldBeCloned()
+    public function testOneToManyRelationShouldBeCloned()
     {
         $fieldMetadata = $this->getFieldMetadata([], [
             'type' => ClassMetadataInfo::ONE_TO_MANY,
