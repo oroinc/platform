@@ -121,9 +121,12 @@ class Router
             return new RedirectResponse($this->request->getUri());
         }
 
-        return new RedirectResponse(
-            $this->router->generate($this->parseRouteName($arrayData), $this->parseRouteParams($arrayData, $context))
-        );
+        $routeName = $this->parseRouteName($arrayData);
+        $routeParams = $this->parseRouteParams($arrayData, $context);
+        $routeParams = $this->mergeRequestQueryParams($routeParams);
+        $redirectUrl = $this->router->generate($routeName, $routeParams);
+
+        return new RedirectResponse($redirectUrl);
     }
 
     /**
@@ -247,6 +250,23 @@ class Router
         }
 
         return $parsedParameters;
+    }
+
+    /**
+     * Returns list of passed route parameters merged with query parameters of current request.
+     *
+     * @param array $routeParams
+     * @return array
+     */
+    protected function mergeRequestQueryParams(array $routeParams)
+    {
+        $queryParams = $this->request->query->all();
+
+        if ($queryParams) {
+            $routeParams = array_merge($queryParams, $routeParams);
+        }
+
+        return $routeParams;
     }
 
     /**
