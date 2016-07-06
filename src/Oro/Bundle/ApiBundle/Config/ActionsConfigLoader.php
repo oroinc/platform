@@ -6,7 +6,10 @@ class ActionsConfigLoader extends AbstractConfigLoader
 {
     /** @var array */
     protected $methodMap = [
-        ActionConfig::EXCLUDE => 'setExcluded',
+        ActionConfig::EXCLUDE           => 'setExcluded',
+        ActionConfig::DISABLE_SORTING   => ['disableSorting', 'enableSorting'],
+        ActionConfig::DISABLE_INCLUSION => ['disableInclusion', 'enableInclusion'],
+        ActionConfig::DISABLE_FIELDSET  => ['disableFieldset', 'enableFieldset'],
     ];
 
     /** @var array */

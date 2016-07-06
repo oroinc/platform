@@ -6,15 +6,26 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class SubresourcesConfiguration extends AbstractConfigurationSection
 {
     /** @var ActionsConfiguration */
     protected $actionsConfiguration;
 
-    public function __construct()
+    /** @var FiltersConfiguration */
+    protected $filtersConfiguration;
+
+    /**
+     * @param string[] $permissibleActions
+     */
+    public function __construct($permissibleActions)
     {
-        $this->actionsConfiguration = new ActionsConfiguration('subresources.subresource.action');
+        $this->actionsConfiguration = new ActionsConfiguration(
+            $permissibleActions,
+            'subresources.subresource.action'
+        );
+        $this->filtersConfiguration = new FiltersConfiguration();
     }
 
     /**
@@ -24,6 +35,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
     {
         parent::setSettings($settings);
         $this->actionsConfiguration->setSettings($settings);
+        $this->filtersConfiguration->setSettings($settings);
     }
 
     /**
@@ -82,6 +94,9 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         $this->actionsConfiguration->configure(
             $node->arrayNode(SubresourceConfig::ACTIONS)->children()
         );
+        $this->filtersConfiguration->configure(
+            $node->arrayNode(ConfigUtil::FILTERS)->children()
+        );
     }
 
     /**
@@ -100,6 +115,9 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         }
         if (empty($config[SubresourceConfig::ACTIONS])) {
             unset($config[SubresourceConfig::ACTIONS]);
+        }
+        if (empty($config[ConfigUtil::FILTERS])) {
+            unset($config[ConfigUtil::FILTERS]);
         }
 
         return $config;

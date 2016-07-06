@@ -66,4 +66,21 @@ class ConfigUtil extends BaseConfigUtil
             $objects
         );
     }
+
+    /**
+     * Makes a deep copy of an array of configuration options.
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    public static function cloneItems(array $items)
+    {
+        return array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $items
+        );
+    }
 }
