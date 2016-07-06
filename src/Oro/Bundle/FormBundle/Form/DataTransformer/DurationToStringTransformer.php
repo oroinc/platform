@@ -18,9 +18,9 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *   Result is rounded to the second. Any part could be omitted.
  * - Column style encoding h:m:s (0:0:0)
  *   Hours and minutes can be omitted, so 0:0 is treated min:sec, 0 as sec.
- *   Parts are converted to int, thus trailing non-digits are trimmed, while leading will
- *   result to 0's (1a:b2:3.5m => 1:0:3). Missing leading zeros are also valid (:1: => 0:1:0).
- * In both styles time parts are cumulative, so '1m 120s' (or '1:120') becomes 3 min.
+ *   Parts are rounded up (to int). All PHP string-to-int conversion rules apply.
+ *    Invalid numbers result to 0's (1a:b2:3.5m => 1:0:4). Missing leading zeros are also valid (1: => 0:1:0).
+ * In both styles time parts are cumulative, so '1m 119.5s' (or '1:119.5') becomes 3 min.
  */
 class DurationToStringTransformer implements DataTransformerInterface
 {
@@ -39,7 +39,7 @@ class DurationToStringTransformer implements DataTransformerInterface
 
         // create \DateInterval from integer
         try {
-            $dateInterval = new \DateInterval('PT' . (int) $value . 'S');
+            $dateInterval = new \DateInterval('PT' . round($value) . 'S');
             // since \DateInterval does not handle carryovers, we need to use \DateTime::diff
             $dateTime = new \DateTimeImmutable();
             $interval = $dateTime->diff($dateTime->add($dateInterval));
@@ -99,9 +99,9 @@ class DurationToStringTransformer implements DataTransformerInterface
         $parts = array_pad(explode(':', $time), -3, 0);
 
         return [
-            'h' => (int)$parts[0],
-            'm' => (int)$parts[1],
-            's' => (int)$parts[2],
+            'h' => round($parts[0]),
+            'm' => round($parts[1]),
+            's' => round($parts[2]),
         ];
     }
 

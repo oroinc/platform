@@ -29,6 +29,10 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
                 86410, // 3600 * 24 + 10,
                 '24h 10s',
             ],
+            '120.5 seconds round up' => [
+                120.5,
+                '2m 1s',
+            ],
         ];
     }
 
@@ -80,6 +84,14 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
                 '3',
                 3,
             ],
+            'Column style seconds round up' => [
+                '3.5',
+                4,
+            ],
+            'Column style seconds round down' => [
+                '3.4',
+                3,
+            ],
             'Column style 123 seconds' => [
                 '123',
                 123, // '00:02:03'
@@ -98,7 +110,7 @@ class DurationToStringTransformerTest extends \PHPUnit_Framework_TestCase
             ],
             'Column style extra trailing symbols' => [
                 '1a:2.5:3c',
-                3723, // '01:02:03'
+                3783, // '01:03:03' (minutes are rounded up)
             ],
             'Column style extra leading symbols' => [
                 'a1:2b:3c',
