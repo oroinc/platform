@@ -152,8 +152,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
 
         $accessLevel = $permission->getAccessLevel();
         $accessLevelName = AccessLevel::getAccessLevelName($accessLevel);
-        $valueText = AclAccessLevelSelectorType::TRANSLATE_KEY_ACCESS_LEVEL . '.'
-            . (empty($accessLevelName) ? 'NONE' : $accessLevelName);
+        $valueText = $this->getRoleTranslationPrefix() . (empty($accessLevelName) ? 'NONE' : $accessLevelName);
         $valueText = $this->translator->trans($valueText);
 
         return [
@@ -165,5 +164,13 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
             'access_level'       => $accessLevel,
             'access_level_label' => $valueText
         ];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRoleTranslationPrefix()
+    {
+        return AclAccessLevelSelectorType::TRANSLATE_KEY_ACCESS_LEVEL . '.';
     }
 }
