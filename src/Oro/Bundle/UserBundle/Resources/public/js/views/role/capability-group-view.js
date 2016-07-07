@@ -14,6 +14,7 @@ define(function(require) {
         className: 'role-capability',
         template: require('tpl!orouser/templates/role/capability-group.html'),
         listSelector: '[data-name="capability-items"]',
+        fallbackSelector: '[data-name="capability-empty-items"]',
         itemView: CapabilityItemView,
         listen: {
             'change collection': 'onChange'
