@@ -151,17 +151,41 @@ define([
                 return;
             }
             var obj = JSON.parse(this.$privileges.val());
-            $.each(obj, function(scopeName, privileges) {
-                $.each(privileges, function(key, privilege) {
-                    if (privilege.identity.id === data.identityId) {
-                        $.each(privilege.permissions, function(permissionName, permission) {
-                            if (permission.name === data.permissionName) {
-                                permission.accessLevel = data.accessLevel;
-                            }
-                        });
-                    }
-                });
-            });
+
+            var knownIdentities = _.reduce(obj, function(memo, group) {
+                memo = _.reduce(group, function(memo, item) {
+                    memo[item.identity.id] = item;
+                    return memo;
+                }, memo);
+                return memo;
+            }, {});
+
+            var privelege;
+            if (data.identityId in knownIdentities) {
+                privelege = knownIdentities[data.identityId];
+            } else {
+                // create privelege
+                privelege = {
+                    identity: {
+                        id: data.identityId
+                    },
+                    permissions: {}
+                };
+                if (data.permissionName === 'EXECUTE') {
+                    obj.action[Object.keys(knownIdentities).length] = privelege;
+                } else {
+                    obj.entity[Object.keys(knownIdentities).length] = privelege;
+                }
+            }
+
+            if (!(data.permissionName in privelege.permissions)) {
+                privelege.permissions[data.permissionName] = {
+                    name: data.permissionName
+                }
+            }
+            var permission = privelege.permissions[data.permissionName];
+            permission.accessLevel = data.accessLevel;
+
             this.$privileges.val(JSON.stringify(obj)).trigger('change');
         }
     });
