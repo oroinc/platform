@@ -16,3 +16,4 @@ oro:
         capability_block:
             label: Capabilities
             select_all: Select All
+            no_capabilities_available: This group has no capabilities
