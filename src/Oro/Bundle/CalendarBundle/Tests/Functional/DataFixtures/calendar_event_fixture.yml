@@ -99,12 +99,12 @@ recurringEventInRangeWithCancelledExceptionNotInRange:
 
 recurringEventInRangeWithTimezone:
     title: 'Recurring event with timezone'
-    start: '2016-01-21 04:00:00'
-    end: '2016-01-21 05:00:00'
+    start: '2016-01-21T04:00:00'
+    end: '2016-01-21T05:00:00'
     allDay: false
     recurrence:
         type: 'daily'
         interval: 1
-        startTime: '2016-01-21 04:00:00'
+        startTime: '2016-01-21T04:00:00'
         occurrences: null
         timeZone: 'America/Los_Angeles'
