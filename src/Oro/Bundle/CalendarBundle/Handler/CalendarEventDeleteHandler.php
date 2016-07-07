@@ -118,6 +118,14 @@ class CalendarEventDeleteHandler extends DeleteHandler
         }
 
         $em = $manager->getObjectManager();
+        $this->processDelete($entity, $em);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processDelete($entity, ObjectManager $em)
+    {
         $this->checkPermissions($entity, $em);
         if ($entity->getRecurrence() && $entity->getRecurrence()->getId()) {
             $em->remove($entity->getRecurrence());
