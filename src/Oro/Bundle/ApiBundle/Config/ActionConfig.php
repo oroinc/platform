@@ -9,32 +9,55 @@ class ActionConfig
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;
-    use Traits\AclResourceTrait;
     use Traits\DescriptionTrait;
+    use Traits\DocumentationTrait;
+    use Traits\AclResourceTrait;
     use Traits\MaxResultsTrait;
-    use Traits\StatusCodesTrait;
+    use Traits\PageSizeTrait;
+    use Traits\SortingTrait;
+    use Traits\InclusionTrait;
+    use Traits\FieldsetTrait;
     use Traits\FormTrait;
+    use Traits\StatusCodesTrait;
 
     /** a flag indicates whether the action should not be available for the entity */
     const EXCLUDE = ConfigUtil::EXCLUDE;
 
-    /** the name of ACL resource */
-    const ACL_RESOURCE = EntityDefinitionConfig::ACL_RESOURCE;
-
-    /** the entity description for the action  */
+    /** a short, human-readable description of API resource */
     const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
+
+    /** a detailed documentation of API resource */
+    const DOCUMENTATION = EntityDefinitionConfig::DOCUMENTATION;
+
+    /** the name of ACL resource that should be used to protect the entity */
+    const ACL_RESOURCE = EntityDefinitionConfig::ACL_RESOURCE;
 
     /** the maximum number of items in the result */
     const MAX_RESULTS = EntityDefinitionConfig::MAX_RESULTS;
 
-    /** the maximum number of items in the result */
-    const STATUS_CODES = EntityDefinitionConfig::STATUS_CODES;
+    /** the default page size */
+    const PAGE_SIZE = EntityDefinitionConfig::PAGE_SIZE;
+
+    /** the default ordering of the result */
+    const ORDER_BY = EntityDefinitionConfig::ORDER_BY;
+
+    /** a flag indicates whether a sorting is disabled */
+    const DISABLE_SORTING = EntityDefinitionConfig::DISABLE_SORTING;
+
+    /** a flag indicates whether an inclusion of related entities is disabled */
+    const DISABLE_INCLUSION = EntityDefinitionConfig::DISABLE_INCLUSION;
+
+    /** a flag indicates whether a requesting of a restricted set of fields is disabled */
+    const DISABLE_FIELDSET = EntityDefinitionConfig::DISABLE_FIELDSET;
 
     /** the form type that should be used for the entity */
-    const FORM_TYPE = 'form_type';
+    const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;
 
     /** the form options that should be used for the entity */
-    const FORM_OPTIONS = 'form_options';
+    const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
+
+    /** additional response status codes for the entity */
+    const STATUS_CODES = EntityDefinitionConfig::STATUS_CODES;
 
     /** a list of fields */
     const FIELDS = EntityDefinitionConfig::FIELDS;
@@ -52,20 +75,10 @@ class ActionConfig
      */
     public function toArray()
     {
-        $result = $this->items;
-
-        $keys = array_keys($result);
-        foreach ($keys as $key) {
-            $value = $result[$key];
-            if (is_object($value) && method_exists($value, 'toArray')) {
-                $result[$key] = $value->toArray();
-            }
-        }
-        if (!empty($this->fields)) {
-            foreach ($this->fields as $fieldName => $field) {
-                $fieldConfig                      = $field->toArray();
-                $result[self::FIELDS][$fieldName] = !empty($fieldConfig) ? $fieldConfig : null;
-            }
+        $result = $this->convertItemsToArray();
+        $fields = ConfigUtil::convertObjectsToArray($this->fields, true);
+        if (!empty($fields)) {
+            $result[self::FIELDS] = $fields;
         }
 
         return $result;
@@ -84,22 +97,12 @@ class ActionConfig
     }
 
     /**
-     * Make a deep copy of object.
+     * Makes a deep copy of the object.
      */
     public function __clone()
     {
-        $this->items = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->items
-        );
-        $this->fields = array_map(
-            function ($field) {
-                return clone $field;
-            },
-            $this->fields
-        );
+        $this->cloneItems();
+        $this->fields = ConfigUtil::cloneObjects($this->fields);
     }
 
     /**
@@ -192,5 +195,37 @@ class ActionConfig
     public function removeField($fieldName)
     {
         unset($this->fields[$fieldName]);
+    }
+
+    /**
+     * Gets the default ordering of the result.
+     * The direction can be "ASC" or "DESC".
+     * The Doctrine\Common\Collections\Criteria::ASC and Doctrine\Common\Collections\Criteria::DESC constants
+     * can be used.
+     *
+     * @return array [field name => direction, ...]
+     */
+    public function getOrderBy()
+    {
+        return array_key_exists(self::ORDER_BY, $this->items)
+            ? $this->items[self::ORDER_BY]
+            : [];
+    }
+
+    /**
+     * Sets the default ordering of the result.
+     * The direction can be "ASC" or "DESC".
+     * The Doctrine\Common\Collections\Criteria::ASC and Doctrine\Common\Collections\Criteria::DESC constants
+     * can be used.
+     *
+     * @param array $orderBy [field name => direction, ...]
+     */
+    public function setOrderBy(array $orderBy = [])
+    {
+        if (!empty($orderBy)) {
+            $this->items[self::ORDER_BY] = $orderBy;
+        } else {
+            unset($this->items[self::ORDER_BY]);
+        }
     }
 }

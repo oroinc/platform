@@ -309,9 +309,9 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
             ),
             '1: [11, 12] reverse' => array(
                 array(
+                    array('1', null),
                     array('12', '1'),
                     array('11', '1'),
-                    array('1', null),
                 ),
                 array(
                     '1' => array('12', '11'),
@@ -323,11 +323,11 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
                 array(
                     array('1', null),
                     array('11', '1'),
-                    array('111', '11'),
                     array('12', '1'),
+                    array('111', '11'),
                 ),
                 array(
-                    '1' => array('11', '12', '111'),
+                    '1' => array('11', '111', '12'),
                     '11' => array('111'),
                     '111' => array(),
                     '12' => array(),
@@ -337,16 +337,16 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
                 array(
                     array('1', null),
                     array('11', '1'),
-                    array('111', '11'),
-                    array('1111', '111'),
-                    array('1112', '111'),
                     array('12', '1'),
+                    array('111', '11'),
                     array('121', '12'),
                     array('122', '12'),
+                    array('1111', '111'),
+                    array('1112', '111'),
                     array('1221', '122'),
                 ),
                 array(
-                    '1' => array('11', '12', '111', '121', '122', '1111', '1112', '1221'),
+                    '1' => array('11', '111', '1111', '1112', '12', '121', '122',  '1221'),
                     '11' => array('111', '1111', '1112'),
                     '111' => array('1111', '1112'),
                     '1111' => array(),
