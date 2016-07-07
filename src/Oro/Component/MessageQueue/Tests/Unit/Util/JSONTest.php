@@ -68,4 +68,11 @@ class JSONTest extends \PHPUnit_Framework_TestCase
 
         JSON::encode($resource);
     }
+
+    public function testShouldThrowExceptionIfInputIsObject()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class, 'Object is not valid json. class: "stdClass"');
+
+        $this->assertSame(0, JSON::decode(new \stdClass()));
+    }
 }

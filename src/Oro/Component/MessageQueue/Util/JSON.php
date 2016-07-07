@@ -12,6 +12,15 @@ class JSON
      */
     public static function decode($string)
     {
+        // PHP7 fix - empty string and null cause syntax error
+        if (null === $string || '' === $string) {
+            return null;
+        }
+
+        if (is_object($string)) {
+            throw new \InvalidArgumentException(sprintf('Object is not valid json. class: "%s"', get_class($string)));
+        }
+
         $decoded = json_decode($string, true);
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new \InvalidArgumentException(sprintf(
