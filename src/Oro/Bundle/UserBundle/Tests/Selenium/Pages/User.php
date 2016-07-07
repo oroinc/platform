@@ -73,7 +73,7 @@ class User extends AbstractPageEntity
         $this->email = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_email']");
         $this->groups = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_groups']");
         $this->roles = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_roles']");
-        $this->owner = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_owner']"));
+        $this->owner = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_owner']/preceding-sibling::div/a");
         $this->inviteUser = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_inviteUser']");
 
         return $this;
@@ -88,7 +88,9 @@ class User extends AbstractPageEntity
 
     public function setOwner($owner)
     {
-        $this->owner->selectOptionByLabel($owner);
+        $this->owner->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
     }
@@ -298,10 +300,14 @@ class User extends AbstractPageEntity
      */
     public function setBusinessUnit($businessUnits = array('Main'))
     {
+        $this->test->byXpath(
+            "//*[@data-ftid='oro_user_user_form_businessUnits']//preceding-sibling::div//input"
+        )->click();
         foreach ($businessUnits as $businessUnit) {
-            $this->test->byXpath(
-                "//div[@data-ftid='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]"
-            )->click();
+            $this->test->byXpath("//*[@data-ftid='oro_user_user_form_businessUnits']//preceding-sibling::div" .
+                "//li[@class='select2-search-field']//input")->value($businessUnit);
+            $this->waitForAjax();
+            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$businessUnit}')]")->click();
         }
 
         return $this;

@@ -4,7 +4,6 @@ define(function(require) {
     var ChoiceTreeFilter;
     var _ = require('underscore');
     var TextFilter = require('oro/filter/text-filter');
-    var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var Select2TreeAutocompleteComponent = require('oro/select2-tree-autocomplete-component');
