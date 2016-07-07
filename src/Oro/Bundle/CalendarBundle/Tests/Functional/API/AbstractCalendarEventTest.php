@@ -30,6 +30,7 @@ abstract class AbstractCalendarEventTest extends WebTestCase
         $this->loadFixtures([
             'Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures\LoadCalendarEventData',
             'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadActivityTargets',
+            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData',
         ]);
 
         $targetOne = $this->getReference('activity_target_one');
@@ -70,6 +71,11 @@ abstract class AbstractCalendarEventTest extends WebTestCase
                 'occurrences' => null,
                 'timeZone' => 'UTC'
             ],
+            'attendees' => [
+                [
+                    'email' => 'simple_user@example.com',
+                ],
+            ],
         ];
         self::$recurringEventExceptionParameters = [
             'title' => 'Test Recurring Event Exception',
@@ -82,6 +88,11 @@ abstract class AbstractCalendarEventTest extends WebTestCase
             'recurringEventId' => -1, // is set dynamically
             'originalStart' => gmdate(DATE_RFC3339),
             'isCancelled' => true,
+            'attendees' => [
+                [
+                    'email' => 'simple_user@example.com',
+                ],
+            ],
         ];
     }
 }
