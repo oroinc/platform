@@ -713,10 +713,14 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      * Set parent calendar event.
      *
      * @param CalendarEvent $parent
+     *
+     * @return CalendarEvent
      */
     public function setParent(CalendarEvent $parent = null)
     {
         $this->parent = $parent;
+
+        return $this;
     }
 
     /**
