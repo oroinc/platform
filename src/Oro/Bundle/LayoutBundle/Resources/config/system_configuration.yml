@@ -31,10 +31,10 @@ oro_system_configuration:
                     general_setup:
                         children:
                             development_settings:
-                                priority: -20
+                                priority: 0
                                 children:
                                     development_layout_settings:
-                                        priority: -10
+                                        priority: 0
                                         children:
                                             - oro_layout.debug_block_info
                                             - oro_layout.debug_developer_toolbar
