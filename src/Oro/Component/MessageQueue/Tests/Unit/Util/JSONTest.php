@@ -18,6 +18,40 @@ class JSONTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['foo' => 'fooVal'], JSON::decode('{]'));
     }
 
+    public function nonStringDataProvider()
+    {
+        $resource = fopen('php://memory', 'r');
+        fclose($resource);
+
+        return [
+            [null,],
+            [true,],
+            [false,],
+            [new \stdClass(),],
+            [123,],
+            [123.45,],
+            [$resource,],
+        ];
+    }
+
+    /**
+     * @dataProvider nonStringDataProvider
+     */
+    public function testShouldThrowExceptionIfInputIsNotString($value)
+    {
+        $this->setExpectedException(
+            \InvalidArgumentException::class,
+            'Accept only string argument but got:'
+        );
+
+        $this->assertSame(0, JSON::decode($value));
+    }
+
+    public function testShouldReturnNullIfInputStringIsEmpty()
+    {
+        $this->assertNull(JSON::decode(''));
+    }
+
     public function testShouldEncodeArray()
     {
         $this->assertEquals('{"key":"value"}', JSON::encode(['key' => 'value']));
@@ -67,12 +101,5 @@ class JSONTest extends \PHPUnit_Framework_TestCase
         fclose($resource);
 
         JSON::encode($resource);
-    }
-
-    public function testShouldThrowExceptionIfInputIsObject()
-    {
-        $this->setExpectedException(\InvalidArgumentException::class, 'Object is not valid json. class: "stdClass"');
-
-        $this->assertSame(0, JSON::decode(new \stdClass()));
     }
 }
