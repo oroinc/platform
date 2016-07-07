@@ -117,29 +117,29 @@ class RestCalendarEventWithRegularEventTest extends AbstractCalendarEventTest
     {
         $request = array(
             'calendar' => self::DEFAULT_USER_CALENDAR_ID,
-            'start' => gmdate(DATE_RFC3339, strtotime('2016-01-21 00:00:00')),
-            'end' => gmdate(DATE_RFC3339, strtotime('2016-01-23 00:00:00')),
+            'start' => date_create('2016-01-21 00:00:00', new \DateTimeZone('UTC'))->format(DATE_RFC3339),
+            'end' => date_create('2016-01-23 00:00:00', new \DateTimeZone('UTC'))->format(DATE_RFC3339),
             'subordinate' => false
         );
         $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(2, $result);
-        $this->assertEquals($result[0]['start'], '2016-01-21T02:00:00+00:00');
-        $this->assertEquals($result[0]['end'], '2016-01-21T03:00:00+00:00');
+        $this->assertEquals($result[0]['start'], '2016-01-21T04:00:00+00:00');
+        $this->assertEquals($result[0]['end'], '2016-01-21T05:00:00+00:00');
 
         $request = array(
             'calendar' => self::DEFAULT_USER_CALENDAR_ID,
-            'start' => gmdate(DATE_RFC3339, strtotime('2016-06-21 00:00:00')),
-            'end' => gmdate(DATE_RFC3339, strtotime('2016-06-23 00:00:00')),
+            'start' => date_create('2016-06-21 00:00:00', new \DateTimeZone('UTC'))->format(DATE_RFC3339),
+            'end' => date_create('2016-06-23 00:00:00', new \DateTimeZone('UTC'))->format(DATE_RFC3339),
             'subordinate' => false
         );
         $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(2, $result);
-        $this->assertEquals($result[0]['start'], '2016-06-21T01:00:00+00:00');
-        $this->assertEquals($result[0]['end'], '2016-06-21T02:00:00+00:00');
+        $this->assertEquals($result[0]['start'], '2016-06-21T03:00:00+00:00');
+        $this->assertEquals($result[0]['end'], '2016-06-21T04:00:00+00:00');
     }
 
     public function testCgetByPagination()

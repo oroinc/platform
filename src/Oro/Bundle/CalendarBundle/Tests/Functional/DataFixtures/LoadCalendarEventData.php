@@ -42,14 +42,12 @@ class LoadCalendarEventData extends AbstractFixture implements DependentFixtureI
         $data = Yaml::parse(file_get_contents($fileName));
 
         foreach ($data as $item) {
-            $start = new \DateTime(gmdate(DATE_RFC3339, strtotime($item['start'])));
+            $start = date_create($item['start'], new \DateTimeZone('UTC'));
             $event = new CalendarEvent();
             $event->setCalendar($calendar)
                 ->setTitle($item['title'])
                 ->setStart($start)
-                ->setEnd(
-                    new \DateTime(gmdate(DATE_RFC3339, strtotime($item['end'])))
-                )
+                ->setEnd(date_create($item['end'], new \DateTimeZone('UTC')))
                 ->setAllDay($item['allDay']);
             if (!empty($item['recurrence'])) {
                 $recurrence = new Recurrence();
@@ -58,7 +56,7 @@ class LoadCalendarEventData extends AbstractFixture implements DependentFixtureI
                     ->setOccurrences($item['recurrence']['occurrences'])
                     ->setTimeZone($item['recurrence']['timeZone'])
                     ->setStartTime(
-                        new \DateTime(gmdate(DATE_RFC3339, strtotime($item['recurrence']['startTime'])))
+                        date_create($item['recurrence']['startTime'], new \DateTimeZone('UTC'))
                     );
                 $event->setRecurrence($recurrence);
             }
@@ -68,10 +66,10 @@ class LoadCalendarEventData extends AbstractFixture implements DependentFixtureI
                     $exception->setCalendar($calendar)
                         ->setTitle($exceptionItem['title'])
                         ->setStart(
-                            new \DateTime(gmdate(DATE_RFC3339, strtotime($exceptionItem['start'])))
+                            date_create($exceptionItem['start'], new \DateTimeZone('UTC'))
                         )
                         ->setEnd(
-                            new \DateTime(gmdate(DATE_RFC3339, strtotime($exceptionItem['end'])))
+                            date_create($exceptionItem['end'], new \DateTimeZone('UTC'))
                         )
                         ->setAllDay($exceptionItem['allDay'])
                         ->setCancelled($exceptionItem['isCancelled'])
@@ -94,9 +92,11 @@ class LoadCalendarEventData extends AbstractFixture implements DependentFixtureI
         $attendee->setUser($this->getReference('simple_user'));
         $event->setCalendar($calendar)
             ->setTitle(self::CALENDAR_EVENT_WITH_ATTENDEE)
-            ->setStart(new \DateTime(gmdate(DATE_RFC3339, strtotime('+1 year'))))
+            ->setStart(
+                date_create('+1 year', new \DateTimeZone('UTC'))
+            )
             ->setEnd(
-                new \DateTime(gmdate(DATE_RFC3339, strtotime('+1 year')))
+                date_create('+1 year', new \DateTimeZone('UTC'))
             )
             ->setAllDay($item['allDay']);
         $event->setRelatedAttendee($attendee);

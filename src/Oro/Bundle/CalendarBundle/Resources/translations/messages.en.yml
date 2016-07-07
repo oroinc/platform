@@ -126,7 +126,7 @@ oro:
             recurring_event_exceptions.label: Recurring Event Exceptions
             recurring_event.label: Recurring Event
             original_start.label: Original Start
-            is_cancelled.label: Is Cancelled
+            cancelled.label: Is Cancelled
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }}, updated by {{ editor }}
