@@ -32,7 +32,7 @@ class Role extends AbstractPageEntity
         foreach ($aclAction as $action) {
             $this->accessLevel = $this->test->byXpath(
                 "//td[normalize-space(text()) = '{$entityName}']/ancestor::tr" .
-                "//span[normalize-space(text()) = '$action']/following-sibling::a[@data-name='accessLevel']"
+                "//span[normalize-space(text()) = '$action']/following-sibling::a"
             );
 
             $this->accessLevel->click();
