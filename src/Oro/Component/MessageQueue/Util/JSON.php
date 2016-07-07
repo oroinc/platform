@@ -1,9 +1,6 @@
 <?php
 namespace Oro\Component\MessageQueue\Util;
 
-use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
-
 class JSON
 {
     /**
@@ -28,29 +25,22 @@ class JSON
     }
 
     /**
-     * @param MessageInterface $message
+     * @param mixed $value
      *
-     * @throws InvalidMessageException
-     *
-     * @return array
+     * @return string
      */
-    public static function decodeMessage(MessageInterface $message)
+    public static function encode($value)
     {
-        if ('application/json' != $message->getHeader('content_type')) {
-            throw new InvalidMessageException(sprintf(
-                'The message content type is not application/json but %s.',
-                $message->getHeader('content_type')
+        $encoded = json_encode($value, JSON_UNESCAPED_UNICODE);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \InvalidArgumentException(sprintf(
+                'Could not encode value into json. Error %s and message %s',
+                json_last_error(),
+                json_last_error_msg()
             ));
         }
 
-        try {
-            return static::decode($message->getBody());
-        } catch (\InvalidArgumentException $e) {
-            throw new InvalidMessageException(
-                'The message content type is a json but the decoded content is not valid json.',
-                null,
-                $e
-            );
-        }
+        return $encoded;
     }
 }

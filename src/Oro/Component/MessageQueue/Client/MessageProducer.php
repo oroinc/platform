@@ -4,6 +4,7 @@ namespace Oro\Component\MessageQueue\Client;
 use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface as TransportMessageProducer;
+use Oro\Component\MessageQueue\Util\JSON;
 
 class MessageProducer implements MessageProducerInterface
 {
@@ -75,7 +76,7 @@ class MessageProducer implements MessageProducerInterface
             }
 
             $headers['content_type'] = 'application/json';
-            $body = json_encode($body);
+            $body = JSON::encode($body);
         } else {
             throw new \InvalidArgumentException(sprintf(
                 'The message\'s body must be either null, scalar or array. Got: %s',
