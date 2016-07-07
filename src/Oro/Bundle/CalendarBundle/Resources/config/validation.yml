@@ -81,4 +81,5 @@ Oro\Bundle\CalendarBundle\Entity\Recurrence:
                 min: 1
                 max: 999
         timeZone:
+            - NotBlank: ~
             - Choice: {callback: [\DateTimeZone, listIdentifiers]}
