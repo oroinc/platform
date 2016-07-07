@@ -154,6 +154,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                                     ->findBy(['email' => $imapEmail->getEmail()]);
 
                                 $emailUser->removeFolder($folder);
+                                // if existing imapEmail is last for current email or is absent
+                                // we remove emailUser and after that will remove last imapEmail and email
                                 if (count($existsEmails) <= 1 && !$emailUser->getFolders()->count()) {
                                     $this->em->remove($emailUser);
                                 }
