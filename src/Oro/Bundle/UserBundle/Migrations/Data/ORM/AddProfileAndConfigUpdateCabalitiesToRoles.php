@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class AddProfileAndConfigUpdateCabalitiesToRoles extends AbstractFixture implements
     ContainerAwareInterface,
@@ -95,6 +96,11 @@ class AddProfileAndConfigUpdateCabalitiesToRoles extends AbstractFixture impleme
      */
     protected function getRoles()
     {
-        return $this->objectManager->getRepository('OroUserBundle:Role')->findAll();
+        $repository = $this->objectManager->getRepository('OroUserBundle:Role');
+        $qb = $repository->createQueryBuilder('r')
+            ->where('r.role <> :anon')
+            ->setParameter('anon', User::ROLE_ANONYMOUS);
+
+        return $qb->getQuery()->getResult();
     }
 }
