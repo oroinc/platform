@@ -192,4 +192,23 @@ class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->handler->processDelete(new CalendarEvent(), $this->manager->getObjectManager());
     }
+
+    public function testProcessDeleteShouldCancelExceptionsInsteadOfRemovingThem()
+    {
+        $exception = (new CalendarEvent())
+            ->setRecurringEvent(new CalendarEvent());
+
+        // guard
+        $this->assertFalse($exception->isCancelled());
+
+        $this->manager->getObjectManager()
+            ->expects($this->never())
+            ->method('remove');
+        $this->manager->getObjectManager()
+            ->expects($this->once())
+            ->method('flush');
+
+        $this->handler->processDelete($exception, $this->manager->getObjectManager());
+        $this->assertTrue($exception->isCancelled());
+    }
 }
