@@ -80,16 +80,19 @@ class DailyStrategyTest extends AbstractTestStrategy
      */
     public function testGetTextValue($recurrenceData, $expected)
     {
+        $startDate = new \DateTime($recurrenceData['startTime']);
+        $endDate = $recurrenceData['endTime'] === null ? null : new \DateTime($recurrenceData['endTime']);
+
         $recurrence = new Entity\Recurrence();
         $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
             ->setInterval($recurrenceData['interval'])
-            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setStartTime($startDate)
             ->setTimeZone($recurrenceData['timeZone'])
-            ->setEndTime($recurrenceData['endTime'] === null ? null : new \DateTime($recurrenceData['endTime']))
+            ->setEndTime($endDate)
             ->setOccurrences($recurrenceData['occurrences']);
 
         $calendarEvent = new Entity\CalendarEvent();
-        $calendarEvent->setStart(new \DateTime($recurrenceData['startTime']));
+        $calendarEvent->setStart($startDate);
         $recurrence->setCalendarEvent($calendarEvent);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
@@ -331,7 +334,7 @@ class DailyStrategyTest extends AbstractTestStrategy
             'with_timezone' => [
                 'params' => [
                     'interval' => 2,
-                    'startTime' => '2016-04-28 04:00:00',
+                    'startTime' => '2016-04-28T04:00:00+00:00',
                     'endTime' => null,
                     'occurrences' => null,
                     'timeZone' => 'America/Los_Angeles'

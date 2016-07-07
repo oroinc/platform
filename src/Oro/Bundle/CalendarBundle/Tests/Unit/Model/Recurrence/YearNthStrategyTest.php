@@ -424,7 +424,7 @@ class YearNthStrategyTest extends AbstractTestStrategy
                     'instance' => 3,
                     'dayOfWeek' => ['saturday'],
                     'monthOfYear' => 6,
-                    'startTime' => '2016-04-28 04:00:00',
+                    'startTime' => '2016-04-28T04:00:00+00:00',
                     'endTime' => null,
                     'occurrences' => null,
                     'timeZone' => 'America/Los_Angeles'
