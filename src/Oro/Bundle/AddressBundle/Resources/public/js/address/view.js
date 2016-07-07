@@ -3,8 +3,9 @@ define([
     'backbone',
     'orotranslation/js/translator',
     'oroui/js/mediator',
-    'orolocale/js/formatter/address'
-], function(_, Backbone, __, mediator, addressFormatter) {
+    'orolocale/js/formatter/address',
+    'oroaction/js/action-manager'
+], function(_, Backbone, __, mediator, addressFormatter, ActionManager) {
     'use strict';
 
     var $ = Backbone.$;
@@ -19,6 +20,13 @@ define([
 
         attributes: {
             'class': 'list-item map-item'
+        },
+
+        messages: {
+            title: __('Delete Confirmation'),
+            message: __('Are you sure you want to delete this item?'),
+            okText: __('Yes, Delete'),
+            cancelText: __('Cancel')
         },
 
         events: {
@@ -51,6 +59,7 @@ define([
         initialize: function(options) {
             this.options.map = _.defaults(options.map || {}, this.options.map);
             this.options.allowToRemovePrimary = _.defaults(options.allowToRemovePrimary || {}, this.options.allowToRemovePrimary);
+            this.options.confirmation = _.defaults(options.confirmation || {}, this.options.confirmation);
             this.$el.attr('id', 'address-book-' + this.model.id);
             this.template = _.template($(options.template || '#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
@@ -77,7 +86,15 @@ define([
             if (this.model.get('primary') && !this.options.allowToRemovePrimary) {
                 mediator.execute('showErrorMessage', __('Primary address can not be removed'));
             } else {
-                this.model.destroy({wait: true});
+                this.confirmationExecutor(_.bind(this.model.destroy, this.model, {wait: true}));
+            }
+        },
+
+        confirmationExecutor: function(callback) {
+            if (this.options.confirmation) {
+                new ActionManager({confirmation: this.messages}).showConfirmDialog(callback);
+            } else {
+                callback();
             }
         },
 
