@@ -39,6 +39,10 @@ class OroSelenium2Driver extends Selenium2Driver
                 $this->fillSelect2Entity($xpath, $value);
 
                 return;
+            } elseif (true === in_array('select2-input', $classes, true)) {
+                $this->fillSelect2Entities($xpath, $value);
+
+                return;
             } elseif ('text' === $element->attribute('type')) {
                 $this->fillTextInput($element, $value);
 
@@ -93,6 +97,48 @@ var node = {{ELEMENT}};
 node.value = '$value';
 JS;
         $this->executeJsOnElement($element, $script);
+    }
+
+    /**
+     * Fill field with many entity
+     * See contexts, to fields in send email form
+     *
+     * @param string $xpath
+     * @param string|array $values
+     * @throws ExpectationException
+     */
+    protected function fillSelect2Entities($xpath, $values)
+    {
+        $values = is_array($values) ? $values : [$values];
+        $input = $this->findElement($xpath);
+
+        // Remove all existing entities
+        $results = $this->findElementXpaths($this->xpathManipulator->prepend(
+            '/../../li/a[contains(@class, "select2-search-choice-close")]',
+            $xpath
+        ));
+        foreach ($results as $result) {
+            $this->executeJsOnXpath($result, '{{ELEMENT}}.click()');
+        }
+
+        $this->waitForAjax();
+
+        foreach ($values as $value) {
+            $input->postValue(['value' => [$value]]);
+            $this->wait(3000, "0 == $('ul.select2-results li.select2-searching').length");
+
+            if (!$results = $this->findElementXpaths('//ul[contains(@class, "select2-result-sub")]/li')) {
+                $results = $this->findElementXpaths('//ul[contains(@class, "select2-results")]/li');
+            }
+
+            $firstResult = $this->findElement(array_shift($results));
+
+            if ('select2-no-results' === $firstResult->attribute('class')) {
+                throw new ExpectationException(sprintf('Not found result for "%s"', $value), $this);
+            }
+
+            $firstResult->click();
+        }
     }
 
     /**
@@ -155,8 +201,7 @@ JS;
             '"complete" == document["readyState"] '.
             '&& (typeof($) != "undefined" '.
             '&& document.title !=="Loading..." '.
-            '&& $ !== null '.
-            '&& false === $( "div.loader-mask" ).hasClass("shown"))'
+            '&& $ !== null)'
         );
     }
 
@@ -170,12 +215,12 @@ JS;
 
         $jsAppActiveCheck = <<<JS
         (function () {
-            var isAppActive = false;
+            var isAppActive = 0 !== $("div.loader-mask.shown").length;
             try {
                 if (!window.mediatorCachedForSelenium) {
                     window.mediatorCachedForSelenium = require('oroui/js/mediator');
                 }
-                isAppActive = window.mediatorCachedForSelenium.execute('isInAction');
+                isAppActive = isAppActive || window.mediatorCachedForSelenium.execute('isInAction');
             } catch (e) {
                 return false;
             }

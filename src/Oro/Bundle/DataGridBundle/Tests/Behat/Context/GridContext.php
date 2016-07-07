@@ -284,11 +284,16 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * Click on row in grid
+     * Example: When click on Charlie in grid
+     *
      * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickOnRow($content)
     {
         $this->getGrid()->getRowByContent($content)->click();
+        // Keep this check for sure that ajax is finish
+        $this->getSession()->getDriver()->waitForAjax();
     }
 
     /**
