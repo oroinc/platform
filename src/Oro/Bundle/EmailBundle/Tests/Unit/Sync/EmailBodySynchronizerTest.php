@@ -96,7 +96,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emailBody));
 
         $this->em->expects($this->once())
-            ->method('persist')
+            ->method('flush')
             ->with($this->identicalTo($email));
 
         $this->logger->expects($this->never())
@@ -270,10 +270,8 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emailBody));
 
         $this->em->expects($this->once())
-            ->method('persist')
+            ->method('flush')
             ->with($this->identicalTo($email));
-        $this->em->expects($this->once())
-            ->method('flush');
         $this->em->expects($this->once())
             ->method('clear');
         $this->logger->expects($this->exactly(2))
