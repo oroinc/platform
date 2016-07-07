@@ -21,6 +21,7 @@ Scenario: Send email
     | To         | [Charlie, Pitt]                                                      |
     | Body       | Hi Man! We have new role for you, you will be happy, I promise!      |
     | Contexts   | [Charlie, Pitt]                                                      |
+# todo: Uncomment by resolve BAP-11089
 #  And add email attachments "email-attachment.jpg, email-attachment2.jpg, email-attachment3.jpg"
 #  And delete email-attachment2.jpg attachment
   When press "Send"
@@ -47,6 +48,7 @@ Scenario: Response email
   When I collapse "Work for you" in activity list
   Then email thread "Work for you" should have two emails
 
+# todo: Uncomment by resolve BAP-11089
 #Scenario: View attachments
 #  Given I go to System/User Management/Users
 #  And click view Charlie in grid
