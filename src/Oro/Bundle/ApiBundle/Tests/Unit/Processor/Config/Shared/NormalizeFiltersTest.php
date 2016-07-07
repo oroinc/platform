@@ -25,6 +25,38 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         $this->processor = new NormalizeFilters($this->doctrineHelper);
     }
 
+    public function testRemoveExcludedFilters()
+    {
+        $filters = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => [
+                    'data_type' => 'integer'
+                ],
+                'field2' => [
+                    'data_type' => 'integer',
+                    'exclude'   => true
+                ]
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject([]));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type' => 'integer'
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
     /**
      * @dataProvider processNotManageableEntityProvider
      */

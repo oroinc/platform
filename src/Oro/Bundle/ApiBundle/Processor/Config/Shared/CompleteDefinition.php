@@ -13,10 +13,14 @@ use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
+ * Makes sure that identifier field names are set for ORM entities.
+ * Updates configuration to ask the EntitySerializer that the entity class should be returned
+ * together with related entity data in case if the entity implemented using Doctrine table inheritance.
  * If "identifier_fields_only" config extra is not exist:
  * * Adds fields and associations which were not configured yet based on an entity metadata.
  * * Marks all not accessible fields and associations as excluded.
@@ -25,7 +29,7 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  * If "identifier_fields_only" config extra exists:
  * * Adds identifier fields which were not configured yet based on an entity metadata.
  * * Removes all other fields and association.
- * By performance reasons both actions are done in one processor.
+ * By performance reasons all these actions are done in one processor.
  */
 class CompleteDefinition implements ProcessorInterface
 {
@@ -68,12 +72,7 @@ class CompleteDefinition implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            $existingFields = [];
-            $fields = $definition->getFields();
-            foreach ($fields as $fieldName => $field) {
-                $propertyPath = $field->getPropertyPath() ?: $fieldName;
-                $existingFields[$propertyPath] = $fieldName;
-            }
+            $existingFields = $this->getExistingFields($definition);
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
             if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
                 $this->completeIdentifierFields($definition, $metadata, $existingFields);
@@ -87,12 +86,63 @@ class CompleteDefinition implements ProcessorInterface
                     $context->getRequestType()
                 );
             }
+            // make sure that identifier field names are set
+            $idFieldNames = $definition->getIdentifierFieldNames();
+            if (empty($idFieldNames)) {
+                $this->setIdentifierFieldNames($definition, $metadata);
+            }
+            // make sure "class name" meta field is added for entity with table inheritance
+            if ($metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
+                $this->addClassNameField($definition);
+            }
         } else {
             if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
                 $this->removeObjectNonIdentifierFields($definition);
             } else {
                 $this->completeObjectAssociations($definition, $context->getVersion(), $context->getRequestType());
             }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     *
+     * @return array [property path => field name, ...]
+     */
+    protected function getExistingFields(EntityDefinitionConfig $definition)
+    {
+        $existingFields = [];
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $existingFields[$propertyPath] = $fieldName;
+        }
+
+        return $existingFields;
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ClassMetadata          $metadata
+     */
+    protected function setIdentifierFieldNames(EntityDefinitionConfig $definition, ClassMetadata $metadata)
+    {
+        $idFieldNames = [];
+        $propertyPaths = $metadata->getIdentifierFieldNames();
+        foreach ($propertyPaths as $propertyPath) {
+            $idFieldNames[] = $definition->findFieldNameByPropertyPath($propertyPath) ?: $propertyPath;
+        }
+        $definition->setIdentifierFieldNames($idFieldNames);
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function addClassNameField(EntityDefinitionConfig $definition)
+    {
+        $classNameField = $definition->findFieldNameByPropertyPath(ConfigUtil::CLASS_NAME);
+        if (null === $classNameField) {
+            $definition->addField(ConfigUtil::CLASS_NAME);
         }
     }
 
@@ -106,17 +156,17 @@ class CompleteDefinition implements ProcessorInterface
         ClassMetadata $metadata,
         array $existingFields
     ) {
-        // make sure all identifier fields are added
         $idFieldNames = $metadata->getIdentifierFieldNames();
+        // remove all not identifier fields
+        foreach ($existingFields as $propertyPath => $fieldName) {
+            if (!in_array($propertyPath, $idFieldNames, true) && !ConfigUtil::isMetadataProperty($propertyPath)) {
+                $definition->removeField($fieldName);
+            }
+        }
+        // make sure all identifier fields are added
         foreach ($idFieldNames as $propertyPath) {
             if (!isset($existingFields[$propertyPath])) {
                 $definition->addField($propertyPath);
-            }
-        }
-        // remove all not identifier fields
-        foreach ($existingFields as $propertyPath => $fieldName) {
-            if (!in_array($propertyPath, $idFieldNames, true)) {
-                $definition->removeField($fieldName);
             }
         }
     }
@@ -198,16 +248,19 @@ class CompleteDefinition implements ProcessorInterface
             [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
         );
         if ($config->hasDefinition()) {
+            if (!$field->getTargetClass()) {
+                $field->setTargetClass($targetClass);
+            }
             if (!$targetEntity) {
                 $targetEntity = $field->createAndSetTargetEntity();
             }
             $targetEntity->setExcludeAll();
             $targetDefinition = $config->getDefinition();
-            $targetIdFieldNames = $targetDefinition->getIdentifierFieldNames();
-            foreach ($targetIdFieldNames as $targetFieldName) {
-                $targetEntity->addField($targetFieldName, $targetDefinition->getField($targetFieldName));
+            $targetFields = $targetDefinition->getFields();
+            foreach ($targetFields as $targetFieldName => $targetField) {
+                $targetEntity->addField($targetFieldName, $targetField);
             }
-            $targetEntity->setIdentifierFieldNames($targetIdFieldNames);
+            $targetEntity->setIdentifierFieldNames($targetDefinition->getIdentifierFieldNames());
             $field->setCollapsed();
         }
     }

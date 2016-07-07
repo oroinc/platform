@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
@@ -16,6 +18,8 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
+    const ACTION_PROCESSOR_BAG_SERVICE_ID      = 'oro_api.action_processor_bag';
+    const ACTION_PROCESSOR_TAG                 = 'oro.api.action_processor';
     const CONFIG_EXTENSION_REGISTRY_SERVICE_ID = 'oro_api.config_extension_registry';
     const CONFIG_EXTENSION_TAG                 = 'oro_api.config_extension';
 
@@ -77,17 +81,22 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         }
 
         /**
-         * To load configuration we need fully configured config tree builder, that's why all configuration extensions
-         *   should be registered before.
+         * To load configuration we need fully configured config tree builder,
+         * that's why the action processors bag and all configuration extensions should be registered before.
          */
-        DependencyInjectionUtil::registerTaggedServices(
-            $container,
-            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
-            self::CONFIG_EXTENSION_TAG,
-            'addExtension'
-        );
+        $this->registerActionProcessors($container);
+        $this->registerConfigExtensions($container);
 
-        $this->loadApiConfiguration($container);
+        try {
+            $this->loadApiConfiguration($container);
+        } catch (InvalidConfigurationException $e) {
+            // we have to rethrow the configuration exception but without an inner exception,
+            // otherwise a message of the root exception is displayed
+            if (null !== $e->getPrevious()) {
+                $e = new InvalidConfigurationException($e->getMessage());
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -148,5 +157,38 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         $chainProviderDef = $container->getDefinition('oro_api.entity_exclusion_provider');
         $chainProviderDef->replaceArgument(1, $inclusions);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function registerActionProcessors(ContainerBuilder $container)
+    {
+        $actionProcessorBagServiceDef = DependencyInjectionUtil::findDefinition(
+            $container,
+            self::ACTION_PROCESSOR_BAG_SERVICE_ID
+        );
+        if (null !== $actionProcessorBagServiceDef) {
+            $taggedServices = $container->findTaggedServiceIds(self::ACTION_PROCESSOR_TAG);
+            foreach ($taggedServices as $id => $attributes) {
+                $actionProcessorBagServiceDef->addMethodCall(
+                    'addProcessor',
+                    [new Reference($id)]
+                );
+            }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function registerConfigExtensions(ContainerBuilder $container)
+    {
+        DependencyInjectionUtil::registerTaggedServices(
+            $container,
+            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
+            self::CONFIG_EXTENSION_TAG,
+            'addExtension'
+        );
     }
 }
