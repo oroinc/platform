@@ -334,7 +334,7 @@ class MonthlyStrategyTest extends AbstractTestStrategy
                 'params' => [
                     'interval' => 2,
                     'dayOfMonth' => 10,
-                    'startTime' => '2016-04-28 04:00:00',
+                    'startTime' => '2016-04-28T04:00:00+00:00',
                     'endTime' => null,
                     'occurrences' => null,
                     'timeZone' => 'America/Los_Angeles',

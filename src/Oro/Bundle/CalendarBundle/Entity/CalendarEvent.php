@@ -883,6 +883,20 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
+     * Cancels this event with all related parent/child events
+     */
+    public function cancelAll()
+    {
+        $event = $this->getRealCalendarEvent();
+        $event->setCancelled(true);
+
+        $childEvents = $event->getChildEvents();
+        foreach ($childEvents as $childEvent) {
+            $childEvent->setCancelled(true);
+        }
+    }
+
+    /**
      * Sets cancelled flag.
      *
      * @param bool $cancelled

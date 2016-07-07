@@ -78,16 +78,19 @@ class MonthNthStrategyTest extends AbstractTestStrategy
      */
     public function testGetTextValue($recurrenceData, $expected)
     {
+        $startDate = new \DateTime($recurrenceData['startTime'], $this->getTimeZone());
+        $endDate = $recurrenceData['endTime'] === null
+            ? null
+            : new \DateTime($recurrenceData['endTime'], $this->getTimeZone());
+
         $recurrence = new Entity\Recurrence();
         $recurrence->setRecurrenceType(Recurrence::TYPE_MONTH_N_TH)
             ->setInterval($recurrenceData['interval'])
             ->setInstance($recurrenceData['instance'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
-            ->setStartTime(new \DateTime($recurrenceData['startTime'], $this->getTimeZone()))
+            ->setStartTime($startDate)
             ->setTimeZone($recurrenceData['timeZone'])
-            ->setEndTime($recurrenceData['endTime'] === null
-                ? null
-                : new \DateTime($recurrenceData['endTime'], $this->getTimeZone()))
+            ->setEndTime($endDate)
             ->setOccurrences($recurrenceData['occurrences']);
 
         $calendarEvent = new Entity\CalendarEvent();
@@ -355,7 +358,7 @@ class MonthNthStrategyTest extends AbstractTestStrategy
                     'interval' => 2,
                     'instance' => 3,
                     'dayOfWeek' => ['sunday'],
-                    'startTime' => '2016-04-28 04:00:00',
+                    'startTime' => '2016-04-28T04:00:00+00:00',
                     'endTime' => null,
                     'occurrences' => null,
                     'timeZone' => 'America/Los_Angeles',
