@@ -302,3 +302,12 @@ services:
         class: %oro_locale.entity_generator.extension.class%
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
+
+    oro_locale.twig.date_time_user:
+        class: Oro\Bundle\LocaleBundle\Twig\DateTimeUserExtension
+        arguments:
+            - '@oro_locale.formatter.date_time'
+        calls:
+            - [setConfigManager, ['@oro_config.manager']]
+        tags:
+            - { name: twig.extension }
