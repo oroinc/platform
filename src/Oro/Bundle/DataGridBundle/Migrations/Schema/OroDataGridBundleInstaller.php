@@ -64,7 +64,7 @@ class OroDataGridBundleInstaller implements Installation
      */
     protected function createOroGridViewUserTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_grid_view_user');
+        $table = $schema->createTable('oro_grid_view_user_rel');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', ['notnull' => false]);
         $table->addColumn('grid_view_id', 'integer', ['notnull' => false]);
