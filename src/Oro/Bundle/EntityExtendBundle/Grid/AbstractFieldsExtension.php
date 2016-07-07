@@ -19,6 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\FieldAcl\Configuration as FieldAclConfiguration;
 
 abstract class AbstractFieldsExtension extends AbstractExtension
 {
@@ -135,6 +136,12 @@ abstract class AbstractFieldsExtension extends AbstractExtension
             );
             $config->offsetSetByPath(
                 sprintf('%s[%s][data_name]', FilterConfiguration::COLUMNS_PATH, $fieldName),
+                sprintf('%s.%s', $alias, $fieldName)
+            );
+
+            // add Field ACL configuration
+            $config->offsetSetByPath(
+                sprintf('%s[%s][data_name]', FieldAclConfiguration::COLUMNS_PATH, $fieldName),
                 sprintf('%s.%s', $alias, $fieldName)
             );
         }

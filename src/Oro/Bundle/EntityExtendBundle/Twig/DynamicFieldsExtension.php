@@ -3,9 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -43,6 +45,9 @@ class DynamicFieldsExtension extends \Twig_Extension
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param ConfigManager            $configManager
      * @param FieldTypeHelper          $fieldTypeHelper
@@ -51,7 +56,8 @@ class DynamicFieldsExtension extends \Twig_Extension
     public function __construct(
         ConfigManager $configManager,
         FieldTypeHelper $fieldTypeHelper,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        SecurityFacade $securityFacade
     ) {
         $this->fieldTypeHelper  = $fieldTypeHelper;
         $this->eventDispatcher  = $dispatcher;
@@ -59,6 +65,7 @@ class DynamicFieldsExtension extends \Twig_Extension
         $this->extendProvider   = $configManager->getProvider('extend');
         $this->entityProvider   = $configManager->getProvider('entity');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -90,6 +97,9 @@ class DynamicFieldsExtension extends \Twig_Extension
             $fieldConfigId = $field->getId();
 
             $fieldName = $fieldConfigId->getFieldName();
+            if (!$this->securityFacade->isGranted('VIEW', new FieldVote($entity, $fieldName))) {
+                continue;
+            }
             $fieldType = $fieldConfigId->getFieldType();
 
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
