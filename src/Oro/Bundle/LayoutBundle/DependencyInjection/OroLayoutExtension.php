@@ -37,7 +37,6 @@ class OroLayoutExtension extends Extension
         }
         $excludedPaths = $this->getExcludedPaths($resources);
 
-
         $resources = $this->loadCumulativeResources(
             $container,
             'requirejs.yml'
@@ -121,9 +120,9 @@ class OroLayoutExtension extends Extension
     /**
      * Load resources from views and config file path
      *
-     * @param ContainerBuilder  $container
-     * @param string|null       $viewsFilePath
-     * @param string|null       $configFilePath
+     * @param ContainerBuilder $container
+     * @param string|null $viewsFilePath
+     * @param string|null $configFilePath
      *
      * @return CumulativeResourceInfo[]
      */
