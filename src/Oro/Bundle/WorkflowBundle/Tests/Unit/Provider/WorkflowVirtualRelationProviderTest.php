@@ -22,7 +22,6 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /**
-    /**
      * {@inheritdoc}
      */
     public function setUp()
@@ -164,7 +163,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
                             'alias' => WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME,
                             'conditionType' => Join::WITH,
                             'condition' => sprintf(
-                                'CAST(entity.%s as text) = CAST(%s.entityId as text) AND %s.entityClass = \'%s\'',
+                                'CAST(entity.%s as string) = CAST(%s.entityId as string) AND %s.entityClass = \'%s\'',
                                 'id',
                                 WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME,
                                 WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME,

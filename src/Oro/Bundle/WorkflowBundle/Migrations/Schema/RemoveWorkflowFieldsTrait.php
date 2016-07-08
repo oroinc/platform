@@ -13,7 +13,7 @@ trait RemoveWorkflowFieldsTrait
     {
         $workflowTables = [
             'oro_workflow_item',
-            'oro_workflow_step',
+            'oro_workflow_step'
         ];
 
         foreach ($table->getForeignKeys() as $foreignKey) {

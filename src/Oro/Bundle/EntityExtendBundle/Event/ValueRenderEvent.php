@@ -37,8 +37,13 @@ class ValueRenderEvent extends Event
     protected $fieldViewValue;
 
     /**
-     * @param object        $entity
-     * @param mixed         $fieldValue
+     * @var bool
+     */
+    protected $fieldVisibility = true;
+
+    /**
+     * @param object $entity
+     * @param mixed $fieldValue
      * @param FieldConfigId $fieldConfigId
      */
     public function __construct($entity, $fieldValue, FieldConfigId $fieldConfigId)
@@ -91,5 +96,21 @@ class ValueRenderEvent extends Event
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isFieldVisible()
+    {
+        return $this->fieldVisibility;
+    }
+
+    /**
+     * @param boolean $fieldVisibility
+     */
+    public function setFieldVisibility($fieldVisibility)
+    {
+        $this->fieldVisibility = $fieldVisibility;
     }
 }

@@ -13,7 +13,3 @@ Right now the bundle generates statistical information about:
 ![alt text](./images/profiler_tab.png "Profiler tab screenshot")
 
 ![alt text](./images/profiler_panel.png "Profiler panel screenshot")
-
-## License
-
-Released under the MIT License, see LICENSE.

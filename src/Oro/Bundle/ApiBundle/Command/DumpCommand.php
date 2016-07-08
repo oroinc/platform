@@ -7,10 +7,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
@@ -77,15 +73,16 @@ class DumpCommand extends AbstractDebugCommand
             $output->writeln(sprintf('<info>%s</info>', $resource->getEntityClass()));
             $output->writeln(
                 $this->convertResourceAttributesToString(
-                    $this->getResourceAttributes($resource, $version, $requestType)
+                    $this->getResourceAttributes($resource, $requestType)
                 )
             );
             if ($isSubresourcesRequested) {
-                $output->writeln(
-                    $this->getEntitySubresourcesText(
-                        $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType)
-                    )
+                $subresourcesText = $this->getEntitySubresourcesText(
+                    $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType)
                 );
+                if ($subresourcesText) {
+                    $output->writeln($subresourcesText);
+                }
             }
         }
     }
@@ -100,12 +97,12 @@ class DumpCommand extends AbstractDebugCommand
         $result = '';
         $subresources = $entitySubresources->getSubresources();
         if (!empty($subresources)) {
-            $result .= '<comment> Sub-resources:</comment>';
+            $result .= ' Sub-resources:';
             foreach ($subresources as $associationName => $subresource) {
-                $result .= "\n  " . $associationName;
+                $result .= sprintf("\n  <comment>%s</comment>", $associationName);
                 $subresourceExcludedActions = $subresource->getExcludedActions();
                 if (!empty($subresourceExcludedActions)) {
-                    $result .= "\n    Excluded Actions: " . implode(', ', $subresourceExcludedActions);
+                    $result .= "\n   Excluded Actions: " . implode(', ', $subresourceExcludedActions);
                 }
             }
         }
@@ -115,12 +112,11 @@ class DumpCommand extends AbstractDebugCommand
 
     /**
      * @param ApiResource $resource
-     * @param string      $version
      * @param RequestType $requestType
      *
      * @return array
      */
-    protected function getResourceAttributes(ApiResource $resource, $version, RequestType $requestType)
+    protected function getResourceAttributes(ApiResource $resource, RequestType $requestType)
     {
         $result = [];
 
@@ -133,24 +129,6 @@ class DumpCommand extends AbstractDebugCommand
             DataType::ENTITY_TYPE,
             $requestType
         );
-
-        /** @var ConfigProvider $configProvider */
-        $configProvider = $this->getContainer()->get('oro_api.config_provider');
-        $config = $configProvider->getConfig(
-            $entityClass,
-            $version,
-            $requestType,
-            [
-                new EntityDefinitionConfigExtra(),
-                new FilterIdentifierFieldsConfigExtra(),
-                new DescriptionsConfigExtra()
-            ]
-        );
-        $entityDefinition = $config->getDefinition();
-        if ($entityDefinition) {
-            $result['Name'] = $entityDefinition->getLabel();
-            $result['Plural Name'] = $entityDefinition->getPluralLabel();
-        }
 
         $excludedActions = $resource->getExcludedActions();
         if (!empty($excludedActions)) {
@@ -174,7 +152,7 @@ class DumpCommand extends AbstractDebugCommand
             if ($i > 0) {
                 $result .= PHP_EOL;
             }
-            $result .= sprintf('  %s: %s', $name, $this->convertValueToString($value));
+            $result .= sprintf(' %s: %s', $name, $this->convertValueToString($value));
             $i++;
         }
 

@@ -33,6 +33,25 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
+    public function testSetDataObjectWithoutMetadataAndWithObjectType()
+    {
+        $object = [
+            'id'        => 123,
+            'name'      => 'Name',
+            '__class__' => 'Test\Class'
+        ];
+
+        $this->documentBuilder->setDataObject($object);
+        $this->assertEquals(
+            [
+                'id'     => 123,
+                'name'   => 'Name',
+                'entity' => 'Test\Class'
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
     public function testSetDataCollectionWithoutMetadata()
     {
         $object = [
@@ -46,6 +65,27 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                 [
                     'id'   => 123,
                     'name' => 'Name',
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testSetDataCollectionWithoutMetadataAndWithObjectType()
+    {
+        $object = [
+            'id'        => 123,
+            'name'      => 'Name',
+            '__class__' => 'Test\Class'
+        ];
+
+        $this->documentBuilder->setDataCollection([$object]);
+        $this->assertEquals(
+            [
+                [
+                    'id'     => 123,
+                    'name'   => 'Name',
+                    'entity' => 'Test\Class'
                 ]
             ],
             $this->documentBuilder->getDocument()
@@ -66,6 +106,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $object = [
             'id'         => 123,
             'name'       => 'Name',
+            'meta1'      => 'Meta1',
             'category'   => 456,
             'group'      => null,
             'role'       => ['id' => 789],
@@ -84,6 +125,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
         $metadata->addField($this->createFieldMetadata('id'));
         $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
         $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
         $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
         $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
@@ -98,6 +140,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 'id'         => 123,
                 'name'       => 'Name',
+                'meta1'      => 'Meta1',
                 'category'   => 456,
                 'group'      => null,
                 'role'       => ['id' => 789],
@@ -121,6 +164,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $object = [
             'id'         => 123,
             'name'       => 'Name',
+            'meta1'      => 'Meta1',
             'category'   => 456,
             'group'      => null,
             'role'       => 789,
@@ -139,6 +183,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
         $metadata->addField($this->createFieldMetadata('id'));
         $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
         $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
         $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
         $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
@@ -154,6 +199,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                 [
                     'id'         => 123,
                     'name'       => 'Name',
+                    'meta1'      => 'Meta1',
                     'category'   => 456,
                     'group'      => null,
                     'role'       => 789,
