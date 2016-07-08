@@ -80,7 +80,7 @@ class WorkflowQueryHelper
     protected static function getItemCondition($entityAlias, $entityClass, $entityIdentifier, $itemAlias)
     {
         return sprintf(
-            'CAST(%s.%s as text) = CAST(%s.entityId as text) AND %s.entityClass = \'%s\'',
+            'CAST(%s.%s as string) = CAST(%s.entityId as string) AND %s.entityClass = \'%s\'',
             $entityAlias,
             $entityIdentifier,
             $itemAlias,
