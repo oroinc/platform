@@ -136,7 +136,7 @@ abstract class AbstractQueryConverter
     /**
      * @param VirtualRelationProviderInterface $virtualRelationProvider
      */
-    public function setVirtualRelationProvider($virtualRelationProvider)
+    public function setVirtualRelationProvider(VirtualRelationProviderInterface $virtualRelationProvider)
     {
         $this->virtualRelationProvider = $virtualRelationProvider;
     }
