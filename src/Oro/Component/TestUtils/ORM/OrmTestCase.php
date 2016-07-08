@@ -5,6 +5,7 @@ namespace Oro\Component\TestUtils\ORM;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
 
+use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
@@ -109,6 +110,9 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
                     array_merge($records, [false])
                 )
             );
+        $statement->expects($this->any())
+            ->method('getIterator')
+            ->willReturn(new FetchIterator($statement));
         if ($params) {
             if ($types) {
                 $counter = 0;
