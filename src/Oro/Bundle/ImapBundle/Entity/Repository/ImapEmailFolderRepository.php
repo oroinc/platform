@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
@@ -49,6 +50,7 @@ class ImapEmailFolderRepository extends EntityRepository
             $qb->andWhere('folder.syncEnabled = :syncEnabled')
                 ->setParameter('syncEnabled', (bool)$syncEnabled);
         }
+        $qb->orderBy('folder.synchronizedAt', Criteria::ASC);
 
         return $qb->getQuery()->getResult();
     }
