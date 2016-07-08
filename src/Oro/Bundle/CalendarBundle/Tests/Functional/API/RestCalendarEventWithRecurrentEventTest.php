@@ -257,9 +257,14 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
         );
 
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->findOneBy(['id' => $data['id']]); // do not use 'load' method to avoid proxy object loading.
-        $this->assertNull($event);
+        $this->assertTrue($event->isCancelled());
+        foreach ($event->getChildEvents() as $childEvent) {
+            $this->assertTrue($childEvent->isCancelled());
+        }
+
         $registry = $this->getContainer()->get('doctrine');
         $recurringEvent = $registry->getRepository('OroCalendarBundle:CalendarEvent')
             ->find(['id' => $data['recurringEventId']]);
