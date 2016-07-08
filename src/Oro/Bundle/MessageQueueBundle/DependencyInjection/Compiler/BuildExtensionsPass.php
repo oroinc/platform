@@ -15,9 +15,21 @@ class BuildExtensionsPass implements CompilerPassInterface
         $tags = $container->findTaggedServiceIds('oro_message_queue.consumption.extension');
         $extensions = [];
         foreach ($tags as $serviceId => $tagAttributes) {
-            $extensions[] = new Reference($serviceId);
+            foreach ($tagAttributes as $tagAttribute) {
+                $priority = isset($tagAttribute['priority']) ? (int) $tagAttribute['priority'] : 0;
+
+                $extensions[$priority][] = new Reference($serviceId);
+            }
         }
 
-        $container->getDefinition('oro_message_queue.consumption.extensions')->replaceArgument(0, $extensions);
+        ksort($extensions);
+
+        $flat = [];
+
+        foreach ($extensions as $extension) {
+            $flat = array_merge($flat, $extension);
+        }
+
+        $container->getDefinition('oro_message_queue.consumption.extensions')->replaceArgument(0, $flat);
     }
 }

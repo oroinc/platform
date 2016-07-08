@@ -61,21 +61,15 @@ services:
         public: false
         arguments:
             - '@oro_message_queue.client.driver'
-
-    oro_message_queue.client.extensions:
-        class: 'Oro\Component\MessageQueue\Consumption\Extensions'
-        public: false
-        arguments:
-            -
-                - '@oro_message_queue.consumption.extensions'
-                - '@oro_message_queue.client.extension.create_queue'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: 10 }
 
     oro_message_queue.client.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         public: false
         arguments:
             - '@oro_message_queue.transport.connection'
-            - '@oro_message_queue.client.extensions'
+            - '@oro_message_queue.consumption.extensions'
 
     oro_message_queue.client.consume_messages_command:
         class: 'Oro\Component\MessageQueue\Client\ConsumeMessagesCommand'
