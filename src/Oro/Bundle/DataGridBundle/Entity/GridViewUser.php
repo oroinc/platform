@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\DataGridBundle\Entity\Repository\GridViewUserRepository")
- * @ORM\Table(name="oro_grid_view_user")
+ * @ORM\Table(name="oro_grid_view_user_rel")
  */
 class GridViewUser
 {

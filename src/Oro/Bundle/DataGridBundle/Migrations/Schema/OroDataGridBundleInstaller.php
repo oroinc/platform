@@ -6,7 +6,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\DataGridBundle\Migrations\Schema\v1_2\DefaultGridViewUsersRelation;
 
 class OroDataGridBundleInstaller implements Installation
 {
@@ -65,7 +64,7 @@ class OroDataGridBundleInstaller implements Installation
      */
     protected function createOroGridViewUserTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_grid_view_user');
+        $table = $schema->createTable('oro_grid_view_user_rel');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', ['notnull' => false]);
         $table->addColumn('grid_view_id', 'integer', ['notnull' => false]);
@@ -79,13 +78,15 @@ class OroDataGridBundleInstaller implements Installation
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null],
+            'FK_10ECBCA8A76ED395'
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_grid_view'),
             ['grid_view_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
+            'FK_10ECBCA8BF53711B'
         );
     }
 }

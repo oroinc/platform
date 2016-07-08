@@ -134,7 +134,7 @@ class GridView implements ViewInterface
      *      cascade={"ALL"},
      *      fetch="EXTRA_LAZY"
      * )
-     * @ORM\JoinTable(name="oro_grid_view_user",
+     * @ORM\JoinTable(name="oro_grid_view_user_rel",
      *     joinColumns={@ORM\JoinColumn(name="id", referencedColumnName="grid_view_id", onDelete="CASCADE")}
      * )
      */

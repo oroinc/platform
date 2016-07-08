@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -48,29 +49,32 @@ class GridViewManager
     /**
      * @param User $user
      * @param ViewInterface $gridView
+     * @param bool $default
      */
-    public function setDefaultGridView(User $user, ViewInterface $gridView)
+    public function setDefaultGridView(User $user, ViewInterface $gridView, $default = true)
     {
-        $isGridViewDefault = $this->isViewDefault($gridView, $user);
-        // Checks if default grid view changed
-        if (!$isGridViewDefault) {
-            /** @var GridViewRepository $repository */
-            $gridName = $gridView->getGridName();
-            $om = $this->registry->getManagerForClass('OroDataGridBundle:GridViewUser');
-            $repository = $om->getRepository('OroDataGridBundle:GridViewUser');
-            $userViews = $repository->findDefaultGridViews($this->aclHelper, $user, $gridName, false);
-            foreach ($userViews as $userView) {
-                $om->remove($userView);
-            }
+        if ($default) {
+            $isGridViewDefault = $this->isViewDefault($gridView, $user);
+            // Checks if default grid view changed
+            if (!$isGridViewDefault) {
+                /** @var GridViewRepository $repository */
+                $gridName = $gridView->getGridName();
+                $om = $this->registry->getManagerForClass('OroDataGridBundle:GridViewUser');
+                $repository = $om->getRepository('OroDataGridBundle:GridViewUser');
+                $userViews = $repository->findDefaultGridViews($this->aclHelper, $user, $gridName, false);
+                foreach ($userViews as $userView) {
+                    $om->remove($userView);
+                }
 
-            $userView = new GridViewUser();
-            $userView->setAlias($gridView->getName());
-            $userView->setUser($user);
-            $userView->setGridName($gridName);
-            if ($gridView instanceof GridView) {
-                $userView->setGridView($gridView);
+                $userView = new GridViewUser();
+                $userView->setAlias($gridView->getName());
+                $userView->setUser($user);
+                $userView->setGridName($gridName);
+                if ($gridView instanceof GridView) {
+                    $userView->setGridView($gridView);
+                }
+                $om->persist($userView);
             }
-            $om->persist($userView);
         }
     }
 
@@ -141,9 +145,12 @@ class GridViewManager
     {
         if (!isset($this->cacheData[self::ALL_VIEWS_KEY])) {
             $systemViews = $this->getSystemViews($gridName);
-            $gridViews = $this->registry
-                ->getRepository('OroDataGridBundle:GridView')
-                ->findGridViews($this->aclHelper, $user, $gridName);
+            $gridViews = [];
+            if ($user instanceof UserInterface) {
+                $gridViews = $this->registry
+                    ->getRepository('OroDataGridBundle:GridView')
+                    ->findGridViews($this->aclHelper, $user, $gridName);
+            }
             $this->cacheData[self::ALL_VIEWS_KEY] = [
                 'system' => $systemViews,
                 'user' => $gridViews
