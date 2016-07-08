@@ -16,6 +16,11 @@ class CreateQueueExtension implements ExtensionInterface
     private $driver;
 
     /**
+     * @var bool
+     */
+    private $createdQueues = [];
+
+    /**
      * @param DriverInterface $driver
      */
     public function __construct(DriverInterface $driver)
@@ -28,6 +33,12 @@ class CreateQueueExtension implements ExtensionInterface
      */
     public function onBeforeReceive(Context $context)
     {
+        if (isset($this->createdQueues[$context->getQueueName()])) {
+            return;
+        }
+
+        $this->createdQueues[$context->getQueueName()] = true;
+        
         $this->driver->createQueue($context->getQueueName());
 
         $context->getLogger()->debug(sprintf(
