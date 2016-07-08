@@ -4,12 +4,8 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 

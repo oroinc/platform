@@ -24,15 +24,8 @@ class AttendeeSearchHandler extends ContextSearchHandler
     protected $attendeeRelationManager;
 
     /**
-     * @param TokenStorageInterface $token
-     * @param TranslatorInterface $translator
-     * @param Indexer $indexer
-     * @param ActivityManager $activityManager
-     * @param ConfigManager $configManager
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param ObjectManager $objectManager
-     * @param ObjectMapper $mapper
-     * @param EventDispatcherInterface $dispatcher
+     * {@inheritdoc}
+     *
      * @param AttendeeRelationManager $attendeeRelationManager
      * @param string|null $class
      */
