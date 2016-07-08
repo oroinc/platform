@@ -5,7 +5,6 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form\RendererEngine;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine as BaseEngine;
 use Symfony\Component\Form\FormView;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 
