@@ -250,6 +250,23 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['bu1', 'bu2', 'bu3', 'bu4'], $tree->getAllBusinessUnitIds());
     }
 
+    public function testSerialization()
+    {
+        $tree = new OwnerTree();
+
+        $tree->addBusinessUnit('bu1', 'org1');
+        $tree->addBusinessUnit('bu2', 'org1');
+        $tree->addBusinessUnitRelation('bu2', 'bu1');
+        $tree->addUser('user1', 'bu1');
+        $tree->addUserBusinessUnit('user1', 'org1', 'bu1');
+        $tree->addUserOrganization('user1', 'org1');
+
+        $unserializedTree = new OwnerTree();
+        $unserializedTree->unserialize($tree->serialize());
+
+        $this->assertEquals($unserializedTree, $tree);
+    }
+
     public static function addBusinessUnitRelationProvider()
     {
         return array(

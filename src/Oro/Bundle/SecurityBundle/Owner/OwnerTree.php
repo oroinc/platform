@@ -571,6 +571,6 @@ class OwnerTree implements OwnerTreeInterface
             $this->assignedBusinessUnitUserIds,
             $this->subordinateBusinessUnitIds,
             $this->organizationBusinessUnitIds
-            ) = json_decode($serialized);
+            ) = json_decode($serialized, true);
     }
 }
