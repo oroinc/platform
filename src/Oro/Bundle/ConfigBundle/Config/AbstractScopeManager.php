@@ -278,6 +278,24 @@ abstract class AbstractScopeManager
     }
 
     /**
+     * @return string
+     */
+    public function getScopeInfo()
+    {
+        return '';
+    }
+
+    /**
+     * Find scope id by provided entity object
+     *
+     * @param object $entity
+     * @return int
+     */
+    public function setScopeIdFromEntity($entity)
+    {
+    }
+
+    /**
      * Makes sure that settings are loaded from a database
      *
      * @param int $entityId

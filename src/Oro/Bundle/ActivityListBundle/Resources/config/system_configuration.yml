@@ -63,6 +63,23 @@ oro_system_configuration:
                                     email_threads:
                                         children:
                                             - oro_activity_list.grouping
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    activity_list_settings:
+                                        children:
+                                            - oro_activity_list.sorting_field
+                                            - oro_activity_list.sorting_direction
+                                            - oro_activity_list.per_page
+                            email_configuration:
+                                children:
+                                    email_threads:
+                                        children:
+                                            - oro_activity_list.grouping
 
     api_tree:
         activity_list:
