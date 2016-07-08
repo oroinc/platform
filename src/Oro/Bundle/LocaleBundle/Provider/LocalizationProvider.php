@@ -23,7 +23,7 @@ class LocalizationProvider
     }
 
     /**
-     * @param $id
+     * @param int $id
      *
      * @return null|Localization
      */
