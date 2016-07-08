@@ -41,6 +41,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /** Determines how often the clearing of outdated folders routine should be executed */
     const CLEANUP_EVERY_N_RUN = 100;
 
+    /** Time limit to sync origin in seconds */
+    const MAX_ORIGIN_SYNC_TIME = 30;
+
     /** @var ImapEmailManager */
     protected $manager;
 
@@ -71,7 +74,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->emailEntityBuilder->clear();
 
         $this->initEnv($origin);
-
+        $processStartTime = time();
         // iterate through all folders enabled for sync and do a synchronization of emails for each one
         $imapFolders = $this->getSyncEnabledImapFolders($origin);
         foreach ($imapFolders as $imapFolder) {
@@ -103,6 +106,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             }
 
             $this->cleanUp(true, $imapFolder->getFolder());
+
+            $processSpentTime = time() - $processStartTime;
+            if ($processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+                break;
+            }
         }
 
         $this->removeRemotelyRemovedEmails($origin);
