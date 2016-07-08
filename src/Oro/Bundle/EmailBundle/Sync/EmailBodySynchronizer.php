@@ -73,18 +73,18 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             }
 
             $loader    = $this->getBodyLoader($origin);
-            $emailBody = null;
+            $bodyLoaded = false;
             try {
                 $em        = $this->getManager();
                 $emailBody = $loader->loadEmailBody($folder, $email, $em);
                 $em->refresh($email);
                 // double check
                 if ($this->isBodyNotLoaded($email)) {
-                    $email->setBodySynced(true);
                     $email->setEmailBody($emailBody);
+                    $email->setBodySynced(true);
+                    $bodyLoaded = true;
+                    $em->persist($email);
                     $em->flush($email);
-                } else {
-                    unset($emailBody);
                 }
             } catch (LoadEmailBodyException $loadEx) {
                 $this->logger->notice(
@@ -99,7 +99,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 );
                 throw new LoadEmailBodyFailedException($email, $ex);
             }
-            if (!empty($emailBody)) {
+            if ($bodyLoaded) {
                 $event = new EmailBodyAdded($email);
                 $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
             }
@@ -132,7 +132,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
             $emails = $repo->getEmailsWithoutBody($batchSize);
             if (count($emails) === 0) {
-                $this->logger->notice('All emails was processed');
+                $this->logger->info('All emails was processed');
                 break;
             }
 
