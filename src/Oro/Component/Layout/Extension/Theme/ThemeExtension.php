@@ -2,8 +2,6 @@
 
 namespace Oro\Component\Layout\Extension\Theme;
 
-use Doctrine\Common\Collections\Collection;
-
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\Exception\LogicException;
@@ -12,7 +10,6 @@ use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 use Oro\Component\Layout\LayoutUpdateImportInterface;
-use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
@@ -34,11 +31,14 @@ class ThemeExtension extends AbstractExtension
     /** @var PathProviderInterface */
     protected $pathProvider;
 
+    /** @var  array */
+    protected $updates;
+
     /**
-     * @param array $resources
+     * @param array                       $resources
      * @param LayoutUpdateLoaderInterface $loader
-     * @param DependencyInitializer $dependencyInitializer
-     * @param PathProviderInterface $provider
+     * @param DependencyInitializer       $dependencyInitializer
+     * @param PathProviderInterface       $provider
      */
     public function __construct(
         array $resources,
@@ -57,82 +57,96 @@ class ThemeExtension extends AbstractExtension
      */
     protected function loadLayoutUpdates(ContextInterface $context)
     {
-        $updates = [];
+        $this->updates = [];
         if ($context->getOr(static::THEME_KEY)) {
-            $files = $this->findApplicableResources($this->getProviderPaths($context));
-            $this->loadLayoutUpdate($files, $context, $updates);
+            $paths = $this->getPaths($context);
+            $files = $this->findApplicableResources($paths);
+            foreach ($files as $file) {
+                $this->loadLayoutUpdate($file, $context);
+            }
         }
-        return $updates;
+
+        return $this->updates;
     }
 
     /**
-     * @param array              $files
+     * @param                    $file
      * @param ContextInterface   $context
-     * @param array              $updates
-     * @param LayoutUpdateImport $import
+     *
+     * @return array
      */
-    protected function loadLayoutUpdatesWithImports(array $files, ContextInterface $context, array &$updates, LayoutUpdateImport $import = null)
+    protected function loadLayoutUpdate($file, ContextInterface $context)
     {
-        // todo where is resource iterator
+        $update = $this->loader->load($file);
+        if ($update) {
+            $el = $update instanceof ElementDependentLayoutUpdateInterface
+                ? $update->getElement()
+                : 'root';
+            $this->updates[$el][] = $update;
 
-        foreach ($files as $file) {
-            $update = $this->loader->load($file);
-            if ($update) {
-                $this->dependencyInitializer->initialize($update);
+            $this->dependencyInitializer->initialize($update);
 
-                if($update instanceof LayoutUpdateImportInterface) {
-                    $update->setImport($import);
+            if ($update instanceof ImportsAwareLayoutUpdateInterface) {
+                // load imports
+                $imports = $update->getImports();
+                foreach ($imports as $importData) {
+                    $import = $this->createImport($importData);
+
+                    $importPaths = $this->getImportPaths($context, $import->getId());
+                    $files = $this->findApplicableResources($importPaths);
+                    foreach ($files as $file) {
+                        $update = $this->loadLayoutUpdate($file, $context);
+
+                        if ($update instanceof LayoutUpdateImportInterface) {
+                            $update->setImport($import);
+                        }
+                    }
                 }
-
-                $el = $update instanceof ElementDependentLayoutUpdateInterface
-                    ? $update->getElement()
-                    : 'root';
-                $updates[$el][] = $update;
-
-                $this->loadImports($update, $context, $updates);
             }
         }
+
+        return $update;
     }
 
     /**
-     * @param LayoutUpdateInterface $update
+     * Return paths that comes from provider and returns array of resource files
+     *
      * @param ContextInterface $context
-     * @param array $updates
+     *
+     * @return array
      */
-    protected function loadImports(LayoutUpdateInterface $update, ContextInterface $context, array &$updates)
+    protected function getPaths(ContextInterface $context)
     {
-        if ($update instanceof ImportsAwareLayoutUpdateInterface) {
-            $imports = $update->getImports();
-            if (!is_array($imports)) {
-                throw new LogicException(sprintf('Imports statement should be an array, %s given', gettype($imports)));
-            }
-            foreach ($imports as $importProperties) {
-                $import = $this->createImport($importProperties);
-                $importPaths = $this->getPathsForImport($context, $import->getId());
-                $importFiles = $this->findApplicableResources($importPaths);
-                $this->loadLayoutUpdate($importFiles, $context, $updates, $import);
-            }
+        if ($this->pathProvider instanceof ContextAwareInterface) {
+            $this->pathProvider->setContext($context);
         }
+
+        return $this->pathProvider->getPaths([]);
     }
 
     /**
      * @param ContextInterface $context
-     * @param string $importId
+     * @param string           $importId
+     *
      * @return string
      */
-    protected function getPathsForImport(ContextInterface $context, $importId)
+    protected function getImportPaths(ContextInterface $context, $importId)
     {
         return [
-            implode(PathProviderInterface::DELIMITER, [
-                $context->get(static::THEME_KEY),
-                static::IMPORT_FOLDER,
-                $importId,
-            ])
+            implode(
+                PathProviderInterface::DELIMITER,
+                [
+                    $context->get(static::THEME_KEY),
+                    static::IMPORT_FOLDER,
+                    $importId,
+                ]
+            )
         ];
     }
 
     /**
      * @param $importProperties
+     *
      * @return LayoutUpdateImport
      */
     protected function createImport($importProperties)
@@ -141,15 +155,21 @@ class ThemeExtension extends AbstractExtension
             $importProperties = [ImportsAwareLayoutUpdateInterface::ID_KEY => $importProperties];
         }
         if (!array_key_exists(ImportsAwareLayoutUpdateInterface::ID_KEY, $importProperties)) {
-            throw new LogicException(sprintf(
-                'Import id should be provided, array with "%s" keys given',
-                implode(', ', array_keys($importProperties))
-            ));
+            throw new LogicException(
+                sprintf(
+                    'Import id should be provided, array with "%s" keys given',
+                    implode(', ', array_keys($importProperties))
+                )
+            );
         }
-        $importProperties = array_merge([
-            ImportsAwareLayoutUpdateInterface::ROOT_KEY => null,
-            ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,
-        ], $importProperties);
+        $importProperties = array_merge(
+            [
+                ImportsAwareLayoutUpdateInterface::ROOT_KEY      => null,
+                ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,
+            ],
+            $importProperties
+        );
+
         return new LayoutUpdateImport(
             $importProperties[ImportsAwareLayoutUpdateInterface::ID_KEY],
             $importProperties[ImportsAwareLayoutUpdateInterface::ROOT_KEY],
@@ -158,46 +178,10 @@ class ThemeExtension extends AbstractExtension
     }
 
     /**
-     * @param string $file
-     * @return null|LayoutUpdateInterface
-     */
-    protected function loadLayoutUpdateOld($file)
-    {
-        $update = $this->loader->load($file);
-        if ($update) {
-            $this->dependencyInitializer->initialize($update);
-        }
-        return $update;
-    }
-
-    /**
-     * @param LayoutUpdateInterface $update
-     * @param array $updates
-     */
-    protected function collectLayoutUpdates($update, array &$updates)
-    {
-        $el = $update instanceof ElementDependentLayoutUpdateInterface
-            ? $update->getElement()
-            : 'root';
-        $updates[$el][] = $update;
-    }
-
-    /**
-     * Return paths that comes from provider and returns array of resource files
-     * @param ContextInterface $context
-     * @return array
-     */
-    protected function getProviderPaths(ContextInterface $context)
-    {
-        if ($this->pathProvider instanceof ContextAwareInterface) {
-            $this->pathProvider->setContext($context);
-        }
-        return $this->pathProvider->getPaths([]);
-    }
-
-    /**
      * Filters resources by paths
+     *
      * @param array $paths
+     *
      * @return array
      */
     protected function findApplicableResources(array $paths)
@@ -224,7 +208,7 @@ class ThemeExtension extends AbstractExtension
     }
 
     /**
-     * @param array $array
+     * @param array  $array
      * @param string $property
      *
      * @return mixed
