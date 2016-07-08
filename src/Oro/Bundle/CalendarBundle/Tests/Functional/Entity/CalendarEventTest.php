@@ -18,45 +18,80 @@ class CalendarEventTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testPreRemoveShouldRemoveRelatedAttendee()
+    public function testRelatedAttendeeShouldBeRemoveFromChildEvent()
     {
         $em = $this->getEntityManager();
 
-        $child = (new Attendee())
-            ->setDisplayName('child');
+        $attendee = $this->createAttendee('event attendee');
+        $childEventRelatedAttendee = $this->createAttendee('child event related attendee');
 
-        $parentEvent = (new CalendarEvent())
-            ->setTitle('Parent')
+        $calendarEvent = $this->createCalendarEvent(
+            'parent event',
+            null,
+            $attendee,
+            [$childEventRelatedAttendee]
+        );
+        $em->persist($calendarEvent);
+
+        $childCalendarEvent = $this->createCalendarEvent('child event', $calendarEvent, $childEventRelatedAttendee);
+        $em->persist($childCalendarEvent);
+
+        $em->flush();
+        $em->refresh($calendarEvent);
+
+        $this->assertCount(2, $calendarEvent->getAttendees()->toArray());
+
+        $secondEventRelatedAttendeeId = $childEventRelatedAttendee->getId();
+
+        $em->remove($childCalendarEvent);
+        $em->flush();
+        $em->clear();
+
+        $this->assertNull($em->find('OroCalendarBundle:Attendee', $secondEventRelatedAttendeeId));
+    }
+
+    /**
+     * @param string $displayName
+     *
+     * @return Attendee
+     */
+    protected function createAttendee($displayName)
+    {
+        $attendee = new Attendee();
+        $attendee->setDisplayName($displayName);
+
+        return $attendee;
+    }
+
+    /**
+     * @param string $title
+     * @param CalendarEvent $parent
+     * @param Attendee|null $relatedAttendee
+     * @param Attendee[] $attendees
+     *
+     * @return CalendarEvent
+     */
+    protected function createCalendarEvent(
+        $title,
+        CalendarEvent $parent = null,
+        Attendee $relatedAttendee = null,
+        array $attendees = []
+    ) {
+        $event = new CalendarEvent();
+        $event->setTitle($title)
             ->setStart(new \DateTime())
             ->setEnd(new \DateTime())
-            ->addAttendee($child)
-            ->setRelatedAttendee(
-                (new Attendee())
-                    ->setDisplayName('parent')
-            );
-        $em->persist($parentEvent);
+            ->setParent($parent);
 
-        $childEvent = (new CalendarEvent())
-            ->setParent($parentEvent)
-            ->setStart(new \DateTime())
-            ->setEnd(new \DateTime())
-            ->setTitle('child')
-            ->setRelatedAttendee(
-                $child
-            );
-        $em->persist($childEvent);
-        $em->flush();
-        $em->refresh($parentEvent);
+        foreach ($attendees as $attendee) {
+            $event->addAttendee($attendee);
+        }
 
-        $this->assertCount(2, $parentEvent->getAttendees()->toArray());
+        if ($relatedAttendee) {
+            $event->setRelatedAttendee($relatedAttendee);
+        }
 
-        $em->remove($parentEvent->getChildEvents()->first());
-        $em->flush();
-        $em->refresh($parentEvent);
-
-        $this->assertCount(1, $parentEvent->getAttendees());
-        $relatedAttendee = $parentEvent->getAttendees()->first();
-        $this->assertEquals('parent', $relatedAttendee->getDisplayName());
+        return $event;
     }
 
     /**

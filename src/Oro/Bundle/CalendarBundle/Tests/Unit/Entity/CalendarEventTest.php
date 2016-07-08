@@ -456,30 +456,4 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals([1 => $exceptionTwo, 2 => $exceptionThree], $actual->toArray());
     }
-
-    public function testPreRemoveShouldRemoveRelatedAttendee()
-    {
-        $relatedAttendee = new Attendee();
-
-        $calendarEvent = (new CalendarEvent())
-            ->setRelatedAttendee($relatedAttendee);
-
-        $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $em->expects($this->once())
-            ->method('remove')
-            ->with($relatedAttendee);
-
-        $calendarEvent->preRemove(new LifecycleEventArgs($calendarEvent, $em));
-    }
-
-    public function testPreRemoveShouldNotRemoveNullRelatedAttendee()
-    {
-        $calendarEvent = new CalendarEvent();
-
-        $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $em->expects($this->never())
-            ->method('remove');
-
-        $calendarEvent->preRemove(new LifecycleEventArgs($calendarEvent, $em));
-    }
 }
