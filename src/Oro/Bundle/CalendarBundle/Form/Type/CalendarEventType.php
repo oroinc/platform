@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\EventListener\CalendarUidSubscriber;
 use Oro\Bundle\CalendarBundle\Form\EventListener\ChildEventsSubscriber;
@@ -138,7 +139,9 @@ class CalendarEventType extends AbstractType
                         continue;
                     }
                     if ($form->has($child->getName())) {
-                        $form->remove($child->getName());
+                        $options = $child->getConfig()->getOptions();
+                        $options['disabled'] = true;
+                        $form->add($child->getName(), $child->getConfig()->getType()->getName(), $options);
                     }
                 }
             }

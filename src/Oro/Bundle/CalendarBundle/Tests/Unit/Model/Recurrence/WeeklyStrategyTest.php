@@ -216,6 +216,7 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                     '2016-05-08',
                     '2016-05-09',
                     '2016-05-22',
+                    '2016-05-23',
                 ],
             ],
             /**
@@ -325,6 +326,7 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                     '2016-05-08',
                     '2016-05-09',
                     '2016-05-22',
+                    '2016-05-23',
                 ],
             ],
             'no endTime' => [
@@ -344,6 +346,7 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                     '2016-05-08',
                     '2016-05-09',
                     '2016-05-22',
+                    '2016-05-23',
                 ],
             ],
         ];

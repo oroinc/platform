@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityNotFoundException;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
@@ -112,6 +113,7 @@ class CalendarEventDeleteHandler extends DeleteHandler
      */
     public function handleDelete($id, ApiEntityManager $manager)
     {
+        /** @var CalendarEvent $entity */
         $entity = $manager->find($id);
         if (!$entity) {
             throw new EntityNotFoundException();
@@ -122,6 +124,8 @@ class CalendarEventDeleteHandler extends DeleteHandler
     }
 
     /**
+     * @param CalendarEvent $entity
+     *
      * {@inheritdoc}
      */
     public function processDelete($entity, ObjectManager $em)
