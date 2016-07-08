@@ -70,7 +70,8 @@ class WorkflowQueryHelperTest extends \PHPUnit_Framework_TestCase
             ->with('itemAlias.currentStep', 'stepAlias');
 
         $this->assertSame(
-            $this->queryBuilder, WorkflowQueryHelper::addQuery($this->queryBuilder, 'stepAlias', 'itemAlias')
+            $this->queryBuilder,
+            WorkflowQueryHelper::addQuery($this->queryBuilder, 'stepAlias', 'itemAlias')
         );
     }
 
