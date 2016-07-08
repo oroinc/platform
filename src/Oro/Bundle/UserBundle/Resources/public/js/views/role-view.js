@@ -181,7 +181,7 @@ define([
             if (!(data.permissionName in privelege.permissions)) {
                 privelege.permissions[data.permissionName] = {
                     name: data.permissionName
-                }
+                };
             }
             var permission = privelege.permissions[data.permissionName];
             permission.accessLevel = data.accessLevel;
