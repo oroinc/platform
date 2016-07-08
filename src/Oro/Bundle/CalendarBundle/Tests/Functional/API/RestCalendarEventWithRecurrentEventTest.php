@@ -23,6 +23,9 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
         $this->getJsonResponseContent($this->client->getResponse(), 400);
     }
 
+    /**
+     * @return array
+     */
     public function postRecurringEventValidationDataProvider()
     {
         return [
