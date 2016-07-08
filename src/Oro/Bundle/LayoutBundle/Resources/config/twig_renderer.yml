@@ -19,7 +19,7 @@ services:
         public: false
         class: %oro_layout.twig.renderer.class%
         arguments:
-            - '@oro_layout.twig.renderer.engine'
+            - '@oro_layout.twig.form.engine'
 
     oro_layout.twig.renderer.engine:
         public: false
@@ -32,10 +32,12 @@ services:
         class: %oro_layout.twig.layout_renderer.class%
         arguments:
             - '@oro_layout.twig.renderer'
-            - '@twig.form.engine'
+            - '@oro_layout.twig.form.engine'
             - '@twig'
 
     oro_layout.twig.form.engine:
         class: %oro_layout.twig.form.engine.class%
         arguments:
             - %twig.form.resources%
+        calls:
+            - [setLayoutHelper, ['@oro_layout.helper']]
