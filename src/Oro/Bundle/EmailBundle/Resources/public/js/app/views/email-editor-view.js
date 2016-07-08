@@ -60,7 +60,7 @@ define(function(require) {
             } else {
                 url = routing.generate(
                     'oro_user_profile_configuration',
-                    {'activeGroup':'platform', 'activeSubGroup': 'email_configuration'}
+                    {'activeGroup': 'platform', 'activeSubGroup': 'email_configuration'}
                 );
                 message = this.model.get('isSignatureEditable') ?
                     __('oro.email.thread.no_signature', {url: url}) :
