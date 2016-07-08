@@ -33,7 +33,7 @@ class LocalizationProvider
     }
 
     /**
-     * @return array
+     * @return array|Localization[]
      */
     public function getLocalizations()
     {
