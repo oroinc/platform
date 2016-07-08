@@ -3,9 +3,9 @@
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator\Extension;
 
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
-use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateExtension;
+use Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateVisitor;
 
 class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,15 +27,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
         $collection = new VisitorCollection();
         $this->extension->prepare(new GeneratorData($source), $collection);
         $this->assertSameSize($expectedData, $collection);
-        foreach ($collection as $visitor) {
-            /** @var VisitorInterface $visitor */
-            $class = new \ReflectionClass(
-                'Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateVisitor'
-            );
-            $property = $class->getProperty('imports');
-            $property->setAccessible(true);
-            $this->assertContains($property->getValue($visitor), $expectedData);
-        }
+        $this->assertEquals(new ImportsLayoutUpdateVisitor($expectedData), $collection[0]);
     }
 
     /**
@@ -45,21 +37,13 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'source' => [],
-                'expectedData' => [],
-            ],
-            [
-                'source' => [
-                    ImportsLayoutUpdateExtension::NODE_IMPORTS => []
-                ],
-                'expectedData' => [],
-            ],
-            [
                 'source' => [
                     ImportsLayoutUpdateExtension::NODE_IMPORTS => [
-                        'id' => 'import_id',
-                        'root' => 'root_block_id',
-                        'namespace' => 'import_namespace',
+                        [
+                            'id' => 'import_id',
+                            'root' => 'root_block_id',
+                            'namespace' => 'import_namespace',
+                        ]
                     ]
                 ],
                 'expectedData' => [
@@ -70,6 +54,34 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
             ]
+        ];
+    }
+
+    /**
+     * @dataProvider prepareWithoutImportsDataProvider
+     * @param array $source
+     */
+    public function testPrepareWithoutImports(array $source)
+    {
+        $collection = new VisitorCollection();
+        $this->extension->prepare(new GeneratorData($source), $collection);
+        $this->assertEmpty($collection);
+    }
+
+    /**
+     * @return array
+     */
+    public function prepareWithoutImportsDataProvider()
+    {
+        return [
+            [
+                'source' => []
+            ],
+            [
+                'source' => [
+                    ImportsLayoutUpdateExtension::NODE_IMPORTS => []
+                ]
+            ],
         ];
     }
 }

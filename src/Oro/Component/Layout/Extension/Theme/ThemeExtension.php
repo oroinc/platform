@@ -154,27 +154,7 @@ class ThemeExtension extends AbstractExtension
         if (!is_array($importProperties)) {
             $importProperties = [ImportsAwareLayoutUpdateInterface::ID_KEY => $importProperties];
         }
-        if (!array_key_exists(ImportsAwareLayoutUpdateInterface::ID_KEY, $importProperties)) {
-            throw new LogicException(
-                sprintf(
-                    'Import id should be provided, array with "%s" keys given',
-                    implode(', ', array_keys($importProperties))
-                )
-            );
-        }
-        $importProperties = array_merge(
-            [
-                ImportsAwareLayoutUpdateInterface::ROOT_KEY      => null,
-                ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => null,
-            ],
-            $importProperties
-        );
-
-        return new LayoutUpdateImport(
-            $importProperties[ImportsAwareLayoutUpdateInterface::ID_KEY],
-            $importProperties[ImportsAwareLayoutUpdateInterface::ROOT_KEY],
-            $importProperties[ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY]
-        );
+        return LayoutUpdateImport::createFromArray($importProperties);
     }
 
     /**
