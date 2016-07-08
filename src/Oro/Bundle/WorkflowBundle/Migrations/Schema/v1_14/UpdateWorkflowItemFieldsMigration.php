@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schema;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -15,11 +15,11 @@ class UpdateWorkflowItemFieldsMigration implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_workflow_item');
-        
+
         if ($table->hasColumn('entity_class')) {
             return;
         }
-        
+
         $table->addColumn('entity_class', 'string', ['length' => 255, 'notnull' => false]);
         $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
 
