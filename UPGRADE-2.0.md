@@ -28,3 +28,4 @@ UPGRADE FROM 1.10 to 2.0
 - Now entity can have more than one active workflows.
 - Added class `Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler` (`oro_workflow.handler.workflow_definition` service) for single point of `WorkflowDefinition` entity management.
      All manipulations with `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity persistence should be provided through the handler. 
+- Added class `Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager` with its abstract service `oro_workflow.abstract.workflow_aware_manager`. (See more about Workflow Aware Manager)[./src/Oro/Bundle/WorkflowBundle/Resources/doc/reference/workflow/workflow-entities.md#workflow-aware-manager]
