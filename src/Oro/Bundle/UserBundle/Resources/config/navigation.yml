@@ -97,9 +97,11 @@ oro_titles:
     oro_user_view: '%%username%%'
     oro_user_update: '%%username%% - Edit'
     oro_user_create: 'Create User'
+    oro_user_config: '%%username%% - Configure'
 
     oro_user_profile_view: '%%username%%'
     oro_user_profile_update: '%%username%% - Edit'
+    oro_user_profile_configuration: '%%username%% - Configure'
 
     oro_user_role_index: ~
     oro_user_role_update: '%%role%% - Edit'
