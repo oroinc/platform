@@ -100,16 +100,17 @@ JS;
     }
 
     /**
-     * Fill field with many entity
-     * See contexts, to fields in send email form
+     * Fill field with many entities
+     * See contexts field in send email form
+     * It will remove all existed entities in field
      *
      * @param string $xpath
-     * @param string|array $values
+     * @param string|array $values Any string(s) for search entity
      * @throws ExpectationException
      */
     protected function fillSelect2Entities($xpath, $values)
     {
-        $values = is_array($values) ? $values : [$values];
+        $values = false === is_array($values) ? $values : [$values];
         $input = $this->findElement($xpath);
 
         // Remove all existing entities
@@ -117,6 +118,7 @@ JS;
             '/../../li/a[contains(@class, "select2-search-choice-close")]',
             $xpath
         ));
+
         foreach ($results as $result) {
             $this->executeJsOnXpath($result, '{{ELEMENT}}.click()');
         }

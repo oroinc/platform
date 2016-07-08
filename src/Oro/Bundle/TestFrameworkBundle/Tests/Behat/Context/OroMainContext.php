@@ -191,8 +191,7 @@ class OroMainContext extends MinkContext implements
      */
     public function selectUserInActivityContextSelector($needle)
     {
-        $contextSelector = $this->getSession()->getPage()
-            ->find('css', 'div.ui-dialog div.widget-content div.btn-group');
+        $contextSelector = $this->elementFactory->createElement('ContextSelector');
         $contextSelector->find('css', 'span.icon-caret-down')->click();
         $contexts = $contextSelector->findAll('css', 'ul.context-items-dropdown li');
 
@@ -255,7 +254,7 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Delete all context from active (collapsed) intem in activity list
+     * Delete all context from active (collapsed) item in activity list
      * Example: And delete all contexts from collapsed email
      *
      * @When /^(?:|I )delete all contexts from collapsed ([\w\s]*)$/
@@ -388,7 +387,7 @@ class OroMainContext extends MinkContext implements
      *
      * @Given /^(?:|I )click "(?P<action>[\w\s]*)" on "(?P<content>[\w\s]*)" in activity list$/
      */
-    public function iClickOnInActivityList($action, $content)
+    public function iClickActionOnContentInActivityList($action, $content)
     {
         $item = $this->getActivityListItem($content);
 
@@ -403,6 +402,11 @@ class OroMainContext extends MinkContext implements
                 return;
             }
         }
+
+        throw new ExpectationException(
+            sprintf('"%s" activity item was found, but "%s" action not', $content, $action),
+            $this->getSession()->getDriver()
+        );
     }
 
     /**
@@ -530,8 +534,7 @@ class OroMainContext extends MinkContext implements
             );
         }
 
-        $collapsedItem = array_shift($collapsedItem);
-        return $collapsedItem;
+        return array_shift($collapsedItem);
     }
 
     /**
