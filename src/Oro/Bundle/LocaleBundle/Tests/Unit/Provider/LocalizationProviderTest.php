@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -15,12 +13,6 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
-    /** @var Registry|\PHPUnit_Framework_MockObject_MockObject */
-    protected $registry;
-
-    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $manager;
-
     /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
@@ -29,32 +21,22 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->registry = $this->getMockBuilder(Registry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->manager = $this->getMockBuilder(ObjectManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->repository = $this->getMockBuilder(ObjectRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->provider = new LocalizationProvider($this->registry);
+        $this->provider = new LocalizationProvider($this->repository);
     }
 
     public function tearDown()
     {
-        unset($this->registry, $this->manager, $this->registry, $this->provider);
+        unset($this->registry, $this->provider);
     }
 
     public function testGetLocalization()
     {
         /** @var Localization $entity */
         $entity = $this->getEntity(Localization::class, ['id' => 1]);
-
-        $this->assertRegistryCalled();
 
         $this->repository->expects($this->once())
             ->method('find')
@@ -75,10 +57,8 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
             $this->getEntity(Localization::class, ['id' => 3]),
         ];
 
-        $this->assertRegistryCalled();
-
         $this->repository->expects($this->once())
-            ->method('findAll')
+            ->method('findBy')
             ->willReturn($entities);
 
         $result = $this->provider->getLocalizations();
@@ -86,17 +66,23 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($entities, $result);
     }
 
-    protected function assertRegistryCalled()
+    public function testGetLocalizationsByIds()
     {
+        /** @var Localization[] $entities */
+        $entities = [
+            $this->getEntity(Localization::class, ['id' => 1]),
+            $this->getEntity(Localization::class, ['id' => 3]),
+        ];
 
-        $this->manager->expects($this->once())
-            ->method('getRepository')
-            ->with(Localization::class)
-            ->willReturn($this->repository);
+        $ids = [1, 3];
 
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(Localization::class)
-            ->willReturn($this->manager);
+        $this->repository->expects($this->once())
+            ->method('findBy')
+            ->with(['id' => $ids])
+            ->willReturn($entities);
+
+        $result = $this->provider->getLocalizations((array)$ids);
+
+        $this->assertEquals($entities, $result);
     }
 }

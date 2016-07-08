@@ -2,24 +2,23 @@
 
 namespace Oro\Bundle\LocaleBundle\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 
 class LocalizationProvider
 {
     /**
-     * @var Registry
+     * @var ObjectRepository
      */
     protected $registry;
 
     /**
-     * @param Registry $registry
+     * @param ObjectRepository $repository
      */
-    public function __construct(Registry $registry)
+    public function __construct(ObjectRepository $repository)
     {
-        $this->registry = $registry;
+        $this->repository = $repository;
     }
 
     /**
@@ -29,22 +28,16 @@ class LocalizationProvider
      */
     public function getLocalization($id)
     {
-        return $this->getRepository()->find($id);
+        return $this->repository->find($id);
     }
 
     /**
+     * @param array $ids
+     *
      * @return array|Localization[]
      */
-    public function getLocalizations()
+    public function getLocalizations(array $ids = null)
     {
-        return $this->getRepository()->findAll();
-    }
-
-    /**
-     * @return LocalizationRepository
-     */
-    protected function getRepository()
-    {
-        return $this->registry->getManagerForClass(Localization::class)->getRepository(Localization::class);
+        return $this->repository->findBy(!is_null($ids) ? ['id' => $ids] : [], ['name' => 'ASC']);
     }
 }

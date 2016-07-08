@@ -311,3 +311,8 @@ services:
             - [setConfigManager, ['@oro_config.manager']]
         tags:
             - { name: twig.extension }
+
+    oro_locale.provider.localization:
+        class: Oro\Bundle\LocaleBundle\Provider\LocalizationProvider
+        arguments:
+            - '@oro_locale.repository.localization'
