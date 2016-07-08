@@ -309,4 +309,55 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
             ->findOneBy(['id' => $data['exceptionId']]);
         $this->assertNull($exception);
     }
+
+    /**
+     * Creates recurring event.
+     *
+     * @return array
+     */
+    public function testPostRecurringEventWithTimeZone()
+    {
+        $recurringEvents = self::$recurringEventParameters;
+        $recurringEvents['recurrence']['timeZone'] = 'America/Santa_Isabel';
+        $recurringEvents['recurrence']['interval'] = '0'; //check that it will be validated
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $recurringEvents);
+        $this->getJsonResponseContent($this->client->getResponse(), 400);
+
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), self::$recurringEventParameters);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->assertNotEmpty($result);
+        $this->assertTrue(isset($result['id']));
+        /** @var CalendarEvent $event */
+        $event = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->find($result['id']);
+        $this->assertNotNull($event);
+        $this->assertEquals(
+            Recurrence::MAX_END_DATE,
+            $event->getRecurrence()->getCalculatedEndTime()->format(DATE_RFC3339)
+        );
+
+        return ['id' => $result['id'], 'recurrenceId' => $event->getRecurrence()->getId()];
+    }
+
+    /**
+     * Reads recurring event.
+     *
+     * @depends testPostRecurringEventWithTimeZone
+     *
+     * @param array $data
+     */
+    public function testGetRecurringEventWithTimeZone($data)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevent', ['id' => $data['id']])
+        );
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertEquals($data['id'], $result['id']);
+        $this->assertEquals($data['recurrenceId'], $result['recurrence']['id']);
+    }
 }
