@@ -38,7 +38,9 @@ define([
             'addressUpdateUrl': null,
             'mapView': Googlemaps,
             'addressMapOptions': {},
-            'allowToRemovePrimary': false
+            'allowToRemovePrimary': false,
+            'confirmation': false,
+            'confirmationComponent': 'oroui/js/delete-confirmation'
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
@@ -151,7 +153,9 @@ define([
                     model: address,
                     map: this.options.addressMapOptions,
                     template: this.options.template,
-                    allowToRemovePrimary: this.options.allowToRemovePrimary
+                    allowToRemovePrimary: this.options.allowToRemovePrimary,
+                    confirmation: this.options.confirmation,
+                    confirmationComponent: this.options.confirmationComponent
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);
