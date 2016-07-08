@@ -17,8 +17,7 @@ class FileField extends Element implements SuiteAwareInterface
      */
     public function setValue($filename)
     {
-        $input = $this->find('css', 'input[type="file"]');
-        $input->attachFile($this->getFilePath($filename));
+        $this->attachFile($this->getFilePath($filename));
     }
 
     /**

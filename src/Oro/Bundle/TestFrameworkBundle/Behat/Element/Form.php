@@ -71,6 +71,10 @@ class Form extends Element
     public function findField($locator)
     {
         if ($field = parent::findField($locator)) {
+            if ($field->hasAttribute('type') && 'file' === $field->getAttribute('type')) {
+                return $this->elementFactory->wrapElement('FileField', $field);
+            }
+
             return $field;
         }
 
@@ -79,7 +83,9 @@ class Form extends Element
             if ($sndParent->hasClass('control-group-collection')) {
                 return $this->elementFactory->wrapElement('CollectionField', $sndParent);
             } elseif ($sndParent->hasClass('control-group-oro_file')) {
-                return $this->elementFactory->wrapElement('FileField', $sndParent);
+                $input = $sndParent->find('css', 'input[type="file"]');
+
+                return $this->elementFactory->wrapElement('FileField', $input);
             } elseif ($select = $sndParent->find('css', 'select')) {
                 return $select;
             } elseif ($sndParent->hasClass('control-group-checkbox')) {

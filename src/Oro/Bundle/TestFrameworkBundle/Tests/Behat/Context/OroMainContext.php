@@ -14,6 +14,7 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
@@ -79,6 +80,36 @@ class OroMainContext extends MinkContext implements
     public function iShouldSeeFlashMessage($title)
     {
         $this->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
+    }
+
+    /**
+     * @Then /^(?:|I )click update schema$/
+     */
+    public function iClickUpdateSchema()
+    {
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $page = $this->getSession()->getPage();
+
+        $page->clickLink('Update schema');
+        $driver->waitForAjax();
+        $page->clickLink('Yes, Proceed');
+        $driver->waitForAjax(120000);
+    }
+
+    /**
+     * Search text in current collapsed activity
+     *
+     * @Then /^(?:|I )should see (?P<text>.+) text in activity/
+     */
+    public function iShouldSeeTextInCollapsedActivityItem($text)
+    {
+        if (false === strpos($this->getCollapsedItem()->getText(), $text)) {
+            throw new ExpectationException(
+                sprintf('Can\'t find "%s" image name in collapsed activity item', $text),
+                $this->getSession()->getDriver()
+            );
+        }
     }
 
     /**
@@ -368,6 +399,21 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then there is no records in activity list
+     */
+    public function thereIsNoRecordsInActivityList()
+    {
+        $itemsCount = count($this->getActivityListItems());
+
+        if (0 !== $itemsCount) {
+            throw new ExpectationException(
+                sprintf('Expect that Activity list not found items, but found %s', $itemsCount),
+                $this->getSession()->getDriver()
+            );
+        }
+    }
+
+    /**
      * Find activity item in activity list and collapse it
      * Example: When I collapse "Fwd: Re: Work for you" in activity list
      *
@@ -493,25 +539,36 @@ class OroMainContext extends MinkContext implements
      */
     protected function getActivityListItem($content)
     {
+        foreach ($this->getActivityListItems() as $item) {
+            if (false !== strpos($item->getText(), $content)) {
+                return $item;
+            }
+        }
+
+        throw new ExpectationException(
+            sprintf('Item with "%s" content not found in activity list', $content),
+            $this->getSession()->getDriver()
+        );
+    }
+
+    /**
+     * @return NodeElement[]
+     * @throws ExpectationException
+     */
+    protected function getActivityListItems()
+    {
         $page = $this->getSession()->getPage();
         $sections = $page->findAll('css', 'h4.scrollspy-title');
 
         /** @var NodeElement $section */
         foreach ($sections as $section) {
             if ('Activity' === $section->getText()) {
-                $items = $section->getParent()->findAll('css', 'div.list-item');
-
-                /** @var NodeElement $item */
-                foreach ($items as $item) {
-                    if (false !== strpos($item->getText(), $content)) {
-                        return $item;
-                    }
-                }
+                return $section->getParent()->findAll('css', 'div.list-item');
             }
         }
 
         throw new ExpectationException(
-            sprintf('Item with "%s" content not found in activity list', $content),
+            sprintf('Can\'t find Activity section on page'),
             $this->getSession()->getDriver()
         );
     }
