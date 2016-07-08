@@ -49,7 +49,6 @@ define([
             this.$privileges = $(this.options.privilegesSelector);
             this.$appendUsers = $(this.options.appendUsersSelector);
             this.$removeUsers = $(this.options.removeUsersSelector);
-            this.privileges = JSON.parse(this.$privileges.val());
 
             var fields = {};
             _.each(
@@ -73,7 +72,6 @@ define([
             delete this.$privileges;
             delete this.$appendUsers;
             delete this.$removeUsers;
-            delete this.privileges;
             delete this.$fields;
 
             RoleView.__super__.dispose.call(this);
@@ -149,7 +147,7 @@ define([
                 }
             );
 
-            data[formName + '[privileges]'] = JSON.stringify(this.privileges);
+            data[formName + '[privileges]'] = this.$privileges.val();
             data[formName + '[appendUsers]'] = this.$appendUsers.val();
             data[formName + '[removeUsers]'] = this.$removeUsers.val();
 
@@ -163,18 +161,43 @@ define([
             if (this.disposed) {
                 return;
             }
+            var obj = JSON.parse(this.$privileges.val());
 
-            $.each(this.privileges, function(scopeName, privileges) {
-                $.each(privileges, function(key, privilege) {
-                    if (privilege.identity.id === data.identityId) {
-                        $.each(privilege.permissions, function(permissionName, permission) {
-                            if (permission.name === data.permissionName) {
-                                permission.accessLevel = data.accessLevel;
-                            }
-                        });
-                    }
-                });
-            });
+            var knownIdentities = _.reduce(obj, function(memo, group) {
+                memo = _.reduce(group, function(memo, item) {
+                    memo[item.identity.id] = item;
+                    return memo;
+                }, memo);
+                return memo;
+            }, {});
+
+            var privelege;
+            if (data.identityId in knownIdentities) {
+                privelege = knownIdentities[data.identityId];
+            } else {
+                // create privelege
+                privelege = {
+                    identity: {
+                        id: data.identityId
+                    },
+                    permissions: {}
+                };
+                if (data.permissionName === 'EXECUTE') {
+                    obj.action[Object.keys(knownIdentities).length] = privelege;
+                } else {
+                    obj.entity[Object.keys(knownIdentities).length] = privelege;
+                }
+            }
+
+            if (!(data.permissionName in privelege.permissions)) {
+                privelege.permissions[data.permissionName] = {
+                    name: data.permissionName
+                };
+            }
+            var permission = privelege.permissions[data.permissionName];
+            permission.accessLevel = data.accessLevel;
+
+            this.$privileges.val(JSON.stringify(obj)).trigger('change');
         }
     });
 
