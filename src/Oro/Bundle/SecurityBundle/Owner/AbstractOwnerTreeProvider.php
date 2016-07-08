@@ -33,8 +33,13 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
 
     /**
      * @return OwnerTreeInterface
+     *
+     * @deprecated since 1.10. Use createTreeObject method instead
      */
-    abstract protected function getTreeData();
+    protected function getTreeData()
+    {
+        return null;
+    }
 
     /**
      * @param OwnerTreeInterface $tree
@@ -45,6 +50,21 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
      * @return MetadataProviderInterface
      */
     abstract protected function getOwnershipMetadataProvider();
+
+    /**
+     * Returns empty instance of OwnerTree object
+     *
+     * @return OwnerTreeInterface
+     */
+    protected function createTreeObject()
+    {
+        $tree = $this->getTreeData();
+        if ($tree) {
+            return $tree;
+        }
+
+        return new OwnerTree();
+    }
 
     /**
      * {@inheritdoc}
@@ -89,10 +109,6 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
     {
         $this->ensureTreeLoaded();
 
-        if ($this->tree === null) {
-            throw new \Exception('ACL tree cache was not warmed');
-        }
-
         return $this->tree;
     }
 
@@ -101,15 +117,23 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
      */
     protected function ensureTreeLoaded()
     {
-        if ($this->tree === null) {
-            $treeData = null;
-            if ($this->getCache()) {
-                $treeData = $this->getCache()->fetch(self::CACHE_KEY);
-            }
-            if ($treeData) {
-                $this->tree = $treeData;
+        if (null !== $this->tree) {
+            // the tree is already loaded
+            return;
+        }
+
+        $cache = $this->getCache();
+        if (null === $cache) {
+            $this->tree = $this->loadTree();
+        } else {
+            $serializedData = $cache->fetch(self::CACHE_KEY);
+            if ($serializedData) {
+                $tree = $this->createTreeObject();
+                $tree->unserialize($serializedData);
+                $this->tree = $tree;
             } else {
                 $this->tree = $this->loadTree();
+                $cache->save(self::CACHE_KEY, $this->tree->serialize());
             }
         }
     }
@@ -121,18 +145,12 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
      */
     protected function loadTree()
     {
-        $treeData = $this->getTreeData();
+        $tree = $this->createTreeObject();
         if ($this->checkDatabase()) {
-            $this->fillTree($treeData);
+            $this->fillTree($tree);
         }
 
-        if ($this->getCache()) {
-            $this->getCache()->save(self::CACHE_KEY, $treeData);
-        }
-
-        $this->tree = $treeData;
-
-        return $treeData;
+        return $tree;
     }
 
     /**
