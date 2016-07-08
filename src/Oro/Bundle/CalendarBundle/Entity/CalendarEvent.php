@@ -271,7 +271,11 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @var Attendee
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee", cascade={"persist"}, fetch="EAGER")
+     * @ORM\ManyToOne(
+     *     targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee",
+     *     cascade={"persist", "remove"},
+     *     fetch="EAGER"
+     * )
      * @ORM\JoinColumn(name="related_attendee_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $relatedAttendee;
@@ -713,10 +717,14 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      * Set parent calendar event.
      *
      * @param CalendarEvent $parent
+     *
+     * @return CalendarEvent
      */
     public function setParent(CalendarEvent $parent = null)
     {
         $this->parent = $parent;
+
+        return $this;
     }
 
     /**
@@ -1047,17 +1055,5 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function getRecurrence()
     {
         return $this->recurrence;
-    }
-
-    /**
-     * @ORM\PreRemove
-     *
-     * @param LifecycleEventArgs $args
-     */
-    public function preRemove(LifecycleEventArgs $args)
-    {
-        if ($this->relatedAttendee) {
-            $args->getEntityManager()->remove($this->relatedAttendee);
-        }
     }
 }

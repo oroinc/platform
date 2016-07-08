@@ -105,7 +105,7 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
             $recurringEventParameters
         );
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertFalse($result['notifiable']);
+        $this->assertTrue($result['notifiable']);
 
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->findOneBy(['id' => $data['id']]);
@@ -204,6 +204,10 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
         $this->assertNotEmpty($result);
         $this->assertEquals($data['id'], $result['id']);
         foreach (self::$recurringEventExceptionParameters as $attribute => $value) {
+            if ($attribute === 'attendees') {
+                continue;
+            }
+
             $this->assertArrayHasKey($attribute, $result);
             $this->assertEquals(
                 $value,
@@ -230,9 +234,14 @@ class RestCalendarEventWithRecurrentEventTest extends AbstractCalendarEventTest
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertFalse($result['notifiable']);
+        $this->assertTrue($result['notifiable']);
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->find($data['id']);
+        $this->assertCount(1, $event->getChildEvents());
+        $this->assertEquals(
+            $event->getRecurringEvent()->getchildEvents()->first()->getId(),
+            $event->getChildEvents()->first()->getRecurringEvent()->getId()
+        );
         $this->assertEquals(self::$recurringEventExceptionParameters['isCancelled'], $event->isCancelled());
         $activityTargetEntities = $event->getActivityTargetEntities();
         $this->assertCount(1, $activityTargetEntities);
