@@ -81,6 +81,7 @@ class CalendarEventTest extends WebTestCase
         $event->setTitle($title)
             ->setStart(new \DateTime())
             ->setEnd(new \DateTime())
+            ->setAllDay(true)
             ->setParent($parent);
 
         foreach ($attendees as $attendee) {
