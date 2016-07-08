@@ -157,12 +157,19 @@ oro:
             clone.label: 'Copy of %name%'
             clone: 'Clone'
             extend_description.label: Description
+
         invite:
             label: Send an Email Invitation
         privileges:
             entity.label: Entity
             action.label: Capabilities
-
+        privilege:
+            category:
+                account_management.label: Account Management
+                address.label: Address
+                application.label: Application
+                calendar.label: Calendar
+                entity.label: Entity
         password:
             change_dialog.title: Change password
             reset_dialog.title: Reset password
