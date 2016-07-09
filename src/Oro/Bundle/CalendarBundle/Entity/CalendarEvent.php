@@ -756,11 +756,33 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
+     * Get attendee for real (parent) Calendar Event
+     *
      * @return Collection|Attendee[]
      */
     public function getAttendees()
     {
-        return $this->getRealCalendarEvent()->attendees;
+        return $this->getRealCalendarEvent()->getCurrentAttendees();
+    }
+
+    /**
+     * Get attendee for current Calendar Event
+     *
+     * @return Collection|Attendee[]
+     */
+    public function getCurrentAttendees()
+    {
+        return $this->attendees;
+    }
+
+    /**
+     * Set attendee for current Calendar Event
+     *
+     * @param Collection|Attendee[] $attendees
+     */
+    public function setCurrentAttendees(Collection $attendees)
+    {
+        $this->attendees = $attendees;
     }
 
     /**
@@ -929,13 +951,15 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
     
     /**
+     * Get attendee for real (parent) Calendar Event
+     *
      * @param Collection|Attendee[] $attendees
      *
      * @return CalendarEvent
      */
     public function setAttendees(Collection $attendees)
     {
-        $this->getRealCalendarEvent()->attendees = $attendees;
+        $this->getRealCalendarEvent()->setCurrentAttendees($attendees);
 
         return $this;
     }
@@ -947,7 +971,8 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      */
     public function addAttendee(Attendee $attendee)
     {
-        $attendees = $this->getRealCalendarEvent()->attendees;
+        $attendees = $this->getRealCalendarEvent()->getCurrentAttendees();
+
         if (!$attendees->contains($attendee)) {
             $attendee->setCalendarEvent($this);
             $attendees->add($attendee);
@@ -965,12 +990,14 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      */
     public function removeAttendee(Attendee $attendee)
     {
-        if ($this->getRealCalendarEvent()->attendees->contains($attendee)) {
+        if ($this->getRealCalendarEvent()
+            && $this->getRealCalendarEvent()->getCurrentAttendees()->contains($attendee)
+        ) {
             $event = $this->getEventByAttendee($attendee);
             if ($event) {
                 $event->relatedAttendee = null;
             }
-            $this->getRealCalendarEvent()->attendees->removeElement($attendee);
+            $this->getRealCalendarEvent()->getCurrentAttendees()->removeElement($attendee);
         }
 
         return $this;

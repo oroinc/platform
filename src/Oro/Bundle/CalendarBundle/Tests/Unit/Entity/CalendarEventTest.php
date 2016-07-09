@@ -76,13 +76,17 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $calendarEvent = new CalendarEvent();
         $calendarEvent->setRelatedAttendee($attendee);
 
-        $attendee->setStatus(new TestEnumValue(CalendarEvent::STATUS_ACCEPTED, CalendarEvent::STATUS_ACCEPTED));
+        $attendee->setStatus(
+            new TestEnumValue(CalendarEvent::STATUS_ACCEPTED, CalendarEvent::STATUS_ACCEPTED)
+        );
         $this->assertEquals(CalendarEvent::ACCEPTED, $calendarEvent->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_ACCEPTED, $calendarEvent->getRelatedAttendee()->getStatus());
 
         $attendee->setStatus(
             new TestEnumValue(CalendarEvent::STATUS_TENTATIVE, CalendarEvent::STATUS_TENTATIVE)
         );
-        $this->assertEquals(CalendarEvent::STATUS_TENTATIVE, $calendarEvent->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::TENTATIVELY_ACCEPTED, $calendarEvent->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_TENTATIVE, $calendarEvent->getRelatedAttendee()->getStatus());
     }
 
     public function testChildren()
@@ -93,7 +97,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $calendarEventOne->setTitle('Second calendar event');
         $calendarEventThree = new CalendarEvent();
         $calendarEventOne->setTitle('Third calendar event');
-        $children = array($calendarEventOne, $calendarEventTwo);
+        $children = [$calendarEventOne, $calendarEventTwo];
 
         $calendarEvent = new CalendarEvent();
         $calendarEvent->setTitle('Parent calendar event');
@@ -117,7 +121,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($calendarEvent, $calendarEvent->addChildEvent($calendarEventThree));
         $actual = $calendarEvent->getChildEvents();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
-        $this->assertEquals(array($calendarEventOne, $calendarEventTwo, $calendarEventThree), $actual->toArray());
+        $this->assertEquals([$calendarEventOne, $calendarEventTwo, $calendarEventThree], $actual->toArray());
         /** @var CalendarEvent $child */
         foreach ($children as $child) {
             $this->assertEquals($calendarEvent->getTitle(), $child->getParent()->getTitle());
@@ -127,7 +131,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($calendarEvent, $calendarEvent->removeChildEvent($calendarEventOne));
         $actual = $calendarEvent->getChildEvents();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
-        $this->assertEquals(array(1 => $calendarEventTwo, 2 => $calendarEventThree), $actual->toArray());
+        $this->assertEquals([1 => $calendarEventTwo, 2 => $calendarEventThree], $actual->toArray());
     }
 
     /**
@@ -221,7 +225,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($reminderData->getSubject(), $obj->getTitle());
         $this->assertEquals($reminderData->getExpireAt(), $obj->getStart());
-        $this->assertTrue($reminderData->getRecipient() === $calendar->getOwner());
+        $this->assertSame($reminderData->getRecipient(), $calendar->getOwner());
     }
 
     /**
@@ -364,17 +368,23 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider childAttendeesProvider
+     *
+     * @param CalendarEvent $event
+     * @param array         $expectedAttendees
      */
     public function testGetChildAttendees(CalendarEvent $event, array $expectedAttendees)
     {
         $this->assertEquals($expectedAttendees, array_values($event->getChildAttendees()->toArray()));
     }
 
+    /**
+     * @return array
+     */
     public function childAttendeesProvider()
     {
         $attendee1 = (new Attendee())->setEmail('first@example.com');
         $attendee2 = (new Attendee())->setEmail('second@example.com');
-        $attendee3 = (new Attendee())->setemail('third@example.com');
+        $attendee3 = (new Attendee())->setEmail('third@example.com');
 
         return [
             'event without realted attendee' => [
@@ -413,7 +423,6 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
-
 
     public function testExceptions()
     {
@@ -458,5 +467,31 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $actual = $calendarEvent->getRecurringEventExceptions();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals([1 => $exceptionTwo, 2 => $exceptionThree], $actual->toArray());
+    }
+
+    public function testGetCurrentAttendees()
+    {
+        $one = new CalendarEvent();
+        $one->setTitle('First calendar event');
+        $two = new CalendarEvent();
+        $two->setTitle('Second calendar event');
+        $two->setParent($one);
+
+        $one->addAttendee(new Attendee(1));
+        $one->addAttendee(new Attendee(2));
+        $one->addAttendee(new Attendee(3));
+        $one->addAttendee(new Attendee(4));
+
+        $this->assertCount(4, $one->getAttendees());
+        $this->assertCount(4, $two->getAttendees());
+        
+        $this->assertCount(4, $one->getCurrentAttendees());
+        $this->assertCount(0, $two->getCurrentAttendees());
+
+        $one->setCurrentAttendees(new ArrayCollection([new Attendee(5), new Attendee(6)]));
+        $two->setCurrentAttendees(new ArrayCollection([new Attendee(7), new Attendee(8)]));
+
+        $this->assertCount(2, $one->getCurrentAttendees());
+        $this->assertCount(2, $two->getCurrentAttendees());
     }
 }

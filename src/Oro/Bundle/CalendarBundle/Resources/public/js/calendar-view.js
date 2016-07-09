@@ -569,9 +569,16 @@ define(function(require) {
          * Performs filtration of calendar events before they are rendered
          *
          * @param {Array} events
+         *
          * @returns {Array}
          */
         filterEvents: function(events) {
+            var visibleEvents = this.filterVisibleEvents(events);
+
+            return this.filterCancelledEvents(visibleEvents);
+        },
+
+        filterVisibleEvents: function (events) {
             var visibleConnectionIds = [];
             // collect visible connections
             this.options.connectionsOptions.collection.each(function(connectionModel) {
@@ -579,12 +586,16 @@ define(function(require) {
                     visibleConnectionIds.push(connectionModel.get('calendarUid'));
                 }
             }, this);
-            // filter visible events
-            events = _.filter(events, function(event) {
+
+            return _.filter(events, function(event) {
                 return -1 !== _.indexOf(visibleConnectionIds, event.get('calendarUid'));
             });
+        },
 
-            return events;
+        filterCancelledEvents: function (events) {
+            return _.filter(events, function(event) {
+                return !event.get('isCancelled');
+            });
         },
 
         /**
