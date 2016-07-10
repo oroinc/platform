@@ -43,6 +43,8 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         $siblingId = null,
         $prepend = false
     ) {
+        $this->addAdditionalBlockPrefixOption($id, $options);
+
         $this
             ->replaceRoot($parentId)
             ->replaceRoot($siblingId);
@@ -51,8 +53,6 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
             ->replaceNamespace($id)
             ->replaceNamespace($parentId)
             ->replaceNamespace($siblingId);
-
-        $this->addAdditionalBlockPrefixOption($id, $options);
 
         $this->layoutManipulator->add($id, $parentId, $blockType, $options, $siblingId, $prepend);
 
