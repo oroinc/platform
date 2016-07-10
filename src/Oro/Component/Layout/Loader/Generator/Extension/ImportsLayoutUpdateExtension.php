@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Loader\Generator\Extension;
 
+use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\Extension\Theme\ThemeExtension;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
@@ -21,7 +22,9 @@ class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensi
         if (!empty($source[self::NODE_IMPORTS])) {
             $visitorCollection->append(new ImportsAwareLayoutUpdateVisitor($source[self::NODE_IMPORTS]));
         }
-        if (strpos($data->getFilename(), ThemeExtension::IMPORT_FOLDER) !== false) { // @todo find another way to detect imports
+        
+        $delimiter = PathProviderInterface::DELIMITER;
+        if (strpos($data->getFilename(), $delimiter.ThemeExtension::IMPORT_FOLDER.$delimiter) !== false) {
             $visitorCollection->append(new ImportLayoutUpdateVisitor());
         }
     }
