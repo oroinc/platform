@@ -6,6 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
+ * @group soap
  */
 class SoapAddressTypeApiTest extends WebTestCase
 {
