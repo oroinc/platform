@@ -64,11 +64,13 @@ class RequireJSConfigProvider extends ConfigProvider
      */
     public function collectConfigs()
     {
+        $baseConfig = $this->config;
 
         $configs = [];
         foreach ($this->getAllThemes() as $theme) {
             $this->currentTheme = $theme->getName();
 
+            $this->config = $baseConfig;
             $this->collectBundlesConfig();
 
             $config = new RequireJSConfig();
@@ -78,9 +80,11 @@ class RequireJSConfigProvider extends ConfigProvider
                 [self::REQUIREJS_JS_DIR, $this->currentTheme, self::REQUIREJS_CONFIG_FILE]
             ));
 
+            $buildPath = isset($this->config['config']['build_path']) ?
+                $this->config['config']['build_path'] : $this->config['build_path'];
             $config->setOutputFilePath(implode(
                 DIRECTORY_SEPARATOR,
-                [self::REQUIREJS_JS_DIR, $this->currentTheme, $this->config['build_path']]
+                [self::REQUIREJS_JS_DIR, $this->currentTheme, $buildPath]
             ));
 
             $this->collectMainConfig($config);
