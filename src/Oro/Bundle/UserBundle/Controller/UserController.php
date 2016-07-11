@@ -40,12 +40,13 @@ class UserController extends Controller
      */
     public function viewProfileAction()
     {
-        return $this->view($this->getUser(), 'oro_user_profile_update');
+        return $this->view($this->getUser(), true);
     }
 
     /**
      * @Route("/profile/edit", name="oro_user_profile_update")
      * @Template("OroUserBundle:User/Profile:update.html.twig")
+     * @AclAncestor("update_own_profile")
      */
     public function updateProfileAction()
     {
@@ -156,18 +157,19 @@ class UserController extends Controller
 
     /**
      * @param User $entity
-     * @param string $editRoute
+     * @param bool $isProfileView
      * @return array
      */
-    protected function view(User $entity, $editRoute = '')
+    protected function view(User $entity, $isProfileView = false)
     {
         // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
         // completely delete an owner and related entities or reassign related entities to another owner before
-        $output = ['entity' => $entity, 'allow_delete' => $this->isUserDeleteAllowed($entity)];
-        if ($editRoute) {
-            $output['editRoute'] = $editRoute;
-        }
-        return $output;
+        
+        return [
+            'entity' => $entity,
+            'allow_delete' => $this->isUserDeleteAllowed($entity),
+            'isProfileView' => $isProfileView
+        ];
     }
 
     /**
