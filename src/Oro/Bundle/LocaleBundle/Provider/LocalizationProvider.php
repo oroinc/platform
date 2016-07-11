@@ -40,4 +40,21 @@ class LocalizationProvider
     {
         return $this->repository->findBy(!is_null($ids) ? ['id' => $ids] : [], ['name' => 'ASC']);
     }
+
+    /**
+     * @throws \Exception
+     *
+     * @return Localization
+     */
+    public function getDefaultLocalization()
+    {
+         //TODO: Implement getting of Default Localization
+
+        $localizations = $this->getLocalizations();
+        if (count($localizations)) {
+            return reset($localizations);
+        }
+
+        return null;
+    }
 }

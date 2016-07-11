@@ -14,6 +14,8 @@ oro_system_configuration:
             title: oro.locale.system_configuration.groups.locale_settings.title
         map_settings:
             title: oro.locale.system_configuration.groups.map_settings.title
+        localization_settings:
+            title: oro.locale.system_configuration.groups.localization_settings.title
 
     fields:
         oro_locale.locale:
@@ -132,6 +134,28 @@ oro_system_configuration:
                     kilometers_per_hour: oro.locale.system_configuration.fields.wind_speed_unit.choices.kilometers_per_hour
                     meters_per_second: oro.locale.system_configuration.fields.wind_speed_unit.choices.meters_per_second
 
+        oro_locale.enabled_localizations:
+            data_type: array
+            type: oro_localization_selection
+            priority: 20
+            options:
+                label: oro.locale.system_configuration.fields.enabled_localizations.label
+                required: true
+                multiple: true
+                constraints:
+                    - NotBlank: ~
+        oro_locale.default_localization:
+            data_type: string
+            type: oro_locale_default_localization_selection
+            priority: 10
+            options:
+                label: oro.locale.system_configuration.fields.default_localization.label
+                required: true
+                multiple: false
+                constraints:
+                    - NotBlank: ~
+
+
     tree:
         system_configuration:
             platform:
@@ -155,6 +179,11 @@ oro_system_configuration:
                                         children:
                                             - oro_locale.temperature_unit
                                             - oro_locale.wind_speed_unit
+                                    localization_settings:
+                                        priority: 0
+                                        children:
+                                            - oro_locale.enabled_localizations
+                                            - oro_locale.default_localization
                             language_settings:
                                 priority: 230
                                 children:
