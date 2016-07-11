@@ -7,7 +7,7 @@ namespace Oro\Bundle\SecurityBundle\Owner;
  *
  * @internal Should cover most of OwnerTree methods, BC break possible
  */
-interface OwnerTreeInterface extends \Serializable
+interface OwnerTreeInterface
 {
     /**
      * Add the given basic entity with local owner to the tree
