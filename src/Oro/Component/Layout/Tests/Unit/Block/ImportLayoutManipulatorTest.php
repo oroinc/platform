@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Oro\Component\Layout\Tests\Unit\Block;
-
 
 use Oro\Component\Layout\ImportLayoutManipulator;
 use Oro\Component\Layout\LayoutManipulatorInterface;

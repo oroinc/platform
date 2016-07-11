@@ -23,26 +23,26 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
         $source = [
             ImportsLayoutUpdateExtension::NODE_IMPORTS => [
                 [
-                    'id'        => 'import_id',
-                    'root'      => 'root_block_id',
+                    'id' => 'import_id',
+                    'root' => 'root_block_id',
                     'namespace' => 'import_namespace',
                 ],
                 [
-                    'id'        => 'import_id_2',
-                    'root'      => 'root_block_id_2',
+                    'id' => 'import_id_2',
+                    'root' => 'root_block_id_2',
                     'namespace' => 'import_namespace_2',
                 ]
             ]
         ];
         $imports = [
             [
-                'id'        => 'import_id',
-                'root'      => 'root_block_id',
+                'id' => 'import_id',
+                'root' => 'root_block_id',
                 'namespace' => 'import_namespace',
             ],
             [
-                'id'        => 'import_id_2',
-                'root'      => 'root_block_id_2',
+                'id' => 'import_id_2',
+                'root' => 'root_block_id_2',
                 'namespace' => 'import_namespace_2',
             ]
         ];
@@ -73,7 +73,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
     public function prepareWithoutNodeImportsDataProvider()
     {
         return [
-            'without imports'    => [
+            'without imports' => [
                 'source' => [],
             ],
             'with empty imports' => [
@@ -114,16 +114,16 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
         $source = [
             ImportsLayoutUpdateExtension::NODE_IMPORTS => [
                 [
-                    'id'        => 'import_id',
-                    'root'      => 'root_block_id',
+                    'id' => 'import_id',
+                    'root' => 'root_block_id',
                     'namespace' => 'import_namespace',
                 ]
             ]
         ];
         $imports = [
             [
-                'id'        => 'import_id',
-                'root'      => 'root_block_id',
+                'id' => 'import_id',
+                'root' => 'root_block_id',
                 'namespace' => 'import_namespace',
             ]
         ];

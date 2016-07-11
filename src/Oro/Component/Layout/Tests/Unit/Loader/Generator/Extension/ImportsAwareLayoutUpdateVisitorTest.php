@@ -16,17 +16,17 @@ class ImportsAwareLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
     {
         $imports = [
             [
-                'id'        => 'import_id',
-                'root'      => 'root_block_id',
+                'id' => 'import_id',
+                'root' => 'root_block_id',
                 'namespace' => 'import_namespace'
             ],
             [
-                'id'        => 'import_id_2',
-                'root'      => 'root_block_id_2',
+                'id' => 'import_id_2',
+                'root' => 'root_block_id_2',
                 'namespace' => 'import_namespace_2'
             ],
         ];
-        $condition    = new ImportsAwareLayoutUpdateVisitor($imports);
+        $condition = new ImportsAwareLayoutUpdateVisitor($imports);
         $phpClass = PhpClass::create('LayoutUpdateWithImport');
         $visitContext = new VisitContext($phpClass);
 
