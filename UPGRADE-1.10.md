@@ -7,6 +7,8 @@ UPGRADE FROM 1.9 to 1.10
 - Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::cleanUpConnections method was removed.
 - Oro\Bundle\TestFrameworkBundle\Test\Client::startTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
 - Oro\Bundle\TestFrameworkBundle\Test\Client::rollbackTransaction method was removed, use one from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase class.
+- `\Oro\Bundle\TestFrameworkBundle\Fixtures\LoadUserData` is deprecated, use `\Oro\Bundle\TestFrameworkBundle\Migrations\Data\ORM\LoadUserData` instead
+- No need to load fixtures after test environment setup using `doctrine:fixture:load`
 
 ####EntityBundle
 - The implementation of `Oro\Bundle\EntityBundle\ORM\EntityAliasResolver` was changed. Now the loaded entity aliases is saved into a cache that gives significant performance gain. Also, from now, you can implement `Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface` to create aliases for any entities not only for ORM entities.
@@ -278,3 +280,10 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 ####Oro\Component\Config
 - `Oro\Component\Config\CumulativeResourceInfo::__construct` signature changed from
 `public function __construct($bundleClass, $name, $path, $data)` to `public function __construct($bundleClass, $name, $path, array $data = [])`
+
+####UserBundle:
+- The constructor of the `Oro\Bundle\UserBundle\Form\Type\UserType` class was changed. Removed argument: `ConfigManager $userConfigManager`.
+- The constructor of the `Oro\Bundle\UserBundle\Form\Handler\UserHandler` class was changed. Removed argument: `SecurityFacade $securityFacade = null`.
+- Added new configuration group user_configuration used to define which personal configurations can be updated by the user (Languages, Locale etc.)
+- Added 2 new capabilites: Update User Profile and Access personal configuration to control access to "My Profile" and  "My Configuration" updates
+- Added new permission "Configure" which controls access to entity configuration settings. Currently is applied to User entity only.
