@@ -126,14 +126,10 @@ abstract class AbstractOwnerTreeProvider implements ContainerAwareInterface, Own
         if (null === $cache) {
             $this->tree = $this->loadTree();
         } else {
-            $serializedData = $cache->fetch(self::CACHE_KEY);
-            if ($serializedData) {
-                $tree = $this->createTreeObject();
-                $tree->unserialize($serializedData);
-                $this->tree = $tree;
-            } else {
+            $this->tree = $cache->fetch(self::CACHE_KEY);
+            if (!$this->tree) {
                 $this->tree = $this->loadTree();
-                $cache->save(self::CACHE_KEY, $this->tree->serialize());
+                $cache->save(self::CACHE_KEY, $this->tree);
             }
         }
     }

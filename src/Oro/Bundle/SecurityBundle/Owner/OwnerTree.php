@@ -539,44 +539,4 @@ class OwnerTree implements OwnerTreeInterface
         $this->subordinateBusinessUnitIds = [];
         $this->organizationBusinessUnitIds = [];
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        // JSON serialization is used by performance reasons,
-        // it is faster and the result is smaller than PHP native serialization
-        return json_encode(
-            [
-                $this->userOwningOrganizationId,
-                $this->userOwningBusinessUnitId,
-                $this->userOrganizationIds,
-                $this->userBusinessUnitIds,
-                $this->userOrganizationBusinessUnitIds,
-                $this->businessUnitOwningOrganizationId,
-                $this->assignedBusinessUnitUserIds,
-                $this->subordinateBusinessUnitIds,
-                $this->organizationBusinessUnitIds
-            ]
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        list(
-            $this->userOwningOrganizationId,
-            $this->userOwningBusinessUnitId,
-            $this->userOrganizationIds,
-            $this->userBusinessUnitIds,
-            $this->userOrganizationBusinessUnitIds,
-            $this->businessUnitOwningOrganizationId,
-            $this->assignedBusinessUnitUserIds,
-            $this->subordinateBusinessUnitIds,
-            $this->organizationBusinessUnitIds
-            ) = json_decode($serialized, true);
-    }
 }
