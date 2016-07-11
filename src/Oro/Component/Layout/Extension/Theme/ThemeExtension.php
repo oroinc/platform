@@ -70,7 +70,7 @@ class ThemeExtension extends AbstractExtension
     }
 
     /**
-     * @param                    $file
+     * @param $file
      * @param ContextInterface $context
      *
      * @return array
