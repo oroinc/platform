@@ -43,6 +43,17 @@ oro_system_configuration:
                                     navbar_settings:
                                         children:
                                             - oro_ui.navbar_position
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        priority: 20
+                        children:
+                            look_and_feel:
+                                children:
+                                    navbar_settings:
+                                        children:
+                                            - oro_ui.navbar_position
 
     api_tree:
         application:
