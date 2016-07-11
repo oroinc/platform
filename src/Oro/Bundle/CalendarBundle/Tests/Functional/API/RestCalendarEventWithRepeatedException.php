@@ -123,6 +123,8 @@ class RestCalendarEventWithRepeatedException extends WebTestCase
      * @depends testPostRecurringEvent
      *
      * @param array $param
+     *
+     * @return array
      */
     public function testMakeRecurringEventWithException(array $param)
     {
