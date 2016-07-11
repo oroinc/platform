@@ -2,20 +2,41 @@
 
 namespace Oro\Bundle\RequireJSBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\RequireJSBundle\Provider\ChainConfigProvider;
 use Oro\Bundle\RequireJSBundle\DependencyInjection\Compiler\ConfigProviderCompilerPass;
+use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 
 class OroBuildCommand extends ContainerAwareCommand
 {
     const BUILD_CONFIG_FILE_NAME    = 'build.js';
     const OPTIMIZER_FILE_PATH       = 'bundles/ororequirejs/lib/r.js';
+
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
+    /**
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($name = null)
+    {
+        parent::__construct($name);
+
+        $this->filesystem = new Filesystem();
+    }
 
     /**
      * {@inheritdoc}
@@ -32,61 +53,76 @@ class OroBuildCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $requireJSConfig = $this->getContainer()->getParameter('oro_require_js');
+        $this->config = $this->getContainer()->getParameter('oro_require_js');
+        
+        /** @var ConfigProviderManager $manager */
+        $manager = $this->getContainer()->get(ConfigProviderCompilerPass::PROVIDER_SERVICE);
+        foreach ($manager->getProviders() as $provider) {
+            foreach ($provider->collectConfigs() as $config) {
+                $output->writeln(sprintf('Generating require.js config'));
 
-        /** @var ChainConfigProvider $chainConfigProvider */
-        $chainConfigProvider = $this->getContainer()->get(ConfigProviderCompilerPass::PROVIDER_SERVICE);
-        foreach ($chainConfigProvider->getProviders() as $configProvider) {
-            foreach ($configProvider->collectAllConfigs() as $key => $configs) {
-                $output->writeln(sprintf('Generating require.js config for "%s" theme', $key));
+                $configPath = $this->getWebRoot() . self::BUILD_CONFIG_FILE_NAME;
 
                 // for some reason built application gets broken with configuration in "oneline-json"
-                $configContent = str_replace(',', ",\n", $configProvider->getMainConfig($key));
-                $this->writeFile(
-                    $configContent,
-                    $this->getWebRoot() . $configProvider->getConfigFilePath()
-                );
+                $mainConfig = str_replace(',', ",\n", $config->getMainConfig());
+                $this->writeFile($mainConfig, $this->getWebRoot() . $config->getConfigFilePath());
 
-                $configContent = '(' . json_encode($configs['buildConfig']) . ')';
-                $configPath = $this->getWebRoot() . self::BUILD_CONFIG_FILE_NAME;
-                $this->writeFile($configContent, $configPath);
+                $buildConfig = '(' . json_encode($config->getBuildConfig()) . ')';
+                $this->writeFile($buildConfig, $configPath);
 
-                $JSEngine = $this->getJSEngine($requireJSConfig);
-                if ($JSEngine) {
-                    $output->writeln(sprintf('Running code optimizer for "%s" theme', $key));
+                $JSEngine = isset($this->config['js_engine']) ? $this->config['js_engine'] : null;
 
-                    $process = new Process($this->getCommandline($JSEngine, $configPath), $this->getWebRoot());
-                    $process->setTimeout($requireJSConfig['building_timeout']);
-                    // some workaround when this command is launched from web
-                    if (isset($_SERVER['PATH'])) {
-                        $env = $_SERVER;
-                        if (isset($env['Path'])) {
-                            unset($env['Path']);
-                        }
-                        $process->setEnv($env);
-                    }
-                    $process->run();
-
-                    if (!$process->isSuccessful()) {
-                        throw new \RuntimeException($process->getErrorOutput());
-                    }
-
-                    $output->writeln('Cleaning up');
-
-                    $this->removeFile($configPath);
-
-                    $output->writeln(
-                        sprintf(
-                            '<comment>%s</comment> <info>[file+]</info> %s',
-                            date('H:i:s'),
-                            realpath(
-                                $this->getWebRoot() .
-                                $configProvider->getOutputFilePath()
-                            )
-                        )
-                    );
+                if (!$JSEngine) {
+                    throw new \RuntimeException("JS engine not found");
                 }
+
+                $output->writeln(sprintf('Running code optimizer'));
+
+                $this->process($JSEngine, $configPath);
+
+                $output->writeln('Cleaning up');
+
+                $this->removeFile($configPath);
+
+                $output->writeln(
+                    sprintf(
+                        '<comment>%s</comment> <info>[file+]</info> %s',
+                        date('H:i:s'),
+                        realpath($this->getWebRoot() . $config->getOutputFilePath())
+                    )
+                );
             }
+        }
+    }
+
+    /**
+     * @param string $JSEngine
+     * @param string $configPath
+     */
+    protected function process($JSEngine, $configPath)
+    {
+        $path = dirname($configPath) . DIRECTORY_SEPARATOR . basename($configPath);
+        $commandline = $JSEngine . ' ' . self::OPTIMIZER_FILE_PATH . ' -o ' . $path . ' 1>&2';
+
+        $process = new Process($commandline, $this->getWebRoot());
+        
+        if (isset($this->config['building_timeout'])) {
+            $process->setTimeout($this->config['building_timeout']);
+        }
+        
+        // some workaround when this command is launched from web
+        if (isset($_SERVER['PATH'])) {
+            $env = $_SERVER;
+            if (isset($env['Path'])) {
+                unset($env['Path']);
+            }
+            $process->setEnv($env);
+        }
+        
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException($process->getErrorOutput());
         }
     }
 
@@ -108,10 +144,8 @@ class OroBuildCommand extends ContainerAwareCommand
      */
     protected function writeFile($content, $path)
     {
-        $fs = new Filesystem();
-
         try {
-            $fs->dumpFile($path, $content);
+            $this->filesystem->dumpFile($path, $content);
         } catch (IOExceptionInterface $e) {
             throw new \RuntimeException('Unable to write file ' . $e->getPath());
         }
@@ -128,36 +162,12 @@ class OroBuildCommand extends ContainerAwareCommand
      */
     protected function removeFile($path)
     {
-        $fs = new Filesystem();
-
         try {
-            $fs->remove($path);
+            $this->filesystem->remove($path);
         } catch (IOExceptionInterface $e) {
             throw new \RuntimeException('Unable to remove file ' . $e->getPath());
         }
 
         return $this;
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return string|null
-     */
-    protected function getJSEngine(array $config)
-    {
-        return isset($config['js_engine']) ? $config['js_engine'] : null;
-    }
-
-    /**
-     * @param $JSEngine
-     * @param $configPath
-     *
-     * @return string
-     */
-    protected function getCommandline($JSEngine, $configPath)
-    {
-        $path = dirname($configPath) . DIRECTORY_SEPARATOR . basename($configPath);
-        return $JSEngine . ' ' . self::OPTIMIZER_FILE_PATH . ' -o ' . $path . ' 1>&2';
     }
 }

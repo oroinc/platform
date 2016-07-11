@@ -2,43 +2,21 @@
 
 namespace Oro\Bundle\RequireJSBundle\Provider;
 
+use Oro\Bundle\RequireJSBundle\Config\Config as RequireJSConfig;
+
 interface ConfigProviderInterface
 {
     /**
-     * Fetches piece of JS-code with require.js main config from cache
-     * or if it was not there - generates and put into a cache
+     * Get current config for require.js
      *
-     * @param $key
-     *
-     * @return string
+     * @return RequireJSConfig
      */
-    public function getMainConfig($key);
+    public function getConfig();
 
     /**
-     * Get path to config file for require.js
+     * Collect configs for require.js
      *
-     * @return string
-     */
-    public function getConfigFilePath();
-
-    /**
-     * Get path to output file
-     *
-     * @return string
-     */
-    public function getOutputFilePath();
-
-    /**
-     * Collect build and main configs for require.js
-     *
-     * @return array
-     */
-    public function collectAllConfigs();
-
-    /**
-     * Collect basic configs for require.js
-     *
-     * @return array
+     * @return RequireJSConfig[]
      */
     public function collectConfigs();
 }

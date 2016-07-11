@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class ConfigProviderCompilerPass implements CompilerPassInterface
 {
-    const PROVIDER_SERVICE  = 'oro_requirejs.config_provider.chain';
+    const PROVIDER_SERVICE  = 'oro_requirejs.config_provider.manager';
     const TAG_NAME          = 'requirejs.config_provider';
 
     /**
@@ -19,8 +19,13 @@ class ConfigProviderCompilerPass implements CompilerPassInterface
         if ($container->hasDefinition(self::PROVIDER_SERVICE)) {
             $chainDef = $container->getDefinition(self::PROVIDER_SERVICE);
 
-            foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $serviceId => $tag) {
-                $chainDef->addMethodCall('addProvider', [new Reference($serviceId)]);
+            foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $serviceId => $tags) {
+                foreach ($tags as $attributes) {
+                    $chainDef->addMethodCall(
+                        'addProvider',
+                        [new Reference($serviceId), $attributes["alias"]]
+                    );
+                }
             }
         }
     }
