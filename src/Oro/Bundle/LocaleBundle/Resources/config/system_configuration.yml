@@ -152,6 +152,7 @@ oro_system_configuration:
                 label: oro.locale.system_configuration.fields.default_localization.label
                 required: true
                 multiple: false
+                resettable: false
                 constraints:
                     - NotBlank: ~
 
