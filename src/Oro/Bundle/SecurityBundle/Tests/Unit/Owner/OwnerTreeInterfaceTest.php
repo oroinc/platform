@@ -54,17 +54,6 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['bu2', 'bu3'], $tree->getOrganizationBusinessUnitIds('org'));
     }
 
-    public function testAddLocalEntityShouldSetBusinessUnitUserIds()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addBasicEntity('user1', 'bu');
-        $tree->addBasicEntity('user2', 'bu');
-
-        $tree->addLocalEntity('bu', null);
-        $this->assertEquals(['user1', 'user2'], $tree->getBusinessUnitUserIds('bu'));
-    }
-
     public function testAddLocalEntityShouldSetUserOwningOrganizationId()
     {
         $tree = new OwnerTree();
@@ -119,19 +108,6 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $tree->getUserBusinessUnitIds('user'));
     }
 
-    public function testAddUserShouldSetBusinessUnitUserIds()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addLocalEntity('bu', null);
-
-        $tree->addBasicEntity('user', 'bu');
-        $this->assertEquals(['user'], $tree->getBusinessUnitUserIds('bu'));
-
-        $tree->addBasicEntity('user1', 'bu');
-        $this->assertEquals(['user', 'user1'], $tree->getBusinessUnitUserIds('bu'));
-    }
-
     public function testAddUserShouldNotSetUserOrganizationIds()
     {
         $tree = new OwnerTree();
@@ -170,16 +146,6 @@ class OwnerTreeInterfaceTest extends \PHPUnit_Framework_TestCase
 
         $tree->addBasicEntity('user', 'bu');
         $this->assertNull($tree->getUserOrganizationId('user'));
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testAddUserBusinessUnitShouldThrowExceptionIfUserDoesNotSet()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addLocalEntityToBasic('user', 'org1', null);
     }
 
     public function testAddUserBusinessUnitShouldNotSetUserBusinessUnitIdsIfBusinessUnitIdIsNull()
