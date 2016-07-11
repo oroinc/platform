@@ -4,9 +4,10 @@ parameters:
 
 services:
     oro_requirejs.twig.requirejs_extension:
-        class:                            %oro_requirejs.twig.class%
+        class: Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension
         arguments:
-            - "@service_container"
+            - '@oro_requirejs.config_provider.manager'
+            - '%oro_require_js.web_root%'
         tags:
             - { name: twig.extension }
 
