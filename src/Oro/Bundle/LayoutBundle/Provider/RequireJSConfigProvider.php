@@ -2,18 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider;
 
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Oro\Bundle\RequireJSBundle\Config\Config as RequireJSConfig;
+use Oro\Bundle\RequireJSBundle\Provider\ConfigProvider;
 
-use Oro\Component\PhpUtils\ArrayUtil;
-use Oro\Bundle\RequireJSBundle\Provider\Config;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
-use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 
-class RequireJSConfigProvider extends Config
+class RequireJSConfigProvider extends ConfigProvider
 {
     const REQUIREJS_CONFIG_CACHE_KEY    = 'layout_requirejs_config';
     const REQUIREJS_CONFIG_FILE         = 'require-config.js';
@@ -25,57 +20,74 @@ class RequireJSConfigProvider extends Config
     protected $themeManager;
 
     /**
-     * {@inheritdoc}
+     * @var
      */
-    public function __construct(ContainerInterface $container, EngineInterface $templating, $template)
+    protected $activeTheme;
+
+    /**
+     * @var string
+     */
+    protected $currentTheme;
+
+    /**
+     * @param ThemeManager $themeManager
+     */
+    public function setThemeManager(ThemeManager $themeManager)
     {
-        parent::__construct($container, $templating, $template);
+        $this->themeManager = $themeManager;
+    }
+
+    /**
+     * @param string $themeName
+     */
+    public function setActiveTheme($themeName)
+    {
+        $this->activeTheme = $themeName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigFilePath()
+    public function getConfig()
     {
-        return implode(
-            [self::REQUIREJS_JS_DIR, $this->configKey, self::REQUIREJS_CONFIG_FILE],
-            DIRECTORY_SEPARATOR
-        );
+        if (!$this->cache->contains($this->getCacheKey())) {
+            $this->cache->save($this->getCacheKey(), $this->collectConfigs());
+        }
+
+        $configs = $this->cache->fetch($this->getCacheKey());
+
+        return $configs[$this->activeTheme];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOutputFilePath()
+    public function collectConfigs()
     {
-        $config = $this->collectConfigs();
-        $path = !empty($config['config']['build_path'])
-            ? $config['config']['build_path']
-            : parent::getOutputFilePath($config);
-
-        return implode(
-            [self::REQUIREJS_JS_DIR, $this->configKey, $path],
-            DIRECTORY_SEPARATOR
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function collectAllConfigs()
-    {
-        $configKey = $this->configKey;
 
         $configs = [];
         foreach ($this->getAllThemes() as $theme) {
-            $this->configKey = $theme->getName();
-            $configs[$this->configKey] = [
-                'mainConfig'    => $this->generateMainConfig(),
-                'buildConfig'   => $this->collectBuildConfig(),
-            ];
-        }
+            $this->currentTheme = $theme->getName();
 
-        $this->configKey = $configKey;
+            $this->collectBundlesConfig();
+
+            $config = new RequireJSConfig();
+
+            $config->setConfigFilePath(implode(
+                DIRECTORY_SEPARATOR,
+                [self::REQUIREJS_JS_DIR, $this->currentTheme, self::REQUIREJS_CONFIG_FILE]
+            ));
+
+            $config->setOutputFilePath(implode(
+                DIRECTORY_SEPARATOR,
+                [self::REQUIREJS_JS_DIR, $this->currentTheme, $this->config['build_path']]
+            ));
+
+            $this->collectMainConfig($config);
+            $this->collectBuildConfig($config);
+
+            $configs[$this->currentTheme] = $config;
+        }
 
         return $configs;
     }
@@ -85,16 +97,18 @@ class RequireJSConfigProvider extends Config
      */
     protected function getFiles($bundle)
     {
-        $theme = $this->getTheme($this->configKey);
-        $reflection = new \ReflectionClass($bundle);
+        $theme = $this->getTheme($this->currentTheme);
 
         $files = [];
+
         if ($theme->getParentTheme()) {
-            $this->configKey = $theme->getParentTheme();
+            $this->currentTheme = $theme->getParentTheme();
             $files = array_merge($files, $this->getFiles($bundle));
-            $this->configKey = $theme->getName();
         }
 
+        $this->currentTheme = $theme->getName();
+
+        $reflection = new \ReflectionClass($bundle);
         $file = dirname($reflection->getFileName()) .
             sprintf('/Resources/views/layouts/%s/requirejs.yml', $theme->getDirectory());
 
@@ -114,7 +128,7 @@ class RequireJSConfigProvider extends Config
      */
     protected function getTheme($themeName)
     {
-        return $this->getThemeManager()->getTheme($themeName);
+        return $this->themeManager->getTheme($themeName);
     }
 
     /**
@@ -122,19 +136,7 @@ class RequireJSConfigProvider extends Config
      */
     protected function getAllThemes()
     {
-        return $this->getThemeManager()->getAllThemes();
-    }
-
-    /**
-     * @return ThemeManager
-     */
-    protected function getThemeManager()
-    {
-        if (!$this->themeManager) {
-            $this->themeManager = $this->container->get('oro_layout.theme_manager');
-        }
-
-        return $this->themeManager;
+        return $this->themeManager->getAllThemes();
     }
 
     /**

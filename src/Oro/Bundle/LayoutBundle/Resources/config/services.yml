@@ -2,7 +2,6 @@ parameters:
     oro_layout.layout_factory_builder.class:    Oro\Component\Layout\LayoutFactoryBuilder
     oro_layout.layout_manager.class:            Oro\Component\Layout\LayoutManager
     oro_layout.form_layout_builder.class:       Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder
-    oro_layout.provider.requirejs_config.class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider
 
 services:
     oro_layout.extension:
@@ -179,15 +178,18 @@ services:
             - @oro_layout.theme_manager
 
     oro_layout.provider.requirejs_config:
-        class: '%oro_layout.provider.requirejs_config.class%'
+        class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider
         arguments:
-            - '@service_container'
             - '@templating'
-            - 'OroRequireJSBundle::require_config.js.twig'
+            - '@oro_requirejs.cache'
+            - '%oro_require_js%'
+            - '%kernel.bundles%'
+            - '%oro_require_js.web_root%'
         calls:
-            - [ setCache, [ '@oro_requirejs.cache' ] ]
+            - [ setThemeManager, [ '@oro_layout.theme_manager' ] ]
+            - [ setActiveTheme, [ '%oro_layout.default_active_theme%' ] ]
         tags:
-            - { name: requirejs.config_provider}
+            - { name: requirejs.config_provider, alias: oro_layout_requirejs_config_provider }
         lazy: true
 
     oro_layout.helper:
