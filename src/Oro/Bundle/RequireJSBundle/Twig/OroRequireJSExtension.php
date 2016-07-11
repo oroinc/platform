@@ -55,13 +55,13 @@ class OroRequireJSExtension extends \Twig_Extension
      *
      * @param string $alias
      *
-     * @return array|string
+     * @return string
      */
     public function getRequireJSConfig($alias = 'oro_requirejs_config_provider')
     {
         $provider = $this->manager->getProvider($alias);
 
-        return $provider ? $provider->getConfig()->getMainConfig() : [];
+        return $provider ? $provider->getConfig()->getMainConfig() : json_encode([]);
     }
 
     /**
