@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\RequireJSBundle\Provider\Config as ConfigProvider;
 
+/**
+ * @deprecated Added for backwards compatibility
+ */
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     /**
