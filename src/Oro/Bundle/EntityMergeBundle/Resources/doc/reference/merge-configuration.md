@@ -87,8 +87,8 @@ oro_entity_config:
                 # As Account doesn't have access to collection of calls the only possible place to configure calls merging
                 # for account is this field in Call entity
                 inverse_display: ~
-                # Same as merge_mode but used for relation entity
-                inverse_modes: ~
+                # Same as merge_modes but used for relation entity
+                inverse_merge_modes: ~
                 # Same as label but used for relation entity
                 inverse_label: ~
                 # Same as cast_method but used for relation entity
@@ -114,6 +114,8 @@ oro_entity_config:
                 # Date Time pattern
                 # Example m/d/Y
                 render_datetime_pattern: ~
+                # Autoescape template values. Can be disabled to render HTML values.
+                autoescape: true
 ```
 
 Example:
