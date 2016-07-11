@@ -119,7 +119,8 @@ class EmailController extends Controller
                 $this->getUser(),
                 $currentOrganization,
                 $maxEmailsDisplay,
-                $folderId
+                $folderId,
+                false
             )
         ];
 
