@@ -2,24 +2,28 @@
 
 namespace Oro\Bundle\RequireJSBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\RequireJSBundle\Provider\Config;
-use Oro\Bundle\RequireJSBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 
 class OroRequireJSExtension extends \Twig_Extension
 {
     /**
-     * @var ContainerInterface
+     * @var ConfigProviderManager
      */
-    protected $container;
+    protected $manager;
 
     /**
-     * @param ContainerInterface $container
+     * @var string
      */
-    public function __construct(ContainerInterface $container)
+    protected $webRoot;
+
+    /**
+     * @param ConfigProviderManager $manager
+     * @param string                $webRoot
+     */
+    public function __construct(ConfigProviderManager $manager, $webRoot)
     {
-        $this->container = $container;
+        $this->manager = $manager;
+        $this->webRoot = $webRoot;
     }
 
     /**
@@ -49,67 +53,43 @@ class OroRequireJSExtension extends \Twig_Extension
     /**
      * Get require.js main config
      *
-     * @param string|null $configKey
+     * @param string $alias
      *
      * @return array|string
      */
-    public function getRequireJSConfig($configKey = null)
+    public function getRequireJSConfig($alias = 'oro_requirejs_config_provider')
     {
-        $provider = $this->getRequireJSConfigProvider($configKey);
+        $provider = $this->manager->getProvider($alias);
 
-        return $provider ? $provider->getMainConfig($configKey) : [];
+        return $provider ? $provider->getConfig()->getMainConfig() : [];
     }
 
     /**
      * Get require.js output file path
      *
-     * @param string|null $configKey
+     * @param string $alias
      *
      * @return null|string
      */
-    public function getRequireJSBuildPath($configKey = null)
+    public function getRequireJSBuildPath($alias = 'oro_requirejs_config_provider')
     {
-        $provider = $this->getRequireJSConfigProvider($configKey);
+        $provider = $this->manager->getProvider($alias);
 
-        return $this->getRequireJSConfig($configKey)
-            ? $provider->getOutputFilePath()
-            : null;
+        return $provider ? $provider->getConfig()->getOutputFilePath() : null;
     }
 
     /**
      * Check if require.js output file exist
      *
-     * @param string|null $configKey
+     * @param string $alias
      *
-     * @return null
+     * @return boolean
      */
-    public function isRequireJSBuildExists($configKey = null)
+    public function isRequireJSBuildExists($alias = 'oro_requirejs_config_provider')
     {
-        $filePath = $this->getRequireJSBuildPath($configKey);
+        $filePath = $this->getRequireJSBuildPath($alias);
 
-        return file_exists(
-            $this->container->getParameter('oro_require_js.web_root') .
-            DIRECTORY_SEPARATOR . $filePath
-        );
-    }
-
-    /**
-     * Retrieve require js config provider
-     *
-     * @param string $configKey
-     *
-     * @return null|ConfigProviderInterface
-     */
-    protected function getRequireJSConfigProvider($configKey)
-    {
-        $chainProvider = $this->container->get('oro_requirejs.config_provider.chain');
-        foreach ($chainProvider->getProviders() as $provider) {
-            if ($provider->getMainConfig($configKey)) {
-                return $provider;
-            }
-        }
-
-        return null;
+        return file_exists($this->webRoot . DIRECTORY_SEPARATOR . $filePath);
     }
 
     /**
