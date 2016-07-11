@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
+use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -11,7 +13,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,11 +48,11 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -60,10 +61,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getProvider')
             ->will($this->returnValue($this->configProvider));
 
-        $this->fieldTypeHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper')
+        $this->fieldTypeHelper = $this->getMockBuilder(FieldTypeHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
@@ -202,7 +205,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFields(array $fields, array $configValues, array $expected)
     {
-        $entity = new \StdClass();
+        $entity = new \stdClass();
         foreach ($fields as $field) {
             /** @var ConfigInterface $field */
             $fieldId = $field->getId();
@@ -216,7 +219,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('filter')
             ->will($this->returnValue($fields));
 
-        $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config = $this->getMockBuilder(ConfigInterface::class)->getMock();
 
         $this->configProvider
             ->expects($this->any())
@@ -335,9 +338,9 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function getFieldMock($fieldName, $fieldType)
     {
-        $field = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $field = $this->getMockBuilder(ConfigInterface::class)->getMock();
         $configId = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
+            ->getMockBuilder(FieldConfigId::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -358,5 +361,38 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
 
         return $field;
+    }
+
+    public function testSkipFieldIfNotVisible()
+    {
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(true);
+        
+        $this->dispatcher->expects($this->any())
+            ->method('dispatch')
+            ->willReturnCallback(function ($eventName, $event) {
+                $event->setFieldVisibility(false);
+            });
+
+        $configFieldId = $this->getMockBuilder(FieldConfigId::class)->disableOriginalConstructor()->getMock();
+        $configFieldId->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn('getFieldValue');
+        $configField = $this->getMockBuilder(ConfigInterface::class)->getMock();
+        $configField->expects($this->once())
+            ->method('getId')
+            ->willReturn($configFieldId);
+        $this->configProvider->expects($this->once())
+            ->method('filter')
+            ->willReturn([$configField]);
+
+        $entityMock = $this->getMockBuilder(ValueRenderEvent::class)->disableOriginalConstructor()->getMock();
+        $entityMock->expects($this->once())
+            ->method('getFieldValue')
+            ->willReturn('testValue');
+
+        $rows = $this->extension->getFields($entityMock, ValueRenderEvent::class);
+        $this->assertEmpty($rows);
     }
 }
