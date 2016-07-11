@@ -177,6 +177,21 @@ services:
         arguments:
             - @oro_layout.theme_manager
 
+    oro_layout.provider.requirejs_config:
+        class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider
+        arguments:
+            - '@templating'
+            - '@oro_requirejs.cache'
+            - '%oro_require_js%'
+            - '%kernel.bundles%'
+            - '%oro_require_js.web_root%'
+        calls:
+            - [ setThemeManager, [ '@oro_layout.theme_manager' ] ]
+            - [ setActiveTheme, [ '%oro_layout.default_active_theme%' ] ]
+        tags:
+            - { name: requirejs.config_provider, alias: oro_layout_requirejs_config_provider }
+        lazy: true
+
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:
