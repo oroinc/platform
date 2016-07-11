@@ -58,14 +58,15 @@ class EmailNotificationManager
     }
 
     /**
-     * @param User          $user
-     * @param Organization  $organization
-     * @param int           $maxEmailsDisplay
-     * @param int|null      $folderId
+     * @param User         $user
+     * @param Organization $organization
+     * @param int          $maxEmailsDisplay
+     * @param int|null     $folderId
+     * @param bool         $cacheBody
      *
      * @return array
      */
-    public function getEmails(User $user, Organization $organization, $maxEmailsDisplay, $folderId)
+    public function getEmails(User $user, Organization $organization, $maxEmailsDisplay, $folderId, $cacheBody = true)
     {
         $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails(
             $user,
@@ -81,7 +82,9 @@ class EmailNotificationManager
             $email = $element[0];
             $bodyContent = '';
             try {
-                $this->emailCacheManager->ensureEmailBodyCached($email);
+                if ($cacheBody) {
+                    $this->emailCacheManager->ensureEmailBodyCached($email);
+                }
                 $emailBody = $email->getEmailBody();
                 if ($emailBody) {
                     $bodyContent = $this->htmlTagHelper->shorten(
