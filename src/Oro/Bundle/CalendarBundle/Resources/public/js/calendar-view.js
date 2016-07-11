@@ -578,7 +578,7 @@ define(function(require) {
             return this.filterCancelledEvents(visibleEvents);
         },
 
-        filterVisibleEvents: function (events) {
+        filterVisibleEvents: function(events) {
             var visibleConnectionIds = [];
             // collect visible connections
             this.options.connectionsOptions.collection.each(function(connectionModel) {
@@ -592,7 +592,7 @@ define(function(require) {
             });
         },
 
-        filterCancelledEvents: function (events) {
+        filterCancelledEvents: function(events) {
             return _.filter(events, function(event) {
                 return !event.get('isCancelled');
             });

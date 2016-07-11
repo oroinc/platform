@@ -870,6 +870,258 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
     }
 
     /**
+     * Create new event
+     *
+     * @return int
+     */
+    public function testPostWithEmptyAttendees()
+    {
+        $data = [
+            'start' => '2016-01-01T08:03:46+00:00',
+            'end'   => '2016-01-01T08:27:00+00:00',
+        ];
+
+        $request = [
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'id'              => null,
+            'title'           => 'Test Event',
+            'description'     => 'Test Description',
+            'start'           => $data['start'],
+            'end'             => $data['end'],
+            'allDay'          => false,
+            'backgroundColor' => '#FF0000',
+            'attendees'       => [],
+        ];
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->assertNotEmpty($result);
+        $this->assertTrue(isset($result['id']));
+
+        $data['id'] = $result['id'];
+
+        return $data;
+    }
+
+    /**
+     * @depends testPostWithEmptyAttendees
+     *
+     * @param array $param
+     *
+     * @return array
+     */
+    public function testPutAddAttendeesWithFullBody(array $param)
+    {
+        $adminUser = $this->getAdminUser();
+
+        $request = [
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'title'           => 'Test Event',
+            'description'     => 'Test Description',
+            'start'           => $param['start'],
+            'end'             => $param['end'],
+            'allDay'          => true,
+            'backgroundColor' => '#FF0000',
+            'attendees'       => [
+                [
+                    'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                    'email'       => $adminUser->getEmail(),
+                    'status'      => null,
+                    'type'        => Attendee::TYPE_REQUIRED,
+                ],
+                [
+                    'displayName' => 'Ext',
+                    'email'       => 'ext@example.com',
+                    'status'      => Attendee::STATUS_TENTATIVE,
+                    'type'        => Attendee::TYPE_ORGANIZER,
+                ],
+            ],
+        ];
+        $this->client->request(
+            'PUT',
+            $this->getUrl('oro_api_put_calendarevent', ['id' => $param['id']]),
+            $request
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertTrue($result['notifiable']);
+
+        return $param;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @depends testPutAddAttendeesWithFullBody
+     *
+     * @param array $param
+     */
+    public function testGetAfterTestPutAddAttendeesWithFullBody(array $param)
+    {
+        $adminUser = $this->getAdminUser();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevent', ['id' => $param['id']])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+
+        foreach ($result['attendees'] as &$attendee) {
+            unset($attendee['createdAt'], $attendee['updatedAt']);
+        }
+
+        $this->assertEquals(
+            [
+                'id'               => $param['id'],
+                'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
+                'title'            => 'Test Event',
+                'description'      => 'Test Description',
+                'start'           => $param['start'],
+                'end'             => $param['end'],
+                'allDay'           => true,
+                'backgroundColor'  => '#FF0000',
+                'invitationStatus' => 'accepted',
+                'parentEventId'    => null,
+                'editable'         => true,
+                'removable'        => true,
+                'notifiable'       => true,
+                'attendees'        => [
+                    [
+                        'displayName' => 'Ext',
+                        'email'       => 'ext@example.com',
+                        'status'      => Attendee::STATUS_TENTATIVE,
+                        'type'        => Attendee::TYPE_ORGANIZER,
+                        'userId'      => null,
+                    ],
+                    [
+                        'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                        'email'       => 'admin@example.com',
+                        'status'      => Attendee::STATUS_ACCEPTED,
+                        'type'        => Attendee::TYPE_REQUIRED,
+                        'userId'      => $adminUser->getId(),
+                    ],
+                ],
+            ],
+            $this->extractInterestingResponseData($result)
+        );
+
+        $calendarEvent = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->find($param['id']);
+
+        $attendees = $calendarEvent->getAttendees();
+        $this->assertCount(2, $attendees);
+    }
+
+    /**
+     * @depends testPutAddAttendeesWithFullBody
+     *
+     * @param array $param
+     *
+     * @return int
+     */
+    public function testPutAddAttendeesWithoutFullBody(array $param)
+    {
+        $adminUser = $this->getAdminUser();
+
+        $request = [
+            'attendees' => [
+                [
+                    'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                    'email'       => $adminUser->getEmail(),
+                    'status'      => null,
+                    'type'        => Attendee::TYPE_REQUIRED,
+                ],
+                [
+                    'displayName' => 'Ext',
+                    'email'       => 'ext@example.com',
+                    'status'      => Attendee::STATUS_TENTATIVE,
+                    'type'        => Attendee::TYPE_ORGANIZER,
+                ],
+            ],
+        ];
+        $this->client->request(
+            'PUT',
+            $this->getUrl('oro_api_put_calendarevent', ['id' => $param['id']]),
+            $request
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertTrue($result['notifiable']);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @depends testPutAddAttendeesWithFullBody
+     *
+     * @param array $param
+     */
+    public function testGetAfterTestPutAddAttendeesWithoutFullBody(array $param)
+    {
+        $adminUser = $this->getAdminUser();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevent', ['id' => $param['id']])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+
+        foreach ($result['attendees'] as &$attendee) {
+            unset($attendee['createdAt'], $attendee['updatedAt']);
+        }
+
+        $this->assertEquals(
+            [
+                'id'               => $param['id'],
+                'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
+                'title'            => 'Test Event',
+                'description'      => 'Test Description',
+                'start'           => $param['start'],
+                'end'             => $param['end'],
+                'allDay'           => true,
+                'backgroundColor'  => '#FF0000',
+                'invitationStatus' => 'accepted',
+                'parentEventId'    => null,
+                'editable'         => true,
+                'removable'        => true,
+                'notifiable'       => true,
+                'attendees'        => [
+                    [
+                        'displayName' => 'Ext',
+                        'email'       => 'ext@example.com',
+                        'status'      => Attendee::STATUS_TENTATIVE,
+                        'type'        => Attendee::TYPE_ORGANIZER,
+                        'userId'      => null,
+                    ],
+                    [
+                        'displayName' => sprintf('%s %s', $adminUser->getFirstName(), $adminUser->getLastName()),
+                        'email'       => 'admin@example.com',
+                        'status'      => Attendee::STATUS_ACCEPTED,
+                        'type'        => Attendee::TYPE_REQUIRED,
+                        'userId'      => $adminUser->getId(),
+                    ],
+                ],
+            ],
+            $this->extractInterestingResponseData($result)
+        );
+
+        $calendarEvent = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->find($param['id']);
+
+        $attendees = $calendarEvent->getAttendees();
+        $this->assertCount(2, $attendees);
+    }
+
+    /**
      * @return User
      */
     protected function getAdminUser()
