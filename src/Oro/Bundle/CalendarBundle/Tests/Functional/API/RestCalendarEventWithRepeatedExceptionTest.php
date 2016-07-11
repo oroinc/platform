@@ -12,7 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RestCalendarEventWithRepeatedException extends WebTestCase
+class RestCalendarEventWithRepeatedExceptionTest extends WebTestCase
 {
     const DEFAULT_USER_CALENDAR_ID = 1;
 
@@ -25,10 +25,83 @@ class RestCalendarEventWithRepeatedException extends WebTestCase
         $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
     }
 
+    public function testExceptionEventWillBeMarkedAsCanceledAfterOriginalEventWasUpdated()
+    {
+        $this->checkPreconditions();
+
+        $start = new \DateTime();
+
+        $end = new \DateTime();
+        $end->modify('+1 hour');
+
+        $recurringCalendarEvent = $this->postRecurringEvent($start, $end);
+
+        /**
+         * Update First time
+         */
+        $recurringEventException = $this->addRecurringEventException($recurringCalendarEvent->getId());
+        $this->deleteRecurringEventException($recurringEventException->getId());
+
+        $start->modify('+1 hour');
+        $end->modify('+1 hour');
+
+        $this->changeRecurringEventTime($start, $end, $recurringCalendarEvent->getId());
+
+        $this->assertRecurringCalendarEvents($recurringCalendarEvent, [$recurringEventException]);
+
+        $secondRecurringEventException = $this->addRecurringEventException($recurringCalendarEvent->getId());
+        $this->deleteRecurringEventException($secondRecurringEventException->getId());
+
+        $start->modify('+1 hour');
+        $end->modify('+1 hour');
+
+        $this->changeRecurringEventTime($start, $end, $recurringCalendarEvent->getId());
+
+        $this->assertRecurringCalendarEvents(
+            $recurringCalendarEvent,
+            [$recurringEventException, $secondRecurringEventException]
+        );
+    }
+
     /**
-     * Check pre conditions
+     * @param CalendarEvent $recurringCalendarEvent
+     * @param CalendarEvent[] $recurringEventExceptions
      */
-    public function testGets()
+    protected function assertRecurringCalendarEvents(
+        CalendarEvent $recurringCalendarEvent,
+        array $recurringEventExceptions
+    ) {
+        $actualCalendarEvents = $this->getCalendarEvents($recurringCalendarEvent->getId());
+
+        $expectedEventsCount = count($recurringEventExceptions) + 1;
+        $this->assertCount($expectedEventsCount, $actualCalendarEvents);
+
+        $this->assertEquals($recurringCalendarEvent->getId(), $actualCalendarEvents[0]['id']);
+        $this->assertFalse($actualCalendarEvents[0]['isCancelled']);
+
+        /**
+         * Remove recurring calendar event from result array
+         */
+        array_shift($actualCalendarEvents);
+        reset($recurringEventExceptions);
+        foreach ($actualCalendarEvents as $actualRecurringCalendarEvent) {
+            $recurringEventException = current($recurringEventExceptions);
+            $this->assertEquals($recurringEventException->getId(), $actualRecurringCalendarEvent['id']);
+            $this->assertTrue(
+                $actualRecurringCalendarEvent['isCancelled'],
+                sprintf(
+                    'Recurrent Event Exception[id: %s; start: %s; end: %s] is not canceled',
+                    $actualRecurringCalendarEvent['id'],
+                    $actualRecurringCalendarEvent['start'],
+                    $actualRecurringCalendarEvent['end']
+                )
+            );
+
+            next($recurringEventExceptions);
+        }
+    }
+
+    protected function checkPreconditions()
     {
         $request = [
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
@@ -43,21 +116,20 @@ class RestCalendarEventWithRepeatedException extends WebTestCase
     }
 
     /**
-     * Creates recurring event for splitting.
+     * @param \DateTime $start
+     * @param \DateTime $end
      *
-     * @depends testGets
-     *
-     * @return array
+     * @return CalendarEvent
      */
-    public function testPostRecurringEvent()
+    protected function postRecurringEvent(\DateTime $start, \DateTime $end)
     {
         $request = [
             'title'       => 'Test Recurring Event splitting',
             'description' => 'Test Recurring Event Description',
             'allDay'      => false,
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
-            'start'       => gmdate(DATE_RFC3339),
-            'end'         => gmdate(DATE_RFC3339),
+            'start'       => $start->format(DATE_RFC3339),
+            'end'         => $end->format(DATE_RFC3339),
             'recurrence'  => [
                 'timeZone'       => 'UTC',
                 'recurrenceType' => Recurrence::TYPE_WEEKLY,
@@ -95,36 +167,15 @@ class RestCalendarEventWithRepeatedException extends WebTestCase
             ->find($result['id']);
         $this->assertNotNull($event);
 
-        return ['id' => $result['id'], 'recurrenceId' => $event->getRecurrence()->getId()];
+        return $event;
     }
 
     /**
-     * @depends testPostRecurringEvent
+     * @param int $calendarEventId
      *
-     * @param array $param
+     * @return CalendarEvent
      */
-    public function testGetRecurringEvent(array $param)
-    {
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevent', ['id' => $param['id']]));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-        $this->assertTrue(isset($result['id']));
-
-        $recurrence = $this->getContainer()->get('doctrine')
-            ->getRepository('OroCalendarBundle:Recurrence')
-            ->find($param['recurrenceId']);
-
-        $this->assertNotEmpty($recurrence);
-        $this->assertNotNull($recurrence->getId());
-    }
-
-    /**
-     * @depends testPostRecurringEvent
-     *
-     * @param array $param
-     */
-    public function testMakeRecurringEventWithException(array $param)
+    protected function addRecurringEventException($calendarEventId)
     {
         $request = [
             'originalStart'    => gmdate(DATE_RFC3339),
@@ -135,7 +186,7 @@ class RestCalendarEventWithRepeatedException extends WebTestCase
             'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
             'start'            => gmdate(DATE_RFC3339),
             'end'              => gmdate(DATE_RFC3339),
-            'recurringEventId' => $param['id'],
+            'recurringEventId' => $calendarEventId,
             'attendees'        => [
                 [
                     'displayName' => 'admin@example.com',
@@ -158,118 +209,70 @@ class RestCalendarEventWithRepeatedException extends WebTestCase
         $this->assertNotEmpty($response);
         $this->assertTrue(isset($response['id']));
 
-
         $events = $this->getContainer()->get('doctrine')
             ->getRepository('OroCalendarBundle:CalendarEvent')
-            ->findAll();
+            ->findBy(['id' => $response['id']]);
 
-        $this->assertCount(2, $events);
+        $this->assertCount(1, $events);
 
-        $result = array_values(
-            array_filter(
-                $events,
-                function ($event) use ($response) {
-                    return $event->getId() === $response['id'];
-                }
-            )
-        );
+        /** @var CalendarEvent $event */
+        $event = reset($events);
 
-        $this->assertCount(1, $result);
-        $this->assertFalse($result[0]->isCancelled());
+        $this->assertNotNull($event);
+        $this->assertFalse($event->isCancelled());
 
-        $param['excluded'] = $result[0]->getId();
-
-        return $param;
+        return $event;
     }
 
     /**
-     * @depends  testMakeRecurringEventWithException
-     *
-     * @param array $param
-     *
-     * @return array
+     * @param int $calendarEventId
      */
-    public function testDeleteRecurringEventWithException(array $param)
+    protected function deleteRecurringEventException($calendarEventId)
     {
         $this->client->request(
             'DELETE',
-            $this->getUrl('oro_api_delete_calendarevent', ['id' => $param['excluded']])
+            $this->getUrl('oro_api_delete_calendarevent', ['id' => $calendarEventId])
         );
         $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
-
-        $event = $this->getContainer()->get('doctrine')
-            ->getRepository('OroCalendarBundle:CalendarEvent')
-            ->find($param['excluded']);
-
-        $this->assertNotNull($event);
-        $this->assertTrue($event->isCancelled());
-
-        return $param;
     }
 
     /**
-     * Creates recurring event for splitting.
-     *
-     * @depends testDeleteRecurringEventWithException
-     *
-     * @param array $param
-     *
-     * @return array
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     * @param  int      $calendarEventId
      */
-    public function testUpdateRecurringEvent(array $param)
+    protected function changeRecurringEventTime(\DateTime $startDate, \DateTime $endDate, $calendarEventId)
     {
         $request = [
-            'title'       => 'Test Recurring Event splitting',
-            'description' => 'Test Recurring Event Description',
-            'allDay'      => false,
-            'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
-            'start'       => gmdate(DATE_RFC3339),
-            'end'         => gmdate(DATE_RFC3339),
-            'recurrence'  => [
-                'timeZone'       => 'UTC',
-                'recurrenceType' => Recurrence::TYPE_WEEKLY,
-                'interval'       => 1,
-                'dayOfWeek'      => ['saturday'],
-                'startTime'      => gmdate(DATE_RFC3339),
-                'occurrences'    => 5,
-                'endTime'        => gmdate(DATE_RFC3339),
-            ],
-            'attendees'   => [
-                [
-                    'displayName' => 'user@example.com',
-                    'email'       => 'user@example.com',
-                    'status'      => Attendee::STATUS_NONE,
-                    'type'        => Attendee::TYPE_REQUIRED,
-                ],
-                [
-                    'displayName' => 'admin@example.com',
-                    'email'       => 'admin@example.com',
-                    'status'      => Attendee::STATUS_NONE,
-                    'type'        => Attendee::TYPE_REQUIRED,
-                ],
-            ],
+            'start' => $startDate->format(DATE_RFC3339),
+            'end'   => $endDate->format(DATE_RFC3339),
         ];
 
         $this->client->request(
             'PUT',
-            $this->getUrl('oro_api_put_calendarevent', ['id' => $param['id']]),
+            $this->getUrl('oro_api_put_calendarevent', ['id' => $calendarEventId]),
             $request
         );
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertNotEmpty($result);
+    }
 
-        /** @var CalendarEvent $event */
-        $event = $this->getContainer()->get('doctrine')
-            ->getRepository('OroCalendarBundle:CalendarEvent')
-            ->find($param['id']);
-        $this->assertNotNull($event);
+    /**
+     * @param int $calendarEventId
+     *
+     * @return array
+     */
+    public function getCalendarEvents($calendarEventId)
+    {
+        $request = [
+            'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
+            'limit'            => 500,
+            'page'             => 1,
+            'recurringEventId' => $calendarEventId,
+        ];
 
-        $eventExclusion = $this->getContainer()->get('doctrine')
-            ->getRepository('OroCalendarBundle:CalendarEvent')
-            ->find($param['excluded']);
-        $this->assertNotNull($eventExclusion);
-
-        return $param;
+        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
+        return $this->getJsonResponseContent($this->client->getResponse(), 200);
     }
 }
