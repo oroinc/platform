@@ -136,6 +136,5 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(new ImportLayoutUpdateVisitor());
 
         $this->extension->prepare(new GeneratorData($source, $filename), $collection);
-
     }
 }
