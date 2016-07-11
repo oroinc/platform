@@ -4,9 +4,6 @@ namespace Oro\Bundle\RequireJSBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\RequireJSBundle\Provider\Config as RequireJSConfigProvider;
 
-/**
- * @deprecated Added for backwards compatibility
- */
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     /**

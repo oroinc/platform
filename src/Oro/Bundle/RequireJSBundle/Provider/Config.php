@@ -12,7 +12,8 @@ use Doctrine\Common\Cache\CacheProvider;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
- * @deprecated Added for backwards compatibility
+ * @deprecated Added for backwards compatibility,
+ * use {@class Oro\Bundle\RequireJSBundle\Provider\ConfigProvider} instead
  */
 class Config
 {
