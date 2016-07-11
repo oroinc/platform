@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
+use Doctrine\Instantiator\Instantiator;
+
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -10,6 +12,9 @@ use Oro\Bundle\SoapBundle\Entity\SoapEntityInterface;
 
 abstract class SoapGetController extends ContainerAware implements EntityManagerAwareInterface, SoapApiReadInterface
 {
+    /** @var Instantiator */
+    protected $instantiator;
+
     /**
      * {@inheritdoc}
      */
@@ -29,7 +34,7 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
     /**
      * Get entity by identifier.
      *
-     * @param  mixed      $id
+     * @param  mixed $id
      * @return object
      * @throws \SoapFault
      */
@@ -57,11 +62,13 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
             in_array('Oro\Bundle\SoapBundle\Entity\SoapEntityInterface', class_implements($soapEntityClass))
         ) {
             /** @var SoapEntityInterface $soapEntity */
-            $soapEntity = unserialize(sprintf('O:%u:"%s":0:{}', strlen($soapEntityClass), $soapEntityClass));
+            $soapEntity = $this->getInstantiator()->instantiate($soapEntityClass);
 
             $soapEntity->soapInit($entity);
+
             return $soapEntity;
         }
+
         return $entity;
     }
 
@@ -77,6 +84,7 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
         foreach ($entities as $key => $entity) {
             $result[$key] = $this->transformToSoapEntity($entity);
         }
+
         return $result;
     }
 
@@ -89,5 +97,17 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
     protected function getSoapEntityClass($entity)
     {
         return ClassUtils::getRealClass($entity) . 'Soap';
+    }
+
+    /**
+     * @return Instantiator
+     */
+    public function getInstantiator()
+    {
+        if (!$this->instantiator) {
+            $this->instantiator = new Instantiator();
+        }
+
+        return $this->instantiator;
     }
 }
