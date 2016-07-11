@@ -280,3 +280,10 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 ####Oro\Component\Config
 - `Oro\Component\Config\CumulativeResourceInfo::__construct` signature changed from
 `public function __construct($bundleClass, $name, $path, $data)` to `public function __construct($bundleClass, $name, $path, array $data = [])`
+
+####UserBundle:
+- The constructor of the `Oro\Bundle\UserBundle\Form\Type\UserType` class was changed. Removed argument: `ConfigManager $userConfigManager`.
+- The constructor of the `Oro\Bundle\UserBundle\Form\Handler\UserHandler` class was changed. Removed argument: `SecurityFacade $securityFacade = null`.
+- Added new configuration group user_configuration used to define which personal configurations can be updated by the user (Languages, Locale etc.)
+- Added 2 new capabilites: Update User Profile and Access personal configuration to control access to "My Profile" and  "My Configuration" updates
+- Added new permission "Configure" which controls access to entity configuration settings. Currently is applied to User entity only.

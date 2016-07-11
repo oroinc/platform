@@ -17,7 +17,8 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
             'SomeGroup',
             'SomeLabel',
             array(), //permissions
-            'SomeDescription'
+            'SomeDescription',
+            'SomeCategory'
         );
     }
 
@@ -33,6 +34,7 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
         static::assertEquals('SomeGroup', $this->entity->getGroup());
         static::assertEquals('SomeLabel', $this->entity->getLabel());
         static::assertEquals('SomeDescription', $this->entity->getDescription());
+        static::assertEquals('SomeCategory', $this->entity->getCategory());
     }
 
     public function testSerialize()
@@ -45,5 +47,6 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
         static::assertEquals('SomeGroup', $emptyEntity->getGroup());
         static::assertEquals('SomeLabel', $emptyEntity->getLabel());
         static::assertEquals('SomeDescription', $emptyEntity->getDescription());
+        static::assertEquals('SomeCategory', $emptyEntity->getCategory());
     }
 }

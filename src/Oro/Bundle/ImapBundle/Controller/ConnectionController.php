@@ -78,7 +78,7 @@ class ConnectionController extends Controller
                         $user = new User();
                         $user->setImapConfiguration($origin);
                         $user->setOrganization($organization);
-                        $userForm = $this->get('oro_user.form.user');
+                        $userForm = $this->createForm('oro_user_emailsettings');
                         $userForm->setData($user);
 
                         $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
