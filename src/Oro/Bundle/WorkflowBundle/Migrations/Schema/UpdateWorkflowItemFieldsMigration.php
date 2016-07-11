@@ -21,7 +21,7 @@ class UpdateWorkflowItemFieldsMigration implements Migration
         }
         
         $table->addColumn('entity_class', 'string', ['length' => 255, 'notnull' => false]);
-        $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
+        $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false, 'default' => null]);
 
         $queries->addPostQuery(
             'UPDATE oro_workflow_item AS wi SET entity_class = ' .
