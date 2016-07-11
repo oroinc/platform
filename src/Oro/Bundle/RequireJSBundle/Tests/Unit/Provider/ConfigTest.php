@@ -2,12 +2,7 @@
 
 namespace Oro\Bundle\RequireJSBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\PhpFileCache;
-
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\RequireJSBundle\Provider\Config as ConfigProvider;
+use Oro\Bundle\RequireJSBundle\Provider\Config as RequireJSConfigProvider;
 
 /**
  * @deprecated Added for backwards compatibility
@@ -15,41 +10,24 @@ use Oro\Bundle\RequireJSBundle\Provider\Config as ConfigProvider;
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
+     * @var RequireJSConfigProvider
      */
-    protected $provider;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EngineInterface
-     */
-    protected $templateEngine;
-
-    /**
-     * @var string
-     */
-    protected $template = '';
+    protected $configProvider;
 
     protected function setUp()
     {
-        $this->container = $this->getMockContainerInterface();
-        $this->templateEngine = $this->getMockEngineInterface();
-        $this->provider = new ConfigProvider($this->container, $this->templateEngine, $this->template);
-    }
+        $parameters = array(
+            'oro_require_js' => array(
+                'build_path' => 'js/app.min.js'
+            ),
+            'kernel.bundles' => array(
+                'Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\TestBundle\TestBundle',
+                'Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle',
+            )
+        );
 
-    /**
-     * @dataProvider parametersProvider
-     *
-     * @param array $parameters
-     */
-    public function testGetOutputFilePath(array $parameters = [])
-    {
-        $this->container
-            ->expects($this->any())
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->any())
             ->method('getParameter')
             ->will($this->returnCallback(
                 function ($name) use (&$parameters) {
@@ -57,235 +35,87 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 }
             ));
 
-        $this->assertEquals(
-            $parameters['oro_require_js']['build_path'],
-            $this->provider->getOutputFilePath()
-        );
-    }
-
-    public function testGetConfigFilePath()
-    {
-        $this->assertEquals(
-            ConfigProvider::REQUIREJS_CONFIG_FILE,
-            $this->provider->getConfigFilePath()
-        );
-    }
-
-    /**
-     * @dataProvider parametersProvider
-     *
-     * @param array $parameters
-     */
-    public function testGetMainConfig(array $parameters = [])
-    {
-        $configKey = '_main';
-        $renderedConfig = '{}';
-        $config = [
-            'config' => [
-                'paths' => [
-                    'oro/test' => 'orosecondtest/js/second-test'
-                ]
-            ]
-        ];
-
-        $this->container
-            ->expects($this->any())
-            ->method('getParameter')
-            ->will($this->returnCallback(
-                function ($name) use (&$parameters) {
-                    return $parameters[$name];
-                }
-            ));
-
-        $this->templateEngine
-            ->expects($this->any())
+        $templating = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $templating->expects($this->any())
             ->method('render')
-            ->with($this->template, $config)
-            ->will($this->returnValue($renderedConfig));
+            ->will($this->returnArgument(1));
 
-        $mainConfig = $this->provider->getMainConfig();
+        $template = '';
 
-        $this->assertEquals($renderedConfig, $mainConfig);
+        $this->configProvider = new RequireJSConfigProvider($container, $templating, $template);
+    }
 
-        $cache = $this->getMockPhpFileCache();
-        $this->provider->setCache($cache);
+    public function testGetMainConfig()
+    {
+        $expected = array(
+            'config' => array(
+                'paths' => array(
+                    'oro/test' => 'orosecondtest/js/second-test'
+                )
+            )
+        );
+        $this->assertEquals($expected, $this->configProvider->getMainConfig());
 
-        $allConfigs = [$configKey => ['mainConfig' => $mainConfig]];
-        $cache->expects($this->once())
+        $expected['config']['paths']['oro/test2'] = 'orotest/js/test2';
+
+        $cache = $this->getMock('\Doctrine\Common\Cache\PhpFileCache', array(), array(), '', false);
+        $cache->expects($this->any())
             ->method('fetch')
-            ->with(ConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue($allConfigs));
+            ->will($this->returnValue($expected));
+        $this->configProvider->setCache($cache);
 
-        $this->assertEquals($renderedConfig, $this->provider->getMainConfig());
+        $this->assertEquals($expected, $this->configProvider->getMainConfig());
     }
 
-    /**
-     * @dataProvider parametersProvider
-     *
-     * @param array $parameters
-     */
-    public function testCollectAllConfigs(array $parameters = [])
+    public function testGenerateMainConfig()
     {
-        $configKey = '_main';
-
-        $this->container
-            ->expects($this->any())
-            ->method('getParameter')
-            ->will($this->returnCallback(
-                function ($name) use (&$parameters) {
-                    return $parameters[$name];
-                }
-            ));
-
-        $allConfigs = $this->provider->collectAllConfigs();
-        $this->assertArrayHasKey('mainConfig', $allConfigs[$configKey]);
-        $this->assertArrayHasKey('buildConfig', $allConfigs[$configKey]);
-    }
-
-    /**
-     * @dataProvider parametersProvider
-     *
-     * @param array $parameters
-     */
-    public function testGenerateMainConfig(array $parameters = [])
-    {
-        $renderedConfig = '{}';
-        $config = [
-            'config' => [
-                'paths' => [
-                    'oro/test' => 'orosecondtest/js/second-test'
-                ]
-            ]
-        ];
-
-        $this->container
-            ->expects($this->any())
-            ->method('getParameter')
-            ->will($this->returnCallback(
-                function ($name) use (&$parameters) {
-                    return $parameters[$name];
-                }
-            ));
-
-        $this->templateEngine
-            ->expects($this->any())
-            ->method('render')
-            ->with($this->template, $config)
-            ->will($this->returnValue($renderedConfig));
-
-        $this->assertEquals($renderedConfig, $this->provider->generateMainConfig());
-    }
-
-    /**
-     * @dataProvider parametersProvider
-     *
-     * @param array $parameters
-     */
-    public function testCollectBuildConfig(array $parameters = [])
-    {
-        $webRoot = $parameters['oro_require_js.web_root'];
-        $buildPath = $parameters['oro_require_js']['build_path'];
-        $config = [
-            'paths' => [
-                'oro/test' => 'empty:',
-                'require-config' => $webRoot . '/js/require-config',
-                'require-lib' => 'ororequirejs/lib/require',
-            ],
-            'baseUrl' => $webRoot . '/bundles',
-            'out' => $webRoot . '/' . $buildPath,
-            'mainConfigFile' => $webRoot . '/js/require-config.js',
-            'include' => ['require-config', 'require-lib', 'oro/test']
-        ];
-
-        $this->container
-            ->expects($this->any())
-            ->method('getParameter')
-            ->will($this->returnCallback(
-                function ($name) use (&$parameters) {
-                    return $parameters[$name];
-                }
-            ));
-
-        $class = new \ReflectionClass(ConfigProvider::class);
-        $method = $class->getMethod('collectBuildConfig');
-        $method->setAccessible(true);
-
-        $this->assertEquals($config, $method->invoke($this->provider));
-    }
-
-    /**
-     * @dataProvider parametersProvider
-     *
-     * @param array $parameters
-     */
-    public function collectConfigs(array $parameters = [])
-    {
-        $this->container
-            ->expects($this->any())
-            ->method('getParameter')
-            ->will($this->returnCallback(
-                function ($name) use (&$parameters) {
-                    return $parameters[$name];
-                }
-            ));
-
-        $this->assertEquals($parameters, $this->provider->collectConfigs());
-    }
-
-    public function getCacheKey()
-    {
-        $class = new \ReflectionClass(ConfigProvider::class);
-        $method = $class->getMethod('getCacheKey');
-        $method->setAccessible(true);
-
         $this->assertEquals(
-            ConfigProvider::REQUIREJS_CONFIG_CACHE_KEY,
-            $method->invoke($this->provider)
+            array(
+                'config' => array(
+                    'paths' => array(
+                        'oro/test' => 'orosecondtest/js/second-test'
+                    )
+                )
+            ),
+            $this->configProvider->generateMainConfig()
         );
     }
 
-    /**
-     * @return array
-     */
-    public function parametersProvider()
+    public function testGenerateBuildConfig()
     {
-        return [
-            [
-                [
-                    'oro_require_js' => [
-                        'build_path' => 'build/path'
-                    ],
-                    'oro_require_js.web_root' => 'web/root',
-                    'kernel.bundles' => [
-                        'Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\TestBundle\TestBundle',
-                        'Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle',
-                    ]
-                ]
-            ]
-        ];
+        $this->assertEquals(
+            array(
+                'paths' => array(
+                    'oro/test' => 'empty:',
+                    'require-config' => '../main-config',
+                    'require-lib' => 'ororequirejs/lib/require',
+                ),
+                'baseUrl' => './bundles',
+                'out' => './js/app.min.js',
+                'mainConfigFile' => './main-config.js',
+                'include' => array('require-config', 'require-lib', 'oro/test')
+            ),
+            $this->configProvider->generateBuildConfig('main-config.js')
+        );
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
-     */
-    protected function getMockContainerInterface()
+    public function testCollectConfigs()
     {
-        return $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface');
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EngineInterface
-     */
-    protected function getMockEngineInterface()
-    {
-        return $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PhpFileCache
-     */
-    protected function getMockPhpFileCache()
-    {
-        return $this->getMock('Doctrine\Common\Cache\PhpFileCache', [], [], '', false);
+        $this->assertEquals(
+            array(
+                'build_path' => 'js/app.min.js',
+                'config' => array(
+                    'paths' => array(
+                        'oro/test' => 'bundles/orosecondtest/js/second-test.js'
+                    )
+                ),
+                'build' => array(
+                    'paths' => array(
+                        'oro/test' => 'empty:'
+                    )
+                )
+            ),
+            $this->configProvider->collectConfigs()
+        );
     }
 }

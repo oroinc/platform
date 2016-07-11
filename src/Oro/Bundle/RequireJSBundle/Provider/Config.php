@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * @deprecated Added for backwards compatibility
@@ -151,8 +151,8 @@ class Config
             foreach ($bundles as $bundle) {
                 $reflection = new \ReflectionClass($bundle);
                 if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/requirejs.yml')) {
-                    $requirejs = Yaml::parse(realpath($file));
-                    $config = ArrayUtils::arrayMergeRecursiveDistinct($config, $requirejs);
+                    $requirejs = Yaml::parse(file_get_contents(realpath($file)));
+                    $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $requirejs);
                 }
             }
 
