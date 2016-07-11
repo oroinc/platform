@@ -134,7 +134,7 @@ define([
 
             for (var i = 0; i < this.subviews.length; i++) {
                 var view = this.subviews[i];
-                if (view.el === tdEl) {
+                if (view.el === tdEl && view.events) {
                     // events cannot be function
                     // this kind of cell views are filtered in CellEventList.getEventsMap()
                     var events = view.events;

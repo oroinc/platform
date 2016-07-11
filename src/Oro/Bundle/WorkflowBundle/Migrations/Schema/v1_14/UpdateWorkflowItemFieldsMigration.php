@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\StringType;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -21,7 +22,10 @@ class UpdateWorkflowItemFieldsMigration implements Migration
         }
 
         $table->addColumn('entity_class', 'string', ['length' => 255, 'notnull' => false]);
-        $table->changeColumn('entity_id', ['string', 'length' => 255, 'notnull' => false]);
+        $table->changeColumn(
+            'entity_id',
+            ['type' => StringType::getType('string'), 'length' => 255, 'notnull' => false]
+        );
 
         $queries->addPostQuery(
             'UPDATE oro_workflow_item AS wi SET entity_class = ' .

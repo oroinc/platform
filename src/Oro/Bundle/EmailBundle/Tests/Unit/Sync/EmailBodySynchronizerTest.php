@@ -96,7 +96,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emailBody));
 
         $this->em->expects($this->once())
-            ->method('persist')
+            ->method('flush')
             ->with($this->identicalTo($email));
 
         $this->logger->expects($this->never())
@@ -218,7 +218,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
         $repo->expects($this->once())->method('getEmailsWithoutBody')
             ->willReturn([]);
         $this->logger->expects($this->once())
-            ->method('notice')
+            ->method('info')
             ->with(
                 'All emails was processed'
             );
@@ -270,14 +270,14 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($emailBody));
 
         $this->em->expects($this->once())
-            ->method('persist')
+            ->method('flush')
             ->with($this->identicalTo($email));
         $this->em->expects($this->once())
-            ->method('flush');
-        $this->em->expects($this->once())
             ->method('clear');
-        $this->logger->expects($this->exactly(2))
+        $this->logger->expects($this->once())
             ->method('notice');
+        $this->logger->expects($this->exactly(2))
+            ->method('info');
         $this->logger->expects($this->never())
             ->method('warning');
 

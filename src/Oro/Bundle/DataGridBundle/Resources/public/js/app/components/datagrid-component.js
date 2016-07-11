@@ -122,7 +122,7 @@ define(function(require) {
 
             options.metadata.options.toolbarOptions =
                 $.extend(true, options.metadata.options.toolbarOptions, options.toolbarOptions);
-            options.$el = $(options.el);
+            options.$el = $(options._sourceElement);
             options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
             options.builders.push('orodatagrid/js/grid-views-builder');
