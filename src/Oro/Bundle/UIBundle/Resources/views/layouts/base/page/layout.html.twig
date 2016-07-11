@@ -16,7 +16,7 @@
     {% include 'OroRequireJSBundle::scripts.html.twig' with {
         compressed: not app.debug,
         config_extend: requirejs_config_extend,
-        config_key: theme
+        provider_alias: provider_alias
     } %}
     {{ block_widget(block) }}
 {% endblock %}
