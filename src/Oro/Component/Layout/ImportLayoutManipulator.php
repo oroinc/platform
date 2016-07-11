@@ -278,7 +278,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
 
     /**
      * @param string $id
-     * @param array  $options
+     * @param array $options
      *
      * @return $this
      */

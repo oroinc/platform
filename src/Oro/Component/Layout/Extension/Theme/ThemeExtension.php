@@ -35,10 +35,10 @@ class ThemeExtension extends AbstractExtension
     protected $updates;
 
     /**
-     * @param array                       $resources
+     * @param array $resources
      * @param LayoutUpdateLoaderInterface $loader
-     * @param DependencyInitializer       $dependencyInitializer
-     * @param PathProviderInterface       $provider
+     * @param DependencyInitializer $dependencyInitializer
+     * @param PathProviderInterface $provider
      */
     public function __construct(
         array $resources,
@@ -71,7 +71,7 @@ class ThemeExtension extends AbstractExtension
 
     /**
      * @param                    $file
-     * @param ContextInterface   $context
+     * @param ContextInterface $context
      *
      * @return array
      */
@@ -129,7 +129,7 @@ class ThemeExtension extends AbstractExtension
 
     /**
      * @param ContextInterface $context
-     * @param string           $importId
+     * @param string $importId
      *
      * @return string
      */
@@ -192,7 +192,7 @@ class ThemeExtension extends AbstractExtension
     }
 
     /**
-     * @param array  $array
+     * @param array $array
      * @param string $property
      *
      * @return mixed

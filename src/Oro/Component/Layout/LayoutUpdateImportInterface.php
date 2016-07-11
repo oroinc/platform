@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Oro\Component\Layout;
-
 
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 

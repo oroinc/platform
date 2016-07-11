@@ -17,7 +17,7 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
     public function startVisit(VisitContext $visitContext)
     {
         $writer = $visitContext->createWriter();
-        $class  = $visitContext->getClass();
+        $class = $visitContext->getClass();
         $class->addUseStatement('Oro\Component\Layout\ImportLayoutManipulator');
         $class->addInterfaceName('Oro\Component\Layout\LayoutUpdateImportInterface');
 
@@ -35,7 +35,9 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
 
         $visitContext->getUpdateMethodWriter()
             ->writeln('if (null === $this->import) {')
-            ->writeln('    throw new \\RuntimeException(\'Missing impost configuration for layout update\');') // todo update message
+            ->writeln(
+                '    throw new \\RuntimeException(\'Missing impost configuration for layout update\');'
+            )// todo update message
             ->writeln('}')
             ->writeln('')
             ->writeln('$layoutManipulator  = new ImportLayoutManipulator($layoutManipulator, $this->import);')

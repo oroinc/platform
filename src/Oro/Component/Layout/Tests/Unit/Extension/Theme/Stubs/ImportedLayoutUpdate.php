@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs;
-
 
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
