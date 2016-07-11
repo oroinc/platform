@@ -89,16 +89,19 @@ class ThemeExtension extends AbstractExtension
             if ($update instanceof ImportsAwareLayoutUpdateInterface) {
                 // load imports
                 $imports = $update->getImports();
+                if (!is_array($imports)) {
+                    throw new LogicException(
+                        sprintf('Imports statement should be an array, %s given', gettype($imports))
+                    );
+                }
                 foreach ($imports as $importData) {
                     $import = $this->createImport($importData);
-
                     $importPaths = $this->getImportPaths($context, $import->getId());
                     $files = $this->findApplicableResources($importPaths);
                     foreach ($files as $file) {
-                        $update = $this->loadLayoutUpdate($file, $context);
-
-                        if ($update instanceof LayoutUpdateImportInterface) {
-                            $update->setImport($import);
+                        $importUpdate = $this->loadLayoutUpdate($file, $context);
+                        if ($importUpdate instanceof LayoutUpdateImportInterface) {
+                            $importUpdate->setImport($import);
                         }
                     }
                 }
@@ -154,6 +157,7 @@ class ThemeExtension extends AbstractExtension
         if (!is_array($importProperties)) {
             $importProperties = [ImportsAwareLayoutUpdateInterface::ID_KEY => $importProperties];
         }
+
         return LayoutUpdateImport::createFromArray($importProperties);
     }
 

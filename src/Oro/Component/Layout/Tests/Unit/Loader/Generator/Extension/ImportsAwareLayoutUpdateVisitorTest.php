@@ -9,7 +9,7 @@ use CG\Core\DefaultGeneratorStrategy;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Generator\Extension\ImportsAwareLayoutUpdateVisitor;
 
-class ImportsLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
+class ImportsAwareLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
 {
     // @codingStandardsIgnoreStart
     public function testVisit()
@@ -51,16 +51,18 @@ class LayoutUpdateWithImport implements \Oro\Component\Layout\ImportsAwareLayout
     public function getImports()
     {
         return array (
-            array (
-              'id' => 'import_id',
-              'root' => 'root_block_id',
-              'namespace' => 'import_namespace',
-            ),
-            array (
-              'id' => 'import_id_2',
-              'root' => 'root_block_id_2',
-              'namespace' => 'import_namespace_2',
-            ),
+          0 => 
+          array (
+            'id' => 'import_id',
+            'root' => 'root_block_id',
+            'namespace' => 'import_namespace',
+          ),
+          1 => 
+          array (
+            'id' => 'import_id_2',
+            'root' => 'root_block_id_2',
+            'namespace' => 'import_namespace_2',
+          ),
         );
     }
 }

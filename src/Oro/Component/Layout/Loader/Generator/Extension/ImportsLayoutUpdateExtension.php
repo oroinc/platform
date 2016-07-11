@@ -19,10 +19,12 @@ class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensi
     {
         $source = $data->getSource();
 
+        // layout update contains imports
         if (!empty($source[self::NODE_IMPORTS])) {
             $visitorCollection->append(new ImportsAwareLayoutUpdateVisitor($source[self::NODE_IMPORTS]));
         }
-        
+
+        // imported layout update
         $delimiter = PathProviderInterface::DELIMITER;
         if (strpos($data->getFilename(), $delimiter.ThemeExtension::IMPORT_FOLDER.$delimiter) !== false) {
             $visitorCollection->append(new ImportLayoutUpdateVisitor());
