@@ -7,8 +7,6 @@ interface WorkflowAwareInterface
     /** @return string */
     public function getWorkflowName();
 
-    /**
-     * @param string $workflowName
-     */
+    /** @param string $workflowName */
     public function setWorkflowName($workflowName);
 }
