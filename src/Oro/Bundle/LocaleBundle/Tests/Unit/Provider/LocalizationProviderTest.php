@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 
@@ -16,8 +17,10 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /** @var  LocalizationProvider */
+    /** @var  LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $provider;
+
+    protected $configManager;
 
     public function setUp()
     {
@@ -25,7 +28,11 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->provider = new LocalizationProvider($this->repository);
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->provider = new LocalizationProvider($this->repository, $this->configManager);
     }
 
     public function tearDown()

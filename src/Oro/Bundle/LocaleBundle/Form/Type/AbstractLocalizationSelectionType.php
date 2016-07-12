@@ -75,7 +75,7 @@ abstract class AbstractLocalizationSelectionType extends AbstractType
 
                     $localizations += (array)$options['additional_localizations'];
 
-                    $this->checkLocalizations($localizations);
+                    $localizations = $this->checkLocalizations($localizations);
 
                     return $this->getChoices($localizations, $options['compact']);
                 },
@@ -123,24 +123,19 @@ abstract class AbstractLocalizationSelectionType extends AbstractType
 
     /**
      * @param array $localizations
-     * @throws LogicException
+     *
+     * @return array
      */
     protected function checkLocalizations(array $localizations)
     {
-        $invalidLocalizations = [];
-
         foreach ($localizations as $id => $label) {
-
             $localization = $this->localizationProvider->getLocalization($id);
-
             if (!($localization instanceof Localization)) {
-                $invalidLocalizations[] = $label;
+                unset($localizations[$id]);
             }
         }
 
-        if ($invalidLocalizations) {
-            throw new LogicException(sprintf('Found unknown localizations: %s.', implode(', ', $invalidLocalizations)));
-        }
+        return $localizations;
     }
 
     /**

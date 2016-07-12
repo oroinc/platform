@@ -86,15 +86,22 @@ class DefaultLocalizationSelectionType extends LocalizationSelectionType
             $defaultLocalization = $this->getDefaultLocalization($localization[self::DEFAULT_LOCALIZATION_NAME]);
             $enabledLocalizations = $this->getEnabledLocalizations($localization[self::ENABLED_LOCALIZATIONS_NAME]);
 
-            if (!in_array($defaultLocalization, $enabledLocalizations, true)) {
-                $localization = $this->localizationProvider->getLocalization($defaultLocalization);
-                $form->addError(new FormError(
-                    $this->translator->trans(
+            if (!in_array($defaultLocalization, $enabledLocalizations)) {
+                $localization = $this->localizationProvider->getLocalization((int)$defaultLocalization);
+                if($localization instanceof Localization){
+                    $message = $this->translator->trans(
                         'oro.locale.validators.is_not_enabled',
                         ['%localization%' => $localization->getName()],
                         'validators'
-                    )
-                ));
+                    );
+                }else{
+                    $message = $this->translator->trans(
+                        'oro.locale.validators.unknown_localization',
+                        ['%localization_id%' => $defaultLocalization],
+                        'validators'
+                    );
+                }
+                $form->addError(new FormError($message));
             }
         }
     }
@@ -103,20 +110,13 @@ class DefaultLocalizationSelectionType extends LocalizationSelectionType
      * @param array $defaultLocalizationData
      * @return string
      */
-    protected function getDefaultLocalization(array $defaultLocalizationData)
+    protected function getDefaultLocalization(array $defaultLocalizationData = null)
     {
-        if (isset($defaultLocalizationData['use_parent_scope_value'])) {
-            $systemDefault = $this->localizationProvider->getDefaultLocalization();
-            $defaultLocalization = '';
-            if ($systemDefault instanceof Localization) {
-                $defaultLocalization = $systemDefault->getId();
-            }
-        } elseif (isset($defaultLocalizationData['value'])) {
+        if (isset($defaultLocalizationData['value'])) {
             $defaultLocalization = $defaultLocalizationData['value'];
         } else {
             $defaultLocalization = '';
         }
-
         return $defaultLocalization;
     }
 
