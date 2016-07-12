@@ -105,7 +105,7 @@ services:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension
         public: false
         arguments:
-            - '@oro_layout.expression.assembler'
+            - '@oro_layout.expression_language'
 
     oro_layout.layout_update_generator.extension.add_tree:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension
