@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
@@ -33,6 +34,7 @@ class UniqueKeyType extends AbstractType
             array(
                 'label' => 'oro.entity_extend.form.name.label',
                 'required' => true,
+                'constraints' => [new Assert\NotBlank()]
             )
         );
 
@@ -44,6 +46,7 @@ class UniqueKeyType extends AbstractType
                 'multiple' => true,
                 'choices'  => $this->fields,
                 'required' => true,
+                'constraints' => [new Assert\NotBlank()]
             )
         );
     }
