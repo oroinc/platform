@@ -126,6 +126,9 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
                         'required' => true,
                         'label'    => 'oro.integration.integration.default_user_owner.label',
                         'tooltip'  => 'oro.integration.integration.default_user_owner.description',
+                        'constraints' => [
+                            new NotNull(),
+                        ],
                     ]
                 )
             )
@@ -220,6 +223,9 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
                         'required' => true,
                         'label'    => 'oro.integration.integration.default_user_owner.label',
                         'tooltip'  => 'oro.integration.integration.default_user_owner.description',
+                        'constraints' => [
+                            new NotNull(),
+                        ],
                     ]
                 )
             )

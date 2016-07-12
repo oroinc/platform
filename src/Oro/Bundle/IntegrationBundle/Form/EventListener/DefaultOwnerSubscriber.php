@@ -79,7 +79,7 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if ($data === null) {
+        if ($data === null || !isset($data['type'])) {
             return;
         }
 
@@ -121,6 +121,9 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
                     'required' => true,
                     'label'    => 'oro.integration.integration.default_user_owner.label',
                     'tooltip'  => 'oro.integration.integration.default_user_owner.description',
+                    'constraints' => [
+                        new NotNull(),
+                    ],
                 ]
             );
         }
