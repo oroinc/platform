@@ -42,18 +42,10 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     public function testCollect()
     {
-        $requset = $this->getMockRequest();
-        $response = $this->getMockResponse();
-        $this->dataCollector->collect($requset, $response);
+        $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
 
-        $class = new \ReflectionClass(LayoutDataCollector::class);
-        $property = $class->getProperty('data');
-        $property->setAccessible(true);
-
-        $data = $property->getValue($this->dataCollector);
-
-        $this->assertArrayHasKey('views', $data);
-        $this->assertArrayHasKey('items', $data);
+        $this->assertTrue(is_array($this->dataCollector->getViews()));
+        $this->assertTrue(is_array($this->dataCollector->getItems()));
     }
 
     public function testCollectViews()
@@ -67,12 +59,9 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
         $view->children[] = $childView;
 
         $this->dataCollector->collectViews($view);
+        $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
 
-        $class = new \ReflectionClass(LayoutDataCollector::class);
-        $property = $class->getProperty('views');
-        $property->setAccessible(true);
-
-        $this->assertEquals(['root' => ['head' => []]], $property->getValue($this->dataCollector));
+        $this->assertEquals(['root' => ['head' => []]], $this->dataCollector->getViews());
     }
 
     public function testCollectContextItems()
@@ -88,69 +77,30 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             'ContextItemInterface' => $contextItemInterface
         ];
 
-        $context = $this->getMockLayoutContext();
-
-        $class = new \ReflectionClass(LayoutContext::class);
-        $property = $class->getProperty('items');
-        $property->setAccessible(true);
-        $property->setValue($context, $items);
+        $context = new LayoutContext();
+        $context->set('string', $items['string']);
+        $context->set('array', $items['array']);
+        $context->set('ContextItemInterface', $items['ContextItemInterface']);
 
         $this->dataCollector->collectContextItems($context);
 
-        $class = new \ReflectionClass(LayoutDataCollector::class);
-        $property = $class->getProperty('contextItems');
-        $property->setAccessible(true);
-
         $items['array'] = json_encode($items['array']);
         $items['ContextItemInterface'] = 'ContextItemInterface';
-        $this->assertEquals($items, $property->getValue($this->dataCollector));
+
+        $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
+        $this->assertEquals($items, $this->dataCollector->getItems());
     }
 
     public function testGetViews()
     {
-        $views = ['root' => ['head' => []]];
-
-        $class = new \ReflectionClass(LayoutDataCollector::class);
-        $property = $class->getProperty('data');
-        $property->setAccessible(true);
-        $property->setValue($this->dataCollector, ['views' => $views]);
-
-        $this->assertEquals($views, $this->dataCollector->getViews());
+        $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
+        $this->assertTrue(is_array($this->dataCollector->getViews()));
     }
 
     public function testGetItems()
     {
-        $items = [
-            'string' => 'string',
-            'array' => ['array'],
-        ];
-
-        $class = new \ReflectionClass(LayoutDataCollector::class);
-        $property = $class->getProperty('data');
-        $property->setAccessible(true);
-        $property->setValue($this->dataCollector, ['items' => $items]);
-
-        $this->assertEquals($items, $this->dataCollector->getItems());
-    }
-
-    public function testRecursiveBuildFinalViewTree()
-    {
-        $view = $this->getMockBlockView();
-        $view->vars['id'] = 'root';
-
-        $childView = $this->getMockBlockView([$view]);
-        $childView->vars['id'] = 'head';
-
-        $view->children[] = $childView;
-
-        $result = [];
-
-        $class = new \ReflectionClass(LayoutDataCollector::class);
-        $method = $class->getMethod('recursiveBuildFinalViewTree');
-        $method->setAccessible(true);
-        $method->invokeArgs($this->dataCollector, [$view, &$result]);
-
-        $this->assertEquals(['head' => []], $result);
+        $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
+        $this->assertTrue(is_array($this->dataCollector->getItems()));
     }
 
     /**
@@ -178,28 +128,12 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Layout|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getMockLayout()
-    {
-        return $this->getMock('Oro\Component\Layout\Layout', [], [], '', false);
-    }
-
-    /**
      * @param array $args
      * @return BlockView|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getMockBlockView(array $args = [])
     {
         return $this->getMock('Oro\Component\Layout\BlockView', [], $args, '', false);
-    }
-
-    /**
-     * @return LayoutContext|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getMockLayoutContext()
-    {
-        return $this->getMock('Oro\Component\Layout\LayoutContext');
     }
 
     /**
