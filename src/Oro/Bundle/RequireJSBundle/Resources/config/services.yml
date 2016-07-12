@@ -24,3 +24,6 @@ services:
         calls:
             - [ setCache, [ '@oro_requirejs.cache' ] ]
         lazy: true
+
+    oro_requirejs.config_provider.manager:
+        class: Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager
