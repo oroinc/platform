@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -123,6 +124,28 @@ class CalendarEventController extends Controller
         $formAction = $this->get('router')->generate('oro_calendar_event_update', ['id' => $entity->getId()]);
 
         return $this->update($entity, $formAction);
+    }
+
+    /**
+     * Remove calendar event.
+     *
+     * @Route("/delete/{id}", name="oro_calendar_event_delete", requirements={"id"="\d+"})
+     *
+     * @Acl(
+     *      id="oro_calendar_event_delete",
+     *      type="entity",
+     *      class="OroCalendarBundle:CalendarEvent",
+     *      permission="DELETE",
+     *      group_name=""
+     * )
+     */
+    public function deleteAction(Request $request, $id)
+    {
+        return $this->forward(
+            'OroCalendarBundle:Api/Rest/CalendarEvent:delete',
+            ['id' => $id],
+            array_merge($request->query->all(), ['isCancelInsteadDelete' => true, '_format' => 'json'])
+        );
     }
 
     /**

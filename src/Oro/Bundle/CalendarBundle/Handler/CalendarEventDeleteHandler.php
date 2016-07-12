@@ -131,17 +131,30 @@ class CalendarEventDeleteHandler extends DeleteHandler
     public function processDelete($entity, ObjectManager $em)
     {
         $this->checkPermissions($entity, $em);
-        if ($entity->getRecurrence() && $entity->getRecurrence()->getId()) {
-            $em->remove($entity->getRecurrence());
-        }
-        if ($entity->getRecurringEvent()) {
+
+        if ($this->shouldCancelInsteadDelete() && $entity->getRecurringEvent()) {
             $event = $entity->getRealCalendarEvent();
+            $event->setCancelled(true);
+
             $childEvents = $event->getChildEvents();
             foreach ($childEvents as $childEvent) {
-                $this->deleteEntity($childEvent, $em);
+                $childEvent->setCancelled(true);
             }
+        } else {
+            if ($entity->getRecurrence() && $entity->getRecurrence()->getId()) {
+                $em->remove($entity->getRecurrence());
+            }
+
+            if ($entity->getRecurringEvent()) {
+                $event = $entity->getRealCalendarEvent();
+                $childEvents = $event->getChildEvents();
+                foreach ($childEvents as $childEvent) {
+                    $this->deleteEntity($childEvent, $em);
+                }
+            }
+            $this->deleteEntity($entity, $em);
         }
-        $this->deleteEntity($entity, $em);
+
         $em->flush();
         
         if ($this->shouldSendNotification()) {
@@ -157,5 +170,15 @@ class CalendarEventDeleteHandler extends DeleteHandler
         $request = $this->requestStack->getCurrentRequest();
 
         return !$request || (bool) $request->query->get('notifyInvitedUsers', false);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldCancelInsteadDelete()
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request && (bool) $request->query->get('isCancelInsteadDelete', false);
     }
 }
