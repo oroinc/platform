@@ -15,7 +15,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration as InlineConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -79,20 +79,25 @@ class FieldAclExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $columns = $config->offsetGetOr(ColumnsExtension::COLUMNS_PATH, []);
         $fieldAclConfig = $config->offsetGetByPath(Configuration::FIELDS_ACL);
-
-        // move config from columns to fields_acl section
-        foreach ($columns as $columnName => $columnConfig) {
-            $fieldAclConfig['columns'][$columnName] = array_key_exists(self::FIELD_ACL, $columnConfig)
-                ? $columnConfig[self::FIELD_ACL]
-                : null;
-        }
 
         $validated = $this->validateConfiguration(
             new Configuration(),
             ['fields_acl' => $fieldAclConfig]
         );
+
+        // if we have enabled Field ACL for grid, turn off inline editing.
+        // @todo: Should be deleted in scope of BAP-11104
+        foreach ($validated['columns'] as $column) {
+            if ($column[PropertyInterface::DISABLED_KEY] !== true) {
+                $config->offsetSetByPath(
+                    InlineConfiguration::ENABLED_CONFIG_PATH,
+                    false
+                );
+
+                break;
+            }
+        }
 
         $config->offsetSetByPath(
             Configuration::FIELDS_ACL,
@@ -162,7 +167,9 @@ class FieldAclExtension extends AbstractExtension
         // collect field ACL config
         $aliases = [];
         foreach ($fieldAclConfig as $columnName => $fieldData) {
-            if ($fieldData[PropertyInterface::DISABLED_KEY] === false) {
+            if (isset($fieldData[PropertyInterface::DISABLED_KEY])
+                && $fieldData[PropertyInterface::DISABLED_KEY] === true
+            ) {
                 continue;
             }
 

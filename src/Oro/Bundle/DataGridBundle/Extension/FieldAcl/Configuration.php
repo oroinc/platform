@@ -26,7 +26,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->treatFalseLike([PropertyInterface::DISABLED_KEY => true])
                         ->treatTrueLike([PropertyInterface::DISABLED_KEY => false])
-                        ->treatNullLike([PropertyInterface::DISABLED_KEY => true])
+                        ->treatNullLike([PropertyInterface::DISABLED_KEY => false])
                         ->children()
                             ->scalarNode(PropertyInterface::DATA_NAME_KEY)->end()
                             ->booleanNode(PropertyInterface::DISABLED_KEY)->defaultFalse()->end()

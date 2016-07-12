@@ -141,7 +141,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
 
             // add Field ACL configuration
             $config->offsetSetByPath(
-                sprintf('%s[%s][data_name]', FieldAclConfiguration::COLUMNS_PATH, $fieldName),
+                sprintf('%s[%s][data_name]', FieldAclConfiguration::COLUMNS_PATH, $columnDataName),
                 sprintf('%s.%s', $alias, $fieldName)
             );
         }
