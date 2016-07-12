@@ -569,7 +569,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
         if ($emailUser != null) {
-            $imapEmail->getEmail()->getEmailUsers()->removeElement($emailUser);
+            $emailUser->removeFolder($imapEmail->getImapFolder()->getFolder());
+            if (!$emailUser->getFolders()->count()) {
+                $imapEmail->getEmail()->getEmailUsers()->removeElement($emailUser);
+            }
         }
         $this->em->remove($imapEmail);
     }
