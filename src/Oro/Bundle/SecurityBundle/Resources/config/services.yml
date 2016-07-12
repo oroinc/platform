@@ -6,8 +6,10 @@ parameters:
     oro_security.acl.sid_manager.class:                        Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
     oro_security.acl.ace_provider.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper
     oro_security.acl.privilege_repository.class:               Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository
+    oro_security.acl.field_privilege_repository.class:         Oro\Bundle\SecurityBundle\Acl\Persistence\FieldAclPrivilegeRepository
     oro_security.acl.extension_selector.class:                 Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
     oro_security.acl.extension.entity.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension
+    oro_security.acl.extension.field.class:                    Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension
     oro_security.acl.extension.action.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension
     oro_security.acl.voter.class:                              Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter
     oro_security.acl.provider.class:                           Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider
@@ -83,6 +85,10 @@ parameters:
     oro_security.configuration.provider.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider
     oro_security.configuration.builder.permission_configuration.class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
 
+    oro_security.form.extension.aclprotected_fields_type.class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
+    oro_security.serializer.filter_chain.class:                Oro\Component\EntitySerializer\Filter\EntityAwareFilterChain
+    oro_security.serializer.acl_filter:                        Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
+
 services:
     oro_security.security_facade:
         class: %oro_security.security_facade.class%
@@ -121,6 +127,13 @@ services:
         arguments:
             - '@oro_security.acl.manager'
             - '@translator'
+
+    oro_security.acl.field_privilege_repository:
+        class: %oro_security.acl.field_privilege_repository.class%
+        arguments:
+            - '@oro_security.acl.manager'
+            - '@translator'
+            - '@oro_entity.entity_field_provider'
 
     oro_security.acl.sid_manager:
         class: %oro_security.acl.sid_manager.class%
@@ -178,6 +191,20 @@ services:
         class: %oro_security.acl.provider.class%
         arguments:
             - '@oro_security.acl.object_identity_factory'
+        calls:
+            - [setUnderlyingCache, ["@security.acl.underlying.cache"]]
+
+    security.acl.underlying.cache:
+        public: false
+        class: Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache
+        arguments:
+            - "@security.acl.underlying.cache.doctrine.cache_impl"
+
+    security.acl.underlying.cache.doctrine.cache_impl:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_acl_underlying' ]]
 
     oro_security.acl.voter_link:
         tags:
@@ -222,6 +249,8 @@ services:
     oro_security.acl.object_id_accessor:
         public: false
         class: %oro_security.acl.object_id_accessor.class%
+        arguments:
+            - '@oro_entity.doctrine_helper'
 
     oro_security.acl.group_provider.chain:
         class: %oro_security.acl.group_provider.chain.class%
@@ -255,6 +284,8 @@ services:
 
     oro_security.form.type.object_label_type:
         class: %oro_security.type.oro_acl_label.class%
+        arguments:
+            - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: form.type, alias: oro_acl_label }
 
@@ -560,7 +591,6 @@ services:
           calls:
               - [setRequest, ["@?request="]]
           tags:
-              - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
 
     oro_security.listener.refresh_context_listener:
@@ -641,3 +671,45 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
+
+    oro_security.form.extension.aclprotected_fields_type:
+        class: %oro_security.form.extension.aclprotected_fields_type.class%
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.provider.security'
+        tags:
+            - { name: form.type_extension, alias: form }
+
+
+    oro_security.acl.extension.field:
+        public: false
+        class: %oro_security.acl.extension.field.class%
+        arguments:
+            - '@oro_security.acl.object_id_accessor'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_security.entity_security_metadata_provider'
+            - '@oro_security.owner.metadata_provider.chain'
+            - '@oro_security.owner.ownership_decision_maker.chain'
+            - '@oro_security.owner.entity_owner_accessor'
+            - '@oro_entity_config.provider.security'
+        tags:
+            - { name: oro_security.acl.extension, priority: 15 } # should be before EntityAclExtension
+
+    oro_security.serializer.acl_filter:
+        class: %oro_security.serializer.acl_filter%
+        arguments:
+            - '@security.authorization_checker'
+            - '@oro_entity_config.provider.security'
+            - '@oro_api.entity_serializer.doctrine_helper'
+
+    oro_security.serializer.filter_chain:
+        class: %oro_security.serializer.filter_chain.class%
+        calls:
+            - ["addFilter", ['@oro_security.serializer.acl_filter']]
+
+    oro_security.listener.config_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\FieldAclConfigListener
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }

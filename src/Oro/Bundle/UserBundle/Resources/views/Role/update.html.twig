@@ -109,13 +109,14 @@
     {% endfor %}
     {% if additionalData is not empty %}
         {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Additional'|trans,
-            'subblocks': [{
-                'title': '',
-                'useSpan': false,
-                'data' : additionalData
+                'title': 'Additional'|trans,
+                'subblocks': [{
+                    'title': '',
+                    'useSpan': false,
+                    'data' : additionalData
+                }]
             }]
-        }] ) %}
+        ) %}
     {% endif %}
 
     {% set rolePermissionsGrid %}

@@ -108,7 +108,12 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         list($this->object, $group) = $this->separateAclGroupFromObject($this->object);
 
         try {
-            $this->extension = $this->extensionSelector->select($this->object);
+            // select ACL extension based on object given (that could be FieldVote instance)
+            //     to be able to choose field ACL extension
+            // or based on object that could be created in separateAclGroupFromObject
+            $this->extension = $this->extensionSelector->select(
+                $object instanceof FieldVote ? $object : $this->object
+            );
         } catch (InvalidDomainObjectException $e) {
             return self::ACCESS_ABSTAIN;
         }
@@ -125,7 +130,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         $result = $this->checkAclGroup($attributes, $group);
 
         if ($result !== self::ACCESS_DENIED) {
-            $result = parent::vote($token, $this->object, $attributes);
+            $result = parent::vote($token, $object, $attributes);
         }
 
         $this->extension = null;

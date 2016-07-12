@@ -1,0 +1,103 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
+{% set entityId = form.vars.value.id %}
+{% oro_title_set({params : { "%role%": form.vars.value.label, "%entityName%": entityName|default('N/A')|trans } }) %}
+{% set formAction = path('oro_field_acl_update', {'id': entityId, 'className': className}) %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(path('oro_user_role_index')) }}
+
+    {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success role-submit', 'label': 'Save and Close'|trans}) %}
+    {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
+        {# button attribute 'action' is avoided because of there is unacceptable submit binding on .action-button in init-layout.js #}
+        {% set html = html ~ UI.buttonType({
+            'type': 'button',
+            'class': 'btn-success main-group role-submit',
+            'label': 'Save'|trans,
+            'data': {
+                'action': 'save_and_stay'
+            }
+        }) %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+
+    {% set fields = [] %}
+    {% for name, child in form %}
+        {% if name not in ['appendUsers', 'removeUsers', 'field', 'privileges', 'action'] %}
+            {% set fields = fields|merge({(name): '#' ~ child.vars.id}) %}
+        {% endif %}
+    {% endfor %}
+
+    {% set options = {
+        elSelector: '.btn-success.role-submit',
+        formName: form.vars.name,
+        formSelector: '#' ~ form.vars.id,
+        privilegesSelector: '#' ~ form.privileges.vars.id,
+        fields : fields
+    } %}
+    <div data-page-component-module="orouser/js/views/role-view"
+         data-page-component-options="{{ options|json_encode }}">
+    </div>
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% if entityId %}
+        {% set breadcrumbs = {
+            'entity':      form.vars.value,
+            'indexPath':   path('oro_user_role_index'),
+            'indexLabel': 'oro.user.role.entity_plural_label'|trans,
+            'entityTitle': entityName,
+            'additional': [
+                {
+                    'entity':      form.vars.value,
+                    'indexPath':   path('oro_user_role_update', {'id': entityId}),
+                    'indexLabel':  form.vars.value.label,
+                }
+            ]
+        }
+        %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.user.role.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set id = 'role-profile' %}
+
+    {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.label, {read_only: true})
+                ]
+            }
+        ]
+    }] %}
+
+    {% set privilegeBlock = 'field' %}
+    {% set privilegeConfig = privilegesConfig[privilegeBlock] %}
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': privilegeConfig.label|trans,
+        'subblocks': [
+            {
+                'title': '',
+                'useSpan': false,
+                'data': [
+                    form_widget(form.children[privilegeBlock])
+                ]
+            }
+        ]
+    }]) %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock content_data %}

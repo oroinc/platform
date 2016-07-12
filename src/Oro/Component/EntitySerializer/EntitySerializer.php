@@ -6,6 +6,8 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
+
 /**
  * @todo: This is draft implementation of the entity serializer.
  *       It is expected that the full implementation will be done when new API component is implemented.
@@ -141,6 +143,9 @@ class EntitySerializer
     /** @var DataNormalizer */
     protected $dataNormalizer;
 
+    /** @var EntityAwareFilterInterface */
+    protected $fieldFilter;
+
     /**
      * @param DoctrineHelper           $doctrineHelper
      * @param DataAccessorInterface    $dataAccessor
@@ -168,6 +173,14 @@ class EntitySerializer
         $this->dataNormalizer   = $dataNormalizer;
 
         $this->configConverter = new ConfigConverter();
+    }
+
+    /**
+     * @param EntityAwareFilterInterface $filter
+     */
+    public function setFieldsFilter(EntityAwareFilterInterface $filter)
+    {
+        $this->fieldFilter = $filter;
     }
 
     /**
@@ -282,7 +295,22 @@ class EntitySerializer
         $result         = [];
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $resultFields   = $this->fieldAccessor->getFieldsToSerialize($entityClass, $config);
+
         foreach ($resultFields as $field) {
+            $isFieldAllowed = $this->fieldFilter ?
+                $this->fieldFilter->checkField($entity, $entityClass, $field) :
+                EntityAwareFilterInterface::FILTER_NOTHING;
+
+            if (EntityAwareFilterInterface::FILTER_ALL === $isFieldAllowed) {
+                continue;
+            }
+
+            if (EntityAwareFilterInterface::FILTER_NOTHING !== $isFieldAllowed) {
+                // return field but without value
+                $result[$field] = null;
+                continue;
+            }
+
             $fieldConfig = $config->getField($field);
 
             $value = null;

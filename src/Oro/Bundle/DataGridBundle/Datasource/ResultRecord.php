@@ -46,6 +46,33 @@ class ResultRecord implements ResultRecordInterface
     }
 
     /**
+     * Set value of property by name
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setValue($name, $value)
+    {
+        foreach ($this->valueContainers as $key => $data) {
+            if (is_array($data)) {
+                if (strpos($name, '[') === 0) {
+                    $this->getPropertyAccessor()->setValue($this->valueContainers[$key], $name, $value);
+                    return;
+                } else {
+                    $this->valueContainers[$key][$name] = $value;
+                    return;
+                }
+            } elseif (is_object($data)) {
+                $this->getPropertyAccessor()->setValue(
+                    $this->valueContainers[$key],
+                    Inflector::camelize($name),
+                    $value
+                );
+            }
+        }
+    }
+
+    /**
      * Get value of property by name
      *
      * @param  string $name

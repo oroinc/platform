@@ -382,6 +382,13 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                             ]
                         ]
                     ],
+                    'fields_acl' => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $alias . '.' . self::FIELD_NAME
+                            ]
+                        ]
+                    ]
                 ]
             ),
             $config->toArray()
@@ -476,6 +483,13 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                             ]
                         ]
                     ],
+                    'fields_acl' => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $alias . '.' . self::FIELD_NAME
+                            ]
+                        ]
+                    ]
                 ]
             ),
             $config->toArray()
@@ -558,6 +572,13 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                             ]
                         ]
                     ],
+                    'fields_acl' => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $alias . '.' . self::FIELD_NAME
+                            ]
+                        ]
+                    ]
                 ]
             ),
             $config->toArray()

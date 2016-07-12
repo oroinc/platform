@@ -87,14 +87,16 @@ class AclManager extends AbstractAclManager
     /**
      * Get access levels list for object.
      *
-     * @param $object
+     * @param object|string $object
+     * @param string|null   $permissionName
+     *
      * @return array
      */
-    public function getAccessLevels($object)
+    public function getAccessLevels($object, $permissionName = null)
     {
         $extension = $this->getExtensionSelector()->select($object);
 
-        return $extension->getAccessLevelNames($object);
+        return $extension->getAccessLevelNames($object, $permissionName);
     }
 
     /**
@@ -495,7 +497,8 @@ class AclManager extends AbstractAclManager
      *
      * @param SID $sid
      * @param OID $oid
-     * @return EntryInterface[]
+     *
+     * @return \Symfony\Component\Security\Acl\Model\EntryInterface[]
      */
     public function getAces(SID $sid, OID $oid)
     {

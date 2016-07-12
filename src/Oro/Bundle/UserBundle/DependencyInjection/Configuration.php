@@ -42,23 +42,32 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->defaultValue(
                         array(
-                            'entity'=>array(
-                                'label' => 'oro.user.privileges.entity.label',
-                                'view_type' => 'grid',
-                                'types' => array('entity'),
-                                'field_type' => 'oro_acl_access_level_selector',
-                                'fix_values' => false,
+                            'entity' => array(
+                                'label'         => 'oro.user.privileges.entity.label',
+                                'view_type'     => 'grid',
+                                'types'         => array('entity'),
+                                'field_type'    => 'oro_acl_access_level_selector',
+                                'fix_values'    => false,
                                 'default_value' => 5,
-                                'show_default' => true,
+                                'show_default'  => true,
                             ),
-                            'action'=>array(
-                                'label' => 'oro.user.privileges.action.label',
-                                'view_type' => 'list',
-                                'types' => array('action'),
-                                'field_type' => 'oro_acl_access_level_selector',
-                                'fix_values' => false,
+                            'field'  => array(
+                                'label'         => 'oro.user.privileges.field.label',
+                                'view_type'     => 'grid',
+                                'types'         => array('field'),
+                                'field_type'    => 'oro_acl_access_level_selector',
+                                'fix_values'    => false,
+                                'default_value' => 5,
+                                'show_default'  => true,
+                            ),
+                            'action' => array(
+                                'label'         => 'oro.user.privileges.action.label',
+                                'view_type'     => 'list',
+                                'types'         => array('action'),
+                                'field_type'    => 'oro_acl_access_level_selector',
+                                'fix_values'    => false,
                                 'default_value' => 1,
-                                'show_default' => false,
+                                'show_default'  => false,
                             )
                         )
                     )

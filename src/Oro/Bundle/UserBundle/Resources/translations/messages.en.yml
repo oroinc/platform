@@ -162,6 +162,7 @@ oro:
             label: Send an Email Invitation
         privileges:
             entity.label: Entity
+            field.label:  Fields
             action.label: Capabilities
         privilege:
             category:

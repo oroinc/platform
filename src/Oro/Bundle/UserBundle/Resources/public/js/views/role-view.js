@@ -104,6 +104,8 @@ define([
             var url = (typeof action === 'string') ? $.trim(action) : '';
             url = url || window.location.href || '';
             if (url) {
+                url += '?input_action=' + $(event.currentTarget).data('action');
+
                 // clean url (don't include hash value)
                 url = (url.match(/^([^#]+)/) || [])[1];
             }
