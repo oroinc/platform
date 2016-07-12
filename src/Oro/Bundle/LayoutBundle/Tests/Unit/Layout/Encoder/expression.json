@@ -1,0 +1,35 @@
+{
+  "expression": "!true === false",
+  "node": {
+    "Symfony\\Component\\ExpressionLanguage\\Node\\BinaryNode": {
+      "attributes": {
+        "operator": "==="
+      },
+      "nodes": {
+        "left": {
+          "Symfony\\Component\\ExpressionLanguage\\Node\\UnaryNode": {
+            "attributes": {
+              "operator": "!"
+            },
+            "nodes": {
+              "node": {
+                "Symfony\\Component\\ExpressionLanguage\\Node\\ConstantNode": {
+                  "attributes": {
+                    "value": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "right": {
+          "Symfony\\Component\\ExpressionLanguage\\Node\\ConstantNode": {
+            "attributes": {
+              "value": false
+            }
+          }
+        }
+      }
+    }
+  }
+}
