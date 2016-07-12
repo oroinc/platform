@@ -135,10 +135,10 @@ define([
                 function(element, name) {
                     var value = element.val();
 
-                    if (element.attr('type') == 'checkbox') {
+                    if (element.attr('type') === 'checkbox') {
                         value = element.is(':checked') ? 1 : 0;
 
-                        if (value == 0) { // do not send the value of checkbox,
+                        if (value === 0) { // do not send the value of checkbox,
                             return;       // it will be set as false in the backend
                         }
                     }
