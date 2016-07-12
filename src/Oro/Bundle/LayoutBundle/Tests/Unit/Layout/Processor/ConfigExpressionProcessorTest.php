@@ -245,7 +245,6 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->processExpressions($values, $context, $data, false, 'json');
 
-        print_r($values);
         $this->assertSame(
             $trueExprJson,
             $values['expr_object'],
