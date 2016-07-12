@@ -6,6 +6,8 @@ use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
 use CG\Core\DefaultGeneratorStrategy;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
@@ -18,7 +20,17 @@ class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     public function testVisit()
     {
-        $condition    = new ConfigExpressionConditionVisitor(new Condition\TrueCondition());
+        $expression = $this->getMockBuilder(ParsedExpression::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        
+        $expressionLanguage = $this->getMock(ExpressionLanguage::class);
+        $expressionLanguage->expects($this->once())
+            ->method('compile')
+            ->with($expression)
+            ->willReturn('(true == $context["enabled"])');
+
+        $condition = new ConfigExpressionConditionVisitor($expression, $expressionLanguage);
         $phpClass = PhpClass::create('LayoutUpdateClass');
         $visitContext = new VisitContext($phpClass);
 
@@ -36,31 +48,20 @@ class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
 <<<CLASS
-class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface
+class LayoutUpdateClass
 {
-    private \$expressionFactory;
-
     public function updateLayout(\$layoutManipulator, \$item)
     {
-        if (null === \$this->expressionFactory) {
-            throw new \RuntimeException('Missing expression factory for layout update');
-        }
-
-        \$expr = \$this->expressionFactory->create('true', []);
-        \$context = ['context' => \$item->getContext()];
-        if (\$expr->evaluate(\$context)) {
+        \$context = \$item->getContext();
+        if ((true == \$context["enabled"])) {
             echo 123;
         }
     }
-
-    public function setExpressionFactory(\Oro\Component\ConfigExpression\ExpressionFactoryInterface \$expressionFactory)
-    {
-        \$this->expressionFactory = \$expressionFactory;
-    }
 }
 CLASS
-        ,
-        $strategy->generate($visitContext->getClass()));
+            ,
+            $strategy->generate($visitContext->getClass())
+        );
     }
     //codingStandardsIgnoreEnd
 }

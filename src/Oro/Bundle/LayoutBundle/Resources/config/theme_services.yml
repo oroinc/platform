@@ -15,8 +15,6 @@ services:
         public: false
         arguments:
             - '@service_container'
-        calls:
-            - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
 
     oro_layout.theme_factory:
         class:  %oro_layout.theme_factory.class%
