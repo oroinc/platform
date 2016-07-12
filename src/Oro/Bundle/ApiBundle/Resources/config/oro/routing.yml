@@ -81,6 +81,7 @@ oro_rest_api_post:
     defaults:
         _controller: OroApiBundle:RestApi:post
         _action: create
+        _format: json
     options:
         group: rest_api
 
@@ -93,6 +94,7 @@ oro_rest_api_patch:
     defaults:
         _controller: OroApiBundle:RestApi:patch
         _action: update
+        _format: json
     options:
         group: rest_api
 
