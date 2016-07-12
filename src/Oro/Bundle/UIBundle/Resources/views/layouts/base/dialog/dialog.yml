@@ -2,20 +2,12 @@ layout:
     actions:
         - '@setBlockTheme':
             themes: 'OroUIBundle:layouts:base/dialog/dialog.html.twig'
-        - '@setOption':
-            id: widget_content
-            optionName: savedId
-            optionValue: { '@value': $data.savedId }
-        - '@setOption':
-            id: widget_content
-            optionName: shoppingList
-            optionValue: { '@value': $data.shoppingList }
         - '@addTree':
             items:
                 widget_content:
                     blockType: widget_content
                 widget_actions:
-                    blockType: container
+                    blockType: widget_actions
             tree:
                 root:
                     widget_content:
