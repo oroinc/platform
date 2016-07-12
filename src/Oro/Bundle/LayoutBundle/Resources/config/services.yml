@@ -164,3 +164,19 @@ services:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:
             - '@request_stack'
+
+    oro_layout.expression_language.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_layout_expression_language' ] ]
+
+    oro_layout.expression_language.parsed_cache:
+        class: Symfony\Bridge\Doctrine\ExpressionLanguage\DoctrineParserCache
+        arguments:
+            - @oro_layout.expression_language.cache
+
+    oro_layout.expression_language:
+        class: Symfony\Component\ExpressionLanguage\ExpressionLanguage
+        arguments:
+            - @oro_layout.expression_language.parsed_cache
