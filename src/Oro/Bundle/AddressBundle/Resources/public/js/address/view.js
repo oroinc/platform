@@ -1,36 +1,35 @@
 define([
+    'jquery',
     'underscore',
-    'backbone',
-    'orotranslation/js/translator',
+    'oroui/js/app/views/base/view',
     'oroui/js/mediator',
-    'orolocale/js/formatter/address'
-], function(_, Backbone, __, mediator, addressFormatter) {
+    'orolocale/js/formatter/address',
+    'oroui/js/delete-confirmation'
+], function($, _, BaseView, mediator, addressFormatter, deleteConfirmation) {
     'use strict';
 
-    var $ = Backbone.$;
+    var AddressView;
 
     /**
      * @export  oroaddress/js/address/view
      * @class   oroaddress.address.View
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    AddressView = BaseView.extend({
         tagName: 'div',
 
         attributes: {
             'class': 'list-item map-item'
         },
 
-        messages: {
-            title: __('Delete Confirmation'),
-            content: __('Are you sure you want to delete this item?'),
-            okText: __('Yes, Delete'),
-            cancelText: __('Cancel')
+        confirmRemoveComponent: deleteConfirmation,
+
+        confirmRemoveMessages: {
+            title: _.__('Delete Confirmation'),
+            content: _.__('Are you sure you want to delete this item?'),
+            okText: _.__('Yes, Delete'),
+            cancelText: _.__('Cancel')
         },
-
-        confirmModal: null,
-
-        deleteConfirmationConstructor: null,
 
         events: {
             'click': 'activate',
@@ -58,17 +57,27 @@ define([
                 'regionCode': 'region_code'
             },
             'allowToRemovePrimary': false,
-            'confirmation': false,
-            'confirmationComponent': 'oroui/js/delete-confirmation'
+            'confirmRemove': false
         },
 
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            this.deleteConfirmationConstructor = require(this.options.confirmationComponent);
+            if (this.options.confirmRemoveComponent) {
+                this.confirmRemoveComponent = this.options.confirmRemoveComponent;
+                if (_.isString(this.confirmRemoveComponent)) {
+                    this.confirmRemoveComponent = require(this.confirmRemoveComponent);
+                }
+            }
+
             this.$el.attr('id', 'address-book-' + this.model.id);
             this.template = _.template($(options.template || '#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:active', this.toggleActive);
+        },
+
+        dispose: function(options) {
+            delete this.confirmRemoveComponent;
+            return AddressView.__super__.dispose.apply(this, arguments);
         },
 
         activate: function() {
@@ -89,17 +98,18 @@ define([
 
         close: function() {
             if (this.model.get('primary') && !this.options.allowToRemovePrimary) {
-                mediator.execute('showErrorMessage', __('Primary address can not be removed'));
+                mediator.execute('showErrorMessage', _.__('Primary address can not be removed'));
             } else {
                 this.confirmClose(_.bind(this.model.destroy, this.model, {wait: true}));
             }
         },
 
         confirmClose: function(callback) {
-            if (this.options.confirmation) {
-                this.confirmModal = new this.deleteConfirmationConstructor(this.messages);
-                Backbone.listenTo(this.confirmModal, 'ok', callback);
-                this.confirmModal.open();
+            if (this.options.confirmRemove) {
+                var confirmRemoveComponent = new this.confirmRemoveComponent(this.confirmRemoveMessages);
+                this.subview('confirmRemoveComponent', confirmRemoveComponent);
+                confirmRemoveComponent.on('ok', callback)
+                    .open();
             } else {
                 callback();
             }
@@ -131,4 +141,6 @@ define([
             return mappedData;
         }
     });
+
+    return AddressView;
 });
