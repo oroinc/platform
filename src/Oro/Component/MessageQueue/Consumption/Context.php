@@ -78,7 +78,7 @@ class Context
     public function setMessage(MessageInterface $message)
     {
         if ($this->message) {
-            throw new IllegalContextModificationException('The message modification is not allowed');
+            throw new IllegalContextModificationException('The message could be set once');
         }
 
         $this->message = $message;
@@ -103,8 +103,12 @@ class Context
     /**
      * @param MessageConsumerInterface $messageConsumer
      */
-    public function setMessageConsumer(MessageConsumerInterface $messageConsumer = null)
+    public function setMessageConsumer(MessageConsumerInterface $messageConsumer)
     {
+        if ($this->messageConsumer) {
+            throw new IllegalContextModificationException('The message consumer could be set once');
+        }
+
         $this->messageConsumer = $messageConsumer;
     }
 
@@ -119,8 +123,12 @@ class Context
     /**
      * @param MessageProcessorInterface $messageProcessor
      */
-    public function setMessageProcessor(MessageProcessorInterface $messageProcessor = null)
+    public function setMessageProcessor(MessageProcessorInterface $messageProcessor)
     {
+        if ($this->messageProcessor) {
+            throw new IllegalContextModificationException('The message processor could be set once');
+        }
+
         $this->messageProcessor = $messageProcessor;
     }
 

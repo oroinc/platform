@@ -99,7 +99,7 @@ The message itself has headers and body and they change this way while traveling
 
 ### Custom transport
 
-LIf you happen to need to implement a custom provider take a look at transport's interfaces.
+If you happen to need to implement a custom provider take a look at transport's interfaces.
 You have to provide an implementation for them
 
 ### Key Classes

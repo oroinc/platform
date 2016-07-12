@@ -18,11 +18,6 @@ class NullMessage implements MessageInterface
     /**
      * @var array
      */
-    private $localProperties;
-
-    /**
-     * @var array
-     */
     private $headers;
 
     /**
@@ -39,7 +34,7 @@ class NullMessage implements MessageInterface
     }
     
     /**
-     * @param string $body
+     * {@inheritdoc}
      */
     public function setBody($body)
     {
@@ -55,7 +50,7 @@ class NullMessage implements MessageInterface
     }
 
     /**
-     * @param array $properties
+     * {@inheritdoc}
      */
     public function setProperties(array $properties)
     {
@@ -79,7 +74,7 @@ class NullMessage implements MessageInterface
     }
 
     /**
-     * @param array $headers
+     * {@inheritdoc}
      */
     public function setHeaders(array $headers)
     {
@@ -103,7 +98,7 @@ class NullMessage implements MessageInterface
     }
 
     /**
-     * @return boolean
+     * {@inheritdoc}
      */
     public function isRedelivered()
     {
@@ -111,7 +106,7 @@ class NullMessage implements MessageInterface
     }
 
     /**
-     * @param boolean $redelivered
+     * {@inheritdoc}
      */
     public function setRedelivered($redelivered)
     {

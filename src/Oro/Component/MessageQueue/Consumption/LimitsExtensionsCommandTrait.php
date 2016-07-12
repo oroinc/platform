@@ -30,16 +30,20 @@ trait LimitsExtensionsCommandTrait
      * @param OutputInterface $output
      *
      * @return ExtensionInterface[]
+     *
+     * @throws \Exception
      */
     protected function getLimitsExtensions(InputInterface $input, OutputInterface $output)
     {
         $extensions = [new LoggerExtension(new ConsoleLogger($output))];
 
-        if ($messageLimit = (int) $input->getOption('message-limit')) {
+        $messageLimit = (int) $input->getOption('message-limit');
+        if ($messageLimit) {
             $extensions[] = new LimitConsumedMessagesExtension($messageLimit);
         }
 
-        if ($timeLimit = $input->getOption('time-limit')) {
+        $timeLimit = $input->getOption('time-limit');
+        if ($timeLimit) {
             try {
                 $timeLimit = new \DateTime($timeLimit);
             } catch (\Exception $e) {
@@ -51,7 +55,8 @@ trait LimitsExtensionsCommandTrait
             $extensions[] = new LimitConsumptionTimeExtension($timeLimit);
         }
 
-        if ($memoryLimit = (int) $input->getOption('memory-limit')) {
+        $memoryLimit = (int) $input->getOption('memory-limit');
+        if ($memoryLimit) {
             $extensions[] = new LimitConsumerMemoryExtension($memoryLimit);
         }
 

@@ -5,11 +5,17 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class InvalidMessageException extends Exception
 {
+    /**
+     * @param MessageInterface $message
+     * @param string $class
+     *
+     * @throws static
+     */
     public static function assertMessageInstanceOf(MessageInterface $message, $class)
     {
-        if (false == $message instanceof $class) {
+        if (!$message instanceof $class) {
             throw new static(sprintf(
-                'A message is invalid. Message must be an instance of %s but it is %s.',
+                'The message must be an instance of %s but it is %s.',
                 $class,
                 get_class($message)
             ));

@@ -5,6 +5,7 @@ use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedExcep
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+
 use Psr\Log\NullLogger;
 
 class QueueConsumer
@@ -60,7 +61,7 @@ class QueueConsumer
     public function bind($queueName, MessageProcessorInterface $messageProcessor)
     {
         if (empty($queueName)) {
-            throw new \LogicException('The queue name is empty. Cannot bind a processor to an empty queue');
+            throw new \LogicException('The queue name must be not empty.');
         }
         if (array_key_exists($queueName, $this->boundMessageProcessors)) {
             throw new \LogicException(sprintf('The queue was already bound. Queue: %s', $queueName));
@@ -72,6 +73,9 @@ class QueueConsumer
     }
 
     /**
+     * Runtime extensions - is a collection of extensions which could be set on runtime.
+     * Here's a good example: @see LimitsExtensionsCommandTrait
+     *
      * @param Extensions|null $runtimeExtensions
      *
      * @throws \Exception
@@ -111,7 +115,7 @@ class QueueConsumer
                     $context->setMessageConsumer($messageConsumer);
                     $context->setMessageProcessor($messageProcessor);
 
-                    $this->doConsume($session, $extensions, $context);
+                    $this->doConsume($extensions, $context);
                 }
             } catch (ConsumptionInterruptedException $e) {
                 $logger->info(sprintf('Consuming interrupted'));
@@ -137,7 +141,6 @@ class QueueConsumer
     }
 
     /**
-     * @param SessionInterface $session
      * @param Extensions $extensions
      * @param Context $context
      *
@@ -145,8 +148,9 @@ class QueueConsumer
      *
      * @return bool
      */
-    protected function doConsume(SessionInterface $session, Extensions $extensions, Context $context)
+    protected function doConsume(Extensions $extensions, Context $context)
     {
+        $session = $context->getSession();
         $messageProcessor = $context->getMessageProcessor();
         $messageConsumer = $context->getMessageConsumer();
         $logger = $context->getLogger();
@@ -166,20 +170,24 @@ class QueueConsumer
             $context->setMessage($message);
 
             $extensions->onPreReceived($context);
-            if (false == $context->getStatus()) {
+            if (!$context->getStatus()) {
                 $status = $messageProcessor->process($message, $session);
                 $status = $status ?: MessageProcessorInterface::ACK;
                 $context->setStatus($status);
             }
 
-            if (MessageProcessorInterface::ACK === $context->getStatus()) {
-                $messageConsumer->acknowledge($message);
-            } elseif (MessageProcessorInterface::REJECT === $context->getStatus()) {
-                $messageConsumer->reject($message, false);
-            } elseif (MessageProcessorInterface::REQUEUE === $context->getStatus()) {
-                $messageConsumer->reject($message, true);
-            } else {
-                throw new \LogicException(sprintf('Status is not supported: %s', $context->getStatus()));
+            switch ($context->getStatus()) {
+                case MessageProcessorInterface::ACK:
+                    $messageConsumer->acknowledge($message);
+                    break;
+                case MessageProcessorInterface::REJECT:
+                    $messageConsumer->reject($message, false);
+                    break;
+                case MessageProcessorInterface::REQUEUE:
+                    $messageConsumer->reject($message, true);
+                    break;
+                default:
+                    throw new \LogicException(sprintf('Status is not supported: %s', $context->getStatus()));
             }
 
             $logger->info(sprintf('Message processed: %s', $context->getStatus()));

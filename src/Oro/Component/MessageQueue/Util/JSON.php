@@ -12,7 +12,7 @@ class JSON
      */
     public static function decode($string)
     {
-        if (false == is_string($string)) {
+        if (!is_string($string)) {
             throw new \InvalidArgumentException(sprintf(
                 'Accept only string argument but got: "%s"',
                 is_object($string) ? get_class($string) : gettype($string)

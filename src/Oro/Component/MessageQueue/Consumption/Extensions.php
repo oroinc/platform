@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Consumption;
 class Extensions implements ExtensionInterface
 {
     /**
-     * @var array|ExtensionInterface[]
+     * @var ExtensionInterface[]
      */
     private $extensions;
 

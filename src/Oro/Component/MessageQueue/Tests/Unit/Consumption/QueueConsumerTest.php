@@ -45,7 +45,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer = new QueueConsumer($this->createConnectionStub(), new Extensions([]), 0);
 
-        $this->setExpectedException(\LogicException::class, 'The queue name is empty.');
+        $this->setExpectedException(\LogicException::class, 'The queue name must be not empty.');
         $consumer->bind('', $messageProcessorMock);
     }
 
