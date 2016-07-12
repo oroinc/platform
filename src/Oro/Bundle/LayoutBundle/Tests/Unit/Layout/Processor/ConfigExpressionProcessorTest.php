@@ -35,8 +35,8 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->encoder = $this->getMockBuilder(JsonConfigExpressionEncoder::class)
-        ->disableOriginalConstructor()
-        ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
         $encoderRegistry->expects($this->any())
             ->method('getEncoder')
             ->with('json')
@@ -192,11 +192,11 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('expressions_evaluate_deferred', true);
-        $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
         $trueExpr = new ParsedExpression('true', new ConstantNode(true));
         $trueExprJson = '{encoded_expression_stub: "true"}';
-        
+
         $classExpr = new ParsedExpression(
             'context["css_class"]',
             new GetAttrNode(
@@ -207,18 +207,18 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
             )
         );
         $classExprJson = '{encoded_expression_stub: "class"}';
-        
+
         $classAttr = new OptionValueBag();
         $classAttr->add('=context["css_class"]');
         $expectedClassAttr = new OptionValueBag();
         $expectedClassAttr->add($classExprJson);
 
-        $values['expr_object']           = $trueExpr;
-        $values['expr_string']           = '=true';
-        $values['not_expr_string']       = '\=true';
-        $values['scalar']                = 123;
-        $values['attr']['enabled']       = '=true';
-        $values['attr']['class']         = $classAttr;
+        $values['expr_object'] = $trueExpr;
+        $values['expr_string'] = '=true';
+        $values['not_expr_string'] = '\=true';
+        $values['scalar'] = 123;
+        $values['attr']['enabled'] = '=true';
+        $values['attr']['class'] = $classAttr;
         $values['label_attr']['enabled'] = '=true';
 
         $this->expressionLanguage->expects($this->exactly(4))
@@ -242,7 +242,7 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        
+
         $this->processor->processExpressions($values, $context, $data, false, 'json');
 
         print_r($values);

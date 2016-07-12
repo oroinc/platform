@@ -131,7 +131,7 @@ class ConfigExpressionProcessor
                 return self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH;
             }
         }
-        
+
         // regular string
         return self::STRING_IS_REGULAR;
     }
