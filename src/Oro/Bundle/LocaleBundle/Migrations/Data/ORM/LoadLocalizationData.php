@@ -9,9 +9,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Intl\Intl;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
@@ -47,7 +44,6 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $manager->flush();
 
         $this->addReference('default_localization', $localization);
-        $this->setSystemDefaultLocalization($localization);
     }
 
     /**
@@ -108,16 +104,5 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $languages = Intl::getLanguageBundle()->getLanguageNames();
 
         return array_key_exists($language, $languages);
-    }
-
-    /**
-     * @param Localization $localization
-     */
-    protected function setSystemDefaultLocalization(Localization $localization)
-    {
-        /** @var ConfigManager $configManager */
-        $configManager = $this->container->get('oro_config.global');
-        $configManager->set('oro_locale.' . Configuration::DEFAULT_LOCALIZATION, $localization->getId());
-        $configManager->flush();
     }
 }
