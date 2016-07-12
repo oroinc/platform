@@ -116,7 +116,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     protected function setSystemDefaultLocalization(Localization $localization)
     {
         /** @var ConfigManager $configManager */
-        $configManager = $this->container->get('oro_config.manager');
+        $configManager = $this->container->get('oro_config.global');
         $configManager->set('oro_locale.' . Configuration::DEFAULT_LOCALIZATION, $localization->getId());
         $configManager->flush();
     }

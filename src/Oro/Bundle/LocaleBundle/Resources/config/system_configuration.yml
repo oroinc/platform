@@ -156,7 +156,6 @@ oro_system_configuration:
                 constraints:
                     - NotBlank: ~
 
-
     tree:
         system_configuration:
             platform:
@@ -205,4 +204,5 @@ oro_system_configuration:
             oro_locale.quarter_start: ~
             oro_locale.temperature_unit: ~
             oro_locale.wind_speed_unit: ~
-
+            oro_locale.enabled_localizations: ~
+            oro_locale.default_localization: ~
