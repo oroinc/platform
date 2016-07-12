@@ -2,12 +2,13 @@
 
 namespace LayoutBundle\Tests\Unit\Layout\Processor;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\DependencyInjection\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
+use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\GetAttrNode;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-use Oro\Component\ConfigExpression\AssemblerInterface;
-use Oro\Component\ConfigExpression\Condition;
-use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\ConfigExpression\Func;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
 
@@ -16,30 +17,37 @@ use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder;
 
 class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AssemblerInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $expressionAssembler;
+    /** @var ExpressionLanguage|\PHPUnit_Framework_MockObject_MockObject */
+    protected $expressionLanguage;
+
+    /** @var JsonConfigExpressionEncoder|\PHPUnit_Framework_MockObject_MockObject */
+    protected $encoder;
 
     /** @var ConfigExpressionProcessor */
     protected $processor;
 
     protected function setUp()
     {
-        $this->expressionAssembler = $this->getMock('Oro\Component\ConfigExpression\AssemblerInterface');
+        $this->expressionLanguage = $this->getMock(ExpressionLanguage::class);
 
         $encoderRegistry = $this
             ->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->encoder = $this->getMockBuilder(JsonConfigExpressionEncoder::class)
+        ->disableOriginalConstructor()
+        ->getMock();
         $encoderRegistry->expects($this->any())
             ->method('getEncoder')
             ->with('json')
-            ->will($this->returnValue(new JsonConfigExpressionEncoder()));
+            ->will($this->returnValue($this->encoder));
 
         $this->processor = new ConfigExpressionProcessor(
-            $this->expressionAssembler,
+            $this->expressionLanguage,
             $encoderRegistry
         );
     }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -47,40 +55,57 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $data  = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
-        $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
-        $expr->expects($this->once())
-            ->method('evaluate')
-            ->with(['context' => $context, 'data' => $data])
-            ->will($this->returnValue(true));
+        $expr = $this->getMockBuilder(ParsedExpression::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $classExpr = new Func\GetValue();
-        $classExpr->initialize([new PropertyPath('context.css_class')]);
-        $classExpr->setContextAccessor(new ContextAccessor());
         $classAttr = new OptionValueBag();
-        $classAttr->add(['@value' => ['$context.css_class']]);
+        $classAttr->add('=context["css_class"]');
         $expectedClassAttr = new OptionValueBag();
         $expectedClassAttr->add('test_class');
 
-        $values['expr_object']           = $expr;
-        $values['expr_array']            = ['@true' => null];
-        $values['not_expr_array']        = ['\@true' => null];
-        $values['scalar']                = 123;
-        $values['attr']['enabled']       = ['@true' => null];
-        $values['attr']['data-scalar']   = 'foo';
-        $values['attr']['data-expr']     = ['@true' => null];
-        $values['attr']['class']         = $classAttr;
-        $values['label_attr']['enabled'] = ['@true' => null];
-        $values['array_with_expr']       = ['item1' => 'val1', 'item2' => ['@true' => null]];
+        $values['expr_object'] = $expr;
+        $values['expr_string'] = '=true';
+        $values['not_expr_string'] = '\=true';
+        $values['scalar'] = 123;
+        $values['attr']['enabled'] = '=true';
+        $values['attr']['data-scalar'] = 'foo';
+        $values['attr']['data-expr'] = '=true';
+        $values['attr']['class'] = $classAttr;
+        $values['label_attr']['enabled'] = '=true';
+        $values['array_with_expr'] = ['item1' => 'val1', 'item2' => '=true'];
 
-        $this->expressionAssembler->expects($this->exactly(6))
-            ->method('assemble')
+        $trueExpr = new ParsedExpression('true', new ConstantNode(true));
+
+        $classExpr = new ParsedExpression(
+            'context["css_class"]',
+            new GetAttrNode(
+                new NameNode('context'),
+                new ConstantNode('css_class'),
+                new ArgumentsNode(),
+                GetAttrNode::ARRAY_CALL
+            )
+        );
+        $this->expressionLanguage->expects($this->exactly(7))
+            ->method('evaluate')
             ->will(
                 $this->returnValueMap(
                     [
-                        [['@true' => null], new Condition\TrueCondition()],
-                        [['@value' => ['$context.css_class']], $classExpr]
+                        [$expr, ['context' => $context, 'data' => $data], true],
+                        [$trueExpr, ['context' => $context, 'data' => $data], true],
+                        [$classExpr, ['context' => $context, 'data' => $data], 'test_class']
+                    ]
+                )
+            );
+        $this->expressionLanguage->expects($this->exactly(6))
+            ->method('parse')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['true', ['context', 'data'], $trueExpr],
+                        ['context["css_class"]', ['context', 'data'], $classExpr]
                     ]
                 )
             );
@@ -94,12 +119,12 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertSame(
             true,
-            $values['expr_array'],
-            'Failed asserting that an expression is assembled and evaluated'
+            $values['expr_string'],
+            'Failed asserting that an expression is parsed and evaluated'
         );
         $this->assertSame(
-            ['@true' => null],
-            $values['not_expr_array'],
+            '=true',
+            $values['not_expr_string'],
             'Failed asserting that a backslash at the begin of the array key is removed'
         );
         $this->assertSame(
@@ -110,7 +135,7 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             true,
             $values['attr']['enabled'],
-            'Failed asserting that an expression in "attr" is assembled and evaluated'
+            'Failed asserting that an expression in "attr" is parsed and evaluated'
         );
         $this->assertSame(
             'foo',
@@ -120,29 +145,29 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             true,
             $values['attr']['data-expr'],
-            'Failed asserting that "attr.data-expr" is assembled and evaluated'
+            'Failed asserting that "attr.data-expr" is parsed and evaluated'
         );
         $this->assertEquals(
             $expectedClassAttr,
             $values['attr']['class'],
-            'Failed asserting that "attr.class" is assembled and evaluated'
+            'Failed asserting that "attr.class" is parsed and evaluated'
         );
         $this->assertSame(
             true,
             $values['label_attr']['enabled'],
-            'Failed asserting that an expression in "label_attr" is assembled and evaluated'
+            'Failed asserting that an expression in "label_attr" is parsed and evaluated'
         );
         $this->assertSame(
             ['item1' => 'val1', 'item2' => true],
             $values['array_with_expr'],
-            'Failed asserting that an expression is assembled and evaluated in nested array'
+            'Failed asserting that an expression is parsed and evaluated in nested array'
         );
     }
 
     public function testProcessExpressionsDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSet()
     {
         $context = new LayoutContext();
-        $data  = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $expr->expects($this->never())
@@ -150,15 +175,15 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $expr->expects($this->never())
             ->method('toArray');
 
-        $values['expr_object']           = $expr;
-        $values['expr_array']            = ['@true' => null];
-        $values['not_expr_array']        = ['\@true' => null];
-        $values['scalar']                = 123;
-        $values['attr']['enabled']       = ['@true' => null];
-        $values['label_attr']['enabled'] = ['@true' => null];
+        $values['expr_object'] = $expr;
+        $values['expr_string'] = '=true';
+        $values['not_expr_string'] = '\=true';
+        $values['scalar'] = 123;
+        $values['attr']['enabled'] = '=true';
+        $values['label_attr']['enabled'] = '=true';
 
-        $this->expressionAssembler->expects($this->never())
-            ->method('assemble');
+        $this->expressionLanguage->expects($this->never())
+            ->method('parse');
 
         $initialVars = $values;
 
@@ -176,49 +201,72 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $expr->expects($this->once())
             ->method('toArray')
-            ->will($this->returnValue(['@true' => null]));
+            ->will($this->returnValue('=true'));
 
-        $classExpr = new Func\GetValue();
-        $classExpr->initialize([new PropertyPath('context.css_class')]);
+        $trueExpr = new ParsedExpression('true', new ConstantNode(true));
+        $trueExprJson = '{encoded_expression_stub: "true"}';
+        
+        $classExpr = new ParsedExpression(
+            'context["css_class"]',
+            new GetAttrNode(
+                new NameNode('context'),
+                new ConstantNode('css_class'),
+                new ArgumentsNode(),
+                GetAttrNode::ARRAY_CALL
+            )
+        );
+        $classExprJson = '{encoded_expression_stub: "class"}';
+        
         $classAttr = new OptionValueBag();
-        $classAttr->add(['@value' => ['$context.css_class']]);
+        $classAttr->add('=context["css_class"]');
         $expectedClassAttr = new OptionValueBag();
-        $expectedClassAttr->add('{"@value":{"parameters":["$context.css_class"]}}');
+        $expectedClassAttr->add($classExprJson);
 
         $values['expr_object']           = $expr;
-        $values['expr_array']            = ['@true' => null];
-        $values['not_expr_array']        = ['\@true' => null];
+        $values['expr_string']           = '=true';
+        $values['not_expr_string']       = '\=true';
         $values['scalar']                = 123;
-        $values['attr']['enabled']       = ['@true' => null];
+        $values['attr']['enabled']       = '=true';
         $values['attr']['class']         = $classAttr;
-        $values['label_attr']['enabled'] = ['@true' => null];
+        $values['label_attr']['enabled'] = '=true';
 
-        $this->expressionAssembler->expects($this->exactly(4))
-            ->method('assemble')
+        $this->expressionLanguage->expects($this->exactly(4))
+            ->method('parse')
             ->will(
                 $this->returnValueMap(
                     [
-                        [['@true' => null], new Condition\TrueCondition()],
-                        [['@value' => ['$context.css_class']], $classExpr]
+                        ['true', ['context', 'data'], $trueExpr],
+                        ['context["css_class"]', ['context', 'data'], $classExpr]
                     ]
                 )
             );
 
+        $this->encoder->expects($this->exactly(4))
+            ->method('encodeExpr')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$trueExpr, $trueExprJson],
+                        [$classExpr, $classExprJson]
+                    ]
+                )
+            );
+        
         $this->processor->processExpressions($values, $context, $data, false, 'json');
 
         $this->assertSame(
-            '{"@true":null}',
+            $trueExprJson,
             $values['expr_object'],
             'Failed asserting that an expression is encoded'
         );
         $this->assertSame(
-            '{"@true":null}',
-            $values['expr_array'],
-            'Failed asserting that an expression is assembled and encoded'
+            $trueExprJson,
+            $values['expr_string'],
+            'Failed asserting that an expression is parsed and encoded'
         );
         $this->assertSame(
-            ['@true' => null],
-            $values['not_expr_array'],
+            '=true',
+            $values['not_expr_string'],
             'Failed asserting that a backslash at the begin of the array key is removed'
         );
         $this->assertSame(
@@ -227,19 +275,19 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
             'Failed asserting that a scalar value is not changed'
         );
         $this->assertSame(
-            '{"@true":null}',
+            $trueExprJson,
             $values['attr']['enabled'],
-            'Failed asserting that an expression in "attr" is assembled and encoded'
+            'Failed asserting that an expression in "attr" is parsed and encoded'
         );
         $this->assertEquals(
             $expectedClassAttr,
             $values['attr']['class'],
-            'Failed asserting that "attr.class" is assembled and encoded'
+            'Failed asserting that "attr.class" is parsed and encoded'
         );
         $this->assertSame(
-            '{"@true":null}',
+            $trueExprJson,
             $values['label_attr']['enabled'],
-            'Failed asserting that an expression in "label_attr" is assembled and encoded'
+            'Failed asserting that an expression in "label_attr" is parsed and encoded'
         );
     }
 }

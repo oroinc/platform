@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Processor;
 
-use Oro\Component\ConfigExpression\AssemblerInterface;
-use Oro\Component\ConfigExpression\ExpressionInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
+
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
@@ -12,26 +13,26 @@ use Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry;
 
 class ConfigExpressionProcessor
 {
-    const ARRAY_IS_REGULAR = 0;
-    const ARRAY_IS_EXPRESSION = 1;
-    const ARRAY_IS_EXPRESSION_STARTED_WITH_BACKSLASH = -1;
+    const STRING_IS_REGULAR = 0;
+    const STRING_IS_EXPRESSION = 1;
+    const STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH = -1;
 
-    /** @var AssemblerInterface */
-    protected $expressionAssembler;
+    /** @var ExpressionLanguage */
+    protected $expressionLanguage;
 
     /** @var ConfigExpressionEncoderRegistry */
     protected $encoderRegistry;
 
     /**
-     * @param AssemblerInterface              $expressionAssembler
+     * @param ExpressionLanguage              $expressionLanguage
      * @param ConfigExpressionEncoderRegistry $encoderRegistry
      */
     public function __construct(
-        AssemblerInterface $expressionAssembler,
+        ExpressionLanguage $expressionLanguage,
         ConfigExpressionEncoderRegistry $encoderRegistry
     ) {
-        $this->expressionAssembler = $expressionAssembler;
-        $this->encoderRegistry     = $encoderRegistry;
+        $this->expressionLanguage = $expressionLanguage;
+        $this->encoderRegistry = $encoderRegistry;
     }
 
     /**
@@ -52,27 +53,28 @@ class ConfigExpressionProcessor
             return;
         }
         foreach ($values as $key => &$value) {
-            if (is_array($value)) {
+            if (is_string($value)) {
                 if (!empty($value)) {
-                    switch ($this->checkArrayValue($value)) {
-                        case self::ARRAY_IS_REGULAR:
-                            $this->processExpressions($value, $context, $data, $evaluate, $encoding);
+                    switch ($this->checkStringValue($value)) {
+                        case self::STRING_IS_REGULAR:
                             break;
-                        case self::ARRAY_IS_EXPRESSION:
+                        case self::STRING_IS_EXPRESSION:
                             $value = $this->processExpression(
-                                $this->expressionAssembler->assemble($value),
+                                $this->expressionLanguage->parse(substr($value, 1), ['context', 'data']),
                                 $context,
                                 $data,
                                 $evaluate,
                                 $encoding
                             );
                             break;
-                        case self::ARRAY_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
+                        case self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
                             // the backslash (\) at the begin of the array key should be removed
-                            $value = [substr(key($value), 1) => reset($value)];
+                            $value = substr($value, 1);
                             break;
                     }
                 }
+            } elseif (is_array($value)) {
+                $this->processExpressions($value, $context, $data, $evaluate, $encoding);
             } elseif ($value instanceof OptionValueBag) {
                 foreach ($value->all() as $action) {
                     $args = $action->getArguments();
@@ -81,14 +83,14 @@ class ConfigExpressionProcessor
                         $action->setArgument($index, $arg);
                     }
                 }
-            } elseif ($value instanceof ExpressionInterface) {
+            } elseif ($value instanceof ParsedExpression) {
                 $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
             }
         }
     }
 
     /**
-     * @param ExpressionInterface   $expr
+     * @param ParsedExpression      $expr
      * @param ContextInterface      $context
      * @param DataAccessorInterface $data
      * @param bool                  $evaluate
@@ -97,44 +99,40 @@ class ConfigExpressionProcessor
      * @return mixed|string
      */
     protected function processExpression(
-        ExpressionInterface $expr,
+        ParsedExpression $expr,
         ContextInterface $context,
         DataAccessorInterface $data,
         $evaluate,
         $encoding
     ) {
         return $evaluate
-            ? $expr->evaluate(['context' => $context, 'data' => $data])
+            ? $this->expressionLanguage->evaluate($expr, ['context' => $context, 'data' => $data])
             : $this->encoderRegistry->getEncoder($encoding)->encodeExpr($expr);
     }
 
     /**
-     * @param array $value
+     * @param string $value
      *
      * @return int the checking result
-     *             0  - the value is regular array
+     *             0  - the value is regular string
      *             1  - the value is an expression
-     *             -1 - the value is an array with one item and its key starts with "\@"
-     *                  which should be replaces with "@"
+     *             -1 - the value is string that starts with "\="
+     *                  which should be replaces with "="
      */
-    protected function checkArrayValue($value)
+    protected function checkStringValue($value)
     {
-        if (count($value) === 1) {
-            reset($value);
-            $k = key($value);
-            if (is_string($k)) {
-                $pos = strpos($k, '@');
-                if ($pos === 0) {
-                    // expression
-                    return self::ARRAY_IS_EXPRESSION;
-                } elseif ($pos === 1 && $k[0] === '\\') {
-                    // the backslash (\) at the begin of the array key should be removed
-                    return self::ARRAY_IS_EXPRESSION_STARTED_WITH_BACKSLASH;
-                }
+        if (is_string($value)) {
+            $pos = strpos($value, '=');
+            if ($pos === 0) {
+                // expression
+                return self::STRING_IS_EXPRESSION;
+            } elseif ($pos === 1 && $value[0] === '\\') {
+                // the backslash (\) at the begin of the array key should be removed
+                return self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH;
             }
         }
-
-        // regular array
-        return self::ARRAY_IS_REGULAR;
+        
+        // regular string
+        return self::STRING_IS_REGULAR;
     }
 }

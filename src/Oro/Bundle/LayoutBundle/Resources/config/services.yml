@@ -145,7 +145,7 @@ services:
     oro_layout.processor.config_expression:
         class: Oro\Bundle\LayoutBundle\Layout\Processor\ConfigExpressionProcessor
         arguments:
-            - '@oro_layout.expression.assembler'
+            - '@oro_layout.expression_language'
             - '@oro_layout.expression.encoder_registry'
 
     oro_layout.config_expression.asset:
