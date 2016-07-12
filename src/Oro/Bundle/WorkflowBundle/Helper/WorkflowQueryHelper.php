@@ -3,40 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 class WorkflowQueryHelper
 {
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param string $stepAlias default 'workflowStep'
-     * @param string $itemAlias default 'workflowItem'
-     * @return QueryBuilder
-     */
-    public static function addQuery(
-        QueryBuilder $queryBuilder,
-        $stepAlias = 'workflowStep',
-        $itemAlias = 'workflowItem'
-    ) {
-        list($entityClass) = $queryBuilder->getRootEntities();
-        list($entityIdentifier) = $queryBuilder->getEntityManager()->getClassMetadata($entityClass)
-            ->getIdentifierFieldNames();
-
-        list($rootAlias) = $queryBuilder->getRootAliases();
-
-        $queryBuilder
-            ->leftJoin(
-                WorkflowItem::class,
-                $itemAlias,
-                Join::WITH,
-                self::getItemCondition($rootAlias, $entityClass, $entityIdentifier, $itemAlias)
-            )
-            ->leftJoin(sprintf('%s.currentStep', $itemAlias), $stepAlias);
-
-        return $queryBuilder;
-    }
 
     /**
      * @param array $query

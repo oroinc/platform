@@ -5,11 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Provider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryHelper;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterface
 {
+    use WorkflowQueryTrait;
     const ITEMS_RELATION_NAME = 'workflowItems_virtual';
     const STEPS_RELATION_NAME = 'workflowSteps_virtual';
 
@@ -70,7 +71,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
             return [];
         }
 
-        return WorkflowQueryHelper::addDatagridQuery(
+        return $this->addDatagridQuery(
             [],
             'entity',
             $className,
