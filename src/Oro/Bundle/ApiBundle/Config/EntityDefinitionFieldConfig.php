@@ -12,19 +12,19 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;
-    use Traits\LabelTrait;
     use Traits\DescriptionTrait;
     use Traits\DataTypeTrait;
+    use Traits\AssociationTargetTrait;
     use Traits\FormTrait;
-
-    /** a human-readable representation of the field */
-    const LABEL = EntityDefinitionConfig::LABEL;
 
     /** a human-readable description of the field */
     const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
 
     /** the data type of the field value */
     const DATA_TYPE = 'data_type';
+
+    /** a flag indicates whether the field represents a meta information */
+    const META_PROPERTY = 'meta_property';
 
     /** the class name of a target entity */
     const TARGET_CLASS = 'target_class';
@@ -54,76 +54,28 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Gets the class name of a target entity.
-     *
-     * @return string|null
-     */
-    public function getTargetClass()
-    {
-        return array_key_exists(self::TARGET_CLASS, $this->items)
-            ? $this->items[self::TARGET_CLASS]
-            : null;
-    }
-
-    /**
-     * Sets the class name of a target entity.
-     *
-     * @param string|null $className
-     */
-    public function setTargetClass($className)
-    {
-        if ($className) {
-            $this->items[self::TARGET_CLASS] = $className;
-        } else {
-            unset($this->items[self::TARGET_CLASS]);
-        }
-    }
-
-    /**
-     * Indicates whether a target association represents "to-many" or "to-one" relationship.
-     *
-     * @return bool|null TRUE if a target association represents "to-many" relationship
-     */
-    public function isCollectionValuedAssociation()
-    {
-        return array_key_exists(self::TARGET_TYPE, $this->items)
-            ? 'to-many' === $this->items[self::TARGET_TYPE]
-            : null;
-    }
-
-    /**
-     * Indicates whether the type of a target association is set explicitly.
+     * Indicates whether the field represents a meta information.
      *
      * @return bool
      */
-    public function hasTargetType()
+    public function isMetaProperty()
     {
-        return array_key_exists(self::TARGET_TYPE, $this->items);
+        return array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY, $this->items)
+            ? $this->items[EntityDefinitionFieldConfig::META_PROPERTY]
+            : false;
     }
 
     /**
-     * Gets the type of a target association.
+     * Sets a flag indicates whether the field represents a meta information.
      *
-     * @return string|null Can be "to-one" or "to-many"
+     * @param bool $isMetaProperty
      */
-    public function getTargetType()
+    public function setMetaProperty($isMetaProperty)
     {
-        return array_key_exists(self::TARGET_TYPE, $this->items)
-            ? $this->items[self::TARGET_TYPE]
-            : null;
-    }
-
-    /**
-     * Sets the type of a target association.
-     *
-     * @param string|null $targetType Can be "to-one" or "to-many"
-     */
-    public function setTargetType($targetType)
-    {
-        if ($targetType) {
-            $this->items[self::TARGET_TYPE] = $targetType;
+        if ($isMetaProperty) {
+            $this->items[EntityDefinitionFieldConfig::META_PROPERTY] = $isMetaProperty;
         } else {
-            unset($this->items[self::TARGET_TYPE]);
+            unset($this->items[EntityDefinitionFieldConfig::META_PROPERTY]);
         }
     }
 

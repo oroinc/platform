@@ -102,6 +102,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $securityConfig->set('type', Provider::ACL_SECURITY_TYPE);
         $securityConfig->set('permissions', 'All');
         $securityConfig->set('group_name', 'SomeGroup');
+        $securityConfig->set('category', '');
 
         $securityConfigs = array($securityConfig);
         $this->securityConfigProvider->expects($this->any())
