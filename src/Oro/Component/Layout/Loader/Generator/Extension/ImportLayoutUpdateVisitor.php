@@ -36,8 +36,8 @@ class ImportLayoutUpdateVisitor implements VisitorInterface
         $visitContext->getUpdateMethodWriter()
             ->writeln('if (null === $this->import) {')
             ->writeln(
-                '    throw new \\RuntimeException(\'Missing impost configuration for layout update\');'
-            )// todo update message
+                '    throw new \\RuntimeException(\'Missing import configuration for layout update\');'
+            )
             ->writeln('}')
             ->writeln('')
             ->writeln('$layoutManipulator  = new ImportLayoutManipulator($layoutManipulator, $this->import);')
