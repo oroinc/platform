@@ -67,7 +67,7 @@ class AddAttendeesToCalendarEventTest extends WebTestCase
             ],
         ];
 
-        $this->assertEquals($actual, $expectedAttendees);
+        $this->assertEquals($actual, $expectedAttendees, '', 0.0, 10, true);
     }
 
     /**
