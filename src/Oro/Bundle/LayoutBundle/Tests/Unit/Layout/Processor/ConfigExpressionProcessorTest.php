@@ -57,16 +57,14 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $context->set('css_class', 'test_class');
         $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
-        $expr = $this->getMockBuilder(ParsedExpression::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $trueExpr = new ParsedExpression('true', new ConstantNode(true));
 
         $classAttr = new OptionValueBag();
         $classAttr->add('=context["css_class"]');
         $expectedClassAttr = new OptionValueBag();
         $expectedClassAttr->add('test_class');
 
-        $values['expr_object'] = $expr;
+        $values['expr_object'] = $trueExpr;
         $values['expr_string'] = '=true';
         $values['not_expr_string'] = '\=true';
         $values['scalar'] = 123;
@@ -77,7 +75,6 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['label_attr']['enabled'] = '=true';
         $values['array_with_expr'] = ['item1' => 'val1', 'item2' => '=true'];
 
-        $trueExpr = new ParsedExpression('true', new ConstantNode(true));
 
         $classExpr = new ParsedExpression(
             'context["css_class"]',
@@ -93,7 +90,6 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [$expr, ['context' => $context, 'data' => $data], true],
                         [$trueExpr, ['context' => $context, 'data' => $data], true],
                         [$classExpr, ['context' => $context, 'data' => $data], 'test_class']
                     ]
@@ -169,11 +165,11 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $context = new LayoutContext();
         $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
-        $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
-        $expr->expects($this->never())
+        $expr = $this->getMockBuilder(ParsedExpression::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->expressionLanguage->expects($this->never())
             ->method('evaluate');
-        $expr->expects($this->never())
-            ->method('toArray');
 
         $values['expr_object'] = $expr;
         $values['expr_string'] = '=true';
@@ -198,11 +194,6 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $context->set('expressions_evaluate_deferred', true);
         $data    = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
-        $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
-        $expr->expects($this->once())
-            ->method('toArray')
-            ->will($this->returnValue('=true'));
-
         $trueExpr = new ParsedExpression('true', new ConstantNode(true));
         $trueExprJson = '{encoded_expression_stub: "true"}';
         
@@ -222,7 +213,7 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $expectedClassAttr = new OptionValueBag();
         $expectedClassAttr->add($classExprJson);
 
-        $values['expr_object']           = $expr;
+        $values['expr_object']           = $trueExpr;
         $values['expr_string']           = '=true';
         $values['not_expr_string']       = '\=true';
         $values['scalar']                = 123;
@@ -241,7 +232,7 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->encoder->expects($this->exactly(4))
+        $this->encoder->expects($this->exactly(5))
             ->method('encodeExpr')
             ->will(
                 $this->returnValueMap(
@@ -254,6 +245,7 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         
         $this->processor->processExpressions($values, $context, $data, false, 'json');
 
+        print_r($values);
         $this->assertSame(
             $trueExprJson,
             $values['expr_object'],
