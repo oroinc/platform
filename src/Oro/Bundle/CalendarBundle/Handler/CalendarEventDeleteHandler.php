@@ -134,20 +134,21 @@ class CalendarEventDeleteHandler extends DeleteHandler
         if ($entity->getRecurrence() && $entity->getRecurrence()->getId()) {
             $em->remove($entity->getRecurrence());
         }
-
         if ($entity->getRecurringEvent()) {
-            $entity->cancelAll();
-        } else {
-            $this->deleteEntity($entity, $em);
+            $event = $entity->getRealCalendarEvent();
+            $childEvents = $event->getChildEvents();
+            foreach ($childEvents as $childEvent) {
+                $this->deleteEntity($childEvent, $em);
+            }
         }
-
+        $this->deleteEntity($entity, $em);
         $em->flush();
-
+        
         if ($this->shouldSendNotification()) {
             $this->emailSendProcessor->sendDeleteEventNotification($entity);
         }
     }
-
+    
     /**
      * @return bool
      */

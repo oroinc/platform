@@ -150,6 +150,13 @@ class CalendarEventApiHandler
         $notify
     ) {
         $new = $entity->getId() ? false : true;
+        if ($entity->isCancelled()) {
+            $event = $entity->getRealCalendarEvent();
+            $childEvents = $event->getChildEvents();
+            foreach ($childEvents as $childEvent) {
+                $childEvent->setCancelled(true);
+            }
+        }
         $this->manager->persist($entity);
         $this->manager->flush();
 
