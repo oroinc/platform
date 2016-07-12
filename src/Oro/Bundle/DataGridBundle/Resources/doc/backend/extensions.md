@@ -16,6 +16,7 @@ Here's list of already implemented extensions:
 - [Toolbar](extensions/toolbar.md) - provides toolbar configuration for view
 - [Grid Views](extensions/grid_views.md) - provides configuration for grid views toolbar
 - [Export](extensions/export.md) - responsible for export grid data
+- [Field ACL](extensions/field_acl.md) - allow to protect your fields with ACL
 
 Customization
 -------------
