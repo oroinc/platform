@@ -60,10 +60,7 @@ class UniqueKeyTypeTest extends TypeTestCase
 
     public function testSubmitNotValidData()
     {
-        $form = $this->builder->create('testForm', null, ['compound' => true])
-            ->add('name', 'text', ['constraints' => [new Assert\NotBlank()]])
-            ->add('key', 'choice', ['constraints' => [new Assert\NotBlank()]])
-            ->getForm();
+        $form = $this->factory->create($this->type);
 
         $formData = array(
             'name' => '',
