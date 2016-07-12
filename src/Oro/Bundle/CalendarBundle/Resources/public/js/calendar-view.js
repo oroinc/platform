@@ -307,8 +307,9 @@ define(function(require) {
         },
 
         onEventDeleted: function(eventModel) {
-            this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
             this.trigger('event:deleted', eventModel);
+            this.updateEvents();
+            this.updateLayout();
         },
 
         onConnectionAdded: function() {
