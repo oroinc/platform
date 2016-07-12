@@ -25,7 +25,7 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (null == $value) {
+        if (null === $value) {
             return 0;
         } elseif (is_array($value)) {
             foreach ($value as &$val) {
@@ -45,7 +45,7 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (null == $value) {
+        if (null === $value) {
             return 0;
         }
 
