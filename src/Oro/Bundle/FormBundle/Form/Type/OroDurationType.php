@@ -45,7 +45,7 @@ class OroDurationType extends AbstractType
     }
 
     /**
-     * Checks whether string is in a recognizable duration format
+     * Checks whether string is in a recognizable duration format and the seconds do not exceed 2^32
      *
      * @param string $value
      * @return bool
@@ -63,7 +63,11 @@ class OroDurationType extends AbstractType
             '((\d{1,3}:)?\d{1,3}:)?\d{1,3}' .
             '$/i';
 
-        return preg_match($regexJIRAFormat, $value) || preg_match($regexColumnFormat, $value);
+        $transformer = new DurationToStringTransformer();
+
+        $isValidFormat = preg_match($regexJIRAFormat, $value) || preg_match($regexColumnFormat, $value);
+
+        return $isValidFormat && ($transformer->reverseTransform($value) < 1 << 31);
     }
 
     /**
