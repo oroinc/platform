@@ -9,7 +9,10 @@ use Oro\Component\Layout\LayoutUpdateImportInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
-class ImportedLayoutUpdateWithImports implements LayoutUpdateInterface, LayoutUpdateImportInterface, ImportsAwareLayoutUpdateInterface
+class ImportedLayoutUpdateWithImports implements
+    LayoutUpdateInterface,
+    LayoutUpdateImportInterface,
+    ImportsAwareLayoutUpdateInterface
 {
     public function setImport(LayoutUpdateImport $import)
     {
