@@ -61,6 +61,15 @@ abstract class AbstractConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Get config files from bundle
+     *
+     * @param string $bundle
+     *
+     * @return array
+     */
+    abstract protected function getFiles($bundle);
+
+    /**
      * @return string
      */
     abstract protected function getCacheKey();
@@ -186,20 +195,5 @@ abstract class AbstractConfigProvider implements ConfigProviderInterface
         }
 
         return $this;
-    }
-
-    /**
-     * Get config files from bundle
-     *
-     * @param string $bundle
-     *
-     * @return array
-     */
-    protected function getFiles($bundle)
-    {
-        $reflection = new \ReflectionClass($bundle);
-        $file = dirname($reflection->getFileName()) . '/Resources/config/requirejs.yml';
-
-        return is_file($file) ? [$file] : [];
     }
 }

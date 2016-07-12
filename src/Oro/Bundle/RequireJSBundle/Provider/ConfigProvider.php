@@ -38,6 +38,17 @@ class ConfigProvider extends AbstractConfigProvider
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getFiles($bundle)
+    {
+        $reflection = new \ReflectionClass($bundle);
+        $file = dirname($reflection->getFileName()) . '/Resources/config/requirejs.yml';
+
+        return is_file($file) ? [$file] : [];
+    }
+
+    /**
      * @return string
      */
     protected function getCacheKey()
