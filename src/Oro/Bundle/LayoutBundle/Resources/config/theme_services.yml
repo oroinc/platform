@@ -15,8 +15,6 @@ services:
         public: false
         arguments:
             - '@service_container'
-        calls:
-            - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
 
     oro_layout.theme_factory:
         class:  %oro_layout.theme_factory.class%
@@ -107,7 +105,7 @@ services:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension
         public: false
         arguments:
-            - '@oro_layout.expression.assembler'
+            - '@oro_layout.expression_language'
 
     oro_layout.layout_update_generator.extension.add_tree:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension

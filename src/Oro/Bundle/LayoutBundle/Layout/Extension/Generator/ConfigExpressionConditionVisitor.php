@@ -2,26 +2,29 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
-use CG\Generator\PhpMethod;
-use CG\Generator\PhpProperty;
-use CG\Generator\PhpParameter;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
 class ConfigExpressionConditionVisitor implements VisitorInterface
 {
-    /** @var ExpressionInterface */
+    /** @var ParsedExpression */
     protected $expression;
 
+    /** @var  ExpressionLanguage */
+    protected $expressionLanguage;
+
     /**
-     * @param ExpressionInterface $expression
+     * @param ParsedExpression $expression Compiled expression
+     * @param ExpressionLanguage $expressionLanguage
      */
-    public function __construct(ExpressionInterface $expression)
+    public function __construct(ParsedExpression $expression, ExpressionLanguage $expressionLanguage)
     {
         $this->expression = $expression;
+        $this->expressionLanguage = $expressionLanguage;
     }
 
     /**
@@ -29,36 +32,14 @@ class ConfigExpressionConditionVisitor implements VisitorInterface
      */
     public function startVisit(VisitContext $visitContext)
     {
-        $writer = $visitContext->createWriter();
-        $class  = $visitContext->getClass();
-
-        $class->addInterfaceName('Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface');
-
-        $setFactoryMethod = PhpMethod::create('setExpressionFactory');
-        $setFactoryMethod->addParameter(
-            PhpParameter::create('expressionFactory')
-                ->setType('Oro\Component\ConfigExpression\ExpressionFactoryInterface')
-        );
-        $setFactoryMethod->setBody($writer->write('$this->expressionFactory = $expressionFactory;')->getContent());
-        $class->setMethod($setFactoryMethod);
-
-        $factoryProperty = PhpProperty::create('expressionFactory');
-        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
-        $class->setProperty($factoryProperty);
-
         $visitContext->getUpdateMethodWriter()
-            ->writeln('if (null === $this->expressionFactory) {')
-            ->writeln('    throw new \\RuntimeException(\'Missing expression factory for layout update\');')
-            ->writeln('}')
-            ->writeln('')
-            ->writeln(sprintf('$expr = %s;', $this->expression->compile('$this->expressionFactory')))
             ->writeln(
                 sprintf(
-                    '$context = [\'context\' => $%s->getContext()];',
+                    '$context = $%s->getContext();',
                     LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM
                 )
             )
-            ->writeln('if ($expr->evaluate($context)) {')
+            ->writeln(sprintf('if (%s) {', $this->expressionLanguage->compile($this->expression)))
             ->indent();
     }
 
