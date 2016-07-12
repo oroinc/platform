@@ -2,19 +2,27 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Encoder;
 
-use Symfony\Component\ExpressionLanguage\Node\Node;
+use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 use Oro\Component\Layout\Action;
 
 class JsonConfigExpressionEncoder implements ConfigExpressionEncoderInterface
 {
+    /** @var ExpressionManipulator  */
+    protected $expressionManipulator;
+
+    public function __construct(ExpressionManipulator $expressionManipulator)
+    {
+        $this->expressionManipulator = $expressionManipulator;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function encodeExpr(ParsedExpression $expr)
     {
-        return json_encode($this->serializeExpression($expr));
+        return json_encode($this->expressionManipulator->toArray($expr));
     }
 
     /**
@@ -35,35 +43,5 @@ class JsonConfigExpressionEncoder implements ConfigExpressionEncoderInterface
                 )
             ]
         );
-    }
-
-    /**
-     * @param ParsedExpression $expr
-     * @return array
-     */
-    protected function serializeExpression(ParsedExpression $expr)
-    {
-        return [
-            'expression' => (string)$expr,
-            'node' => $this->serializeExpressionNode($expr->getNodes())
-        ];
-    }
-
-    /**
-     * @param Node $node
-     * @return array
-     */
-    protected function serializeExpressionNode(Node $node)
-    {
-        $result = [];
-        $class = get_class($node);
-        foreach ($node->attributes as $name => $value) {
-            $result[$class]['attributes'][$name] = $value;
-        }
-        foreach ($node->nodes as $name => $node) {
-            $result[$class]['nodes'][$name] = $this->serializeExpressionNode($node);
-        }
-
-        return $result;
     }
 }

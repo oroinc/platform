@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Encoder;
 
+use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\UnaryNode;
@@ -16,16 +17,31 @@ class JsonConfigExpressionEncoderTest extends \PHPUnit_Framework_TestCase
 {
     public function testEncodeExpr()
     {
-        $parsedExpression = $this->createParsedExpression();
+        $parsedExpression = new ParsedExpression('true', new ConstantNode(true));
+        $expressionManipulator = $this->getMock(ExpressionManipulator::class);
+        $expressionManipulator->expects($this->once())
+            ->method('toArray')
+            ->with($parsedExpression)
+            ->willReturn(
+                [
+                    'expression' => 'true',
+                    'node' => [
+                        'Symfony\Component\ExpressionLanguage\Node\ConstantNode' => [
+                            'attributes' => ['value' => false],
+                        ]
+                    ]
+                ]
+            );
 
-        $encoder = new JsonConfigExpressionEncoder();
+        $encoder = new JsonConfigExpressionEncoder($expressionManipulator);
         $result = $encoder->encodeExpr($parsedExpression);
         $this->assertJsonStringEqualsJsonFile(__DIR__.'/expression.json', $result);
     }
 
     public function testEncodeActions()
     {
-        $encoder = new JsonConfigExpressionEncoder();
+        $expressionManipulator = $this->createExpressionManipulator();
+        $encoder = new JsonConfigExpressionEncoder($expressionManipulator);
         $result = $encoder->encodeActions(
             [
                 new Action('add', ['val1']),
@@ -39,13 +55,12 @@ class JsonConfigExpressionEncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ParsedExpression
+     * @return ExpressionManipulator
      */
-    protected function createParsedExpression()
+    protected function createExpressionManipulator()
     {
-        $node = new BinaryNode('===', new UnaryNode('!', new ConstantNode(true)), new ConstantNode(false));
-        $parsedExpression = new ParsedExpression('!true === false', $node);
+        $expressionManipulator = new ExpressionManipulator();
 
-        return $parsedExpression;
+        return $expressionManipulator;
     }
 }
