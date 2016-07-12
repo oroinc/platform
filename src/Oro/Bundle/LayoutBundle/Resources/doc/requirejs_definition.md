@@ -4,7 +4,7 @@
 This doc describes how to organize and minimize your JavaScript files **for each theme** you have.
 
 ## Configuration
-The configuration file should be placed at theme folder and named `requirejs.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/requirejs.yml`
+The configuration file should be placed at theme folder and named `requirejs.yml`, for example `DemoBundle/Resources/views/layouts/base/requirejs.yml`
 
 ### RequireJS configuration reference
 LayoutBundle is depends on [RequireJSBundle](../../../RequireJSBundle/README.md),
