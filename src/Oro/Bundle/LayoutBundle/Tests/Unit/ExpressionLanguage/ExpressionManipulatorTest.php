@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\ExpressionLanguage;
 
-use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\UnaryNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
+
+use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 
 class ExpressionManipulatorTest extends \PHPUnit_Framework_TestCase
 {

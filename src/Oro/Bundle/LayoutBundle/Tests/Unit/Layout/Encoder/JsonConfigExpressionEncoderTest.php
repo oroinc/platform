@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Encoder;
 
-use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
-use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
-use Symfony\Component\ExpressionLanguage\Node\UnaryNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\Action;
 
+use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder;
 
 class JsonConfigExpressionEncoderTest extends \PHPUnit_Framework_TestCase
