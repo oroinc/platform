@@ -61,6 +61,7 @@ class LocalizationProvider
         $id = $this->configManager->get('oro_locale.'. Configuration::DEFAULT_LOCALIZATION);
 
         $localization = $this->getLocalization($id);
+        
         if($localization instanceof Localization){
            return $localization;
         }

@@ -316,4 +316,4 @@ services:
         class: Oro\Bundle\LocaleBundle\Provider\LocalizationProvider
         arguments:
             - '@oro_locale.repository.localization'
-            - '@oro_config.manager'
+            - '@oro_config.global'
