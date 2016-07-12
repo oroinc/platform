@@ -1,58 +1,109 @@
 <?php
+
 namespace Oro\Bundle\RequireJSBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\RequireJSBundle\Config\Config;
+use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
+use Oro\Bundle\RequireJSBundle\Provider\ConfigProvider;
 use Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension;
 
 class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    protected $functions = array(
-        'get_requirejs_config' => '{"config": "test"}',
-        'get_requirejs_build_path' => 'oro.min.js',
-        'requirejs_build_exists' => array(),
-    );
+    /**
+     * @var OroRequireJSExtension
+     */
+    protected $twigExtension;
 
-    protected $parameters = array(
-        array('oro_require_js.build_path', 'oro.min.js')
-    );
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Config
+     */
+    protected $config;
 
-    public function testGetFunctions()
+    protected function setUp()
     {
-        $configProvider = $this->getMock('Oro\Bundle\RequireJSBundle\Provider\Config', array(), array(), '', false);
-        $configProvider->expects($this->any())
-            ->method('getMainConfig')
-            ->will($this->returnValue($this->functions['get_requirejs_config']));
+        $this->config = $this->getMock('Oro\Bundle\RequireJSBundle\Config\Config');
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->any())
-            ->method('getParameter')
-            ->will($this->returnValueMap($this->parameters));
-        $container->expects($this->any())
-            ->method('get')
-            ->will($this->returnValue($configProvider));
+        $provider = $this->getMock('Oro\Bundle\RequireJSBundle\Provider\ConfigProvider', [], [], '', false);
+        $provider->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($this->config));
 
-        $extension = new OroRequireJSExtension($container);
+        $manager = $this->getMock('Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager');
+        $manager->expects($this->any())
+            ->method('getProvider')
+            ->with('oro_requirejs_config_provider')
+            ->will($this->returnValue($provider));
 
-        /** @var \Twig_SimpleFunction[] $functions */
-        $functions = $extension->getFunctions();
-        foreach ($functions as $function) {
-            $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-            $this->assertArrayHasKey($function->getName(), $this->functions);
-            if ($function->getName() === 'requirejs_build_exists') {
-                $this->assertInternalType('boolean', call_user_func($function->getCallable()));
-            } else {
-                $this->assertEquals(
-                    $this->functions[$function->getName()],
-                    call_user_func($function->getCallable())
-                );
-            }
-        }
+        $this->twigExtension = new OroRequireJSExtension($manager, './web/root');
     }
 
+    /**
+     * @dataProvider expectedFunctionsProvider
+     *
+     * @param string $keyName
+     * @param string $functionName
+     */
+    public function testGetFunctions($keyName, $functionName)
+    {
+        $actualFunctions = $this->twigExtension->getFunctions();
+        /** @var \Twig_SimpleFunction $function */
+        $function = $actualFunctions[$keyName];
+
+        $this->assertArrayHasKey($keyName, $actualFunctions);
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals(
+            [$this->twigExtension, $functionName],
+            $function->getCallable()
+        );
+    }
+
+    public function testGetRequireJSConfig()
+    {
+        $config = ['Main Config'];
+        $this->config
+            ->expects($this->any())
+            ->method('getMainConfig')
+            ->will($this->returnValue($config));
+
+        $this->assertEquals($config, $this->twigExtension->getRequireJSConfig('oro_requirejs_config_provider'));
+    }
+
+    public function testGetRequireJSBuildPath()
+    {
+        $filePath = 'file/path';
+        $this->config
+            ->expects($this->once())
+            ->method('getOutputFilePath')
+            ->will($this->returnValue($filePath));
+
+        $this->assertEquals($filePath, $this->twigExtension->getRequireJSBuildPath('oro_requirejs_config_provider'));
+    }
+
+    public function testIsRequireJSBuildExists()
+    {
+        $filePath = 'file/path';
+        $this->config
+            ->expects($this->once())
+            ->method('getOutputFilePath')
+            ->will($this->returnValue($filePath));
+
+        $this->assertFalse($this->twigExtension->isRequireJSBuildExists('oro_requirejs_config_provider'));
+    }
 
     public function testGetName()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $extension = new OroRequireJSExtension($container);
-        $this->assertEquals('requirejs_extension', $extension->getName());
+        $this->assertEquals('requirejs_extension', $this->twigExtension->getName());
+    }
+
+    /**
+     * @return array
+     */
+    public function expectedFunctionsProvider()
+    {
+        return [
+            ['get_requirejs_config', 'getRequireJSConfig'],
+            ['get_requirejs_build_path', 'getRequireJSBuildPath'],
+            ['requirejs_build_exists', 'isRequireJSBuildExists'],
+        ];
     }
 }
