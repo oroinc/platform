@@ -6,6 +6,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
+use Doctrine\Common\Inflector\Inflector;
 
 class Form extends Element
 {
@@ -75,13 +76,20 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('FileField', $field);
             }
 
+            if ($field->hasAttribute('type') && 'datetime' === $field->getAttribute('type')) {
+                return $this->elementFactory->wrapElement('DateTimePicker', $field->getParent()->getParent());
+            }
+
             return $field;
         }
 
         if ($label = $this->findLabel($locator)) {
             $sndParent = $label->getParent()->getParent();
             if ($sndParent->hasClass('control-group-collection')) {
-                return $this->elementFactory->wrapElement('CollectionField', $sndParent);
+                $elementName = Inflector::singularize(trim($label->getText())).'Collection';
+                $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
+
+                return $this->elementFactory->wrapElement($elementName, $sndParent);
             } elseif ($sndParent->hasClass('control-group-oro_file')) {
                 $input = $sndParent->find('css', 'input[type="file"]');
 
@@ -92,7 +100,7 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } else {
                 throw new ExpectationException(
-                    sprintf('Find label "%s", but can\'t detemine field type', $locator),
+                    sprintf('Find label "%s", but can\'t determine field type', $locator),
                     $this->getDriver()
                 );
             }
@@ -115,6 +123,10 @@ class Form extends Element
 
         if (0 === strpos($value, '[')) {
             return explode(',', trim($value, '[]'));
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
+            return new \DateTime($value);
         }
 
         return $value;

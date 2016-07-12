@@ -14,7 +14,7 @@ class GridFilterDateTimeItem extends AbstractGridFilterItem
     public function setStartTime(\DateTime $dateTime)
     {
         $dateTimePicker = $this->createDateTimePicker('div.filter-start-date');
-        $dateTimePicker->chooseDate($dateTime);
+        $dateTimePicker->setValue($dateTime);
     }
 
     /**
@@ -24,7 +24,7 @@ class GridFilterDateTimeItem extends AbstractGridFilterItem
     public function setEndTime(\DateTime $dateTime)
     {
         $dateTimePicker = $this->createDateTimePicker('div.filter-end-date');
-        $dateTimePicker->chooseDate($dateTime);
+        $dateTimePicker->setValue($dateTime);
     }
 
     /**

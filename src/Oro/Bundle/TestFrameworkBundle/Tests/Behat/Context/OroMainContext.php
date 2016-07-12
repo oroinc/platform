@@ -139,6 +139,17 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
+     * @When /^(?:|I )fill form with:$/
+     */
+    public function iFillFormWith(TableNode $table, $formName = "OroForm")
+    {
+        /** @var Form $form */
+        $form = $this->createElement($formName);
+        $form->fill($table);
+    }
+
+    /**
      * Fill embed form
      * Example: And I fill in address:
      *            | Primary         | check         |
@@ -153,6 +164,22 @@ class OroMainContext extends MinkContext implements
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->fill($table);
+    }
+
+    /**
+     * Set collection field with set of values
+     * Example: And set Reminders with:
+     *            | Method        | Interval unit | Interval number |
+     *            | Email         | days          | 1               |
+     *            | Flash message | minutes       | 30              |
+     *
+     * @Given /^(?:|I )set (?P<field>[^"]+) with:$/
+     */
+    public function setCollectionFieldWith($field, TableNode $table)
+    {
+        /** @var Form $form */
+        $form = $this->createElement('OroForm');
+        $form->fillField($field, $table);
     }
 
     /**
@@ -256,17 +283,6 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
-    }
-
-    /**
-     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
-     * @When /^(?:|I )fill form with:$/
-     */
-    public function iFillFormWith(TableNode $table, $formName = "OroForm")
-    {
-        /** @var Form $form */
-        $form = $this->createElement($formName);
-        $form->fill($table);
     }
 
     /**
@@ -530,6 +546,36 @@ class OroMainContext extends MinkContext implements
             sprintf('Context with "%s" name not found', $text),
             $this->getSession()->getDriver()
         );
+    }
+
+    /**
+     * Assert text by label in page
+     *
+     * @Then /^(?:|I )should see (?P<entity>[\w\s]+) with:$/
+     */
+    public function iShouldSeeActivityWith($entity, TableNode $table)
+    {
+        $page = $this->getSession()->getPage();
+
+        foreach ($table->getRows() as $row) {
+            $label = $page->find('xpath', sprintf('//label[text()="%s"]', $row[0]));
+
+            if (!$label) {
+                throw new ExpectationException(
+                    sprintf('Can\'t find "%s" label', $row[0]),
+                    $this->getSession()->getDriver()
+                );
+            }
+
+            $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
+
+            if (false === preg_match(sprintf('/%s/i', $row[1]), $text)) {
+                throw new ExpectationException(
+                    sprintf('Expect "%s" text of "%s" label, but got "%s"', $row[1], $row[0], $text),
+                    $this->getSession()->getDriver()
+                );
+            }
+        }
     }
 
     /**
