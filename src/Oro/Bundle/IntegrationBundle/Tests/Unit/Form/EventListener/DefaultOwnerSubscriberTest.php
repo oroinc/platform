@@ -123,9 +123,12 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo('oro_user_organization_acl_select'),
                 $this->equalTo(
                     [
-                        'required' => true,
-                        'label'    => 'oro.integration.integration.default_user_owner.label',
-                        'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip',
+                        'required'    => true,
+                        'label'       => 'oro.integration.integration.default_user_owner.label',
+                        'tooltip'     => 'oro.integration.integration.default_user_owner.tooltip',
+                        'constraints' => [
+                            new NotNull(),
+                        ]
                     ]
                 )
             )
@@ -217,9 +220,12 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo('oro_user_organization_acl_select'),
                 $this->equalTo(
                     [
-                        'required' => true,
-                        'label'    => 'oro.integration.integration.default_user_owner.label',
-                        'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip',
+                        'required'    => true,
+                        'label'       => 'oro.integration.integration.default_user_owner.label',
+                        'tooltip'     => 'oro.integration.integration.default_user_owner.tooltip',
+                        'constraints' => [
+                            new NotNull(),
+                        ]
                     ]
                 )
             )
