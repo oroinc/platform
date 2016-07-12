@@ -78,43 +78,19 @@ class DynamicFieldsExtension extends \Twig_Extension
      */
     public function getFields($entity, $entityClass = null)
     {
-        $dynamicRow = [];
-
         if (null === $entityClass) {
             $entityClass = ClassUtils::getRealClass($entity);
         }
 
         $fields = $this->extendProvider->filter([$this, 'filterFields'], $entityClass);
-        foreach ($fields as $field) {
-            /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId = $field->getId();
+        $dynamicRows = $this->createDynamicFieldRows($fields, $entity);
 
-            $fieldName = $fieldConfigId->getFieldName();
-            $fieldType = $fieldConfigId->getFieldType();
-
-            $value = $this->propertyAccessor->getValue($entity, $fieldName);
-
-            $event = new ValueRenderEvent($entity, $value, $fieldConfigId);
-            $this->eventDispatcher->dispatch(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
-                $event
-            );
-
-            $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
-            $dynamicRow[$fieldName] = [
-                'type'     => $this->viewProvider->getConfigById($fieldConfigId)->get('type') ?: $fieldType,
-                'label'    => $fieldConfig->get('label') ?: $fieldName,
-                'value'    => $event->getFieldViewValue(),
-                'priority' => $this->viewProvider->getConfigById($fieldConfigId)->get('priority') ?: 0
-            ];
-        }
-
-        ArrayUtil::sortBy($dynamicRow, true);
-        foreach ($dynamicRow as &$row) {
+        ArrayUtil::sortBy($dynamicRows, true);
+        foreach ($dynamicRows as &$row) {
             unset($row['priority']);
         }
 
-        return $dynamicRow;
+        return $dynamicRows;
     }
 
     /**
@@ -158,5 +134,57 @@ class DynamicFieldsExtension extends \Twig_Extension
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * @param array $fields
+     * @param object $entity
+     * @return array
+     */
+    protected function createDynamicFieldRows($fields, $entity)
+    {
+        $dynamicRows = [];
+        foreach ($fields as $field) {
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId = $field->getId();
+            $fieldName = $fieldConfigId->getFieldName();
+
+            if ($row = $this->createDynamicFieldRow($fieldConfigId, $fieldName, $entity)) {
+                $dynamicRows[$fieldName] = $row;
+            }
+        }
+
+        return $dynamicRows;
+    }
+
+    /**
+     * @param FieldConfigId $fieldConfigId
+     * @param string $fieldName
+     * @param $entity
+     * @return array|bool
+     */
+    protected function createDynamicFieldRow(FieldConfigId $fieldConfigId, $fieldName, $entity)
+    {
+        $fieldType = $fieldConfigId->getFieldType();
+
+        $value = $this->propertyAccessor->getValue($entity, $fieldName);
+
+        $event = new ValueRenderEvent($entity, $value, $fieldConfigId);
+        $this->eventDispatcher->dispatch(
+            EntityExtendEvents::BEFORE_VALUE_RENDER,
+            $event
+        );
+
+        if (!$event->isFieldVisible()) {
+            return false;
+        }
+
+        $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
+        return [
+            'type' => $this->viewProvider->getConfigById($fieldConfigId)->get('type') ?: $fieldType,
+            'label' => $fieldConfig->get('label') ?: $fieldName,
+            'value' => $event->getFieldViewValue(),
+            'priority' => $this->viewProvider->getConfigById($fieldConfigId)->get('priority') ?: 0
+        ];
     }
 }

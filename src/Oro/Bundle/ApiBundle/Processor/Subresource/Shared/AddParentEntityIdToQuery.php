@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Adds restriction by the primary entity identifier to the ORM QueryBuilder
@@ -16,6 +17,17 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
  */
 class AddParentEntityIdToQuery implements ProcessorInterface
 {
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -36,16 +48,23 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         }
 
         $associationName = $this->getAssociationName($context);
-        if ($context->isCollection()) {
+        $parentClassName = $context->getParentClassName();
+        $joinFieldName = $this->getJoinFieldName($parentClassName, $associationName);
+        if ($joinFieldName) {
+            // bidirectional association
+            $query->innerJoin('e.' . $joinFieldName, 'parent_entity');
+        } elseif ($context->isCollection()) {
+            // unidirectional "to-many" association
             $query->innerJoin(
-                $context->getParentClassName(),
+                $parentClassName,
                 'parent_entity',
                 Join::WITH,
                 sprintf('%s MEMBER OF parent_entity.%s', $rootAlias, $associationName)
             );
         } else {
+            // unidirectional "to-one" association
             $query->innerJoin(
-                $context->getParentClassName(),
+                $parentClassName,
                 'parent_entity',
                 Join::WITH,
                 sprintf('parent_entity.%s = %s', $associationName, $rootAlias)
@@ -69,5 +88,25 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             ->getPropertyPath();
 
         return $propertyPath ?: $associationName;
+    }
+
+    /**
+     * @param string $parentClassName
+     * @param string $associationName
+     *
+     * @return string|null
+     */
+    protected function getJoinFieldName($parentClassName, $associationName)
+    {
+        $parentMetadata = $this->doctrineHelper->getEntityMetadataForClass($parentClassName);
+        if (!$parentMetadata->hasAssociation($associationName)) {
+            return null;
+        }
+
+        $associationMapping = $parentMetadata->getAssociationMapping($associationName);
+
+        return $associationMapping['isOwningSide']
+            ? $associationMapping['inversedBy']
+            : $associationMapping['mappedBy'];
     }
 }

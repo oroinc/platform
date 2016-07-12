@@ -27,7 +27,8 @@ use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "form"={
  *              "form_type"="oro_organization_select"

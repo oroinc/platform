@@ -162,6 +162,33 @@ oro_system_configuration:
                                         children:
                                             - oro_locale.language
                                             - oro_locale.languages
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            localization:
+                                priority: 255
+                                children:
+                                    locale_settings:
+                                        priority: 100
+                                        children:
+                                            - oro_locale.locale
+                                            - oro_locale.country
+                                            - oro_locale.format_address_by_address_country
+                                            - oro_locale.timezone
+                                            - oro_locale.currency
+                                    map_settings:
+                                        priority: 50
+                                        children:
+                                            - oro_locale.temperature_unit
+                                            - oro_locale.wind_speed_unit
+                            language_settings:
+                                priority: 230
+                                children:
+                                    language_languages:
+                                        children:
+                                            - oro_locale.language
 
     api_tree:
         localization:

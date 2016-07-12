@@ -117,15 +117,15 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
                 'IDENTITY(bu.organization) organization',
                 'IDENTITY(bu.owner) owner' //aka parent business unit
             ])
+            ->addSelect('(CASE WHEN bu.owner IS NULL THEN 0 ELSE 1 END) AS HIDDEN ORD')
+            ->addOrderBy('ORD, owner', 'ASC')
             ->getQuery()
             ->getArrayResult();
 
         foreach ($businessUnits as $businessUnit) {
             if (!empty($businessUnit['organization'])) {
                 $tree->addLocalEntity($businessUnit['id'], (int)$businessUnit['organization']);
-                if ($businessUnit['owner']) {
-                    $tree->addDeepEntity($businessUnit['id'], $businessUnit['owner']);
-                }
+                $tree->addDeepEntity($businessUnit['id'], $businessUnit['owner']);
             }
         }
 
