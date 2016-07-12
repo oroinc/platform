@@ -28,7 +28,7 @@ oro_menu_config:
             route: 'oro_user_role_index'
             extras:
                 position: 20
-                routes: ['oro_user_role_*']
+                routes: ['oro_user_role_*', 'oro_field_acl_update']
                 description: 'oro.user.menu.user_roles.description'
         user_groups:
             label: 'oro.user.group.entity_plural_label'
