@@ -50,6 +50,12 @@ UPGRADE FROM 1.9 to 1.10
 - Added `acl_permission` twig extension - allows get `Permission` by `AclPermission`.
 - Added third parameter `$byCurrentGroup` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface::getPermissions` for getting permissions only for current application group name. Updated same method in `Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension` and `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`.
 - For php version from 7.0.0 to 7.0.5 we replaced `Symfony\Component\Security\Acl\Domain\Entry` on `Oro\Bundle\SecurityBundle\Acl\Domain\Entry` to avoid [bug](https://bugs.php.net/bug.php?id=71940) with unserialization of an object reference
+- Method `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::getTreeData` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::createTreeObject` instead.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBU` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBusinessUnit` instead.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getBusinessUnitUserIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getOrganizationUserIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder::fillOrganizationBusinessUnitIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder::fillOrganizationUserIds` marked as deprecated as it is not used anywhere.
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Exception\ActionException` marked as deprecated. Use `Oro\Component\Action\Exception\ActionException` instead.
