@@ -3,7 +3,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Component\Testing\ClassExtensionTrait;
-use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
+use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpConnection;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;

@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
-use Oro\Component\MessageQueue\Transport\Amqp\AmqpConnection;
+use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\Alias;
