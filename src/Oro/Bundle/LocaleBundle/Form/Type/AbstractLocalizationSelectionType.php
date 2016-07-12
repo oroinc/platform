@@ -156,7 +156,9 @@ abstract class AbstractLocalizationSelectionType extends AbstractType
      */
     protected function getLocalizations()
     {
-        return $this->configManager->get($this->getLocalizationSelectorConfigKey()) ? : [];
+        $data = $this->configManager->get($this->getLocalizationSelectorConfigKey());
+
+        return $data ? : $this->localizationChoicesProvider->getLocalizationChoices();
     }
 
     /**

@@ -127,7 +127,7 @@ class DefaultLocalizationSelectionType extends LocalizationSelectionType
     protected function getEnabledLocalizations(array $enabledLocalizationsData)
     {
         if (isset($enabledLocalizationsData['use_parent_scope_value'])) {
-            $enabledLocalizations = $this->localizationChoicesProvider->getLocalizationChoices();
+            $enabledLocalizations = array_keys($this->localizationChoicesProvider->getLocalizationChoices());
         } elseif (isset($enabledLocalizationsData['value'])) {
             $enabledLocalizations = $enabledLocalizationsData['value'];
         } else {

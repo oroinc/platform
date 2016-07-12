@@ -4,6 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Provider;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationProvider
@@ -14,11 +17,18 @@ class LocalizationProvider
     protected $registry;
 
     /**
-     * @param ObjectRepository $repository
+     * @var ConfigManager
      */
-    public function __construct(ObjectRepository $repository)
+    protected $configManager;
+
+    /**
+     * @param ObjectRepository $repository
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ObjectRepository $repository, ConfigManager $configManager)
     {
         $this->repository = $repository;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -48,12 +58,18 @@ class LocalizationProvider
      */
     public function getDefaultLocalization()
     {
-         //TODO: Implement getting of Default Localization
+        $id = $this->configManager->get('oro_locale.'. Configuration::DEFAULT_LOCALIZATION);
+
+        $localization = $this->getLocalization($id);
+        if($localization instanceof Localization){
+           return $localization;
+        }
 
         $localizations = $this->getLocalizations();
         if (count($localizations)) {
             return reset($localizations);
         }
+
 
         return null;
     }
