@@ -3,12 +3,12 @@
 namespace Oro\Bundle\LayoutBundle\Provider;
 
 use Oro\Bundle\RequireJSBundle\Config\Config as RequireJSConfig;
-use Oro\Bundle\RequireJSBundle\Provider\ConfigProvider;
+use Oro\Bundle\RequireJSBundle\Provider\AbstractConfigProvider;
 
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class RequireJSConfigProvider extends ConfigProvider
+class RequireJSConfigProvider extends AbstractConfigProvider
 {
     const REQUIREJS_CONFIG_CACHE_KEY    = 'layout_requirejs_config';
     const REQUIREJS_CONFIG_FILE         = 'require-config.js';
@@ -50,11 +50,7 @@ class RequireJSConfigProvider extends ConfigProvider
      */
     public function getConfig()
     {
-        if (!$this->cache->contains($this->getCacheKey())) {
-            $this->cache->save($this->getCacheKey(), $this->collectConfigs());
-        }
-
-        $configs = $this->cache->fetch($this->getCacheKey());
+        $configs = $this->getConfigs();
 
         return $configs[$this->activeTheme];
     }
@@ -71,26 +67,21 @@ class RequireJSConfigProvider extends ConfigProvider
             $this->currentTheme = $theme->getName();
 
             $this->config = $baseConfig;
-            $this->collectBundlesConfig();
 
-            $config = new RequireJSConfig();
-
-            $config->setConfigFilePath(implode(
+            $configPath = implode(
                 DIRECTORY_SEPARATOR,
                 [self::REQUIREJS_JS_DIR, $this->currentTheme, self::REQUIREJS_CONFIG_FILE]
-            ));
+            );
 
             $buildPath = isset($this->config['config']['build_path']) ?
                 $this->config['config']['build_path'] : $this->config['build_path'];
-            $config->setOutputFilePath(implode(
+
+            $buildPath = implode(
                 DIRECTORY_SEPARATOR,
                 [self::REQUIREJS_JS_DIR, $this->currentTheme, $buildPath]
-            ));
+            );
 
-            $this->collectMainConfig($config);
-            $this->collectBuildConfig($config);
-
-            $configs[$this->currentTheme] = $config;
+            $configs[$this->currentTheme] = $this->createRequireJSConfig($configPath, $buildPath);
         }
 
         return $configs;
