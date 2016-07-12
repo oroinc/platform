@@ -123,8 +123,13 @@ services:
             - '@service_container'
             - {}
 
+    oro_layout.expression_language.expression_manipulator:
+        class: Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator
+
     oro_layout.expression.json_encoder:
         class: Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder
+        arguments:
+            - '@oro_layout.expression_language.expression_manipulator'
         tags:
             - { name: oro_layout.expression.encoder, format: json }
 
