@@ -8,6 +8,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
 
+use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension;
 use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder;
 
@@ -25,7 +26,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
         $encoderRegistry->expects($this->any())
             ->method('getEncoder')
             ->with('json')
-            ->will($this->returnValue(new JsonConfigExpressionEncoder()));
+            ->will($this->returnValue(new JsonConfigExpressionEncoder(new ExpressionManipulator())));
 
         $this->extension = new ClassAttributeExtension($encoderRegistry);
     }
