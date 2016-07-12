@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
+use Oro\Component\AmqpMessageQueue\Client\AmqpDriver;
 use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpConnection;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
