@@ -2,16 +2,6 @@
 
 namespace Oro\Bundle\RequireJSBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
-use Symfony\Component\Yaml\Yaml;
-
-use Oro\Bundle\RequireJSBundle\Config\Config as RequireJSConfig;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-
 class ConfigProvider extends AbstractConfigProvider
 {
     const REQUIREJS_CONFIG_CACHE_KEY    = 'requirejs_config';

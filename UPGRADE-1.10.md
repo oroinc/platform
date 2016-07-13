@@ -295,4 +295,7 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 - Added new permission "Configure" which controls access to entity configuration settings. Currently is applied to User entity only.
 
 ####RequireJsBundle:
+- Added `Oro\Bundle\RequireJSBundle\Provider\ConfigProviderInterface` interface. 
 - Class `Oro\Bundle\RequireJSBundle\Provider\Config` marked as deprecated. Use `Oro\Bundle\RequireJSBundle\Provider\ConfigProvider` instead.
+- Added `Oro\Bundle\RequireJSBundle\Provider\AbstractConfigProvider` class. 
+- Added `Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager` class for building all configs provided by config providers via `oro:requirejs:build`. 

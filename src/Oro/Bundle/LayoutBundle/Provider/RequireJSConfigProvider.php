@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider;
 
-use Oro\Bundle\RequireJSBundle\Config\Config as RequireJSConfig;
 use Oro\Bundle\RequireJSBundle\Provider\AbstractConfigProvider;
 
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
