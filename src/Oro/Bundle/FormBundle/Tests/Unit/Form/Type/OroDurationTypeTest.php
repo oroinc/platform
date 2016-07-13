@@ -85,15 +85,6 @@ class OroDurationTypeTest extends FormIntegrationTestCase
         $this->assertCount(1, $errors);
     }
 
-    public function testSubmitBigDataThrowsError()
-    {
-        $form = $this->factory->create($this->type);
-        $form->submit(OroDurationType::MAX_DURATION + 1);
-        $errors = $form->getErrors();
-
-        $this->assertCount(1, $errors);
-    }
-
     public function testConfigureOptions()
     {
         $expectedOptions = [
