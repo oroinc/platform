@@ -3,8 +3,8 @@ define(function(require) {
 
     var ActionPermissionsReadonlyCell;
     var BaseView = require('oroui/js/app/views/base/view');
-    var PermissionCollectionView = require('orouser/js/datagrid/cell/permission/permission-collection-view');
-    var PermissionReadOnlyView = require('orouser/js/datagrid/cell/permission/permission-readonly-view');
+    var PermissionCollectionView = require('orouser/js/datagrid/permission/permission-collection-view');
+    var PermissionReadOnlyView = require('orouser/js/datagrid/permission/permission-readonly-view');
 
     ActionPermissionsReadonlyCell = BaseView.extend({
         tagName: 'td',

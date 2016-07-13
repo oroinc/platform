@@ -418,10 +418,6 @@ datagrid:
                     data_name: group
                     frontend_type: string
                     renderable: false
-            actions:
-                role-premissions:
-                    type: frontend
-                    frontend_type: role-permissions
             filters: ~
             sorters: ~
             options:

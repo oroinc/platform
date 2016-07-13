@@ -7,10 +7,12 @@ define(function(require) {
     var PermissionModel = require('orouser/js/models/role/permission-model');
     var AccessLevelsCollection = require('orouser/js/models/role/access-levels-collection');
     var BaseCollection = require('oroui/js/app/models/base/collection');
+    var RowView = require('orouser/js/datagrid/action-permissions-row-view');
 
     rolesDatagridBuilder = {
         processDatagridOptions: function(deferred, options) {
             var reg = /\\/g;
+            options.themeOptions.rowView = RowView;
             _.each(options.data.data, function(item) {
                 item.permissions = new BaseCollection(item.permissions, {
                     model: PermissionModel

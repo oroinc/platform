@@ -10,4 +10,3 @@ config:
         'orouser/js/components/role/capability-set-component': 'orouser/js/components/role/capability-set-component.js'
         'oro/datagrid/cell/action-permissions-cell': 'orouser/js/datagrid/cell/action-permissions-cell.js'
         'oro/datagrid/cell/action-permissions-readonly-cell': 'orouser/js/datagrid/cell/action-permissions-readonly-cell.js'
-        'oro/datagrid/action/role-permissions-action': 'orouser/js/datagrid/action/role-permissions-action.js'
