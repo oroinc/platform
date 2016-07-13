@@ -6,13 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableSeparator;
 
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
@@ -48,7 +42,7 @@ class DumpCommand extends AbstractDebugCommand
                 'sub-resources',
                 null,
                 InputOption::VALUE_NONE,
-                'Shows sub resources'
+                'Shows sub-resources'
             );
         parent::configure();
     }
@@ -72,38 +66,25 @@ class DumpCommand extends AbstractDebugCommand
         /** @var SubresourcesProvider $subresourcesProvider */
         $subresourcesProvider = $this->getContainer()->get('oro_api.subresources_provider');
 
-        $table = new Table($output);
-        $table->setHeaders(['Entity', 'Attributes']);
-
-        $i = 0;
         foreach ($resources as $resource) {
             if ($entityClass && $resource->getEntityClass() !== $entityClass) {
                 continue;
             }
-            if ($i > 0) {
-                $table->addRow(new TableSeparator());
-            }
-            $entityCellText = $resource->getEntityClass();
+            $output->writeln(sprintf('<info>%s</info>', $resource->getEntityClass()));
+            $output->writeln(
+                $this->convertResourceAttributesToString(
+                    $this->getResourceAttributes($resource, $requestType)
+                )
+            );
             if ($isSubresourcesRequested) {
-                $entitySubresourcesText = $this->getEntitySubresourcesText(
+                $subresourcesText = $this->getEntitySubresourcesText(
                     $subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType)
                 );
-                if ($entitySubresourcesText) {
-                    $entityCellText .= "\n" . $entitySubresourcesText;
+                if ($subresourcesText) {
+                    $output->writeln($subresourcesText);
                 }
             }
-            $table->addRow(
-                [
-                    $entityCellText,
-                    $this->convertResourceAttributesToString(
-                        $this->getResourceAttributes($resource, $version, $requestType)
-                    )
-                ]
-            );
-            $i++;
         }
-
-        $table->render();
     }
 
     /**
@@ -116,12 +97,12 @@ class DumpCommand extends AbstractDebugCommand
         $result = '';
         $subresources = $entitySubresources->getSubresources();
         if (!empty($subresources)) {
-            $result .= 'Sub resources:';
+            $result .= ' Sub-resources:';
             foreach ($subresources as $associationName => $subresource) {
-                $result .= "\n  " . $associationName;
+                $result .= sprintf("\n  <comment>%s</comment>", $associationName);
                 $subresourceExcludedActions = $subresource->getExcludedActions();
                 if (!empty($subresourceExcludedActions)) {
-                    $result .= "\n    Excluded Actions: " . implode(', ', $subresourceExcludedActions);
+                    $result .= "\n   Excluded Actions: " . implode(', ', $subresourceExcludedActions);
                 }
             }
         }
@@ -131,12 +112,11 @@ class DumpCommand extends AbstractDebugCommand
 
     /**
      * @param ApiResource $resource
-     * @param string      $version
      * @param RequestType $requestType
      *
      * @return array
      */
-    protected function getResourceAttributes(ApiResource $resource, $version, RequestType $requestType)
+    protected function getResourceAttributes(ApiResource $resource, RequestType $requestType)
     {
         $result = [];
 
@@ -149,24 +129,6 @@ class DumpCommand extends AbstractDebugCommand
             DataType::ENTITY_TYPE,
             $requestType
         );
-
-        /** @var ConfigProvider $configProvider */
-        $configProvider = $this->getContainer()->get('oro_api.config_provider');
-        $config = $configProvider->getConfig(
-            $entityClass,
-            $version,
-            $requestType,
-            [
-                new EntityDefinitionConfigExtra(),
-                new FilterIdentifierFieldsConfigExtra(),
-                new DescriptionsConfigExtra()
-            ]
-        );
-        $entityDefinition = $config->getDefinition();
-        if ($entityDefinition) {
-            $result['Name'] = $entityDefinition->getLabel();
-            $result['Plural Name'] = $entityDefinition->getPluralLabel();
-        }
 
         $excludedActions = $resource->getExcludedActions();
         if (!empty($excludedActions)) {
@@ -190,7 +152,7 @@ class DumpCommand extends AbstractDebugCommand
             if ($i > 0) {
                 $result .= PHP_EOL;
             }
-            $result .= sprintf('%s: %s', $name, $this->convertValueToString($value));
+            $result .= sprintf(' %s: %s', $name, $this->convertValueToString($value));
             $i++;
         }
 

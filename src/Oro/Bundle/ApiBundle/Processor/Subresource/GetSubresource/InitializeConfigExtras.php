@@ -13,6 +13,8 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 
 /**
  * Sets an initial list of requests for configuration data.
+ * It is supposed that the list was initialized if
+ * the EntityDefinitionConfigExtra is already exist in the Context.
  */
 class InitializeConfigExtras implements ProcessorInterface
 {
@@ -23,7 +25,19 @@ class InitializeConfigExtras implements ProcessorInterface
     {
         /** @var SubresourceContext $context */
 
-        $context->addConfigExtra(new EntityDefinitionConfigExtra($context->getAction()));
+        if ($context->hasConfigExtra(EntityDefinitionConfigExtra::NAME)) {
+            // config extras are already initialized
+            return;
+        }
+
+        $context->addConfigExtra(
+            new EntityDefinitionConfigExtra(
+                $context->getAction(),
+                $context->isCollection(),
+                $context->getParentClassName(),
+                $context->getAssociationName()
+            )
+        );
         $context->addConfigExtra(new CustomizeLoadedDataConfigExtra());
         $context->addConfigExtra(new DataTransformersConfigExtra());
         if ($context->isCollection()) {

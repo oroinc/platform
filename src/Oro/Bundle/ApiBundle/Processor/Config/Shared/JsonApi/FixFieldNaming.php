@@ -5,8 +5,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Tries to rename fields if they are equal to reserved words.
@@ -17,17 +17,6 @@ class FixFieldNaming implements ProcessorInterface
 {
     const TYPE_FIELD_NAME = 'type';
     const ID_FIELD_NAME   = 'id';
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-    }
 
     /**
      * {@inheritdoc}
@@ -43,11 +32,13 @@ class FixFieldNaming implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
+        // process "type" field
         if ($definition->hasField(self::TYPE_FIELD_NAME)) {
             $this->renameReservedField($definition, $entityClass, self::TYPE_FIELD_NAME);
         }
+        // process "id" field
         if ($definition->hasField(self::ID_FIELD_NAME)
-            && !$this->isIdentifierField($entityClass, self::ID_FIELD_NAME)
+            && !$this->isIdentifierField($definition, self::ID_FIELD_NAME)
         ) {
             $this->renameReservedField($definition, $entityClass, self::ID_FIELD_NAME);
         }
@@ -62,18 +53,9 @@ class FixFieldNaming implements ProcessorInterface
      */
     protected function renameReservedField(EntityDefinitionConfig $definition, $entityClass, $fieldName)
     {
-        if (!$entityClass) {
-            throw new \RuntimeException(
-                sprintf(
-                    'The "%s" reserved word cannot be used as a field name.',
-                    $fieldName
-                )
-            );
-        }
-
         $newFieldName = lcfirst($this->getShortClassName($entityClass)) . ucfirst($fieldName);
         if ($definition->hasField($newFieldName)) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'The "%s" reserved word cannot be used as a field name'
                     . ' and it cannot be renamed to "%s" because a field with this name already exists.',
@@ -90,24 +72,26 @@ class FixFieldNaming implements ProcessorInterface
         }
         $definition->removeField($fieldName);
         $definition->addField($newFieldName, $field);
+        // rename identifier field if needed
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        $idFieldNameIndex = array_search($fieldName, $idFieldNames, true);
+        if (false !== $idFieldNameIndex) {
+            $idFieldNames[$idFieldNameIndex] = $newFieldName;
+            $definition->setIdentifierFieldNames($idFieldNames);
+        }
     }
 
     /**
      * Checks whether the given field is an identifier of the given entity
      *
-     * @param string $entityClass
-     * @param string $fieldName
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $fieldName
      *
      * @return bool
      */
-    protected function isIdentifierField($entityClass, $fieldName)
+    protected function isIdentifierField(EntityDefinitionConfig $definition, $fieldName)
     {
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
-        if (null === $metadata) {
-            return false;
-        }
-
-        $idFieldNames = $metadata->getIdentifierFieldNames();
+        $idFieldNames = $definition->getIdentifierFieldNames();
 
         return count($idFieldNames) === 1 && reset($idFieldNames) === $fieldName;
     }
