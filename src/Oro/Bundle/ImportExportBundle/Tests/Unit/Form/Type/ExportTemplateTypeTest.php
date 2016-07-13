@@ -3,11 +3,12 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Form\Type\ExportTemplateType;
 
-class ExportTemplateTypeTest extends \PHPUnit_Framework_TestCase
+class ExportTemplateTypeTest extends FormIntegrationTestCase
 {
     /**
      * @var ProcessorRegistry|\PHPUnit_Framework_MockObject_MockObject
@@ -21,6 +22,8 @@ class ExportTemplateTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->processorRegistry = $this->getMock(ProcessorRegistry::class);
         $this->exportTemplateType = new ExportTemplateType($this->processorRegistry);
     }

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Form\Type\ExportType;
 
-class ExportTypeTest extends \PHPUnit_Framework_TestCase
+class ExportTypeTest extends FormIntegrationTestCase
 {
     const ENTITY_NAME = 'testName';
 
@@ -23,6 +24,8 @@ class ExportTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->processorRegistry = $this->getMockBuilder(ProcessorRegistry::class)->getMock();
         $this->exportType = new ExportType($this->processorRegistry);
     }

@@ -2,13 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\ImportExportBundle\Form\Model\ExportTemplateData;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class ExportTemplateType extends ExportType

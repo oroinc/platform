@@ -14,7 +14,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
-use Oro\Bundle\ImportExportBundle\Form\Model\ExportTemplateData;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
@@ -209,7 +208,6 @@ class ImportExportController extends Controller
             $exportForm->submit($request);
 
             if ($exportForm->isValid()) {
-                /** @var ExportTemplateData $data */
                 $data = $exportForm->getData();
 
                 $exportTemplateResponse = $this->forward(
