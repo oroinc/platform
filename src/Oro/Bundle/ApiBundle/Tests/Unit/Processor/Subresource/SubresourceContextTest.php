@@ -80,8 +80,8 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
     public function testIsCollection()
     {
         $this->assertFalse($this->context->isCollection());
-        $this->assertFalse($this->context->has(SubresourceContext::COLLECTION));
-        $this->assertNull($this->context->get(SubresourceContext::COLLECTION));
+        $this->assertTrue($this->context->has(SubresourceContext::COLLECTION));
+        $this->assertFalse($this->context->get(SubresourceContext::COLLECTION));
 
         $this->context->setIsCollection(true);
         $this->assertTrue($this->context->isCollection());
@@ -113,7 +113,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                new EntityDefinitionConfigExtra('get_list'),
+                new EntityDefinitionConfigExtra(),
                 new FilterFieldsConfigExtra(
                     [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                 )
@@ -122,7 +122,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             [
-                new EntityDefinitionConfigExtra('get_list'),
+                new EntityDefinitionConfigExtra(),
                 new FilterFieldsConfigExtra(
                     [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                 )
@@ -153,7 +153,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS));
         $this->assertEquals(
             [
-                new EntityDefinitionConfigExtra('get_list'),
+                new EntityDefinitionConfigExtra(),
                 new FilterFieldsConfigExtra(
                     [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                 )
@@ -162,7 +162,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             [
-                new EntityDefinitionConfigExtra('get_list'),
+                new EntityDefinitionConfigExtra(),
                 new FilterFieldsConfigExtra(
                     [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                 )
@@ -202,7 +202,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
                 $version,
                 new RequestType([$requestType]),
                 [
-                    new EntityDefinitionConfigExtra('get_list'),
+                    new EntityDefinitionConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )
@@ -245,7 +245,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
                 $version,
                 new RequestType([$requestType]),
                 [
-                    new EntityDefinitionConfigExtra('get_list'),
+                    new EntityDefinitionConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )
@@ -378,7 +378,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
                 $version,
                 new RequestType([$requestType]),
                 [
-                    new EntityDefinitionConfigExtra('get_list'),
+                    new EntityDefinitionConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )
@@ -443,7 +443,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
                 $version,
                 new RequestType([$requestType]),
                 [
-                    new EntityDefinitionConfigExtra('get_list'),
+                    new EntityDefinitionConfigExtra(),
                     new FilterFieldsConfigExtra(
                         [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
                     )

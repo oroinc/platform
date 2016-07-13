@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\InitializeApiFormExtension;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipContextTest;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipTestCase;
 
-class InitializeApiFormExtensionTest extends ChangeRelationshipContextTest
+class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formExtensionSwitcher;

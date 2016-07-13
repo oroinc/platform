@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetDefaultSorting;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -19,7 +20,7 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor = new SetDefaultSorting($this->doctrineHelper);
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessWhenQueryIsAlreadyExist()
     {
         $qb = $this->getQueryBuilderMock();
 
@@ -33,10 +34,11 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
     {
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
-        $this->assertEquals(1, $filters->count());
+        $this->assertCount(1, $filters);
         /** @var SortFilter $sortFilter */
         $sortFilter = $filters->get('sort');
         $this->assertEquals('orderBy', $sortFilter->getDataType());
@@ -47,10 +49,11 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
     {
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category');
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
-        $this->assertEquals(1, $filters->count());
+        $this->assertCount(1, $filters);
         /** @var SortFilter $sortFilter */
         $sortFilter = $filters->get('sort');
         $this->assertEquals('orderBy', $sortFilter->getDataType());
@@ -60,13 +63,27 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessForEntityWithCompositeIdentifier()
     {
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity');
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
-        $this->assertEquals(1, $filters->count());
+        $this->assertCount(1, $filters);
         /** @var SortFilter $sortFilter */
         $sortFilter = $filters->get('sort');
         $this->assertEquals('orderBy', $sortFilter->getDataType());
         $this->assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+    }
+
+    public function testProcessWhenSortingIsDisabled()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->disableSorting();
+
+        $this->context->getRequestType()->add(RequestType::JSON_API);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        $this->assertCount(0, $filters);
     }
 }

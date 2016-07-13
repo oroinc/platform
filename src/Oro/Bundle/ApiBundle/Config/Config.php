@@ -26,14 +26,7 @@ class Config implements \IteratorAggregate
      */
     public function toArray()
     {
-        $result = [];
-        foreach ($this->items as $sectionName => $config) {
-            $result[$sectionName] = is_object($config) && method_exists($config, 'toArray')
-                ? $config->toArray()
-                : $config;
-        }
-
-        return $result;
+        return $this->convertItemsToArray();
     }
 
     /**
@@ -47,16 +40,11 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Make a deep copy of object.
+     * Makes a deep copy of the object.
      */
     public function __clone()
     {
-        $this->items = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->items
-        );
+        $this->cloneItems();
     }
 
     /**
@@ -177,5 +165,35 @@ class Config implements \IteratorAggregate
     public function setActions(ActionsConfig $actions = null)
     {
         $this->set(ConfigUtil::ACTIONS, $actions);
+    }
+
+    /**
+     * Checks whether the configuration of sub-resources.
+     *
+     * @return bool
+     */
+    public function hasSubresources()
+    {
+        return $this->has(ConfigUtil::SUBRESOURCES);
+    }
+
+    /**
+     * Gets the configuration of sub-resources.
+     *
+     * @return SubresourcesConfig|null
+     */
+    public function getSubresources()
+    {
+        return $this->get(ConfigUtil::SUBRESOURCES);
+    }
+
+    /**
+     * Sets the configuration of sub-resources.
+     *
+     * @param SubresourcesConfig|null $subresources
+     */
+    public function setSubresources(SubresourcesConfig $subresources = null)
+    {
+        $this->set(ConfigUtil::SUBRESOURCES, $subresources);
     }
 }

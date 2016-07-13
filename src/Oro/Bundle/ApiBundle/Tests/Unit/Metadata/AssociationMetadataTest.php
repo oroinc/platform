@@ -17,7 +17,84 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->entityMetadata->setInheritedType(true);
     }
 
-    public function testGetName()
+    public function testClone()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setDataType('testDataType');
+        $associationMetadata->setTargetClassName('targetClassName');
+        $associationMetadata->setAcceptableTargetClassNames(['targetClassName1']);
+        $associationMetadata->setIsCollection(true);
+        $associationMetadata->setIsNullable(true);
+        $targetEntityMetadata = new EntityMetadata();
+        $targetEntityMetadata->setClassName('TargetEntityClassName');
+        $associationMetadata->setTargetMetadata($targetEntityMetadata);
+
+        $associationMetadataClone = clone $associationMetadata;
+
+        $this->assertEquals($associationMetadata, $associationMetadataClone);
+        $this->assertNotSame($targetEntityMetadata, $associationMetadataClone->getTargetMetadata());
+    }
+
+    public function testCloneWithoutTargetMetadata()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+
+        $associationMetadataClone = clone $associationMetadata;
+
+        $this->assertEquals($associationMetadata, $associationMetadataClone);
+        $this->assertNull($associationMetadataClone->getTargetMetadata());
+    }
+
+    public function testToArray()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setDataType('testDataType');
+        $associationMetadata->setTargetClassName('targetClassName');
+        $associationMetadata->setAcceptableTargetClassNames(['targetClassName1', 'targetClassName2']);
+        $associationMetadata->setIsCollection(true);
+        $associationMetadata->setIsNullable(true);
+        $associationMetadata->setTargetMetadata($this->entityMetadata);
+
+        $this->assertEquals(
+            [
+                'name'                      => 'testName',
+                'data_type'                 => 'testDataType',
+                'target_class'              => 'targetClassName',
+                'acceptable_target_classes' => ['targetClassName1', 'targetClassName2'],
+                'collection'                => true,
+                'nullable'                  => true,
+                'target_metadata'           => [
+                    'class'     => 'entityClassName',
+                    'inherited' => true
+                ]
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
+    public function testToArrayWithRequiredPropertiesOnly()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+
+        $this->assertEquals(
+            [
+                'name' => 'testName'
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
+    public function testNameInConstructor()
+    {
+        $fieldMetadata = new AssociationMetadata('associationName');
+        $this->assertEquals('associationName', $fieldMetadata->getName());
+    }
+
+    public function testName()
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -26,7 +103,7 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('associationName', $associationMetadata->getName());
     }
 
-    public function testGetDataType()
+    public function testDataType()
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -41,28 +118,28 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($associationMetadata->getTargetClassName());
         $associationMetadata->setTargetClassName('targetClassName');
-        $this->assertSame('targetClassName', $associationMetadata->getTargetClassName());
+        $this->assertEquals('targetClassName', $associationMetadata->getTargetClassName());
     }
 
     public function testAcceptableTargetClassName()
     {
         $associationMetadata = new AssociationMetadata();
 
-        $this->assertSame([], $associationMetadata->getAcceptableTargetClassNames());
-        $associationMetadata->setAcceptableTargetClassNames(['targetClassName0', 'targetClassName1']);
-        $this->assertSame(
-            ['targetClassName0', 'targetClassName1'],
+        $this->assertEquals([], $associationMetadata->getAcceptableTargetClassNames());
+        $associationMetadata->setAcceptableTargetClassNames(['targetClassName1', 'targetClassName2']);
+        $this->assertEquals(
+            ['targetClassName1', 'targetClassName2'],
             $associationMetadata->getAcceptableTargetClassNames()
         );
-        $associationMetadata->removeAcceptableTargetClassName('targetClassName0');
-        $associationMetadata->addAcceptableTargetClassName('targetClassName2');
-        $this->assertSame(
-            ['targetClassName1', 'targetClassName2'],
+        $associationMetadata->removeAcceptableTargetClassName('targetClassName1');
+        $associationMetadata->addAcceptableTargetClassName('targetClassName3');
+        $this->assertEquals(
+            ['targetClassName2', 'targetClassName3'],
             $associationMetadata->getAcceptableTargetClassNames()
         );
     }
 
-    public function testIsCollection()
+    public function testCollection()
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -71,7 +148,7 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($associationMetadata->isCollection());
     }
 
-    public function testIsNullable()
+    public function testNullable()
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -86,31 +163,6 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($associationMetadata->getTargetMetadata());
         $associationMetadata->setTargetMetadata($this->entityMetadata);
-        $this->assertSame($this->entityMetadata, $associationMetadata->getTargetMetadata());
-    }
-
-    public function testToArray()
-    {
-        $associationMetadata = new AssociationMetadata();
-
-        $associationMetadata->setTargetClassName('targetClassName');
-        $associationMetadata->setAcceptableTargetClassNames(['targetClassName1', 'targetClassName2']);
-        $associationMetadata->setIsCollection(true);
-        $associationMetadata->setTargetMetadata($this->entityMetadata);
-        $associationMetadata->setTargetMetadata($this->entityMetadata);
-
-        $this->assertSame(
-            [
-                AssociationMetadata::TARGET_CLASS_NAME => 'targetClassName',
-                AssociationMetadata::ACCEPTABLE_TARGET_CLASS_NAMES => ['targetClassName1', 'targetClassName2'],
-                AssociationMetadata::COLLECTION => true,
-                'targetMetadata' => [
-                    'class' => 'entityClassName',
-                    'inherited' => true,
-                    'identifiers' => []
-                ]
-            ],
-            $associationMetadata->toArray()
-        );
+        $this->assertEquals($this->entityMetadata, $associationMetadata->getTargetMetadata());
     }
 }

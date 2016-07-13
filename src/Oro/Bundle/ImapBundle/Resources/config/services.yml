@@ -1,5 +1,6 @@
 parameters:
-    oro_imap.user_form_name:                         oro_user_user_form
+    oro_imap.user_form_name:                         oro_user_emailsettings
+    oro_imap.user_form_type:                         oro_user_emailsettings
     oro_imap.email_mailbox_form_name:                oro_email_mailbox
     oro_imap.email_mailbox_form_type:                oro_email_mailbox
     oro_imap.connector.factory.class:                Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory
@@ -163,13 +164,13 @@ services:
         class: %oro_imap.manager.connection_controller_manager.class%
         scope: request
         arguments:
-            - '@oro_user.form.user'
             - '@form.factory'
             - '@oro_security.encoder.mcrypt'
             - '@doctrine'
             - '@oro_imap.connector.factory'
             - '@oro_imap.imap_email_google_oauth2_manager'
             - %oro_imap.user_form_name%
+            - %oro_imap.user_form_type%
             - %oro_imap.email_mailbox_form_name%
             - %oro_imap.email_mailbox_form_type%
 

@@ -40,6 +40,10 @@ abstract class SetDefaultSorting implements ProcessorInterface
             // a query is already built
             return;
         }
+        if (!$context->getConfig()->isSortingEnabled()) {
+            // a sorting is disabled
+            return;
+        }
 
         $entityClass = $context->getClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {

@@ -11,8 +11,7 @@ define(function(require) {
 
     FullScreenPlugin = BasePlugin.extend({
         enable: function() {
-            this.listenTo(this.main, 'shown', this.updateLayout, this);
-            this.listenTo(this.main, 'rendered', this.updateLayout, this);
+            this.listenTo(this.main, 'shown rendered content:update', this.updateLayout, this);
             if (this.main.filterManager) {
                 this.listenFilterManager();
             } else {

@@ -136,7 +136,6 @@ services:
 
     oro_api.resources_cache:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesCache
-        public: false
         arguments:
             - '@oro_api.resources_cache.impl'
 
@@ -173,6 +172,16 @@ services:
     oro_api.config_extension.actions:
         class: Oro\Bundle\ApiBundle\Config\ActionsConfigExtension
         public: false
+        arguments:
+            - '@oro_api.action_processor_bag'
+        tags:
+            - { name: oro_api.config_extension }
+
+    oro_api.config_extension.subresources:
+        class: Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension
+        public: false
+        arguments:
+            - '@oro_api.action_processor_bag'
         tags:
             - { name: oro_api.config_extension }
 
@@ -283,7 +292,12 @@ services:
         public: false
         arguments:
             - %kernel.debug%
-            - []
+            -
+                - '\InvalidArgumentException'
+                - '\UnexpectedValueException'
+                - '\OutOfBoundsException'
+                - 'Oro\Bundle\ApiBundle\Exception\ExceptionInterface'
+                - 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface'
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }
 
@@ -326,7 +340,6 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
-            - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
             - { name: oro_api.routing_options_resolver }
@@ -343,8 +356,6 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
-            - '@oro_api.resource_doc_provider'
-            - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
@@ -368,12 +379,18 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
 
-    oro_api.resource_doc_provider:
-        class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
+    oro_api.entity_description_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider
         public: false
         arguments:
             - '@oro_entity.entity_class_name_provider'
-            - '@oro_api.subresources_provider'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_api.doctrine_helper'
+            - '@translator'
+
+    oro_api.resource_doc_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
+        public: false
 
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory

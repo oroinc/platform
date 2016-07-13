@@ -20,7 +20,7 @@ class MultiRelationGuesser extends RelationGuesser
     /**
      * {@inheritdoc}
      */
-    public function guessColumnOptions($columnName, $entityName, $column)
+    public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];
  
