@@ -160,6 +160,15 @@ class Pager extends AbstractPager implements PagerInterface
     }
 
     /**
+     * @param int $nbResults
+     */
+    public function setCalculatedNbResults($nbResults)
+    {
+        $this->setNbResults($nbResults);
+        $this->isTotalCalculated = true;
+    }
+
+    /**
      * Returns the current pager's parameter holder.
      *
      * @return array

@@ -78,6 +78,11 @@ class OrmPagerExtension extends AbstractExtension
             $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
             $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
         }
+        $calculatedCount = $this->getOr(PagerInterface::CALCULATED_COUNT);
+
+        if (null !== $calculatedCount && is_int($calculatedCount) && $calculatedCount >= 0) {
+            $this->pager->setCalculatedNbResults($calculatedCount);
+        }
         $this->pager->init();
     }
 

@@ -4,16 +4,18 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 class DatagridExportConnector implements ItemReaderInterface, \Countable, ContextAwareInterface
 {
@@ -157,7 +159,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
             $gridData         = $this->getGridData();
             $this->totalCount = $gridData->getTotalRecords();
             $this->sourceData = $gridData->getData();
-            $this->offset     = 0;
+            $this->offset = 0;
         }
     }
 
@@ -172,13 +174,14 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
             $this->gridDataSource = clone $this->grid->getDatasource();
         }
 
-        $this->grid->getParameters()->set(
-            PagerInterface::PAGER_ROOT_PARAM,
-            [
-                PagerInterface::PAGE_PARAM     => $this->page,
-                PagerInterface::PER_PAGE_PARAM => $this->pageSize
-            ]
-        );
+        $pagerParameters = [
+            PagerInterface::PAGE_PARAM     => $this->page,
+            PagerInterface::PER_PAGE_PARAM => $this->pageSize
+        ];
+        if (null !== $this->totalCount) {
+            $pagerParameters[PagerInterface::CALCULATED_COUNT] = $this->totalCount;
+        }
+        $this->grid->getParameters()->set(PagerInterface::PAGER_ROOT_PARAM, $pagerParameters);
 
         return $this->grid->getData();
     }
