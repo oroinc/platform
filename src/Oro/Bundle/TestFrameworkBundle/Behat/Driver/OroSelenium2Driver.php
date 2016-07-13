@@ -133,7 +133,7 @@ JS;
      */
     protected function fillSelect2Entities($xpath, $values)
     {
-        $values = false === is_array($values) ? $values : [$values];
+        $values = true === is_array($values) ? $values : [$values];
         $input = $this->findElement($xpath);
 
         // Remove all existing entities
@@ -152,11 +152,7 @@ JS;
             $input->postValue(['value' => [$value]]);
             $this->wait(3000, "0 == $('ul.select2-results li.select2-searching').length");
 
-            if (!$results = $this->findElementXpaths('//ul[contains(@class, "select2-result-sub")]/li')) {
-                $results = $this->findElementXpaths('//ul[contains(@class, "select2-results")]/li');
-            }
-
-            $firstResult = $this->findElement(array_shift($results));
+            $firstResult = $this->findElement(array_shift($this->getEntitiesSearchResultXpaths()));
 
             if ('select2-no-results' === $firstResult->attribute('class')) {
                 throw new ExpectationException(sprintf('Not found result for "%s"', $value), $this);
@@ -164,6 +160,29 @@ JS;
 
             $firstResult->click();
         }
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getEntitiesSearchResultXpaths()
+    {
+        $resultsHoldersXpaths = [
+            '//ul[contains(@class, "select2-result-sub")]',
+            '//ul[contains(@class, "select2-result")]',
+        ];
+
+        while ($resultsHoldersXpath = array_shift($resultsHoldersXpaths)) {
+            foreach ($this->findElementXpaths($resultsHoldersXpath) as $xpath) {
+                $resultsHolder = $this->findElement($xpath);
+
+                if ($resultsHolder->displayed()) {
+                    return $this->findElementXpaths($xpath.'/li');
+                }
+            }
+        }
+
+        return [];
     }
 
     /**
@@ -190,7 +209,7 @@ JS;
         }
 
         $this->wait(3000, "0 == $('ul.select2-results li.select2-searching').length");
-        $results = $this->findElementXpaths('//ul[contains(@class, "select2-results")]/li');
+        $results = $this->getEntitiesSearchResultXpaths();
 
         if (1 < count($results)) {
             foreach ($results as $result) {
@@ -206,13 +225,11 @@ JS;
             throw new ExpectationException(sprintf('Too many results for "%s"', $value), $this);
         }
 
-        $firstResult = $this->findElement(array_shift($results));
-
-        if ('select2-no-results' === $firstResult->attribute('class')) {
+        if (0 === count($results)) {
             throw new ExpectationException(sprintf('Not found result for "%s"', $value), $this);
         }
 
-        $firstResult->click();
+        $this->findElement(array_shift($results))->click();
     }
 
     /**
@@ -224,9 +241,7 @@ JS;
         $this->wait(
             $time,
             '"complete" == document["readyState"] '.
-            '&& (typeof($) != "undefined" '.
-            '&& document.title !=="Loading..." '.
-            '&& $ !== null)'
+            '&& document.title !=="Loading..." '
         );
     }
 
@@ -240,7 +255,11 @@ JS;
 
         $jsAppActiveCheck = <<<JS
         (function () {
-            var isAppActive = 0 !== $("div.loader-mask.shown").length;
+            if (typeof(jQuery) == "undefined" || jQuery == null) {
+                return false;
+            }
+
+            var isAppActive = 0 !== jQuery("div.loader-mask.shown").length;
             try {
                 if (!window.mediatorCachedForSelenium) {
                     window.mediatorCachedForSelenium = require('oroui/js/mediator');
