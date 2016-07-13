@@ -33,7 +33,6 @@ layout:
                 __update:
                     blockType: button
                     options:
-                        template:
                         action: submit
                         text: 'Save label'
                 __cancel:
