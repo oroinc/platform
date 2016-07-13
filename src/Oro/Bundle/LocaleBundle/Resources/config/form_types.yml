@@ -125,28 +125,4 @@ services:
             - '@oro_locale.provider.localization'
             - '@oro_locale.provider.localization_choices'
         tags:
-            - { name: form.type, alias: oro_localization_selection }
-
-    oro_locale.form.type.enabled_localization_selection:
-       class: 'Oro\Bundle\LocaleBundle\Form\Type\EnabledLocalizationSelectionType'
-       public: true
-       arguments:
-            - '@oro_config.manager'
-            - '@oro_locale.settings'
-            - '@oro_locale.provider.localization'
-            - '@oro_locale.provider.localization_choices'
-       tags:
-            - { name: form.type, alias: oro_locale_enabled_localization_selection }
-
-    oro_locale.form.type.default_localization_selection:
-       class: 'Oro\Bundle\LocaleBundle\Form\Type\DefaultLocalizationSelectionType'
-       public: true
-       arguments:
-            - '@oro_config.manager'
-            - '@oro_locale.settings'
-            - '@oro_locale.provider.localization'
-            - '@oro_locale.provider.localization_choices'
-            - "@translator"
-            - "@request_stack"
-       tags:
-            - { name: form.type, alias: oro_locale_default_localization_selection }
+            - { name: form.type, alias: oro_locale_localization_selection }

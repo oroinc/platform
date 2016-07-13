@@ -3,7 +3,7 @@ oro_system_configuration:
         localization:
             title: oro.locale.system_configuration.groups.localization.title
             icon:  'icon-flag'
-            page_reload: true
+            page_reload: false
         language_settings:
             title: oro.locale.system_configuration.groups.language_settings.title
             icon:  'icon-font'
@@ -136,17 +136,19 @@ oro_system_configuration:
 
         oro_locale.enabled_localizations:
             data_type: array
-            type: oro_localization_selection
+            type: oro_locale_localization_selection
             priority: 20
             options:
                 label: oro.locale.system_configuration.fields.enabled_localizations.label
                 required: true
                 multiple: true
+                resettable: false
                 constraints:
                     - NotBlank: ~
+
         oro_locale.default_localization:
             data_type: string
-            type: oro_locale_default_localization_selection
+            type: oro_locale_localization_selection
             priority: 10
             options:
                 label: oro.locale.system_configuration.fields.default_localization.label
@@ -154,6 +156,7 @@ oro_system_configuration:
                 multiple: false
                 resettable: false
                 constraints:
+                    - Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalization: ~
                     - NotBlank: ~
 
     tree:
