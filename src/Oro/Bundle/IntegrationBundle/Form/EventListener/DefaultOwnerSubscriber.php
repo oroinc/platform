@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
@@ -121,9 +121,7 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
                     'required' => true,
                     'label'    => 'oro.integration.integration.default_user_owner.label',
                     'tooltip'  => 'oro.integration.integration.default_user_owner.description',
-                    'constraints' => [
-                        new NotNull(),
-                    ],
+                    'constraints' => new NotBlank(),
                 ]
             );
         }
@@ -147,9 +145,7 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
                     'required'    => true,
                     'label'       => 'oro.integration.integration.default_business_unit_owner.label',
                     'tooltip'     => 'oro.integration.integration.default_business_unit_owner.description',
-                    'constraints' => [
-                        new NotNull(),
-                    ],
+                    'constraints' => new NotBlank(),
                 ]
             );
         }
