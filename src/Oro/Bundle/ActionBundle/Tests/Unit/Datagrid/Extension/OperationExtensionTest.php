@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 
@@ -77,6 +78,7 @@ class OperationExtensionTest extends AbstractExtensionTest
             $optionsHelper,
             $this->gridConfigurationHelper
         );
+        $this->extension->setParameters(new ParameterBag());
     }
 
     protected function tearDown()
@@ -158,6 +160,16 @@ class OperationExtensionTest extends AbstractExtensionTest
 
             $this->assertEquals($expectedActions, call_user_func($actionConfigurationCallback, $record, []));
         }
+    }
+
+    public function testExtensionDisabledByParameters()
+    {
+        $this->extension->getParameters()->set(
+            OperationExtension::OPERATION_ROOT_PARAM,
+            [OperationExtension::DISABLED_PARAM => true]
+        );
+
+        $this->assertFalse($this->extension->isApplicable(DatagridConfiguration::create([])));
     }
 
     /**

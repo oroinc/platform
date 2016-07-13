@@ -11,6 +11,7 @@ interface PagerInterface
     const PAGE_PARAM       = '_page';
     const PER_PAGE_PARAM   = '_per_page';
     const DISABLED_PARAM   = '_disabled';
+    const CALCULATED_COUNT = '_calculated_count';
 
     const MINIFIED_PAGE_PARAM     = 'i';
     const MINIFIED_PER_PAGE_PARAM = 'p';
