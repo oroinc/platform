@@ -429,7 +429,9 @@ define([
                     return {
                         displayName: attendee.displayName,
                         email: attendee.email,
-                        fullName: attendee.text
+                        fullName: attendee.text,
+                        status: attendee.status,
+                        type: attendee.type
                     };
                 });
             }

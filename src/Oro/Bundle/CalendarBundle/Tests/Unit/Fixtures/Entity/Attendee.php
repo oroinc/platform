@@ -21,6 +21,8 @@ class Attendee extends BaseAttendee
     public function setStatus($status)
     {
         $this->status = $status;
+
+        return $this;
     }
 
     public function getStatus()
@@ -36,5 +38,7 @@ class Attendee extends BaseAttendee
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
     }
 }
