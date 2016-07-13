@@ -68,14 +68,6 @@ class View implements ViewInterface
     }
 
     /**
-     * @return bool
-     */
-    public function getId()
-    {
-        return false;
-    }
-
-    /**
      * @param string $label
      *
      * @return $this

@@ -23,6 +23,6 @@ class ViewListStub extends AbstractViewsList
 
     public function getViewsList()
     {
-        // TODO: Implement getViewsList() method.
+        return [];
     }
 }

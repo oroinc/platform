@@ -5,25 +5,25 @@ interface ViewInterface
 {
     /**
      * @param array $filtersData
-     * @return mixed
+     * @return ViewInterface
      */
     public function setFiltersData(array $filtersData);
 
     /**
      * @param array $sortersData
-     * @return mixed
+     * @return ViewInterface
      */
     public function setSortersData(array $sortersData = []);
 
     /**
      * @param array $columnsData
-     * @return mixed
+     * @return ViewInterface
      */
     public function setColumnsData(array $columnsData = []);
 
     /**
      * @param string $gridName
-     * @return mixed
+     * @return ViewInterface
      */
     public function setGridName($gridName);
 
