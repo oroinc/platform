@@ -26,9 +26,6 @@ abstract class AbstractFilter implements FilterInterface
     /** @var array */
     protected $unresolvedOptions = [];
 
-    /** @var array [array, ...] */
-    protected $additionalOptions = [];
-
     protected $state;
 
     /**
