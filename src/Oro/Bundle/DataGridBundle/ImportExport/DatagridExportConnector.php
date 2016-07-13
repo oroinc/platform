@@ -69,8 +69,8 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
      */
     public function __construct(ServiceLink $gridManagerLink)
     {
-        $this->gridManagerLink   = $gridManagerLink;
-        $this->pageSize          = BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE;
+        $this->gridManagerLink = $gridManagerLink;
+        $this->pageSize        = BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE;
     }
 
     /**
@@ -90,7 +90,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
     {
         $this->ensureSourceDataInitialized();
 
-        $result = null;
+        $result  = null;
         $context = $this->getContext();
         if ($context->getReadCount() < $this->totalCount) {
             if ($this->offset === $this->pageSize && $this->page * $this->pageSize < $this->totalCount) {
@@ -159,7 +159,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
             $gridData         = $this->getGridData();
             $this->totalCount = $gridData->getTotalRecords();
             $this->sourceData = $gridData->getData();
-            $this->offset = 0;
+            $this->offset     = 0;
         }
     }
 
