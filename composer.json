@@ -29,7 +29,7 @@
         "doctrine/data-fixtures": "1.1.1",
         "doctrine/doctrine-fixtures-bundle": "2.2.0",
         "twig/extensions": "1.0.1",
-        "symfony/assetic-bundle": "2.3.0",
+        "symfony/assetic-bundle": "2.7.1",
         "symfony/swiftmailer-bundle": "2.3.*",
         "symfony/monolog-bundle": "2.7.*",
         "sensio/distribution-bundle": "4.0.*",
