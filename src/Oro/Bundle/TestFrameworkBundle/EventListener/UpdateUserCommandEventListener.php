@@ -45,6 +45,8 @@ class UpdateUserCommandEventListener
             $user
                 ->setUsername('admin')
                 ->setPlainPassword('admin')
+                ->setFirstName('John')
+                ->setLastName('Doe')
                 ->setEmail('admin@example.com')
                 ->setSalt('');
 
