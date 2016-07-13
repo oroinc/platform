@@ -17,7 +17,7 @@ Each block in HTML has data attributes:
 - `data-layout-debug-block-id` - unique identifier of current block
 - `data-layout-debug-block-template` - template of current block that was rendered
 
-**!!! Important !!!** If you want to render block debug information in HTML, you need to define `{{ block('block_attributes') }}` **for each twig block you have**.
+**IMPORTANT:** If you want to render block debug information in HTML, you need to define `{{ block('block_attributes') }}` **for each twig block you have**.
 
 **Example:**
 
