@@ -39,7 +39,7 @@ class ImportedLayoutUpdate implements \Oro\Component\Layout\LayoutUpdateImportIn
     public function testMethod()
     {
         if (null === \$this->import) {
-            throw new \RuntimeException('Missing impost configuration for layout update');
+            throw new \RuntimeException('Missing import configuration for layout update');
         }
 
         \$layoutManipulator  = new ImportLayoutManipulator(\$layoutManipulator, \$this->import);
