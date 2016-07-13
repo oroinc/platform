@@ -40,6 +40,9 @@ class RestCalendarEventWithRepeatedExceptionTest extends WebTestCase
          * Update First time
          */
         $recurringEventException = $this->addRecurringEventException($recurringCalendarEvent->getId());
+        /**
+         * @todo add cancel route instead of delete
+         */
         $this->deleteRecurringEventException($recurringEventException->getId());
 
         $start->modify('+1 hour');
@@ -71,7 +74,7 @@ class RestCalendarEventWithRepeatedExceptionTest extends WebTestCase
         CalendarEvent $recurringCalendarEvent,
         array $recurringEventExceptions
     ) {
-        $actualCalendarEvents = $this->getCalendarEvents($recurringCalendarEvent->getId());
+        $actualCalendarEvents = $this->getAllCalendarEventsViaApi($recurringCalendarEvent->getId());
 
         $expectedEventsCount = count($recurringEventExceptions) + 1;
         $this->assertCount($expectedEventsCount, $actualCalendarEvents);
@@ -263,7 +266,7 @@ class RestCalendarEventWithRepeatedExceptionTest extends WebTestCase
      *
      * @return array
      */
-    public function getCalendarEvents($calendarEventId)
+    public function getAllCalendarEventsViaApi($calendarEventId)
     {
         $request = [
             'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
@@ -273,6 +276,18 @@ class RestCalendarEventWithRepeatedExceptionTest extends WebTestCase
         ];
 
         $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        return $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        /**
+         * For avoiding different element order in different DB`s
+         */
+        usort(
+            $result,
+            function (array $first, array $second) {
+                return $first['id'] - $second['id'];
+            }
+        );
+
+        return $result;
     }
 }
