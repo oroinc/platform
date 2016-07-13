@@ -179,6 +179,8 @@ services:
 
     oro_api.get_relationship.add_parent_entity_id_to_query:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -150 }
 

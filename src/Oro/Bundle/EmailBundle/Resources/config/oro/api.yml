@@ -28,4 +28,5 @@ oro_api:
         Oro\Bundle\EmailBundle\Entity\EmailRecipient: ~
         Oro\Bundle\EmailBundle\Entity\EmailThread: ~
         Oro\Bundle\EmailBundle\Entity\EmailUser: ~
+        Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin: ~
         Oro\Bundle\EmailBundle\Entity\Mailbox: ~

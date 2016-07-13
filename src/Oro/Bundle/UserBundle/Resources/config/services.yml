@@ -45,8 +45,12 @@ parameters:
 
     oro_user.role.datagrid_helper.class:          Oro\Bundle\UserBundle\Datagrid\RoleGridHelper
 
+    oro_user.provider.user_configuration.form_provider.class: Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider
+
     # Validator
     oro_user.validator.user_custom_grid_field_validator.class: Oro\Bundle\UserBundle\Validator\UserGridFieldValidator
+
+    oro_user.imap_configuration.subscriber.class:    Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber
 
 services:
     oro_user.manager:
@@ -392,3 +396,20 @@ services:
             - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
+
+    oro_user.provider.user_config_form_provider:
+        class: %oro_user.provider.user_configuration.form_provider.class%
+        arguments:
+            - '@oro_config.config_bag'
+            - '@form.factory'
+            - '@oro_security.security_facade'
+        tags:
+            -  { name: oro_config.configuration_provider }
+        lazy: true
+
+    oro_user.imap_configuration.subscriber:
+        class: %oro_user.imap_configuration.subscriber.class%
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@request_stack'
+            - '@security.context'
