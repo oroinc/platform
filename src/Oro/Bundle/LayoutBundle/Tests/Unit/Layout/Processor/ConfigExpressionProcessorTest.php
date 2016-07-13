@@ -75,7 +75,6 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $values['label_attr']['enabled'] = '=true';
         $values['array_with_expr'] = ['item1' => 'val1', 'item2' => '=true'];
 
-
         $classExpr = new ParsedExpression(
             'context["css_class"]',
             new GetAttrNode(
