@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class AssetsThemeDumpCommandTest extends WebTestCase
 {
     const NAME = 'oro:assetic:dump:theme';
-    const PARAMETER = 'default';
+    const PARAMETER = 'base';
 
     protected function setUp()
     {
