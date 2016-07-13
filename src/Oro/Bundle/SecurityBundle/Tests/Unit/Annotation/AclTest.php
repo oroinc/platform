@@ -17,6 +17,7 @@ class AclTest extends \PHPUnit_Framework_TestCase
                 'group_name' => 'SomeGroup',
                 'label' => 'SomeLabel',
                 'description' => 'SomeDescription',
+                'category' => 'SomeCategory',
                 'ignore_class_acl' => true
             )
         );
@@ -27,6 +28,7 @@ class AclTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('SomeGroup', $annotation->getGroup());
         $this->assertEquals('SomeLabel', $annotation->getLabel());
         $this->assertEquals('SomeDescription', $annotation->getDescription());
+        $this->assertEquals('SomeCategory', $annotation->getCategory());
         $this->assertTrue($annotation->getIgnoreClassAcl());
     }
 

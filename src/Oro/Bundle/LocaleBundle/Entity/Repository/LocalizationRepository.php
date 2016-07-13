@@ -4,13 +4,17 @@ namespace Oro\Bundle\LocaleBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorInterface;
+use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
  * @method Localization|null findOneByName($name)
  */
-class LocalizationRepository extends EntityRepository
+class LocalizationRepository extends EntityRepository implements BatchIteratorInterface
 {
+    use BatchIteratorTrait;
+    
     /**
      * @return array
      */

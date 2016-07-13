@@ -210,7 +210,8 @@ class EntitySecurityMetadataProvider
                     $securityConfig->get('group_name'),
                     $label,
                     $permissions,
-                    $description
+                    $description,
+                    $securityConfig->get('category')
                 );
             }
         }
