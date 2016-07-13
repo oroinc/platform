@@ -463,9 +463,9 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
-            var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON
-                ? jqXHR.responseJSON.code
-                : jqXHR.status;
+            var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON ?
+                jqXHR.responseJSON.code :
+                jqXHR.status;
 
             var errors = [];
             var fieldLabel;
