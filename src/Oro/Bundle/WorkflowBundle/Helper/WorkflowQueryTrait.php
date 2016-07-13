@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 trait WorkflowQueryTrait
