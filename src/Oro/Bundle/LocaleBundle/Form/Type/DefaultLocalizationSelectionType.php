@@ -46,7 +46,7 @@ class DefaultLocalizationSelectionType extends LocalizationSelectionType
         ConfigManager $configManager,
         LocaleSettings $localeSettings,
         LocalizationProvider $localizationProvider,
-        LocalizationChoicesProvider $localizationChoicesProvider,        
+        LocalizationChoicesProvider $localizationChoicesProvider,
         TranslatorInterface $translator,
         RequestStack $requestStack
     ) {
@@ -54,7 +54,7 @@ class DefaultLocalizationSelectionType extends LocalizationSelectionType
         $this->translator = $translator;
         $this->requestStack = $requestStack;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -88,13 +88,13 @@ class DefaultLocalizationSelectionType extends LocalizationSelectionType
 
             if (!in_array($defaultLocalization, $enabledLocalizations)) {
                 $localization = $this->localizationProvider->getLocalization((int)$defaultLocalization);
-                if($localization instanceof Localization){
+                if ($localization instanceof Localization) {
                     $message = $this->translator->trans(
                         'oro.locale.validators.is_not_enabled',
                         ['%localization%' => $localization->getName()],
                         'validators'
                     );
-                }else{
+                } else {
                     $message = $this->translator->trans(
                         'oro.locale.validators.unknown_localization',
                         ['%localization_id%' => $defaultLocalization],

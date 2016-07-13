@@ -62,23 +62,23 @@ abstract class AbstractLocalizationSelectionType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {
-                    $this->checkOptions($options);
+                $this->checkOptions($options);
 
-                    if ($options['full_localization_list']) {
-                        return $this->localizationChoicesProvider->getLocalizationChoices();
-                    }
+                if ($options['full_localization_list']) {
+                    return $this->localizationChoicesProvider->getLocalizationChoices();
+                }
 
-                    $localizations = $options['localizations_list'];
-                    if (!count($localizations)) {
-                        $localizations = $this->getLocalizations();
-                    }
+                $localizations = $options['localizations_list'];
+                if (!count($localizations)) {
+                    $localizations = $this->getLocalizations();
+                }
 
-                    $localizations += (array)$options['additional_localizations'];
+                $localizations += (array)$options['additional_localizations'];
 
-                    $localizations = $this->checkLocalizations($localizations);
+                $localizations = $this->checkLocalizations($localizations);
 
-                    return $this->getChoices($localizations, $options['compact']);
-                },
+                return $this->getChoices($localizations, $options['compact']);
+            },
             'compact' => false,
             'localizations_list' => null,
             'additional_localizations' => null,
@@ -110,7 +110,6 @@ abstract class AbstractLocalizationSelectionType extends AbstractType
      */
     protected function getChoices(array $localizations, $isCompact)
     {
-
         if ($isCompact) {
             $choices = array_combine($localizations, $localizations);
         } else {
@@ -155,11 +154,6 @@ abstract class AbstractLocalizationSelectionType extends AbstractType
 
         return $data ? : $this->localizationChoicesProvider->getLocalizationChoices();
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    abstract public function getName();
 
     /**
      * @return string

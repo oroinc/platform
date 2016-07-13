@@ -42,7 +42,7 @@ class LocalizationProvider
     }
 
     /**
-     * @param array $ids
+     * @param array|null $ids
      *
      * @return array|Localization[]
      */
@@ -52,17 +52,15 @@ class LocalizationProvider
     }
 
     /**
-     * @throws \Exception
-     *
      * @return Localization
      */
     public function getDefaultLocalization()
     {
-        $id = $this->configManager->get('oro_locale.'. Configuration::DEFAULT_LOCALIZATION);
+        $id = $this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION));
 
         $localization = $this->getLocalization($id);
-        
-        if($localization instanceof Localization){
+
+        if ($localization instanceof Localization){
            return $localization;
         }
 
@@ -70,7 +68,6 @@ class LocalizationProvider
         if (count($localizations)) {
             return reset($localizations);
         }
-
 
         return null;
     }

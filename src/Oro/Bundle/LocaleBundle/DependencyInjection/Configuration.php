@@ -124,4 +124,13 @@ class Configuration implements ConfigurationInterface
 
         return $treeBuilder;
     }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public static function getConfigKeyByName($name)
+    {
+        return sprintf('oro_locale.%s', $name);
+    }
 }

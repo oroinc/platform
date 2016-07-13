@@ -9,10 +9,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\Translator;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Form\Type\DefaultLocalizationSelectionType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -106,12 +105,12 @@ class DefaultLocalizationSelectionTypeTest extends FormIntegrationTestCase
     public function tearDown()
     {
         unset(
-        $this->configManager,
-        $this->localeSettings,
-        $this->localizationProvider,
-        $this->localizationChoicesProvider,
-        $this->translator,
-        $this->requestStack
+            $this->configManager,
+            $this->localeSettings,
+            $this->localizationProvider,
+            $this->localizationChoicesProvider,
+            $this->translator,
+            $this->requestStack
         );
     }
 
@@ -124,13 +123,13 @@ class DefaultLocalizationSelectionTypeTest extends FormIntegrationTestCase
             new PreloadedExtension(
                 [
                     'oro_locale_default_localization_selection' => new DefaultLocalizationSelectionType(
-                            $this->configManager,
-                            $this->localeSettings,
-                            $this->localizationProvider,
-                            $this->localizationChoicesProvider,
-                            $this->translator,
-                            $this->requestStack
-                        ),
+                        $this->configManager,
+                        $this->localeSettings,
+                        $this->localizationProvider,
+                        $this->localizationChoicesProvider,
+                        $this->translator,
+                        $this->requestStack
+                    ),
                 ],
                 []
             ),
@@ -158,8 +157,12 @@ class DefaultLocalizationSelectionTypeTest extends FormIntegrationTestCase
      * @param string $submittedValue
      * @param bool $isValid
      */
-    public function testSubmitValidForm(array $defaultLocalization, array $enabledLocalizations, $submittedValue, $isValid)
-    {
+    public function testSubmitValidForm(
+        array $defaultLocalization,
+        array $enabledLocalizations,
+        $submittedValue,
+        $isValid
+    ) {
         $currentRequest = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -179,7 +182,7 @@ class DefaultLocalizationSelectionTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create('oro_locale_default_localization_selection');
 
         /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $parentForm */
-        $rootForm = $this->getMock('Symfony\Component\Form\FormInterface');
+        $rootForm = $this->getMock(FormInterface::class);
 
         $rootForm->expects($this->once())
             ->method('getRoot')

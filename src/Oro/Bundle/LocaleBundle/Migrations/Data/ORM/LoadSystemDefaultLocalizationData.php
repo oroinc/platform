@@ -14,7 +14,9 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
-class LoadSystemDefaultLocalizationData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class LoadSystemDefaultLocalizationData extends AbstractFixture implements
+    ContainerAwareInterface,
+    DependentFixtureInterface
 {
     use ContainerAwareTrait;
 
@@ -27,15 +29,18 @@ class LoadSystemDefaultLocalizationData extends AbstractFixture implements Conta
         $localization = $this->getReference('default_localization');
         /** @var ConfigManager $configManager */
         $configManager = $this->container->get('oro_config.global');
-        $configManager->set('oro_locale.' . Configuration::DEFAULT_LOCALIZATION, $localization->getId());
+        $configManager->set(
+            Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION),
+            $localization->getId()
+        );
         $configManager->flush();
     }
 
     /**
      * {@inheritdoc}
      */
-    function getDependencies()
+    public function getDependencies()
     {
-        return ['\Oro\Bundle\LocaleBundle\Migrations\Data\ORM\LoadLocalizationData'];
+        return ['Oro\Bundle\LocaleBundle\Migrations\Data\ORM\LoadLocalizationData'];
     }
 }

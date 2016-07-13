@@ -1,12 +1,14 @@
 <?php
 
-namespace OroB2B\Bundle\PricingBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Intl\Locale\Locale;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Form\Type\EnabledLocalizationSelectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 
@@ -18,12 +20,12 @@ class EnabledLocalizationSelectionTypeTest extends FormIntegrationTestCase
     protected $formType;
 
     /**
-     * @var \Oro\Bundle\ConfigBundle\Config\ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $configManager;
 
     /**
-     * @var \Oro\Bundle\LocaleBundle\Model\LocaleSettings|\PHPUnit_Framework_MockObject_MockObject
+     * @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $localeSettings;
 
@@ -44,13 +46,13 @@ class EnabledLocalizationSelectionTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->setMethods(['get'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->localeSettings = $this
-            ->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->getMockBuilder(LocaleSettings::class)
             ->setMethods(['getCurrency', 'getLocale'])
             ->disableOriginalConstructor()
             ->getMock();
