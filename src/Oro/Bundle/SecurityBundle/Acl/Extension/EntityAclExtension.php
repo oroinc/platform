@@ -274,8 +274,10 @@ class EntityAclExtension extends AbstractAclExtension
                 $mask           = $rootMask & $permissionMask;
                 $accessLevel    = $this->getAccessLevel($mask);
                 if (!$metadata->hasOwner()) {
+                    $ownershipPermissions = $this->getOwnershipPermissions();
+
                     if ($identity === $this->getIdentityForPermission('ASSIGN')
-                        && ($permission === 'ASSIGN' || $permission === 'SHARE')
+                        && in_array($permission, $ownershipPermissions, true)
                     ) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                     } elseif ($accessLevel < AccessLevel::SYSTEM_LEVEL) {
@@ -392,13 +394,21 @@ class EntityAclExtension extends AbstractAclExtension
 
             $metadata = $this->getMetadata($oid);
             if (!$metadata->hasOwner()) {
-                $result = array_diff($result, ['ASSIGN', 'SHARE']);
+                $result = array_diff($result, $this->getOwnershipPermissions());
             }
         }
 
         $allowed = $this->getPermissionsForType($oid->getType());
 
         return array_values(array_intersect($result, $allowed));
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOwnershipPermissions()
+    {
+        return ['ASSIGN'];
     }
 
     /**
@@ -627,12 +637,12 @@ class EntityAclExtension extends AbstractAclExtension
             $maskBuilder = $this->getMaskBuilder($permission);
             $maskBuilder->reset()->add($maskBuilder->getMask('GROUP_SYSTEM'));
 
-            if ($maskBuilder->hasMask('MASK_ASSIGN_SYSTEM')) {
-                $maskBuilder->remove('ASSIGN_SYSTEM');
-            }
-
-            if ($maskBuilder->hasMask('MASK_SHARE_SYSTEM')) {
-                $maskBuilder->remove('SHARE_SYSTEM');
+            foreach ($this->getOwnershipPermissions() as $ownershipPermission) {
+                $maskName = 'MASK_' . $ownershipPermission . '_SYSTEM';
+                
+                if ($maskBuilder->hasMask($maskName)) {
+                    $maskBuilder->remove($ownershipPermission . '_SYSTEM');
+                }
             }
 
             return $maskBuilder->get();
