@@ -30,13 +30,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     /** @var AbstractRole */
     protected $role;
 
-    /** @var string[] Exclude share permissions in platform application because it is enterprise feature
-     * Should be fixed by - CRM-5781 */
-    protected static $excludePermissions = ['SHARE'];
-
     /**
-     * RolePermissionDatasource constructor.
-     *
      * @param TranslatorInterface           $translator
      * @param PermissionManager             $permissionManager
      * @param AclRoleHandler                $aclRoleHandler
@@ -100,7 +94,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
         foreach ($privilege->getPermissions() as $permissionName => $permission) {
             /** @var AclPermission $permission */
             $permissionEntity = $this->permissionManager->getPermissionByName($permission->getName());
-            if ($permissionEntity && $this->isSupportedPermission($permissionName)) {
+            if ($permissionEntity) {
                 $privilegePermission = $this->getPrivilegePermission(
                     $privilege,
                     $permissionEntity,
@@ -114,19 +108,6 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
         array_multisort($orders, $item['permissions']);
 
         return $item;
-    }
-
-    /**
-     * Filter some permissions like SHARE in platform. Should be fixed by - CRM-5781
-     * Should be fixed in PermissionCollectionType too.
-     *
-     * @param string $permissionName
-     *
-     * @return bool
-     */
-    protected function isSupportedPermission($permissionName)
-    {
-        return !in_array($permissionName, static::$excludePermissions, true);
     }
 
     /**
