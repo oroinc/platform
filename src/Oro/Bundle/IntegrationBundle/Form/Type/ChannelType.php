@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
