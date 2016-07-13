@@ -21,6 +21,8 @@ class OroDurationType extends AbstractType
 {
     const NAME = 'oro_duration';
 
+    const MAX_DURATION = 2147483647; // Date functions limit (2^31 - 1)
+
     /**
      * {@inheritdoc}
      */
@@ -45,7 +47,7 @@ class OroDurationType extends AbstractType
     }
 
     /**
-     * Checks whether string is in a recognizable duration format and the seconds do not exceed 2^32
+     * Checks whether string is in a recognizable duration format and the seconds do not exceed MAX_DURATION
      *
      * @param string $value
      * @return bool
@@ -67,7 +69,7 @@ class OroDurationType extends AbstractType
 
         $isValidFormat = preg_match($regexJIRAFormat, $value) || preg_match($regexColumnFormat, $value);
 
-        return $isValidFormat && ($transformer->reverseTransform($value) < 1 << 31);
+        return $isValidFormat && ($transformer->reverseTransform($value) <= self::MAX_DURATION);
     }
 
     /**
