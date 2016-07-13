@@ -6,13 +6,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
-use Oro\Component\Layout\Layout;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\ContextItemInterface;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 
 class LayoutDataCollector extends DataCollector
 {
