@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\EventListener;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -123,12 +123,10 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo('oro_user_organization_acl_select'),
                 $this->equalTo(
                     [
-                        'required'    => true,
-                        'label'       => 'oro.integration.integration.default_user_owner.label',
-                        'tooltip'     => 'oro.integration.integration.default_user_owner.tooltip',
-                        'constraints' => [
-                            new NotNull(),
-                        ]
+                        'required' => true,
+                        'label'    => 'oro.integration.integration.default_user_owner.label',
+                        'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip',
+                        'constraints' => new NotBlank()
                     ]
                 )
             )
@@ -172,9 +170,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
                         'required'    => true,
                         'label'       => 'oro.integration.integration.default_business_unit_owner.label',
                         'tooltip'     => 'oro.integration.integration.default_business_unit_owner.tooltip',
-                        'constraints' => [
-                            new NotNull(),
-                        ],
+                        'constraints' => new NotBlank(),
                     ]
                 )
             )
@@ -220,12 +216,10 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo('oro_user_organization_acl_select'),
                 $this->equalTo(
                     [
-                        'required'    => true,
-                        'label'       => 'oro.integration.integration.default_user_owner.label',
-                        'tooltip'     => 'oro.integration.integration.default_user_owner.tooltip',
-                        'constraints' => [
-                            new NotNull(),
-                        ]
+                        'required' => true,
+                        'label'    => 'oro.integration.integration.default_user_owner.label',
+                        'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip',
+                        'constraints' => new NotBlank(),
                     ]
                 )
             )
@@ -273,9 +267,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
                         'required'    => true,
                         'label'       => 'oro.integration.integration.default_business_unit_owner.label',
                         'tooltip'     => 'oro.integration.integration.default_business_unit_owner.tooltip',
-                        'constraints' => [
-                            new NotNull(),
-                        ],
+                        'constraints' => new NotBlank(),
                     ]
                 )
             )
