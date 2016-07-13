@@ -60,8 +60,8 @@ class LocalizationProvider
 
         $localization = $this->getLocalization($id);
 
-        if ($localization instanceof Localization){
-           return $localization;
+        if ($localization instanceof Localization) {
+            return $localization;
         }
 
         $localizations = $this->getLocalizations();

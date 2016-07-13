@@ -47,8 +47,7 @@ abstract class AbstractLocalizationSelectionType extends AbstractType
         LocaleSettings $localeSettings,
         LocalizationProvider $localizationProvider,
         LocalizationChoicesProvider $localizationChoicesProvider
-    )
-    {
+    ) {
         $this->configManager = $configManager;
         $this->localeSettings = $localeSettings;
         $this->localizationProvider = $localizationProvider;
