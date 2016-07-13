@@ -553,7 +553,7 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see (?P<entity>[\w\s]+) with:$/
      */
-    public function iShouldSeeActivityWith($entity, TableNode $table)
+    public function assertValuesByLabels($entity, TableNode $table)
     {
         $page = $this->getSession()->getPage();
 

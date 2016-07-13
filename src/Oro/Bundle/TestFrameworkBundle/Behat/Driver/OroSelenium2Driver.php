@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Driver;
 
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Exception\ExpectationException;
+use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
 use WebDriver\Element;
 
@@ -15,11 +16,17 @@ class OroSelenium2Driver extends Selenium2Driver
     private $xpathManipulator;
 
     /**
+     * @var Escaper
+     */
+    private $xpathEscaper;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($browserName, $desiredCapabilities, $wdHost)
     {
         $this->xpathManipulator = new Manipulator();
+        $this->xpathEscaper = new Escaper();
 
         parent::__construct($browserName, $desiredCapabilities, $wdHost);
     }
@@ -31,6 +38,22 @@ class OroSelenium2Driver extends Selenium2Driver
     {
         $element = $this->findElement($xpath);
         $elementName = strtolower($element->name());
+
+        if ('select' === $elementName) {
+            if (is_array($value)) {
+                $this->deselectAllOptions($element);
+
+                foreach ($value as $option) {
+                    $this->selectOptionOnElement($element, $option, true);
+                }
+
+                return;
+            }
+
+            $this->selectOptionOnElement($element, $value);
+
+            return;
+        }
 
         if ('input' === $elementName) {
             $classes = explode(' ', $element->attribute('class'));
@@ -269,5 +292,50 @@ JS;
         }
 
         return $this->getWebDriverSession()->execute_async($options);
+    }
+
+    /**
+     * @param Element $element
+     * @param string  $value
+     * @param bool    $multiple
+     */
+    protected function selectOptionOnElement(Element $element, $value, $multiple = false)
+    {
+        $escapedValue = $this->xpathEscaper->escapeLiteral($value);
+        // The value of an option is value attribute or the normalized version of its text
+        $optionQuery = sprintf('.//option[@value = %s or normalize-space(.) = %1$s]', $escapedValue);
+        $option = $element->element('xpath', $optionQuery);
+
+        if ($multiple || !$element->attribute('multiple')) {
+            if (!$option->selected()) {
+                $option->click();
+            }
+
+            return;
+        }
+
+        // Deselect all options before selecting the new one
+        $this->deselectAllOptions($element);
+        $option->click();
+    }
+
+    /**
+     * Deselects all options of a multiple select
+     *
+     * Note: this implementation does not trigger a change event after deselecting the elements.
+     *
+     * @param Element $element
+     */
+    private function deselectAllOptions(Element $element)
+    {
+        $script = <<<JS
+var node = {{ELEMENT}};
+var i, l = node.options.length;
+for (i = 0; i < l; i++) {
+    node.options[i].selected = false;
+}
+JS;
+
+        $this->executeJsOnElement($element, $script);
     }
 }

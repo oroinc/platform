@@ -15,7 +15,6 @@ class DateTimePicker extends Element
     public function setValue(\DateTime $dateTime)
     {
         $this->find('css', 'input.datepicker-input')->click();
-        $page = $this->getPage();
 
         $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
@@ -23,7 +22,7 @@ class DateTimePicker extends Element
 
         /** @var NodeElement $date */
         foreach ($this->getCalendar()->findAll('css', 'tbody a') as $date) {
-            if ($date->getText() == $dateValue) {
+            if ($date->getText() === $dateValue) {
                 $date->click();
 
                 return;
@@ -41,12 +40,7 @@ class DateTimePicker extends Element
      */
     protected function getMonthPicker()
     {
-        return array_shift(array_filter(
-            $this->getPage()->findAll('css', '.ui-datepicker-month'),
-            function (NodeElement $element) {
-                return $element->isVisible();
-            }
-        ));
+        return $this->findVisible('css', '.ui-datepicker-month');
     }
 
     /**
@@ -54,12 +48,7 @@ class DateTimePicker extends Element
      */
     protected function getYearPicker()
     {
-        return array_shift(array_filter(
-            $this->getPage()->findAll('css', '.ui-datepicker-year'),
-            function (NodeElement $element) {
-                return $element->isVisible();
-            }
-        ));
+        return $this->findVisible('css', '.ui-datepicker-year');
     }
 
     /**
@@ -67,8 +56,19 @@ class DateTimePicker extends Element
      */
     protected function getCalendar()
     {
+        return $this->findVisible('css', '.ui-datepicker-calendar');
+    }
+
+    /**
+     * @param string       $selector selector engine name
+     * @param string|array $locator  selector locator
+     *
+     * @return NodeElement|null
+     */
+    protected function findVisible($selector, $locator)
+    {
         return array_shift(array_filter(
-            $this->getPage()->findAll('css', '.ui-datepicker-calendar'),
+            $this->getPage()->findAll($selector, $locator),
             function (NodeElement $element) {
                 return $element->isVisible();
             }
