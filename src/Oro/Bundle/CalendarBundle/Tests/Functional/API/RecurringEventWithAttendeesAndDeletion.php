@@ -16,6 +16,20 @@ class RecurringEventWithAttendeesAndDeletion extends WebTestCase
 {
     const DEFAULT_USER_CALENDAR_ID = 1;
 
+    const EVENT_START_TIME = '2016-07-02T08:00:00P';
+    const EVENT_END_TIME = '2016-07-02T08:30:00P';
+
+    const RECURRENCE_START_TIME = '2016-07-01T00:00:00P';
+    const RECURRENCE_END_TIME = '2016-07-30T00:00:00P';
+
+    const SEARCH_START_TIME = '2016-06-26T00:00:00P';
+    const SEARCH_END_TIME = '2016-08-07T00:00:00P';
+
+    const EXCLUSION_START_TIME = '2016-07-02T10:00:00P';
+    const EXCLUSION_END_TIME = '2016-07-02T10:30:00P';
+
+    const ORIGINAL_START_TIME = '2016-07-09T08:00:00P';
+
     /**
      * {@inheritdoc}
      */
@@ -27,55 +41,35 @@ class RecurringEventWithAttendeesAndDeletion extends WebTestCase
 
     public function testRecurringEventWithAttendeesAndDeletion()
     {
-        $start = new \DateTime('2016-07-13 18:24:13');
-        $end   = clone $start;
-        $end->modify('+1 hour');
+        $this->checkPreconditions();
 
-        $this->checkPreconditions($start, $end);
+        $recurringCalendarEvent = $this->postRecurringEvent();
 
-        $recurringCalendarEvent = $this->postRecurringEvent($start, $end);
-
-        $allEvents = $this->getAllEvents($start, $end);
+        $allEvents = $this->getAllEvents();
 
         $this->assertFalse($allEvents[0]['isCancelled']);
 
-        $this->checkAfterPostConditions($start, $end, 5, 2);
+        $this->checkUIResponseEventQuantity(5);
+        $this->checkEventQuantityInDB(2);
 
         $this->postExclusionCalendarEvent($recurringCalendarEvent);
 
-        $this->checkAfterPostConditions($start, $end, 6, 4);
+        $this->checkUIResponseEventQuantity(4);
+        $this->checkEventQuantityInDB(4);
 
-        $allEvents = $this->getAllEvents($start, $end);
-
-        $result = array_filter(
-            $allEvents,
-            function (array $element) {
-                return $element['isCancelled'] === true;
-            }
-        );
-
-        $this->assertCount(1, $result);
+        $this->checkCancelledEventsOnUIResponse(0);
+        $this->checkCancelledEventsInDB(2);
     }
 
     /**
-     * @param \DateTime $start
-     * @param \DateTime $end
-     *
      * @return array
      */
-    protected function getAllEvents(\DateTime $start, \DateTime $end)
+    protected function getAllEvents()
     {
-        $newEnd = clone $end;
-        $newEnd->modify('+2 month');
-
-        $newStart = clone $start;
-        $newStart->modify('-2 month');
-
-
         $request = [
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
-            'start'       => $newStart->format(DATE_RFC3339),
-            'end'         => $newEnd->format(DATE_RFC3339),
+            'start'       => self::SEARCH_START_TIME,
+            'end'         => self::SEARCH_END_TIME,
             'subordinate' => true,
         ];
 
@@ -83,14 +77,11 @@ class RecurringEventWithAttendeesAndDeletion extends WebTestCase
     }
 
     /**
-     * @param \DateTime $start
-     * @param \DateTime $end
-     *
      * @return array
      */
-    protected function checkPreconditions(\DateTime $start, \DateTime $end)
+    protected function checkPreconditions()
     {
-        $result = $this->getAllEvents($start, $end);
+        $result = $this->getAllEvents();
 
         $this->assertEmpty($result);
     }
@@ -111,51 +102,27 @@ class RecurringEventWithAttendeesAndDeletion extends WebTestCase
     }
 
     /**
-     * @param \DateTime $start
-     * @param \DateTime $end
-     *
      * @return CalendarEvent
      */
-    protected function postRecurringEvent(\DateTime $start, \DateTime $end)
+    protected function postRecurringEvent()
     {
-        $user = $this->getReference('simple_user');
-
-        $newEnd = clone $end;
-        $newEnd->modify('+1 month');
-
-        $newStart = clone $start;
-        $newStart->modify('-1 day');
-
         $request = [
             'title'       => 'Test Recurring Event',
             'description' => 'Test Recurring Event',
             'allDay'      => false,
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
-            'start'       => $start->format(DATE_RFC3339),
-            'end'         => $end->format(DATE_RFC3339),
+            'start'       => self::EVENT_START_TIME,
+            'end'         => self::EVENT_START_TIME,
             'recurrence'  => [
                 'timeZone'       => 'UTC',
                 'recurrenceType' => Recurrence::TYPE_WEEKLY,
                 'interval'       => 1,
                 'dayOfWeek'      => ['saturday'],
-                'startTime'      => $newStart->format(DATE_RFC3339),
+                'startTime'      => self::RECURRENCE_START_TIME,
                 'occurrences'    => 5,
-                'endTime'        => $newEnd->format(DATE_RFC3339),
+                'endTime'        => self::RECURRENCE_END_TIME,
             ],
-            'attendees'   => [
-                [
-                    'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
-                    'email'       => $user->getEmail(),
-                    'status'      => Attendee::STATUS_NONE,
-                    'type'        => Attendee::TYPE_REQUIRED,
-                ],
-                [
-                    'displayName' => 'admin@example.com',
-                    'email'       => 'admin@example.com',
-                    'status'      => Attendee::STATUS_NONE,
-                    'type'        => Attendee::TYPE_REQUIRED,
-                ],
-            ],
+            'attendees'   => $this->getAttendees(),
         ];
 
         return $this->postAPI($request);
@@ -169,14 +136,16 @@ class RecurringEventWithAttendeesAndDeletion extends WebTestCase
     protected function postExclusionCalendarEvent(CalendarEvent $recurringCalendarEvent)
     {
         $request = [
-            'originalStart'    => $recurringCalendarEvent->getStart()->format(DATE_RFC3339),
+            'originalStart'    => self::ORIGINAL_START_TIME,
             'isCancelled'      => true,
-            'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
-            'recurringEventId' => $recurringCalendarEvent->getId(),
-            'start'            => date(DATE_RFC3339, strtotime('+4 hour')),
-            'end'              => date(DATE_RFC3339, strtotime('+4 hour')),
             'title'            => $recurringCalendarEvent->getTitle(),
             'description'      => $recurringCalendarEvent->getDescription(),
+            'allDay'           => false,
+            'attendees'        => $this->getAttendees(),
+            'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
+            'start'            => self::EXCLUSION_START_TIME,
+            'end'              => self::EXCLUSION_END_TIME,
+            'recurringEventId' => $recurringCalendarEvent->getId(),
         ];
 
         $this->postAPI($request);
@@ -205,20 +174,75 @@ class RecurringEventWithAttendeesAndDeletion extends WebTestCase
     }
 
     /**
-     * @param \DateTime $start
-     * @param \DateTime $end
-     * @param int       $postCount
-     * @param int       $dbCount
+     * @param int $number
      */
-    protected function checkAfterPostConditions(\DateTime $start, \DateTime $end, $postCount, $dbCount)
+    protected function checkUIResponseEventQuantity($number)
     {
-        $allEvents = $this->getAllEvents($start, $end);
-        $this->assertCount($postCount, $allEvents);
+        $allEvents = $this->getAllEvents();
+        $this->assertCount($number, $allEvents);
+    }
 
+    /**
+     * @param int $number
+     */
+    protected function checkEventQuantityInDB($number)
+    {
         $allEvents = $this->getContainer()->get('doctrine')
             ->getRepository('OroCalendarBundle:CalendarEvent')
             ->findAll();
 
-        $this->assertCount($dbCount, $allEvents);
+        $this->assertCount($number, $allEvents);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAttendees()
+    {
+        $user = $this->getReference('simple_user');
+
+        return [
+            [
+                'displayName' => sprintf('%s %s', $user->getFirstName(), $user->getLastName()),
+                'email'       => $user->getEmail(),
+                'status'      => Attendee::STATUS_NONE,
+                'type'        => Attendee::TYPE_REQUIRED,
+            ],
+            [
+                'displayName' => 'admin@example.com',
+                'email'       => 'admin@example.com',
+                'status'      => Attendee::STATUS_NONE,
+                'type'        => Attendee::TYPE_REQUIRED,
+            ],
+        ];
+    }
+
+    /**
+     * @param $number
+     */
+    protected function checkCancelledEventsOnUIResponse($number)
+    {
+        $allEvents = $this->getAllEvents();
+
+        $result = array_filter(
+            $allEvents,
+            function (array $element) {
+                return $element['isCancelled'] === true;
+            }
+        );
+
+        $this->assertCount($number, $result);
+    }
+
+    /**
+     * @param int $number
+     */
+    protected function checkCancelledEventsInDB($number)
+    {
+        $allEvents = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->findBy(['cancelled' => true]);
+
+        $this->assertCount($number, $allEvents);
     }
 }
