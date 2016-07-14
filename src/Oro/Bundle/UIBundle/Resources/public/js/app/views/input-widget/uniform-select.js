@@ -16,6 +16,15 @@ define(function(require) {
          * @inheritDoc
          */
         initializeWidget: function() {
+            //support for readonly attr
+            if (this.$el.is('[readonly]')) {
+                this.$el.on('click mousedown', function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+                $('option:not(:selected), [value=""]', this.$el).remove();
+            }
+
             UniformSelectInputWidget.__super__.initializeWidget.apply(this, arguments);
             if (this.$el.is('.error:not([multiple])')) {
                 this.$el.removeClass('error');

@@ -4,10 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\FormBuilderInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -49,33 +47,20 @@ class RestrictionsExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['disable_workflow_restrictions'] ||
             empty($options['data_class']) ||
-            !$this->restrictionsManager->hasEntityClassRestrictions($options['data_class'])
+            !$this->restrictionsManager->hasEntityClassRestrictions($options['data_class']) ||
+            $form->isSubmitted()
         ) {
             return;
         }
-
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            [$this, 'addRestrictionListener']
-        );
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function addRestrictionListener(FormEvent $event)
-    {
-        $entity = $event->getData();
-        if (!is_object($entity)) {
+        $data = $form->getData();
+        if (!$data) {
             return;
         }
-
-        $form = $event->getForm();
-        $restrictions = $this->restrictionsManager->getEntityRestrictions($entity);
+        $restrictions = $this->restrictionsManager->getEntityRestrictions($data);
         foreach ($restrictions as $restriction) {
             if ($form->has($restriction['field'])) {
                 $this->applyRestriction($restriction, $form);
@@ -108,7 +93,7 @@ class RestrictionsExtension extends AbstractTypeExtension
         $field = $restriction['field'];
         $mode  = $restriction['mode'];
         if ($mode === 'full') {
-            FormUtils::replaceField($form, $field, ['disabled' => true]);
+            FormUtils::replaceField($form, $field, ['read_only' => true]);
         } else {
             $values = $restriction['values'];
             if ($mode === 'disallow') {
@@ -133,7 +118,7 @@ class RestrictionsExtension extends AbstractTypeExtension
         if ($fieldForm->getConfig()->hasOption('disabled_values')) {
             FormUtils::replaceField($form, $field, ['disabled_values' => $disabledValues]);
         } else {
-            FormUtils::replaceField($form, $field, ['disabled' => true]);
+            FormUtils::replaceField($form, $field, ['read_only' => true]);
         }
     }
 }
