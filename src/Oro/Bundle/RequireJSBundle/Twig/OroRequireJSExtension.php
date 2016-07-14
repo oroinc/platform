@@ -6,6 +6,8 @@ use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 
 class OroRequireJSExtension extends \Twig_Extension
 {
+    const DEFAULT_PROVIDER_ALIAS = 'oro_requirejs_config_provider';
+
     /**
      * @var ConfigProviderManager
      */
@@ -108,6 +110,6 @@ class OroRequireJSExtension extends \Twig_Extension
      */
     protected function getDefaultAliasIfEmpty($alias)
     {
-        return $alias ?: 'oro_requirejs_config_provider';
+        return $alias ?: static::DEFAULT_PROVIDER_ALIAS;
     }
 }
