@@ -6,6 +6,8 @@ use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 
 class OroRequireJSExtension extends \Twig_Extension
 {
+    const DEFAULT_PROVIDER_ALIAS = 'oro_requirejs_config_provider';
+
     /**
      * @var ConfigProviderManager
      */
@@ -57,9 +59,9 @@ class OroRequireJSExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function getRequireJSConfig($alias = 'oro_requirejs_config_provider')
+    public function getRequireJSConfig($alias = null)
     {
-        $provider = $this->manager->getProvider($alias);
+        $provider = $this->manager->getProvider($this->getDefaultAliasIfEmpty($alias));
 
         return $provider ? $provider->getConfig()->getMainConfig() : json_encode([]);
     }
@@ -71,9 +73,9 @@ class OroRequireJSExtension extends \Twig_Extension
      *
      * @return null|string
      */
-    public function getRequireJSBuildPath($alias = 'oro_requirejs_config_provider')
+    public function getRequireJSBuildPath($alias = null)
     {
-        $provider = $this->manager->getProvider($alias);
+        $provider = $this->manager->getProvider($this->getDefaultAliasIfEmpty($alias));
 
         return $provider ? $provider->getConfig()->getOutputFilePath() : null;
     }
@@ -85,9 +87,9 @@ class OroRequireJSExtension extends \Twig_Extension
      *
      * @return boolean
      */
-    public function isRequireJSBuildExists($alias = 'oro_requirejs_config_provider')
+    public function isRequireJSBuildExists($alias = null)
     {
-        $filePath = $this->getRequireJSBuildPath($alias);
+        $filePath = $this->getRequireJSBuildPath($this->getDefaultAliasIfEmpty($alias));
 
         return file_exists($this->webRoot . DIRECTORY_SEPARATOR . $filePath);
     }
@@ -100,5 +102,14 @@ class OroRequireJSExtension extends \Twig_Extension
     public function getName()
     {
         return 'requirejs_extension';
+    }
+
+    /**
+     * @param string $alias
+     * @return string
+     */
+    protected function getDefaultAliasIfEmpty($alias)
+    {
+        return $alias ?: static::DEFAULT_PROVIDER_ALIAS;
     }
 }
