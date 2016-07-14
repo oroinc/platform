@@ -15,7 +15,7 @@ define(function(require) {
             return new this.itemView({
                 autoRender: false,
                 model: model,
-                accessLevels: this.collection.accessLevels
+                accessLevels: model.accessLevels
             });
         }
     });

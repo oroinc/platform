@@ -20,14 +20,15 @@ class AclPermissionController extends Controller
 {
     /**
      * @Route(
-     *  "/acl-access-levels/{oid}",
+     *  "/acl-access-levels/{oid}/{permission}",
      *  name="oro_security_access_levels",
-     *  requirements={"oid"="\w+:[\w\(\)]+"},
-     *  defaults={"_format"="json"}
+     *  requirements={"oid"="[\w\+]+:[\w\(\)]+", "permission"="[\w/]+"},
+     *  defaults={"_format"="json", "permission"=null}
      * )
      * @Template
      *
      * @param string $oid
+     * @param string $permission
      *
      * @return array
      */

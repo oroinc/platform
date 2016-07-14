@@ -20,9 +20,12 @@ define(function(require) {
                 if (options.metadata.options.access_level_route) {
                     routeParameters.routeName = options.metadata.options.access_level_route;
                 }
-
-                item.permissions.accessLevels = new AccessLevelsCollection([], {
+                var accessLevelsCollection = new AccessLevelsCollection([], {
                     routeParameters: routeParameters
+                });
+                item.permissions.accessLevels = accessLevelsCollection;
+                item.permissions.each(function(model) {
+                    model.accessLevels = accessLevelsCollection;
                 });
             });
             deferred.resolve();
