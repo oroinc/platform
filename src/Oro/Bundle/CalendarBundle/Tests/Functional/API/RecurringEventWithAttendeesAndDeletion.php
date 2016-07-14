@@ -9,8 +9,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- *
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RecurringEventWithAttendeesAndDeletion extends WebTestCase
 {
@@ -218,7 +216,7 @@ class RecurringEventWithAttendeesAndDeletion extends WebTestCase
     }
 
     /**
-     * @param $number
+     * @param int $number
      */
     protected function checkCancelledEventsOnUIResponse($number)
     {
