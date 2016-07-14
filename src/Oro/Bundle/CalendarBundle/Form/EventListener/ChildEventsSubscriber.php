@@ -87,35 +87,35 @@ class ChildEventsSubscriber implements EventSubscriberInterface
      */
     public function postSubmit(FormEvent $event)
     {
-        /** @var CalendarEvent $parentEvent */
-        $parentEvent = $event->getForm()->getData();
-        $this->updateCalendarEvents($parentEvent);
-        $this->updateAttendeeDisplayNames($parentEvent);
-        if (!$parentEvent) {
+        /** @var CalendarEvent $calendarEvent */
+        $calendarEvent = $event->getForm()->getData();
+        $this->updateCalendarEvents($calendarEvent);
+        $this->updateAttendeeDisplayNames($calendarEvent);
+        if (!$calendarEvent) {
             return;
         }
 
-        $this->setDefaultAttendeeStatus($parentEvent->getRelatedAttendee(), CalendarEvent::STATUS_ACCEPTED);
-        foreach ($parentEvent->getChildEvents() as $calendarEvent) {
-            $calendarEvent
-                ->setTitle($parentEvent->getTitle())
-                ->setDescription($parentEvent->getDescription())
-                ->setStart($parentEvent->getStart())
-                ->setEnd($parentEvent->getEnd())
-                ->setAllDay($parentEvent->getAllDay());
+        $this->setDefaultAttendeeStatus($calendarEvent->getRelatedAttendee(), CalendarEvent::STATUS_ACCEPTED);
+        foreach ($calendarEvent->getChildEvents() as $childEvent) {
+            $childEvent
+                ->setTitle($calendarEvent->getTitle())
+                ->setDescription($calendarEvent->getDescription())
+                ->setStart($calendarEvent->getStart())
+                ->setEnd($calendarEvent->getEnd())
+                ->setAllDay($calendarEvent->getAllDay());
 
-            if ($parentEvent->getRecurringEvent() && $calendarEvent->getCalendar()) {
-                $calendarEvent
+            if ($calendarEvent->getRecurringEvent() && $childEvent->getCalendar()) {
+                $childEvent
                     ->setRecurringEvent(
-                        $parentEvent
+                        $calendarEvent
                             ->getRecurringEvent()
-                            ->getChildEventByCalendar($calendarEvent->getCalendar())
+                            ->getChildEventByCalendar($childEvent->getCalendar())
                     )
-                    ->setOriginalStart($parentEvent->getOriginalStart());
+                    ->setOriginalStart($calendarEvent->getOriginalStart());
             }
         }
 
-        foreach ($parentEvent->getChildAttendees() as $attendee) {
+        foreach ($calendarEvent->getChildAttendees() as $attendee) {
             $this->setDefaultAttendeeStatus($attendee);
         }
     }
@@ -123,12 +123,17 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     /**
      * Creates/removes calendar events based on attendee changes
      *
-     * @param CalendarEvent $parent
+     * @param CalendarEvent $calendarEvent
      */
-    protected function updateCalendarEvents(CalendarEvent $parent)
+    protected function updateCalendarEvents(CalendarEvent $calendarEvent)
     {
         $attendeesByUserId = [];
-        $attendees         = $parent->getAttendees();
+        if ($calendarEvent->getId() === null && $calendarEvent->getRecurringEvent() && $calendarEvent->isCancelled()) {
+            $attendees = $calendarEvent->getRecurringEvent()->getAttendees();
+        } else {
+            $attendees = $calendarEvent->getAttendees();
+        }
+
         foreach ($attendees as $attendee) {
             if (!$attendee->getUser()) {
                 continue;
@@ -139,15 +144,15 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         $currentUserIds = array_keys($attendeesByUserId);
 
         $calendarEventOwnerIds = [];
-        $calendar              = $parent->getCalendar();
+        $calendar              = $calendarEvent->getCalendar();
         if ($calendar && $calendar->getOwner()) {
             $owner = $calendar->getOwner();
             if (isset($attendeesByUserId[$owner->getId()])) {
-                $parent->setRelatedAttendee($attendeesByUserId[$owner->getId()]);
+                $calendarEvent->setRelatedAttendee($attendeesByUserId[$owner->getId()]);
             }
             $calendarEventOwnerIds[] = $calendar->getOwner()->getId();
         }
-        $events = $parent->getChildEvents();
+        $events = $calendarEvent->getChildEvents();
         foreach ($events as $event) {
             $calendar = $event->getCalendar();
             if (!$calendar) {
@@ -161,7 +166,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
             $ownerId = $owner->getId();
             if (!in_array($ownerId, $currentUserIds)) {
-                $parent->removeChildEvent($event);
+                $calendarEvent->removeChildEvent($event);
 
                 continue;
             }
@@ -170,7 +175,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         }
 
         $this->createChildEvent(
-            $parent,
+            $calendarEvent,
             array_diff($currentUserIds, $calendarEventOwnerIds),
             $attendeesByUserId
         );

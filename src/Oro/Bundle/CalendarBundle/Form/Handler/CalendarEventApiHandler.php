@@ -73,8 +73,11 @@ class CalendarEventApiHandler
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             // clone attendees to have have original attendees at disposal later
             $originalAttendees = new ArrayCollection($entity->getAttendees()->toArray());
-
-            $this->form->submit($this->request->request->all());
+            $data = $this->request->request->all();
+            if (empty($data['attendees'])) {
+                $data['attendees'] = new ArrayCollection();
+            }
+            $this->form->submit($data);
 
             if ($this->form->isValid()) {
                 /** @deprecated since version 1.10. Please use field attendees instead of invitedUsers */
@@ -150,6 +153,13 @@ class CalendarEventApiHandler
         $notify
     ) {
         $new = $entity->getId() ? false : true;
+        if ($entity->isCancelled()) {
+            $event = $entity->getRealCalendarEvent();
+            $childEvents = $event->getChildEvents();
+            foreach ($childEvents as $childEvent) {
+                $childEvent->setCancelled(true);
+            }
+        }
         $this->manager->persist($entity);
         $this->manager->flush();
 

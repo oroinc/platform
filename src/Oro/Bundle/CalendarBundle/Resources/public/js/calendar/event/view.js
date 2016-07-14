@@ -182,10 +182,11 @@ define([
                     error: _.bind(this._handleResponseError, this),
                 };
                 if (deleteUrl) {
-                    options.url = deleteUrl;
+                    options.url = routing.generate(deleteUrl, {id: this.model.originalId});
                 } else {
-                    options.url = this.model.url() + '?notifyInvitedUsers=true';
+                    options.url = this.model.url();
                 }
+                options.url += '?notifyInvitedUsers=true';
                 this.model.destroy(options);
             } catch (err) {
                 this.showError(err);
