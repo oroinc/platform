@@ -102,7 +102,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         if ($permissions[self::RULE_BUSINESS_UNIT] && $permissions[self::RULE_ORGANIZATION]) {
             $builder->expects($this->at(++$order))
                 ->method('add')
-                ->with('businessUnits', 'oro_type_business_unit_select_autocomplete')
+                ->with('organizations', 'oro_organizations_select')
                 ->will($this->returnValue($builder));
         }
         $builder->expects($this->at(++$order))

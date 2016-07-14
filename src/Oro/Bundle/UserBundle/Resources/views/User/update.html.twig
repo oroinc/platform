@@ -163,17 +163,6 @@
         }] ) %}
     {% endif %}
 
-    {% if form.businessUnits is defined %}
-        {% set dataBlocks = dataBlocks|merge( [{
-        'title': 'Access Settings'|trans,
-        'subblocks': [{
-        'title': '',
-        'useSpan': false,
-        'data': [form_row(form.businessUnits)]
-        }]
-        }] ) %}
-    {% endif %}
-
     {% if form.change_password is defined %}
         {% set dataBlocks = dataBlocks|merge( [{
             'title': 'oro.user.password.label'|trans,
