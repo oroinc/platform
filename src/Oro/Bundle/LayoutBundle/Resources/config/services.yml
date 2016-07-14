@@ -153,13 +153,6 @@ services:
             - '@oro_layout.expression.assembler'
             - '@oro_layout.expression.encoder_registry'
 
-    oro_layout.config_expression.asset:
-        class: Oro\Bundle\LayoutBundle\ConfigExpression\Asset
-        arguments:
-            - '@assets.packages'
-        tags:
-            - { name: oro_layout.expression, alias: asset }
-
     oro_layout.provider.image_type:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
@@ -185,3 +178,10 @@ services:
         class: Symfony\Component\ExpressionLanguage\ExpressionLanguage
         arguments:
             - @oro_layout.expression_language.parsed_cache
+
+    oro_layout.data_provider.asset:
+        class: Oro\Bundle\LayoutBundle\Layout\DataProvider\AssetProvider
+        arguments:
+            - '@assets.packages'
+        tags:
+            - { name: layout.data_provider, alias: asset }
