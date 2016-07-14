@@ -14,7 +14,9 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
-class LoadSystemDefaultLocalizationData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class LoadSystemDefaultLocalizationData extends AbstractFixture implements
+    ContainerAwareInterface,
+    DependentFixtureInterface
 {
     use ContainerAwareTrait;
 
@@ -34,8 +36,8 @@ class LoadSystemDefaultLocalizationData extends AbstractFixture implements Conta
     /**
      * {@inheritdoc}
      */
-    function getDependencies()
+    public function getDependencies()
     {
-        return ['\Oro\Bundle\LocaleBundle\Migrations\Data\ORM\LoadLocalizationData'];
+        return [LoadLocalizationData::class];
     }
 }
