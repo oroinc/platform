@@ -14,6 +14,7 @@ parameters:
     oro_organization.entity_ownership.listener.class:          Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener
     oro_organization.business_unit.listener.class:             Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
     oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
+    oro_organization.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\OrganizationBundle\EventListener\ChoiceTreeFilterLoadDataListener
 
     oro_organization.provider.business_units.class:            Oro\Bundle\OrganizationBundle\Provider\BusinessUnitGridService
 
@@ -33,6 +34,8 @@ parameters:
 
     oro_organization.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
     oro_organization.provider.busines_unit_acl.class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider
+    oro_organization.autocomplete.business_unit_owner_search_handler.class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitOwnerSearchHandler
+    oro_organization.autocomplete.business_unit_tree_search_handler.class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitTreeSearchHandler
 
 services:
     #
@@ -133,19 +136,6 @@ services:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
             - { name: doctrine.event_listener, event: onClear }
 
-    oro_organization.listener.indexer_prepare_query_listener:
-        class: Oro\Bundle\OrganizationBundle\EventListener\IndexerPrepareQueryListener
-        arguments:
-            - '@oro_security.security_facade'
-        tags:
-            - { name: kernel.event_listener, event: oro_search.indexed_prepare_query, method: updateQuery }
-
-    oro_organization.listener.choice_tree_filter_load_data_listener:
-        class: Oro\Bundle\OrganizationBundle\EventListener\ChoiceTreeFilterLoadDataListener
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
     #
     # DataGrid
     #
@@ -256,16 +246,8 @@ services:
             - '@?security.acl.voter.basic_permissions'
             - '@oro_security.ownership_tree_provider'
 
-    # Autocomplete business unit search handler for organization structure
-    oro_organization.autocomplete.business_unit_search_handler:
-        class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitSearchHandler
-        parent: oro_organization.autocomplete.business_unit_owner_search_handler
-        tags:
-            - { name: oro_form.autocomplete.search_handler, alias: business_units_search_handler }
-        lazy: true
-
     oro_organization.autocomplete.business_unit_owner_search_handler:
-        class: Oro\Bundle\OrganizationBundle\Autocomplete\BusinessUnitOwnerSearchHandler
+        class: '%oro_organization.autocomplete.business_unit_owner_search_handler.class%'
         parent: oro_form.autocomplete.search_handler
         arguments:
             - %oro_organization.business_unit.entity.class%
@@ -273,4 +255,20 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units_owner_search_handler }
+        lazy: true
+
+    oro_organization.listener.choice_tree_filter_load_data_listener:
+        class: '%oro_organization.listener.choice_tree_filter_load_data_listener.class%'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
+
+    oro_organization.autocomplete.business_unit_tree_search_handler:
+        class: '%oro_organization.autocomplete.business_unit_tree_search_handler.class%'
+        parent: oro_organization.autocomplete.business_unit_owner_search_handler
+        calls:
+            - [setSecurityFacade, ['@oro_security.security_facade']]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: business_units_tree_search_handler }
         lazy: true

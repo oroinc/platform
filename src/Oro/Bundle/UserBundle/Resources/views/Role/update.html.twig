@@ -118,25 +118,34 @@
         }] ) %}
     {% endif %}
 
-    {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': privilegeConfig.label|trans,
-            'subblocks': [
-                {
-                    'title': '',
-                    'useSpan': false,
-                    'data': [
-                        form_widget(form.children[privilegeBlock])
-                    ]
-                }
-            ]
-        }]) %}
-    {% endfor %}
+    {% set rolePermissionsGrid %}
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/entity-category-tabs-component',
+            options: tabsOptions
+        }) }}></div>
+        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid' }) }}
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'orouser/js/components/role/capability-set-component',
+            options: capabilitySetOptions
+        }) }}></div>
+    {% endset %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': privilegesConfig['entity'].label|trans,
+        'subblocks': [
+            {
+                'title': '',
+                'useSpan': false,
+                'data': [
+                    rolePermissionsGrid
+                ]
+            }
+        ]
+    }]) %}
 
     {% set dataBlocks = dataBlocks|merge([{
         'title' : 'oro.user.entity_plural_label'|trans,
-        'subblocks':
-        [
+        'subblocks': [
             {
                 'title' : null,
                 'useSpan': false,

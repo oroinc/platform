@@ -51,7 +51,7 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
         $metadata = parent::getMetadata();
 
         if (!$metadata['autocomplete_alias']) {
-            $metadata['autocomplete_alias'] = 'business_units_search_handler';
+            $metadata['autocomplete_alias'] = 'business_units_tree_search_handler';
         }
 
         return $metadata;

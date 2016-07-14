@@ -32,16 +32,25 @@ parameters:
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
     oro_user.mailer.processor.class:              Oro\Bundle\UserBundle\Mailer\Processor
     oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
+    oro_user.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
 
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
     oro_user.provider.filter.user_choice_tree.class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
+    oro_user.provider.role_privilege_category_provider.class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider
+    oro_user.datagrid.datasource.role_permission_datasource.class: Oro\Bundle\UserBundle\Datagrid\RolePermissionDatasource
+    oro_user.provider.role_privilege_capability_provider.class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider
+    oro_user.provider.privilege_category_provider.class: Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProvider
 
     oro_user.token.factory.wsse.class:            Oro\Bundle\UserBundle\Security\WsseTokenFactory
 
     oro_user.role.datagrid_helper.class:          Oro\Bundle\UserBundle\Datagrid\RoleGridHelper
 
+    oro_user.provider.user_configuration.form_provider.class: Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider
+
     # Validator
     oro_user.validator.user_custom_grid_field_validator.class: Oro\Bundle\UserBundle\Validator\UserGridFieldValidator
+
+    oro_user.imap_configuration.subscriber.class:    Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber
 
 services:
     oro_user.manager:
@@ -340,6 +349,32 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_locale.dql.formatter.name'
 
+    oro_user.provider.role_privilege_category_provider:
+        class: %oro_user.provider.role_privilege_category_provider.class%
+
+    oro_user.provider.privilege_category_provider:
+        class: %oro_user.provider.privilege_category_provider.class%
+        tags:
+            - { name: oro_user.privilege_category}
+
+    oro_user.provider.role_privilege_capability_provider:
+        class: %oro_user.provider.role_privilege_capability_provider.class%
+        arguments:
+            - '@translator'
+            - '@oro_user.provider.role_privilege_category_provider'
+            - '@oro_user.form.handler.abstract.acl_role='
+
+    oro_user.datagrid.datasource.role_permission_datasource:
+        class: %oro_user.datagrid.datasource.role_permission_datasource.class%
+        arguments:
+            - '@translator'
+            - '@oro_security.acl.permission_manager'
+            - '@oro_user.form.handler.abstract.acl_role='
+            - '@oro_user.provider.role_privilege_category_provider'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro_datagrid.datasource, type: role-permission-provider }
+
     # Validator
     oro_user.validator.user_custom_grid_field_validator:
         class: %oro_user.validator.user_custom_grid_field_validator.class%
@@ -356,8 +391,25 @@ services:
           - '@security.token_storage'
 
     oro_user.listener.choice_tree_filter_load_data_listener:
-        class: Oro\Bundle\UserBundle\EventListener\ChoiceTreeFilterLoadDataListener
+        class: '%oro_user.listener.choice_tree_filter_load_data_listener.class%'
         arguments:
             - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
+
+    oro_user.provider.user_config_form_provider:
+        class: %oro_user.provider.user_configuration.form_provider.class%
+        arguments:
+            - '@oro_config.config_bag'
+            - '@form.factory'
+            - '@oro_security.security_facade'
+        tags:
+            -  { name: oro_config.configuration_provider }
+        lazy: true
+
+    oro_user.imap_configuration.subscriber:
+        class: %oro_user.imap_configuration.subscriber.class%
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@request_stack'
+            - '@security.context'

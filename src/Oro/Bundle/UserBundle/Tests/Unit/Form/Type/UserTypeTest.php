@@ -23,18 +23,12 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $securityFacade;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $userConfigManager;
-
     protected function setUp()
     {
         $this->securityInterface   = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->userConfigManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -108,7 +102,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         if ($permissions[self::RULE_BUSINESS_UNIT] && $permissions[self::RULE_ORGANIZATION]) {
             $builder->expects($this->at(++$order))
                 ->method('add')
-                ->with('businessUnits', 'oro_type_business_unit_select_autocomplete')
+                ->with('organizations', 'oro_organizations_select')
                 ->will($this->returnValue($builder));
         }
         $builder->expects($this->at(++$order))
@@ -118,10 +112,6 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(++$order))
             ->method('add')
             ->with('emails', 'collection')
-            ->will($this->returnValue($builder));
-        $builder->expects($this->at(++$order))
-            ->method('add')
-            ->with('imapConfiguration', 'oro_imap_configuration')
             ->will($this->returnValue($builder));
         $builder->expects($this->at(++$order))
             ->method('add')
@@ -136,7 +126,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->with('inviteUser', 'checkbox')
             ->will($this->returnValue($builder));
 
-        $type = new UserType($this->securityInterface, $this->securityFacade, $request, $this->userConfigManager);
+        $type = new UserType($this->securityInterface, $this->securityFacade, $request);
         $type->buildForm($builder, []);
     }
 
@@ -237,8 +227,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $type = new UserType(
             $this->securityInterface,
             $this->securityFacade,
-            new Request(),
-            $this->userConfigManager
+            new Request()
         );
         $type->setDefaultOptions($resolver);
     }

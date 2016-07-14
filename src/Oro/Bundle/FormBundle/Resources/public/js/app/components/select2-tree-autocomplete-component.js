@@ -8,6 +8,7 @@ define(function(require) {
 
     Select2TreeAutocompleteComponent = Select2AutocompleteComponent.extend({
         ViewType: Select2AutocompleteView,
+
         preConfig: function(config) {
             config = Select2TreeAutocompleteComponent.__super__.preConfig.apply(this, arguments);
 
@@ -23,11 +24,11 @@ define(function(require) {
                     this.container.removeClass('hide-all-tree-related-ui');
                 };
             };
+
             return config;
         },
 
         makeItemTemplate: function(propName, forSelection) {
-
             var template = require('tpl!oroform/templates/select2-tree-autocomplete-result.html');
 
             var mixData = {

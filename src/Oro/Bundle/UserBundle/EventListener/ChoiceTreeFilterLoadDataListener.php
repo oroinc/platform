@@ -30,7 +30,6 @@ class ChoiceTreeFilterLoadDataListener
     {
         if ($event->getClassName() === static::SUPPORTED_CLASS_NAME) {
             $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id' => $event->getValues()]);
-
             $data = [];
             /** @var User $entity */
             foreach ($entities as $entity) {
@@ -39,7 +38,6 @@ class ChoiceTreeFilterLoadDataListener
                     'fullName' => $entity->getFullName()
                 ];
             }
-
             $event->setData($data);
         }
     }

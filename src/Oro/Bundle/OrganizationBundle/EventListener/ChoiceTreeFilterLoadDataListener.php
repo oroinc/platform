@@ -30,7 +30,6 @@ class ChoiceTreeFilterLoadDataListener
     {
         if ($event->getClassName() === static::SUPPORTED_CLASS_NAME) {
             $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id'=> $event->getValues()]);
-
             $data = [];
             /** @var BusinessUnit $entity */
             foreach ($entities as $entity) {
@@ -41,7 +40,6 @@ class ChoiceTreeFilterLoadDataListener
                     'organization_id' => $entity->getOrganization()->getId()
                 ];
             }
-
             $event->setData($data);
         }
     }
@@ -55,13 +53,11 @@ class ChoiceTreeFilterLoadDataListener
     protected function getPath($businessUnit, $path)
     {
         array_unshift($path, ['name'=> $businessUnit->getName()]);
-
         $owner = $businessUnit->getOwner();
         if ($owner) {
             $path = $this->getPath($owner, $path);
         } else {
             array_unshift($path, ['name'=> $businessUnit->getOrganization()->getName()]);
-
         }
 
         return $path;

@@ -3,6 +3,9 @@ define(function(require) {
 
     var ChoiceTreeFilter;
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var $ = require('jquery');
+    var messenger = require('oroui/js/messenger');
     var TextFilter = require('oro/filter/text-filter');
     var tools = require('oroui/js/tools');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
@@ -65,12 +68,14 @@ define(function(require) {
             }
             return result;
         },
+
         _showCriteria: function() {
             if (!this.select2component) {
                 this._initSelect2Component();
             }
             ChoiceTreeFilter.__super__._showCriteria.apply(this, arguments);
         },
+
         /**
          * @inheritDoc
          */
@@ -101,7 +106,6 @@ define(function(require) {
             }
             this.$(this.criteriaValueSelectors.value).data('selected-data', this.data);
             this.select2component = new Select2TreeAutocompleteComponent(options);
-
         },
 
         /**
@@ -158,17 +162,70 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var renderedPropertyName = this.renderedPropertyName || 'name';
-            var label = [];
-            _.each(value.value.split(','), function(val) {
-                var item = _.findWhere(this.data, {id: parseInt(val)});
-                if (item !== void 0) {
-                    label.push(item[renderedPropertyName]);
-                }
-            }, this);
+            if (this.data.length === 0) {
+                this.loadDataById(value);
+            } else {
+                var renderedPropertyName = this.renderedPropertyName || 'name';
+                var label = [];
+                _.each(value.value.split(','), function (val) {
+                    var item = _.findWhere(this.data, {id: parseInt(val)});
+                    if (item !== void 0) {
+                        if (item.treePath) {
+                            var path = [];
+                            _.each(item.treePath, function (item) {
+                                path.push(item[renderedPropertyName]);
+                            });
+                            label.push(path.join(' / '));
+                        } else {
+                            label.push(item[renderedPropertyName]);
+                        }
+                    }
+                }, this);
 
-            var hintValue = this.wrapHintValue ? ('"' + label.join(',') + '"') : label.join(',');
-            return (option ? option.label + ' ' : '') + hintValue;
+                if (this.select2component && this.select2component.view.$el.select2('data').length === 0) {
+                    this.select2component.view.$el.select2('data', this.data);
+                }
+
+                var hintValue = this.wrapHintValue ? ('"' + label.join(', ') + '"') : label.join(', ');
+                return (option ? option.label + ' ' : '') + hintValue;
+            }
+        },
+
+        getQuery: function(value) {
+            var query;
+            if (typeof value.value === 'string') {
+                query = value.value;
+            } else {
+                var ids = [];
+                _.each(value.value, function (val) {
+                    ids.push(val.id);
+                });
+                query = ids.join(',');
+            }
+
+            return query;
+        },
+
+        loadDataById: function(value) {
+            var query = this.getQuery(value);
+            var self = this;
+            $.ajax({
+                url: this.autocomplete_url,
+                data: {
+                    page: 1,
+                    per_page: 10,
+                    name: self.autocomplete_alias,
+                    query: query,
+                    search_by_id: true
+                },
+                success: function(reposne) {
+                    self.data = reposne.results;
+                    self._updateCriteriaHint(true);
+                },
+                error: function(jqXHR) {
+                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                }
+            });
         },
 
         reset: function() {
