@@ -14,61 +14,8 @@ class AbstractUseCaseTestCase extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
-    }
-
-    /**
-     * @param CalendarEvent $calendarEvent
-     * @param string        $start
-     * @param string        $end
-     * @param string        $originalEventStartAt
-     *
-     * @return CalendarEvent
-     */
-    protected function addRecurringEventExceptionForCalendarEvent(
-        CalendarEvent $calendarEvent,
-        $start,
-        $end,
-        $originalEventStartAt
-    ) {
-        $attendees = [];
-        foreach ($calendarEvent->getAttendees() as $attendee) {
-            $attendees[] = [
-                'displayName' => $attendee->getDisplayName(),
-                'email'       => $attendee->getEmail(),
-                'status'      => $attendee->getStatus()->getId(),
-                'type'        => $attendee->getType()->getId()
-            ];
-        }
-
-        $data = [
-            'originalStart'    => $originalEventStartAt,
-            'isCancelled'      => false,
-            'title'            => $calendarEvent->getTitle(),
-            'description'      => $calendarEvent->getDescription(),
-            'allDay'           => $calendarEvent->getAllDay(),
-            'calendar'         => $calendarEvent->getCalendar()->getId(),
-            'start'            => $start,
-            'end'              => $end,
-            'recurringEventId' => $calendarEvent->getId(),
-            'attendees'        => $attendees,
-        ];
-        $calendarEventId = $this->addCalendarEventViaAPI($data);
-
-        $events = $this->getContainer()->get('doctrine')
-            ->getRepository('OroCalendarBundle:CalendarEvent')
-            ->findBy(['id' => $calendarEventId]);
-
-        $this->assertCount(1, $events);
-
-        /** @var CalendarEvent $event */
-        $event = reset($events);
-
-        $this->assertNotNull($event);
-        $this->assertFalse($event->isCancelled());
-
-        return $event;
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData'], true);
     }
 
     /**
