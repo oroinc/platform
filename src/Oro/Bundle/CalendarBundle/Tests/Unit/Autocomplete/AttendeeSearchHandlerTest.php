@@ -8,9 +8,10 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 use Oro\Bundle\CalendarBundle\Autocomplete\AttendeeSearchHandler;
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
@@ -38,9 +39,13 @@ class AttendeeSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnCallback(function ($id) {
-                return $id;
-            }));
+            ->will(
+                $this->returnCallback(
+                    function ($id) {
+                        return $id;
+                    }
+                )
+            );
 
         $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
             ->disableOriginalConstructor()
@@ -127,12 +132,18 @@ class AttendeeSearchHandlerTest extends \PHPUnit_Framework_TestCase
                 [$users[0]],
                 [$users[1]]
             )
-            ->will($this->returnCallback(function (User $user) {
-                return (new Attendee)
-                    ->setUser($user)
-                    ->setDisplayName($user->getFirstName())
-                    ->setEmail($user->getEmail());
-            }));
+            ->will(
+                $this->returnCallback(
+                    function (User $user) {
+                        return (new Attendee)
+                            ->setUser($user)
+                            ->setDisplayName($user->getFirstName())
+                            ->setEmail($user->getEmail())
+                            ->setStatus(new TestEnumValue('test', 'test'))
+                            ->setType(new TestEnumValue('test', 'test'));
+                    }
+                )
+            );
 
         $result = $this->attendeeSearchHandler->search('query', 1, 100);
 
@@ -140,25 +151,33 @@ class AttendeeSearchHandlerTest extends \PHPUnit_Framework_TestCase
             [
                 'results' => [
                     [
-                        'id' => json_encode([
-                            'entityClass' => 'Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\User',
-                            'entityId' => 1,
-                        ]),
-                        'text' => 'user1',
+                        'id'          => json_encode(
+                            [
+                                'entityClass' => 'Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\User',
+                                'entityId'    => 1,
+                            ]
+                        ),
+                        'text'        => 'user1',
                         'displayName' => 'user1',
-                        'email' => 'user1@example.com',
+                        'email'       => 'user1@example.com',
+                        'status'      => 'test',
+                        'type'        => 'test',
                     ],
                     [
-                        'id' => json_encode([
-                            'entityClass' => 'Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\User',
-                            'entityId' => 2,
-                        ]),
-                        'text' => 'user2',
+                        'id'          => json_encode(
+                            [
+                                'entityClass' => 'Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\User',
+                                'entityId'    => 2,
+                            ]
+                        ),
+                        'text'        => 'user2',
                         'displayName' => 'user2',
-                        'email' => 'user2@example.com',
+                        'email'       => 'user2@example.com',
+                        'status'      => 'test',
+                        'type'        => 'test',
                     ],
                 ],
-                'more' => false,
+                'more'    => false,
             ],
             $result
         );

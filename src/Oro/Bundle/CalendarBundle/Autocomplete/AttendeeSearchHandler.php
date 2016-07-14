@@ -27,7 +27,7 @@ class AttendeeSearchHandler extends ContextSearchHandler
      * {@inheritdoc}
      *
      * @param AttendeeRelationManager $attendeeRelationManager
-     * @param string|null $class
+     * @param string|null             $class
      */
     public function __construct(
         TokenStorageInterface $token,
@@ -85,15 +85,17 @@ class AttendeeSearchHandler extends ContextSearchHandler
             }
 
             $result[] = [
-                'id'   => json_encode(
+                'id'          => json_encode(
                     [
                         'entityClass' => ClassUtils::getClass($object),
                         'entityId'    => $object->getId(),
                     ]
                 ),
-                'text' => $attendee->getDisplayName(),
+                'text'        => $attendee->getDisplayName(),
                 'displayName' => $attendee->getDisplayName(),
-                'email' => $attendee->getEmail(),
+                'email'       => $attendee->getEmail(),
+                'status'      => $attendee->getStatus() ? $attendee->getStatus()->getId() : null,
+                'type'        => $attendee->getType() ? $attendee->getType()->getId() : null,
             ];
         }
 
