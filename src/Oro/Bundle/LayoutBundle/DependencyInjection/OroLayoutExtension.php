@@ -15,31 +15,33 @@ use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 
 class OroLayoutExtension extends Extension
 {
-    const UPDATE_LOADER_SERVICE_ID = 'oro_layout.loader';
-    const THEME_MANAGER_SERVICE_ID = 'oro_layout.theme_manager';
+    const UPDATE_LOADER_SERVICE_ID      = 'oro_layout.loader';
+    const THEME_MANAGER_SERVICE_ID      = 'oro_layout.theme_manager';
+    const THEME_CONFIGS_PATH            = 'Resources/views/layouts/{folder}/';
+
+    const RESOURCES_FOLDER_PLACEHOLDER  = '{folder}';
+    const RESOURCES_FOLDER_PATTERN      = '[a-zA-Z][a-zA-Z0-9_\-:]*';
 
     /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configLoader = new CumulativeConfigLoader(
-            'oro_layout',
-            [
-                new FolderingCumulativeFileLoader(
-                    '{folder}',
-                    '[a-zA-Z][a-zA-Z0-9_\-:]*',
-                    new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
-                ),
-                new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
-            ]
+        $resources = $this->loadCumulativeResources(
+            $container,
+            'theme.yml',
+            'Resources/config/oro/layout.yml'
         );
-        $themesResources    = $configLoader->load($container);
-        $existThemePaths = [];
-        foreach ($themesResources as $resource) {
-            $existThemePaths[$resource->path] = true;
+        foreach ($resources as $resource) {
             $configs[] = $this->getThemeConfig($resource);
         }
+        $excludedPaths = $this->getExcludedPaths($resources);
+
+        $resources = $this->loadCumulativeResources(
+            $container,
+            'requirejs.yml'
+        );
+        $excludedPaths = array_merge($excludedPaths, $this->getExcludedPaths($resources));
 
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
@@ -107,7 +109,7 @@ class OroLayoutExtension extends Extension
              *    ]
              * ]
              */
-            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($existThemePaths, $resource->data);
+            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($excludedPaths, $resource->data);
             $resourceThemeLayoutUpdates = $this->sortThemeLayoutUpdates($resourceThemeLayoutUpdates);
             $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resourceThemeLayoutUpdates);
         }
@@ -115,6 +117,53 @@ class OroLayoutExtension extends Extension
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
 
         $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
+    }
+
+    /**
+     * Load resources from views and config file path
+     *
+     * @param ContainerBuilder $container
+     * @param string|null $viewsFilePath
+     * @param string|null $configFilePath
+     *
+     * @return CumulativeResourceInfo[]
+     */
+    protected function loadCumulativeResources(
+        ContainerBuilder $container,
+        $viewsFilePath = null,
+        $configFilePath = null
+    ) {
+        $resourceLoaders = [];
+
+        if ($viewsFilePath) {
+            $resourceLoaders[] = new FolderingCumulativeFileLoader(
+                self::RESOURCES_FOLDER_PLACEHOLDER,
+                self::RESOURCES_FOLDER_PATTERN,
+                new YamlCumulativeFileLoader(self::THEME_CONFIGS_PATH . $viewsFilePath)
+            );
+        }
+
+        if ($configFilePath) {
+            $resourceLoaders[] = new YamlCumulativeFileLoader($configFilePath);
+        }
+
+        $configLoader = new CumulativeConfigLoader('oro_layout', $resourceLoaders);
+
+        return $configLoader->load($container);
+    }
+
+    /**
+     * @param CumulativeResourceInfo[] $resources
+     * @return array
+     */
+    protected function getExcludedPaths(array $resources)
+    {
+        $excludedPaths = [];
+        foreach ($resources as $resource) {
+            $excludedPaths[$resource->path] = true;
+        }
+
+        return $excludedPaths;
     }
 
     /**

@@ -66,12 +66,14 @@ define([
         initItemView: function(model) {
             Row = this.row || this.itemView;
             if (Row) {
-                return new Row({
+                var rowOptions = {
                     autoRender: false,
                     model: model,
                     collection: this.filteredColumns,
                     columns: this.columns
-                });
+                };
+                this.columns.trigger('configureInitializeOptions', Row, rowOptions);
+                return new Row(rowOptions);
             } else {
                 throw new Error('The one of Body#row or Body#itemView properties ' +
                     'must be defined or the initItemView() must be overridden.');
