@@ -342,7 +342,7 @@ define(function(require) {
             }
 
             var data = this.$(this.elementSelector).inputWidget('data');
-            if (!data.length) {
+            if (!data || !data.length) {
                 data = this.previousData.length ? this.previousData : this.initialData;
             }
             var hintRawValue = _.isObject(_.first(value.value)) ?
