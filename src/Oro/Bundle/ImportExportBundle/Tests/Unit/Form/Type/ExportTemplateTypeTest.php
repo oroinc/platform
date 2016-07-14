@@ -24,7 +24,7 @@ class ExportTemplateTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->processorRegistry = $this->getMock(ProcessorRegistry::class);
+        $this->processorRegistry = $this->getMockBuilder(ProcessorRegistry::class)->getMock();
         $this->exportTemplateType = new ExportTemplateType($this->processorRegistry);
     }
 
@@ -71,6 +71,6 @@ class ExportTemplateTypeTest extends FormIntegrationTestCase
      */
     protected function getBuilderMock()
     {
-        return $this->getMock(FormBuilderInterface::class);
+        return $this->getMockBuilder(FormBuilderInterface::class)->getMock();
     }
 }

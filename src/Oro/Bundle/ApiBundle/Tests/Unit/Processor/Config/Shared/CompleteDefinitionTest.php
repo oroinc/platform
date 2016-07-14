@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
@@ -395,10 +397,11 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $this->exclusionProvider->expects($this->exactly(5))
+        $this->exclusionProvider->expects($this->exactly(6))
             ->method('isIgnoredField')
             ->willReturnMap(
                 [
+                    [$rootEntityMetadata, 'id', false],
                     [$rootEntityMetadata, 'field1', false],
                     [$rootEntityMetadata, 'field3', true],
                     [$rootEntityMetadata, 'field4', false],
@@ -407,10 +410,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 ]
             );
 
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
             ->willReturn(
                 [
+                    'id',
                     'field1',
                     'field2',
                     'field3',
@@ -438,7 +445,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
                     'field1' => null,
                     'field2' => [
                         'exclude' => true
@@ -472,9 +481,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -501,7 +513,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'exclusion_policy' => 'all'
                     ],
@@ -520,9 +534,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -555,7 +572,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => null
                 ]
             ],
@@ -572,9 +591,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -618,7 +640,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
@@ -641,9 +665,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $config = [];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -687,7 +714,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
@@ -716,9 +745,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['realAssociation1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -762,7 +794,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'property_path'          => 'realAssociation1',
                         'exclusion_policy'       => 'all',
@@ -792,9 +826,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -836,7 +873,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'exclude'                => true,
                         'exclusion_policy'       => 'all',
@@ -866,9 +905,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -910,7 +952,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
@@ -937,9 +981,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -983,7 +1030,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'exclude'                => true,
                         'exclusion_policy'       => 'all',
@@ -1013,9 +1062,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -1059,7 +1111,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'data_type'              => 'string',
                         'exclusion_policy'       => 'all',
@@ -1087,9 +1141,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getFieldNames')
-            ->willReturn([]);
+            ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
@@ -1136,7 +1193,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
@@ -1173,7 +1232,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
@@ -1192,7 +1251,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
                     'id' => null
                 ]
             ],
@@ -1207,7 +1267,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
@@ -1226,7 +1286,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
                     'id' => null
                 ]
             ],
@@ -1245,7 +1306,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['name']);
 
@@ -1264,7 +1325,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_field_names' => ['renamedId'],
+                'fields'                 => [
                     'renamedId' => [
                         'property_path' => 'name'
                     ]
@@ -1341,6 +1403,220 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'renamedId' => [
                         'property_path' => 'name'
                     ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessTableInheritanceEntity()
+    {
+        $config = [
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'        => null,
+                    '__class__' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessTableInheritanceEntityWhenClassNameFieldAlreadyExists()
+    {
+        $config = [
+            'fields' => [
+                '__class__' => null
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'        => null,
+                    '__class__' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessTableInheritanceEntityWhenClassNameFieldAlreadyExistsAndRenamed()
+    {
+        $config = [
+            'fields' => [
+                'type' => [
+                    'property_path' => '__class__'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'   => null,
+                    'type' => [
+                        'property_path' => '__class__'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessTableInheritanceAssociation()
+    {
+        $config = [
+            'fields' => [
+                'association1' => null
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\Association1Target',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id'        => null,
+                            '__class__' => null
+                        ]
+                    ]
+                )
+            );
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id'        => null,
+                            '__class__' => null
+                        ]
+                    ],
                 ]
             ],
             $this->context->getResult()
