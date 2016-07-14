@@ -90,6 +90,39 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->twigExtension->isRequireJSBuildExists('oro_requirejs_config_provider'));
     }
 
+    public function testGetRequireJSConfigNull()
+    {
+        $config = ['Main Config'];
+        $this->config
+            ->expects($this->any())
+            ->method('getMainConfig')
+            ->will($this->returnValue($config));
+
+        $this->assertEquals($config, $this->twigExtension->getRequireJSConfig());
+    }
+
+    public function testGetRequireJSBuildPathNull()
+    {
+        $filePath = 'file/path';
+        $this->config
+            ->expects($this->once())
+            ->method('getOutputFilePath')
+            ->will($this->returnValue($filePath));
+
+        $this->assertEquals($filePath, $this->twigExtension->getRequireJSBuildPath());
+    }
+
+    public function testIsRequireJSBuildExistsNull()
+    {
+        $filePath = 'file/path';
+        $this->config
+            ->expects($this->once())
+            ->method('getOutputFilePath')
+            ->will($this->returnValue($filePath));
+
+        $this->assertFalse($this->twigExtension->isRequireJSBuildExists());
+    }
+
     public function testGetName()
     {
         $this->assertEquals('requirejs_extension', $this->twigExtension->getName());
