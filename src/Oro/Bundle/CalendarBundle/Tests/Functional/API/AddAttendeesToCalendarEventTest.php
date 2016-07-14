@@ -3,24 +3,17 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
  */
-class AddAttendeesToCalendarEventTest extends WebTestCase
+class AddAttendeesToCalendarEventTest extends AbstractUseCaseTestCase
 {
-    protected function setUp()
-    {
-        $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
-    }
-
     public function testAttendeesCanBeAddedToAlreadyExistedCalendarEvent()
     {
         $em = $this->getContainer()->get('doctrine')->getManager();
 
-        $calendarEventId = $this->postCalendarEventWithoutEmptyAttendees();
+        $calendarEventId = $this->postCalendarEventWithEmptyAttendees();
         $em->clear();
 
         $user = $this->getReference('simple_user');
@@ -42,7 +35,8 @@ class AddAttendeesToCalendarEventTest extends WebTestCase
         $this->addOnlyAttendees($calendarEventId, [$firstAttendee, $secondAttendee]);
         $em->clear();
 
-        $calendarEvent = $this->getCalendarEvent($calendarEventId);
+        $calendarEvent = $this->getCalendarEventViaAPI($calendarEventId);
+        $this->assertNotEmpty($calendarEvent);
         $actual = $calendarEvent['attendees'];
 
         foreach ($actual as &$actualAttendee) {
@@ -75,10 +69,10 @@ class AddAttendeesToCalendarEventTest extends WebTestCase
      *
      * @return int
      */
-    public function postCalendarEventWithoutEmptyAttendees()
+    public function postCalendarEventWithEmptyAttendees()
     {
-        $request = [
-            'calendar'        => 1,
+        return $this->addCalendarEventViaAPI([
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
             'id'              => null,
             'title'           => 'Test Event',
             'description'     => 'Test Description',
@@ -87,14 +81,7 @@ class AddAttendeesToCalendarEventTest extends WebTestCase
             'allDay'          => false,
             'backgroundColor' => '#FF0000',
             'attendees'       => [],
-        ];
-        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
-        $this->assertNotEmpty($result);
-        $this->assertTrue(isset($result['id']));
-
-        return $result['id'];
+        ]);
     }
 
     /**
@@ -105,23 +92,19 @@ class AddAttendeesToCalendarEventTest extends WebTestCase
      */
     public function addAttendeesWithFullBody($calendarEventId, array $attendees)
     {
-        $request = [
-            'calendar'        => 1,
-            'title'           => 'Test Event',
-            'description'     => 'Test Description',
-            'start'           => '2016-01-01T08:03:46+00:00',
-            'end'             => '2016-01-01T08:27:00+00:00',
-            'allDay'          => true,
-            'backgroundColor' => '#FF0000',
-            'attendees'       => $attendees,
-        ];
-        $this->client->request(
-            'PUT',
-            $this->getUrl('oro_api_put_calendarevent', ['id' => $calendarEventId]),
-            $request
+        $result = $this->updateCalendarEventViaAPI(
+            $calendarEventId,
+            [
+                'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+                'title'           => 'Test Event',
+                'description'     => 'Test Description',
+                'start'           => '2016-01-01T08:03:46+00:00',
+                'end'             => '2016-01-01T08:27:00+00:00',
+                'allDay'          => true,
+                'backgroundColor' => '#FF0000',
+                'attendees'       => $attendees,
+            ]
         );
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertTrue($result['notifiable']);
 
         return $result;
@@ -135,32 +118,6 @@ class AddAttendeesToCalendarEventTest extends WebTestCase
      */
     public function addOnlyAttendees($calendarEventId, array $attendees)
     {
-        $this->client->request(
-            'PUT',
-            $this->getUrl('oro_api_put_calendarevent', ['id' => $calendarEventId]),
-            ['attendees' => $attendees]
-        );
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        return $result;
-    }
-
-    /**
-     * @param int $calendarEventId
-     *
-     * @return array
-     */
-    public function getCalendarEvent($calendarEventId)
-    {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_api_get_calendarevent', ['id' => $calendarEventId])
-        );
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertNotEmpty($result);
-
-        return $result;
+        return $this->updateCalendarEventViaAPI($calendarEventId, ['attendees' => $attendees]);
     }
 }
