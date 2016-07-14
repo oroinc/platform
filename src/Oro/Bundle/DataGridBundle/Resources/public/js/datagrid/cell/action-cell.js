@@ -42,8 +42,8 @@ define([
             '<div class="more-bar-holder">' +
                 '<div class="dropdown">' +
                     '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
-                    '<ul class="dropdown-menu dropdown-menu__action-cell pull-right launchers-dropdown-menu" ' +
-                        'data-options="{&quot;html&quot;: true}"></ul>' +
+                    '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
+                        'data-options="{&quot;html&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
                 '</div>' +
             '</div>',
 

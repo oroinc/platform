@@ -112,7 +112,8 @@ class ActionMetadataProvider
                 $annotation->getId(),
                 $annotation->getGroup(),
                 $annotation->getLabel(),
-                $annotation->getDescription()
+                $annotation->getDescription(),
+                $annotation->getCategory()
             );
         }
 

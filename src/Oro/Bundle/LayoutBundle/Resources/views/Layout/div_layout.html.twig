@@ -30,6 +30,11 @@
             class: attr.class|replace({'{{ class_prefix }}': class_prefix})
         }) %}
     {% endif %}
+    {% if hidden %}
+        {% set attr = attr|merge({
+            class: attr.class|default('') ~ ' hidden'
+        }) %}
+    {% endif %}
     {% for attrname, attrvalue in attr %}
         {% if (attrvalue is iterable) %}{% set attrvalue = attrvalue|json_encode(constant('JSON_FORCE_OBJECT')) %}{% endif %}
         {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}
@@ -133,7 +138,7 @@
     {%- endif -%}
 {% endblock %}
 
-{% block form_widget %}
+{% block form_fields_widget %}
     {% if split_to_fields %}
         {{ block_widget(block) }}
     {% else %}
@@ -147,6 +152,14 @@
 
 {% block form_field_widget %}
     {{ form_row(form) }}
+{% endblock %}
+
+{% block form_errors_widget %}
+    {% if form.vars.errors|length > 0 %}
+        <div{{ block('block_attributes') }}>
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block fieldset_widget %}

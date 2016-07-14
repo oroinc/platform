@@ -62,7 +62,9 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         $this->result[self::DATA] = [];
         if (is_array($collection) || $collection instanceof \Traversable) {
             foreach ($collection as $object) {
-                $this->result[self::DATA][] = $this->transformObjectToArray($object, $metadata);
+                $this->result[self::DATA][] = null === $object || is_scalar($object)
+                    ? $object
+                    : $this->transformObjectToArray($object, $metadata);
             }
         } else {
             throw $this->createUnexpectedValueException('array or \Traversable', $collection);
@@ -72,7 +74,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setErrorObject(Error $error, EntityMetadata $metadata = null)
+    public function setErrorObject(Error $error)
     {
         $this->assertNoData();
 
@@ -82,7 +84,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setErrorCollection(array $errors, EntityMetadata $metadata = null)
+    public function setErrorCollection(array $errors)
     {
         $this->assertNoData();
 
@@ -114,7 +116,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     protected function assertNoData()
     {
         if (array_key_exists(self::DATA, $this->result)) {
-            throw new \RuntimeException('A primary data already exist.');
+            throw new \InvalidArgumentException('A primary data already exist.');
         }
     }
 

@@ -10,6 +10,12 @@ class ProcessorBag implements ProcessorBagInterface
     /** @var ProcessorFactoryInterface */
     protected $processorFactory;
 
+    /** @var ProcessorIteratorFactoryInterface */
+    protected $processorIteratorFactory;
+
+    /** @var ProcessorApplicableCheckerFactoryInterface */
+    protected $applicableCheckerFactory;
+
     /** @var bool */
     protected $debug;
 
@@ -18,7 +24,7 @@ class ProcessorBag implements ProcessorBagInterface
      * after the bag is initialized this property is set to NULL,
      * this switches the bag in "frozen" state and further modification of it is prohibited
      */
-    private $initialData = [];
+    protected $initialData = [];
 
     /**
      * @var array
@@ -33,27 +39,31 @@ class ProcessorBag implements ProcessorBagInterface
      *      ...
      *  ]
      */
-    private $processors;
+    protected $processors;
 
     /** @var ChainApplicableChecker */
-    private $processorApplicableChecker;
+    protected $processorApplicableChecker;
 
     /**
-     * @param ProcessorFactoryInterface $processorFactory
-     * @param bool                      $debug
+     * @param ProcessorFactoryInterface                       $processorFactory
+     * @param bool                                            $debug
+     * @param ProcessorApplicableCheckerFactoryInterface|null $applicableCheckerFactory
+     * @param ProcessorIteratorFactoryInterface|null          $processorIteratorFactory
      */
-    public function __construct(ProcessorFactoryInterface $processorFactory, $debug = false)
-    {
+    public function __construct(
+        ProcessorFactoryInterface $processorFactory,
+        $debug = false,
+        ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory = null,
+        ProcessorIteratorFactoryInterface $processorIteratorFactory = null
+    ) {
         $this->processorFactory = $processorFactory;
         $this->debug = $debug;
+        $this->applicableCheckerFactory = $applicableCheckerFactory ?: new ProcessorApplicableCheckerFactory();
+        $this->processorIteratorFactory = $processorIteratorFactory ?: new ProcessorIteratorFactory();
     }
 
     /**
-     * Registers a processing group
-     *
-     * @param string $group
-     * @param string $action
-     * @param int    $priority
+     * {@inheritdoc}
      */
     public function addGroup($group, $action, $priority = 0)
     {
@@ -63,13 +73,7 @@ class ProcessorBag implements ProcessorBagInterface
     }
 
     /**
-     * Registers a processor
-     *
-     * @param string      $processorId
-     * @param array       $attributes
-     * @param string|null $action
-     * @param string|null $group
-     * @param int         $priority
+     * {@inheritdoc}
      */
     public function addProcessor($processorId, array $attributes, $action = null, $group = null, $priority = 0)
     {
@@ -89,10 +93,7 @@ class ProcessorBag implements ProcessorBagInterface
     }
 
     /**
-     * Registers a processor applicable checker
-     *
-     * @param ApplicableCheckerInterface $checker
-     * @param int                        $priority
+     * {@inheritdoc}
      */
     public function addApplicableChecker(ApplicableCheckerInterface $checker, $priority = 0)
     {
@@ -108,7 +109,7 @@ class ProcessorBag implements ProcessorBagInterface
     {
         $this->ensureInitialized();
 
-        return new ProcessorIterator(
+        return $this->processorIteratorFactory->createProcessorIterator(
             $this->processors,
             $context,
             $this->processorApplicableChecker,
@@ -261,35 +262,23 @@ class ProcessorBag implements ProcessorBagInterface
      */
     protected function initializeProcessorApplicableChecker()
     {
-        $this->processorApplicableChecker = new ChainApplicableChecker();
-        $this->registerApplicableChecker(new GroupRangeApplicableChecker());
-        $this->registerApplicableChecker(new SkipGroupApplicableChecker());
-        $matchApplicableChecker = new MatchApplicableChecker();
-        // add the "priority" attribute to the ignore list,
-        // as it is added by LoadProcessorsCompilerPass to processors' attributes only in debug mode
-        if ($this->debug) {
-            $matchApplicableChecker->addIgnoredAttribute('priority');
-        }
-        $this->registerApplicableChecker($matchApplicableChecker);
+        $this->processorApplicableChecker = $this->applicableCheckerFactory->createApplicableChecker();
         if (!empty($this->initialData['checkers'])) {
             $checkers = $this->sortByPriorityAndFlatten($this->initialData['checkers']);
             foreach ($checkers as $checker) {
-                $this->registerApplicableChecker($checker);
+                $this->processorApplicableChecker->addChecker($checker);
             }
         }
-    }
-
-    /**
-     * Adds a checker to $this->processorApplicableChecker
-     *
-     * @param ApplicableCheckerInterface $checker
-     */
-    protected function registerApplicableChecker(ApplicableCheckerInterface $checker)
-    {
-        if ($checker instanceof ProcessorBagAwareApplicableCheckerInterface) {
-            $checker->setProcessorBag($this);
+        foreach ($this->processorApplicableChecker as $checker) {
+            // add the "priority" attribute to the ignore list,
+            // as it is added by LoadProcessorsCompilerPass to processors' attributes only in debug mode
+            if ($this->debug && $checker instanceof MatchApplicableChecker) {
+                $checker->addIgnoredAttribute('priority');
+            }
+            if ($checker instanceof ProcessorBagAwareApplicableCheckerInterface) {
+                $checker->setProcessorBag($this);
+            }
         }
-        $this->processorApplicableChecker->addChecker($checker);
     }
 
     /**

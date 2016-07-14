@@ -686,11 +686,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
     {
         try {
-            \PHPUnit_Framework_TestCase::assertEquals(
-                $statusCode,
-                $response->getStatusCode(),
-                $response->getContent()
-            );
+            \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode());
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             if ($statusCode < 400
                 && $response->getStatusCode() >= 400
@@ -708,6 +704,11 @@ abstract class WebTestCase extends BaseWebTestCase
                         $e->getMessage()
                         . ' Error message: ' . $content['message']
                         . ($errors ? '. Errors: ' . $errors : ''),
+                        $e->getComparisonFailure()
+                    );
+                } else {
+                    $e = new \PHPUnit_Framework_ExpectationFailedException(
+                        $e->getMessage() . ' Response content: ' . $response->getContent(),
                         $e->getComparisonFailure()
                     );
                 }

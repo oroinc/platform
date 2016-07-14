@@ -32,7 +32,8 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  *      id="oro_entityconfig_manage",
  *      label="oro.entity_config.action.manage",
  *      type="action",
- *      group_name=""
+ *      group_name="",
+ *      category="entity"
  * )
  */
 class ConfigController extends Controller
@@ -114,10 +115,7 @@ class ConfigController extends Controller
                     $this->get('translator')->trans('oro.entity_config.controller.config_entity.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    ['route' => 'oro_entityconfig_update', 'parameters' => ['id' => $id]],
-                    ['route' => 'oro_entityconfig_view', 'parameters' => ['id' => $id]]
-                );
+                return $this->get('oro_ui.router')->redirect($entity);
             }
         }
 
@@ -237,10 +235,7 @@ class ConfigController extends Controller
                     $this->get('translator')->trans('oro.entity_config.controller.config_field.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    ['route' => 'oro_entityconfig_field_update', 'parameters' => ['id' => $id]],
-                    ['route' => 'oro_entityconfig_view', 'parameters' => ['id' => $field->getEntity()->getId()]]
-                );
+                return $this->get('oro_ui.router')->redirect($field);
             }
         }
 

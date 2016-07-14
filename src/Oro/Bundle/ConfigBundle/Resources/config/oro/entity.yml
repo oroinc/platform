@@ -2,3 +2,10 @@ oro_entity:
     entity_alias_exclusions:
         - Oro\Bundle\ConfigBundle\Entity\Config
         - Oro\Bundle\ConfigBundle\Entity\ConfigValue
+    entity_aliases:
+        Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
+            alias:        configuration
+            plural_alias: configuration
+        Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
+            alias:        configurationoption
+            plural_alias: configurationoptions

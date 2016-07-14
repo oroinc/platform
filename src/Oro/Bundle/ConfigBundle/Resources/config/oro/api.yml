@@ -1,0 +1,57 @@
+oro_api:
+    entities:
+        Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
+            identifier_field_names: [id]
+            fields:
+                id:
+                    description: The path to a configuration section
+                    data_type: string
+                options:
+                    description: The list of configuration options
+                    target_class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption
+                    target_type: collection
+                    max_results: -1 # no limit for the number of configuration options
+            actions:
+                get:
+                    description: Get System Configuration Section
+                    acl_resource: oro_config_system
+                get_list:
+                    description: Get System Configuration Sections
+                    acl_resource: oro_config_system
+                    page_size: -1 # disable paging
+                    disable_sorting: true
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+                get_subresource: false
+                get_relationship: false
+
+        Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
+            identifier_field_names: [key]
+            fields:
+                key:
+                    description: An unique identifier of a configuration option
+                    data_type: string
+                scope:
+                    description: Configuration Scope
+                    data_type: string
+                dataType:
+                    description: Data Type
+                    data_type: string
+                value:
+                    description: Value
+                    data_type: string
+                createdAt:
+                    description: Created At
+                    data_type: datetime
+                updatedAt:
+                    description: Updated At
+                    data_type: datetime
+            actions:
+                get: false
+                get_list: false
+                update: false
+                create: false
+                delete: false
+                delete_list: false

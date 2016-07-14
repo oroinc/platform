@@ -91,8 +91,8 @@ class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
             ['john@example.com', null, 'john@example.com'],
             ['john@example.com', '', 'john@example.com'],
             ['john@example.com', null, 'john@example.com'],
-            ['john@example.com', 'John Smith', 'John Smith <john@example.com>'],
-            [' john@example.com ', ' John Smith ', 'John Smith <john@example.com>'],
+            ['john@example.com', 'John Smith', '"John Smith" <john@example.com>'],
+            [' john@example.com ', ' John Smith ', '"John Smith" <john@example.com>'],
         ];
     }
 
@@ -126,7 +126,7 @@ class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['John Smith IV. <john@example.com>',   'John'],
-            ['John Smith <john@example.com>',       'John'],
+            ['"John Smith" <john@example.com>',     'John'],
             ['John <john@example.com>',             'John'],
             ['john.smith@example.com',              'john'],
             ['john@example.com',                    'john'],
@@ -137,7 +137,7 @@ class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['John Smith IV. <john@example.com>',   'Smith IV.'],
-            ['John Smith <john@example.com>',       'Smith'],
+            ['"John Smith" <john@example.com>',     'Smith'],
             ['John <john@example.com>',             'example.com'],
             ['john.smith@example.com',              'smith'],
             ['john@example.com',                    'example.com'],

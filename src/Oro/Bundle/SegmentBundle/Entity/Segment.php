@@ -29,7 +29,8 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true
@@ -401,5 +402,13 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStaticType()
+    {
+        return $this->getType() && $this->getType()->getName() == SegmentType::TYPE_STATIC;
     }
 }

@@ -50,14 +50,14 @@ class NormalizeMetadata implements ProcessorInterface
     {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (null === $field) {
-                continue;
-            }
             if ($field->isExcluded()) {
                 $entityMetadata->removeProperty($fieldName);
-            } elseif ($field->hasPropertyPath()) {
+            } else {
                 $propertyPath = $field->getPropertyPath();
-                if ($fieldName !== $propertyPath && count(ConfigUtil::explodePropertyPath($propertyPath)) === 1) {
+                if ($propertyPath
+                    && $fieldName !== $propertyPath
+                    && count(ConfigUtil::explodePropertyPath($propertyPath)) === 1
+                ) {
                     $entityMetadata->renameProperty($propertyPath, $fieldName);
                 }
             }

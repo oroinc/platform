@@ -37,7 +37,9 @@ abstract class NormalizeSection implements ProcessorInterface
         $entityClass,
         EntityDefinitionConfig $definition
     ) {
-        $this->updatePropertyPath($section, $definition);
+        if ($section->hasFields()) {
+            $this->removeExcludedFieldsAndUpdatePropertyPath($section, $definition);
+        }
         $this->collect($section, $sectionName, $entityClass, $definition);
     }
 
@@ -45,18 +47,24 @@ abstract class NormalizeSection implements ProcessorInterface
      * @param EntityConfigInterface  $section
      * @param EntityDefinitionConfig $definition
      */
-    protected function updatePropertyPath(
+    protected function removeExcludedFieldsAndUpdatePropertyPath(
         EntityConfigInterface $section,
         EntityDefinitionConfig $definition
     ) {
         $fields = $section->getFields();
+        $toRemoveFieldNames = [];
         foreach ($fields as $fieldName => $field) {
-            if (!$field->hasPropertyPath() && $definition->hasField($fieldName)) {
+            if ($field->isExcluded()) {
+                $toRemoveFieldNames[] = $fieldName;
+            } elseif (!$field->hasPropertyPath() && $definition->hasField($fieldName)) {
                 $propertyPath = $definition->getField($fieldName)->getPropertyPath();
                 if ($propertyPath) {
                     $field->setPropertyPath($propertyPath);
                 }
             }
+        }
+        foreach ($toRemoveFieldNames as $fieldName) {
+            $section->removeField($fieldName);
         }
     }
 

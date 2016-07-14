@@ -4,10 +4,10 @@
     {% else %}
         {% set data = form.parent.parent.vars.value %}
     {% endif %}
-    {% if data and 'oro_user_user_form' in form.parent.parent.vars.full_name %}
-        {% set forEntity = 'user' %}
-    {% else %}
+    {% if data and 'oro_email_mailbox' in form.parent.parent.vars.full_name %}
         {% set forEntity = 'mailbox' %}
+    {% else %}
+        {% set forEntity = 'user' %}
     {% endif %}
     {% set options = form.vars.options|default({})|merge({
         elementNamePrototype: full_name,

@@ -17,6 +17,9 @@ class AddIncludeFilter implements ProcessorInterface
 {
     const FILTER_KEY = 'include';
 
+    const FILTER_DESCRIPTION =
+        'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.';
+
     /**
      * {@inheritdoc}
      */
@@ -44,16 +47,17 @@ class AddIncludeFilter implements ProcessorInterface
         }
         */
 
+        if (!$context->getConfig()->isInclusionEnabled()) {
+            // the "include" filter is disabled
+            return;
+        }
         $associations = $context->getMetadata()->getAssociations();
         if (empty($associations)) {
             // the "include" filter has sense only if an entity has at least one association
             return;
         }
 
-        $filter = new IncludeFilter(
-            DataType::STRING,
-            'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.'
-        );
+        $filter = new IncludeFilter(DataType::STRING, self::FILTER_DESCRIPTION);
         $filter->setArrayAllowed(true);
         $filters->add(self::FILTER_KEY, $filter);
     }

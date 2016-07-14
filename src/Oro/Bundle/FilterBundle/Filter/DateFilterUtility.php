@@ -23,20 +23,20 @@ class DateFilterUtility
     /** @var array */
     protected $partToDateFunction = [
         DateModifierInterface::PART_MONTH => 'MONTH',
-        DateModifierInterface::PART_DOW => 'DAYOFWEEK',
-        DateModifierInterface::PART_WEEK => 'WEEK',
-        DateModifierInterface::PART_DAY => 'DAY',
-        DateModifierInterface::PART_DOY => 'DAYOFYEAR',
-        DateModifierInterface::PART_YEAR => 'YEAR',
+        DateModifierInterface::PART_DOW   => 'DAYOFWEEK',
+        DateModifierInterface::PART_WEEK  => 'WEEK',
+        DateModifierInterface::PART_DAY   => 'DAY',
+        DateModifierInterface::PART_DOY   => 'DAYOFYEAR',
+        DateModifierInterface::PART_YEAR  => 'YEAR',
     ];
 
     /**
      * @param LocaleSettings $localeSettings
-     * @param Compiler $compiler
+     * @param Compiler       $compiler
      */
     public function __construct(LocaleSettings $localeSettings, Compiler $compiler)
     {
-        $this->localeSettings = $localeSettings;
+        $this->localeSettings     = $localeSettings;
         $this->expressionCompiler = $compiler;
     }
 
@@ -55,25 +55,33 @@ class DateFilterUtility
             return false;
         }
 
-        $data['value'] = array_merge(['start' => null, 'end' => null], $data['value']);
+        $data['value'] = array_merge(
+            [
+                'start'          => null,
+                'end'            => null,
+                'start_original' => null,
+                'end_original'   => null
+            ],
+            $data['value']
+        );
         $data['type']  = isset($data['type']) ? $data['type'] : DateRangeFilterType::TYPE_BETWEEN;
 
         // values will not be used, so just unset them
         if ($data['type'] == DateRangeFilterType::TYPE_MORE_THAN) {
-            $data['value']['end'] = null;
+            $data['value']['end']          = null;
             $data['value']['end_original'] = null;
         } elseif ($data['type'] == DateRangeFilterType::TYPE_LESS_THAN) {
-            $data['value']['start'] = null;
+            $data['value']['start']          = null;
             $data['value']['start_original'] = null;
         }
 
         $data = [
             'date_start'          => $data['value']['start'],
             'date_end'            => $data['value']['end'],
-            'date_start_original' => $data['value']['start_original'],
-            'date_end_original'   => $data['value']['end_original'],
+            'date_start_original' => $this->getArrayValue($data['value'], 'start_original'),
+            'date_end_original'   => $this->getArrayValue($data['value'], 'end_original'),
             'type'                => $data['type'],
-            'part'                => isset($data['part']) ? $data['part'] : DateModifierInterface::PART_VALUE,
+            'part'                => $this->getArrayValue($data, 'part', DateModifierInterface::PART_VALUE),
             'field'               => $field
         ];
         $data = $this->applyDatePart($data, $type);
@@ -104,7 +112,7 @@ class DateFilterUtility
     /**
      * Applies datepart expressions
      *
-     * @param array $data
+     * @param array  $data
      * @param string $type
      *
      * @return array
@@ -118,19 +126,19 @@ class DateFilterUtility
         } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
             $field = $this->getEnforcedTimezoneQuarter($field, $type);
         } elseif ($data['part'] === DateModifierInterface::PART_VALUE &&
-            strpos($field, 'MONTH') === false &&
-            $this->containsMonthVariable($data)
+                  strpos($field, 'MONTH') === false &&
+                  $this->containsMonthVariable($data)
         ) {
-            $field = $this->getEnforcedTimezoneFunction('MONTH', $field, $type);
+            $field              = $this->getEnforcedTimezoneFunction('MONTH', $field, $type);
             $data['date_start'] = $this->formatDate($data['date_start'], 'm');
-            $data['date_end'] = $this->formatDate($data['date_end'], 'm');
+            $data['date_end']   = $this->formatDate($data['date_end'], 'm');
         }
 
         return array_merge($data, ['field' => $field]);
     }
 
     /**
-     * @param mixed $date
+     * @param mixed  $date
      * @param string $format
      *
      * @return mixed
@@ -144,12 +152,13 @@ class DateFilterUtility
         return $date->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()))
             ->format($format);
     }
+
     /**
      * variable 'this day without year' search all today records without year
      * text 'January 16' search all January 16 records without year
      *
      * @param string $sqlField
-     * @param array $data
+     * @param array  $data
      * @param string $type
      *
      * @return string
@@ -157,12 +166,12 @@ class DateFilterUtility
     protected function modifyFieldToDayWithMonth($sqlField, array &$data, $type)
     {
         $isModifyAllowed = false;
-        $fields = ['date_start', 'date_end'];
+        $fields          = ['date_start', 'date_end'];
         foreach ($fields as $field) {
-            $originalKey = $field.'_original';
+            $originalKey = $field . '_original';
             if ($this->allowToModifyFieldToDayWithMonth($data, $originalKey, $field)) {
-                    $data[$field] = $this->formatDate($data[$field], 'md');
-                    $isModifyAllowed = true;
+                $data[$field]    = $this->formatDate($data[$field], 'md');
+                $isModifyAllowed = true;
             }
         }
 
@@ -177,9 +186,10 @@ class DateFilterUtility
     /**
      * Allow to modify sql field if present 'this day without year' variable or date without year
      *
-     * @param array $data
+     * @param array  $data
      * @param string $originalKey
      * @param string $field
+     *
      * @return bool
      */
     protected function allowToModifyFieldToDayWithMonth(array $data, $originalKey, $field)
@@ -217,7 +227,7 @@ class DateFilterUtility
     }
 
     /**
-     * @param array $data
+     * @param array  $data
      * @param string $key
      *
      * @return ExpressionResult|null
@@ -231,6 +241,20 @@ class DateFilterUtility
         $result = $this->expressionCompiler->compile($data[$key], true);
 
         return $result instanceof ExpressionResult ? $result : null;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $key
+     * @param mixed|null   $defaultValue
+     *
+     * @return mixed|null
+     */
+    protected function getArrayValue(array $data, $key, $defaultValue = null)
+    {
+        return isset($data[$key])
+            ? $data[$key]
+            : $defaultValue;
     }
 
     /**

@@ -18,32 +18,16 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: initialize, priority: 250 }
 
-    oro_api.update.validate_request_type_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+    oro_api.update.validate_request_type_and_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion
         tags:
             - { name: oro.api.processor, action: update, group: initialize, priority: 210 }
-
-    oro_api.update.validate_class_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
-        tags:
-            - { name: oro.api.processor, action: update, group: initialize, priority: 210 }
-
-    oro_api.update.normalize_version:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
-        tags:
-            - { name: oro.api.processor, action: update, group: initialize, priority: 200 }
-
-    oro_api.update.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: update, group: initialize, priority: 50 }
 
     oro_api.update.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.resources_loader'
-            - '@oro_api.resources_cache'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: update, group: initialize, priority: 20 }
 
@@ -53,34 +37,13 @@ services:
             - { name: oro.api.processor, action: update, group: initialize, priority: 10 }
 
     #
-    # security_check
-    #
-
-    oro_api.update.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - EDIT
-        tags:
-            - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
-
-    # VIEW permissions are required to update an entity because the updated entity should be returned in response
-    # the "security_check" group is disabled for the "get" action is executed by
-    # the "oro_api.update.load_normalized_entity" processor
-    # so, if you add own security processor for the "get" action, add it here as well
-    oro_api.update.entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
-
-    #
     # normalize_input
     #
+
+    oro_api.update.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: 240 }
 
     oro_api.update.validate_request_data_exist:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestDataExist
@@ -122,12 +85,39 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: rest, priority: -110 }
 
     #
+    # security_check
+    #
+
+    oro_api.update.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - EDIT
+        tags:
+            - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
+
+    # VIEW permissions are required to update an entity because the updated entity should be returned in response
+    # the "security_check" group is disabled for the "get" action is executed by
+    # the "oro_api.update.load_normalized_entity" processor
+    # so, if you add own security processor for the "get" action, add it here as well
+    oro_api.update.entity_type_security_check.view:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
+
+    #
     # build_query
     #
 
     oro_api.update.initialize_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
         arguments:
+            - '@oro_api.doctrine_helper'
             - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro.api.processor, action: update, group: build_query, priority: 100 }
@@ -197,8 +187,8 @@ services:
     # save_data
     #
 
-    oro_api.update.save_orm_entity:
-        class: Oro\Bundle\ApiBundle\Processor\Update\SaveOrmEntity
+    oro_api.update.save_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Update\SaveEntity
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
@@ -274,10 +264,10 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -100 }
 
-    oro_api.update.json_api.validate_result_schema:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
+    oro_api.update.json_api.validate_normalized_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultSchema
         tags:
-            - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -200 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -210 }
 
     oro_api.update.json_api.set_response_content_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType

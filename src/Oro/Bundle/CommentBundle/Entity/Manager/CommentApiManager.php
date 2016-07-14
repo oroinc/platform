@@ -12,7 +12,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -21,7 +21,6 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -42,8 +41,8 @@ class CommentApiManager extends ApiEntityManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    /** @var AttachmentProvider */
+    protected $attachmentProvider;
 
     /** @var aclHelper */
     protected $aclHelper;
@@ -57,7 +56,7 @@ class CommentApiManager extends ApiEntityManager
      * @param EntityNameResolver       $entityNameResolver
      * @param Pager                    $pager
      * @param EventDispatcherInterface $eventDispatcher
-     * @param AttachmentManager        $attachmentManager
+     * @param AttachmentProvider       $attachmentProvider
      * @param AclHelper                $aclHelper
      * @param ConfigManager            $configManager
      */
@@ -67,7 +66,7 @@ class CommentApiManager extends ApiEntityManager
         EntityNameResolver $entityNameResolver,
         Pager $pager,
         EventDispatcherInterface $eventDispatcher,
-        AttachmentManager $attachmentManager,
+        AttachmentProvider $attachmentProvider,
         AclHelper $aclHelper,
         ConfigManager $configManager
     ) {
@@ -75,7 +74,7 @@ class CommentApiManager extends ApiEntityManager
         $this->securityFacade     = $securityFacade;
         $this->entityNameResolver = $entityNameResolver;
         $this->pager              = $pager;
-        $this->attachmentManager  = $attachmentManager;
+        $this->attachmentProvider = $attachmentProvider;
         $this->aclHelper          = $aclHelper;
         $this->configManager      = $configManager;
 
@@ -206,7 +205,7 @@ class CommentApiManager extends ApiEntityManager
             'editable'      => $this->securityFacade->isGranted('EDIT', $entity),
             'removable'     => $this->securityFacade->isGranted('DELETE', $entity),
         ];
-        $result = array_merge($result, $this->getAttachmentInfo($entity));
+        $result = array_merge($result, $this->attachmentProvider->getAttachmentInfo($entity));
         $result = array_merge($result, $this->getCommentAvatarImageUrl($entity->getOwner()));
 
         return $result;
@@ -342,59 +341,6 @@ class CommentApiManager extends ApiEntityManager
         }
 
         return true;
-    }
-
-    /**
-     * @param Comment $entity
-     * @param File    $attachment
-     *
-     * @return string
-     */
-    protected function getAttachmentURL($entity, $attachment)
-    {
-        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download');
-    }
-
-    /**
-     * @param $entity
-     *
-     * @return File
-     */
-    protected function getAttachment($entity)
-    {
-        $accessor   = PropertyAccess::createPropertyAccessor();
-        $attachment = $accessor->getValue($entity, 'attachment');
-
-        return $attachment;
-    }
-
-    /**
-     * @param Comment $entity
-     *
-     * @return array
-     */
-    protected function getAttachmentInfo(Comment $entity)
-    {
-        $result     = [];
-        $attachment = $this->getAttachment($entity);
-        if ($attachment) {
-            $thumbnail = '';
-            if ($this->attachmentManager->isImageType($attachment->getMimeType())) {
-                $thumbnail = $this->attachmentManager->getResizedImageUrl(
-                    $attachment,
-                    AttachmentManager::THUMBNAIL_WIDTH,
-                    AttachmentManager::THUMBNAIL_HEIGHT
-                );
-            }
-            $result = [
-                'attachmentURL'       => $this->getAttachmentURL($entity, $attachment),
-                'attachmentSize'      => $this->attachmentManager->getFileSize($attachment->getFileSize()),
-                'attachmentFileName'  => $attachment->getOriginalFilename(),
-                'attachmentIcon'      => $this->attachmentManager->getAttachmentIconClass($attachment),
-                'attachmentThumbnail' => $thumbnail
-            ];
-        }
-        return $result;
     }
 
     /**
