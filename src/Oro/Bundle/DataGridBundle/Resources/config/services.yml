@@ -143,6 +143,7 @@ services:
             - '@oro_security.security_facade'
             - '@oro_security.acl_helper'
             - '@translator'
+            - '@oro_datagrid.grid_view.manager'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.grid_views_load, method: onViewsLoad }
 
@@ -161,6 +162,11 @@ services:
         arguments:
             - '@oro_security.acl_helper'
             - '@doctrine'
+            - '@oro_datagrid.datagrid.manager'
+
+    oro_datagrid.grid_view.manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_datagrid.grid_view.manager }
 
     oro_datagrid.grid_view.manager.api:
         class: %oro_datagrid.grid_view.manager.api.class%
