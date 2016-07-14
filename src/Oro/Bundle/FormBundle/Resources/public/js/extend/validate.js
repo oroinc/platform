@@ -371,4 +371,33 @@ define([
             return this[0] && this[0].form && $.data(this[0].form, 'validator') && handler.apply(this, arguments);
         });
     });
+
+    /**
+     * Filters unsupported validation rules from validator configuration object
+     *
+     * @param {Object} validationRules - validator configuration object
+     * @returns {Object} filtered validation rules
+     */
+    $.validator.filterUnsupportedValidators = function(validationRules) {
+        var validationRulesCopy = $.extend(true,  {}, validationRules);
+        for (var ruleName in validationRulesCopy) {
+            if (validationRulesCopy.hasOwnProperty(ruleName)) {
+                if (!_.isFunction($.validator.methods[ruleName])) {
+                    if (tools.debug) {
+                        if (console && console.warn) {
+                            console.warn('Cannot find validator implementation for `' + ruleName + '`')
+                        } else {
+                            var error = new Error('Warning: Cannot find validator implementation for `' +
+                                ruleName + '`');
+                            setTimeout(function () {
+                                throw error;
+                            }, 0);
+                        }
+                    }
+                    delete validationRulesCopy[ruleName];
+                }
+            }
+        }
+        return validationRulesCopy;
+    }
 });
