@@ -47,6 +47,9 @@ define([
         initialize: function(options) {
             _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText']));
             this.rows = this.subviews;
+            if ('rowView' in options.themeOptions) {
+                this.itemView = options.themeOptions.rowView;
+            }
             Body.__super__.initialize.apply(this, arguments);
         },
 
