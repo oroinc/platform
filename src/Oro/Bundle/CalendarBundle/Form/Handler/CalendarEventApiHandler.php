@@ -73,11 +73,7 @@ class CalendarEventApiHandler
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             // clone attendees to have have original attendees at disposal later
             $originalAttendees = new ArrayCollection($entity->getAttendees()->toArray());
-            $data = $this->request->request->all();
-            if (empty($data['attendees'])) {
-                $data['attendees'] = new ArrayCollection();
-            }
-            $this->form->submit($data);
+            $this->form->submit($this->request->request->all());
 
             if ($this->form->isValid()) {
                 /** @deprecated since version 1.10. Please use field attendees instead of invitedUsers */
