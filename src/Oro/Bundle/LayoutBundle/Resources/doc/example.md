@@ -50,7 +50,7 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        href: { @value: $data.theme.icon }
+                        href: '=data["theme"].getIcon()'
                         rel: shortcut icon
                 head_style:
                     blockType: container
@@ -428,7 +428,7 @@ layout:
             parentId: body_wrapper
             blockType: block
             options:
-                visible: { @value: $context.debug }
+                visible: '=context["debug"]'
 ```
 Note that if `visible` evaluates to false, the block will not be added to the final layout at all.
 
@@ -534,12 +534,7 @@ layout:
         - @setOption:
             id: head
             optionName: title
-            optionValue:
-                @join:
-                    - ' - '
-                    - { @value: {@value: $data.product.name} }
-                    - { @value: {@value: $data.product.subcategory} }
-                    - { @value: {@value: $data.product.category} }
+            optionValue: '=data["product"].getName()~" - "~data["product"].getSubcategory()~" - "~data["product"].getCategory()'
         - @add:
             id: link_canonical
             parentId: head
@@ -548,7 +543,7 @@ layout:
                 rel:  canonical
                 href: {@value: $data.product.url}
 ```
-Note how we use [Join](../../../../Component/ConfigExpression/Func/Join.php) function to compose the page title from different product fields.
+Note how we use [Symfony expression syntax](http://symfony.com/doc/current/components/expression_language/syntax.html) to compose the page title from different product fields.
 
 ### Data providers ###
 
@@ -606,9 +601,9 @@ layout:
             blockType: block
             options:
                vars:
-                  default_language: { @value: $data.locale.default_language }
-                  available_languages: { @value: $data.locale.available_languages }
-                  product_url: { @value: $data.product.url }
+                  default_language: '=data["locale"].getDefaultLanguage()'
+                  available_languages: '=data["locale"].getAvailableLanguages()'
+                  product_url: '=data["product"].getUrl()'
 ```
 
 We also need to create the block template for the language switcher:
@@ -706,7 +701,7 @@ layout:
         - @setOption:
             id: lang_switch
             optionName: vars.current_language
-            optionValue: { @value: $data.current_language }
+            optionValue: '=data["current_language"]'
 ```
 
 Now if you go to `/layout/test?product_id=99&___store=french` url you'll see that French language is preselected.
@@ -726,7 +721,7 @@ layout:
             blockType: meta
             options:
                 name: 'description'
-                content: {@value: $data.product.description}
+                content: '=data["product"].getDescription()'
             siblingId: meta
 ```
 If you need to place some block before another one, you should use the `prepend: true` attribute.
@@ -1043,7 +1038,7 @@ layout:
             parentId: breadcrumbs
             blockType: text
             options:
-                text: { @value: $data.product.name }
+                text: '=data["product.name"]'
 ```
 
 This should render into the following HTML:
@@ -1526,12 +1521,12 @@ layout:
                 product_image:
                     blockType: image
                     options:
-                        path: { @value: $data.product.image }
-                        alt: { @value: $data.product.name }
+                        path: '=data["product"].getImage()'
+                        alt: '=data["product"].getName()'
                         attr:
                             id: image-main
                             class: gallery-image visible
-                            title: { @value: $data.product.name }
+                            title: '=data["product"].getName()'
                 product_gallery:
                     blockType: list
                     options:
@@ -1541,7 +1536,7 @@ layout:
                     blockType: link
                     options:
                         path: '#'
-                        image: { @value: $data.product.image }
+                        image: '=data["product"].getImage()'
                         attr:
                             class: thumb-link
             tree:
@@ -1637,12 +1632,12 @@ layout:
                     blockType: block
                     options:
                         vars:
-                            name: { @value: $data.product.name }
+                            name: '=data["product"].getName()'
                 product_price:
                     blockType: block
                     options:
                         vars:
-                            price: { @value: $data.product.price }
+                            price: '=data["product"].getPrice()'
                 # All blocks are managed in the layout update. No custom block templates are required.
                 product_extra:
                     blockType: container
@@ -1655,11 +1650,7 @@ layout:
                     options:
                         type: p
                         attr:
-                            class:
-                                @join:
-                                    - ' '
-                                    - availability
-                                    - { @iif: [$data.product.is_in_stock, 'in-stock', 'out-of-stock'] }
+                            class: '=availability~"  "~data["product"].getIsInStock() ? "in-stock" : "out-of-stock"'
                 product_availability_label_wrapper:
                     blockType: container
                     options:
@@ -1679,7 +1670,7 @@ layout:
                 product_availability_value:
                     blockType: text
                     options:
-                        text: { @iif: [$data.product.is_in_stock, 'In Stock', 'Out of Stock'] }
+                        text: 'data.["product"].getIsInStock() ? "In Stock" : "Out of Stock"'
                 product_short_description:
                     blockType: container
                     options:
@@ -1695,7 +1686,7 @@ layout:
                 product_short_description_value:
                     blockType: text
                     options:
-                        text: { @value: $data.product.short_description }
+                        text: 'data["product"].getShortDescription()'
                 # Adding list of links in 2 different ways.
                 # 1 - Using only layout update
                 product_add_to_links:
@@ -1706,11 +1697,7 @@ layout:
                 product_add_to_wishlist_link:
                     blockType: link
                     options:
-                        path:
-                            @join:
-                              - '/'
-                              - wishlist/index/add/product/
-                              - { @value: $data.product.id }
+                        path: '=/~""~wishlist/index/add/product/~""~data["product"].getId()'
                         text: Add to Wishlist
                         attr:
                             class: link-wishlist
@@ -1786,7 +1773,7 @@ layout:
             parentId: product_collateral_tabs
             blockType: text
             options:
-                text: { @value: $data.product.description }
+                text: '=data["product"].getDescription()'
                 vars:
                     tabLabel: "Description"
         # Adding footer links
