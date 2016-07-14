@@ -92,7 +92,7 @@ class RestrictionsExtension extends AbstractTypeExtension
         $field = $restriction['field'];
         $mode  = $restriction['mode'];
         if ($mode === 'full') {
-            $view->children[$field]->vars['attrs']['disabled'] = 'true';
+            $view->children[$field]->vars['attrs']['disabled'] = true;
         } else {
             $values = $restriction['values'];
             if ($mode === 'disallow') {
