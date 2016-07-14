@@ -16,8 +16,6 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 
 class LocalizationSelectionType extends AbstractType
 {
-    const LOCALIZATION_SELECTOR_CONFIG_KEY = 'oro_locale.enabled_localizations';
-
     const NAME = 'oro_locale_localization_selection';
 
     /**
@@ -154,14 +152,6 @@ class LocalizationSelectionType extends AbstractType
     public function getParent()
     {
         return 'choice';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLocalizationSelectorConfigKey()
-    {
-        return static::LOCALIZATION_SELECTOR_CONFIG_KEY;
     }
 
     /**

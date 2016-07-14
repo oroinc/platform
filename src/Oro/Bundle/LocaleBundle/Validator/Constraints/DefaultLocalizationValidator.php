@@ -73,6 +73,6 @@ class DefaultLocalizationValidator extends ConstraintValidator
      */
     protected function isSyncApplicable(FormInterface $rootForm)
     {
-        return $rootForm && $rootForm->getName() == 'localization' && $rootForm->has(self::ENABLED_LOCALIZATIONS_NAME);
+        return $rootForm->getName() == 'localization' && $rootForm->has(self::ENABLED_LOCALIZATIONS_NAME);
     }
 }
