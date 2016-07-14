@@ -15,6 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class OrganizationsSelectType extends AbstractType
 {
@@ -115,6 +117,20 @@ class OrganizationsSelectType extends AbstractType
     }
 
     /**
+     * @return int[]
+     */
+    protected function getOrganizationOptionsIds()
+    {
+        $ids = [];
+        $organizations = $this->getOrganizationOptions();
+        foreach ($organizations as $organization) {
+            $ids[] = $organization->getId();
+        }
+
+        return $ids;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
@@ -144,10 +160,18 @@ class OrganizationsSelectType extends AbstractType
     /**
      * Prepare choice options for a select
      *
-     * @return array
+     * @return Organization[]
      */
     protected function getOrganizationOptions()
     {
-        return $this->em->getRepository('OroOrganizationBundle:Organization')->getEnabled();
+        return $this->getLoggedInUser()->getOrganizations(true);
+    }
+
+    /**
+     * @return User
+     */
+    protected function getLoggedInUser()
+    {
+        return $this->securityFacade->getLoggedUser();
     }
 }
