@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -43,7 +45,10 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
-        $data = ['contexts' => []];
+        $data = [
+            'contexts' => [],
+            'attendees' => new ArrayCollection()
+        ];
         $this->request = new Request();
         $this->request->request = new ParameterBag($data);
 
