@@ -152,7 +152,8 @@ JS;
             $input->postValue(['value' => [$value]]);
             $this->wait(3000, "0 == $('ul.select2-results li.select2-searching').length");
 
-            $firstResult = $this->findElement(array_shift($this->getEntitiesSearchResultXpaths()));
+            $results = $this->getEntitiesSearchResultXpaths();
+            $firstResult = $this->findElement(array_shift($results));
 
             if ('select2-no-results' === $firstResult->attribute('class')) {
                 throw new ExpectationException(sprintf('Not found result for "%s"', $value), $this);
