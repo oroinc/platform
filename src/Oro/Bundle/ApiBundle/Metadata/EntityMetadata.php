@@ -3,26 +3,113 @@
 namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\ChainProcessor\ToArrayInterface;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class EntityMetadata extends ParameterBag
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
+class EntityMetadata implements ToArrayInterface
 {
-    /** FQCN of an entity */
-    const CLASS_NAME = 'class';
+    /** @var string */
+    protected $className;
 
-    /** entity inheritance flag */
-    const INHERITED = 'inherited';
+    /** @var bool */
+    protected $inherited = false;
 
-    /** a flag indicates whether the entity has some strategy to generate identifier value */
-    const HAS_IDENTIFIER_GENERATOR = 'has_identifier_generator';
+    /** @var bool */
+    protected $hasIdGenerator = false;
 
     /** @var string[] */
-    private $identifiers = [];
+    protected $identifiers = [];
+
+    /** @var MetaPropertyMetadata[] */
+    protected $metaProperties = [];
 
     /** @var FieldMetadata[] */
-    private $fields = [];
+    protected $fields = [];
 
     /** @var AssociationMetadata[] */
-    private $associations = [];
+    protected $associations = [];
+
+    /** @var ParameterBag|null */
+    protected $attributes;
+
+    /**
+     * Makes a deep copy of the object.
+     */
+    public function __clone()
+    {
+        if (null !== $this->attributes) {
+            $attributes = ConfigUtil::cloneItems($this->attributes->toArray());
+            $this->attributes->clear();
+            foreach ($attributes as $key => $value) {
+                $this->attributes->set($key, $value);
+            }
+        }
+        $this->metaProperties = ConfigUtil::cloneObjects($this->metaProperties);
+        $this->fields = ConfigUtil::cloneObjects($this->fields);
+        $this->associations = ConfigUtil::cloneObjects($this->associations);
+    }
+
+    /**
+     * Gets a native PHP array representation of the object.
+     *
+     * @return array [key => value, ...]
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public function toArray()
+    {
+        $result = [];
+        if (null !== $this->attributes) {
+            $result = $this->attributes->toArray();
+        }
+        if ($this->className) {
+            $result['class'] = $this->className;
+        }
+        if ($this->inherited) {
+            $result['inherited'] = $this->inherited;
+        }
+        if ($this->hasIdGenerator) {
+            $result['has_identifier_generator'] = $this->hasIdGenerator;
+        }
+        $identifiers = $this->getIdentifierFieldNames();
+        if (!empty($identifiers)) {
+            $result['identifiers'] = $identifiers;
+        }
+        $metaProperties = $this->convertPropertiesToArray($this->metaProperties);
+        if (!empty($metaProperties)) {
+            $result['meta_properties'] = $metaProperties;
+        }
+        $fields = $this->convertPropertiesToArray($this->fields);
+        if (!empty($fields)) {
+            $result['fields'] = $fields;
+        }
+        $associations = $this->convertPropertiesToArray($this->associations);
+        if (!empty($associations)) {
+            $result['associations'] = $associations;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param ToArrayInterface[] $properties
+     *
+     * @return array
+     */
+    protected function convertPropertiesToArray(array $properties)
+    {
+        $result = [];
+        foreach ($properties as $name => $property) {
+            $data = $property->toArray();
+            unset($data['name']);
+            $result[$name] = $data;
+        }
+
+        return $result;
+    }
 
     /**
      * Gets FQCN of an entity.
@@ -31,7 +118,7 @@ class EntityMetadata extends ParameterBag
      */
     public function getClassName()
     {
-        return $this->get(self::CLASS_NAME);
+        return $this->className;
     }
 
     /**
@@ -41,7 +128,7 @@ class EntityMetadata extends ParameterBag
      */
     public function setClassName($className)
     {
-        $this->set(self::CLASS_NAME, $className);
+        $this->className = $className;
     }
 
     /**
@@ -71,7 +158,7 @@ class EntityMetadata extends ParameterBag
      */
     public function hasIdentifierGenerator()
     {
-        return (bool)$this->get(self::HAS_IDENTIFIER_GENERATOR);
+        return $this->hasIdGenerator;
     }
 
     /**
@@ -81,7 +168,7 @@ class EntityMetadata extends ParameterBag
      */
     public function setHasIdentifierGenerator($hasIdentifierGenerator)
     {
-        $this->set(self::HAS_IDENTIFIER_GENERATOR, $hasIdentifierGenerator);
+        $this->hasIdGenerator = $hasIdentifierGenerator;
     }
 
     /**
@@ -93,7 +180,7 @@ class EntityMetadata extends ParameterBag
      */
     public function isInheritedType()
     {
-        return (bool)$this->get(self::INHERITED);
+        return $this->inherited;
     }
 
     /**
@@ -103,7 +190,7 @@ class EntityMetadata extends ParameterBag
      */
     public function setInheritedType($inherited)
     {
-        $this->set(self::INHERITED, $inherited);
+        $this->inherited = $inherited;
     }
 
     /**
@@ -115,7 +202,10 @@ class EntityMetadata extends ParameterBag
      */
     public function hasProperty($propertyName)
     {
-        return $this->hasField($propertyName) || $this->hasAssociation($propertyName);
+        return
+            $this->hasField($propertyName)
+            || $this->hasAssociation($propertyName)
+            || $this->hasMetaProperty($propertyName);
     }
 
     /**
@@ -129,6 +219,8 @@ class EntityMetadata extends ParameterBag
             $this->removeField($propertyName);
         } elseif ($this->hasAssociation($propertyName)) {
             $this->removeAssociation($propertyName);
+        } elseif ($this->hasMetaProperty($propertyName)) {
+            $this->removeMetaProperty($propertyName);
         }
     }
 
@@ -144,6 +236,86 @@ class EntityMetadata extends ParameterBag
             $this->renameField($oldName, $newName);
         } elseif ($this->hasAssociation($oldName)) {
             $this->renameAssociation($oldName, $newName);
+        } elseif ($this->hasMetaProperty($oldName)) {
+            $this->renameMetaProperty($oldName, $newName);
+        }
+    }
+
+    /**
+     * Gets metadata for all meta properties.
+     *
+     * @return MetaPropertyMetadata[] [meta property name => MetaPropertyMetadata, ...]
+     */
+    public function getMetaProperties()
+    {
+        return $this->metaProperties;
+    }
+
+    /**
+     * Checks whether metadata of the given meta property exists.
+     *
+     * @param string $metaPropertyName
+     *
+     * @return bool
+     */
+    public function hasMetaProperty($metaPropertyName)
+    {
+        return isset($this->metaProperties[$metaPropertyName]);
+    }
+
+    /**
+     * Gets metadata of a meta property.
+     *
+     * @param string $metaPropertyName
+     *
+     * @return MetaPropertyMetadata|null
+     */
+    public function getMetaProperty($metaPropertyName)
+    {
+        if (!isset($this->metaProperties[$metaPropertyName])) {
+            return null;
+        }
+
+        return $this->metaProperties[$metaPropertyName];
+    }
+
+    /**
+     * Adds metadata of a meta property.
+     *
+     * @param MetaPropertyMetadata $metaProperty
+     *
+     * @return MetaPropertyMetadata
+     */
+    public function addMetaProperty(MetaPropertyMetadata $metaProperty)
+    {
+        $this->metaProperties[$metaProperty->getName()] = $metaProperty;
+
+        return $metaProperty;
+    }
+
+    /**
+     * Removes metadata of a meta property.
+     *
+     * @param string $metaPropertyName
+     */
+    public function removeMetaProperty($metaPropertyName)
+    {
+        unset($this->metaProperties[$metaPropertyName]);
+    }
+
+    /**
+     * Renames existing meta property
+     *
+     * @param string $oldName
+     * @param string $newName
+     */
+    public function renameMetaProperty($oldName, $newName)
+    {
+        $metadata = $this->getMetaProperty($oldName);
+        if (null !== $metadata) {
+            $this->removeMetaProperty($oldName);
+            $metadata->setName($newName);
+            $this->addMetaProperty($metadata);
         }
     }
 
@@ -178,19 +350,25 @@ class EntityMetadata extends ParameterBag
      */
     public function getField($fieldName)
     {
-        return isset($this->fields[$fieldName])
-            ? $this->fields[$fieldName]
-            : null;
+        if (!isset($this->fields[$fieldName])) {
+            return null;
+        }
+
+        return $this->fields[$fieldName];
     }
 
     /**
      * Adds metadata of a field.
      *
      * @param FieldMetadata $field
+     *
+     * @return FieldMetadata
      */
     public function addField(FieldMetadata $field)
     {
         $this->fields[$field->getName()] = $field;
+
+        return $field;
     }
 
     /**
@@ -250,19 +428,25 @@ class EntityMetadata extends ParameterBag
      */
     public function getAssociation($associationName)
     {
-        return isset($this->associations[$associationName])
-            ? $this->associations[$associationName]
-            : null;
+        if (!isset($this->associations[$associationName])) {
+            return null;
+        }
+
+        return $this->associations[$associationName];
     }
 
     /**
      * Adds metadata of an association.
      *
      * @param AssociationMetadata $association
+     *
+     * @return AssociationMetadata
      */
     public function addAssociation(AssociationMetadata $association)
     {
         $this->associations[$association->getName()] = $association;
+
+        return $association;
     }
 
     /**
@@ -292,32 +476,56 @@ class EntityMetadata extends ParameterBag
     }
 
     /**
-     * {@inheritdoc}
+     * Checks whether an additional attribute exists.
+     *
+     * @param string $attributeName
+     *
+     * @return bool
      */
-    public function toArray()
+    public function has($attributeName)
     {
-        $result = parent::toArray();
+        return null !== $this->attributes && $this->attributes->has($attributeName);
+    }
 
-        $result['identifiers'] = $this->getIdentifierFieldNames();
-
-        $fields = $this->getFields();
-        if (!empty($fields)) {
-            foreach ($fields as $field) {
-                $data = $field->toArray();
-                unset($data[AssociationMetadata::NAME]);
-                $result['fields'][$field->getName()] = $data;
-            }
+    /**
+     * Gets an additional attribute.
+     *
+     * @param string $attributeName
+     *
+     * @return mixed|null
+     */
+    public function get($attributeName)
+    {
+        if (null === $this->attributes) {
+            return null;
         }
 
-        $associations = $this->getAssociations();
-        if (!empty($associations)) {
-            foreach ($associations as $association) {
-                $data = $association->toArray();
-                unset($data[AssociationMetadata::NAME]);
-                $result['associations'][$association->getName()] = $data;
-            }
-        }
+        return $this->attributes->get($attributeName);
+    }
 
-        return $result;
+    /**
+     * Sets an additional attribute.
+     *
+     * @param string $attributeName
+     * @param mixed  $value
+     */
+    public function set($attributeName, $value)
+    {
+        if (null === $this->attributes) {
+            $this->attributes = new ParameterBag();
+        }
+        $this->attributes->set($attributeName, $value);
+    }
+
+    /**
+     * Removes an additional attribute.
+     *
+     * @param string $attributeName
+     */
+    public function remove($attributeName)
+    {
+        if (null !== $this->attributes) {
+            $this->attributes->remove($attributeName);
+        }
     }
 }

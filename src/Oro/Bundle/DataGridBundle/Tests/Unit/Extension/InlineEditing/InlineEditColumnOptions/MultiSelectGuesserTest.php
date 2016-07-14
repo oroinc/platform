@@ -144,7 +144,6 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
                 [],
                 [
                     'inline_editing' => [
-                        'enable' => 1,
                         'editor' => [
                             'view' => 'oroform/js/app/views/editor/multi-checkbox-editor-view'
                         ]
@@ -165,7 +164,6 @@ class MultiSelectGuesserTest extends \PHPUnit_Framework_TestCase
                 ],
                 [
                     'inline_editing' => [
-                        'enable' => 1,
                         'editor' => [
                             'view' => 'oroform/js/app/views/editor/multi-checkbox-editor-view'
                         ]

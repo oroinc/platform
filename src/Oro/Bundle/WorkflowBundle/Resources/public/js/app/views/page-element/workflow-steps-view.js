@@ -8,7 +8,8 @@ define(function(require) {
         template: require('tpl!../../../../templates/workflow-steps-view.html'),
         listen: {
             'change model': 'render',
-            'layout:reposition mediator': 'updateMaxWidth'
+            'layout:reposition mediator': 'updateMaxWidth',
+            'page-rendered mediator': 'updateContainerWidth'
         },
         getTemplateData: function() {
             var data = WokflowStepsView.__super__.getTemplateData.call(this);
@@ -30,6 +31,7 @@ define(function(require) {
             WokflowStepsView.__super__.render.call(this);
             this.updateContainerWidth();
             this.updateMaxWidth();
+            return this;
         },
         updateContainerWidth: function() {
             var $container = this.$el;

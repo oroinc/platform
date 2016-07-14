@@ -33,6 +33,17 @@ oro_system_configuration:
                                         children:
                                             - oro_entity_pagination.enabled
                                             - oro_entity_pagination.limit
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                children:
+                                    grid_settings:
+                                        children:
+                                            - oro_entity_pagination.enabled
+                                            - oro_entity_pagination.limit
 
     api_tree:
         look-and-feel:
