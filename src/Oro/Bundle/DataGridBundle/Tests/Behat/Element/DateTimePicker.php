@@ -12,7 +12,7 @@ class DateTimePicker extends Element
      * @param \DateTime $dateTime
      * @throws ExpectationException
      */
-    public function setValue(\DateTime $dateTime)
+    public function setValue($dateTime)
     {
         $this->find('css', 'input.datepicker-input')->click();
 
