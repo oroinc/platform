@@ -11,11 +11,10 @@ interface GuesserInterface
     /**
      * @param string $columnName
      * @param string $entityName
-     * @param array  $column
+     * @param array $column
+     * @param bool $isEnabledInline
      *
      * @return array
-     *
-     * @throws \Exception
      */
-    public function guessColumnOptions($columnName, $entityName, $column);
+    public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false);
 }

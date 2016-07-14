@@ -4,12 +4,15 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class ResourcesCache
 {
     const RESOURCES_KEY_PREFIX            = 'resources_';
+    const SUBRESOURCE_KEY_PREFIX          = 'subresource_';
     const ACCESSIBLE_RESOURCES_KEY_PREFIX = 'accessible_';
 
     /** @var CacheProvider */
@@ -68,20 +71,41 @@ class ResourcesCache
     }
 
     /**
+     * Fetches an entity sub-resources from the cache.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The Data API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return ApiResourceSubresources[]|null The list of sub-resources or NULL if it is not cached yet
+     */
+    public function getSubresources($entityClass, $version, RequestType $requestType)
+    {
+        $cachedData = $this->cache->fetch(
+            self::SUBRESOURCE_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType) . $entityClass
+        );
+        if (false === $cachedData) {
+            return null;
+        }
+
+        return $this->unserializeApiResourceSubresources($entityClass, $cachedData);
+    }
+
+    /**
      * Puts Data API resources into the cache.
      *
      * @param string        $version     The Data API version
      * @param RequestType   $requestType The request type, for example "rest", "soap", etc.
      * @param ApiResource[] $resources   The list of Data API resources
      */
-    public function save($version, RequestType $requestType, array $resources)
+    public function saveResources($version, RequestType $requestType, array $resources)
     {
         $allResources = [];
         $accessibleResources = [];
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
             $allResources[$entityClass] = $this->serializeApiResource($resource);
-            if (!in_array('get', $resource->getExcludedActions(), true)) {
+            if (!in_array(ApiActions::GET, $resource->getExcludedActions(), true)) {
                 $accessibleResources[] = $entityClass;
             }
         }
@@ -89,6 +113,24 @@ class ResourcesCache
         $keyIndex = $this->getCacheKeyIndex($version, $requestType);
         $this->cache->save(self::RESOURCES_KEY_PREFIX . $keyIndex, $allResources);
         $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResources);
+    }
+
+    /**
+     * Puts sub-resources for all entities into the cache.
+     *
+     * @param string                    $version      The Data API version
+     * @param RequestType               $requestType  The request type, for example "rest", "soap", etc.
+     * @param ApiResourceSubresources[] $subresources The list of sub-resources
+     */
+    public function saveSubresources($version, RequestType $requestType, array $subresources)
+    {
+        $keyIndex = self::SUBRESOURCE_KEY_PREFIX . $this->getCacheKeyIndex($version, $requestType);
+        foreach ($subresources as $entitySubresources) {
+            $this->cache->save(
+                $keyIndex . $entitySubresources->getEntityClass(),
+                $this->serializeApiResourceSubresources($entitySubresources)
+            );
+        }
     }
 
     /**
@@ -133,6 +175,49 @@ class ResourcesCache
     {
         return [
             $resource->getExcludedActions()
+        ];
+    }
+
+    /**
+     * @param string $entityClass
+     * @param array  $cachedData
+     *
+     * @return ApiResourceSubresources
+     */
+    protected function unserializeApiResourceSubresources($entityClass, array $cachedData)
+    {
+        $resource = new ApiResourceSubresources($entityClass);
+        foreach ($cachedData[0] as $associationName => $serializedSubresource) {
+            $subresource = $resource->addSubresource($associationName);
+            $subresource->setTargetClassName($serializedSubresource[0]);
+            $subresource->setAcceptableTargetClassNames($serializedSubresource[1]);
+            $subresource->setIsCollection($serializedSubresource[2]);
+            $subresource->setExcludedActions($serializedSubresource[3]);
+        }
+
+        return $resource;
+    }
+
+    /**
+     * @param ApiResourceSubresources $entitySubresources
+     *
+     * @return array
+     */
+    protected function serializeApiResourceSubresources(ApiResourceSubresources $entitySubresources)
+    {
+        $serializedSubresources = [];
+        $subresources = $entitySubresources->getSubresources();
+        foreach ($subresources as $associationName => $subresource) {
+            $serializedSubresources[$associationName] = [
+                $subresource->getTargetClassName(),
+                $subresource->getAcceptableTargetClassNames(),
+                $subresource->isCollection(),
+                $subresource->getExcludedActions()
+            ];
+        }
+
+        return [
+            $serializedSubresources
         ];
     }
 }

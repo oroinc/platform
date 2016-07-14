@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -12,6 +13,7 @@ use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -29,6 +31,16 @@ class DebugCommand extends AbstractDebugCommand
                 'action',
                 InputArgument::OPTIONAL,
                 'Shows a list of processors for a specified action'
+            )
+            ->addOption(
+                'attribute',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Shows processors which will be executed only when the context has'
+                . ' a given attribute with the specified value.'
+                . ' The name and value should be separated by the colon,'
+                . ' e.g.: <info>--attribute=collection:true</info> for scalar value'
+                . ' or <info>--attribute=extra:[definition,filters]</info> for array value'
             );
         parent::configure();
     }
@@ -50,7 +62,7 @@ class DebugCommand extends AbstractDebugCommand
         if (empty($action)) {
             $this->dumpActions($output);
         } else {
-            $this->dumpProcessors($output, $action, $this->getRequestType($input));
+            $this->dumpProcessors($output, $action, $this->getRequestType($input), $input->getOption('attribute'));
         }
     }
 
@@ -59,9 +71,12 @@ class DebugCommand extends AbstractDebugCommand
      */
     protected function dumpActions(OutputInterface $output)
     {
+        /** @var ActionProcessorBagInterface $processorBag */
+        $actionProcessorBag = $this->getContainer()->get('oro_api.action_processor_bag');
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
 
+        $output->writeln('<info>All Actions:</info>');
         $table = new Table($output);
         $table->setHeaders(['Action', 'Groups']);
 
@@ -76,6 +91,11 @@ class DebugCommand extends AbstractDebugCommand
 
         $table->render();
 
+        $output->writeln('<info>Public Actions:</info>');
+        foreach ($actionProcessorBag->getActions() as $action) {
+            $output->writeln('  ' . $action);
+        }
+
         $output->writeln('');
         $output->writeln(
             sprintf(
@@ -89,8 +109,9 @@ class DebugCommand extends AbstractDebugCommand
      * @param OutputInterface $output
      * @param string          $action
      * @param RequestType     $requestType
+     * @param string[]        $attributes
      */
-    protected function dumpProcessors(OutputInterface $output, $action, RequestType $requestType)
+    protected function dumpProcessors(OutputInterface $output, $action, RequestType $requestType, array $attributes)
     {
         $output->writeln('The processors are displayed in the order they are executed.');
 
@@ -103,10 +124,17 @@ class DebugCommand extends AbstractDebugCommand
         $context = new Context();
         $context->setAction($action);
         $context->set(ApiContext::REQUEST_TYPE, $requestType);
+        $specifiedAttributes = [];
+        foreach ($attributes as $attribute) {
+            list($name, $value) = explode(':', $attribute, 2);
+            $context->set($name, $this->getTypedValue($value));
+            $specifiedAttributes[] = $name;
+        }
         $processors = $processorBag->getProcessors($context);
 
         $applicableChecker = new ChainApplicableChecker();
-        $applicableChecker->addChecker(new RequestTypeApplicableChecker());
+        $applicableChecker->addChecker(new Util\RequestTypeApplicableChecker());
+        $applicableChecker->addChecker(new Util\AttributesApplicableChecker($specifiedAttributes));
         $processors->setApplicableChecker($applicableChecker);
 
         $i = 0;
@@ -176,30 +204,16 @@ class DebugCommand extends AbstractDebugCommand
                 ': ',
                 [
                     'group',
-                    sprintf('<comment>%s</comment>', $this->formatProcessorAttributeValue($attributes['group']))
+                    sprintf('<comment>%s</comment>', $this->convertValueToString($attributes['group']))
                 ]
             );
             unset($attributes['group']);
         }
 
         foreach ($attributes as $key => $val) {
-            $rows[] = implode(': ', [$key, $this->formatProcessorAttributeValue($val)]);
+            $rows[] = implode(': ', [$key, $this->convertValueToString($val)]);
         }
 
         return implode(PHP_EOL, $rows);
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return string
-     */
-    protected function formatProcessorAttributeValue($value)
-    {
-        if (is_array($value)) {
-            return '[' . implode(', ', $value) . ']';
-        }
-
-        return (string)$value;
     }
 }

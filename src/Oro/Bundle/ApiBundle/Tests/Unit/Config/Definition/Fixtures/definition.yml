@@ -36,24 +36,6 @@ invalid_exclusion_policy:
     expected: []
     error: 'The value "invalid" is not allowed for path "entity.exclusion_policy". Permissible values: "all", "none"'
 
-default_disable_partial_load:
-    config:
-        disable_partial_load: false
-    expected:
-        disable_partial_load: false
-
-disable_partial_load:
-    config:
-        disable_partial_load: true
-    expected:
-        disable_partial_load: true
-
-invalid_disable_partial_load:
-    config:
-        disable_partial_load: 123
-    expected: []
-    error: 'Invalid type for path "entity.disable_partial_load". Expected boolean, but got integer.'
-
 empty_order_by:
     config:
         order_by: []
@@ -75,6 +57,17 @@ invalid_direction_in_order_by:
             field1: other
     expected: []
     error: 'The value "other" is not allowed for path "entity.order_by.field1". Permissible values: "ASC", "DESC"'
+
+empty_identifier_field_names:
+    config:
+        identifier_field_names: []
+    expected: []
+
+invalid_identifier_field_names:
+    config:
+        identifier_field_names: 123
+    expected: []
+    error: 'Invalid type for path "entity.identifier_field_names". Expected array, but got integer'
 
 default_max_results:
     config:
@@ -135,69 +128,93 @@ post_serialize:
     expected:
         post_serialize: [class, method]
 
-null_label:
+description_cannot_be_set_in_config:
     config:
-        label: ~
+        description: test
     expected: []
-    error: 'The path "entity.label" cannot contain an empty value, but got null.'
+    error: 'Unrecognized option "description" under "entity"'
 
-empty_label:
+documentation_cannot_be_set_in_config:
     config:
-        label: ""
+        documentation: test
     expected: []
-    error: 'The path "entity.label" cannot contain an empty value, but got "".'
+    error: 'Unrecognized option "documentation" under "entity"'
 
-null_plural_label:
+acl_resource_cannot_be_set_in_config:
     config:
-        plural_label: ~
+        acl_resource: test_acl_resource
     expected: []
-    error: 'The path "entity.plural_label" cannot contain an empty value, but got null.'
+    error: 'Unrecognized option "acl_resource" under "entity"'
 
-empty_plural_label:
+page_size_cannot_be_set_in_config:
     config:
-        plural_label: ""
+        page_size: 123
     expected: []
-    error: 'The path "entity.plural_label" cannot contain an empty value, but got "".'
+    error: 'Unrecognized option "page_size" under "entity"'
 
-null_description:
+disable_sorting_cannot_be_set_in_config:
     config:
-        description: ~
+        disable_sorting: true
     expected: []
-    error: 'The path "entity.description" cannot contain an empty value, but got null.'
+    error: 'Unrecognized option "disable_sorting" under "entity"'
 
-empty_description:
+enable_inclusion:
     config:
-        description: ""
+        disable_inclusion: false
+    expected:
+        disable_inclusion: false
+
+disable_inclusion:
+    config:
+        disable_inclusion: true
+    expected:
+        disable_inclusion: true
+
+invalid_value_for_disable_inclusion:
+    config:
+        disable_inclusion: 123
     expected: []
-    error: 'The path "entity.description" cannot contain an empty value, but got "".'
+    error: 'Invalid type for path "entity.disable_inclusion". Expected boolean, but got integer'
+
+enable_fieldset:
+    config:
+        disable_fieldset: false
+    expected:
+        disable_fieldset: false
+
+disable_fieldset:
+    config:
+        disable_fieldset: true
+    expected:
+        disable_fieldset: true
+
+invalid_value_for_disable_fieldset:
+    config:
+        disable_fieldset: 123
+    expected: []
+    error: 'Invalid type for path "entity.disable_fieldset". Expected boolean, but got integer'
 
 all_attributes:
     config:
         exclusion_policy: all
-        disable_partial_load: true
         order_by:
             id: DESC
         max_results: 50
+        identifier_field_names: ['id']
         hints:
             - HINT_1
             - {name: HINT_2, value: hint_val2}
         post_serialize: [class, method]
-        label: label1
-        plural_label: plural_label1
-        description: description1
     expected:
         exclusion_policy: all
-        disable_partial_load: true
         order_by:
             id: DESC
         max_results: 50
+        identifier_field_names: ['id']
         hints:
             - {name: HINT_1}
             - {name: HINT_2, value: hint_val2}
         post_serialize: [class, method]
-        label: label1
-        plural_label: plural_label1
-        description: description1
 
 empty_field:
     config:
@@ -257,6 +274,28 @@ empty_field_property_path:
     expected: []
     error: 'The path "entity.fields.field1.property_path" cannot contain an empty value, but got "".'
 
+field_meta_property:
+    config:
+        fields:
+            field1:
+                meta_property: true
+            field2:
+                meta_property: false
+    expected:
+        fields:
+            field1:
+                meta_property: true
+            field2:
+                meta_property: false
+
+invalid_field_meta_property:
+    config:
+        fields:
+            field1:
+                meta_property: 123
+    expected: []
+    error: 'Invalid type for path "entity.fields.field1.meta_property". Expected boolean, but got integer.'
+
 field_collapse:
     config:
         fields:
@@ -298,32 +337,6 @@ field_data_transformer:
             field4:
                 data_transformer: [service1, [class, method]]
 
-field_label:
-    config:
-        fields:
-            field1:
-                label: path1
-    expected:
-        fields:
-            field1:
-                label: path1
-
-null_field_label:
-    config:
-        fields:
-            field1:
-                label: null
-    expected: []
-    error: 'The path "entity.fields.field1.label" cannot contain an empty value, but got null.'
-
-empty_field_label:
-    config:
-        fields:
-            field1:
-                label: ""
-    expected: []
-    error: 'The path "entity.fields.field1.label" cannot contain an empty value, but got "".'
-
 field_description:
     config:
         fields:
@@ -349,6 +362,75 @@ empty_field_description:
                 description: ""
     expected: []
     error: 'The path "entity.fields.field1.description" cannot contain an empty value, but got "".'
+
+empty_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: ""
+    expected: []
+    error: 'The value "" is not allowed for path "entity.fields.field1.target_type". Permissible values: "to-many", "to-one", "collection"'
+
+invalid_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: test
+    expected: []
+    error: 'The value "test" is not allowed for path "entity.fields.field1.target_type". Permissible values: "to-many", "to-one", "collection"'
+
+to_one_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: to-one
+    expected:
+        fields:
+            field1:
+                target_type: to-one
+
+to_many_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: to-many
+    expected:
+        fields:
+            field1:
+                target_type: to-many
+
+collection_field_target_type:
+    config:
+        fields:
+            field1:
+                target_type: collection
+    expected:
+        fields:
+            field1:
+                target_type: to-many
+
+field_target_class_without_target_type:
+    config:
+        fields:
+            field1:
+                target_class: Test\Class
+    expected:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-one
+
+field_target_class_with_target_type:
+    config:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-many
+    expected:
+        fields:
+            field1:
+                target_class: Test\Class
+                target_type: to-many
 
 filters_and_sorters:
     config:
@@ -416,7 +498,6 @@ field_with_target_entity:
             field1:
                 collapse: true
                 exclusion_policy: all
-                disable_partial_load: true
                 order_by:
                     id: DESC
                 max_results: 50
@@ -428,13 +509,52 @@ field_with_target_entity:
             field1:
                 collapse: true
                 exclusion_policy: all
-                disable_partial_load: true
                 order_by:
                     id: DESC
                 max_results: 50
                 hints:
                     - {name: HINT_1}
                     - {name: HINT_2, value: hint_val2}
+
+page_size_should_not_be_set_to_target_entity:
+    config:
+        fields:
+            field1:
+                page_size: 20
+    expected: []
+    error: 'Unrecognized option "page_size" under "entity.fields.field1"'
+
+disable_sorting_should_not_be_set_to_target_entity:
+    config:
+        fields:
+            field1:
+                disable_sorting: true
+    expected: []
+    error: 'Unrecognized option "disable_sorting" under "entity.fields.field1"'
+
+disable_inclusion_should_not_be_set_to_target_entity:
+    config:
+        fields:
+            field1:
+                disable_inclusion: true
+    expected: []
+    error: 'Unrecognized option "disable_inclusion" under "entity.fields.field1"'
+
+disable_fieldset_should_not_be_set_to_target_entity:
+    config:
+        fields:
+            field1:
+                disable_fieldset: true
+    expected: []
+    error: 'Unrecognized option "disable_fieldset" under "entity.fields.field1"'
+
+identifier_field_names_should_not_be_set_to_target_entity:
+    config:
+        fields:
+            field1:
+                identifier_field_names: ['id']
+    expected: []
+    error: 'Unrecognized option "identifier_field_names" under "entity.fields.field1"'
 
 extra_config:
     config:
@@ -523,6 +643,14 @@ invalid_entity_form_options:
         form_options: test
     expected: []
     error: 'Invalid type for path "entity.form_options". Expected array, but got string'
+
+dash_in_field_name:
+    config:
+        fields:
+            test-field: ~
+    expected:
+        fields:
+            test-field: []
 
 field_form:
     config:

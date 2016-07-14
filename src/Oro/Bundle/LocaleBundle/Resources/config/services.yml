@@ -31,6 +31,9 @@ parameters:
     oro_locale.twig.number.class: Oro\Bundle\LocaleBundle\Twig\NumberExtension
 
     oro_locale.formatter.datetime.class: Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter
+    oro_locale.formatter.date.class: Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter
+
+    oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
 
     oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
 
@@ -242,6 +245,14 @@ services:
         tags:
             - { name: oro_formatter, formatter: datetime }
 
+    oro_locale.format.date:
+        class: %oro_locale.formatter.date.class%
+        arguments:
+            - '@oro_locale.formatter.date_time'
+            - '@translator'
+        tags:
+            - { name: oro_formatter, formatter: date }
+
     oro_locale.format.currency:
         class: Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter
         arguments:
@@ -291,3 +302,12 @@ services:
         class: %oro_locale.entity_generator.extension.class%
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
+
+    oro_locale.twig.date_time_organization:
+        class: Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension
+        parent: oro_locale.twig.date_time
+        deprecated: The "%service_id%" service is deprecated since 1.11, will be removed after 1.13.
+        calls:
+            - [setConfigManager, ['@oro_config.global']]
+        tags:
+            - { name: twig.extension }

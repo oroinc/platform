@@ -15,6 +15,9 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -194,6 +197,21 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setResponseStatusCode(500);
         $this->assertEquals(500, $this->context->getResponseStatusCode());
         $this->assertEquals(500, $this->context->get(Context::RESPONSE_STATUS_CODE));
+    }
+
+    public function testIsSuccessResponse()
+    {
+        $this->assertFalse($this->context->isSuccessResponse());
+
+        $this->context->setResponseStatusCode(200);
+        $this->assertTrue($this->context->isSuccessResponse());
+        $this->context->setResponseStatusCode(299);
+        $this->assertTrue($this->context->isSuccessResponse());
+
+        $this->context->setResponseStatusCode(199);
+        $this->assertFalse($this->context->isSuccessResponse());
+        $this->context->setResponseStatusCode(300);
+        $this->assertFalse($this->context->isSuccessResponse());
     }
 
     public function testClassName()
@@ -523,9 +541,17 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
+    public function testHasConfigOfUndefinedSection()
+    {
+        $this->context->setConfigExtras([new TestConfigSection('section1')]);
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->assertFalse($this->context->hasConfigOf('undefined'));
+    }
+
     public function testGetConfigOfUndefinedSection()
     {
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
@@ -534,7 +560,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->never())
             ->method('getConfig');
 
-        $this->context->getConfigOf('undefined');
+        $this->assertNull($this->context->getConfigOf('undefined'));
     }
 
     /**

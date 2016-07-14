@@ -1,6 +1,6 @@
 @name = calendar_reminder
 @entityName = Oro\Bundle\CalendarBundle\Entity\CalendarEvent
-@subject = {{ entity.title }} is starting at {{ entity.start|date('F j, Y, g:i A') }}
+@subject = {{ entity.title }} is starting at {{ entity.start|oro_format_datetime_organization({'organization': entity.calendar.organization}) }}
 @isSystem = 1
 @isEditable = 1
 
@@ -17,7 +17,7 @@
 <table class="wrapper" style="border-collapse: collapse; width: 640px; width: 480pt; max-width: 100%; box-sizing: border-box">
     <tr>
         <td style="background-color: #ffffff; padding: 4pt">
-            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 14pt; line-height: 14pt; color: #444444">{{ entity.title }} is starting at {{ entity.start|date('F j, Y, g:i A') }}</span>
+            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 14pt; line-height: 14pt; color: #444444">{{ entity.title }} is starting at {{ entity.start|oro_format_datetime_organization({'organization': entity.calendar.organization}) }}</span>
             <div style="height: 10pt; line-height: 10pt">&nbsp;</div>
             <table class="highlight" style="border-collapse:collapse; background: #FFF9E9; color: #827030; width: 100%; font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">
                 <tr>
@@ -25,7 +25,7 @@
                 </tr>
                 <tr>
                     <td style="width: 65pt; padding: 0 5pt 0 9pt; line-height: 1.3em; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; vertical-align: top"><strong>When:</strong></td>
-                    <td style="padding: 0 9pt 0 0; line-height: 1.3em; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; vertical-align: top">{{ calendar_date_range(entity.start, entity.end, entity.allDay, 1) }}</td>
+                    <td style="padding: 0 9pt 0 0; line-height: 1.3em; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; vertical-align: top">{{ calendar_date_range_organization(entity.start, entity.end, entity.allDay, 1, null, null, null, entity.calendar.organization) }}</td>
                 </tr>
                 <tr>
                     <td style="width: 65pt; padding: 0 5pt 0 9pt; line-height: 1.3em; height:1em; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; vertical-align: top"><strong>Calendar:</strong></td>

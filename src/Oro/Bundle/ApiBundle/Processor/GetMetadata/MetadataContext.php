@@ -24,9 +24,12 @@ class MetadataContext extends ApiContext
     /** @var MetadataExtraInterface[] */
     protected $extras = [];
 
-    public function __construct()
+    /**
+     * {@inheritdoc}
+     */
+    protected function initialize()
     {
-        parent::__construct();
+        parent::initialize();
         $this->set(self::EXTRA, []);
     }
 

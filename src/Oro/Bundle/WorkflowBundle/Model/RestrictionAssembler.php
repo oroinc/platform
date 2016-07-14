@@ -8,12 +8,12 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\AbstractAssembler;
+use Oro\Component\Action\Model\AbstractAssembler as ComponentAbstractAssembler;
 
 use Oro\Bundle\ActionBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
-class RestrictionAssembler extends AbstractAssembler
+class RestrictionAssembler extends ComponentAbstractAssembler
 {
     /**
      * @var Attribute[]

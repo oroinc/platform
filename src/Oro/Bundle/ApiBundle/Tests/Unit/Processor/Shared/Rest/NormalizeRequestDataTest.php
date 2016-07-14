@@ -27,6 +27,36 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor = new NormalizeRequestData($this->entityIdTransformer);
     }
 
+    /**
+     * @param string $fieldName
+     *
+     * @return FieldMetadata
+     */
+    protected function createFieldMetadata($fieldName)
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName($fieldName);
+
+        return $fieldMetadata;
+    }
+
+    /**
+     * @param string $associationName
+     * @param string $targetClass
+     * @param bool   $isCollection
+     *
+     * @return AssociationMetadata
+     */
+    protected function createAssociationMetadata($associationName, $targetClass, $isCollection)
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName($associationName);
+        $associationMetadata->setTargetClassName($targetClass);
+        $associationMetadata->setIsCollection($isCollection);
+
+        return $associationMetadata;
+    }
+
     public function testProcess()
     {
         $inputData = [
@@ -39,30 +69,20 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         ];
 
         $metadata = new EntityMetadata();
-        $firstName = new FieldMetadata();
-        $firstName->setName('firstName');
-        $metadata->addField($firstName);
-        $lastName = new FieldMetadata();
-        $lastName->setName('lastName');
-        $metadata->addField($lastName);
-        $toOneRelation = new AssociationMetadata();
-        $toOneRelation->setName('toOneRelation');
-        $toOneRelation->setTargetClassName('Test\User');
-        $metadata->addAssociation($toOneRelation);
-        $toManyRelation = new AssociationMetadata();
-        $toManyRelation->setName('toManyRelation');
-        $toManyRelation->setTargetClassName('Test\Group');
-        $toManyRelation->setIsCollection(true);
-        $metadata->addAssociation($toManyRelation);
-        $emptyToOneRelation = new AssociationMetadata();
-        $emptyToOneRelation->setName('emptyToOneRelation');
-        $emptyToOneRelation->setTargetClassName('Test\User');
-        $metadata->addAssociation($emptyToOneRelation);
-        $emptyToManyRelation = new AssociationMetadata();
-        $emptyToManyRelation->setName('emptyToManyRelation');
-        $emptyToManyRelation->setTargetClassName('Test\Group');
-        $emptyToManyRelation->setIsCollection(true);
-        $metadata->addAssociation($emptyToManyRelation);
+        $metadata->addField($this->createFieldMetadata('firstName'));
+        $metadata->addField($this->createFieldMetadata('lastName'));
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('toManyRelation', 'Test\Group', true)
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('emptyToOneRelation', 'Test\User', false)
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('emptyToManyRelation', 'Test\Group', true)
+        );
 
         $this->entityIdTransformer->expects($this->any())
             ->method('reverseTransform')
@@ -112,15 +132,12 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         ];
 
         $metadata = new EntityMetadata();
-        $toOneRelation = new AssociationMetadata();
-        $toOneRelation->setName('toOneRelation');
-        $toOneRelation->setTargetClassName('Test\User');
-        $metadata->addAssociation($toOneRelation);
-        $toManyRelation = new AssociationMetadata();
-        $toManyRelation->setName('toManyRelation');
-        $toManyRelation->setTargetClassName('Test\Group');
-        $toManyRelation->setIsCollection(true);
-        $metadata->addAssociation($toManyRelation);
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('toManyRelation', 'Test\Group', true)
+        );
 
         $this->entityIdTransformer->expects($this->any())
             ->method('reverseTransform')
@@ -155,10 +172,10 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                     ->setSource(ErrorSource::createByPropertyPath('toOneRelation')),
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
-                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation/0')),
+                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation.0')),
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
-                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation/1')),
+                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation.1')),
             ],
             $this->context->getErrors()
         );
