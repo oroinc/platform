@@ -53,6 +53,14 @@ services:
         tags:
              - { name: layout.block_type, alias: script }
 
+    oro_layout.block_type.requires:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{provider_alias: {default: 'oro_requirejs_config_provider'}}]]
+            - [setName, ['requires']]
+        tags:
+            - { name: layout.block_type, alias: requires }
+
     oro_layout.block_type.style:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
         tags:
