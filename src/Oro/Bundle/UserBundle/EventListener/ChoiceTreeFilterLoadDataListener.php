@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Oro\Bundle\EntityBundle\ORM\Registry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Oro\Bundle\FilterBundle\Event\ChoiceTreeFilterLoadDataEvent;
 use Oro\Bundle\UserBundle\Entity\User;
 

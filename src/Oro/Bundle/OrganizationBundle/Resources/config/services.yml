@@ -229,7 +229,7 @@ services:
         arguments:
             - %oro_organization.business_unit.entity.class%
             - ["name"]
-            - '@doctrine'
+            - @doctrine
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units_owner_search_handler }
         lazy: true
@@ -237,7 +237,7 @@ services:
     oro_organization.listener.choice_tree_filter_load_data_listener:
         class: %oro_organization.listener.choice_tree_filter_load_data_listener.class%
         arguments:
-            - '@doctrine'
+            - @doctrine
         tags:
             - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
 
