@@ -4,5 +4,6 @@ services:
         public: false
         arguments:
             - '@oro_config.user'
+            - '%kernel.debug%'
         tags:
             - { name: data_collector, template: 'OroLayoutBundle:Collector:layout.html.twig', id: layout }

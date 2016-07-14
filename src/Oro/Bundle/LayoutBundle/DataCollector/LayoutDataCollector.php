@@ -22,6 +22,11 @@ class LayoutDataCollector extends DataCollector
     protected $configManager;
 
     /**
+     * @var bool
+     */
+    protected $isDebug;
+
+    /**
      * @var array
      */
     protected $views = [];
@@ -33,10 +38,12 @@ class LayoutDataCollector extends DataCollector
 
     /**
      * @param ConfigManager $configManager
+     * @param bool $isDebug
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, $isDebug = false)
     {
         $this->configManager = $configManager;
+        $this->isDebug = $isDebug;
     }
 
     /**
@@ -61,7 +68,7 @@ class LayoutDataCollector extends DataCollector
      */
     public function collectViews(BlockView $rootView)
     {
-        if ($this->configManager->get('oro_layout.debug_developer_toolbar')) {
+        if ($this->isDebug && $this->configManager->get('oro_layout.debug_developer_toolbar')) {
             $this->buildFinalViewTree($rootView);
         }
     }

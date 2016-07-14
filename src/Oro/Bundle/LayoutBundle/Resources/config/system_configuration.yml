@@ -15,6 +15,7 @@ oro_system_configuration:
                 choices:
                     - oro.layout.system_configuration.fields.debug_block_info.choices.no
                     - oro.layout.system_configuration.fields.debug_block_info.choices.yes
+            priority: 20
         oro_layout.debug_developer_toolbar:
             data_type: boolean
             type: choice
@@ -23,6 +24,7 @@ oro_system_configuration:
                 choices:
                     - oro.layout.system_configuration.fields.debug_developer_toolbar.choices.no
                     - oro.layout.system_configuration.fields.debug_developer_toolbar.choices.yes
+            priority: 10
 
     tree:
         system_configuration:
