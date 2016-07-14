@@ -67,11 +67,13 @@ class DateTimePicker extends Element
      */
     protected function findVisible($selector, $locator)
     {
-        return array_shift(array_filter(
+        $visibleElements = array_filter(
             $this->getPage()->findAll($selector, $locator),
             function (NodeElement $element) {
                 return $element->isVisible();
             }
-        ));
+        );
+
+        return array_shift($visibleElements);
     }
 }
