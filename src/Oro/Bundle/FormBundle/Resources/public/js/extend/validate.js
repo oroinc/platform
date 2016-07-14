@@ -351,7 +351,7 @@ define([
      * @param {Object} validationRules - validator configuration object
      * @returns {Object} filtered validation rules
      */
-    $.validator.filterUnsupportedValidators = function (validationRules) {
+    $.validator.filterUnsupportedValidators = function(validationRules) {
         var validationRulesCopy = $.extend(true,  {}, validationRules);
         for (var ruleName in validationRulesCopy) {
             if (validationRulesCopy.hasOwnProperty(ruleName)) {
