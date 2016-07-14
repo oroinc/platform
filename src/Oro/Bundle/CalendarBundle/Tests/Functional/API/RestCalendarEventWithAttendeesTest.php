@@ -870,6 +870,70 @@ class RestCalendarEventWithAttendeesTest extends WebTestCase
     }
 
     /**
+     * Create new event
+     *
+     * @return int
+     */
+    public function testPostWithNullAttendee()
+    {
+        $adminUser = $this->getAdminUser();
+
+        $request = [
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'id'              => null,
+            'title'           => 'Test Event',
+            'description'     => 'Test Description',
+            'start'           => '2016-05-04T11:29:46+00:00',
+            'end'             => '2016-05-04T11:29:46+00:00',
+            'allDay'          => true,
+            'backgroundColor' => '#FF0000',
+            'attendees'       => [
+                [
+                    'email'  => $adminUser->getEmail(),
+                    'status' => null,
+                    'type'   => Attendee::TYPE_ORGANIZER,
+                ],
+            ],
+        ];
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->assertNotEmpty($result);
+        $this->assertTrue(isset($result['id']));
+
+        return $result['id'];
+    }
+
+    /**
+     * @depends testPostWithNullAttendee
+     *
+     * @param int $id
+     *
+     * @return int
+     */
+    public function testPutWithNullAttendee($id)
+    {
+        $request = [
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'title'           => 'Test Event Updated',
+            'description'     => 'Test Description Updated',
+            'start'           => '2016-05-04T12:29:46+00:00',
+            'end'             => '2016-05-04T12:29:46+00:00',
+            'allDay'          => true,
+            'backgroundColor' => '#FF0000',
+            'attendees'       => '',
+        ];
+        $this->client->request(
+            'PUT',
+            $this->getUrl('oro_api_put_calendarevent', ['id' => $id]),
+            $request
+        );
+
+        $this->getJsonResponseContent($this->client->getResponse(), 200);
+    }
+
+    /**
      * @return User
      */
     protected function getAdminUser()

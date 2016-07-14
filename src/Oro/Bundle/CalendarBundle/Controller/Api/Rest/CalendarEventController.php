@@ -392,6 +392,10 @@ class CalendarEventController extends RestController implements ClassResourceInt
             $data['use_hangout'] = false;
         }
 
+        if (isset($data['attendees']) && ($data['attendees'] === '')) {
+            $data['attendees'] = null;
+        }
+
         // remove auxiliary attributes if any
         unset($data['updatedAt'], $data['editable'], $data['removable'], $data['notifiable']);
 
