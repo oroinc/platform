@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
@@ -31,6 +33,17 @@ class ProcessDefinitionControllerTest extends WebTestCase
 
         $result = $response->getContent();
         $this->assertContains('data-page-component-name="process-definitions-grid"', $result);
+
+        $response = $this->client->requestGrid(
+            [
+                'gridName' => 'process-definitions-grid',
+                'process-definitions-grid[_sort_by][id]' => 'DESC',
+            ]
+        );
+
+        $this->assertJsonResponseStatusCodeEquals($response, Response::HTTP_OK);
+        $result = $response->getContent();
+
         $this->assertContains(LoadProcessEntities::FIRST_DEFINITION, $result);
         $this->assertContains(LoadProcessEntities::SECOND_DEFINITION, $result);
         $this->assertContains(LoadProcessEntities::DISABLED_DEFINITION, $result);
