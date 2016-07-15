@@ -12,6 +12,7 @@ use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -291,7 +292,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I go to System/ Channels
      * Example: And go to System/ User Management/ Users
      *
-     * @Given /^(?:|I )go to (?P<path>[^"]*)$/
+     * @Given /^(?:|I )go to (?P<path>(?:(?!\d+ page of activity list)([^"]*)))$/
      */
     public function iOpenTheMenuAndClick($path)
     {
@@ -427,6 +428,33 @@ class OroMainContext extends MinkContext implements
                 $this->getSession()->getDriver()
             );
         }
+    }
+
+    /**
+     * @Then /^there (?:is|are) (?P<number>(?:|one|two|\d+)) records in activity list$/
+     */
+    public function thereIsNumberRecordsInActivityList($number)
+    {
+        /** @var GridPaginator $activityListPaginator */
+        $activityListPaginator = $this->createElement('ActivityListPaginator');
+        $itemsCount = $activityListPaginator->getTotalRecordsCount();
+
+        if ($this->getCount($number) !== $itemsCount) {
+            throw new ExpectationException(
+                sprintf('Expect that Activity list has %s items, but found %s', $number, $itemsCount),
+                $this->getSession()->getDriver()
+            );
+        }
+    }
+
+    /**
+     * @When /^(?:|I )go to (?P<pageNumber>\d+) page of activity list$/
+     */
+    public function goToPageOfActivityList($pageNumber)
+    {
+        /** @var GridPaginator $activityListPaginator */
+        $activityListPaginator = $this->createElement('ActivityListPaginator');
+        $activityListPaginator->find('css', 'input[type="number"]')->setValue($pageNumber);
     }
 
     /**

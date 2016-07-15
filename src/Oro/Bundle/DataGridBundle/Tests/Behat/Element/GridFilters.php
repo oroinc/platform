@@ -8,8 +8,11 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 class GridFilters extends Element
 {
     /**
-     * @param string $name
-     * @param string $locator
+     * Find filter by title and wrap it in element
+     *
+     * @param string $name Element name
+     * @param string $locator Filter title
+     *
      * @return null|AbstractGridFilterItem
      * @throws ExpectationException
      */

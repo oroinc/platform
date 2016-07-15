@@ -15,12 +15,4 @@ abstract class AbstractGridFilterItem extends Element
     {
         $this->find('css', '.filter-criteria-selector span.caret')->click();
     }
-
-    /**
-     * Apply filter to the grid
-     */
-    public function submit()
-    {
-        $this->find('css', '.filter-update')->click();
-    }
 }
