@@ -51,17 +51,6 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bu2', 'bu3'), $tree->getOrganizationBusinessUnitIds('org'));
     }
 
-    public function testAddBusinessUnitShouldSetBusinessUnitUserIds()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addUser('user1', 'bu');
-        $tree->addUser('user2', 'bu');
-
-        $tree->addBusinessUnit('bu', null);
-        $this->assertEquals(array('user1', 'user2'), $tree->getBusinessUnitUserIds('bu'));
-    }
-
     public function testAddBusinessUnitShouldSetUserOwningOrganizationId()
     {
         $tree = new OwnerTree();
@@ -116,19 +105,6 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $tree->getUserBusinessUnitIds('user'));
     }
 
-    public function testAddUserShouldSetBusinessUnitUserIds()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addBusinessUnit('bu', null);
-
-        $tree->addUser('user', 'bu');
-        $this->assertEquals(array('user'), $tree->getBusinessUnitUserIds('bu'));
-
-        $tree->addUser('user1', 'bu');
-        $this->assertEquals(array('user', 'user1'), $tree->getBusinessUnitUserIds('bu'));
-    }
-
     public function testAddUserShouldNotSetUserOrganizationIds()
     {
         $tree = new OwnerTree();
@@ -167,16 +143,6 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
 
         $tree->addUser('user', 'bu');
         $this->assertNull($tree->getUserOrganizationId('user'));
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testAddUserBusinessUnitShouldThrowExceptionIfUserDoesNotSet()
-    {
-        $tree = new OwnerTree();
-
-        $tree->addUserBusinessUnit('user', 'org1', null);
     }
 
     public function testAddUserBusinessUnitShouldNotSetUserBusinessUnitIdsIfBusinessUnitIdIsNull()
@@ -354,6 +320,31 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
                     '12' => array('121', '122', '1221'),
                     '121' => array(),
                     '122' => array('1221'),
+                )
+            ),
+            'unknown parent' => array(
+                array(
+                    array('1', null),
+                    array('11', '1'),
+                    array('12', '2'),
+                ),
+                array(
+                    '1' => array('11'),
+                    '11' => array(),
+                )
+            ),
+            'child loaded before parent' => array(
+                array(
+                    array('111', '11'),
+                    array('11', '1'),
+                    array('12', '1'),
+                    array('1', null),
+                ),
+                array(
+                    '1' => array('11', '111', '12'),
+                    '11' => array('111'),
+                    '111' => array(),
+                    '12' => array(),
                 )
             ),
         );
