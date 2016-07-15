@@ -1,5 +1,6 @@
 {% set compressed = compressed is defined ? compressed : true %}
 {% set baseAssetParts = asset('bundles')|split('?', 2) %}
+{% set provider_alias = provider_alias is defined ? provider_alias : null %}
 {% set config_extend %}
     require({
         baseUrl: {{ baseAssetParts[0]|json_encode|raw }},
@@ -7,7 +8,7 @@
     });
     {{ config_extend|default('') }}
 {% endset %}
-{% if compressed and requirejs_build_exists() %}
+{% if compressed and requirejs_build_exists(provider_alias) %}
     <script type="text/javascript">
         var require = (function(){
             var r=function(c){m(r.c,c)};r.c={};function m(a,b){
@@ -17,11 +18,11 @@
         {{ config_extend|raw }}
         require = require.c;
     </script>
-    <script type="text/javascript" src="{{ asset(get_requirejs_build_path()) }}"></script>
+    <script type="text/javascript" src="{{ asset(get_requirejs_build_path(provider_alias)) }}"></script>
 {% else %}
     <script type="text/javascript" src="{{ asset('bundles/ororequirejs/lib/require.js') }}"></script>
     <script type="text/javascript">
-        {{ get_requirejs_config() }}
+        {{ get_requirejs_config(provider_alias) }}
     </script>
     <script type="text/javascript">
         {{ config_extend|raw }}
