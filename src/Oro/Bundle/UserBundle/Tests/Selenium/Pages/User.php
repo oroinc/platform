@@ -313,7 +313,7 @@ class User extends AbstractPageEntity
         return $this;
     }
 
-    public function setOrganization($organizations = array()) {
+    public function setOrganizationOnForm($organizations = array()) {
         foreach ($organizations as $organization) {
             $this->test->byXpath("//*[@data-ftid='oro_user_user_form_organizations']" .
                 "//b[contains(., '{$organization}')]")->click();
