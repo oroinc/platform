@@ -94,8 +94,7 @@ class OrganizationsSelectType extends AbstractType
             [
                 'class'    => 'OroOrganizationBundle:Organization',
                 'property' => 'name',
-                'multiple' => true,
-                'choices'  => $this->getOrganizationOptions(),
+                'multiple' => true
             ]
         );
         $builder->add(
@@ -114,20 +113,6 @@ class OrganizationsSelectType extends AbstractType
                 ]
             ]
         );
-    }
-
-    /**
-     * @return int[]
-     */
-    protected function getOrganizationOptionsIds()
-    {
-        $ids = [];
-        $organizations = $this->getOrganizationOptions();
-        foreach ($organizations as $organization) {
-            $ids[] = $organization->getId();
-        }
-
-        return $ids;
     }
 
     /**
@@ -155,16 +140,6 @@ class OrganizationsSelectType extends AbstractType
         $view->vars['selected_organizations']  = [$this->securityFacade->getOrganizationId()];
         $view->vars['selected_business_units'] = $businessUnitData;
         $view->vars['accordion_enabled'] = $this->buManager->getTreeNodesCount($buTree) > 1000;
-    }
-
-    /**
-     * Prepare choice options for a select
-     *
-     * @return Organization[]
-     */
-    protected function getOrganizationOptions()
-    {
-        return $this->getLoggedInUser()->getOrganizations(true);
     }
 
     /**

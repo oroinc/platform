@@ -104,6 +104,7 @@ class BusinessUnitRepository extends EntityRepository
             $tree[$organizationItem['id']] = [
                 'id'       => $organizationItem['id'],
                 'name'     => $organizationItem['name'],
+                'enabled'  => $organizationItem['enabled'],
                 'children' => []
             ];
         }
