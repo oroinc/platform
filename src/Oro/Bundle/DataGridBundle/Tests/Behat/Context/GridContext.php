@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
@@ -180,6 +182,42 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * Assert column values by given row
+     * Example: Then I should see Charlie Sheen in grid with following data:
+     *            | Email   | charlie@gmail.com   |
+     *            | Phone   | +1 415-731-9375     |
+     *            | Country | Ukraine             |
+     *            | State   | Kharkivs'ka Oblast' |
+     *
+     * @Then /^(?:|I )should see (?P<content>([\w\s]+)) in grid with following data:$/
+     */
+    public function assertRowValues($content, TableNode $table)
+    {
+        /** @var Grid $grid */
+        $grid = $this->elementFactory->createElement('Grid');
+        /** @var GridHeader $gridHeader */
+        $gridHeader = $this->elementFactory->createElement('GridHeader');
+        $columns = $grid->getRowByContent($content)->findAll('css', 'td');
+
+        foreach ($table->getRows() as list($header, $value)) {
+            $columnNumber = $gridHeader->getColumnNumber($header);
+            $actualValue = $columns[$columnNumber]->getText();
+
+            if ($actualValue != $value) {
+                throw new ExpectationException(
+                    sprintf(
+                        'Expect that %s column should be with "%s" value but "%s" found on grid',
+                        $header,
+                        $value,
+                        $actualValue
+                    ),
+                    $this->getSession()->getDriver()
+                );
+            }
+        }
+    }
+
+    /**
      * @Then /^(?P<content>([\w\s]+)) must be (?P<rowNumber>(first|second|[\d]+)) record$/
      */
     public function assertRowContent($content, $rowNumber)
@@ -260,7 +298,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
-     * @When confirm deletion
+     * @When /^(?:|I )confirm deletion$/
      */
     public function confirmDeletion()
     {
@@ -292,6 +330,9 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * Check that mass action link is not available in grid mass actions
+     * Example: Then I shouldn't see Delete action
+     *
      * @Then /^(?:|I )shouldn't see (?P<action>(?:[^"]|\\")*) action$/
      */
     public function iShouldNotSeeDeleteAction($action)

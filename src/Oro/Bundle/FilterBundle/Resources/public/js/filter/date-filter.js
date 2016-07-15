@@ -552,7 +552,7 @@ define(function(require) {
          * Converts the date value from Raw to Display
          *
          * @param {string} value
-         * @param {string{ part
+         * @param {string} part
          * @returns {string}
          * @protected
          */
