@@ -2,6 +2,8 @@ define(function(require) {
     'use strict';
 
     var Select2AutocompleteComponent;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var Select2AutocompleteView = require('oroform/js/app/views/select2-autocomplete-view');
     var Select2Component = require('oro/select2-component');
 
