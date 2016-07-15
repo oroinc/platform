@@ -142,42 +142,46 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
             $attendeesByUserId[$attendee->getUser()->getId()] = $attendee;
         }
-        $currentUserIds = array_keys($attendeesByUserId);
+        $currentAttendeeUserIds = array_keys($attendeesByUserId);
 
         $calendarEventOwnerIds = [];
         $calendar              = $calendarEvent->getCalendar();
         if ($calendar && $calendar->getOwner()) {
-            $owner = $calendar->getOwner();
-            if (isset($attendeesByUserId[$owner->getId()])) {
-                $calendarEvent->setRelatedAttendee($attendeesByUserId[$owner->getId()]);
+            $childEventOwner = $calendar->getOwner();
+            if (isset($attendeesByUserId[$childEventOwner->getId()])) {
+                $calendarEvent->setRelatedAttendee($attendeesByUserId[$childEventOwner->getId()]);
             }
             $calendarEventOwnerIds[] = $calendar->getOwner()->getId();
         }
-        $events = $calendarEvent->getChildEvents();
-        foreach ($events as $event) {
-            $calendar = $event->getCalendar();
-            if (!$calendar) {
+        foreach ($calendarEvent->getChildEvents() as $childEvent) {
+            $childEventCalendar = $childEvent->getCalendar();
+            if (!$childEventCalendar) {
                 continue;
             }
 
-            $owner = $calendar->getOwner();
-            if (!$owner) {
+            $childEventOwner = $childEventCalendar->getOwner();
+            if (!$childEventOwner) {
                 continue;
             }
 
-            $ownerId = $owner->getId();
-            if (!in_array($ownerId, $currentUserIds)) {
-                $calendarEvent->removeChildEvent($event);
-
+            $childEventOwnerId = $childEventOwner->getId();
+            if (!in_array($childEventOwnerId, $currentAttendeeUserIds)) {
+                if ($childEvent->getRecurringEvent()) {
+                    // if this is an exception of recurring event then it should be cancelled
+                    $childEvent->setCancelled(true);
+                } else {
+                    // otherwise it should be removed
+                    $calendarEvent->removeChildEvent($childEvent);
+                }
                 continue;
             }
 
-            $calendarEventOwnerIds[] = $ownerId;
+            $calendarEventOwnerIds[] = $childEventOwnerId;
         }
 
         $this->createChildEvent(
             $calendarEvent,
-            array_diff($currentUserIds, $calendarEventOwnerIds),
+            array_diff($currentAttendeeUserIds, $calendarEventOwnerIds),
             $attendeesByUserId
         );
     }

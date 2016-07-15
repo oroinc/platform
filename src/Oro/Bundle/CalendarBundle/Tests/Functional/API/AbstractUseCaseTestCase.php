@@ -79,7 +79,7 @@ class AbstractUseCaseTestCase extends WebTestCase
                 $expectedValue,
                 $actual[$propertyName],
                 sprintf(
-                    '%s Property[name: %s] actual value does not match expected.%s' .
+                    '%s Property "%s" actual value does not match expected value.%s' .
                     'Expected data: %s.%sActual Data: %s',
                     $entityAlias,
                     $propertyName,
