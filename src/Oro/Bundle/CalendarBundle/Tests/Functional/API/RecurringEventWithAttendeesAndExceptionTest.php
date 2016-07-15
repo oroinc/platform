@@ -63,6 +63,8 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
         $this->assertCount(1, $mainCalendarEvent->getChildEvents()->toArray());
         $this->assertCount(1, $mainExceptionEvent->getChildEvents()->toArray());
 
+        $simpleUser = $this->getReference('simple_user');
+
         $expectedEventsData = [
             [
                 'id'          => $mainCalendarEvent->getId(),
@@ -71,7 +73,12 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ],
             [
                 'id'          => $mainCalendarEvent->getId(),
@@ -80,7 +87,12 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ],
             [
                 'id'          => $mainCalendarEvent->getId(),
@@ -89,7 +101,12 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ],
             [
                 'id'          => $mainCalendarEvent->getId(),
@@ -98,7 +115,12 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ],
             [
                 'id'          => $mainExceptionEvent->getId(),
@@ -107,12 +129,18 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ]
         ];
-        $this->assertUserCalendarEvents(self::DEFAULT_USER_CALENDAR_ID, $expectedEventsData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->changeExpectedDataCalendarId($expectedEventsData, self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
-        $simpleUser = $this->getReference('simple_user');
         $simpleUserCalendar = $this->getUserCalendar($simpleUser);
 
         $attendeeMainEventId = $this->getAttendeeCalendarEvent($simpleUser, $mainCalendarEvent)->getId();
@@ -124,20 +152,26 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
         $attendeeExceptionEvent = $this->getAttendeeCalendarEvent($simpleUser, $mainExceptionEvent);
         $expectedEventsData[4]['id'] = $attendeeExceptionEvent->getId();
 
-        $this->assertUserCalendarEvents($simpleUserCalendar->getId(), $expectedEventsData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
+        $this->changeExpectedDataCalendarId($expectedEventsData, $simpleUserCalendar->getId());
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
         $updatedEventData = $exceptionData;
         $updatedEventData['isCancelled'] = true;
         $this->updateCalendarEventViaAPI($mainExceptionEvent->getId(), $updatedEventData);
         unset($expectedEventsData[4]);
 
-        $this->assertUserCalendarEvents($simpleUserCalendar->getId(), $expectedEventsData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
+        $this->changeExpectedDataCalendarId($expectedEventsData, $simpleUserCalendar->getId());
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
         $expectedEventsData[0]['id'] = $mainCalendarEvent->getId();
         $expectedEventsData[1]['id'] = $mainCalendarEvent->getId();
         $expectedEventsData[2]['id'] = $mainCalendarEvent->getId();
         $expectedEventsData[3]['id'] = $mainCalendarEvent->getId();
-        $this->assertUserCalendarEvents(self::DEFAULT_USER_CALENDAR_ID, $expectedEventsData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->changeExpectedDataCalendarId($expectedEventsData, self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
         $mainExceptionEvent = $this->getCalendarEventById($mainExceptionEvent->getId());
         $attendeeExceptionEvent = $this->getCalendarEventById($attendeeExceptionEvent->getId());
@@ -184,10 +218,15 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'isCancelled' => true
             ]
         ];
-        $this->assertUserCalendarEvents(self::DEFAULT_USER_CALENDAR_ID, $expectedCalendarEventsUpdatedData);
-        $this->assertUserCalendarEvents($simpleUserCalendar->getId(), $expectedCalendarEventsUpdatedData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->changeExpectedDataCalendarId($expectedCalendarEventsUpdatedData, self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedCalendarEventsUpdatedData, $actualEvents);
 
-        $this->deleteRecurringEventException($mainExceptionEvent->getId());
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
+        $this->changeExpectedDataCalendarId($expectedCalendarEventsUpdatedData, $simpleUserCalendar->getId());
+        $this->assertCalendarEvents($expectedCalendarEventsUpdatedData, $actualEvents);
+
+        $this->deleteEventViaAPI($mainExceptionEvent->getId());
         unset($expectedCalendarEventsUpdatedData[5]);
 
         $this->getEntityManager()->clear();
@@ -252,6 +291,8 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
         $this->assertCount(1, $mainCalendarEvent->getChildEvents()->toArray());
         $this->assertCount(1, $mainExceptionEvent->getChildEvents()->toArray());
 
+        $simpleUser = $this->getReference('simple_user');
+
         $expectedEventsData = [
             [
                 'id'          => $mainCalendarEvent->getId(),
@@ -260,7 +301,12 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ],
             [
                 'id'          => $mainCalendarEvent->getId(),
@@ -269,7 +315,12 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ],
             [
                 'id'          => $mainCalendarEvent->getId(),
@@ -278,7 +329,12 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ],
             [
                 'id'          => $mainCalendarEvent->getId(),
@@ -287,7 +343,12 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ],
             [
                 'id'          => $mainExceptionEvent->getId(),
@@ -296,12 +357,18 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'title'       => $calendarEventData['title'],
                 'description' => $calendarEventData['description'],
                 'allDay'      => $calendarEventData['allDay'],
-                'isCancelled' => false
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
             ]
         ];
-        $this->assertUserCalendarEvents(self::DEFAULT_USER_CALENDAR_ID, $expectedEventsData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->changeExpectedDataCalendarId($expectedEventsData, self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
-        $simpleUser = $this->getReference('simple_user');
         $simpleUserCalendar = $this->getUserCalendar($simpleUser);
 
         $attendeeMainEventId = $this->getAttendeeCalendarEvent($simpleUser, $mainCalendarEvent)->getId();
@@ -313,7 +380,9 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
         $attendeeExceptionEvent = $this->getAttendeeCalendarEvent($simpleUser, $mainExceptionEvent);
         $expectedEventsData[4]['id'] = $attendeeExceptionEvent->getId();
 
-        $this->assertUserCalendarEvents($simpleUserCalendar->getId(), $expectedEventsData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
+        $this->changeExpectedDataCalendarId($expectedEventsData, $simpleUserCalendar->getId());
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
         $outlookCancelRequest = [
             'isCancelled'      => true,
@@ -329,13 +398,18 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
         $this->updateCalendarEventViaAPI($mainExceptionEvent->getId(), $outlookCancelRequest);
         unset($expectedEventsData[4]);
 
-        $this->assertUserCalendarEvents($simpleUserCalendar->getId(), $expectedEventsData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
+        $this->changeExpectedDataCalendarId($expectedEventsData, $simpleUserCalendar->getId());
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
         $expectedEventsData[0]['id'] = $mainCalendarEvent->getId();
         $expectedEventsData[1]['id'] = $mainCalendarEvent->getId();
         $expectedEventsData[2]['id'] = $mainCalendarEvent->getId();
         $expectedEventsData[3]['id'] = $mainCalendarEvent->getId();
-        $this->assertUserCalendarEvents(self::DEFAULT_USER_CALENDAR_ID, $expectedEventsData);
+
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->changeExpectedDataCalendarId($expectedEventsData, self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
         $mainExceptionEvent = $this->getCalendarEventById($mainExceptionEvent->getId());
         $attendeeExceptionEvent = $this->getCalendarEventById($attendeeExceptionEvent->getId());
@@ -379,10 +453,14 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
                 'isCancelled' => true
             ]
         ];
-        $this->assertUserCalendarEvents(self::DEFAULT_USER_CALENDAR_ID, $expectedCalendarEventsUpdatedData);
-        $this->assertUserCalendarEvents($simpleUserCalendar->getId(), $expectedCalendarEventsUpdatedData);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->changeExpectedDataCalendarId($expectedCalendarEventsUpdatedData, self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedCalendarEventsUpdatedData, $actualEvents);
 
-        $this->deleteRecurringEventException($mainExceptionEvent->getId());
+        $this->changeExpectedDataCalendarId($expectedCalendarEventsUpdatedData, $simpleUserCalendar->getId());
+        $this->assertCalendarEvents($expectedCalendarEventsUpdatedData, $actualEvents);
+
+        $this->deleteEventViaAPI($mainExceptionEvent->getId());
         unset($expectedCalendarEventsUpdatedData[5]);
 
         $this->getEntityManager()->clear();
@@ -392,48 +470,21 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
         $this->assertNull($attendeeExceptionEvent);
     }
 
+    /**
+     * @param array $expectedCalendarEventsData
+     * @param int   $calendarId
+     */
+    protected function changeExpectedDataCalendarId(array &$expectedCalendarEventsData, $calendarId)
+    {
+        foreach ($expectedCalendarEventsData as &$expectedCalendarEventData) {
+            $expectedCalendarEventData['calendar'] = $calendarId;
+        }
+    }
+
     protected function checkPreconditions()
     {
         $result = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
         $this->assertEmpty($result);
-    }
-
-    /**
-     * @param int   $calendarId
-     * @param array $expectedCalendarEvents
-     */
-    protected function assertUserCalendarEvents($calendarId, array $expectedCalendarEvents)
-    {
-        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($calendarId);
-        $this->assertCount(count($expectedCalendarEvents), $actualEvents);
-
-        $simpleUser = $this->getReference('simple_user');
-        reset($actualEvents);
-        foreach ($expectedCalendarEvents as $expectedEventData) {
-            $actualEvent = current($actualEvents);
-
-            foreach ($expectedEventData as $propertyName => $expectedValue) {
-                $this->assertEquals(
-                    $expectedValue,
-                    $actualEvent[$propertyName],
-                    sprintf(
-                        'Calendar Event Property[name: %s] actual value does not match expected.%s' .
-                        'Expected data: %s.%sActual Data: %s',
-                        $propertyName,
-                        PHP_EOL,
-                        json_encode($expectedEventData),
-                        PHP_EOL,
-                        json_encode($actualEvent)
-                    )
-                );
-            }
-
-            $this->assertEquals($calendarId, $actualEvent['calendar']);
-            $this->assertCount(1, $actualEvent['attendees']);
-            $this->assertEquals($simpleUser->getId(), $actualEvent['attendees'][0]['userId']);
-
-            next($actualEvents);
-        }
     }
 
     /**

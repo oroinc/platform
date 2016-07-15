@@ -19,6 +19,72 @@ class AbstractUseCaseTestCase extends WebTestCase
     }
 
     /**
+     * @param array $expectedCalendarEvents
+     * @param array $actualCalendarEvents
+     */
+    protected function assertCalendarEvents(array $expectedCalendarEvents, array $actualCalendarEvents)
+    {
+        $this->assertCount(count($expectedCalendarEvents), $actualCalendarEvents, 'Calendar Events count mismatch');
+
+        reset($actualCalendarEvents);
+        foreach ($expectedCalendarEvents as $expectedEventData) {
+            $actualEvent = current($actualCalendarEvents);
+
+            if (isset($expectedEventData['attendees'])) {
+                $expectedAttendeesData = $expectedEventData['attendees'];
+                unset($expectedEventData['attendees']);
+
+                $this->assertCount(
+                    count($expectedAttendeesData),
+                    $actualEvent['attendees'],
+                    'Calendar Event Attendees count mismatch'
+                );
+
+                reset($actualEvent['attendees']);
+                foreach ($expectedAttendeesData as $expectedAttendeeData) {
+                    $actualAttendee = current($actualEvent['attendees']);
+                    $this->assertArraysPartiallyEqual(
+                        $expectedAttendeeData,
+                        $actualAttendee,
+                        'Calendar Event Attendee'
+                    );
+
+                    next($actualEvent['attendees']);
+                }
+            }
+
+            $this->assertArraysPartiallyEqual($expectedEventData, $actualEvent, 'Calendar Event');
+
+            next($actualCalendarEvents);
+        }
+    }
+
+    /**
+     * @param array $expected
+     * @param array $actual
+     * @param string $entityAlias
+     */
+    protected function assertArraysPartiallyEqual(array $expected, array $actual, $entityAlias)
+    {
+        foreach ($expected as $propertyName => $expectedValue) {
+            $this->assertEquals(
+                $expectedValue,
+                $actual[$propertyName],
+                sprintf(
+                    '%s Property[name: %s] actual value does not match expected.%s' .
+                    'Expected data: %s.%sActual Data: %s',
+                    $entityAlias,
+                    $propertyName,
+                    PHP_EOL,
+                    json_encode($expected),
+                    PHP_EOL,
+                    json_encode($actual)
+                )
+            );
+        }
+    }
+
+    /**
      * Create new event
      *
      * @return int
@@ -112,7 +178,7 @@ class AbstractUseCaseTestCase extends WebTestCase
     /**
      * @param int $calendarEventId
      */
-    protected function deleteRecurringEventException($calendarEventId)
+    protected function deleteEventViaAPI($calendarEventId)
     {
         $this->client->request(
             'DELETE',
