@@ -49,7 +49,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
             ->setRoles(array('Label_' . $role))
-            ->setOrganizationOnForm(['OroCRM'])
+            ->setBusinessUnitOrganization(['OroCRM'])
             ->setBusinessUnit()
             ->uncheckInviteUser()
             ->save()

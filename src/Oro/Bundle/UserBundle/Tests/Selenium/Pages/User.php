@@ -313,7 +313,14 @@ class User extends AbstractPageEntity
         return $this;
     }
 
-    public function setOrganizationOnForm($organizations = array()) {
+    /**
+     * Select one or more organizations in business unit selector. This method should be used before
+     * business unit selection when multiple organizations is used
+     *
+     * @param array $organizations
+     * @return $this
+     */
+    public function setBusinessUnitOrganization($organizations = array()) {
         foreach ($organizations as $organization) {
             $this->test->byXpath("//*[@data-ftid='oro_user_user_form_organizations']" .
                 "//b[contains(., '{$organization}')]")->click();
