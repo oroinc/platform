@@ -301,10 +301,10 @@ class User extends AbstractPageEntity
     public function setBusinessUnit($businessUnits = array('Main'))
     {
         $this->test->byXpath(
-            "//*[@data-ftid='oro_user_user_form_businessUnits']//preceding-sibling::div//input"
+            "//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div//input"
         )->click();
         foreach ($businessUnits as $businessUnit) {
-            $this->test->byXpath("//*[@data-ftid='oro_user_user_form_businessUnits']//preceding-sibling::div" .
+            $this->test->byXpath("//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div" .
                 "//li[@class='select2-search-field']//input")->value($businessUnit);
             $this->waitForAjax();
             $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$businessUnit}')]")->click();
