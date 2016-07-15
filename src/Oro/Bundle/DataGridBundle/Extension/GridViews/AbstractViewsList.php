@@ -15,6 +15,9 @@ abstract class AbstractViewsList
 
     /** @var null|ArrayCollection */
     protected $views = null;
+    
+    /** @var array */
+    protected $systemViews = [];
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -27,6 +30,31 @@ abstract class AbstractViewsList
      * @return View[]
      */
     abstract protected function getViewsList();
+
+    /**
+     * Return all system views that defined in ViewList
+     * @return array
+     */
+    public function getSystemViewsList()
+    {
+        $views = [];
+        foreach ($this->systemViews as $view) {
+            $systemView = new View(
+                $view['name'],
+                $view['filters'],
+                $view['sorters'],
+                'system',
+                $view['columns']
+            );
+            if ($view['is_default']) {
+                $systemView->setDefault(true);
+            }
+            $systemView->setLabel($this->translator->trans($view['label']));
+            $views[] = $systemView;
+        }
+
+        return $views;
+    }
 
     /**
      * Public interface to retrieve list

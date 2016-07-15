@@ -136,14 +136,6 @@ services:
             - { name: oro.api.processor, action: get_config, priority: -5 }
             - { name: oro.api.processor, action: get_relation_config, priority: -5 }
 
-    oro_api.get_config.ensure_identifier_field_names_initialized:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\EnsureIdentifierFieldNamesInitialized
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, priority: -10 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -10 }
-
     oro_api.get_config.complete_definition.expand_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities
         arguments:
@@ -177,14 +169,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -60 }
             - { name: oro.api.processor, action: get_relation_config, extra: !identifier_fields_only&definition, priority: -60 }
-
-    oro_api.get_config.set_type_for_table_inheritance_relations:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetTypeForTableInheritanceRelations
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, requestType: json_api, priority: -70 }
-            - { name: oro.api.processor, action: get_relation_config, extra: !identifier_fields_only&definition, requestType: json_api, priority: -70 }
 
     oro_api.get_config.complete_filters:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters
