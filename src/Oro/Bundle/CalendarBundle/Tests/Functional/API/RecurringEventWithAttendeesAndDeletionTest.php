@@ -12,14 +12,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class RecurringEventWithAttendeesAndDeletionTest extends AbstractUseCaseTestCase
 {
-    const DEFAULT_USER_CALENDAR_ID = 1;
-
-    const RECURRENCE_START_TIME = '2016-07-01T00:00:00P';
-    const RECURRENCE_END_TIME = '2016-07-30T00:00:00P';
-
-    const SEARCH_START_TIME = '2016-06-26T00:00:00P';
-    const SEARCH_END_TIME = '2016-08-07T00:00:00P';
-
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testRecurringEventWithAttendeesAndDeletion()
     {
         $this->checkPreconditions();
@@ -47,9 +42,9 @@ class RecurringEventWithAttendeesAndDeletionTest extends AbstractUseCaseTestCase
                 'recurrenceType' => Recurrence::TYPE_WEEKLY,
                 'interval'       => 1,
                 'dayOfWeek'      => ['saturday'],
-                'startTime'      => self::RECURRENCE_START_TIME,
+                'startTime'      => '2016-07-01T00:00:00P',
                 'occurrences'    => 5,
-                'endTime'        => self::RECURRENCE_END_TIME,
+                'endTime'        => '2016-07-30T00:00:00P',
             ],
             'attendees'   => $attendees,
         ];
@@ -149,28 +144,30 @@ class RecurringEventWithAttendeesAndDeletionTest extends AbstractUseCaseTestCase
         ];
         $this->addCalendarEventViaAPI($exceptionCalendarEventData);
 
-        $allEvents = $this->getAllCalendarEvents(self::DEFAULT_USER_CALENDAR_ID);
         unset($expectedCalendarEventData[0]);
-        $this->assertCalendarEvents($expectedCalendarEventData, $allEvents);
-        $this->assertEventQuantityInDB(4);
+        unset($expectedSimpleUserCalendarEventData[0]);
 
-        $allEvents = $this->getAllCalendarEvents();
-        $result = array_filter(
-            $allEvents,
-            function (array $element) {
-                return $element['isCancelled'] === true;
-            }
-        );
-        $this->assertCount(0, $result);
+        $actualEvents = $this->getAllCalendarEvents(self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedCalendarEventData, $actualEvents);
+
+        $actualEvents = $this->getAllCalendarEvents($simpleUserCalendar->getId());
+        $this->assertCalendarEvents($expectedSimpleUserCalendarEventData, $actualEvents);
+
+        $this->assertEventQuantityInDB(4);
 
         $canceledCalendarEvents = $this->getCanceledCalendarEvents();
         $this->assertCount(2, $canceledCalendarEvents);
 
         $this->deleteEventViaAPI($recurringCalendarEventId);
-        $allEvents = $this->getAllCalendarEvents(self::DEFAULT_USER_CALENDAR_ID);
-        $this->assertCount(0, $allEvents);
-        $allEvents = $this->getAllCalendarEventsFromDB();
-        $this->assertCount(0, $allEvents);
+
+        $actualEvents = $this->getAllCalendarEvents(self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCount(0, $actualEvents);
+
+        $actualEvents = $this->getAllCalendarEvents($simpleUserCalendar->getId());
+        $this->assertCount(0, $actualEvents);
+
+        $actualEvents = $this->getAllCalendarEventsFromDB();
+        $this->assertCount(0, $actualEvents);
     }
 
     /**
@@ -178,7 +175,7 @@ class RecurringEventWithAttendeesAndDeletionTest extends AbstractUseCaseTestCase
      */
     protected function checkPreconditions()
     {
-        $result = $this->getAllCalendarEvents();
+        $result = $this->getAllCalendarEvents(self::DEFAULT_USER_CALENDAR_ID);
 
         $this->assertEmpty($result);
     }
@@ -204,8 +201,8 @@ class RecurringEventWithAttendeesAndDeletionTest extends AbstractUseCaseTestCase
     {
         $request = [
             'calendar'    => $calendarId,
-            'start'       => self::SEARCH_START_TIME,
-            'end'         => self::SEARCH_END_TIME,
+            'start'       => '2016-06-26T00:00:00P',
+            'end'         => '2016-08-07T00:00:00P',
             'subordinate' => true,
         ];
 
