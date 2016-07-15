@@ -4,8 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
@@ -13,14 +16,16 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 
+use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
+use Oro\Bundle\SearchBundle\Command\IndexCommand;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
     const FLUSH_BATCH_SIZE = 100;
 
-    /** @var EntityManager */
-    protected $entityManager;
+    /** @var RegistryInterface */
+    protected $registry;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -34,30 +39,34 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /** @var RequestStack */
     protected $requestStack;
 
-    /**
-     * @var string
-     */
+    /** @var OptionalListenerManager */
+    protected $listenerManager;
+
+    /** @var string */
     protected $responseMessage = 'oro.grid.mass_action.delete.success_message';
 
     /**
-     * @param EntityManager       $entityManager
-     * @param TranslatorInterface $translator
-     * @param SecurityFacade      $securityFacade
-     * @param MassDeleteLimiter   $limiter
-     * @param RequestStack        $requestStack
+     * @param RegistryInterface       $registry
+     * @param TranslatorInterface     $translator
+     * @param SecurityFacade          $securityFacade
+     * @param MassDeleteLimiter       $limiter
+     * @param RequestStack            $requestStack
+     * @param OptionalListenerManager $listenerManager
      */
     public function __construct(
-        EntityManager $entityManager,
+        RegistryInterface $registry,
         TranslatorInterface $translator,
         SecurityFacade $securityFacade,
         MassDeleteLimiter $limiter,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        OptionalListenerManager $listenerManager
     ) {
-        $this->entityManager  = $entityManager;
+        $this->registry  = $registry;
         $this->translator     = $translator;
         $this->securityFacade = $securityFacade;
         $this->limiter        = $limiter;
         $this->requestStack   = $requestStack;
+        $this->listenerManager = $listenerManager;
     }
 
     /**
@@ -81,12 +90,19 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
 
     /**
      * Finish processed batch
+     *
+     * @param EntityManager $manager
+     * @param string        $entityName
+     * @param array         $deletedIds
      */
-    protected function finishBatch()
+    protected function finishBatch(EntityManager $manager, $entityName, array $deletedIds)
     {
-        $this->entityManager->flush();
-        if ($this->entityManager->getConnection()->getTransactionNestingLevel() == 1) {
-            $this->entityManager->clear();
+        $jobManager = $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
+        $jobManager->persist(new Job(IndexCommand::NAME, [$entityName, implode(' ', $deletedIds)]));
+        $manager->flush();
+        $manager->clear();
+        if ($jobManager !== $manager) {
+            $jobManager->flush();
         }
     }
 
@@ -188,17 +204,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     }
 
     /**
-     * @param string $entityName
-     * @param mixed  $identifierValue
-     *
-     * @return object
-     */
-    protected function getEntity($entityName, $identifierValue)
-    {
-        return $this->entityManager->getReference($entityName, $identifierValue);
-    }
-
-    /**
      * @param MassActionHandlerArgs $args
      *
      * @return MassActionResponse
@@ -207,51 +212,40 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     protected function doDelete(MassActionHandlerArgs $args)
     {
         $iteration             = 0;
-        $entityName            = null;
-        $entityIdentifiedField = null;
+        $entityName = $this->getEntityName($args);
         $queryBuilder          = $args->getResults()->getSource();
-
         $results = new DeletionIterableResult($queryBuilder);
         $results->setBufferSize(self::FLUSH_BATCH_SIZE);
-
-        // batch remove should be processed in transaction
-        $this->entityManager->beginTransaction();
-        try {
-            // if huge amount data must be deleted
-            set_time_limit(0);
-
-            foreach ($results as $result) {
-                /** @var $result ResultRecordInterface */
-                $entity = $result->getRootEntity();
-                if (!$entity) {
-                    // no entity in result record, it should be extracted from DB
-                    if (!$entityName) {
-                        $entityName = $this->getEntityName($args);
-                    }
-                    if (!$entityIdentifiedField) {
-                        $entityIdentifiedField = $this->getEntityIdentifierField($args);
-                    }
-                    $entity = $this->getEntity($entityName, $result->getValue($entityIdentifiedField));
-                }
-
-                if ($entity) {
-                    $this->entityManager->remove($entity);
-                    $iteration++;
-
-                    if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
-                        $this->finishBatch();
-                    }
-                }
+        $this->listenerManager->disableListeners(['oro_search.index_listener']);
+        // if huge amount data must be deleted
+        set_time_limit(0);
+        $deletedIds = [];
+        $entityIdentifiedField = $this->getEntityIdentifierField($args);
+        /** @var EntityManager $manager */
+        $manager = $this->registry->getManagerForClass($entityName);
+        foreach ($results as $result) {
+            /** @var $result ResultRecordInterface */
+            $entity = $result->getRootEntity();
+            $identifierValue = $result->getValue($entityIdentifiedField);
+            if (!$entity) {
+                // no entity in result record, it should be extracted from DB
+                $entity = $manager->getReference($entityName, $identifierValue);
             }
 
-            if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
-                $this->finishBatch();
-            }
+            if ($entity) {
+                $deletedIds[] = $identifierValue;
+                $manager->remove($entity);
+                $iteration++;
 
-            $this->entityManager->commit();
-        } catch (\Exception $e) {
-            $this->entityManager->rollback();
-            throw $e;
+                if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
+                    $this->finishBatch($manager, $entityName, $deletedIds);
+                    $deletedIds = [];
+                }
+            }
+        }
+
+        if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
+            $this->finishBatch($manager, $entityName, $deletedIds);
         }
 
         return $this->getDeleteResponse($args, $iteration);
