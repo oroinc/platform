@@ -70,6 +70,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@example.com')
             ->setRoles(['Administrator'], true)
+            ->setOrganizationOnForm(['OroCRM'])
             ->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->save()
@@ -143,6 +144,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setLastName($lastName)
             ->setEmail($username.'@example.com')
             ->setRoles(['Administrator'], true)
+            ->setOrganizationOnForm(['OroCRM'])
             ->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->save();
