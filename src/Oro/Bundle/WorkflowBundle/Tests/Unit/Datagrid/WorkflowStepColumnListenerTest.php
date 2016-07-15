@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -187,12 +188,13 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $inputConfig
      * @param array $expectedConfig
+     * @param bool $multiWorkflows
      * @dataProvider buildBeforeAddColumnDataProvider
      */
-    public function testBuildBeforeAddColumn(array $inputConfig, array $expectedConfig)
+    public function testBuildBeforeAddColumn(array $inputConfig, array $expectedConfig, $multiWorkflows = true)
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
-        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME);
+        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
@@ -322,7 +324,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             ],
                             WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => [
                                 'type' => 'entity',
-                                'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN,
+                                'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
                                 'options' => [
                                     'field_type' => WorkflowStepSelectType::NAME,
                                     'field_options' => [
@@ -343,6 +345,115 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
+            'full configuration for one workflow' => [
+                'inputConfig' => [
+                    'source' => [
+                        'query' => [
+                            'select' => [
+                                self::ALIAS . '.rootField',
+                                'b.innerJoinField',
+                                'c.leftJoinField',
+                            ],
+                            'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
+                            'join' => [
+                                'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
+                                'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']],
+                            ],
+                        ],
+                    ],
+                    'columns' => [
+                        'rootField' => ['label' => 'Root field'],
+                        'innerJoinField' => ['label' => 'Inner join field'],
+                        'leftJoinField' => ['label' => 'Left join field'],
+                    ],
+                    'filters' => [
+                        'columns' => [
+                            'rootField' => ['data_name' => self::ALIAS . '.rootField'],
+                            'innerJoinField' => ['data_name' => 'b.innerJoinField'],
+                            'leftJoinField' => ['data_name' => 'c.leftJoinField'],
+                        ],
+                    ],
+                    'sorters' => [
+                        'columns' => [
+                            'rootField' => ['data_name' => self::ALIAS . '.rootField'],
+                            'innerJoinField' => ['data_name' => 'b.innerJoinField'],
+                            'leftJoinField' => ['data_name' => 'c.leftJoinField'],
+                        ],
+                    ],
+                ],
+                'expectedConfig' => [
+                    'source' => [
+                        'query' => [
+                            'select' => [
+                                self::ALIAS . '.rootField',
+                                'b.innerJoinField',
+                                'c.leftJoinField'
+                            ],
+                            'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
+                            'join' => [
+                                'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
+                                'left' => [
+                                    ['join' => self::ALIAS . '.c', 'alias' => 'c'],
+                                    [
+                                        'join' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
+                                        'alias' => 'workflowItem',
+                                        'conditionType' => 'WITH',
+                                        'condition' => sprintf(
+                                            'CAST(%s.id as string) = CAST(workflowItem.entityId as string) ' .
+                                            'AND workflowItem.entityClass = %s',
+                                            self::ALIAS,
+                                            "'" . self::ENTITY_FULL_NAME . "'"
+                                        )
+                                    ],
+                                    [
+                                        'join' => 'workflowItem.currentStep',
+                                        'alias' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN
+                                    ]
+                                ]
+                            ],
+                        ],
+                    ],
+                    'columns' => [
+                        'rootField' => ['label' => 'Root field'],
+                        'innerJoinField' => ['label' => 'Inner join field'],
+                        'leftJoinField' => ['label' => 'Left join field'],
+                        WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN => [
+                            'label' => 'oro.workflow.workflowstep.grid.label',
+                            'type' => 'twig',
+                            'frontend_type' => 'html',
+                            'template' => 'OroWorkflowBundle:Datagrid:Column/workflowStep.html.twig'
+                        ],
+                    ],
+                    'filters' => [
+                        'columns' => [
+                            'rootField' => ['data_name' => self::ALIAS . '.rootField'],
+                            'innerJoinField' => ['data_name' => 'b.innerJoinField'],
+                            'leftJoinField' => ['data_name' => 'c.leftJoinField'],
+                            WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => [
+                                'type' => 'entity',
+                                'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
+                                'options' => [
+                                    'field_type' => WorkflowStepSelectType::NAME,
+                                    'field_options' => [
+                                        'workflow_entity_class' => self::ENTITY_FULL_NAME,
+                                        'multiple' => true
+                                    ]
+                                ],
+                                'label' => 'oro.workflow.workflowstep.grid.label'
+                            ],
+                        ],
+                    ],
+                    'sorters' => [
+                        'columns' => [
+                            'rootField' => ['data_name' => self::ALIAS . '.rootField'],
+                            'innerJoinField' => ['data_name' => 'b.innerJoinField'],
+                            'leftJoinField' => ['data_name' => 'c.leftJoinField'],
+                            'workflowStepLabel' => ['data_name' => 'workflowStepLabel.stepOrder']
+                        ],
+                    ],
+                ],
+                'multiWorkflow' => false
+            ]
         ];
     }
 
@@ -694,13 +805,25 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $entity
      * @param bool $hasWorkflow
+     * @param bool $multiWorkflow
      */
-    protected function setUpWorkflowManagerMock($entity, $hasWorkflow = true)
+    protected function setUpWorkflowManagerMock($entity, $hasWorkflow = true, $multiWorkflow = true)
     {
         $this->workflowManager->expects($this->any())
-            ->method('hasApplicableWorkflowsByEntityClass')
+            ->method('hasApplicableWorkflows')
             ->with($entity)
             ->willReturn($hasWorkflow);
+
+        $workflows = [$this->getWorkflowMock()];
+
+        if ($multiWorkflow) {
+            $workflows[] = $this->getWorkflowMock();
+        }
+
+        $this->workflowManager->expects($this->any())
+            ->method('getApplicableWorkflows')
+            ->with($entity)
+            ->willReturn($workflows);
     }
 
     /**
@@ -753,5 +876,15 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->any())->method('getDatagrid')->willReturn($datagrid);
 
         return $event;
+    }
+
+    /**
+     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getWorkflowMock()
+    {
+        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

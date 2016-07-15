@@ -84,7 +84,12 @@ class WorkflowItemRepositoryTest extends WebTestCase
         );
     }
 
-    public function testGetGroupedWorkflowNameAndWorkflowStepName()
+    /**
+     * @dataProvider getGroupedWorkflowNameAndWorkflowStepNameProvider
+     *
+     * @param bool $withWorkflowName
+     */
+    public function testGetGroupedWorkflowNameAndWorkflowStepName($withWorkflowName = true)
     {
         $entities = [
             $this->getReference('workflow_aware_entity.15'),
@@ -108,20 +113,26 @@ class WorkflowItemRepositoryTest extends WebTestCase
                     ->getWorkflowItem($entity, $workflowName);
 
                 if ($workflowItem) {
-                    $expectedData[$entity->getId()][] = [
-                        'entityId' => $entity->getId(),
-                        'workflowName' => $workflowItem->getDefinition()->getLabel(),
-                        'stepName' => $workflowItem->getCurrentStep()->getLabel()
-                    ];
+                    $data = ['entityId' => $entity->getId(), 'stepName' => $workflowItem->getCurrentStep()->getLabel()];
+
+                    if ($withWorkflowName) {
+                        $data['workflowName'] = $workflowItem->getDefinition()->getLabel();
+                    }
+
+                    $expectedData[$entity->getId()][] = $data;
                 }
             }
         }
 
         $result = $this->repository->getGroupedWorkflowNameAndWorkflowStepName(
             'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
-            array_map(function (WorkflowAwareEntity $entity) {
-                return $entity->getId();
-            }, $entities)
+            array_map(
+                function (WorkflowAwareEntity $entity) {
+                    return $entity->getId();
+                },
+                $entities
+            ),
+            $withWorkflowName
         );
 
         /** @var WorkflowAwareEntity $entity */
@@ -131,7 +142,17 @@ class WorkflowItemRepositoryTest extends WebTestCase
                 $this->assertContains($data, $expectedData[$entity->getId()]);
             }
         }
+    }
 
+    /**
+     * @return array
+     */
+    public function getGroupedWorkflowNameAndWorkflowStepNameProvider()
+    {
+        return [
+            [true],
+            [false]
+        ];
     }
 
     public function testGetEntityIdsByEntityClassAndWorkflowStepIds()

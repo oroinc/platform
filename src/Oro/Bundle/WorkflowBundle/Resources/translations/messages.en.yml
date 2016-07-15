@@ -206,8 +206,7 @@ oro:
                 select_replacement: Select Workflows
 
             form:
-                replace_message: "You may also select workflows to be deactivated."
-                reset_workflow_data_on_deactivation_message: 'Attention: Deactivation will reset workflow data of selected workflows.'
+                replace_message: "Optionally you may select workflows to be deactivated. Deactivation will reset workflow data of selected workflows."
 
         workflowitem:
             entity_label:             Workflow Item

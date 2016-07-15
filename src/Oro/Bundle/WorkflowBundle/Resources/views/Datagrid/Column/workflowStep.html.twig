@@ -1,6 +1,9 @@
 {% for line in record.getValue('workflowStepLabel') %}
-   <div class="grid-workflow-step-column">
-       <div class="grid-workflow-step-column-row">{{ line.workflowName }}:</div>
-       <div class="grid-workflow-step-column-row">{{ line.stepName }}</div>
-   </div>
+    <div class="grid-workflow-step-column">
+        {% if line.workflowName is defined %}
+            <div class="grid-workflow-step-column-row">{{ line.workflowName }}:</div>
+        {% endif %}
+        <div class="grid-workflow-step-column-row">{{ line.stepName }}</div>
+    </div>
+    <br>
 {% endfor %}

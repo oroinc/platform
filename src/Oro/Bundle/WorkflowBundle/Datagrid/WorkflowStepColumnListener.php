@@ -16,10 +16,13 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowStepColumnListener
 {
+    use WorkflowQueryTrait;
+
     const WORKFLOW_STEP_COLUMN = 'workflowStepLabel';
 
     const WORKFLOW_FILTER = 'workflowStepLableByWorkflow';
@@ -44,6 +47,11 @@ class WorkflowStepColumnListener
      * @var array
      */
     protected $workflowStepColumns = [self::WORKFLOW_STEP_COLUMN];
+
+    /**
+     * @var array
+     */
+    protected $workflows = [];
 
     /**
      * @param DoctrineHelper  $doctrineHelper
@@ -85,7 +93,7 @@ class WorkflowStepColumnListener
         }
 
         // whether entity has active workflow and entity should render workflow step field
-        $isShowWorkflowStep = $this->workflowManager->hasApplicableWorkflowsByEntityClass($rootEntity)
+        $isShowWorkflowStep = $this->workflowManager->hasApplicableWorkflows($rootEntity)
             && $this->isShowWorkflowStep($rootEntity);
 
         // check whether grid contains workflow step column
@@ -99,7 +107,7 @@ class WorkflowStepColumnListener
 
         // add workflow step if it must be shown and there are no workflow step columns
         if ($isShowWorkflowStep && !$workflowStepColumns) {
-            $this->addWorkflowStep($config, $rootEntity);
+            $this->addWorkflowStep($config, $rootEntity, $rootEntityAlias);
         }
     }
 
@@ -145,7 +153,8 @@ class WorkflowStepColumnListener
                     return $record->getValue('id');
                 },
                 $records
-            )
+            ),
+            $this->isEntityHaveMoreThanOneWorkflow($rootEntity)
         );
 
         foreach ($records as $record) {
@@ -189,8 +198,9 @@ class WorkflowStepColumnListener
     /**
      * @param DatagridConfiguration $config
      * @param string $rootEntity
+     * @param string $rootEntityAlias
      */
-    protected function addWorkflowStep(DatagridConfiguration $config, $rootEntity)
+    protected function addWorkflowStep(DatagridConfiguration $config, $rootEntity, $rootEntityAlias)
     {
         // add column
         $columns = $config->offsetGetByPath('[columns]', []);
@@ -202,25 +212,42 @@ class WorkflowStepColumnListener
         ];
         $config->offsetSetByPath('[columns]', $columns);
 
+        $isManyWorkflows = $this->isEntityHaveMoreThanOneWorkflow($rootEntity);
+        if (!$isManyWorkflows) {
+            $config->offsetSetByPath(
+                '[source][query]',
+                $this->addDatagridQuery(
+                    $config->offsetGetByPath('[source][query]', []),
+                    $rootEntityAlias,
+                    $rootEntity,
+                    'id',
+                    self::WORKFLOW_STEP_COLUMN
+                )
+            );
+        }
+
         // add filter (only if there is at least one filter)
         $filters = $config->offsetGetByPath('[filters][columns]', []);
         if ($filters) {
-            $filters[self::WORKFLOW_FILTER] = [
-                'label' => 'oro.workflow.workflowdefinition.entity_label',
-                'type' => 'entity',
-                'data_name' => self::WORKFLOW_STEP_COLUMN,
-                'options' => [
-                    'field_type' => WorkflowDefinitionSelectType::NAME,
-                    'field_options' => [
-                        'workflow_entity_class' => $rootEntity,
-                        'multiple' => true
+            if ($isManyWorkflows) {
+                $filters[self::WORKFLOW_FILTER] = [
+                    'label' => 'oro.workflow.workflowdefinition.entity_label',
+                    'type' => 'entity',
+                    'data_name' => self::WORKFLOW_STEP_COLUMN,
+                    'options' => [
+                        'field_type' => WorkflowDefinitionSelectType::NAME,
+                        'field_options' => [
+                            'workflow_entity_class' => $rootEntity,
+                            'multiple' => true
+                        ]
                     ]
-                ]
-            ];
+                ];
+            }
+
             $filters[self::WORKFLOW_STEP_FILTER] = [
                 'label' => 'oro.workflow.workflowstep.grid.label',
                 'type' => 'entity',
-                'data_name' => self::WORKFLOW_STEP_COLUMN,
+                'data_name' => self::WORKFLOW_STEP_COLUMN . '.id',
                 'options' => [
                     'field_type' => WorkflowStepSelectType::NAME,
                     'field_options' => [
@@ -231,6 +258,13 @@ class WorkflowStepColumnListener
             ];
             $config->offsetSetByPath('[filters][columns]', $filters);
         }
+
+        // add sorter (only if there is at least one sorter)
+        $sorters = $config->offsetGetByPath('[sorters][columns]', []);
+        if ($sorters && !$isManyWorkflows) {
+            $sorters[self::WORKFLOW_STEP_COLUMN] = ['data_name' => self::WORKFLOW_STEP_COLUMN . '.stepOrder'];
+            $config->offsetSetByPath('[sorters][columns]', $sorters);
+        }
     }
 
     /**
@@ -239,35 +273,20 @@ class WorkflowStepColumnListener
      */
     protected function removeWorkflowStep(DatagridConfiguration $config, array $workflowStepColumns)
     {
-        // remove columns
-        $columns = $config->offsetGetByPath('[columns]', []);
-        foreach ($workflowStepColumns as $column) {
-            if (!empty($columns[$column])) {
-                unset($columns[$column]);
-            }
-        }
-        $config->offsetSetByPath('[columns]', $columns);
+        $paths = [
+            '[columns]',
+            '[filters][columns]',
+            '[sorters][columns]'
+        ];
 
-        // remove filters
-        $filters = $config->offsetGetByPath('[filters][columns]', []);
-        if ($filters) {
+        foreach ($paths as $path) {
+            $columns = $config->offsetGetByPath($path, []);
             foreach ($workflowStepColumns as $column) {
-                if (!empty($filters[$column])) {
-                    unset($filters[$column]);
+                if (!empty($columns[$column])) {
+                    unset($columns[$column]);
                 }
             }
-            $config->offsetSetByPath('[filters][columns]', $filters);
-        }
-
-        // remove sorters
-        $sorters = $config->offsetGetByPath('[sorters][columns]', []);
-        if ($sorters) {
-            foreach ($workflowStepColumns as $column) {
-                if (!empty($sorters[$column])) {
-                    unset($sorters[$column]);
-                }
-            }
-            $config->offsetSetByPath('[sorters][columns]', $sorters);
+            $config->offsetSetByPath($path, $columns);
         }
     }
 
@@ -345,5 +364,27 @@ class WorkflowStepColumnListener
             unset($filters[$filter]);
             $parameters->set('_filter', $filters);
         }
+    }
+
+    /**
+     * @param string $className
+     * @return array
+     */
+    protected function getWorkflows($className)
+    {
+        if (!array_key_exists($className, $this->workflows)) {
+            $this->workflows[$className] = $this->workflowManager->getApplicableWorkflows($className);
+        }
+
+        return $this->workflows[$className];
+    }
+
+    /**
+     * @param string $className
+     * @return bool
+     */
+    protected function isEntityHaveMoreThanOneWorkflow($className)
+    {
+        return count($this->getWorkflows($className)) > 1;
     }
 }

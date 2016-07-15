@@ -158,23 +158,27 @@ class WorkflowItemRepository extends EntityRepository
     /**
      * @param string $entityClass
      * @param array $entityIds
+     * @param bool $withWorkflowName
      * @return array
      */
-    public function getGroupedWorkflowNameAndWorkflowStepName($entityClass, array $entityIds)
+    public function getGroupedWorkflowNameAndWorkflowStepName($entityClass, array $entityIds, $withWorkflowName = true)
     {
         $entityIds = array_map(function ($item) {
             return (string)$item;
         }, $entityIds);
 
         $qb = $this->createQueryBuilder('wi');
-        $qb->select('wi.entityId AS entityId, d.label AS workflowName, ws.label AS stepName')
+        $qb->select('wi.entityId AS entityId, ws.label AS stepName')
             ->join('wi.currentStep', 'ws')
             ->join('wi.definition', 'd')
             ->where($qb->expr()->eq('wi.entityClass', ':entityClass'))
             ->andWhere($qb->expr()->in('wi.entityId', ':entityId'))
             ->setParameter('entityClass', $entityClass)
-            ->setParameter('entityId', $entityIds)
-        ;
+            ->setParameter('entityId', $entityIds);
+
+        if ($withWorkflowName) {
+            $qb->addSelect('d.label AS workflowName');
+        }
 
         $items = $qb->getQuery()->getArrayResult();
 

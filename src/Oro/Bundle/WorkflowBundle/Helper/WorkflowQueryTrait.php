@@ -64,7 +64,7 @@ trait WorkflowQueryTrait
         array $query,
         $entityAlias,
         $entityClass,
-        $entityIdentifier,
+        $entityIdentifier = 'id',
         $stepAlias = 'workflowStep',
         $itemAlias = 'workflowItem'
     ) {

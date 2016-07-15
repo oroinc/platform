@@ -48,19 +48,6 @@ class WorkflowStepSelectType extends AbstractType
             'query_builder',
             function (Options $options, $qb) {
                 if (!$qb) {
-                    if (isset($options['workflow_name'])) {
-                        $workflowName = $options['workflow_name'];
-                        $workflows = [$this->workflowManager->getWorkflow($workflowName)];
-                    } elseif (isset($options['workflow_entity_class'])) {
-                        $workflows = array_values(
-                            $this->workflowManager->getApplicableWorkflows($options['workflow_entity_class'])
-                        );
-                    } else {
-                        throw new \InvalidArgumentException(
-                            'Either "workflow_name" or "workflow_entity_class" must be set'
-                        );
-                    }
-
                     $qb = $this->getQueryBuilder(
                         $options['em'],
                         $options['class'],
@@ -68,7 +55,7 @@ class WorkflowStepSelectType extends AbstractType
                             function (Workflow $workflow) {
                                 return $workflow->getDefinition();
                             },
-                            $workflows
+                            $this->getWorkflows($options)
                         )
                     );
                 }
@@ -83,12 +70,14 @@ class WorkflowStepSelectType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        /** @var ChoiceView $choiceView */
-        foreach ($view->vars['choices'] as $choiceView) {
-            /** @var WorkflowStep $step */
-            $step = $choiceView->data;
+        if (count($this->getWorkflows($options)) > 1) {
+            /** @var ChoiceView $choiceView */
+            foreach ($view->vars['choices'] as $choiceView) {
+                /** @var WorkflowStep $step */
+                $step = $choiceView->data;
 
-            $choiceView->label = sprintf('%s: %s', $step->getDefinition()->getLabel(), $choiceView->label);
+                $choiceView->label = sprintf('%s: %s', $step->getDefinition()->getLabel(), $choiceView->label);
+            }
         }
     }
 
@@ -123,5 +112,25 @@ class WorkflowStepSelectType extends AbstractType
             ->orderBy('ws.definition', 'ASC')
             ->orderBy('ws.stepOrder', 'ASC')
             ->orderBy('ws.label', 'ASC');
+    }
+
+    /**
+     * @param array|Options $options
+     * @return array
+     */
+    protected function getWorkflows($options)
+    {
+        if (isset($options['workflow_name'])) {
+            $workflowName = $options['workflow_name'];
+            $workflows = [$this->workflowManager->getWorkflow($workflowName)];
+        } elseif (isset($options['workflow_entity_class'])) {
+            $workflows = array_values(
+                $this->workflowManager->getApplicableWorkflows($options['workflow_entity_class'])
+            );
+        } else {
+            throw new \InvalidArgumentException('Either "workflow_name" or "workflow_entity_class" must be set');
+        }
+
+        return $workflows;
     }
 }

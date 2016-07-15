@@ -129,7 +129,33 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->factory->create($this->type, null, $options);
     }
 
-    public function testFinishView()
+    public function testFinishViewWithOneWorkflow()
+    {
+        $step1 = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep');
+        $step2 = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep');
+
+        $view = new FormView();
+        $view->vars['choices'] = [
+            new ChoiceView($step1, 'step1', 'step1label'),
+            new ChoiceView($step2, 'step2', 'step2label'),
+        ];
+
+        $this->workflowManager->expects($this->once())
+            ->method('getWorkflow')
+            ->with('test')
+            ->willReturn(new \stdClass());
+
+        $this->type->finishView(
+            $view,
+            $this->getMock('Symfony\Component\Form\Test\FormInterface'),
+            ['workflow_name' => 'test']
+        );
+
+        $this->assertEquals('step1label', $view->vars['choices'][0]->label);
+        $this->assertEquals('step2label', $view->vars['choices'][1]->label);
+    }
+
+    public function testFinishViewWithMoreThanOneWorkflow()
     {
         $step1 = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep', 'wf_l1');
         $step2 = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep', 'wf_l2');
@@ -140,10 +166,32 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             new ChoiceView($step2, 'step2', 'step2label'),
         ];
 
-        $this->type->finishView($view, $this->getMock('Symfony\Component\Form\Test\FormInterface'), []);
+        $this->workflowManager->expects($this->once())
+            ->method('getApplicableWorkflows')
+            ->with('\stdClass')
+            ->willReturn([new \stdClass(), new \stdClass()]);
+
+        $this->type->finishView(
+            $view,
+            $this->getMock('Symfony\Component\Form\Test\FormInterface'),
+            ['workflow_entity_class' => '\stdClass']
+        );
 
         $this->assertEquals('wf_l1: step1label', $view->vars['choices'][0]->label);
         $this->assertEquals('wf_l2: step2label', $view->vars['choices'][1]->label);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Either "workflow_name" or "workflow_entity_class" must be set
+     */
+    public function testFinishViewException()
+    {
+        $this->type->finishView(
+            new FormView(),
+            $this->getMock('Symfony\Component\Form\Test\FormInterface'),
+            []
+        );
     }
 
     /**
@@ -159,7 +207,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $definition->expects($this->any())->method('getLabel')->willReturn($definitionLabel);
 
         $object = $this->getMockBuilder($class)->disableOriginalConstructor()->getMock();
-        $object->expects($this->once())->method('getDefinition')->willReturn($definition);
+        $object->expects($this->any())->method('getDefinition')->willReturn($definition);
 
         return $object;
     }
