@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
@@ -47,7 +47,7 @@ class RestrictionsExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['disable_workflow_restrictions'] ||
             empty($options['data_class']) ||
@@ -62,7 +62,7 @@ class RestrictionsExtension extends AbstractTypeExtension
         $restrictions = $this->restrictionsManager->getEntityRestrictions($data);
         foreach ($restrictions as $restriction) {
             if ($form->has($restriction['field'])) {
-                $this->applyRestriction($restriction, $form);
+                $this->applyRestriction($restriction, $view);
             }
         }
     }
@@ -84,40 +84,32 @@ class RestrictionsExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param array         $restriction
-     * @param FormInterface $form
+     * @param array    $restriction
+     * @param FormView $view
      */
-    protected function applyRestriction(array $restriction, FormInterface $form)
+    protected function applyRestriction(array $restriction, FormView $view)
     {
         $field = $restriction['field'];
         $mode  = $restriction['mode'];
         if ($mode === 'full') {
-            FormUtils::replaceField($form, $field, ['disabled' => true]);
+            $view->children[$field]->vars['attrs']['disabled'] = true;
         } else {
             $values = $restriction['values'];
             if ($mode === 'disallow') {
-                $this->tryDisableFieldValues($form, $field, $values);
+                $view->children[$field]->vars['choices'] = array_filter(
+                    $view->vars['form']->children[$field]->vars['choices'],
+                    function (ChoiceView $choice) use ($values) {
+                        return !in_array($choice->value, $values);
+                    }
+                );
             } elseif ($mode === 'allow') {
-                $restrictionClosure = function ($value) use ($values) {
-                    return in_array($value, $values);
-                };
-                $this->tryDisableFieldValues($form, $field, $restrictionClosure);
+                $view->children[$field]->vars['choices'] = array_filter(
+                    $view->vars['form']->children[$field]->vars['choices'],
+                    function (ChoiceView $choice) use ($values) {
+                        return in_array($choice->value, $values);
+                    }
+                );
             }
-        }
-    }
-
-    /**
-     * @param FormInterface  $form
-     * @param string         $field
-     * @param array|callable $disabledValues
-     */
-    protected function tryDisableFieldValues(FormInterface $form, $field, $disabledValues)
-    {
-        $fieldForm = $form->get($field);
-        if ($fieldForm->getConfig()->hasOption('disabled_values')) {
-            FormUtils::replaceField($form, $field, ['disabled_values' => $disabledValues]);
-        } else {
-            FormUtils::replaceField($form, $field, ['disabled' => true]);
         }
     }
 }

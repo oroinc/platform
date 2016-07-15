@@ -1,14 +1,16 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Test\Unit\Form\Extension;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Extension;
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class RestrictionsExtensionTest extends FormIntegrationTestCase
 {
@@ -53,47 +55,195 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
     }
 
     /**
-     * @dataProvider testBuildViewDataProvider
-     *
-     * @param array $options
-     * @param array $fields
-     * @param array $restrictions
+     * @dataProvider finishViewWithDisabledExtensionProvider
      */
-    public function testBuildView(array $options, array $fields = [], array $restrictions = [])
+    public function testFinishViewWithDisabledExtension(FormInterface $form, array $options, $hasRestrictions)
     {
-        $hasRestrictions = !empty($restrictions);
-        $data            = [1];
+        $this->restrictionsManager
+            ->expects($this->any())
+            ->method('hasEntityClassRestrictions')
+            ->with('Test')
+            ->will($this->returnValue($hasRestrictions));
 
-        if (!empty($options['data_class']) &&
-            empty($options['disable_workflow_restrictions']) &&
-            $hasRestrictions
-        ) {
-            $this->restrictionsManager
+        $this->restrictionsManager
+            ->expects($this->never())
+            ->method('getEntityRestrictions');
+
+        $this->extension->finishView(new FormView(), $form, $options);
+    }
+
+    public function finishViewWithDisabledExtensionProvider()
+    {
+        $formWithoutData = $this->getMock('Symfony\Component\Form\FormInterface');
+        $formWithoutData
+            ->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue(null));
+
+        $formWithData = $this->getMock('Symfony\Component\Form\FormInterface');
+        $formWithData
+            ->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue(['status' => 'something']));
+
+        return [
+            [
+                $formWithData,
+                [
+                    'disable_workflow_restrictions' => false,
+                ],
+                false,
+            ],
+            [
+                $formWithData,
+                [
+                    'disable_workflow_restrictions' => false,
+                    'data_class' => ''
+                ],
+                false,
+            ],
+            [
+                $formWithData,
+                [
+                    'disable_workflow_restrictions' => true,
+                    'data_class' => 'Test'
+                ],
+                true,
+            ],
+            [
+                $formWithoutData,
+                [
+                    'disable_workflow_restrictions' => false,
+                    'data_class' => 'Test'
+                ],
+                true,
+            ],
+        ];
+    }
+
+    public function testFinishViewWithDisallowRestriction()
+    {
+        $restrictions = [
+            [
+                'field' => 'status',
+                'mode' => 'disallow',
+                'values' => ['one', 'three'],
+            ]
+        ];
+
+        $form = $this->factory->createBuilder('form', ['status' => 2])
+            ->add('status', 'choice', ['choices' => ['one' => 1, 'two' => 2, 'three' => 3, 'four' => 4]])
+            ->getForm();
+        $expectedView = $form->createView();
+        unset(
+            $expectedView->children['status']->vars['choices'][0],
+            $expectedView->children['status']->vars['choices'][2]
+        );
+
+        $this->restrictionsManager
                 ->expects($this->once())
                 ->method('hasEntityClassRestrictions')
-                ->with($options['data_class'])
-                ->willReturn($hasRestrictions);
-            $this->restrictionsManager
-                ->expects($this->once())
-                ->method('getEntityRestrictions')
-                ->with($data)
-                ->willReturn($restrictions);
-        }
-        $builder = $this->factory->createNamedBuilder('test_entity');
-        foreach ($fields as $field) {
-            $builder->add($field['name'], null, []);
-        }
+                ->with('Test')
+                ->willReturn(true);
+        $this->restrictionsManager
+            ->expects($this->once())
+            ->method('getEntityRestrictions')
+            ->with($form->getData())
+            ->willReturn($restrictions);
 
-        $form = $builder->getForm();
-        $form->setData($data);
-        $formView = $form->createView();
-        $this->extension->buildView($formView, $form, $options);
-        foreach ($fields as $field) {
-            $this->assertEquals(
-                $field['disabled'],
-                $form->get($field['name'])->getConfig()->getOption('disabled')
-            );
-        }
+        $view = $form->createView();
+        $this->extension->finishView(
+            $view,
+            $form,
+            [
+                'disable_workflow_restrictions' => false,
+                'data_class' => 'Test',
+            ]
+        );
+
+        $this->assertEquals($expectedView, $view);
+    }
+
+    public function testFinishViewWithAllowRestriction()
+    {
+        $restrictions = [
+            [
+                'field' => 'status',
+                'mode' => 'allow',
+                'values' => ['one', 'two', 'three'],
+            ]
+        ];
+
+        $form = $this->factory->createBuilder('form', ['status' => 2])
+            ->add('status', 'choice', ['choices' => ['one' => 1, 'two' => 2, 'three' => 3, 'four' => 4]])
+            ->getForm();
+        $expectedView = $form->createView();
+        unset(
+            $expectedView->children['status']->vars['choices'][3]
+        );
+
+        $this->restrictionsManager
+                ->expects($this->once())
+                ->method('hasEntityClassRestrictions')
+                ->with('Test')
+                ->willReturn(true);
+        $this->restrictionsManager
+            ->expects($this->once())
+            ->method('getEntityRestrictions')
+            ->with($form->getData())
+            ->willReturn($restrictions);
+
+        $view = $form->createView();
+        $this->extension->finishView(
+            $view,
+            $form,
+            [
+                'disable_workflow_restrictions' => false,
+                'data_class' => 'Test',
+            ]
+        );
+
+        $this->assertEquals($expectedView, $view);
+    }
+
+    public function testFinishViewWithFullRestriction()
+    {
+        $restrictions = [
+            [
+                'field' => 'status',
+                'mode' => 'full',
+                'values' => [],
+            ]
+        ];
+
+        $form = $this->factory->createBuilder('form', ['status' => 2])
+            ->add('status', 'choice', ['choices' => ['one' => 1, 'two' => 2, 'three' => 3, 'four' => 4]])
+            ->getForm();
+        $expectedView = $form->createView();
+        $expectedView->children['status']->vars['attrs']['disabled'] = true;
+
+        $this->restrictionsManager
+                ->expects($this->once())
+                ->method('hasEntityClassRestrictions')
+                ->with('Test')
+                ->willReturn(true);
+        $this->restrictionsManager
+            ->expects($this->once())
+            ->method('getEntityRestrictions')
+            ->with($form->getData())
+            ->willReturn($restrictions);
+
+        $view = $form->createView();
+        $this->extension->finishView(
+            $view,
+            $form,
+            [
+                'disable_workflow_restrictions' => false,
+                'data_class' => 'Test',
+            ]
+        );
+
+        $this->assertEquals($expectedView, $view);
     }
 
     public function testConfigureOptions()
@@ -109,46 +259,6 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
     public function testGetExtendedType()
     {
         $this->assertEquals('form', $this->extension->getExtendedType());
-    }
-
-    public function testBuildViewDataProvider()
-    {
-        return [
-            'enabled extension'          => [
-                ['disable_workflow_restrictions' => false, 'data_class' => 'test'],
-                [
-                    ['name' => 'test_field_1', 'disabled' => true],
-                    ['name' => 'test_field_2', 'disabled' => false]
-                ],
-                [
-                    ['field' => 'test_field_1', 'mode' => 'full'],
-                ]
-            ],
-            'no fields for restrictions' => [
-                ['disable_workflow_restrictions' => false, 'data_class' => 'test'],
-                [
-                    ['name' => 'test_field_1', 'disabled' => false],
-                    ['name' => 'test_field_2', 'disabled' => false]
-                ],
-                [
-                    ['field' => 'test_field_3', 'mode' => 'full'],
-                ]
-            ],
-            'disabled extension'         => [
-                ['disable_workflow_restrictions' => false],
-                [
-                    ['name' => 'test_field_1', 'disabled' => false],
-                    ['name' => 'test_field_2', 'disabled' => false]
-                ],
-            ],
-            'no data_class option'       => [
-                ['disable_workflow_restrictions' => true],
-                [
-                    ['name' => 'test_field_1', 'disabled' => false],
-                    ['name' => 'test_field_2', 'disabled' => false]
-                ],
-            ]
-        ];
     }
 
     /**
