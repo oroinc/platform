@@ -37,27 +37,50 @@ class OwnerHelper
     /**
      * @param WidgetOptionBag $widgetOptions
      *
-     * @return int[]
+     * @return int[] Returns array of user ids, [] if filter is empty
+     * or [0] if intersection among options wasn't found
      */
     public function getOwnerIds(WidgetOptionBag $widgetOptions)
     {
         $key = spl_object_hash($widgetOptions);
         if (!isset($this->ownerIds[$key])) {
-            $businessUnitIds = $this->getBusinessUnitsIds($widgetOptions);
-
-            $array = array_unique(
-                array_merge($this->getUserOwnerIds($businessUnitIds), $this->getUsersIds($widgetOptions))
-            );
-
-            $roleIds = $this->getRoleIds($widgetOptions);
-            $array   = array_unique(array_merge($this->getUserOwnerIdsByRoles($roleIds), $array));
-
-            $array = $this->replaceCurrentValues($array);
+            $parts = $this->collectParts($widgetOptions);
+            $array = $parts
+                ? ($this->replaceCurrentValues(
+                    array_unique(
+                        count($parts) === 1 ? $parts[0] : call_user_func_array('array_intersect', $parts)
+                    )
+                ) ?: [0])
+                : [];
 
             $this->ownerIds[$key] = $array;
         }
 
         return $this->ownerIds[$key];
+    }
+
+    /**
+     * @param WidgetOptionBag $widgetOptions
+     *
+     * @return array
+     */
+    protected function collectParts(WidgetOptionBag $widgetOptions)
+    {
+        $parts = [];
+
+        if ($userIds = $this->getUsersIds($widgetOptions)) {
+            $parts[] = $userIds;
+        }
+
+        if ($businessUnitIds = $this->getBusinessUnitsIds($widgetOptions)) {
+            $parts[] = $this->getUserOwnerIds($businessUnitIds);
+        }
+
+        if ($roleIds = $this->getRoleIds($widgetOptions)) {
+            $parts[] = $this->getUserOwnerIdsByRoles($roleIds);
+        }
+
+        return $parts;
     }
 
     /**
