@@ -96,7 +96,6 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
             ]);
 
         $this->formType->configureOptions($resolver);
-
     }
 
     /**
@@ -139,11 +138,11 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
     public function submitFormDataProvider()
     {
         return [
-            'valid without default' => [
+            'valid' => [
                 'submittedValue' => '1',
                 'isValid' => true
             ],
-            'invalid without default' => [
+            'invalid' => [
                 'submittedValue' => '10',
                 'isValid' => false
             ],
