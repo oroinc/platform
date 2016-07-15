@@ -263,3 +263,8 @@ oro:
                 wysiwyg_enabled:
                     label: 'Enable WYSIWYG editor'
                     tooltip: 'Enables WYSIWYG editor for all text fields'
+        oro_duration.tooltip: >
+            Encodings supported:<ul>
+            <li>#:#:# (e.g. '1:30:0' or '90:00')
+            <li>#h #m #s (e.g. '1h 30m' or '1.5h' or '90m')
+

@@ -32,6 +32,10 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
         $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $gridViewManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager')
+            ->disableOriginalConstructor()
+            ->getMock();
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->registry
@@ -48,22 +52,13 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             $this->registry,
             $this->securityFacade,
             $aclHelper,
-            $translator
+            $translator,
+            $gridViewManager
         );
     }
 
     public function testListenerShouldAddViewsIntoEvent()
     {
-        $originalViews = [
-            [
-                'name' => 'first',
-                'filters' => [],
-                'sorters' => [],
-                'type' => 'system',
-            ],
-        ];
-        $event = new GridViewsLoadEvent('grid', $originalViews);
-
         $currentUser = new User();
 
         $this->securityFacade
@@ -71,6 +66,8 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getLoggedUser')
             ->will($this->returnValue($currentUser));
 
+
+        $systemView = new View('first');
         $view1 = new GridView();
         $view1->setId(1);
         $view1->setOwner($currentUser);
@@ -80,21 +77,26 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
         $view2->setName('view2');
         $view2->setOwner($currentUser);
         $gridViews = [
-            $view1,
-            $view2,
+            'system' => [
+                $systemView
+            ],
+            'user' => [$view1, $view2]
         ];
 
-        $this->gridViewRepository
-            ->expects($this->once())
-            ->method('findGridViews')
-            ->will($this->returnValue($gridViews));
+        $event = new GridViewsLoadEvent('grid', $gridViews);
 
         $expectedViews = [
             [
-                'name'    => 'first',
-                'filters' => [],
-                'sorters' => [],
-                'type' => 'system',
+                'name'       => 'first',
+                'label'      => 'first',
+                'type'       => 'system',
+                'filters'    => [],
+                'sorters'    => [],
+                'columns'    => [],
+                'editable'   => false,
+                'deletable'  => false,
+                'is_default' => false,
+                'shared_by'  => null,
             ],
             [
                 'label'     => 'view1',
