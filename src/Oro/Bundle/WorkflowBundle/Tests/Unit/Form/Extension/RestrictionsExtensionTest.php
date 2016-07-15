@@ -55,16 +55,16 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
     }
 
     /**
-     * @dataProvider testBuildViewDataProvider
+     * @dataProvider testBuildFormDataProvider
      *
      * @param array $options
      * @param array $fields
      * @param array $restrictions
      */
-    public function testBuildView(array $options, array $fields = [], array $restrictions = [])
+    public function testBuildForm(array $options, array $fields = [], array $restrictions = [])
     {
         $hasRestrictions = !empty($restrictions);
-        $data            = [1];
+        $data            = (object)[1];
 
         if (!empty($options['data_class']) &&
             empty($options['disable_workflow_restrictions']) &&
@@ -85,11 +85,12 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         foreach ($fields as $field) {
             $builder->add($field['name'], null, []);
         }
-
         $form = $builder->getForm();
-        $form->setData($data);
-        $formView = $form->createView();
-        $this->extension->buildView($formView, $form, $options);
+        $this->extension->buildForm($builder, $options);
+        $dispatcher = $form->getConfig()->getEventDispatcher();
+        $event = new FormEvent($form, $data);
+        $dispatcher->dispatch(FormEvents::POST_SET_DATA, $event);
+
         foreach ($fields as $field) {
             $this->assertEquals(
                 $field['read_only'],
@@ -113,7 +114,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->assertEquals('form', $this->extension->getExtendedType());
     }
 
-    public function testBuildViewDataProvider()
+    public function testBuildFormDataProvider()
     {
         return [
             'enabled extension'          => [

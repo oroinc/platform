@@ -18,11 +18,11 @@ define(function(require) {
         initializeWidget: function() {
             //support for readonly attr
             if (this.$el.is('[readonly]')) {
-                this.$el.on('click mousedown', function (e) {
+                this.$el.on('click mousedown', function(e) {
                     e.preventDefault();
                     return false;
                 });
-                $('option:not(:selected), [value=""]', this.$el).remove();
+                this.$el.find('option:not(:selected), [value=""]').remove();
             }
 
             UniformSelectInputWidget.__super__.initializeWidget.apply(this, arguments);

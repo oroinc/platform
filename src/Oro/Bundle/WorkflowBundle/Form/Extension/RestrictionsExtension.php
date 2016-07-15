@@ -3,8 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
@@ -47,20 +49,33 @@ class RestrictionsExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['disable_workflow_restrictions'] ||
             empty($options['data_class']) ||
-            !$this->restrictionsManager->hasEntityClassRestrictions($options['data_class']) ||
-            $form->isSubmitted()
+            !$this->restrictionsManager->hasEntityClassRestrictions($options['data_class'])
         ) {
             return;
         }
-        $data = $form->getData();
-        if (!$data) {
+
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            [$this, 'addRestrictionListener']
+        );
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function addRestrictionListener(FormEvent $event)
+    {
+        $entity = $event->getData();
+        if (!is_object($entity)) {
             return;
         }
-        $restrictions = $this->restrictionsManager->getEntityRestrictions($data);
+
+        $form = $event->getForm();
+        $restrictions = $this->restrictionsManager->getEntityRestrictions($entity);
         foreach ($restrictions as $restriction) {
             if ($form->has($restriction['field'])) {
                 $this->applyRestriction($restriction, $form);
