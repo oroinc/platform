@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Dashboard;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
-
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
 class OwnerHelper
 {
@@ -18,6 +18,9 @@ class OwnerHelper
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
+    /** @var OwnerTreeProviderInterface */
+    protected $ownerTreeProvider;
+
     const CURRENT_USER          = 'current_user';
     const CURRENT_BUSINESS_UNIT = 'current_business_unit';
 
@@ -25,13 +28,18 @@ class OwnerHelper
     protected $ownerIds;
 
     /**
-     * @param RegistryInterface     $registry
-     * @param TokenStorageInterface $tokenStorage
+     * @param RegistryInterface          $registry
+     * @param TokenStorageInterface      $tokenStorage
+     * @param OwnerTreeProviderInterface $ownerTreeProvider
      */
-    public function __construct(RegistryInterface $registry, TokenStorageInterface $tokenStorage)
-    {
-        $this->registry     = $registry;
-        $this->tokenStorage = $tokenStorage;
+    public function __construct(
+        RegistryInterface $registry,
+        TokenStorageInterface $tokenStorage,
+        OwnerTreeProviderInterface $ownerTreeProvider
+    ) {
+        $this->registry          = $registry;
+        $this->tokenStorage      = $tokenStorage;
+        $this->ownerTreeProvider = $ownerTreeProvider;
     }
 
     /**
@@ -167,21 +175,7 @@ class OwnerHelper
             return [];
         }
 
-        $businessUnitIds = $this->replaceCurrentValues($businessUnitIds);
-
-        $qb = $this->registry->getRepository('OroUserBundle:User')
-            ->createQueryBuilder('u')
-            ->select('DISTINCT(u.id)')
-            ->join('u.businessUnits', 'bu');
-        QueryUtils::applyOptimizedIn($qb, 'bu.id', $businessUnitIds);
-
-        $result = array_map('current', $qb->getQuery()->getResult());
-
-        if (empty($result)) {
-            $result = [0];
-        }
-
-        return $result;
+        return $this->ownerTreeProvider->getTree()->getUsersAssignedToBusinessUnits($businessUnitIds) ?: [0];
     }
 
     /**

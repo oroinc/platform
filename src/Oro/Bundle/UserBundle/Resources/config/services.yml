@@ -388,6 +388,7 @@ services:
         arguments:
           - '@doctrine'
           - '@security.token_storage'
+          - '@oro_security.ownership_tree_provider'
 
     oro_user.provider.user_config_form_provider:
         class: %oro_user.provider.user_configuration.form_provider.class%
