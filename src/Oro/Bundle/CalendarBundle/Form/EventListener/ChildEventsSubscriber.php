@@ -4,11 +4,11 @@ namespace Oro\Bundle\CalendarBundle\Form\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;

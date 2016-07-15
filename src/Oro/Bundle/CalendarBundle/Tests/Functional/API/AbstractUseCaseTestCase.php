@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -87,12 +89,16 @@ class AbstractUseCaseTestCase extends WebTestCase
     /**
      * @param array $expectedCalendarEventsData
      * @param int   $calendarId
+     *
+     * @return array
      */
-    protected function changeExpectedDataCalendarId(array &$expectedCalendarEventsData, $calendarId)
+    protected function changeExpectedDataCalendarId(array $expectedCalendarEventsData, $calendarId)
     {
         foreach ($expectedCalendarEventsData as &$expectedCalendarEventData) {
             $expectedCalendarEventData['calendar'] = $calendarId;
         }
+
+        return $expectedCalendarEventsData;
     }
 
     /**
@@ -211,6 +217,36 @@ class AbstractUseCaseTestCase extends WebTestCase
         );
         $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+    }
+
+    /**
+     * @return CalendarEvent[]
+     */
+    public function getRecurringCalendarEventsFromDB()
+    {
+        $criteria = new Criteria();
+        $criteria->where(Criteria::expr()->isNull('recurringEvent'));
+
+        $calendarEvents = $this->getEntityManager()
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->matching($criteria);
+
+        return $calendarEvents->toArray();
+    }
+
+    /**
+     * @return CalendarEvent[]
+     */
+    public function getCalendarEventExceptionsFromDB()
+    {
+        $criteria = new Criteria();
+        $criteria->where(Criteria::expr()->neq('recurringEvent', null));
+
+        $calendarEvents = $this->getEntityManager()
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->matching($criteria);
+
+        return $calendarEvents->toArray();
     }
 
     /**

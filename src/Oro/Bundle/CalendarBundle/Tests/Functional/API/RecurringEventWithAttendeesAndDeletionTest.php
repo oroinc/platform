@@ -122,10 +122,11 @@ class RecurringEventWithAttendeesAndDeletionTest extends AbstractUseCaseTestCase
 
         $simpleUserCalendar = $this->getUserCalendar($simpleUser);
 
-        $expectedSimpleUserCalendarEventData = $expectedCalendarEventData;
-
         $actualEvents = $this->getAllCalendarEvents($simpleUserCalendar->getId());
-        $this->changeExpectedDataCalendarId($expectedSimpleUserCalendarEventData, $simpleUserCalendar->getId());
+        $expectedSimpleUserCalendarEventData = $this->changeExpectedDataCalendarId(
+            $expectedCalendarEventData,
+            $simpleUserCalendar->getId()
+        );
         $this->assertCalendarEvents($expectedSimpleUserCalendarEventData, $actualEvents);
 
         $this->assertEventQuantityInDB(2);
