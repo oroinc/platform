@@ -123,7 +123,7 @@
             module: 'orouser/js/components/role/entity-category-tabs-component',
             options: tabsOptions
         }) }}></div>
-        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid' }) }}
+        {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: false} }) }}
         <div {{ UI.renderPageComponentAttributes({
             module: 'orouser/js/components/role/capability-set-component',
             options: capabilitySetOptions
