@@ -58,22 +58,4 @@ class DateTimePicker extends Element
     {
         return $this->findVisible('css', '.ui-datepicker-calendar');
     }
-
-    /**
-     * @param string       $selector selector engine name
-     * @param string|array $locator  selector locator
-     *
-     * @return NodeElement|null
-     */
-    protected function findVisible($selector, $locator)
-    {
-        $visibleElements = array_filter(
-            $this->getPage()->findAll($selector, $locator),
-            function (NodeElement $element) {
-                return $element->isVisible();
-            }
-        );
-
-        return array_shift($visibleElements);
-    }
 }
