@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Form\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -214,9 +215,9 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CalendarEvent $parent
-     * @param array         $missingEventUserIds
-     * @param array         $attendeesByUserId
+     * @param CalendarEvent    $parent
+     * @param array            $missingEventUserIds
+     * @param array|Attendee[] $attendeesByUserId
      */
     protected function createChildEvent(CalendarEvent $parent, array $missingEventUserIds, array $attendeesByUserId)
     {
@@ -226,11 +227,14 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             $organizationId     = $this->securityFacade->getOrganizationId();
 
             $calendars = $calendarRepository->findDefaultCalendars($missingEventUserIds, $organizationId);
+
+            /** @var Calendar $calendar */
             foreach ($calendars as $calendar) {
                 $event = new CalendarEvent();
                 $event->setCalendar($calendar);
                 $parent->addChildEvent($event);
-                if ($calendar->getOwner() && isset($attendeesByUserId[$calendar->getOwner()->getId()])) {
+
+                if ($this->shouldRelatedAttendeeBeSet($calendar, $attendeesByUserId)) {
                     $event->setRelatedAttendee($attendeesByUserId[$calendar->getOwner()->getId()]);
                 }
             }
@@ -259,5 +263,23 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         return $this->registry
             ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE))
             ->find($type);
+    }
+
+    /**
+     * @param Calendar $calendar
+     * @param array    $attendeesByUserId
+     *
+     * @return bool
+     */
+    protected function shouldRelatedAttendeeBeSet(Calendar $calendar, array $attendeesByUserId)
+    {
+        /** @var Attendee $attendee */
+        $attendee = isset($attendeesByUserId[$calendar->getOwner()->getId()])
+            ? $attendeesByUserId[$calendar->getOwner()->getId()]
+            : null;
+
+        return $calendar->getOwner()
+        && $attendee
+        && !($attendee->getCalendarEvent() && $attendee->getCalendarEvent()->getId());
     }
 }
