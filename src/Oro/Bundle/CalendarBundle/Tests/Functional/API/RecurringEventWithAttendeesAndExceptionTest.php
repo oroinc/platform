@@ -241,8 +241,6 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
      */
     public function testCreateRecurringEventWithAttendeesAndExceptionCanceledDeletedAndPartiallyUpdatedCorrectly()
     {
-        $this->markTestSkipped('Should be enabled after AEIV-769 STR 6 will be fixed.');
-
         $this->checkPreconditions();
 
         $startDate = '2016-02-07T09:00:00+00:00';
@@ -418,7 +416,7 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
 
         $this->updateCalendarEventViaAPI(
             $mainCalendarEvent->getId(),
-            ['2016-02-07T11:00:00+00:00', '2016-02-07T12:00:00+00:00']
+            ['start' => '2016-02-07T11:00:00+00:00', 'end' => '2016-02-07T12:00:00+00:00']
         );
 
         $expectedCalendarEventsUpdatedData = [
@@ -457,6 +455,7 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
         $this->changeExpectedDataCalendarId($expectedCalendarEventsUpdatedData, self::DEFAULT_USER_CALENDAR_ID);
         $this->assertCalendarEvents($expectedCalendarEventsUpdatedData, $actualEvents);
 
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
         $this->changeExpectedDataCalendarId($expectedCalendarEventsUpdatedData, $simpleUserCalendar->getId());
         $this->assertCalendarEvents($expectedCalendarEventsUpdatedData, $actualEvents);
 
