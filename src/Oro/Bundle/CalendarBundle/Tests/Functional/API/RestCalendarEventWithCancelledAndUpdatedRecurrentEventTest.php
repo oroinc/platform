@@ -64,8 +64,6 @@ class RestCalendarEventWithCancelledAndUpdatedRecurrentEventTest extends Abstrac
         ];
         $mainExceptionCalendarEventId = $this->addCalendarEventViaAPI($exceptionData);
         $mainExceptionEvent = $this->getCalendarEventById($mainExceptionCalendarEventId);
-        $this->assertCount(1, $mainCalendarEvent->getChildEvents()->toArray());
-        $this->assertCount(1, $mainExceptionEvent->getChildEvents()->toArray());
 
         $simpleUser = $this->getReference('simple_user');
 
@@ -132,11 +130,11 @@ class RestCalendarEventWithCancelledAndUpdatedRecurrentEventTest extends Abstrac
 
         $simpleUserCalendar = $this->getUserCalendar($simpleUser);
 
-        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
         $expectedSimpleUserEventsData = $this->changeExpectedDataCalendarId(
             $expectedEventsData,
             $simpleUserCalendar->getId()
         );
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
         $this->assertCalendarEvents($expectedSimpleUserEventsData, $actualEvents);
 
         $calendarEvents = $this->getRecurringCalendarEventsFromDB();

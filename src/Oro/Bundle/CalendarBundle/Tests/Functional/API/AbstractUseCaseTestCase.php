@@ -39,7 +39,13 @@ class AbstractUseCaseTestCase extends WebTestCase
                 $this->assertCount(
                     count($expectedAttendeesData),
                     $actualEvent['attendees'],
-                    'Calendar Event Attendees count mismatch'
+                    sprintf(
+                        'Calendar Event Attendees count mismatch for calendar event.%s Expected: %s%s Actual: %s',
+                        PHP_EOL,
+                        json_encode($expectedEventData),
+                        PHP_EOL,
+                        json_encode($actualEvent)
+                    )
                 );
 
                 reset($actualEvent['attendees']);

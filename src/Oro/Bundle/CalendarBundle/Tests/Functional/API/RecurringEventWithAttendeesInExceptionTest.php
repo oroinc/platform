@@ -2,225 +2,216 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
  */
-class RecurringEventWithAttendeesInExceptionTest extends WebTestCase
+class RecurringEventWithAttendeesInExceptionTest extends AbstractUseCaseTestCase
 {
-    protected function setUp()
-    {
-        $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures([
-            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData',
-            'Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures\LoadUserData',
-        ]);
-    }
-
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testDeleteExceptionWithAttendees()
     {
-        $manager = $this->getContainer()->get('doctrine');
-        $calendarRepo = $manager->getRepository('OroCalendarBundle:Calendar');
-        $calendarEventRepo = $manager->getRepository('OroCalendarBundle:CalendarEvent');
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $calendar1 = $calendarRepo->findDefaultCalendar($this->getReference('simple_user_1'), $organization->getId());
+        $this->checkPreconditions();
 
-        // create recurring event
-        $parameters = [
-            'title' => 'Test Recurring Event',
+        $startDate = '2016-02-07T09:00:00+00:00';
+        $endDate = '2016-02-07T09:30:00+00:00';
+        $exceptionStart = '2016-02-07T18:00:00+00:00';
+        $exceptionEnd = '2016-02-07T18:30:00+00:00';
+
+        $calendarEventData = [
+            'title'       => 'Test Recurring Event',
             'description' => 'Test Recurring Event Description',
-            'start' => gmdate(DATE_RFC3339, strtotime('2016-07-02T09:00:00+00:00')),
-            'end' => gmdate(DATE_RFC3339, strtotime('2016-07-02T09:30:00+00:00')),
-            'allDay' => true,
-            'backgroundColor' => '#FF0000',
-            'calendar' => $calendar1->getId(),
-            'recurrence' => [
+            'allDay'      => false,
+            'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+            'start'       => $startDate,
+            'end'         => $endDate,
+            'recurrence'  => [
+                'timeZone'       => 'UTC',
                 'recurrenceType' => Recurrence::TYPE_WEEKLY,
-                'interval' => 1,
-                'instance' => null,
-                'dayOfWeek' => [Recurrence::DAY_SATURDAY],
-                'dayOfMonth' => null,
-                'monthOfYear' => null,
-                'startTime' => gmdate(DATE_RFC3339, strtotime('2016-07-02T09:00:00+00:00')),
-                'endTime' => null,
-                'occurrences' => 5,
-                'timeZone' => 'UTC'
+                'interval'       => 1,
+                'dayOfWeek'      => ['saturday'],
+                'startTime'      => $startDate,
+                'occurrences'    => 5,
+                'endTime'        => null,
             ],
-            'attendees' => null,
+            'attendees'   => null,
         ];
-        $this->client->request(
-            'POST',
-            $this->getUrl('oro_api_post_calendarevent'),
-            $parameters
-        );
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
-        $this->assertNotEmpty($result);
-        $this->assertTrue(isset($result['id']));
-        $recurringEventId = $result['id'];
+        $calendarEventId = $this->addCalendarEventViaAPI($calendarEventData);
+        $this->getCalendarEventById($calendarEventId);
 
-        // create exception event
-        $parameters = [
-            'recurringEventId' => $result['id'],
-            'title' => 'Test Recurring Event Exception',
-            'description' => 'Test Recurring Exception Description',
-            'start' => gmdate(DATE_RFC3339, strtotime('2016-07-09T16:00:00+00:00')),
-            'end' => gmdate(DATE_RFC3339, strtotime('2016-07-09T16:30:00+00:00')),
-            'allDay' => true,
-            'backgroundColor' => '#FF0000',
-            'calendar' => $calendar1->getId(),
-            'originalStart' => gmdate(DATE_RFC3339, strtotime('2016-07-09T09:00:00+00:00')),
-            'isCancelled' => false,
-            'attendees' => [
+        $exceptionData = [
+            'isCancelled'      => false,
+            'title'            => $calendarEventData['title'],
+            'description'      => $calendarEventData['description'],
+            'start'            => $exceptionStart,
+            'allDay'           => $calendarEventData['allDay'],
+            'calendar'         => $calendarEventData['calendar'],
+            'recurringEventId' => $calendarEventId,
+            'originalStart'    => '2016-02-13T09:00:00+00:00',
+            'end'              => $exceptionEnd,
+            'attendees'        => [
                 [
-                    'email' => 'simple_user_2@example.com',
+                    'displayName' => 'simple_user@example.com',
+                    'email'       => 'simple_user@example.com',
+                    'status'      => Attendee::STATUS_NONE,
+                    'type'        => Attendee::TYPE_REQUIRED,
                 ],
-                [
-                    'email' => 'simple_user_3@example.com',
+            ]
+        ];
+        $mainExceptionCalendarEventId = $this->addCalendarEventViaAPI($exceptionData);
+        $mainExceptionEvent = $this->getCalendarEventById($mainExceptionCalendarEventId);
+
+        $simpleUser = $this->getReference('simple_user');
+        $expectedEventsData = [
+            [
+                'start'       => '2016-03-12T09:00:00+00:00',
+                'end'         => '2016-03-12T09:30:00+00:00',
+                'title'       => $calendarEventData['title'],
+                'description' => $calendarEventData['description'],
+                'allDay'      => $calendarEventData['allDay'],
+                'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+                'isCancelled' => false,
+                'attendees'   => [],
+            ],
+            [
+                'start'       => '2016-03-05T09:00:00+00:00',
+                'end'         => '2016-03-05T09:30:00+00:00',
+                'title'       => $calendarEventData['title'],
+                'description' => $calendarEventData['description'],
+                'allDay'      => $calendarEventData['allDay'],
+                'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+                'isCancelled' => false,
+                'attendees'   => [],
+            ],
+            [
+                'start'       => '2016-02-27T09:00:00+00:00',
+                'end'         => '2016-02-27T09:30:00+00:00',
+                'title'       => $calendarEventData['title'],
+                'description' => $calendarEventData['description'],
+                'allDay'      => $calendarEventData['allDay'],
+                'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+                'isCancelled' => false,
+                'attendees'   => [],
+            ],
+            [
+                'start'       => '2016-02-20T09:00:00+00:00',
+                'end'         => '2016-02-20T09:30:00+00:00',
+                'title'       => $calendarEventData['title'],
+                'description' => $calendarEventData['description'],
+                'allDay'      => $calendarEventData['allDay'],
+                'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+                'isCancelled' => false,
+                'attendees'   => [],
+            ],
+            [
+                'start'       => $exceptionStart,
+                'end'         => $exceptionEnd,
+                'title'       => $calendarEventData['title'],
+                'description' => $calendarEventData['description'],
+                'allDay'      => $calendarEventData['allDay'],
+                'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
                 ],
             ],
         ];
-        $this->client->request(
-            'POST',
-            $this->getUrl('oro_api_post_calendarevent'),
-            $parameters
-        );
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
-        $this->assertNotEmpty($result);
-        $this->assertTrue(isset($result['id']));
-        $exceptionId = $result['id'];
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
 
-        // checks expanded result (is used on UI) for each user
-        $start = gmdate(DATE_RFC3339, strtotime('2016-06-01T00:00:00+00:00'));
-        $end = gmdate(DATE_RFC3339, strtotime('2016-08-01T00:00:00+00:00'));
-        // for simple_user_1
-        $request = array(
-            'calendar' => $calendar1->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        // recurring event is expanded into five occurrences
-        $this->assertCount(5, $result);
-        // but in database there are still two records: recurring event and its exception
-        $this->assertCount(2, $calendarEventRepo->findBy([
-            'calendar' => $calendar1->getId()
-        ]));
-
-        // for simple_user_2
-        $calendar2 = $calendarRepo->findDefaultCalendar($this->getReference('simple_user_2'), $organization->getId());
-        $request = array(
-            'calendar' => $calendar2->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        // simple_user_2 sees only exception
-        $this->assertCount(1, $result);
-        $this->assertCount(1, $calendarEventRepo->findBy([
-            'calendar' => $calendar2->getId()
-        ]));
-
-        // for simple_user_3
-        $calendar3 = $calendarRepo->findDefaultCalendar($this->getReference('simple_user_3'), $organization->getId());
-        $request = array(
-            'calendar' => $calendar3->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        // simple_user_3 sees only exception
-        $this->assertCount(1, $result);
-        $this->assertCount(1, $calendarEventRepo->findBy([
-            'calendar' => $calendar3->getId()
-        ]));
-
-        // makes exception cancelled
-        $parameters = [
-            'isCancelled' => true,
+        $simpleUserCalendar = $this->getUserCalendar($simpleUser);
+        $expectedSimpleUserEventsData = [
+            [
+                'start'       => $exceptionStart,
+                'end'         => $exceptionEnd,
+                'title'       => $calendarEventData['title'],
+                'description' => $calendarEventData['description'],
+                'allDay'      => $calendarEventData['allDay'],
+                'calendar'    => $simpleUserCalendar->getId(),
+                'isCancelled' => false,
+                'attendees'   => [
+                    [
+                        'userId' => $simpleUser->getId()
+                    ]
+                ],
+            ],
         ];
-        $this->client->request(
-            'PUT',
-            $this->getUrl('oro_api_put_calendarevent', ['id' => $exceptionId]),
-            $parameters
-        );
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertNotEmpty($result);
-        $calendarEventRepo->clear();
-        $exception = $calendarEventRepo->findOneBy(['id' => $exceptionId]);
-        $this->assertTrue($exception->isCancelled());
-        // there are one cancelled exception is in database
-        $this->assertCount(1, $calendarEventRepo->findBy([
-            'cancelled' => true,
-        ]));
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
+        $this->assertCalendarEvents($expectedSimpleUserEventsData, $actualEvents);
 
-        // checks expanded result (is used on UI) for each user
-        // for simple_user_1, events for simple_user_2, simple_user_3 should be deleted as child events
-        $request = array(
-            'calendar' => $calendar1->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        // recurring event is expanded into four occurrences, one occurrence is cancelled
-        $this->assertCount(4, $result);
+        $recurringCalendarEvents = $this->getRecurringCalendarEventsFromDB();
+        $this->assertCount(2, $recurringCalendarEvents);
 
-        // delete exception
-        $this->client->request(
-            'DELETE',
-            $this->getUrl('oro_api_delete_calendarevent', ['id' => $exceptionId])
-        );
-        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
-        $calendarEventRepo->clear();
-        $exception = $calendarEventRepo->findOneBy(['id' => $exceptionId]);
-        $this->assertEmpty($exception);
-        // there are no exceptions in database
-        $this->assertCount(0, $calendarEventRepo->findBy([
-            'recurringEvent' => $recurringEventId,
-        ]));
+        $calendarEventExceptions = $this->getCalendarEventExceptionsFromDB();
+        $this->assertCount(1, $calendarEventExceptions);
 
-        // checks expanded result (is used on UI) for each user
-        // for simple_user_1
-        $request = array(
-            'calendar' => $calendar1->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        // recurring event is expanded into five occurrences
-        $this->assertCount(5, $result);
-        // for simple_user_2
-        $request = array(
-            'calendar' => $calendar2->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(0, $result);
+        $outlookCancelRequest = [
+            'isCancelled'      => true,
+            'title'            => $exceptionData['title'],
+            'description'      => $exceptionData['description'],
+            'start'            => $exceptionData['start'],
+            'allDay'           => $exceptionData['allDay'],
+            'calendar'         => $exceptionData['calendar'],
+            'recurringEventId' => $exceptionData['recurringEventId'],
+            'originalStart'    => $exceptionData['originalStart'],
+            'end'              => $exceptionData['end'],
+        ];
+        $this->updateCalendarEventViaAPI($mainExceptionEvent->getId(), $outlookCancelRequest);
+        unset($expectedEventsData[4]);
 
-        // for simple_user_3
-        $request = array(
-            'calendar' => $calendar3->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(0, $result);
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
+
+        $calendarEventExceptions = $this->getCalendarEventExceptionsFromDB();
+        $this->assertCount(1, $calendarEventExceptions);
+        /** @var CalendarEvent $calendarEventException */
+        $calendarEventException = reset($calendarEventExceptions);
+        $this->assertTrue($calendarEventException->isCancelled());
+
+        $this->deleteEventViaAPI($mainExceptionEvent->getId());
+
+        $expectedEventsData[5]['start'] = '2016-02-13T09:00:00+00:00';
+        $expectedEventsData[5]['end'] = '2016-02-13T09:30:00+00:00';
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertCalendarEvents($expectedEventsData, $actualEvents);
+
+        $actualEvents = $this->getCalendarEventsByCalendarViaAPI($simpleUserCalendar->getId());
+        $this->assertCalendarEvents([], $actualEvents);
+
+        $recurringCalendarEvents = $this->getRecurringCalendarEventsFromDB();
+        $this->assertCount(1, $recurringCalendarEvents);
+
+        $calendarEventExceptions = $this->getCalendarEventExceptionsFromDB();
+        $this->assertCount(0, $calendarEventExceptions);
+    }
+
+    protected function checkPreconditions()
+    {
+        $result = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);
+        $this->assertEmpty($result);
+    }
+
+    /**
+     * @param int $calendarId
+     *
+     * @return array
+     */
+    protected function getCalendarEventsByCalendarViaAPI($calendarId)
+    {
+        $request = [
+            'calendar'    => $calendarId,
+            'start'       => '2016-02-06T00:00:00+00:00',
+            'end'         => '2016-04-15T00:00:00+00:00',
+            'subordinate' => true,
+        ];
+
+        return $this->getOrderedCalendarEventsViaAPI($request);
     }
 }
