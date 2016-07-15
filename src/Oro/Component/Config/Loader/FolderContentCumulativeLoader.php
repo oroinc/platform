@@ -66,9 +66,6 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     /** @var PropertyAccess */
     protected $propertyAccessor;
 
-    /** @var string */
-    protected $resource;
-
     /**
      * @param string   $relativeFolderPath
      * @param int      $maxNestingLevel      Pass -1 to unlimit, if you want to find files in exact path given pass 1
