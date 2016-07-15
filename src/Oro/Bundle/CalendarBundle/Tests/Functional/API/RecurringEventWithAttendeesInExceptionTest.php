@@ -157,13 +157,13 @@ class RecurringEventWithAttendeesInExceptionTest extends WebTestCase
         $calendarEventRepo->clear();
         $exception = $calendarEventRepo->findOneBy(['id' => $exceptionId]);
         $this->assertTrue($exception->isCancelled());
-        // there are three cancelled exceptions in database
-        $this->assertCount(3, $calendarEventRepo->findBy([
+        // there are one cancelled exception is in database
+        $this->assertCount(1, $calendarEventRepo->findBy([
             'cancelled' => true,
         ]));
 
         // checks expanded result (is used on UI) for each user
-        // for simple_user_1
+        // for simple_user_1, events for simple_user_2, simple_user_3 should be deleted as child events
         $request = array(
             'calendar' => $calendar1->getId(),
             'start' => $start,
@@ -174,29 +174,6 @@ class RecurringEventWithAttendeesInExceptionTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         // recurring event is expanded into four occurrences, one occurrence is cancelled
         $this->assertCount(4, $result);
-        // for simple_user_2
-        $request = array(
-            'calendar' => $calendar2->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(1, $result);
-        $this->assertTrue($result[0]['isCancelled']);
-
-        // for simple_user_3
-        $request = array(
-            'calendar' => $calendar3->getId(),
-            'start' => $start,
-            'end' => $end,
-            'subordinate' => false
-        );
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(1, $result);
-        $this->assertTrue($result[0]['isCancelled']);
 
         // delete exception
         $this->client->request(
