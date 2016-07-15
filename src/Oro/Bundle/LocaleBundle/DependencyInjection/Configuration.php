@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 /**
@@ -131,6 +132,6 @@ class Configuration implements ConfigurationInterface
      */
     public static function getConfigKeyByName($name)
     {
-        return sprintf('oro_locale.%s', $name);
+        return sprintf('oro_locale%s%s', ConfigManager::SECTION_MODEL_SEPARATOR, $name);
     }
 }
