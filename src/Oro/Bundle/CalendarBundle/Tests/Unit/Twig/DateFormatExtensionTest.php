@@ -3,9 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\CalendarBundle\Twig\DateFormatExtension;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,7 +31,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->markTestSkipped('CRM-5745');
-
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -46,34 +43,7 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->extension = new DateFormatExtension($this->formatter, $this->configManager);
-    }
-
-    public function testGetFunctions()
-    {
-        $this->extension = new DateFormatExtension($this->formatter);
-
-        $this->assertEquals(
-            [
-                'calendar_date_range' => new \Twig_Function_Method(
-                    $this->extension,
-                    'formatCalendarDateRange'
-                ),
-                'calendar_date_range_user' => new \Twig_Function_Method(
-                    $this->extension,
-                    'formatCalendarDateRangeUser'
-                )
-            ],
-            $this->extension->getFunctions()
-        );
-    }
-
-    public function testGetName()
-    {
-        $this->extension = new DateFormatExtension($this->formatter);
-
-        $this->assertEquals('oro_calendar', $this->extension->getName());
     }
 
     /**
@@ -95,14 +65,9 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter->expects($this->any())
             ->method('formatTime')
             ->will($this->returnValue('Time'));
-
-        $this->extension = new DateFormatExtension($this->formatter);
-
         $startDate = new \DateTime($start);
         $endDate = $end === null ? null : new \DateTime($end);
-
         $result = $this->extension->formatCalendarDateRange($startDate, $endDate, $skipTime);
-
         $this->assertEquals($expected, $result);
     }
 
@@ -140,7 +105,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
     ) {
         $startDate = new \DateTime($start);
         $endDate = $end === null ? null : new \DateTime($end);
-
         $this->configManager->expects($this->any())
             ->method('get')
             ->will(
@@ -151,7 +115,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-
         $this->extension->formatCalendarDateRangeOrganization(
             $startDate,
             $endDate,
@@ -162,10 +125,8 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
             $timeZone,
             $organization
         );
-
         $this->configManager->expects($this->never())
             ->method('get');
-
         $this->extension->formatCalendarDateRangeOrganization(
             $startDate,
             $endDate,
@@ -180,7 +141,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
     public function formatCalendarDateRangeOrganizationProvider()
     {
         $organization = new Organization(1);
-
         return [
             'Localization settings from global scope' => [
                 '2016-05-01T10:30:15+00:00',
@@ -191,8 +151,8 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
                 $organization
             ],
             'Localization settings from params values' => [
-            '2016-05-01T10:30:15+00:00',
-            '2016-05-01T11:30:15+00:00',
+                '2016-05-01T10:30:15+00:00',
+                '2016-05-01T11:30:15+00:00',
                 ['locale' => 'en_US', 'timeZone' => 'UTC'], // config global scope
                 'en_US',
                 'Europe/Athens',
