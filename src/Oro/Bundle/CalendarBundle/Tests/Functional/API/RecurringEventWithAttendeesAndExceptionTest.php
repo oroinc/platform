@@ -470,17 +470,6 @@ class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCas
         $this->assertNull($attendeeExceptionEvent);
     }
 
-    /**
-     * @param array $expectedCalendarEventsData
-     * @param int   $calendarId
-     */
-    protected function changeExpectedDataCalendarId(array &$expectedCalendarEventsData, $calendarId)
-    {
-        foreach ($expectedCalendarEventsData as &$expectedCalendarEventData) {
-            $expectedCalendarEventData['calendar'] = $calendarId;
-        }
-    }
-
     protected function checkPreconditions()
     {
         $result = $this->getCalendarEventsByCalendarViaAPI(self::DEFAULT_USER_CALENDAR_ID);

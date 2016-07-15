@@ -85,6 +85,17 @@ class AbstractUseCaseTestCase extends WebTestCase
     }
 
     /**
+     * @param array $expectedCalendarEventsData
+     * @param int   $calendarId
+     */
+    protected function changeExpectedDataCalendarId(array &$expectedCalendarEventsData, $calendarId)
+    {
+        foreach ($expectedCalendarEventsData as &$expectedCalendarEventData) {
+            $expectedCalendarEventData['calendar'] = $calendarId;
+        }
+    }
+
+    /**
      * Create new event
      *
      * @return int
