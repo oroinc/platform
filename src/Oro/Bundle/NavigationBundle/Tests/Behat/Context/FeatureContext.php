@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Behat\Context;
 
-use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
-class FeatureContext extends RawMinkContext implements OroElementFactoryAware
+class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
 {
     use ElementFactoryDictionary;
 
@@ -35,7 +35,7 @@ class FeatureContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function menuMustBeOnLeftSide()
     {
-        \PHPUnit_Framework_Assert::assertFalse($this->createElement('MainMenu')->hasClass('main-menu-top'));
+        self::assertFalse($this->createElement('MainMenu')->hasClass('main-menu-top'));
     }
 
     /**
@@ -44,6 +44,6 @@ class FeatureContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function menuMustBeOnRightSide()
     {
-        \PHPUnit_Framework_Assert::assertTrue($this->createElement('MainMenu')->hasClass('main-menu-top'));
+        self::assertTrue($this->createElement('MainMenu')->hasClass('main-menu-top'));
     }
 }

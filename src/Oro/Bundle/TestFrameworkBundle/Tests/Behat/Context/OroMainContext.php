@@ -11,14 +11,15 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Symfony2Extension\Context\KernelAwareContext;
+use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 
 /**
  * Defines application features from the specific context.
@@ -28,6 +29,7 @@ class OroMainContext extends MinkContext implements
     OroElementFactoryAware,
     KernelAwareContext
 {
+    use AssertTrait;
     use KernelDictionary, ElementFactoryDictionary;
 
     /** @BeforeStep */
@@ -228,7 +230,7 @@ class OroMainContext extends MinkContext implements
             str_replace('Updated At: ', '', $records[1]->getText())
         );
 
-        \PHPUnit_Framework_Assert::assertGreaterThan($updatedDate, $createdDate);
+        self::assertGreaterThan($updatedDate, $createdDate);
     }
 
     /**
@@ -236,7 +238,7 @@ class OroMainContext extends MinkContext implements
      */
     public function userShouldBeAnOwner($owner)
     {
-        \PHPUnit_Framework_Assert::assertEquals(
+        self::assertEquals(
             $owner,
             $this->getSession()->getPage()->find('css', '.user-info-state li a')->getText()
         );
@@ -254,7 +256,7 @@ class OroMainContext extends MinkContext implements
         foreach ($labels as $label) {
             if (preg_match(sprintf('/%s/i', $fieldName), $label->getText())) {
                 $value = $label->getParent()->find('css', 'div.control-label')->getText();
-                \PHPUnit_Framework_Assert::assertRegExp(sprintf('/%s/i', $fieldValue), $value);
+                self::assertRegExp(sprintf('/%s/i', $fieldValue), $value);
 
                 return;
             }
