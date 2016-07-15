@@ -270,11 +270,12 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     {
         if ($this->hasNamespacePlaceholder($id)) {
             $namespace = $this->import->getNamespace();
-            if ($namespace === null) {
-                throw new LogicException(sprintf('Import namespace for block "%s" is not defined.', $id));
+            $replacement = $namespace.self::NAMESPACE_SUFFIX;
+            if (!$namespace) {
+                $replacement = '';
             }
 
-            $id = substr_replace($id, $namespace.self::NAMESPACE_SUFFIX, 0, strlen(self::NAMESPACE_PLACEHOLDER));
+            $id = substr_replace($id, $replacement, 0, strlen(self::NAMESPACE_PLACEHOLDER));
         }
 
         return $this;
