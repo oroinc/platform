@@ -230,19 +230,19 @@ Feature: User login
 
 Scenario: Success login
   Given I am on "/user/login"
-  And I fill "Login" form with:
+  When I fill "Login" form with:
       | Username | admin |
       | Password | admin |
   And I press "Log in"
-  And I should be on "/"
+  Then I should be on "/"
 
 Scenario Outline: Fail login
   Given I am on "/user/login"
-  And I fill "Login" form with:
+  When I fill "Login" form with:
       | Username | <login>    |
       | Password | <password> |
   And I press "Log in"
-  And I should be on "/user/login"
+  Then I should be on "/user/login"
   And I should see "Invalid user name or password."
 
   Examples:
@@ -285,7 +285,7 @@ You can use [faker](https://github.com/fzaninotto/faker) and and [entity referen
     | Willie     | Chavez    | <email()> |
     | Arthur     | Fisher    | <email()> |
     | Wanda      | Ford      | <email()> |
-  Given I have 5 Cases
+  And I have 5 Cases
   And there are 5 calls
   And there are two users with their own 7 Accounts
   And there are 3 users with their own 3 Tasks
