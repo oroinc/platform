@@ -54,7 +54,8 @@ define(function(require) {
             return this;
         },
 
-        onFieldsSectionToggle: function() {
+        onFieldsSectionToggle: function(e) {
+            e.preventDefault();
             this.$el.toggleClass('collapsed');
             this.$('[data-name=fields-list]').slideToggle(!this.$el.hasClass('collapsed'));
         }
