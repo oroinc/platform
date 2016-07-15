@@ -88,7 +88,8 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                'choices' => function () {},
+                'choices' => function () {
+                },
                 'compact' => false,
                 'localizations_list' => null,
                 'additional_localizations' => null,
