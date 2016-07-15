@@ -234,14 +234,44 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
             /** @var Calendar $calendar */
             foreach ($calendars as $calendar) {
-                $event = new CalendarEvent();
-                $event->setCalendar($calendar);
-                $parent->addChildEvent($event);
+                $childEvent = new CalendarEvent();
+                $childEvent->setCalendar($calendar);
+                $parent->addChildEvent($childEvent);
 
                 if ($this->shouldRelatedAttendeeBeSet($calendar, $attendeesByUserId)) {
-                    $event->setRelatedAttendee($attendeesByUserId[$calendar->getOwner()->getId()]);
+                    $childEvent->setRelatedAttendee($attendeesByUserId[$calendar->getOwner()->getId()]);
                 }
+
+                $this->copyRecurringEventExceptions($parent, $childEvent);
             }
+        }
+    }
+
+    /**
+     * @param CalendarEvent $parentEvent
+     * @param CalendarEvent $childEvent
+     */
+    protected function copyRecurringEventExceptions(CalendarEvent $parentEvent, CalendarEvent $childEvent)
+    {
+        if (!$parentEvent->getRecurrence()) {
+            // if this is not recurring event then there are no exceptions to copy
+            return;
+        }
+
+        foreach ($parentEvent->getRecurringEventExceptions() as $parentException) {
+            // $exception will be parent for new exception of attendee
+            $childException = new CalendarEvent();
+            $childException->setCalendar($childEvent->getCalendar())
+                ->setTitle($parentException->getTitle() . 'child exception')
+                ->setDescription($parentException->getDescription())
+                ->setStart($parentException->getStart())
+                ->setEnd($parentException->getEnd())
+                ->setOriginalStart($parentException->getOriginalStart())
+                ->setCancelled($parentException->isCancelled())
+                ->setAllDay($parentException->getAllDay())
+                ->setRecurringEvent($childEvent);
+
+            $parentException->addChildEvent($childException);
         }
     }
 
@@ -283,7 +313,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             : null;
 
         return $calendar->getOwner()
-        && $attendee
-        && !($attendee->getCalendarEvent() && $attendee->getCalendarEvent()->getId());
+            && $attendee
+            && !($attendee->getCalendarEvent() && $attendee->getCalendarEvent()->getId());
     }
 }
