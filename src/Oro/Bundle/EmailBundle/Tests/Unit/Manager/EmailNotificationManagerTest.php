@@ -17,6 +17,9 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailCacheManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
     /** @var HtmlTagHelper */
@@ -54,6 +57,10 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->router->expects($this->any())->method('generate')->willReturn('oro_email_email_reply');
 
+
+        $this->emailCacheManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Cache\EmailCacheManager')
+            ->disableOriginalConstructor()->getMock();
+
         $metadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
             ->disableOriginalConstructor()->getMock();
 
@@ -65,6 +72,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             $this->entityManager,
             $this->htmlTagHelper,
             $this->router,
+            $this->emailCacheManager,
             $this->configManager
         );
     }
@@ -77,6 +85,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $testEmails = $this->getEmails($user);
         $this->repository->expects($this->once())->method('getNewEmails')->willReturn($testEmails);
+        $this->emailCacheManager->expects($this->exactly(2))->method('ensureEmailBodyCached')->willReturn(true);
         $maxEmailsDisplay = 1;
         $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
 

@@ -8,6 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
@@ -25,6 +27,9 @@ class EmailNotificationManager
     /** @var Router */
     protected $router;
 
+    /** @var EmailCacheManager */
+    protected $emailCacheManager;
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -35,25 +40,28 @@ class EmailNotificationManager
      * @param EntityManager $entityManager
      * @param HtmlTagHelper $htmlTagHelper
      * @param Router $router
+     * @param EmailCacheManager $emailCacheManager
      * @param ConfigManager $configManager
      */
     public function __construct(
         EntityManager $entityManager,
         HtmlTagHelper $htmlTagHelper,
         Router $router,
+        EmailCacheManager $emailCacheManager,
         ConfigManager $configManager
     ) {
         $this->em = $entityManager;
         $this->htmlTagHelper = $htmlTagHelper;
         $this->router = $router;
+        $this->emailCacheManager = $emailCacheManager;
         $this->configManager = $configManager;
     }
 
     /**
-     * @param User         $user
-     * @param Organization $organization
-     * @param int          $maxEmailsDisplay
-     * @param int|null     $folderId
+     * @param User          $user
+     * @param Organization  $organization
+     * @param int           $maxEmailsDisplay
+     * @param int|null      $folderId
      *
      * @return array
      */
@@ -72,13 +80,18 @@ class EmailNotificationManager
             $isSeen = $element['seen'];
             $email = $element[0];
             $bodyContent = '';
-            $emailBody = $email->getEmailBody();
-            if ($emailBody) {
-                $bodyContent = $this->htmlTagHelper->shorten(
-                    $this->htmlTagHelper->stripTags(
-                        $this->htmlTagHelper->purify($emailBody->getBodyContent())
-                    )
-                );
+            try {
+                $this->emailCacheManager->ensureEmailBodyCached($email);
+                $emailBody = $email->getEmailBody();
+                if ($emailBody) {
+                    $bodyContent = $this->htmlTagHelper->shorten(
+                        $this->htmlTagHelper->stripTags(
+                            $this->htmlTagHelper->purify($emailBody->getBodyContent())
+                        )
+                    );
+                }
+            } catch (LoadEmailBodyException $e) {
+                // no content
             }
 
             $emailId = $email->getId();

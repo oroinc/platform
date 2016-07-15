@@ -61,11 +61,11 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         RequestStack $requestStack,
         OptionalListenerManager $listenerManager
     ) {
-        $this->registry  = $registry;
-        $this->translator     = $translator;
-        $this->securityFacade = $securityFacade;
-        $this->limiter        = $limiter;
-        $this->requestStack   = $requestStack;
+        $this->registry        = $registry;
+        $this->translator      = $translator;
+        $this->securityFacade  = $securityFacade;
+        $this->limiter         = $limiter;
+        $this->requestStack    = $requestStack;
         $this->listenerManager = $listenerManager;
     }
 
@@ -211,21 +211,21 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      */
     protected function doDelete(MassActionHandlerArgs $args)
     {
-        $iteration             = 0;
-        $entityName = $this->getEntityName($args);
-        $queryBuilder          = $args->getResults()->getSource();
-        $results = new DeletionIterableResult($queryBuilder);
+        $iteration    = 0;
+        $entityName   = $this->getEntityName($args);
+        $queryBuilder = $args->getResults()->getSource();
+        $results      = new DeletionIterableResult($queryBuilder);
         $results->setBufferSize(self::FLUSH_BATCH_SIZE);
         $this->listenerManager->disableListeners(['oro_search.index_listener']);
         // if huge amount data must be deleted
         set_time_limit(0);
-        $deletedIds = [];
+        $deletedIds            = [];
         $entityIdentifiedField = $this->getEntityIdentifierField($args);
         /** @var EntityManager $manager */
         $manager = $this->registry->getManagerForClass($entityName);
         foreach ($results as $result) {
             /** @var $result ResultRecordInterface */
-            $entity = $result->getRootEntity();
+            $entity          = $result->getRootEntity();
             $identifierValue = $result->getValue($entityIdentifiedField);
             if (!$entity) {
                 // no entity in result record, it should be extracted from DB

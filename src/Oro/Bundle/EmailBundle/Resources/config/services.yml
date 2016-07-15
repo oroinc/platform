@@ -861,6 +861,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_ui.html_tag_helper'
             - '@router'
+            - '@oro_email.email.cache.manager'
             - '@oro_entity_config.config_manager'
 
     oro_email.datagrid.origin_folder.provider:
