@@ -128,7 +128,10 @@ class RecurringEventWithAttendeesAndAttendeesCleanTest extends AbstractUseCaseTe
         $expectedSimpleUserCalendarEventData = $expectedCalendarEventData;
 
         $actualEvents = $this->getAllCalendarEvents($simpleUserCalendar->getId());
-        $this->changeExpectedDataCalendarId($expectedSimpleUserCalendarEventData, $simpleUserCalendar->getId());
+        $expectedSimpleUserCalendarEventData = $this->changeExpectedDataCalendarId(
+            $expectedSimpleUserCalendarEventData,
+            $simpleUserCalendar->getId()
+        );
         $this->assertCalendarEvents($expectedSimpleUserCalendarEventData, $actualEvents);
 
         $this->assertEventQuantityInDB(2);
@@ -161,7 +164,10 @@ class RecurringEventWithAttendeesAndAttendeesCleanTest extends AbstractUseCaseTe
         $actualEvents = $this->getAllCalendarEvents($simpleUserCalendar->getId());
         $expectedSimpleUserCalendarEventData[0] = $exceptionCalendarEventData;
         $expectedSimpleUserCalendarEventData[0]['recurringEventId'] = $actualEvents[0]['recurringEventId'];
-        $this->changeExpectedDataCalendarId($expectedSimpleUserCalendarEventData, $simpleUserCalendar->getId());
+        $expectedSimpleUserCalendarEventData = $this->changeExpectedDataCalendarId(
+            $expectedSimpleUserCalendarEventData,
+            $simpleUserCalendar->getId()
+        );
         $this->assertCalendarEvents($expectedSimpleUserCalendarEventData, $actualEvents);
 
         $this->assertEventQuantityInDB(4);
