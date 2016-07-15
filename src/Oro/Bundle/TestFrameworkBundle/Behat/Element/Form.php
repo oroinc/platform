@@ -83,6 +83,24 @@ class Form extends Element
             return $field;
         }
 
+        if ($field = $this->findFieldByLabel($locator)) {
+            return $field;
+        }
+
+        if ($fieldSetLabel = $this->findFieldSetLabel($locator)) {
+            return $this->elementFactory->wrapElement('FieldSet', $fieldSetLabel->getParent());
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $locator Label text
+     * @return NodeElement|null
+     * @throws ExpectationException If label was found but field not
+     */
+    protected function findFieldByLabel($locator)
+    {
         if ($label = $this->findLabel($locator)) {
             $sndParent = $label->getParent()->getParent();
             if ($sndParent->hasClass('control-group-collection')) {
@@ -104,10 +122,6 @@ class Form extends Element
                     $this->getDriver()
                 );
             }
-        }
-
-        if ($fieldSetLabel = $this->findFieldSetLabel($locator)) {
-            return $this->elementFactory->wrapElement('FieldSet', $fieldSetLabel->getParent());
         }
 
         return null;
