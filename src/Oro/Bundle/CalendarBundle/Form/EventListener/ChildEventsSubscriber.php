@@ -128,7 +128,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     protected function updateCalendarEvents(CalendarEvent $calendarEvent)
     {
         $attendeesByUserId = [];
-        if ($calendarEvent->getId() === null && $calendarEvent->getRecurringEvent() && $calendarEvent->isCancelled()) {
+        if ($calendarEvent->getRecurringEvent() && $calendarEvent->isCancelled()) {
             $attendees = $calendarEvent->getRecurringEvent()->getAttendees();
         } else {
             $attendees = $calendarEvent->getAttendees();
