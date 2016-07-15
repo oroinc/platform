@@ -59,6 +59,9 @@ class LocalizationChoicesProvider
         return Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage());
     }
 
+    /**
+     * @return array
+     */
     public function getLocalizationChoices()
     {
         /** @var Localization[] $choices */

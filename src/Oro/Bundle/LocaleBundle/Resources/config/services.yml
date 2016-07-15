@@ -275,6 +275,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_locale.localization_validator }
 
+    oro_locale.validator.default_localization:
+        class: 'Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator'
+        arguments:
+            - '@oro_locale.provider.localization'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_locale.default_localization_validator }
+
     oro_locale.acl.voter.localization:
         class: 'Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter'
         arguments:
