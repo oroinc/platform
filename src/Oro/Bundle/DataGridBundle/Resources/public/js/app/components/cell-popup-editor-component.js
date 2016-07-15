@@ -463,7 +463,10 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
-            var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
+            var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON ?
+                jqXHR.responseJSON.code :
+                jqXHR.status;
+
             var errors = [];
             var fieldLabel;
 
@@ -523,6 +526,20 @@ define(function(require) {
                         backendErrors = {value: responseErrors.errors[0]};
                     }
                     this.errorHolderView.setErrorMessages(backendErrors);
+                }
+            } else if (_.isArray(jqXHR.responseJSON)) {
+                var allErrors = _.chain(jqXHR.responseJSON)
+                    .map(_.property('detail'))
+                    .filter()
+                    .value();
+
+                if (this.disposed || this.options.cell.disposed) {
+                    _.each(allErrors, _.partial(mediator.execute, 'showMessage', 'error'));
+                } else {
+                    var error = _.first(allErrors);
+                    if (error) {
+                        this.errorHolderView.setErrorMessages({value: error});
+                    }
                 }
             }
         }
