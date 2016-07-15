@@ -43,8 +43,21 @@ define([
             this.model.destroy({
                 url: this.getLink(),
                 wait: true,
-                error: function() {
+                error: function(req, resp) {
                     var messageText = __('You do not have permission to perform this action.');
+
+                    if(resp && resp.statusText)
+                    {
+                        messageText = resp.statusText;
+
+                        if(resp.responseText)
+                        {
+                            var respObj = JSON.parse(resp.responseText);
+                            if(respObj && respObj.message)
+                                messageText += respObj.message;
+                        }
+                    }
+
                     messenger.notificationFlashMessage('error', messageText);
                 },
                 success: function() {
