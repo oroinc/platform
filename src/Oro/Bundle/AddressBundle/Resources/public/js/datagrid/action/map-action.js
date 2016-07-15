@@ -23,6 +23,7 @@ define(function(require) {
             });
 
             this.datagrid.on('rendered', this.onGridRendered, this);
+            this.datagrid.on('content:update', this.onGridRendered, this);
         },
 
         dispose: function() {
@@ -30,7 +31,7 @@ define(function(require) {
                 return;
             }
             delete this.$mapContainerFrame;
-            this.datagrid.off('rendered', this.onGridRendered, this);
+            this.datagrid.off(null, null, this);
             MapAction.__super__.dispose.apply(this, arguments);
         },
 
@@ -49,7 +50,8 @@ define(function(require) {
                 html: true,
                 closeButton: true,
                 class: 'map-popover',
-                content: this.$mapContainerFrame
+                content: this.$mapContainerFrame,
+                trigger: 'focus'
             }).on('shown.bs.popover', _.bind(function() {
                 this.mapView.updateMap(this.getAddress(), this.model.get('label'));
             }, this));
