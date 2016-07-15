@@ -4,25 +4,25 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Router;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Router\Recipient;
 use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
-use Oro\Component\MessageQueue\Router\RouterMessageProcessor;
+use Oro\Component\MessageQueue\Router\RouteRecipientListProcessor;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class RouteRecipientListProcessorTest extends \PHPUnit_Framework_TestCase
 {
     use ClassExtensionTrait;
 
     public function testShouldImplementMessageProcessorInterface()
     {
-        $this->assertClassImplements(MessageProcessorInterface::class, RouterMessageProcessor::class);
+        $this->assertClassImplements(MessageProcessorInterface::class, RouteRecipientListProcessor::class);
     }
 
     public function testCouldBeConstructedWithRouterAsFirstArgument()
     {
-        new RouterMessageProcessor($this->createRouterMock());
+        new RouteRecipientListProcessor($this->createRecipientListRouterMock());
     }
 
     public function testShouldProduceRecipientsMessagesAndAckOriginalMessage()
@@ -32,7 +32,7 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $originalMessage = new NullMessage();
 
-        $routerMock = $this->createRouterMock();
+        $routerMock = $this->createRecipientListRouterMock();
         $routerMock
             ->expects($this->once())
             ->method('route')
@@ -59,7 +59,7 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($producerMock)
         ;
 
-        $processor = new RouterMessageProcessor($routerMock);
+        $processor = new RouteRecipientListProcessor($routerMock);
 
         $status = $processor->process($originalMessage, $sessionMock);
 
@@ -85,7 +85,7 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|RecipientListRouterInterface
      */
-    protected function createRouterMock()
+    protected function createRecipientListRouterMock()
     {
         return $this->getMock(RecipientListRouterInterface::class);
     }

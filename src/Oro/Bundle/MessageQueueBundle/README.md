@@ -104,11 +104,8 @@ You have to provide an implementation for them
 
 ### Key Classes
 
-* MessageProducer - The client's message producer, you will use it all the time to send messages
-* MessageProcessorInterface - Each class which does the job has to implement this interface
-* TopicSubscriberInterface - Kind of EventSubscriberInterface. It allows you to keep a processing code and topics it is subscribed to in one place.
-* MessageConsumeCommand - A command you use to consume messages.
-* QueueConsumer - A class that works inside the command and watch for a new message and once it is get it pass it to a message processor.
-
-
-implement transport interfaces
+* [MessageProducer](../../Component/MessageQueue/Client/MessageProducer.php) - The client's message producer, you will use it all the time to send messages
+* [MessageProcessorInterface](../../Component/MessageQueue/Consumption/MessageProcessorInterface.php) - Each class which does the job has to implement this interface
+* [TopicSubscriberInterface](../../Component/MessageQueue/Client/TopicSubscriberInterface.php) - Kind of EventSubscriberInterface. It allows you to keep a processing code and topics it is subscribed to in one place.
+* [MessageConsumeCommand](../../Component/MessageQueue/Client/ConsumeMessagesCommand.php) - A command you use to consume messages.
+* [QueueConsumer](../../Component/MessageQueue/Consumption/QueueConsumer.php) - A class that works inside the command and watch for a new message and once it is get it pass it to a message processor.

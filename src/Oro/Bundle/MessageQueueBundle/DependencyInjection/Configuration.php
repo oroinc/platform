@@ -28,7 +28,7 @@ class Configuration implements ConfigurationInterface
             ->end()->end()
             ->arrayNode('client')->children()
                 ->booleanNode('traceable_producer')->defaultFalse()->end()
-                ->scalarNode('prefix')->defaultValue('oro.message_queue.client')->end()
+                ->scalarNode('prefix')->defaultValue('oro')->end()
                 ->scalarNode('router_processor')->defaultNull()->end()
                 ->scalarNode('router_destination')->defaultValue('default')->cannotBeEmpty()->end()
                 ->scalarNode('default_destination')->defaultValue('default')->cannotBeEmpty()->end()

@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption;
 
-class Extensions implements ExtensionInterface
+class ChainExtension extends AbstractExtension
 {
     /**
      * @var ExtensionInterface[]

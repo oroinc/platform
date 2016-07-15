@@ -1,15 +1,12 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
+use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Psr\Log\LoggerInterface;
 
-class LoggerExtension implements ExtensionInterface
+class LoggerExtension extends AbstractExtension
 {
-    use ExtensionTrait;
-
     /**
      * @var LoggerInterface
      */

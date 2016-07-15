@@ -3,16 +3,13 @@ namespace Oro\Component\MessageQueue\Consumption\Extension;
 
 declare(ticks = 1);
 
+use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Psr\Log\LoggerInterface;
 
-class SignalExtension implements ExtensionInterface
+class SignalExtension extends AbstractExtension
 {
-    use ExtensionTrait;
-
     /**
      * @var bool
      */

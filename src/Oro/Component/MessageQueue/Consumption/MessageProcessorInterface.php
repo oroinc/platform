@@ -27,7 +27,7 @@ interface MessageProcessorInterface
      * @param MessageInterface $message
      * @param SessionInterface $session
      *
-     * @return null|string
+     * @return string
      */
     public function process(MessageInterface $message, SessionInterface $session);
 }

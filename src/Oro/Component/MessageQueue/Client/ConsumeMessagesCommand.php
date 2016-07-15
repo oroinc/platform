@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
-use Oro\Component\MessageQueue\Consumption\Extensions;
+use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Symfony\Component\Console\Command\Command;
@@ -80,7 +80,7 @@ class ConsumeMessagesCommand extends Command
             }
         }
 
-        $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
+        $runtimeExtensions = new ChainExtension($this->getLimitsExtensions($input, $output));
 
         try {
             $this->consumer->consume($runtimeExtensions);

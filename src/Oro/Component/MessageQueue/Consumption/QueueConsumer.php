@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Consumption;
 use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedException;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\VarExport;
 
 use Psr\Log\NullLogger;
 
@@ -16,7 +16,7 @@ class QueueConsumer
     private $connection;
 
     /**
-     * @var Extensions
+     * @var ChainExtension
      */
     private $extensions;
 
@@ -32,10 +32,10 @@ class QueueConsumer
 
     /**
      * @param ConnectionInterface $connection
-     * @param Extensions $extensions
+     * @param ChainExtension $extensions
      * @param int $idleMicroseconds 100ms by default
      */
-    public function __construct(ConnectionInterface $connection, Extensions $extensions, $idleMicroseconds = 100000)
+    public function __construct(ConnectionInterface $connection, ChainExtension $extensions, $idleMicroseconds = 100000)
     {
         $this->connection = $connection;
         $this->extensions = $extensions;
@@ -73,14 +73,14 @@ class QueueConsumer
     }
 
     /**
-     * Runtime extensions - is a collection of extensions which could be set on runtime.
+     * Runtime extension - is an extension or a collection of extensions which could be set on runtime.
      * Here's a good example: @see LimitsExtensionsCommandTrait
      *
-     * @param Extensions|null $runtimeExtensions
+     * @param ExtensionInterface|ChainExtension|null $runtimeExtension
      *
      * @throws \Exception
      */
-    public function consume(Extensions $runtimeExtensions = null)
+    public function consume(ExtensionInterface $runtimeExtension = null)
     {
         $session = $this->connection->createSession();
 
@@ -92,8 +92,8 @@ class QueueConsumer
         }
 
         $extensions = $this->extensions;
-        if ($runtimeExtensions) {
-            $extensions = new Extensions([$extensions, $runtimeExtensions]);
+        if ($runtimeExtension) {
+            $extensions = new ChainExtension([$extensions, $runtimeExtension]);
         }
 
         $context = new Context($session);
@@ -141,14 +141,14 @@ class QueueConsumer
     }
 
     /**
-     * @param Extensions $extensions
+     * @param ChainExtension $extensions
      * @param Context $context
      *
      * @throws ConsumptionInterruptedException
      *
      * @return bool
      */
-    protected function doConsume(Extensions $extensions, Context $context)
+    protected function doConsume(ChainExtension $extensions, Context $context)
     {
         $session = $context->getSession();
         $messageProcessor = $context->getMessageProcessor();
@@ -163,16 +163,15 @@ class QueueConsumer
         
         if (false == $context->isExecutionInterrupted() && $message = $messageConsumer->receive($timeout = 1)) {
             $logger->info('Message received');
-            $logger->debug(sprintf('Headers: %s', var_export($message->getHeaders(), true)));
-            $logger->debug(sprintf('Properties: %s', var_export($message->getProperties(), true)));
-            $logger->debug(sprintf('Payload: %s', var_export($message->getBody(), true)));
+            $logger->debug('Headers: {headers}', ['headers' => new VarExport($message->getHeaders())]);
+            $logger->debug('Properties: {properties}', ['properties' => new VarExport($message->getProperties())]);
+            $logger->debug('Payload: {payload}', ['payload' => new VarExport($message->getBody())]);
 
             $context->setMessage($message);
 
             $extensions->onPreReceived($context);
             if (!$context->getStatus()) {
                 $status = $messageProcessor->process($message, $session);
-                $status = $status ?: MessageProcessorInterface::ACK;
                 $context->setStatus($status);
             }
 

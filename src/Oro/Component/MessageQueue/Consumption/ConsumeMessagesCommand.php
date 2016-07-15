@@ -24,7 +24,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     public function __construct(QueueConsumer $consumer)
     {
-        parent::__construct($name = 'oro:message-queue:transport:consume');
+        parent::__construct('oro:message-queue:transport:consume');
         
         $this->consumer = $consumer;
     }
@@ -63,7 +63,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
             ));
         }
 
-        $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
+        $runtimeExtensions = new ChainExtension($this->getLimitsExtensions($input, $output));
 
         try {
             $this->consumer->bind($queueName, $messageProcessor);

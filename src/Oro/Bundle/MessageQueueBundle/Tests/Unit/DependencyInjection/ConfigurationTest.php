@@ -128,7 +128,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'null' => true,
             ],
             'client' => [
-                'prefix' => 'oro.message_queue.client',
+                'prefix' => 'oro',
                 'router_processor' => null,
                 'router_destination' => 'default',
                 'default_destination' => 'default',

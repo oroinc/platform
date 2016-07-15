@@ -2,11 +2,11 @@
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
-use Oro\Component\MessageQueue\Router\RecipientListRouterInterface as RuterInterface;
+use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Router\Recipient;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
-class Router implements RuterInterface
+class Router implements RecipientListRouterInterface
 {
     /**
      * @var DriverInterface
@@ -87,8 +87,7 @@ class Router implements RuterInterface
                 Config::PARAMETER_TOPIC_NAME
             ));
         }
-
-        // TODO: what to do with such messages? silently drop?
+        
         if (array_key_exists($topicName, $this->routes)) {
             foreach ($this->routes[$topicName] as $route) {
                 $recipient = $this->createRecipient(
