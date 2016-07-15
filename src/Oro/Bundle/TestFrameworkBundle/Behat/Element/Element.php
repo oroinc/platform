@@ -57,6 +57,20 @@ class Element extends NodeElement
     }
 
     /**
+     * Finds label with specified locator.
+     *
+     * @param string $locator label text
+     *
+     * @return NodeElement|null
+     */
+    public function findLabel($locator)
+    {
+        $labelSelector = sprintf("label:contains('%s')", $locator);
+
+        return $this->find('css', $labelSelector);
+    }
+
+    /**
      * @return DocumentElement
      */
     protected function getPage()

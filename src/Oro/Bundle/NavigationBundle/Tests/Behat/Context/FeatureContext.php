@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Behat\Context;
 
 use Behat\MinkExtension\Context\RawMinkContext;
+use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
@@ -15,7 +16,9 @@ class FeatureContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function uncheckUseDefaultForField($label)
     {
-        $this->createElement('SystemConfigForm')->uncheckUseDefaultCheckbox($label);
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        $form->uncheckUseDefaultCheckbox($label);
     }
 
     /**
