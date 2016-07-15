@@ -228,6 +228,9 @@ class WidgetConfigs
         }
 
         $widget       = $this->findWidget($widgetId);
+        if (!$widget) {
+            return new WidgetOptionBag();
+        }
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
         $options      = $widget->getOptions();
 
