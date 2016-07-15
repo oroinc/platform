@@ -143,8 +143,8 @@ class RecurringEventWithAttendeesAndDeletionTest extends AbstractUseCaseTestCase
             'recurringEventId' => $recurringCalendarEventId,
         ];
         $exceptionCalendarEventExceptionId = $this->addCalendarEventViaAPI($exceptionCalendarEventData);
-        $this->assertCountEventAttendees($exceptionCalendarEventExceptionId, 1);
-        $this->assertCountEventAttendees($exceptionCalendarEventExceptionId, 1);
+        $this->assertCalendarEventAttendeesCount($exceptionCalendarEventExceptionId, 1);
+        $this->assertCalendarEventAttendeesCount($exceptionCalendarEventExceptionId, 1);
 
         unset($expectedCalendarEventData[0]);
         unset($expectedSimpleUserCalendarEventData[0]);
@@ -156,8 +156,8 @@ class RecurringEventWithAttendeesAndDeletionTest extends AbstractUseCaseTestCase
         $this->assertCalendarEvents($expectedSimpleUserCalendarEventData, $actualEvents);
 
         $this->assertEventQuantityInDB(4);
-        $this->assertCountEventAttendees($exceptionCalendarEventExceptionId, 1);
-        $this->assertCountEventAttendees($exceptionCalendarEventExceptionId, 1);
+        $this->assertCalendarEventAttendeesCount($exceptionCalendarEventExceptionId, 1);
+        $this->assertCalendarEventAttendeesCount($exceptionCalendarEventExceptionId, 1);
 
         $canceledCalendarEvents = $this->getCanceledCalendarEvents();
         $this->assertCount(2, $canceledCalendarEvents);

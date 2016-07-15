@@ -97,16 +97,16 @@ class AbstractUseCaseTestCase extends WebTestCase
 
     /**
      * @param int $eventId
-     * @param int $number
+     * @param int $expectedCount
      */
-    protected function assertCountEventAttendees($eventId, $number)
+    protected function assertCalendarEventAttendeesCount($eventId, $expectedCount)
     {
         /** we should clear doctrine cache to get real result */
-        $this->getContainer()->get('doctrine')->getManager()->clear();
+        $this->getEntityManager()->clear();
 
         $calendarEvent = $this->getCalendarEventById($eventId);
 
-        $this->assertCount($number, $calendarEvent->getAttendees()->toArray());
+        $this->assertCount($expectedCount, $calendarEvent->getAttendees()->toArray());
     }
 
     /**
