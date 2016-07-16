@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
-use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -12,10 +11,11 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
-class GridContext extends RawMinkContext implements OroElementFactoryAware
+class GridContext extends OroFeatureContext implements OroElementFactoryAware
 {
     use ElementFactoryDictionary;
 
@@ -46,7 +46,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfRecordsShouldBe($number)
     {
-        \PHPUnit_Framework_Assert::assertEquals((int) $number, $this->getGridPaginator()->getTotalRecordsCount());
+        self::assertEquals((int) $number, $this->getGridPaginator()->getTotalRecordsCount());
     }
 
     /**
@@ -54,7 +54,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfPagesShouldBe($number)
     {
-        \PHPUnit_Framework_Assert::assertEquals((int) $number, $this->getGridPaginator()->getTotalPageCount());
+        self::assertEquals((int) $number, $this->getGridPaginator()->getTotalPageCount());
     }
 
     /**
@@ -96,7 +96,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsDecreasedBy($number)
     {
-        \PHPUnit_Framework_Assert::assertEquals(
+        self::assertEquals(
             $this->gridRecordsNumber - $number,
             $this->getGridPaginator()->getTotalRecordsCount()
         );
@@ -108,7 +108,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsRemainedTheSame()
     {
-        \PHPUnit_Framework_Assert::assertEquals(
+        self::assertEquals(
             $this->gridRecordsNumber,
             $this->getGridPaginator()->getTotalRecordsCount()
         );
@@ -136,7 +136,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfPageShouldBe($number)
     {
-        \PHPUnit_Framework_Assert::assertEquals(
+        self::assertEquals(
             (int) $number,
             (int) $this->getGridPaginator()->find('css', 'input[type="number"]')->getAttribute('value')
         );
@@ -170,13 +170,13 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
 
         switch ($comparison) {
             case 'lower':
-                \PHPUnit_Framework_Assert::assertGreaterThan($value1, $value2);
+                self::assertGreaterThan($value1, $value2);
                 break;
             case 'greater':
-                \PHPUnit_Framework_Assert::assertLessThan($value1, $value2);
+                self::assertLessThan($value1, $value2);
                 break;
             case 'equal':
-                \PHPUnit_Framework_Assert::assertEquals($value1, $value2);
+                self::assertEquals($value1, $value2);
                 break;
         }
     }
@@ -223,7 +223,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function assertRowContent($content, $rowNumber)
     {
         $row = $this->getGrid()->getRowByNumber($this->getNumberFromString($rowNumber));
-        \PHPUnit_Framework_Assert::assertRegExp(sprintf('/%s/i', $content), $row->getText());
+        self::assertRegExp(sprintf('/%s/i', $content), $row->getText());
     }
 
     /**
@@ -326,7 +326,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
 
 
         $regex = '/\d+ entities were deleted/';
-        \PHPUnit_Framework_Assert::assertRegExp($regex, $flashMessage->getText());
+        self::assertRegExp($regex, $flashMessage->getText());
     }
 
     /**
