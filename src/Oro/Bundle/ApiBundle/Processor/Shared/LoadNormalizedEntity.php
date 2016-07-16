@@ -70,7 +70,7 @@ class LoadNormalizedEntity implements ProcessorInterface
     protected function prepareGetContext(GetContext $getContext, SingleItemContext $context)
     {
         $getContext->setVersion($context->getVersion());
-        $getContext->getRequestType()->set($context->getRequestType()->toArray());
+        $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
         $getContext->setClassName($context->getClassName());
         if ($this->reuseExistingEntity && $context->hasResult()) {
