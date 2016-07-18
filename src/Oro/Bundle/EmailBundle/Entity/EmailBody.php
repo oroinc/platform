@@ -236,6 +236,19 @@ class EmailBody
     }
 
     /**
+     * @param EmailAttachment $attachment
+     *
+     * @return $this
+     */
+    public function removeAttachment(EmailAttachment $attachment)
+    {
+        $this->attachments->removeElement($attachment);
+        if (!$this->attachments->count()) {
+            $this->setHasAttachments(false);
+        }
+    }
+
+    /**
      * @return Email
      */
     public function getEmail()

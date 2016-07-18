@@ -1,3 +1,14 @@
+{% block _email_configuration_oro_email___attachment_sync_max_size_value_widget %}
+    {{ form_widget(form) }}
+    {% if is_granted('oro_email_email_user_edit') %}
+        <a class="btn pull-right"
+           href="{{ path('oro_email_remove_larger_attachments') }}"
+           data-page-component-module="{{ 'oroui/js/app/components/hidden-redirect-component' }}"
+           data-page-component-options="{{ {showLoading: true}|json_encode }}"
+           >Remove larger attachments</a>
+    {% endif %}
+{% endblock %}
+
 {% block _oro_email_autoresponserule_conditions_entry_field_row %}
     {{ form_widget(form) }}
 {% endblock %}

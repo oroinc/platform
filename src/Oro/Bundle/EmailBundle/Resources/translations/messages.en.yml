@@ -14,7 +14,10 @@ oro:
             recently_used: Recently used
             contexts: Contexts
         filter.inactive: inactive
-        controller.emailtemplate.saved.message: "Template saved"
+        controller:
+            emailtemplate.saved.message: "Template saved"
+            job_scheduled.message: "The job has been added to the queue %link%"
+            job_progress: Check progress
         form:
             choose_template:                     ""
             add_signature:                       Add Signature
