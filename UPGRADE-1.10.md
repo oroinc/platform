@@ -235,6 +235,9 @@ Now:
 - The constructor of the `Oro\Bundle\EmailBundle\Mailer\Processor` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailOwnerProvider $emailOwnerProvider, EmailActivityManager $emailActivityManager, ServiceLink $serviceLink, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`. After: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailActivityManager $emailActivityManager, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`.
 - `Oro\Bundle\EmailBundle\Mailer\Processor::getEmailOrigin` marked as deprecated. Use method `Oro\Bundle\EmailBundle\Tools\EmailOriginHelper::getEmailOrigin` instead.
 - Additional you should use origin as second parameter for `Oro\Bundle\EmailBundle\Mailer\Processor::process` if you want use specific transport different from system.
+- The constructor of the `Oro\Bundle\EmailBundle\Manager\EmailNotificationManager` class was changed.
+    Before: `__construct(EntityManager $entityManager, HtmlTagHelper $htmlTagHelper, Router $router, EmailCacheManager $emailCacheManager, ConfigManager $configManager)`.
+    After: `__construct(EntityManager $entityManager, HtmlTagHelper $htmlTagHelper, Router $router, ConfigManager $configManager)`.
 - Visibility of method `recipientsFromResult` in `Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper` was changed from `protected` to `public`. This can bring a `backward compatibility break` if you have own implementation of this class.
 
 ####PlatformBundle
