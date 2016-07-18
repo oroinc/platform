@@ -428,6 +428,206 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessForManageableEntityWithNotManageableFieldsInConfig()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1'        => null,
+                'field2'        => [
+                    'data_type' => 'integer'
+                ],
+                'metaProperty1' => [
+                    'meta_property' => true,
+                    'data_type'     => 'integer'
+                ],
+                'association1'  => [
+                    'target_class' => 'Test\Association1Target',
+                    'data_type'    => 'integer'
+                ],
+                'association2'  => [
+                    'target_class' => 'Test\Association2Target',
+                    'target_type'  => 'to-many',
+                    'data_type'    => 'integer'
+                ]
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('field1')
+            ->willReturn('integer');
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+        $classMetadata->expects($this->never())
+            ->method('getAssociationTargetClass');
+        $classMetadata->expects($this->never())
+            ->method('isCollectionValuedAssociation');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+        $expectedMetadata->addField($this->createFieldMetadata('field1', 'integer'));
+        $expectedMetadata->addField($this->createFieldMetadata('field2', 'integer'))->setIsNullable(true);
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1', 'integer'));
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                false,
+                'integer',
+                ['Test\Association1Target']
+            )
+        );
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association2',
+                'Test\Association2Target',
+                true,
+                'integer',
+                ['Test\Association2Target']
+            )
+        );
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessForManageableEntityWithConfigAndConfigShouldOverrideAttributesFromDoctrineMetadata()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1'        => [
+                    'data_type' => 'string'
+                ],
+                'metaProperty1' => [
+                    'meta_property' => true,
+                    'data_type'     => 'string'
+                ],
+                'association1'  => [
+                    'data_type' => 'string'
+                ]
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(
+                [
+                    'field1',
+                    'metaProperty1',
+                ]
+            );
+        $classMetadata->expects($this->never())
+            ->method('getTypeOfField');
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn(
+                [
+                    'association1',
+                ]
+            );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationTargetClass')
+            ->willReturnMap(
+                [
+                    ['association1', 'Test\Association1Target'],
+                ]
+            );
+        $classMetadata->expects($this->once())
+            ->method('isCollectionValuedAssociation')
+            ->willReturnMap(
+                [
+                    ['association1', false],
+                ]
+            );
+
+        $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
+        $association1ClassMetadata->expects($this->never())
+            ->method('getIdentifierFieldNames');
+        $association1ClassMetadata->expects($this->never())
+            ->method('getTypeOfField');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $classMetadata],
+                    ['Test\Association1Target', true, $association1ClassMetadata],
+                ]
+            );
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+        $expectedMetadata->addField($this->createFieldMetadata('field1', 'string'));
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1', 'string'));
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                false,
+                'string',
+                ['Test\Association1Target']
+            )
+        );
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
     public function testProcessForManageableEntityWhenRenamedIdentifierField()
     {
         $config = [
@@ -530,5 +730,138 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->addField($this->createFieldMetadata('someField', 'integer'));
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The "data_type" configuration attribute should be specified for the "metaProperty1" field of the "Test\Class" entity.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessForManageableEntityWithNotManageableMetaPropertyWithoutDataTypeInConfig()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'metaProperty1' => [
+                    'meta_property' => true
+                ]
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The "data_type" configuration attribute should be specified for the "field1" field of the "Test\Class" entity.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessForManageableEntityWithNotManageableFieldWithoutDataTypeInConfig()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The "data_type" configuration attribute should be specified for the "association1" field of the "Test\Class" entity.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessForManageableEntityWithNotManageableAssociationWithoutDataTypeInConfig()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'target_class' => 'Test\Association1Target'
+                ]
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
     }
 }

@@ -1,4 +1,7 @@
 oro_api:
     entities:
         Oro\Bundle\AttachmentBundle\Entity\Attachment: ~
-        Oro\Bundle\AttachmentBundle\Entity\File: ~
+        Oro\Bundle\AttachmentBundle\Entity\File:
+            fields:
+                content:
+                    data_type: string

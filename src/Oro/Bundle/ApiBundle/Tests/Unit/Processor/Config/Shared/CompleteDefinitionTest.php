@@ -1446,7 +1446,10 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'        => null,
-                    '__class__' => null
+                    '__class__' => [
+                        'meta_property' => true,
+                        'data_type'     => 'string'
+                    ]
                 ]
             ],
             $this->context->getResult()
