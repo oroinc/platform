@@ -146,7 +146,8 @@ class EmailRepository extends EntityRepository
             ->andWhere('eu.seen = :seen')
             ->setParameter('organization', $organization)
             ->setParameter('owner', $user)
-            ->setParameter('seen', false);
+            ->setParameter('seen', false)
+            ->groupBy('f.id');
 
         return $qb->getQuery()->getResult();
     }
