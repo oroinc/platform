@@ -14,6 +14,9 @@ class MultipleChoice extends AbstractGridFilterItem
      */
     public function checkItems(array $values)
     {
+        $this->open();
+        // Wait for open widget
+        $this->getDriver()->waitForAjax();
         $widget = $this->getWidget();
         $inputs = $widget->findAll('css', 'li label');
 
@@ -32,7 +35,7 @@ class MultipleChoice extends AbstractGridFilterItem
         }
 
         // Hide dropdown menu, because of #oro-dropdown-mask cover all page
-        $this->getPage()->find('css', 'body')->click();
+        $this->close();
     }
 
     /**
@@ -77,5 +80,12 @@ class MultipleChoice extends AbstractGridFilterItem
         }
 
         return null;
+    }
+
+    public function close()
+    {
+        if ($dropDownMask = $this->getPage()->find('css', '.oro-dropdown-mask')) {
+            $dropDownMask->click();
+        }
     }
 }

@@ -229,7 +229,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterStringItem', $filterName);
 
-        $filterItem->activate();
+        $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setFilterValue($value);
         $filterItem->submit();
@@ -250,7 +250,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
         /** @var GridFilterDateTimeItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
 
-        $filterItem->activate();
+        $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setStartTime(new \DateTime($start));
         $filterItem->setEndTime(new \DateTime($end));
@@ -269,7 +269,6 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
         $filterItems = array_map('trim', explode(',', $filterItems));
 
-        $filterItem->activate();
         $filterItem->checkItems($filterItems);
     }
 
