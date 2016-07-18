@@ -8,9 +8,11 @@ In developer toolbar you can find section **Layout** that contains:
 
 Also you can disable **Layout Tree** in developer toolbar, go to `System - Configuration - Development Settings - Generate Layout Tree Dump For The Developer Toolbar`
 
+**IMPORTANT:** This options works with debug mode enabled only
+
 ## Debug layout blocks
 
-You can enable **block debug information**, go to `System - Configuration - Development Settings - Include Block Debug Info HTML`
+You can enable **block debug information**, go to `System - Configuration - Development Settings - Include Block Debug Info Into HTML`
 
 Each block in HTML has data attributes:
 

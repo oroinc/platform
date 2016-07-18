@@ -32,7 +32,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function ($code) use ($configs) {
                 return $configs[$code];
             }));
-        $this->dataCollector = new LayoutDataCollector($configManager);
+        $this->dataCollector = new LayoutDataCollector($configManager, true);
     }
 
     public function testGetName()

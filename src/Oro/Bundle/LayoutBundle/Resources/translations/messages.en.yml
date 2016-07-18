@@ -8,12 +8,13 @@ oro:
                     title: Layouts
             fields:
                 debug_block_info:
-                    label: Include block debug info HTML
+                    label: Include block debug info into HTML
                     choices:
                         no: No
                         yes: Yes
                 debug_developer_toolbar:
                     label: Generate layout tree dump for the developer toolbar
+                    tooltip: This option works with debug mode enabled only
                     choices:
                         no: No
                         yes: Yes
