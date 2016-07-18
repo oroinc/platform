@@ -84,7 +84,7 @@ class StaleAssociationListener
 
     /**
      * Searches the source entities in $entityData for a given entity.
-     * Exludes master entity
+     * Excludes master entity
      *
      * @param EntityData $entityData
      * @param object $needle The searched entity
