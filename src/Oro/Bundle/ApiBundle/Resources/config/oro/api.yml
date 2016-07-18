@@ -9,6 +9,7 @@ oro_api:
                 # @see Oro\Component\EntitySerializer\ConfigUtil::CLASS_NAME
                 # @see Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface::getClassName
                 __class__:
+                    meta_property: true
                     data_type: string
                     property_path: class
                 # the identifier of the target entity

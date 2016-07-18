@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
@@ -18,6 +20,8 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 /**
  * Loads metadata for an entity.
  * This processor works with both ORM and not ORM entities.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class LoadEntityMetadata implements ProcessorInterface
 {
@@ -76,6 +80,9 @@ class LoadEntityMetadata implements ProcessorInterface
         $entityMetadata = $this->createEntityMetadata($classMetadata, $config);
         $this->loadFields($entityMetadata, $classMetadata, $allowedFields, $config);
         $this->loadAssociations($entityMetadata, $classMetadata, $allowedFields, $config);
+        if (null !== $config && $config->hasFields()) {
+            $this->loadPropertiesFromConfig($entityMetadata, $config);
+        }
 
         return $entityMetadata;
     }
@@ -172,18 +179,97 @@ class LoadEntityMetadata implements ProcessorInterface
             if ($hasConfig && !isset($allowedFields[$propertyPath])) {
                 continue;
             }
-            $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
-                $classMetadata,
-                $propertyPath
-            );
             if ($hasConfig) {
                 $associationName = $allowedFields[$propertyPath];
+                $field = $config->getField($associationName);
+                $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
+                    $classMetadata,
+                    $propertyPath,
+                    $field->getDataType()
+                );
                 if ($propertyPath !== $associationName) {
                     $associationMetadata->setName($associationName);
                 }
+            } else {
+                $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
+                    $classMetadata,
+                    $propertyPath
+                );
             }
             $entityMetadata->addAssociation($associationMetadata);
         }
+    }
+
+    /**
+     * @param EntityMetadata         $entityMetadata
+     * @param EntityDefinitionConfig $config
+     */
+    protected function loadPropertiesFromConfig(
+        EntityMetadata $entityMetadata,
+        EntityDefinitionConfig $config
+    ) {
+        $fields = $config->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->isExcluded()) {
+                continue;
+            }
+            if ($field->isMetaProperty()) {
+                if (!$entityMetadata->hasMetaProperty($fieldName)) {
+                    $metaPropertyMetadata = new MetaPropertyMetadata($fieldName);
+                    $metaPropertyMetadata->setDataType(
+                        $this->assertDataType($field->getDataType(), $entityMetadata->getClassName(), $fieldName)
+                    );
+                    $entityMetadata->addMetaProperty($metaPropertyMetadata);
+                }
+            } else {
+                $isField = $entityMetadata->hasField($fieldName);
+                $isAssociation = !$isField && $entityMetadata->hasAssociation($fieldName);
+                if (!$isField && !$isAssociation) {
+                    $targetClass = $field->getTargetClass();
+                    if (!$targetClass) {
+                        $fieldMetadata = new FieldMetadata($fieldName);
+                        $fieldMetadata->setDataType(
+                            $this->assertDataType($field->getDataType(), $entityMetadata->getClassName(), $fieldName)
+                        );
+                        $fieldMetadata->setIsNullable(true);
+                        $entityMetadata->addField($fieldMetadata);
+                    } else {
+                        $associationMetadata = new AssociationMetadata($fieldName);
+                        $associationMetadata->setDataType(
+                            $this->assertDataType($field->getDataType(), $entityMetadata->getClassName(), $fieldName)
+                        );
+                        $associationMetadata->setIsNullable(true);
+                        $associationMetadata->setTargetClassName($targetClass);
+                        $associationMetadata->addAcceptableTargetClassName($targetClass);
+                        $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
+                        $entityMetadata->addAssociation($associationMetadata);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param mixed  $dataType
+     * @param string $entityClass
+     * @param string $fieldName
+     *
+     * @return mixed
+     */
+    protected function assertDataType($dataType, $entityClass, $fieldName)
+    {
+        if (!$dataType) {
+            throw new RuntimeException(
+                sprintf(
+                    'The "%s" configuration attribute should be specified for the "%s" field of the "%s" entity.',
+                    EntityDefinitionFieldConfig::DATA_TYPE,
+                    $fieldName,
+                    $entityClass
+                )
+            );
+        }
+
+        return $dataType;
     }
 
     /**

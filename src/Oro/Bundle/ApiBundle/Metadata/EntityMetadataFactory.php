@@ -82,11 +82,15 @@ class EntityMetadataFactory
     /**
      * @param ClassMetadata $classMetadata
      * @param string        $associationName
+     * @param string|null   $associationDataType
      *
      * @return AssociationMetadata
      */
-    public function createAssociationMetadata(ClassMetadata $classMetadata, $associationName)
-    {
+    public function createAssociationMetadata(
+        ClassMetadata $classMetadata,
+        $associationName,
+        $associationDataType = null
+    ) {
         $targetClass = $classMetadata->getAssociationTargetClass($associationName);
 
         $associationMetadata = new AssociationMetadata();
@@ -95,11 +99,15 @@ class EntityMetadataFactory
         $associationMetadata->setIsCollection($classMetadata->isCollectionValuedAssociation($associationName));
 
         $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
-        $targetIdFields = $targetMetadata->getIdentifierFieldNames();
-        if (count($targetIdFields) === 1) {
-            $associationMetadata->setDataType($targetMetadata->getTypeOfField(reset($targetIdFields)));
+        if ($associationDataType) {
+            $associationMetadata->setDataType($associationDataType);
         } else {
-            $associationMetadata->setDataType(DataType::STRING);
+            $targetIdFields = $targetMetadata->getIdentifierFieldNames();
+            if (count($targetIdFields) === 1) {
+                $associationMetadata->setDataType($targetMetadata->getTypeOfField(reset($targetIdFields)));
+            } else {
+                $associationMetadata->setDataType(DataType::STRING);
+            }
         }
 
         if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {

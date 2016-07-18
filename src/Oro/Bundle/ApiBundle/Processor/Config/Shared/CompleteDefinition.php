@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -142,7 +143,9 @@ class CompleteDefinition implements ProcessorInterface
     {
         $classNameField = $definition->findFieldNameByPropertyPath(ConfigUtil::CLASS_NAME);
         if (null === $classNameField) {
-            $definition->addField(ConfigUtil::CLASS_NAME);
+            $classNameField = $definition->addField(ConfigUtil::CLASS_NAME);
+            $classNameField->setMetaProperty(true);
+            $classNameField->setDataType(DataType::STRING);
         }
     }
 
