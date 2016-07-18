@@ -3,11 +3,13 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
+use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -49,6 +51,9 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function initialize(ExtensionManager $extensionManager)
     {
+        /** @var MinkExtension $minkExtension */
+        $minkExtension = $extensionManager->getExtension('mink');
+        $minkExtension->registerDriverFactory(new OroSelenium2Factory());
     }
 
     /**
@@ -214,7 +219,7 @@ class OroTestFrameworkExtension implements TestworkExtension
                 continue;
             }
 
-            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse($mappingPath));
+            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse(file_get_contents($mappingPath)));
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(1, $elementConfiguration);
@@ -228,7 +233,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function getSuiteContexts(SymfonyBundleSuite $bundleSuite, array $commonContexts)
     {
         $suiteContexts = array_filter($bundleSuite->getSetting('contexts'), 'class_exists');
-        $suiteContexts = count($suiteContexts) ? $suiteContexts : $commonContexts;
+        $suiteContexts = array_merge($suiteContexts, $commonContexts);
 
         return $suiteContexts;
     }

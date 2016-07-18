@@ -23,6 +23,8 @@ class AddFieldsFilter implements ProcessorInterface
     const FILTER_KEY          = 'fields';
     const FILTER_KEY_TEMPLATE = 'fields[%s]';
 
+    const FILTER_DESCRIPTION_TEMPLATE = 'A list of fields for the \'%s\' entity to be returned.';
+
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
@@ -61,7 +63,15 @@ class AddFieldsFilter implements ProcessorInterface
         }
         */
 
-        $this->addFilter($filters, $context->getClassName(), $context->getRequestType());
+        $config = $context->getConfig();
+        if (!$config->isFieldsetEnabled()) {
+            // the "fields" filter is disabled
+            return;
+        }
+        if (count($config->getFields()) > 1) {
+            // the "fields" filter for the primary entity has sense only if it has more than one field
+            $this->addFilter($filters, $context->getClassName(), $context->getRequestType());
+        }
 
         $associations = $context->getMetadata()->getAssociations();
         foreach ($associations as $association) {
@@ -83,7 +93,7 @@ class AddFieldsFilter implements ProcessorInterface
         if ($entityType) {
             $filter = new FieldsFilter(
                 DataType::STRING,
-                sprintf('A list of fields for the \'%s\' entity to be returned.', $entityType)
+                sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)
             );
             $filter->setArrayAllowed(true);
 

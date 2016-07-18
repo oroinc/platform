@@ -25,6 +25,33 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
         $this->processor = new NormalizeSorters($this->doctrineHelper);
     }
 
+    public function testRemoveExcludedSorters()
+    {
+        $sorters = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null,
+                'field2' => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject([]));
+        $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => null
+                ]
+            ],
+            $this->context->getSorters()
+        );
+    }
+
     /**
      * @dataProvider processNotManageableEntityProvider
      */

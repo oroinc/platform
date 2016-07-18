@@ -38,7 +38,7 @@ class RegisterFiltersTest extends GetListProcessorTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage Expected "all" exclusion policy for filters. Got: none.
      */
     public function testProcessWithNotNormalizedFiltersConfig()

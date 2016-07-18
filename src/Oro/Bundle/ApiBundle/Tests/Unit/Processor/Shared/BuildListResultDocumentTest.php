@@ -3,7 +3,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildListResultDocument;
@@ -69,11 +68,6 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
         $this->documentBuilder->expects($this->once())
             ->method('setErrorCollection')
             ->with([$error]);
-
-        $config = new Config();
-        $this->configProvider->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($config);
 
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->context->addError($error);

@@ -6,6 +6,11 @@ oro_user_bundle:
     type:         annotation
     prefix:       /user
 
+oro_user_bundle_config:
+    resource:     "@OroUserBundle/Controller/ConfigurationController.php"
+    type:         annotation
+    prefix:       /config
+
 oro_user_api_user:
     resource:     "@OroUserBundle/Controller/Api/Rest/UserController.php"
     type:         rest

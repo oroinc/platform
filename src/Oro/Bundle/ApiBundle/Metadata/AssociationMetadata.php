@@ -2,22 +2,121 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
-class AssociationMetadata extends PropertyMetadata
+use Oro\Component\ChainProcessor\ToArrayInterface;
+
+class AssociationMetadata implements ToArrayInterface
 {
-    /** FQCN of an association target */
-    const TARGET_CLASS_NAME = 'targetClass';
+    /** @var string */
+    protected $name;
 
-    /** FQCN of acceptable association targets */
-    const ACCEPTABLE_TARGET_CLASS_NAMES = 'acceptableTargetClasses';
+    /** @var string */
+    protected $dataType;
 
-    /** a flag indicates if an association represents "to-many" or "to-one" relation */
-    const COLLECTION = 'collection';
+    /** @var string */
+    protected $targetClass;
+
+    /** @var string[] */
+    protected $acceptableTargetClasses = [];
+
+    /** @var bool */
+    protected $collection = false;
+
+    /** @var bool */
+    protected $nullable = false;
 
     /** @var EntityMetadata|null */
     private $targetMetadata;
 
     /**
-     * Gets metadata of an association target.
+     * @param string|null $name
+     */
+    public function __construct($name = null)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Makes a deep copy of the object.
+     */
+    public function __clone()
+    {
+        if (null !== $this->targetMetadata) {
+            $this->targetMetadata = clone $this->targetMetadata;
+        }
+    }
+
+    /**
+     * Gets a native PHP array representation of the object.
+     *
+     * @return array [key => value, ...]
+     */
+    public function toArray()
+    {
+        $result = ['name' => $this->name];
+        if ($this->dataType) {
+            $result['data_type'] = $this->dataType;
+        }
+        if ($this->targetClass) {
+            $result['target_class'] = $this->targetClass;
+        }
+        if ($this->acceptableTargetClasses) {
+            $result['acceptable_target_classes'] = $this->acceptableTargetClasses;
+        }
+        if ($this->collection) {
+            $result['collection'] = $this->collection;
+        }
+        if ($this->nullable) {
+            $result['nullable'] = $this->nullable;
+        }
+        if (null !== $this->targetMetadata) {
+            $result['target_metadata'] = $this->targetMetadata->toArray();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets the name of the association.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Sets the name of the association.
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Gets the data-type of the association identifier field.
+     *
+     * @return string
+     */
+    public function getDataType()
+    {
+        return $this->dataType;
+    }
+
+    /**
+     * Sets the data-type of the association identifier field.
+     *
+     * @param string $dataType
+     */
+    public function setDataType($dataType)
+    {
+        $this->dataType = $dataType;
+    }
+
+    /**
+     * Gets metadata of the association target.
      *
      * @return EntityMetadata|null
      */
@@ -27,7 +126,7 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
-     * Sets metadata of an association target.
+     * Sets metadata of the association target.
      *
      * @param EntityMetadata $targetMetadata
      */
@@ -37,23 +136,23 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
-     * Gets FQCN of an association target.
+     * Gets FQCN of the association target.
      *
      * @return string
      */
     public function getTargetClassName()
     {
-        return $this->get(self::TARGET_CLASS_NAME);
+        return $this->targetClass;
     }
 
     /**
-     * Sets FQCN of an association target.
+     * Sets FQCN of the association target.
      *
      * @param string $className
      */
     public function setTargetClassName($className)
     {
-        $this->set(self::TARGET_CLASS_NAME, $className);
+        $this->targetClass = $className;
     }
 
     /**
@@ -63,11 +162,7 @@ class AssociationMetadata extends PropertyMetadata
      */
     public function getAcceptableTargetClassNames()
     {
-        $classNames = $this->get(self::ACCEPTABLE_TARGET_CLASS_NAMES);
-
-        return null !== $classNames
-            ? $classNames
-            : [];
+        return $this->acceptableTargetClasses;
     }
 
     /**
@@ -77,7 +172,7 @@ class AssociationMetadata extends PropertyMetadata
      */
     public function setAcceptableTargetClassNames(array $classNames)
     {
-        $this->set(self::ACCEPTABLE_TARGET_CLASS_NAMES, $classNames);
+        $this->acceptableTargetClasses = $classNames;
     }
 
     /**
@@ -87,11 +182,9 @@ class AssociationMetadata extends PropertyMetadata
      */
     public function addAcceptableTargetClassName($className)
     {
-        $classNames = $this->getAcceptableTargetClassNames();
-        if (!in_array($className, $classNames, true)) {
-            $classNames[] = $className;
+        if (!in_array($className, $this->acceptableTargetClasses, true)) {
+            $this->acceptableTargetClasses[] = $className;
         }
-        $this->set(self::ACCEPTABLE_TARGET_CLASS_NAMES, $classNames);
     }
 
     /**
@@ -101,45 +194,50 @@ class AssociationMetadata extends PropertyMetadata
      */
     public function removeAcceptableTargetClassName($className)
     {
-        $classNames = $this->getAcceptableTargetClassNames();
-        $key = array_search($className, $classNames, true);
+        $key = array_search($className, $this->acceptableTargetClasses, true);
         if (false !== $key) {
-            unset($classNames[$key]);
-            $this->set(self::ACCEPTABLE_TARGET_CLASS_NAMES, array_values($classNames));
+            unset($this->acceptableTargetClasses[$key]);
+            $this->acceptableTargetClasses = array_values($this->acceptableTargetClasses);
         }
     }
 
     /**
-     * Whether an association represents "to-many" or "to-one" relation.
+     * Whether the association represents "to-many" or "to-one" relationship.
      *
      * @return bool
      */
     public function isCollection()
     {
-        return (bool)$this->get(self::COLLECTION);
+        return $this->collection;
     }
 
     /**
-     * Sets a flag indicates whether an association represents "to-many" or "to-one" relation.
+     * Sets a flag indicates whether the association represents "to-many" or "to-one" relationship.
      *
-     * @param bool $value TRUE for "to-many" relation, FALSE for "to-one" relation
+     * @param bool $value TRUE for "to-many" relation, FALSE for "to-one" relationship
      */
     public function setIsCollection($value)
     {
-        $this->set(self::COLLECTION, $value);
+        $this->collection = $value;
     }
 
     /**
-     * {@inheritdoc}
+     * Whether a value of the association can be NULL.
+     *
+     * @return bool
      */
-    public function toArray()
+    public function isNullable()
     {
-        $result = parent::toArray();
+        return $this->nullable;
+    }
 
-        if (null !== $this->targetMetadata) {
-            $result['targetMetadata'] = $this->targetMetadata->toArray();
-        }
-
-        return $result;
+    /**
+     * Sets a flag indicates whether a value of the association can be NULL.
+     *
+     * @param bool $value
+     */
+    public function setIsNullable($value)
+    {
+        $this->nullable = $value;
     }
 }

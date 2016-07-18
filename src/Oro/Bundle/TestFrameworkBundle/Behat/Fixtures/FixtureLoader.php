@@ -5,11 +5,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
 use Nelmio\Alice\Persister\Doctrine as AliceDoctrine;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 
-class FixtureLoader
+class FixtureLoader implements SuiteAwareInterface
 {
     /**
      * @var AliceLoader
@@ -88,8 +89,16 @@ class FixtureLoader
 
         $rows = $table->getRows();
         $headers = array_shift($rows);
+        array_walk($headers, function (&$header) {
+            $header = ucfirst(preg_replace('/\s*/', '', $header));
+        });
 
         foreach ($rows as $row) {
+            array_walk($row, function (&$value) {
+                if (0 === strpos($value, '[')) {
+                    $value = explode(', ', trim($value, '[]'));
+                }
+            });
             $values = array_combine($headers, $row);
             $object = $this->getObjectFromArray($className, $values);
 
@@ -170,7 +179,7 @@ class FixtureLoader
     }
 
     /**
-     * @param Suite $suite
+     * {@inheritdoc}
      */
     public function setSuite(Suite $suite)
     {
