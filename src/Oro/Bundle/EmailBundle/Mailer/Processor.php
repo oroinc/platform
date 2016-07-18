@@ -27,6 +27,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * Class Processor
@@ -50,11 +53,20 @@ class Processor
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
+    /** @var EmailEntityBuilder */
+    protected $emailEntityBuilder;
+
+    /** @var  EmailOwnerProvider */
+    protected $emailOwnerProvider;
+
     /** @var  EmailActivityManager */
     protected $emailActivityManager;
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /** @var Mcrypt */
     protected $encryptor;
@@ -62,12 +74,19 @@ class Processor
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
+    /** @var array */
+    protected $origins = [];
+
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     *
      * @param DoctrineHelper           $doctrineHelper
      * @param DirectMailer             $mailer
      * @param EmailAddressHelper       $emailAddressHelper
      * @param EmailEntityBuilder       $emailEntityBuilder
+     * @param EmailOwnerProvider       $emailOwnerProvider
      * @param EmailActivityManager     $emailActivityManager
+     * @param ServiceLink              $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
      * @param Mcrypt                   $encryptor
      * @param EmailOriginHelper        $emailOriginHelper
@@ -77,7 +96,9 @@ class Processor
         DirectMailer $mailer,
         EmailAddressHelper $emailAddressHelper,
         EmailEntityBuilder $emailEntityBuilder,
+        EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
+        ServiceLink $serviceLink,
         EventDispatcherInterface $eventDispatcher,
         Mcrypt $encryptor,
         EmailOriginHelper $emailOriginHelper
@@ -86,7 +107,9 @@ class Processor
         $this->mailer               = $mailer;
         $this->emailAddressHelper   = $emailAddressHelper;
         $this->emailEntityBuilder   = $emailEntityBuilder;
+        $this->emailOwnerProvider   = $emailOwnerProvider; # can be removed to EOH
         $this->emailActivityManager = $emailActivityManager;
+        $this->securityFacade       = $serviceLink->getService();
         $this->eventDispatcher      = $eventDispatcher;
         $this->encryptor            = $encryptor;
         $this->emailOriginHelper    = $emailOriginHelper;
@@ -109,6 +132,9 @@ class Processor
         $parentMessageId = $this->getParentMessageId($model);
         $message = $this->prepareMessage($model, $parentMessageId, $messageDate);
 
+        if ($origin === null && $persist) {
+            $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
+        }
         $this->processSend($message, $origin);
 
         $emailUser = $this->prepareEmailUser($model, $origin, $message, $messageDate, $parentMessageId);
@@ -188,7 +214,11 @@ class Processor
 
         //In case when 'useremailorigin' origin doesn't have folder, get folder from internal origin
         if (!$folder && $origin instanceof UserEmailOrigin) {
-            $origin = $this->emailOriginHelper->getEmailOrigin($email, null, InternalEmailOrigin::BAP, false);
+            $originKey = InternalEmailOrigin::BAP.$email;
+            if (array_key_exists($originKey, $this->origins)) {
+                unset($this->origins[$originKey]);
+            }
+            $origin = $this->getEmailOrigin($email, null, InternalEmailOrigin::BAP, false);
             return $origin->getFolder(FolderType::SENT);
         }
 
@@ -324,8 +354,6 @@ class Processor
     }
 
     /**
-     * @deprecated since 1.9. Use {@see Oro\Bundle\EmailBundle\Tools\EmailOriginHelper} instead
-     *
      * @param string                $email
      * @param OrganizationInterface $organization
      * @param string                $originName
@@ -339,7 +367,23 @@ class Processor
         $originName = InternalEmailOrigin::BAP,
         $enableUseUserEmailOrigin = true
     ) {
-        return $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName, $enableUseUserEmailOrigin);
+        $originKey = $originName . $email;
+        if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
+            $organization = $this->securityFacade->getOrganization();
+        }
+        if (!array_key_exists($originKey, $this->origins)) {
+            $emailOwner = $this->emailOwnerProvider->findEmailOwner(
+                $this->getEntityManager(),
+                $this->emailAddressHelper->extractPureEmailAddress($email)
+            );
+
+            $origin = $this->emailOriginHelper
+                ->findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin);
+
+            $this->origins[$originKey] = $origin;
+        }
+
+        return $this->origins[$originKey];
     }
 
     /**

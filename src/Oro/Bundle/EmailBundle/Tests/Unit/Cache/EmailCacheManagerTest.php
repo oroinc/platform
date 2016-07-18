@@ -62,9 +62,6 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         $this->emailBodySynchronizer
             ->expects($this->once())
             ->method('syncOneEmailBody');
-        $this->em
-            ->expects($this->once())
-            ->method('flush');
 
         $this->manager->ensureEmailBodyCached($email);
     }
