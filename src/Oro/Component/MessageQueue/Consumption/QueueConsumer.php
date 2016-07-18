@@ -16,9 +16,9 @@ class QueueConsumer
     private $connection;
 
     /**
-     * @var ChainExtension
+     * @var ExtensionInterface|ChainExtension|null
      */
-    private $extensions;
+    private $extension;
 
     /**
      * @var MessageProcessorInterface[]
@@ -32,13 +32,16 @@ class QueueConsumer
 
     /**
      * @param ConnectionInterface $connection
-     * @param ChainExtension $extensions
+     * @param ExtensionInterface|ChainExtension|null $extension
      * @param int $idleMicroseconds 100ms by default
      */
-    public function __construct(ConnectionInterface $connection, ChainExtension $extensions, $idleMicroseconds = 100000)
-    {
+    public function __construct(
+        ConnectionInterface $connection,
+        ExtensionInterface $extension = null,
+        $idleMicroseconds = 100000
+    ) {
         $this->connection = $connection;
-        $this->extensions = $extensions;
+        $this->extension = $extension;
         $this->idleMicroseconds = $idleMicroseconds;
 
         $this->boundMessageProcessors = [];
@@ -91,13 +94,13 @@ class QueueConsumer
             $messageConsumers[$queueName] = $session->createConsumer($queue);
         }
 
-        $extensions = $this->extensions;
+        $extension = $this->extension ?: new ChainExtension([]);
         if ($runtimeExtension) {
-            $extensions = new ChainExtension([$extensions, $runtimeExtension]);
+            $extension = new ChainExtension([$extension, $runtimeExtension]);
         }
 
         $context = new Context($session);
-        $extensions->onStart($context);
+        $extension->onStart($context);
 
         $logger = $context->getLogger() ?: new NullLogger();
         $logger->info('Start consuming');
@@ -115,14 +118,14 @@ class QueueConsumer
                     $context->setMessageConsumer($messageConsumer);
                     $context->setMessageProcessor($messageProcessor);
 
-                    $this->doConsume($extensions, $context);
+                    $this->doConsume($extension, $context);
                 }
             } catch (ConsumptionInterruptedException $e) {
                 $logger->info(sprintf('Consuming interrupted'));
 
                 $context->setExecutionInterrupted(true);
 
-                $extensions->onInterrupted($context);
+                $extension->onInterrupted($context);
                 $session->close();
 
                 return;
@@ -131,7 +134,7 @@ class QueueConsumer
                 
                 $context->setExecutionInterrupted(true);
                 $context->setException($e);
-                $extensions->onInterrupted($context);
+                $extension->onInterrupted($context);
 
                 $session->close();
 
@@ -141,21 +144,21 @@ class QueueConsumer
     }
 
     /**
-     * @param ChainExtension $extensions
+     * @param ExtensionInterface $extension
      * @param Context $context
      *
      * @throws ConsumptionInterruptedException
      *
      * @return bool
      */
-    protected function doConsume(ChainExtension $extensions, Context $context)
+    protected function doConsume(ExtensionInterface $extension, Context $context)
     {
         $session = $context->getSession();
         $messageProcessor = $context->getMessageProcessor();
         $messageConsumer = $context->getMessageConsumer();
         $logger = $context->getLogger();
         
-        $extensions->onBeforeReceive($context);
+        $extension->onBeforeReceive($context);
 
         if ($context->isExecutionInterrupted()) {
             throw new ConsumptionInterruptedException();
@@ -169,7 +172,7 @@ class QueueConsumer
 
             $context->setMessage($message);
 
-            $extensions->onPreReceived($context);
+            $extension->onPreReceived($context);
             if (!$context->getStatus()) {
                 $status = $messageProcessor->process($message, $session);
                 $context->setStatus($status);
@@ -191,12 +194,12 @@ class QueueConsumer
 
             $logger->info(sprintf('Message processed: %s', $context->getStatus()));
 
-            $extensions->onPostReceived($context);
+            $extension->onPostReceived($context);
         } else {
             $logger->info(sprintf('Idle'));
 
             usleep($this->idleMicroseconds);
-            $extensions->onIdle($context);
+            $extension->onIdle($context);
         }
 
         if ($context->isExecutionInterrupted()) {

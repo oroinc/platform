@@ -25,20 +25,6 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('time-limit', $options);
     }
 
-    public function testByDefaultShouldReturnOnlyLoggerExtension()
-    {
-        $command = new LimitsExtensionsCommand('name');
-
-        $tester = new CommandTester($command);
-        $tester->execute([]);
-
-        $result = $command->getExtensions();
-
-        $this->assertCount(1, $result);
-
-        $this->assertInstanceOf(LoggerExtension::class, $result[0]);
-    }
-
     public function testShouldAddMessageLimitExtension()
     {
         $command = new LimitsExtensionsCommand('name');
@@ -50,10 +36,9 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit_Framework_TestCase
 
         $result = $command->getExtensions();
 
-        $this->assertCount(2, $result);
+        $this->assertCount(1, $result);
 
-        $this->assertInstanceOf(LoggerExtension::class, $result[0]);
-        $this->assertInstanceOf(LimitConsumedMessagesExtension::class, $result[1]);
+        $this->assertInstanceOf(LimitConsumedMessagesExtension::class, $result[0]);
     }
 
     public function testShouldAddTimeLimitExtension()
@@ -67,10 +52,9 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit_Framework_TestCase
 
         $result = $command->getExtensions();
 
-        $this->assertCount(2, $result);
+        $this->assertCount(1, $result);
 
-        $this->assertInstanceOf(LoggerExtension::class, $result[0]);
-        $this->assertInstanceOf(LimitConsumptionTimeExtension::class, $result[1]);
+        $this->assertInstanceOf(LimitConsumptionTimeExtension::class, $result[0]);
     }
 
     public function testShouldThrowExceptionIfTimeLimitExpressionIsNotValid()
@@ -98,9 +82,28 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit_Framework_TestCase
 
         $result = $command->getExtensions();
 
-        $this->assertCount(2, $result);
+        $this->assertCount(1, $result);
 
-        $this->assertInstanceOf(LoggerExtension::class, $result[0]);
-        $this->assertInstanceOf(LimitConsumerMemoryExtension::class, $result[1]);
+        $this->assertInstanceOf(LimitConsumerMemoryExtension::class, $result[0]);
+    }
+
+    public function testShouldAddThreeLimitExtensions()
+    {
+        $command = new LimitsExtensionsCommand('name');
+
+        $tester = new CommandTester($command);
+        $tester->execute([
+            '--time-limit' => '+5',
+            '--memory-limit' => 5,
+            '--message-limit' => 5,
+        ]);
+
+        $result = $command->getExtensions();
+
+        $this->assertCount(3, $result);
+
+        $this->assertInstanceOf(LimitConsumedMessagesExtension::class, $result[0]);
+        $this->assertInstanceOf(LimitConsumptionTimeExtension::class, $result[1]);
+        $this->assertInstanceOf(LimitConsumerMemoryExtension::class, $result[2]);
     }
 }

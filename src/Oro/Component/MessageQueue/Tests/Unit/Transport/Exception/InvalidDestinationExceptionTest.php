@@ -1,12 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Exception;
 
+use Oro\Component\MessageQueue\Tests\Unit\Mock\DestinationBar;
+use Oro\Component\MessageQueue\Tests\Unit\Mock\DestinationFoo;
 use Oro\Component\MessageQueue\Transport\Exception\Exception as ExceptionInterface;
-use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
 use Oro\Component\Testing\ClassExtensionTrait;
-
-// @codingStandardsIgnoreStart
 
 class InvalidDestinationExceptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +23,11 @@ class InvalidDestinationExceptionTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowIfAssertDestinationInstanceOfNotSameAsExpected()
     {
-        $this->setExpectedException(InvalidDestinationException::class, 'The destination must be an instance of Oro\Component\MessageQueue\Tests\Unit\Transport\Exception\DestinationBar but it is Oro\Component\MessageQueue\Tests\Unit\Transport\Exception\DestinationFoo.');
+        $this->setExpectedException(
+            InvalidDestinationException::class,
+            'The destination must be an instance of Oro\Component\MessageQueue\Tests\Unit\Mock\DestinationBar'.
+            ' but it is Oro\Component\MessageQueue\Tests\Unit\Mock\DestinationFoo.'
+        );
 
         InvalidDestinationException::assertDestinationInstanceOf(new DestinationFoo(), DestinationBar::class);
     }
@@ -34,13 +37,3 @@ class InvalidDestinationExceptionTest extends \PHPUnit_Framework_TestCase
         InvalidDestinationException::assertDestinationInstanceOf(new DestinationFoo(), DestinationFoo::class);
     }
 }
-
-class DestinationFoo implements DestinationInterface
-{
-}
-
-class DestinationBar implements DestinationInterface
-{
-}
-
-// @codingStandardsIgnoreEnd

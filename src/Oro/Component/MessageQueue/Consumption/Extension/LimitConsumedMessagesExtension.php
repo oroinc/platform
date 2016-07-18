@@ -37,6 +37,7 @@ class LimitConsumedMessagesExtension extends AbstractExtension
      */
     public function onBeforeReceive(Context $context)
     {
+        // this is added here to handle an edge case. when a user sets zero as limit.
         $this->checkMessageLimit($context);
     }
 

@@ -3,11 +3,13 @@ namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
+use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsumeMessagesCommand extends Command
@@ -80,7 +82,10 @@ class ConsumeMessagesCommand extends Command
             }
         }
 
-        $runtimeExtensions = new ChainExtension($this->getLimitsExtensions($input, $output));
+        $extensions = $this->getLimitsExtensions($input, $output);
+        array_unshift($extensions, new LoggerExtension(new ConsoleLogger($output)));
+
+        $runtimeExtensions = new ChainExtension($extensions);
 
         try {
             $this->consumer->consume($runtimeExtensions);

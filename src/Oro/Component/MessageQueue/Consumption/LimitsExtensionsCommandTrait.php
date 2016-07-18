@@ -35,7 +35,7 @@ trait LimitsExtensionsCommandTrait
      */
     protected function getLimitsExtensions(InputInterface $input, OutputInterface $output)
     {
-        $extensions = [new LoggerExtension(new ConsoleLogger($output))];
+        $extensions = [];
 
         $messageLimit = (int) $input->getOption('message-limit');
         if ($messageLimit) {

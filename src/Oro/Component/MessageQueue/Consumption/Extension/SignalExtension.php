@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
-declare(ticks = 1);
-
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
@@ -43,6 +41,8 @@ class SignalExtension extends AbstractExtension
     {
         $this->logger = $context->getLogger();
 
+        pcntl_signal_dispatch();
+
         $this->interruptExecutionIfNeeded($context);
     }
 
@@ -59,6 +59,8 @@ class SignalExtension extends AbstractExtension
      */
     public function onPostReceived(Context $context)
     {
+        pcntl_signal_dispatch();
+
         $this->interruptExecutionIfNeeded($context);
     }
 
@@ -67,6 +69,8 @@ class SignalExtension extends AbstractExtension
      */
     public function onIdle(Context $context)
     {
+        pcntl_signal_dispatch();
+
         $this->interruptExecutionIfNeeded($context);
     }
 
@@ -96,6 +100,7 @@ class SignalExtension extends AbstractExtension
             case SIGTERM:  // 15 : supervisor default stop
             case SIGQUIT:  // 3  : kill -s QUIT
             case SIGINT:   // 2  : ctrl+c
+                $this->logger->debug('[SignalExtension] Interrupt consumption');
                 $this->interruptConsumption = true;
                 break;
             default:

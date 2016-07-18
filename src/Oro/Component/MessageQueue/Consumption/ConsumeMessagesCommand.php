@@ -1,9 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption;
 
+use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -63,7 +65,10 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
             ));
         }
 
-        $runtimeExtensions = new ChainExtension($this->getLimitsExtensions($input, $output));
+        $extensions = $this->getLimitsExtensions($input, $output);
+        array_unshift($extensions, new LoggerExtension(new ConsoleLogger($output)));
+
+        $runtimeExtensions = new ChainExtension($extensions);
 
         try {
             $this->consumer->bind($queueName, $messageProcessor);
