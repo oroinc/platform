@@ -346,21 +346,15 @@ class OroMainContext extends MinkContext implements
         foreach ($table->getRows() as $row) {
             $label = $page->find('xpath', sprintf('//label[text()="%s"]', $row[0]));
 
-            if (!$label) {
-                throw new ExpectationException(
-                    sprintf('Can\'t find "%s" label', $row[0]),
-                    $this->getSession()->getDriver()
-                );
-            }
+            self::assertNotNull($label, sprintf('Can\'t find "%s" label', $row[0]));
 
             $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-            if (false === preg_match(sprintf('/%s/i', $row[1]), $text)) {
-                throw new ExpectationException(
-                    sprintf('Expect "%s" text of "%s" label, but got "%s"', $row[1], $row[0], $text),
-                    $this->getSession()->getDriver()
-                );
-            }
+            self::assertStringMatchesFormat(
+                '%d',
+                stripos($text, $row[1]),
+                sprintf('Expect "%s" text of "%s" label, but got "%s"', $row[1], $row[0], $text)
+            );
         }
     }
 

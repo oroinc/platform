@@ -5,13 +5,12 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
-use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
-use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
-class ActivityContext extends RawMinkContext implements OroElementFactoryAware, SnippetAcceptingContext
+class ActivityContext extends OroFeatureContext implements OroElementFactoryAware, SnippetAcceptingContext
 {
     use ElementFactoryDictionary;
 
@@ -53,12 +52,11 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
     {
         $itemsCount = count($this->getActivityListItems());
 
-        if (0 !== $itemsCount) {
-            throw new ExpectationException(
-                sprintf('Expect that Activity list not found items, but found %s', $itemsCount),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertCount(
+            0,
+            $itemsCount,
+            sprintf('Expect that Activity list not found items, but found %s', $itemsCount)
+        );
     }
 
     /**
@@ -72,12 +70,11 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
         $activityListPaginator = $this->createElement('ActivityListPaginator');
         $itemsCount = $activityListPaginator->getTotalRecordsCount();
 
-        if ($this->getCount($number) !== $itemsCount) {
-            throw new ExpectationException(
-                sprintf('Expect that Activity list has %s items, but found %s', $number, $itemsCount),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertCount(
+            $this->getCount($number),
+            $itemsCount,
+            sprintf('Expect that Activity list has %s items, but found %s', $number, $itemsCount)
+        );
     }
 
     /**
@@ -145,12 +142,11 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
         $collapsedItem = $this->getCollapsedItem();
         $emailBody = $collapsedItem->find('css', 'div.email-body')->getHtml();
 
-        if (false === strpos($emailBody, $content)) {
-            throw new ExpectationException(
-                sprintf('"%s" not found in "%s"', $content, $emailBody),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertStringMatchesFormat(
+            '%d',
+            strpos($emailBody, $content),
+            sprintf('"%s" not found in "%s"', $content, $emailBody)
+        );
     }
 
     /**
@@ -161,12 +157,10 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
         $item = $this->getActivityListItem($content);
         $icon = $item->find('css', 'div.icon i');
 
-        if (false === $icon->hasClass('icon-email-thread')) {
-            throw new ExpectationException(
-                sprintf('Expect that "%s" has thread email icon, but it hasn\'t', $content),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertTrue(
+            $icon->hasClass('icon-email-thread'),
+            sprintf('Expect that "%s" has thread email icon, but it hasn\'t', $content)
+        );
     }
 
     /**
@@ -180,12 +174,11 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
         $item = $this->getActivityListItem($content);
         $threadEmails = $item->findAll('css', 'div.thread-view div.email-info');
 
-        if ($this->getCount($emailsCount) !== count($threadEmails)) {
-            throw new ExpectationException(
-                sprintf('Expect %s number of emails in thread, but get %s', $emailsCount, count($threadEmails)),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertCount(
+            $this->getCount($emailsCount),
+            count($threadEmails),
+            sprintf('Expect %s number of emails in thread, but get %s', $emailsCount, count($threadEmails))
+        );
     }
 
     /**
@@ -200,7 +193,7 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
 
         /** @var NodeElement $context */
         foreach ($contexts as $context) {
-            if (false !== strpos($context->getText(), $text)) {
+            if (false !== stripos($context->getText(), $text)) {
                 return;
             }
         }
@@ -218,12 +211,11 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
      */
     public function iShouldSeeTextInCollapsedActivityItem($text)
     {
-        if (false === strpos($this->getCollapsedItem()->getText(), $text)) {
-            throw new ExpectationException(
-                sprintf('Can\'t find "%s" image name in collapsed activity item', $text),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertStringMatchesFormat(
+            '%d',
+            stripos($this->getCollapsedItem()->getText(), $text),
+            sprintf('Can\'t find "%s" image name in collapsed activity item', $text)
+        );
     }
 
     /**
@@ -273,7 +265,6 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
 
     /**
      * @return NodeElement Collapsed activity element
-     * @throws ExpectationException If no collapsed element will found
      */
     protected function getCollapsedItem()
     {
@@ -282,12 +273,10 @@ class ActivityContext extends RawMinkContext implements OroElementFactoryAware, 
             return $element->hasClass('in');
         });
 
-        if (0 === count($collapsedItem)) {
-            throw new ExpectationException(
-                'Not found collapsed items in activity list',
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertTrue(
+            0 < count($collapsedItem),
+            'Not found collapsed items in activity list'
+        );
 
         return array_shift($collapsedItem);
     }
