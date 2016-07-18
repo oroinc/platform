@@ -2,8 +2,10 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
+use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\FooTransportFactory;
+use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
+use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Oro\Component\Testing\ClassExtensionTrait;
-use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpConnection;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -17,9 +19,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertClassImplements(ConfigurationInterface::class, Configuration::class);
     }
 
-    public function testCouldBeConstructedWithoutAnyArguments()
+    public function testCouldBeConstructedWithFactoriesAsFirstArgument()
     {
-        new Configuration();
+        new Configuration([]);
     }
 
     public function testThrowIfTransportNotConfigured()
@@ -29,103 +31,117 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'The child node "transport" at path "oro_message_queue" must be configured.'
         );
 
-        $configuration = new Configuration();
+        $configuration = new Configuration([]);
 
         $processor = new Processor();
         $processor->processConfiguration($configuration, [[]]);
     }
 
-    public function testThrowIfDefaultTransportNotConfigured()
+    public function testShouldInjectFooTransportFactoryConfig()
     {
-        $this->setExpectedException(
-            InvalidConfigurationException::class,
-            'The path "oro_message_queue.transport.default" cannot contain an empty value, but got null.'
-        );
-
-        $configuration = new Configuration();
+        $configuration = new Configuration([new FooTransportFactory()]);
 
         $processor = new Processor();
         $processor->processConfiguration($configuration, [[
             'transport' => [
-                'default' => null,
+                'foo' => [
+                    'foo_param' => 'aParam'
+                ],
             ]
         ]]);
     }
 
-    public function testShouldAllowConfigureAmqpTransport()
+    public function testThrowExceptionIfFooTransportConfigInvalid()
     {
-        if (false == class_exists(AmqpConnection::class)) {
-            $this->markTestSkipped('Amqp lib is not installed');
-        }
-
-        $configuration = new Configuration();
+        $configuration = new Configuration([new FooTransportFactory()]);
 
         $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, [[
+
+        $this->setExpectedException(
+            InvalidConfigurationException::class,
+            'The path "oro_message_queue.transport.foo.foo_param" cannot contain an empty value, but got null.'
+        );
+
+        $processor->processConfiguration($configuration, [[
             'transport' => [
-                'default' => 'amqp',
-                'amqp' => [
-                    'host' => 'theHost',
-                    'port' => 'thePort',
-                    'user' => 'theUser',
-                    'password' => 'thePassword',
-                    'vhost' => 'theVhost'
-                ]
+                'foo' => [
+                    'foo_param' => null
+                ],
             ]
         ]]);
+    }
 
-        $this->assertEquals([
+    public function testShouldAllowConfigureDefaultTransport()
+    {
+        $configuration = new Configuration([new DefaultTransportFactory()]);
+
+        $processor = new Processor();
+        $processor->processConfiguration($configuration, [[
             'transport' => [
-                'default' => 'amqp',
-                'amqp' => [
-                    'host' => 'theHost',
-                    'port' => 'thePort',
-                    'user' => 'theUser',
-                    'password' => 'thePassword',
-                    'vhost' => 'theVhost'
-                ],
-                'null' => false,
+                'default' => ['alias' => 'foo'],
             ]
-        ], $config);
+        ]]);
     }
 
     public function testShouldAllowConfigureNullTransport()
     {
-        $configuration = new Configuration();
+        $configuration = new Configuration([new NullTransportFactory()]);
 
         $processor = new Processor();
         $config = $processor->processConfiguration($configuration, [[
             'transport' => [
-                'default' => 'null',
                 'null' => true,
             ]
         ]]);
 
         $this->assertEquals([
             'transport' => [
-                'default' => 'null',
+                'null' => [],
+            ]
+        ], $config);
+    }
+
+    public function testShouldAllowConfigureSeveralTransportsSameTime()
+    {
+        $configuration = new Configuration([
+            new NullTransportFactory(),
+            new DefaultTransportFactory(),
+            new FooTransportFactory(),
+        ]);
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration($configuration, [[
+            'transport' => [
+                'default' => 'foo',
                 'null' => true,
+                'foo' => ['foo_param' => 'aParam'],
+            ]
+        ]]);
+
+        $this->assertEquals([
+            'transport' => [
+                'default' => ['alias' => 'foo'],
+                'null' => [],
+                'foo' => ['foo_param' => 'aParam'],
             ]
         ], $config);
     }
 
     public function testShouldSetDefaultConfigurationForClient()
     {
-        $configuration = new Configuration();
+        $configuration = new Configuration([new DefaultTransportFactory()]);
 
         $processor = new Processor();
         $config = $processor->processConfiguration($configuration, [[
             'transport' => [
-                'default' => 'null',
-                'null' => true,
+                'default' => ['alias' => 'foo'],
             ],
             'client' => null,
         ]]);
 
         $this->assertEquals([
             'transport' => [
-                'default' => 'null',
-                'null' => true,
+                'default' => ['alias' => 'foo'],
             ],
             'client' => [
                 'prefix' => 'oro',
@@ -137,20 +153,19 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ], $config);
     }
 
-    public function testShouldThrowExceptionIfRouterDestinationIsEmpty()
+    public function testThrowExceptionIfRouterDestinationIsEmpty()
     {
         $this->setExpectedException(
             InvalidConfigurationException::class,
             'The path "oro_message_queue.client.router_destination" cannot contain an empty value, but got "".'
         );
 
-        $configuration = new Configuration();
+        $configuration = new Configuration([new DefaultTransportFactory()]);
 
         $processor = new Processor();
         $processor->processConfiguration($configuration, [[
             'transport' => [
-                'default' => 'null',
-                'null' => true,
+                'default' => ['alias' => 'foo'],
             ],
             'client' => [
                 'router_destination' => '',
@@ -165,13 +180,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'The path "oro_message_queue.client.default_destination" cannot contain an empty value, but got "".'
         );
 
-        $configuration = new Configuration();
+        $configuration = new Configuration([new DefaultTransportFactory()]);
 
         $processor = new Processor();
         $processor->processConfiguration($configuration, [[
             'transport' => [
-                'default' => 'null',
-                'null' => true,
+                'default' => ['alias' => 'foo'],
             ],
             'client' => [
                 'default_destination' => '',

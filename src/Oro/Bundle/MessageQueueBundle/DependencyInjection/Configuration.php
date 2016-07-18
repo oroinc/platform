@@ -1,11 +1,25 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 
+use Oro\Component\MessageQueue\DependencyInjection\TransportFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    /**
+     * @var TransportFactoryInterface[]
+     */
+    private $factories;
+
+    /**
+     * @param TransportFactoryInterface[] $factories
+     */
+    public function __construct(array $factories)
+    {
+        $this->factories = $factories;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -13,19 +27,17 @@ class Configuration implements ConfigurationInterface
     {
         $tb = new TreeBuilder();
         $rootNode = $tb->root('oro_message_queue');
+        
+        $transportChildren = $rootNode->children()
+            ->arrayNode('transport')->isRequired()->children();
+            
+        foreach ($this->factories as $factory) {
+            $factory->addConfiguration(
+                $transportChildren->arrayNode($factory->getName())
+            );
+        }
 
         $rootNode->children()
-            ->arrayNode('transport')->isRequired()->children()
-                ->scalarNode('default')->isRequired()->cannotBeEmpty()->end()
-                ->booleanNode('null')->defaultFalse()->end()
-                ->arrayNode('amqp')->children()
-                    ->scalarNode('host')->isRequired()->cannotBeEmpty()->end()
-                    ->scalarNode('port')->isRequired()->cannotBeEmpty()->end()
-                    ->scalarNode('user')->isRequired()->cannotBeEmpty()->end()
-                    ->scalarNode('password')->isRequired()->cannotBeEmpty()->end()
-                    ->scalarNode('vhost')->isRequired()->cannotBeEmpty()->end()
-                ->end()->end()
-            ->end()->end()
             ->arrayNode('client')->children()
                 ->booleanNode('traceable_producer')->defaultFalse()->end()
                 ->scalarNode('prefix')->defaultValue('oro')->end()
