@@ -3,9 +3,10 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/tools',
+    'oroui/js/tools/logger',
     './../optional-validation-handler',
     'jquery.validate'
-], function($, _, __, tools, validationHandler) {
+], function($, _, __, tools, logger, validationHandler) {
     'use strict';
 
     var console = window.console;
@@ -383,17 +384,7 @@ define([
         for (var ruleName in validationRulesCopy) {
             if (validationRulesCopy.hasOwnProperty(ruleName)) {
                 if (!_.isFunction($.validator.methods[ruleName])) {
-                    if (tools.debug) {
-                        if (console && console.warn) {
-                            console.warn('Cannot find validator implementation for `' + ruleName + '`')
-                        } else {
-                            var error = new Error('Warning: Cannot find validator implementation for `' +
-                                ruleName + '`');
-                            setTimeout(function () {
-                                throw error;
-                            }, 0);
-                        }
-                    }
+                    logger.warn('Cannot find validator implementation for `' + ruleName + '`');
                     delete validationRulesCopy[ruleName];
                 }
             }
