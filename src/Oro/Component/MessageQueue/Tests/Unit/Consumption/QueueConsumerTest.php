@@ -572,6 +572,8 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCloseSessionWhenConsumptionInterruptedByException()
     {
+        $expectedException = new \Exception;
+
         $messageConsumerStub = $this->createMessageConsumerStub($message = $this->createMessageMock());
 
         $sessionMock = $this->createSessionStub($messageConsumerStub);
@@ -584,7 +586,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $messageProcessorMock
             ->expects($this->once())
             ->method('process')
-            ->willThrowException(new \Exception)
+            ->willThrowException($expectedException)
         ;
 
         $connectionStub = $this->createConnectionStub($sessionMock);
@@ -592,8 +594,57 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $queueConsumer = new QueueConsumer($connectionStub, new BreakCycleExtension(1), 0);
         $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $this->setExpectedException(\Exception::class);
-        $queueConsumer->consume();
+        try {
+            $queueConsumer->consume();
+        } catch (\Exception $e) {
+            $this->assertSame($expectedException, $e);
+            $this->assertNull($e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('Exception throw is expected.');
+    }
+
+    public function testShouldSetMainExceptionAsPreviousToExceptionThrownOnInterrupt()
+    {
+        $mainException = new \Exception;
+        $expectedException = new \Exception;
+
+        $messageConsumerStub = $this->createMessageConsumerStub($message = $this->createMessageMock());
+
+        $sessionMock = $this->createSessionStub($messageConsumerStub);
+
+        $messageProcessorMock = $this->createMessageProcessorMock();
+        $messageProcessorMock
+            ->expects($this->once())
+            ->method('process')
+            ->willThrowException($mainException)
+        ;
+
+        $extension = $this->createExtension();
+        $extension
+            ->expects($this->atLeastOnce())
+            ->method('onInterrupted')
+            ->willThrowException($expectedException)
+        ;
+
+        $connectionStub = $this->createConnectionStub($sessionMock);
+
+        $chainExtensions = new ChainExtension([$extension, new BreakCycleExtension(1)]);
+        $queueConsumer = new QueueConsumer($connectionStub, $chainExtensions, 0);
+        $queueConsumer->bind('aQueueName', $messageProcessorMock);
+
+        try {
+            $queueConsumer->consume();
+        } catch (\Exception $e) {
+            $this->assertSame($expectedException, $e);
+            $this->assertSame($mainException, $e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('Exception throw is expected.');
     }
 
     public function testShouldAllowInterruptConsumingOnPreReceiveButProcessCurrentMessage()

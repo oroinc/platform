@@ -129,16 +129,41 @@ class QueueConsumer
                 $session->close();
 
                 return;
-            } catch (\Exception $e) {
+            } catch (\Exception $exception) {
                 $logger->error(sprintf('Consuming interrupted by exception'));
                 
                 $context->setExecutionInterrupted(true);
-                $context->setException($e);
-                $extension->onInterrupted($context);
+                $context->setException($exception);
 
-                $session->close();
+                try {
+                    $extension->onInterrupted($context);
+                } catch (\Exception $e) {
+                    // logic is similar to one in Symfony's ExceptionListener::onKernelException
+                    $logger->error(sprintf(
+                        'Exception thrown when handling an exception (%s: %s at %s line %s)',
+                        get_class($e),
+                        $e->getMessage(),
+                        $e->getFile(),
+                        $e->getLine()
+                    ));
 
-                throw $e;
+                    $wrapper = $e;
+                    while ($prev = $wrapper->getPrevious()) {
+                        if ($exception === $wrapper = $prev) {
+                            throw $e;
+                        }
+                    }
+
+                    $prev = new \ReflectionProperty('Exception', 'previous');
+                    $prev->setAccessible(true);
+                    $prev->setValue($wrapper, $exception);
+
+                    throw $e;
+                } finally {
+                    $session->close();
+                }
+
+                throw $exception;
             }
         }
     }
