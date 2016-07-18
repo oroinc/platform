@@ -110,7 +110,7 @@ class ValueNormalizer
     {
         /** @var NormalizeValueContext $context */
         $context = $this->processor->createContext();
-        $context->getRequestType()->set($requestType->toArray());
+        $context->getRequestType()->set($requestType);
         $context->setDataType($dataType);
         $context->setResult($value);
         $context->setArrayAllowed($isArrayAllowed);

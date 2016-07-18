@@ -52,7 +52,7 @@ class SubresourcesProvider
         /** @var CollectSubresourcesContext $context */
         $context = $this->processor->createContext();
         $context->setVersion($version);
-        $context->getRequestType()->set($requestType->toArray());
+        $context->getRequestType()->set($requestType);
         $context->setResources($this->resourcesProvider->getResources($version, $requestType));
 
         $this->processor->process($context);
