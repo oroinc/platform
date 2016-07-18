@@ -14,6 +14,9 @@ use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithConnectionAndExtensionsAsArguments()
