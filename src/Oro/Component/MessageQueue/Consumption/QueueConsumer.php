@@ -138,8 +138,12 @@ class QueueConsumer
 
                 try {
                     $this->onInterruptionByException($extension, $context);
-                } finally {
                     $session->close();
+                } catch (\Exception $e) {
+                    // for some reason finally does not work here on php5.5
+                    $session->close();
+
+                    throw $e;
                 }
             }
         }
