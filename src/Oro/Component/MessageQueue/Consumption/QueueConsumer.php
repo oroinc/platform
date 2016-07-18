@@ -8,6 +8,9 @@ use Oro\Component\MessageQueue\Util\VarExport;
 
 use Psr\Log\NullLogger;
 
+/**
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 class QueueConsumer
 {
     /**
