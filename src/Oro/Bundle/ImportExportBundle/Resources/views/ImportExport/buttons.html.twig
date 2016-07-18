@@ -1,16 +1,26 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% set hasImportProcessor = importProcessor is defined and importProcessor is not empty %}
-{% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
-{% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
-{% set hasExportPopupConfig = exportPopupConfig is defined %}
-{% set hasExportTemplatePopupConfig = exportTemplatePopupConfig is defined %}
-{% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
-{% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
-{% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
-{% set importLabel = importLabel|default('oro.importexport.import.label'|trans) %}
-{% set exportLabel = exportPopupConfig.exportLabel|default('oro.importexport.export.label'|trans) %}
-{% set exportTemplateLabel = exportTemplatePopupConfig.label|default('oro.importexport.export_template.label'|trans) %}
 
+{% set hasImportProcessor = importProcessor is defined and importProcessor is not empty %}
+{% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
+{% set importLabel = importLabel|default('oro.importexport.import.label'|trans) %}
+
+{% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
+{% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
+{% if exportAllowed %}
+    {% set isExportPopupRequired = exportProcessor is iterable %}
+    {% set exportProcessor = exportProcessor is iterable ? exportProcessor[0] : exportProcessor %}
+{% endif %}
+{% set exportLabel = exportLabel|default('oro.importexport.export.label'|trans) %}
+
+{% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
+{% if hasExportTemplateProcessor %}
+    {% set isExportTemplatePopupRequired = exportTemplateProcessor is iterable %}
+    {% set exportTemplateProcessor = exportTemplateProcessor is iterable ? exportTemplateProcessor[0] : exportTemplateProcessor %}
+{% endif %}
+
+{% set exportTemplateLabel = exportTemplatelabel|default('oro.importexport.export_template.label'|trans) %}
+
+{% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
 {% if exportAllowed or importAllowed %}
     {% if options is not defined %}
         {% set options = {} %}
@@ -32,7 +42,8 @@
     {% endif %}
 
     {% if exportAllowed %}
-        {% set exportRoute = hasExportPopupConfig ? 'oro_importexport_export_config' : 'oro_importexport_export_instant' %}
+        {% set exportRoute = isExportPopupRequired ? 'oro_importexport_export_config' : 'oro_importexport_export_instant' %}
+
         <div class="btn-group">
             <a type="button"
                class="btn export-btn icons-holder-text no-hash"
@@ -51,10 +62,10 @@
                     <i class="icon-download-alt hide-text">{{ importLabel }}</i>{{ importLabel }}
                 </a>
                 {% if hasExportTemplateProcessor %}
-                    {% set exportTemplateRoute = hasExportTemplatePopupConfig ? 'oro_importexport_export_template_config' : 'oro_importexport_export_template' %}
+                    {% set exportTemplateRoute = isExportTemplatePopupRequired ? 'oro_importexport_export_template_config' : 'oro_importexport_export_template' %}
                     <a type="button"
                        class="btn template-btn icons-holder-text no-hash"
-                       {% if not hasExportTemplatePopupConfig %}target="_blank" {% endif %}
+                       {% if not isExportTemplatePopupRequired %}target="_blank" {% endif %}
                        href="{{ path(exportTemplateRoute, defaultRouteParams|merge({'processorAlias': exportTemplateProcessor, 'entity': entity_class})) }}">
                         <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
                     </a>
@@ -108,7 +119,7 @@
             });
             {% endif %}
 
-            {% if hasExportTemplateProcessor and hasExportTemplatePopupConfig %}
+            {% if hasExportTemplateProcessor and isExportTemplatePopupRequired is defined and isExportTemplatePopupRequired  %}
                 $('.template-btn').on('click', function(e) {
                     e.preventDefault();
 
@@ -129,31 +140,31 @@
             {% endif %}
 
             {% if hasExportProcessor %}
-            $('.export-btn').on('click', function(e) {
-                e.preventDefault();
+                $('.export-btn').on('click', function(e) {
+                    e.preventDefault();
 
-                {% if hasExportPopupConfig %}
-                    var widget = new DialogWidget({
-                        'url': this.href,
-                        'title': {{ exportTitle|default(exportLabel)|json_encode|raw }},
-                        'stateEnabled': false,
-                        'incrementalPosition': false,
-                        'dialogOptions': {
-                            'width': 650,
-                            'autoResize': true,
-                            'modal': true,
-                            'minHeight': 100
-                        }
-                    });
-                    widget.render();
-                {% else %}
-                    var exportStartedMessage = exportHandler.startExportNotificationMessage();
-                    $.getJSON(this.href, function(data) {
-                        exportStartedMessage.close();
-                        exportHandler.handleExportResponse(data);
-                    });
-                {% endif %}
-            });
+                    {% if isExportPopupRequired %}
+                        var widget = new DialogWidget({
+                            'url': this.href,
+                            'title': {{ exportTitle|default(exportLabel)|json_encode|raw }},
+                            'stateEnabled': false,
+                            'incrementalPosition': false,
+                            'dialogOptions': {
+                                'width': 650,
+                                'autoResize': true,
+                                'modal': true,
+                                'minHeight': 100
+                            }
+                        });
+                        widget.render();
+                    {% else %}
+                        var exportStartedMessage = exportHandler.startExportNotificationMessage();
+                        $.getJSON(this.href, function(data) {
+                            exportStartedMessage.close();
+                            exportHandler.handleExportResponse(data);
+                        });
+                    {% endif %}
+                });
             {% endif %}
         });
     </script>
