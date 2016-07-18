@@ -198,4 +198,23 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
 
         $this->assertEquals($expectedMetadata, $metadata);
     }
+
+    public function testCreateAssociationMetadataWithDataType()
+    {
+        $expectedMetadata = new AssociationMetadata();
+        $expectedMetadata->setName('category');
+        $expectedMetadata->setDataType('integer');
+        $expectedMetadata->setIsNullable(true);
+        $expectedMetadata->setIsCollection(false);
+        $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'Category');
+        $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'Category']);
+
+        $metadata = $this->metadataFactory->createAssociationMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            'category',
+            'integer'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
 }
