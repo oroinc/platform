@@ -19,7 +19,6 @@ define(function(require) {
             //support for readonly attr
             if (this.$el.is('[readonly]')) {
                 this.$el.on('click mousedown', function(e) {
-                    e.preventDefault();
                     return false;
                 });
                 this.$el.find('option:not(:selected), [value=""]').remove();
