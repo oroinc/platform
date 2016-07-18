@@ -5,11 +5,10 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Twig;
 use Oro\Bundle\CalendarBundle\Twig\DateFormatExtension;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var DateTimeFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formatter;
 
     /** @var DateFormatExtension */
@@ -46,6 +45,8 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->extension = new DateFormatExtension($this->formatter, $this->configManager);
     }
 
     /**
@@ -67,7 +68,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter->expects($this->any())
             ->method('formatTime')
             ->will($this->returnValue('Time'));
-        $this->extension = new DateFormatExtension($this->formatter);
 
         $startDate = new \DateTime($start);
         $endDate = $end === null ? null : new \DateTime($end);
@@ -97,19 +97,20 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
      * @param array $config
      * @param string|null $locale
      * @param string|null $timeZone
-     * @param User $user
-     * @param string $expected
+     * @param Organization $organization
      *
-     * @dataProvider formatCalendarDateRangeUserProvider
+     * @dataProvider formatCalendarDateRangeOrganizationProvider
      */
-    public function testFormatCalendarDateRangeUser($start, $end, array $config, $locale, $timeZone, $user, $expected)
-    {
-        $this->formatter = new DateTimeFormatter($this->localeSettings, $this->translator);
-        $this->extension = new DateFormatExtension($this->formatter);
-        $this->extension->setConfigManager($this->configManager);
-
-        $startDate = new \DateTime($start, new \DateTimeZone('UTC'));
-        $endDate = $end === null ? null : new \DateTime($end, new \DateTimeZone('UTC'));
+    public function testFormatCalendarDateRangeOrganization(
+        $start,
+        $end,
+        array $config,
+        $locale,
+        $timeZone,
+        $organization
+    ) {
+        $startDate = new \DateTime($start);
+        $endDate = $end === null ? null : new \DateTime($end);
 
         $this->configManager->expects($this->any())
             ->method('get')
@@ -122,7 +123,7 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $result = $this->extension->formatCalendarDateRangeUser(
+        $this->extension->formatCalendarDateRangeOrganization(
             $startDate,
             $endDate,
             false,
@@ -130,53 +131,43 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
             null,
             $locale,
             $timeZone,
-            $user
+            $organization
         );
 
-        $this->assertEquals($expected, $result);
+        $this->configManager->expects($this->never())
+            ->method('get');
+
+        $this->extension->formatCalendarDateRangeOrganization(
+            $startDate,
+            $endDate,
+            false,
+            null,
+            null,
+            $locale,
+            $timeZone
+        );
     }
 
-    public function formatCalendarDateRangeUserProvider()
+    public function formatCalendarDateRangeOrganizationProvider()
     {
         $organization = new Organization(1);
-        $user = new User(1, null, $organization);
 
         return [
             'Localization settings from global scope' => [
-                '2016-05-01 10:30:15',
-                '2016-05-01 11:30:15',
+                '2016-05-01T10:30:15+00:00',
+                '2016-05-01T11:30:15+00:00',
                 ['locale' => 'en_US', 'timeZone' => 'UTC'], // config global scope
                 null,
                 null,
-                $user,
-                'May 1, 2016 10:30 AM - 11:30 AM'
-            ],
-            'Localization settings from global scope start=end' => [
-                '2016-05-01 10:30:15',
-                '2016-05-01 10:30:15',
-                ['locale' => 'en_US', 'timeZone' => 'UTC'], // config global scope
-                null,
-                null,
-                $user,
-                'May 1, 2016, 10:30 AM'
+                $organization
             ],
             'Localization settings from params values' => [
-                '2016-05-01 10:30:15',
-                '2016-05-01 11:30:15',
+            '2016-05-01T10:30:15+00:00',
+            '2016-05-01T11:30:15+00:00',
                 ['locale' => 'en_US', 'timeZone' => 'UTC'], // config global scope
                 'en_US',
                 'Europe/Athens',
-                null,
-                'May 1, 2016 1:30 PM - 2:30 PM'
-            ],
-            'Localization settings from params values start=end' => [
-                '2016-05-01 10:30:15',
-                '2016-05-01 10:30:15',
-                ['locale' => 'en_US', 'timeZone' => 'UTC'], // config global scope
-                'en_US',
-                'Europe/Athens',
-                null,
-                'May 1, 2016, 1:30 PM'
+                null
             ]
         ];
     }

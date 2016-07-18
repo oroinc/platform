@@ -31,4 +31,11 @@ interface AclClassInfo
      * @return string
      */
     public function getDescription();
+
+    /**
+     * Gets the category
+     *
+     * @return string
+     */
+    public function getCategory();
 }

@@ -50,6 +50,12 @@ UPGRADE FROM 1.9 to 1.10
 - Added `acl_permission` twig extension - allows get `Permission` by `AclPermission`.
 - Added third parameter `$byCurrentGroup` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface::getPermissions` for getting permissions only for current application group name. Updated same method in `Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension` and `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`.
 - For php version from 7.0.0 to 7.0.5 we replaced `Symfony\Component\Security\Acl\Domain\Entry` on `Oro\Bundle\SecurityBundle\Acl\Domain\Entry` to avoid [bug](https://bugs.php.net/bug.php?id=71940) with unserialization of an object reference
+- Method `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::getTreeData` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::createTreeObject` instead.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBU` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBusinessUnit` instead.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getBusinessUnitUserIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getOrganizationUserIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder::fillOrganizationBusinessUnitIds` marked as deprecated as it is not used anywhere.
+- Method `Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder::fillOrganizationUserIds` marked as deprecated as it is not used anywhere.
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Exception\ActionException` marked as deprecated. Use `Oro\Component\Action\Exception\ActionException` instead.
@@ -229,6 +235,9 @@ Now:
 - The constructor of the `Oro\Bundle\EmailBundle\Mailer\Processor` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailOwnerProvider $emailOwnerProvider, EmailActivityManager $emailActivityManager, ServiceLink $serviceLink, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`. After: `__construct(DoctrineHelper $doctrineHelper, DirectMailer $mailer, EmailAddressHelper $emailAddressHelper, EmailEntityBuilder $emailEntityBuilder, EmailActivityManager $emailActivityManager, EventDispatcherInterface $eventDispatcher, Mcrypt $encryptor, EmailOriginHelper $emailOriginHelper)`.
 - `Oro\Bundle\EmailBundle\Mailer\Processor::getEmailOrigin` marked as deprecated. Use method `Oro\Bundle\EmailBundle\Tools\EmailOriginHelper::getEmailOrigin` instead.
 - Additional you should use origin as second parameter for `Oro\Bundle\EmailBundle\Mailer\Processor::process` if you want use specific transport different from system.
+- The constructor of the `Oro\Bundle\EmailBundle\Manager\EmailNotificationManager` class was changed.
+    Before: `__construct(EntityManager $entityManager, HtmlTagHelper $htmlTagHelper, Router $router, EmailCacheManager $emailCacheManager, ConfigManager $configManager)`.
+    After: `__construct(EntityManager $entityManager, HtmlTagHelper $htmlTagHelper, Router $router, ConfigManager $configManager)`.
 
 ####PlatformBundle
 - The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
@@ -239,7 +248,7 @@ Now:
 
 ####CalendarBundle
 - The method `formatCalendarDateRange` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatExtension.php` class was changed. Argument $dateTimeFormat was deleted, because it has no sense. `calendar_date_range` extension method in twig templates should be called without this param.
-- Added method `formatCalendarDateRangeUser` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatUserExtension.php`. Method `calendar_date_range_user` get additional param 'user' and return sate range according to user organization localization settings.
+- Added method `formatCalendarDateRangeOrganization` of `src/Oro/src/Oro/Bundle/CalendarBundle/Twig/DateFormatOrganizationExtension.php`. Method `calendar_date_range_organization` get additional param 'organization' and return sate range according to organization localization settings.
 
 ####LayoutBundle:
 - Added possibility to create layout block types using only DI configuration, for details please check out documentation at
@@ -261,13 +270,13 @@ Classes `Oro/Bundle/EmbeddedFormBundle/Layout/Block/Type/EmbedFormSuccessType` a
 - Layout block types was replaced with DI only configuration for `abstract_configurable` block,
 class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was removed.
 
-#### LocaleBundle:
+####LocaleBundle:
 - Added entity `Oro\Bundle\LocaleBundle\Entity\Localization` ([`see documentation`](./src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localization)).
 - Added entity `Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue` ([`see documentation`](./src/Oro/Bundle/LocaleBundle/Resources/doc/reference/entities.md#localizedfallbackvalue)) for translating strings in different localizations.
 - Added trait `Oro\Bundle\LocaleBundle\Entity\FallbackTrait` for retrieve translated value for the needed localization.
-- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter`  for displaying full title of the language by code.
-- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter`  for displaying full title of the formatting by code.
-- Added `oro_format_datetime_user` twig extension - allows get formatted date and calendar date range by user organization localization settings. Deprecated since 1.11. Will be removed after 1.13.
+- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter` for displaying full title of the language by code.
+- Added Formatter `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter` for displaying full title of the formatting by code.
+- Added `oro_format_datetime_organization` twig extension - allows get formatted date and calendar date range by organization localization settings. Deprecated since 1.11. Will be removed after 1.13.
 
 ####Layout Component:
 - `\Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface::prepare()` signature was changed from `prepare(array $source, VisitorCollection $visitorCollection);` to `prepare(Oro\Component\Layout\Loader\Generator\GeneratorData $data, VisitorCollection $visitorCollection);`
@@ -280,3 +289,16 @@ class `Oro/Bundle/ActionBundle/Layout/Block/Type/ActionCombinedButtonsType` was 
 ####Oro\Component\Config
 - `Oro\Component\Config\CumulativeResourceInfo::__construct` signature changed from
 `public function __construct($bundleClass, $name, $path, $data)` to `public function __construct($bundleClass, $name, $path, array $data = [])`
+
+####UserBundle:
+- The constructor of the `Oro\Bundle\UserBundle\Form\Type\UserType` class was changed. Removed argument: `ConfigManager $userConfigManager`.
+- The constructor of the `Oro\Bundle\UserBundle\Form\Handler\UserHandler` class was changed. Removed argument: `SecurityFacade $securityFacade = null`.
+- Added new configuration group user_configuration used to define which personal configurations can be updated by the user (Languages, Locale etc.)
+- Added 2 new capabilites: Update User Profile and Access personal configuration to control access to "My Profile" and  "My Configuration" updates
+- Added new permission "Configure" which controls access to entity configuration settings. Currently is applied to User entity only.
+
+####RequireJsBundle:
+- Added `Oro\Bundle\RequireJSBundle\Provider\ConfigProviderInterface` interface. 
+- Class `Oro\Bundle\RequireJSBundle\Provider\Config` marked as deprecated. Use `Oro\Bundle\RequireJSBundle\Provider\ConfigProvider` instead.
+- Added `Oro\Bundle\RequireJSBundle\Provider\AbstractConfigProvider` class. 
+- Added `Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager` class for building all configs provided by config providers via `oro:requirejs:build`. 

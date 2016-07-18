@@ -1,0 +1,54 @@
+.role-capability {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #F1F1F1;
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 10px;
+  }
+  & &__items {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  & &__empty-items {
+    opacity: 0.4;
+  }
+  & &__item {
+    display: inline-block;
+    width: 30%;
+    padding: 0 30px 10px 0;
+    input[type="checkbox"] {
+      margin: 0 0 0 -15px;
+    }
+  }
+  & &__item-label {
+    padding-right: 8px;
+  }
+  & label&__item-label {
+    padding-left: 23px;
+    margin: 0 0 0 -8px;
+    display: inline-block;
+  }
+  & &__item-label_changed {
+    background-color: #f5f5f5;
+    box-shadow: 0 0 0 3px #f5f5f5;
+  }
+  & &__select-all {
+    float: right;
+    &.disabled {
+      pointer-events: none;
+      color: #aaa;
+    }
+  }
+  & &__group-common-title {
+    display: none;
+    .role-capabilities_single-group & {
+      display: inline;
+    }
+  }
+  & &__group-own-title {
+    display: inline;
+    .role-capabilities_single-group & {
+      display: none;
+    }
+  }
+}
