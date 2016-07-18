@@ -140,7 +140,7 @@ define(function(require) {
                 return;
             }
             dialogManager.remove(this);
-            if (this.model) {
+            if (this.model && !this.options.preventToRemoveModel) {
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
                         // Suppress error if it's 404 response and not debug mode
