@@ -329,6 +329,10 @@ class User extends AbstractPageEntity
         return $this;
     }
 
+    public function hasBusinessUnitOrganizationChoice() {
+        return $this->isElementPresent("//*[@data-ftid='oro_user_user_form_organizations']//input[@type='checkbox']");
+    }
+
     public function edit()
     {
         $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit User']")->click();
