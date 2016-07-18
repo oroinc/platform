@@ -9,7 +9,7 @@ Settings
 ---------
 Totals setting should be placed under `totals` tree node.
 
-```
+```yml
 datagrid:
   demo:
     source:
