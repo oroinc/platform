@@ -200,22 +200,6 @@ services:
             - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -130 }
             - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -130 }
 
-    oro_api.get_config.remove_duplicated_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\RemoveDuplicatedFilters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -140 }
-            - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -140 }
-
-    oro_api.get_config.remove_duplicated_sorters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\RemoveDuplicatedSorters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -140 }
-            - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -140 }
-
     oro_api.get_config.set_data_transformers:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetDataTransformers
         arguments:
