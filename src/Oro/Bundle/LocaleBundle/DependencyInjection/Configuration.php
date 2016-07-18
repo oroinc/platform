@@ -13,6 +13,8 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
  */
 class Configuration implements ConfigurationInterface
 {
+    const ROOT_NAME   = 'oro_locale';
+
     const DEFAULT_LOCALE   = 'en';
     const DEFAULT_LANGUAGE = 'en';
     const DEFAULT_COUNTRY  = 'US';
@@ -29,7 +31,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         /** @var ArrayNodeDefinition $rootNode */
         $rootNode = $treeBuilder
-            ->root('oro_locale')
+            ->root(self::ROOT_NAME)
             ->children()
                 ->arrayNode('name_format')
                     ->prototype('scalar')
