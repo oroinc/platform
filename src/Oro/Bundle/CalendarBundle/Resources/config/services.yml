@@ -6,16 +6,21 @@ parameters:
     oro_calendar.listener.entity_listener.class:                 Oro\Bundle\CalendarBundle\EventListener\EntityListener
     oro_calendar.listener.datagrid.activity.class:               Oro\Bundle\CalendarBundle\EventListener\Datagrid\ActivityGridListener
     oro_calendar.listener.datagrid.system_calendar.class:        Oro\Bundle\CalendarBundle\EventListener\Datagrid\SystemCalendarGridListener
+    oro_calendar.datagrid.helper.calendar_event_grid.class:      Oro\Bundle\CalendarBundle\Datagrid\CalendarEventGridHelper
     oro_calendar.datagrid.action_permission_provider.class:      Oro\Bundle\CalendarBundle\Datagrid\ActionPermissionProvider
     oro_calendar.calendar_event.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.calendar_property.manager.api.class:            Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager
     oro_calendar.system_calendar.manager.api.class:              Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
+    oro_calendar.twig.recurrence.class:                          Oro\Bundle\CalendarBundle\Twig\RecurrenceExtension
     oro_calendar.provider.calendar_config.class:                 Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider
+    oro_calendar.provider.attendee_email_recipients.class:       Oro\Bundle\CalendarBundle\Provider\AttendeeEmailRecipientsProvider
     oro_calendar.owner_assignment_checker.calendar.class:        Oro\Bundle\CalendarBundle\Ownership\CalendarOwnerAssignmentChecker
     oro_calendar.activity_list.provider.class:                   Oro\Bundle\CalendarBundle\Provider\CalendarEventActivityListProvider
     oro_calendar.calendar_event_manager.class:                   Oro\Bundle\CalendarBundle\Manager\CalendarEventManager
     oro_calendar.calendar_manager.class:                         Oro\Bundle\CalendarBundle\Manager\CalendarManager
+    oro_calendar.attendee_manager.class:                         Oro\Bundle\CalendarBundle\Manager\AttendeeManager
+    oro_calendar.attendee_relation_manager.class:                Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager
     oro_calendar.calendar_property_provider.class:               Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider
     oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
     oro_calendar.calendar_provider.system.class:                 Oro\Bundle\CalendarBundle\Provider\SystemCalendarProvider
@@ -31,13 +36,29 @@ parameters:
     oro_calendar.calendar_event.handler.delete.class:            Oro\Bundle\CalendarBundle\Handler\CalendarEventDeleteHandler
     oro_calendar.system_calendar_event.datagrid_helper.class:    Oro\Bundle\CalendarBundle\Datagrid\SystemCalendarEventGridHelper
 
+    oro_calendar.strategy.abstract.class:                        Oro\Bundle\CalendarBundle\Model\Recurrence\AbstractStrategy
+    oro_calendar.strategy.delegate.class:                        Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy
+    oro_calendar.strategy.daily.class:                           Oro\Bundle\CalendarBundle\Model\Recurrence\DailyStrategy
+    oro_calendar.strategy.weekly.class:                          Oro\Bundle\CalendarBundle\Model\Recurrence\WeeklyStrategy
+    oro_calendar.strategy.monthly.class:                         Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy
+    oro_calendar.strategy.yearly.class:                          Oro\Bundle\CalendarBundle\Model\Recurrence\YearlyStrategy
+    oro_calendar.strategy.monthnth.class:                        Oro\Bundle\CalendarBundle\Model\Recurrence\MonthNthStrategy
+    oro_calendar.strategy.yearnth.class:                         Oro\Bundle\CalendarBundle\Model\Recurrence\YearNthStrategy
+
+    oro_calendar.model.recurrence.class:                         Oro\Bundle\CalendarBundle\Model\Recurrence
+
+    oro_calendar.validator.recurrence.class:                     Oro\Bundle\CalendarBundle\Validator\RecurrenceValidator
+    oro_calendar.validator.calendar_event.class:                 Oro\Bundle\CalendarBundle\Validator\CalendarEventValidator
+
 services:
     oro_calendar.listener.entity_listener:
         class: %oro_calendar.listener.entity_listener.class%
         arguments:
             - '@oro_organization.link.security_context'
+            - '@oro_calendar.model.recurrence'
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
 
@@ -93,10 +114,26 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_calendar.twig.recurrence:
+        class: '%oro_calendar.twig.recurrence.class%'
+        arguments:
+            - '@translator'
+            - '@oro_calendar.model.recurrence'
+        tags:
+            - { name: twig.extension }
+
     oro_calendar.provider.calendar_config:
         class: %oro_calendar.provider.calendar_config.class%
         arguments:
             - '@oro_locale.settings'
+
+    oro_calendar.provider.attendee_email_recipients:
+        class: %oro_calendar.provider.attendee_email_recipients.class%
+        arguments:
+            - '@doctrine'
+            - '@oro_email.provider.email_recipients.helper'
+        tags:
+            - { name: oro_email.recipients_provider, priority: 50 }
 
     oro_calendar.owner_assignment_checker.calendar:
         class: %oro_calendar.owner_assignment_checker.calendar.class%
@@ -125,6 +162,19 @@ services:
         arguments:
             - '@oro_calendar.calendar_property_provider'
 
+    oro_calendar.attendee_manager:
+        class: %oro_calendar.attendee_manager.class%
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_calendar.attendee_relation_manager'
+
+    oro_calendar.attendee_relation_manager:
+        class: %oro_calendar.attendee_relation_manager.class%
+        arguments:
+            - '@doctrine'
+            - '@oro_locale.formatter.name'
+            - '@oro_locale.dql.formatter.name'
+
     oro_calendar.calendar_property_provider:
         class: %oro_calendar.calendar_property_provider.class%
         arguments:
@@ -138,6 +188,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_calendar.calendar_event_normalizer.user'
+            - '@oro_calendar.model.recurrence'
         public: false
         tags:
             - { name: oro_calendar.calendar_provider, alias: user }
@@ -169,19 +220,21 @@ services:
         arguments:
             - '@oro_reminder.entity.manager'
             - '@oro_security.security_facade'
-            - '@oro_entity.doctrine_helper'
+            - '@oro_calendar.attendee_manager'
 
     oro_calendar.calendar_event_normalizer.system:
         class: %oro_calendar.calendar_event_normalizer.system.class%
         arguments:
             - '@oro_reminder.entity.manager'
             - '@oro_security.security_facade'
+            - '@oro_calendar.attendee_manager'
 
     oro_calendar.calendar_event_normalizer.public:
         class: %oro_calendar.calendar_event_normalizer.public.class%
         arguments:
             - '@oro_reminder.entity.manager'
             - '@oro_security.security_facade'
+            - '@oro_calendar.attendee_manager'
 
     oro_calendar.autocomplete.user_calendar_handler:
         class: %oro_calendar.autocomplete.user_calendar_handler.class%
@@ -214,6 +267,7 @@ services:
         arguments:
             - '@oro_notification.email_processor'
             - '@doctrine.orm.entity_manager'
+            - '@oro_security.security_facade'
 
     oro_calendar.listener.datagrid.system_calendar:
         class: %oro_calendar.listener.datagrid.system_calendar.class%
@@ -223,6 +277,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.system-calendar-grid, method: onBuildBefore }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.system-calendar-grid, method: onBuildAfter }
+
+    oro_calendar.datagrid.helper.calendar_event_grid:
+        class: %oro_calendar.datagrid.helper.calendar_event_grid.class%
+        arguments:
+            - '@router'
 
     oro_calendar.system_calendar_config:
         class: %oro_calendar.system_calendar_config.class%
@@ -247,6 +306,7 @@ services:
         class: %oro_calendar.calendar_event.handler.delete.class%
         parent: oro_soap.handler.delete.abstract
         calls:
+            - [setRequestStack, ['@request_stack']]
             - [setCalendarConfig, ['@oro_calendar.system_calendar_config']]
             - [setSecurityFacade, ['@oro_security.security_facade']]
             - [setEmailSendProcessor, ['@oro_calendar.send_processor.email']]
@@ -264,3 +324,92 @@ services:
         tags:
             - { name: oro_workflow.action, alias: create_calendar_event }
 
+    oro_calendar.autocomplete.attendee_search_handler:
+        class: Oro\Bundle\CalendarBundle\Autocomplete\AttendeeSearchHandler
+        arguments:
+            - @security.token_storage
+            - @translator
+            - @oro_search.index
+            - @oro_activity.manager
+            - @oro_entity_config.config_manager
+            - @oro_entity.entity_class_name_helper
+            - @doctrine.orm.entity_manager
+            - @oro_search.mapper
+            - @event_dispatcher
+            - @oro_calendar.attendee_relation_manager
+
+    # Recurrence Strategies
+    oro_calendar.recurrence.strategy.abstract:
+        class: '%oro_calendar.strategy.abstract.class%'
+        abstract: true
+        public: false
+        arguments:
+            - '@translator'
+            - '@oro_locale.formatter.date_time'
+            - '@oro_locale.settings'
+
+    oro_calendar.recurrence.strategy.delegate:
+        class: '%oro_calendar.strategy.delegate.class%'
+
+    oro_calendar.recurrence.strategy:
+        alias: oro_calendar.recurrence.strategy.delegate
+
+    oro_calendar.recurrence.strategy.daily:
+        class: '%oro_calendar.strategy.daily.class%'
+        public: false
+        parent: oro_calendar.recurrence.strategy.abstract
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
+    oro_calendar.recurrence.strategy.weekly:
+        class: '%oro_calendar.strategy.weekly.class%'
+        public: false
+        parent: oro_calendar.recurrence.strategy.abstract
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
+    oro_calendar.recurrence.strategy.monthly:
+        class: '%oro_calendar.strategy.monthly.class%'
+        public: false
+        parent: oro_calendar.recurrence.strategy.abstract
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
+    oro_calendar.recurrence.strategy.yearly:
+        class: '%oro_calendar.strategy.yearly.class%'
+        public: false
+        parent: oro_calendar.recurrence.strategy.abstract
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
+    oro_calendar.recurrence.strategy.monthnth:
+        class: '%oro_calendar.strategy.monthnth.class%'
+        public: false
+        parent: oro_calendar.recurrence.strategy.abstract
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
+    oro_calendar.recurrence.strategy.yearnth:
+        class: '%oro_calendar.strategy.yearnth.class%'
+        public: false
+        parent: oro_calendar.recurrence.strategy.abstract
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
+    oro_calendar.model.recurrence:
+        arguments:
+            - '@validator'
+            - '@oro_calendar.recurrence.strategy'
+        class: '%oro_calendar.model.recurrence.class%'
+
+    oro_calendar.validator.recurrence:
+        class: '%oro_calendar.validator.recurrence.class%'
+        arguments:
+            - '@oro_calendar.model.recurrence'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_calendar.recurrence_validator }
+
+    oro_calendar.validator.calendar_event:
+        class: '%oro_calendar.validator.calendar_event.class%'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_calendar.calendar_event_validator }

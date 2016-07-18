@@ -9,8 +9,12 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class CalendarEventApiHandler
 {
@@ -29,25 +33,31 @@ class CalendarEventApiHandler
     /** @var ActivityManager */
     protected $activityManager;
 
+    /** @var AttendeeRelationManager */
+    protected $attendeeRelationManager;
+
     /**
-     * @param FormInterface      $form
-     * @param Request            $request
-     * @param ObjectManager      $manager
-     * @param EmailSendProcessor $emailSendProcessor
-     * @param ActivityManager    $activityManager
+     * @param FormInterface           $form
+     * @param Request                 $request
+     * @param ObjectManager           $manager
+     * @param EmailSendProcessor      $emailSendProcessor
+     * @param ActivityManager         $activityManager
+     * @param AttendeeRelationManager $attendeeRelationManager
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         ObjectManager $manager,
         EmailSendProcessor $emailSendProcessor,
-        ActivityManager $activityManager
+        ActivityManager $activityManager,
+        AttendeeRelationManager $attendeeRelationManager
     ) {
-        $this->form               = $form;
-        $this->request            = $request;
-        $this->manager            = $manager;
-        $this->emailSendProcessor = $emailSendProcessor;
-        $this->activityManager    = $activityManager;
+        $this->form                    = $form;
+        $this->request                 = $request;
+        $this->manager                 = $manager;
+        $this->emailSendProcessor      = $emailSendProcessor;
+        $this->activityManager         = $activityManager;
+        $this->attendeeRelationManager = $attendeeRelationManager;
     }
 
     /**
@@ -60,30 +70,37 @@ class CalendarEventApiHandler
     {
         $this->form->setData($entity);
 
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $originalChildren = new ArrayCollection();
-            foreach ($entity->getChildEvents() as $childEvent) {
-                $originalChildren->add($childEvent);
-            }
-
-            $this->form->submit($this->request);
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+            // clone attendees to have have original attendees at disposal later
+            $originalAttendees = new ArrayCollection($entity->getAttendees()->toArray());
+            $this->form->submit($this->request->request->all());
 
             if ($this->form->isValid()) {
+                /** @deprecated since version 1.10. Please use field attendees instead of invitedUsers */
+                if ($this->form->has('invitedUsers')) {
+                    $this->convertInvitedUsersToAttendees($entity, $this->form->get('invitedUsers')->getData());
+                }
+
                 // TODO: should be refactored after finishing BAP-8722
                 // Contexts handling should be moved to common for activities form handler
-                if ($this->form->has('contexts')) {
+                if ($this->form->has('contexts') && $this->request->request->has('contexts')) {
                     $contexts = $this->form->get('contexts')->getData();
                     $owner = $entity->getCalendar()->getOwner();
                     if ($owner && $owner->getId()) {
                         $contexts = array_merge($contexts, [$owner]);
                     }
                     $this->activityManager->setActivityTargets($entity, $contexts);
+                } elseif (!$entity->getId() && $entity->getRecurringEvent()) {
+                    $this->activityManager->setActivityTargets(
+                        $entity,
+                        $entity->getRecurringEvent()->getActivityTargetEntities()
+                    );
                 }
 
                 $this->onSuccess(
                     $entity,
-                    $originalChildren,
-                    $this->form->get('notifyInvitedUsers')->getData()
+                    $originalAttendees,
+                    $this->shouldBeNotified()
                 );
                 return true;
             }
@@ -93,29 +110,75 @@ class CalendarEventApiHandler
     }
 
     /**
+     * @deprecated since version 1.10. Please use field attendees instead of invitedUsers
+     *
+     * @param CalendarEvent $event
+     * @param User[]        $users
+     */
+    protected function convertInvitedUsersToAttendees(CalendarEvent $event, array $users)
+    {
+        foreach ($users as $user) {
+            $attendee = $this->attendeeRelationManager->createAttendee($user);
+
+            if ($attendee) {
+                $status = $this->manager
+                    ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
+                    ->find(Attendee::STATUS_NONE);
+                $attendee->setStatus($status);
+
+                $type = $this->manager
+                    ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE))
+                    ->find(Attendee::TYPE_REQUIRED);
+                $attendee->setType($type);
+
+                $event->addAttendee($attendee);
+            }
+        }
+    }
+
+    /**
      * "Success" form handler
      *
-     * @param CalendarEvent   $entity
-     * @param ArrayCollection $originalChildren
-     * @param boolean         $notify
+     * @param CalendarEvent              $entity
+     * @param ArrayCollection|Attendee[] $originalAttendees
+     * @param boolean                    $notify
      */
     protected function onSuccess(
         CalendarEvent $entity,
-        ArrayCollection $originalChildren,
+        ArrayCollection $originalAttendees,
         $notify
     ) {
         $new = $entity->getId() ? false : true;
+        if ($entity->isCancelled()) {
+            $event = $entity->getRealCalendarEvent();
+            $childEvents = $event->getChildEvents();
+            foreach ($childEvents as $childEvent) {
+                $childEvent->setCancelled(true);
+            }
+        }
         $this->manager->persist($entity);
         $this->manager->flush();
 
-        if ($new) {
-            $this->emailSendProcessor->sendInviteNotification($entity);
-        } else {
-            $this->emailSendProcessor->sendUpdateParentEventNotification(
-                $entity,
-                $originalChildren,
-                $notify
-            );
+        if ($notify) {
+            if ($new) {
+                $this->emailSendProcessor->sendInviteNotification($entity);
+            } else {
+                $this->emailSendProcessor->sendUpdateParentEventNotification(
+                    $entity,
+                    $originalAttendees,
+                    $notify
+                );
+            }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldBeNotified()
+    {
+        $notifyInvitedUsers = $this->form->get('notifyInvitedUsers')->getData();
+
+        return $notifyInvitedUsers === 'true' || $notifyInvitedUsers === true;
     }
 }

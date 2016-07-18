@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -18,6 +19,9 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendarEventNormalizer;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $recurrenceModel;
 
     /** @var UserCalendarProvider */
     protected $provider;
@@ -34,11 +38,16 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer')
                 ->disableOriginalConstructor()
                 ->getMock();
+        $this->recurrenceModel =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence')
+                ->disableOriginalConstructor()
+                ->getMock();
 
         $this->provider = new UserCalendarProvider(
             $this->doctrineHelper,
             $this->entityNameResolver,
-            $this->calendarEventNormalizer
+            $this->calendarEventNormalizer,
+            $this->recurrenceModel
         );
     }
 
@@ -141,7 +150,70 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $start          = new \DateTime();
         $end            = new \DateTime();
         $connections    = [10 => true, 20 => false];
-        $events         = [['id' => 1]];
+        $events         = [
+            [
+                'id'    => 1,
+                'start' => '2016-05-04T11:29:46+00:00',
+                'end'   => '2016-05-06T11:29:46+00:00',
+                'recurrence' => [
+                    'recurrenceType' => Recurrence::TYPE_DAILY,
+                    'interval' => 1,
+                    'instance' => null,
+                    'dayOfWeek' => [],
+                    'dayOfMonth' => null,
+                    'monthOfYear' => null,
+                    'startTime' => '2016-05-04T11:29:46+00:00',
+                    'endTime' => null,
+                    'calculatedEndTime' => Recurrence::MAX_END_DATE,
+                    'occurrences' => null,
+                    'timeZone' => 'UTC'
+                ],
+            ],
+        ];
+        $expectedEvents = [
+            [
+                'id'    => 1,
+                'start' => '2016-05-04T11:29:46+00:00',
+                'end'   => '2016-05-06T11:29:46+00:00',
+                'recurrence' => [
+                    'recurrenceType' => Recurrence::TYPE_DAILY,
+                    'interval' => 1,
+                    'instance' => null,
+                    'dayOfWeek' => [],
+                    'dayOfMonth' => null,
+                    'monthOfYear' => null,
+                    'startTime' => '2016-05-04T11:29:46+00:00',
+                    'endTime' => null,
+                    'occurrences' => null,
+                    'timeZone' => 'UTC'
+                ],
+                'recurrencePattern' => null,
+                'removable' => false,
+                'startEditable' => false,
+                'durationEditable' => false,
+            ],
+            [
+                'id'    => 1,
+                'start' => '2016-05-05T11:29:46+00:00',
+                'end'   => '2016-05-07T11:29:46+00:00',
+                'recurrence' => [
+                    'recurrenceType' => Recurrence::TYPE_DAILY,
+                    'interval' => 1,
+                    'instance' => null,
+                    'dayOfWeek' => [],
+                    'dayOfMonth' => null,
+                    'monthOfYear' => null,
+                    'startTime' => '2016-05-04T11:29:46+00:00',
+                    'endTime' => null,
+                    'occurrences' => null,
+                    'timeZone' => 'UTC'
+                ],
+                'recurrencePattern' => null,
+                'removable' => false,
+                'startEditable' => false,
+                'durationEditable' => false,
+            ],
+        ];
 
         $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -166,7 +238,6 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('setParameter')
-            ->with('visibleIds', [10])
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('getQuery')
@@ -176,9 +247,15 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getCalendarEvents')
             ->with($calendarId, $this->identicalTo($query))
             ->will($this->returnValue($events));
+        $this->recurrenceModel->expects($this->once())
+            ->method('getOccurrences')
+            ->will($this->returnValue([
+                new \DateTime('2016-05-04T11:29:46+00:00'),
+                new \DateTime('2016-05-05T11:29:46+00:00'),
+            ]));
 
         $result = $this->provider->getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
-        $this->assertEquals($events, $result);
+        $this->assertEquals($expectedEvents, $result);
     }
 
     public function testGetCalendarEventsAllInvisible()

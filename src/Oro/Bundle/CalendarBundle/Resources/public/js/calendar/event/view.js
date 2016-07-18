@@ -45,14 +45,14 @@ define([
             loadingMaskContent: '.loading-content',
             backgroundColor: 'input[name$="[backgroundColor]"]',
             calendarUid: '[name*="calendarUid"]',
-            invitedUsers: 'input[name$="[invitedUsers]"]',
+            attendees: 'input[name$="[attendees]"]',
             contexts: 'input[name$="[contexts]"]'
         },
 
         /** @property {Array} */
         userCalendarOnlyFields: [
             {fieldName: 'reminders', emptyValue: {}, selector: '.reminders-collection'},
-            {fieldName: 'invitedUsers', emptyValue: '', selector: 'input[name$="[invitedUsers]"]'}
+            {fieldName: 'attendees', emptyValue: '', selector: 'input[name$="[attendees]"]'}
         ],
 
         initialize: function(options) {
@@ -179,11 +179,14 @@ define([
             try {
                 var options = {
                     wait: true,
-                    error: _.bind(this._handleResponseError, this)
+                    error: _.bind(this._handleResponseError, this),
                 };
                 if (deleteUrl) {
-                    options.url = deleteUrl;
+                    options.url = routing.generate(deleteUrl, {id: this.model.originalId});
+                } else {
+                    options.url = this.model.url();
                 }
+                options.url += '?notifyInvitedUsers=true';
                 this.model.destroy(options);
             } catch (err) {
                 this.showError(err);
@@ -235,7 +238,7 @@ define([
             var fieldNameRegex = /\[(\w+)\]/g;
 
             // show loading mask if child events users should be updated
-            if (!_.isEmpty(modelData.invitedUsers)) {
+            if (!_.isEmpty(modelData.attendees)) {
                 this.eventDialog.once('renderComplete', function() {
                     self.showLoadingMask();
                 });
@@ -260,16 +263,25 @@ define([
                             input.prop('checked', input.val() === value);
                         }
                     } else {
-                        input.val(value);
+                        if (_.first(matches) === 'attendees') {
+                            if (value && value.length) {
+                                input.on('select2-data-loaded', function() {
+                                    self._hideMask();
+                                });
+                                input.val(self.model.originalId);
+                            }
+                        } else {
+                            input.val(value);
+                        }
                     }
                     input.change();
                 }
 
-                // hide loading mask if child events users should be updated
-                if (name.indexOf('[invitedUsers]') !== -1 && !_.isEmpty(modelData.invitedUsers)) {
-                    input.on('select2-data-loaded', function() {
-                        self._hideMask();
-                    });
+                if (modelData.recurrence &&
+                    name.indexOf('[title]') === -1 &&
+                    name.indexOf('[description]') === -1 &&
+                    name.indexOf('[contexts]') === -1) {
+                    input.attr('disabled', true);
                 }
             });
 
@@ -344,7 +356,7 @@ define([
                     this._showUserCalendarOnlyFields(form, false);
                 }
             }, this));
-            form.find(this.selectors.invitedUsers).on('change', _.bind(function(e) {
+            form.find(this.selectors.attendees).on('change', _.bind(function(e) {
                 this._toggleCalendarUidByInvitedUsers(form);
             }, this));
 
@@ -411,9 +423,17 @@ define([
                 delete data.calendarUid;
             }
 
-            if (data.hasOwnProperty('invitedUsers')) {
-                data.invitedUsers = _.map(data.invitedUsers ? data.invitedUsers.split(',') : [], function(item) {
-                    return parseInt(item);
+            if (data.hasOwnProperty('attendees')) {
+                var attendees = this.eventDialog.form.find('[name="oro_calendar_event_form[attendees]"]')
+                    .select2('data');
+                data.attendees = _.map(attendees, function(attendee) {
+                    return {
+                        displayName: attendee.displayName,
+                        email: attendee.email,
+                        fullName: attendee.text,
+                        status: attendee.status,
+                        type: attendee.type
+                    };
                 });
             }
 
@@ -448,7 +468,7 @@ define([
             if (!$calendarUid.length) {
                 return;
             }
-            if (form.find(this.selectors.invitedUsers).val()) {
+            if (form.find(this.selectors.attendees).val()) {
                 $calendarUid.attr('disabled', 'disabled');
                 $calendarUid.parent().attr('title', __('The calendar cannot be changed because the event has guests'));
                 // fix select2 dynamic change disabled
