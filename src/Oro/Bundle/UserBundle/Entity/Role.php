@@ -21,7 +21,8 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

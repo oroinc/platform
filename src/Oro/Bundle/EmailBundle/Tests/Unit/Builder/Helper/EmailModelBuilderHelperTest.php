@@ -114,7 +114,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testPreciseFullEmailAddressIsFullQualifiedName()
     {
-        $emailAddress = 'Admin <someaddress@example.com>';
+        $emailAddress = '"Admin" <someaddress@example.com>';
 
         $this->entityRoutingHelper->expects($this->never())
             ->method('getEntity');
@@ -131,7 +131,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
     public function testPreciseFullEmailAddressViaRoutingHelper()
     {
         $emailAddress = 'someaddress@example.com';
-        $expected     = 'Admin <someaddress@example.com>';
+        $expected     = '"Admin" <someaddress@example.com>';
 
         $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
         $ownerId    = 1;
@@ -183,7 +183,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
     public function testPreciseFullEmailAddressViaAddressManager()
     {
         $emailAddress = 'someaddress@example.com';
-        $expected     = 'Admin <someaddress@example.com>';
+        $expected     = '"Admin" <someaddress@example.com>';
 
         $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
         $ownerId    = null;
@@ -307,19 +307,19 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'FirstName LastName <test@example.com>',
+                '"FirstName LastName" <test@example.com>',
                 'test@example.com',
                 null,
                 null
             ],
             [
-                'FirstName LastName <test@example.com>',
+                '"FirstName LastName" <test@example.com>',
                 'test@example.com',
                 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser',
                 null
             ],
             [
-                'OwnerFirstName OwnerLastName <test@example.com>',
+                '"OwnerFirstName OwnerLastName" <test@example.com>',
                 'test@example.com',
                 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser',
                 123
@@ -410,7 +410,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $email = 'email';
         $format = 'format';
-        $expected = 'format <email>';
+        $expected = '"format" <email>';
 
         $user->expects($this->once())
             ->method('getEmail')

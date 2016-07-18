@@ -23,6 +23,7 @@ parameters:
     oro_user.form.type.user_acl_select.class:   Oro\Bundle\UserBundle\Form\Type\UserAclSelectType
     oro_user.form.type.organization_user_acl_select.class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclSelectType
     oro_user.form.type.organization_user_multiselect.class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType
+    oro_user.form.type.user_emailsettings.class: Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
 
 services:
     oro_user.form.user:
@@ -73,6 +74,12 @@ services:
         factory_service:              form.factory
         arguments:                    ["oro_user_status_form", "oro_user_status", null]
 
+    oro_user.form.emailsettings:
+        class:                        Symfony\Component\Form\Form
+        factory_method:               createNamed
+        factory_service:              form.factory
+        arguments:                    ["oro_user_emailsettings_form", "oro_user_emailsettings", null]
+
     oro_user.form.type.user:
         scope: request
         class:                        %oro_user.form.type.user.class%
@@ -80,7 +87,6 @@ services:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
-            - '@oro_config.user'
         tags:
             - { name: form.type, alias: oro_user_user }
 
@@ -91,7 +97,8 @@ services:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
-            - '@oro_config.user'
+        calls:
+            - [setUserConfigManager, ["@oro_config.user"]]
         tags:
             - { name: form.type, alias: user }
 
@@ -188,6 +195,14 @@ services:
         tags:
             - { name: form.type, alias: oro_gender }
 
+    oro_user.form.type.user_emailsettings:
+        class: %oro_user.form.type.user_emailsettings.class%
+        arguments:
+            - '@oro_config.user'
+            - '@oro_user.imap_configuration.subscriber'
+        tags:
+            - { name: form.type, alias: oro_user_emailsettings }
+
     oro_user.form.handler.user:
         class: %oro_user.form.handler.user.class%
         scope: request
@@ -201,7 +216,6 @@ services:
             - '@session.flash_bag'
             - '@translator'
             - '@logger'
-            - '@oro_security.security_facade'
         calls:
             - [setBusinessUnitManager, ["@oro_organization.business_unit_manager"]]
 
@@ -264,3 +278,58 @@ services:
             - '@oro_user.form.type.set_password.form'
             - '@oro_user.mailer.processor'
             - '@oro_user.manager'
+
+    # Dashboard
+    oro_user.form.type.widget_owners:
+        class: Oro\Bundle\UserBundle\Form\Type\WidgetOwnersType
+        tags:
+            - { name: form.type, alias: 'oro_type_widget_owners' }
+
+    oro_user.form.type.widget_user_multiselect:
+        class: Oro\Bundle\UserBundle\Form\Type\WidgetUserSelectType
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_form.autocomplete.search_registry'
+            - '@oro_entity_config.provider.form'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: form.type, alias: 'oro_type_widget_user_select' }
+
+    oro_user.form.type.widget_role_multiselect:
+        class: Oro\Bundle\UserBundle\Form\Type\WidgetRoleSelectType
+        tags:
+            - { name: form.type, alias: 'oro_type_widget_role_select' }
+
+    oro_user.widget_config_value.widget_user_multiselect.converter:
+        class: Oro\Bundle\UserBundle\Dashboard\Converters\WidgetUserSelectConverter
+        arguments:
+            - '@oro_user.dashboard.owner_helper'
+            - '@oro_security.acl_helper'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_entity.doctrine_helper'
+            - '@doctrine.orm.entity_manager'
+            - 'Oro\Bundle\UserBundle\Entity\User'
+        tags:
+            - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_user_select' }
+
+    oro_user.widget_config_value.widget_role_multiselect.converter:
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter
+        arguments:
+            - '@oro_security.acl_helper'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_entity.doctrine_helper'
+            - '@doctrine.orm.entity_manager'
+            - 'Oro\Bundle\UserBundle\Entity\Role'
+        tags:
+            - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_role_select' }
+
+    oro_user.widget_config_value.widget_owners.converter:
+        class: Oro\Bundle\UserBundle\Dashboard\Converters\WidgetDefaultOwnersConverter
+        arguments:
+            - '@translator'
+        calls:
+            - [ setConverter, ['@oro_organization.widget_config_value.widget_business_unit_multiselect.converter', 'businessUnits', 'oro.user.dashboard.business_unit'] ]
+            - [ setConverter, ['@oro_user.widget_config_value.widget_role_multiselect.converter', 'roles', 'oro.user.dashboard.role'] ]
+            - [ setConverter, ['@oro_user.widget_config_value.widget_user_multiselect.converter', 'users', 'oro.user.dashboard.owner'] ]
+        tags:
+            - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_owners' }

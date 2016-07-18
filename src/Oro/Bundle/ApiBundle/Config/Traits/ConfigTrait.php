@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 /**
  * @property array $items
  */
@@ -68,5 +70,30 @@ trait ConfigTrait
         if (array_key_exists($key, $config) && $defaultValue === $config[$key]) {
             unset($config[$key]);
         }
+    }
+
+    /**
+     * Gets a native PHP array representation of the configuration options.
+     *
+     * @return array
+     */
+    protected function convertItemsToArray()
+    {
+        $result = $this->items;
+        foreach ($this->items as $key => $value) {
+            if (is_object($value) && method_exists($value, 'toArray')) {
+                $result[$key] = $value->toArray();
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Makes a deep copy of the configuration options.
+     */
+    protected function cloneItems()
+    {
+        $this->items = ConfigUtil::cloneItems($this->items);
     }
 }

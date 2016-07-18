@@ -18,31 +18,48 @@
 
 {% block block_attributes -%}
     {% set renderer = 'block_attributes_base' %}
-    {% if attr_renderer is defined %}
+    {%- if attr_renderer is defined -%}
         {% set renderer = attr_renderer %}
-    {% endif %}
-    {{ block(renderer) }}
+    {%- endif -%}
+    {{- block(renderer) -}}
 {%- endblock %}
 
 {% block block_attributes_base -%}
-    {% if attr.class is defined %}
+    {%- if attr.class is defined -%}
         {% set attr = attr|merge({
-            class: attr.class|replace({'{{ class_prefix }}': class_prefix})
+        class: attr.class|replace({'{{ class_prefix }}': class_prefix})
         }) %}
-    {% endif %}
-    {% for attrname, attrvalue in attr %}
-        {% if (attrvalue is iterable) %}{% set attrvalue = attrvalue|json_encode(constant('JSON_FORCE_OBJECT')) %}{% endif %}
-        {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}
-    {% endfor %}
+    {%- endif -%}
+    {%- if hidden -%}
+        {% set attr = attr|merge({
+            class: attr.class|default('') ~ ' hidden'
+        }) %}
+    {%- endif -%}
+    {%- for attrname, attrvalue in attr -%}
+        {%- if (attrvalue is iterable) -%}
+            {% set attrvalue = attrvalue|json_encode(constant('JSON_FORCE_OBJECT')) %}
+        {%- endif -%}
+        {%- if attrname is same as('title') -%}
+            {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain) }}"
+        {% else %}
+            {{- ' ' ~ attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
 {%- endblock %}
 
 {% block block_label_attributes -%}
-    {% if label_attr.class is defined %}
+    {%- if label_attr.class is defined -%}
         {% set label_attr = label_attr|merge({
             class: label_attr.class|replace({'{{ class_prefix }}': class_prefix})
         }) %}
-    {% endif %}
-    {% for attrname, attrvalue in label_attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|block_text(translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
+    {%- endif -%}
+    {%- for attrname, attrvalue in label_attr -%}
+        {%- if attrname is same as('title') -%}
+            {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain) }}"
+        {% else %}
+            {{- ' ' ~ attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
 {%- endblock %}
 
 {% block icon_block -%}
@@ -81,38 +98,46 @@
     {% if reverse %}
         {% set value = value|reverse %}
     {% endif %}
-    <title>
-        {%- for element in value -%}
-            {{ element|block_text(translation_domain) }}
-            {%- if not loop.last -%}
-                {{ separator }}
-            {%- endif -%}
-        {%- endfor -%}
-    </title>
+    {% spaceless %}
+        <title>
+            {%- for element in value -%}
+                {{ element|block_text(translation_domain) }}
+                {%- if not loop.last -%}
+                    {{ separator }}
+                {%- endif -%}
+            {%- endfor -%}
+        </title>
+    {% endspaceless %}
 {%- endblock %}
 
 {% block meta_widget %}
-    <meta{{ block('block_attributes') }}/>
+    {% spaceless %}
+        <meta{{ block('block_attributes') }}/>
+    {% endspaceless %}
 {% endblock %}
 
 {% block script_widget %}
-    {% if attr.src is defined and attr.src is not empty %}
-        <script{{ block('block_attributes') }}></script>
-    {% else %}
-        <script{{ block('block_attributes') }}>
-            {{ content|raw }}
-        </script>
-    {% endif %}
+    {% spaceless %}
+        {%- if attr.src is defined and attr.src is not empty -%}
+            <script{{ block('block_attributes') }}></script>
+        {% else %}
+            <script{{ block('block_attributes') }}>
+                {{ content|raw }}
+            </script>
+        {%- endif -%}
+    {% endspaceless %}
 {% endblock %}
 
 {% block style_widget %}
-    {% if attr.href is defined and attr.href is not empty %}
-        <link rel="stylesheet"{{ block('block_attributes') }}/>
-    {% else %}
-        <style{{ block('block_attributes') }}>
-            {{ content|raw }}
-        </style>
-    {% endif %}
+    {% spaceless %}
+        {%- if attr.href is defined and attr.href is not empty -%}
+            <link rel="stylesheet"{{ block('block_attributes') }}/>
+        {% else %}
+            <style{{ block('block_attributes') }}>
+                {{ content|raw }}
+            </style>
+        {%- endif -%}
+    {% endspaceless %}
 {% endblock %}
 
 {% block body_widget %}
@@ -133,7 +158,7 @@
     {%- endif -%}
 {% endblock %}
 
-{% block form_widget %}
+{% block form_fields_widget %}
     {% if split_to_fields %}
         {{ block_widget(block) }}
     {% else %}
@@ -147,6 +172,14 @@
 
 {% block form_field_widget %}
     {{ form_row(form) }}
+{% endblock %}
+
+{% block form_errors_widget %}
+    {% if form.vars.errors|length > 0 %}
+        <div{{ block('block_attributes') }}>
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block fieldset_widget %}
@@ -165,10 +198,12 @@
 {%- endblock %}
 
 {% block link_widget -%}
-    <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
-        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
-        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
-    </a>
+    {% spaceless %}
+        <a{{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
+            {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+            {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+        </a>
+    {% endspaceless %}
 {%- endblock %}
 
 {% block button_widget -%}
@@ -180,20 +215,24 @@
 {%- endblock %}
 
 {% block button_widget_input -%}
-    <input{{ block('block_attributes') }}
-        type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
-        {%- if name is defined %} name="{{ name }}"{% endif %}
-        {%- if value is defined or text is defined %} value="{{ value is defined ? value : text|block_text(translation_domain) }}"{% endif %}/>
+    {% spaceless %}
+        <input{{ block('block_attributes') }}
+            type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
+            {%- if name is defined %} name="{{ name }}"{% endif %}
+            {%- if value is defined or text is defined %} value="{{ value is defined ? value : text|block_text(translation_domain) }}"{% endif %}/>
+    {% endspaceless %}
 {%- endblock %}
 
 {% block button_widget_button -%}
-    <button{{ block('block_attributes') }}
-        {%- if action in ['submit', 'reset'] %} type="{{ action }}"{% endif %}
-        {%- if name is defined %} name="{{ name }}"{% endif %}
-        {%- if value is defined %} value="{{ value }}"{% endif %}>
-        {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
-        {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
-    </button>
+    {% spaceless %}
+        <button{{ block('block_attributes') }}
+            {%- if action in ['submit', 'reset'] %} type="{{ action }}"{% endif %}
+            {%- if name is defined %} name="{{ name }}"{% endif %}
+            {%- if value is defined %} value="{{ value }}"{% endif %}>
+            {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
+            {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+        </button>
+    {% endspaceless %}
 {%- endblock %}
 
 {% block external_resource_widget %}
@@ -201,27 +240,31 @@
 {% endblock %}
 
 {% block list_widget -%}
-    <ul{{ block('block_attributes') }}>
-    {% for child in block if child.vars.visible -%}
-        {% if child.vars.own_template is defined and child.vars.own_template -%}
-            {{ block_widget(child) }}
-        {%- else %}
-            <li>{{ block_widget(child) }}</li>
-        {%- endif %}
-    {%- endfor %}
-    </ul>
+    {% spaceless %}
+        <ul{{ block('block_attributes') }}>
+        {% for child in block if child.vars.visible -%}
+            {% if child.vars.own_template is defined and child.vars.own_template -%}
+                {{ block_widget(child) }}
+            {%- else %}
+                <li>{{ block_widget(child) }}</li>
+            {%- endif %}
+        {%- endfor %}
+        </ul>
+    {% endspaceless %}
 {%- endblock %}
 
 {% block ordered_list_widget -%}
-    <ol{{ block('block_attributes') }}>
-    {% for child in block if child.vars.visible -%}
-        {% if child.vars.own_template is defined and child.vars.own_template -%}
-            {{ block_widget(child) }}
-        {%- else %}
-            <li>{{ block_widget(child) }}</li>
-        {%- endif %}
-    {%- endfor %}
-    </ol>
+    {% spaceless %}
+        <ol{{ block('block_attributes') }}>
+        {% for child in block if child.vars.visible -%}
+            {% if child.vars.own_template is defined and child.vars.own_template -%}
+                {{ block_widget(child) }}
+            {%- else %}
+                <li>{{ block_widget(child) }}</li>
+            {%- endif %}
+        {%- endfor %}
+        </ol>
+    {% endspaceless %}
 {%- endblock %}
 
 {% block list_item_widget -%}
