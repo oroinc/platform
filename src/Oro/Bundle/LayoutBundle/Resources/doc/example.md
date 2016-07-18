@@ -1038,7 +1038,7 @@ layout:
             parentId: breadcrumbs
             blockType: text
             options:
-                text: '=data["product.name"]'
+                text: '=data["product"].getName()'
 ```
 
 This should render into the following HTML:
@@ -1697,7 +1697,7 @@ layout:
                 product_add_to_wishlist_link:
                     blockType: link
                     options:
-                        path: '=/~""~wishlist/index/add/product/~""~data["product"].getId()'
+                        path: '="/wishlist/index/add/product/"~data["product"].getId()'
                         text: Add to Wishlist
                         attr:
                             class: link-wishlist
