@@ -133,40 +133,14 @@ class QueueConsumer
 
                 return;
             } catch (\Exception $exception) {
-                $logger->error(sprintf('Consuming interrupted by exception'));
-                
                 $context->setExecutionInterrupted(true);
                 $context->setException($exception);
 
                 try {
-                    $extension->onInterrupted($context);
-                } catch (\Exception $e) {
-                    // logic is similar to one in Symfony's ExceptionListener::onKernelException
-                    $logger->error(sprintf(
-                        'Exception thrown when handling an exception (%s: %s at %s line %s)',
-                        get_class($e),
-                        $e->getMessage(),
-                        $e->getFile(),
-                        $e->getLine()
-                    ));
-
-                    $wrapper = $e;
-                    while ($prev = $wrapper->getPrevious()) {
-                        if ($exception === $wrapper = $prev) {
-                            throw $e;
-                        }
-                    }
-
-                    $prev = new \ReflectionProperty('Exception', 'previous');
-                    $prev->setAccessible(true);
-                    $prev->setValue($wrapper, $exception);
-
-                    throw $e;
+                    $this->onInterruptionByException($extension, $context);
                 } finally {
                     $session->close();
                 }
-
-                throw $exception;
             }
         }
     }
@@ -185,13 +159,13 @@ class QueueConsumer
         $messageProcessor = $context->getMessageProcessor();
         $messageConsumer = $context->getMessageConsumer();
         $logger = $context->getLogger();
-        
+
         $extension->onBeforeReceive($context);
 
         if ($context->isExecutionInterrupted()) {
             throw new ConsumptionInterruptedException();
         }
-        
+
         if (false == $context->isExecutionInterrupted() && $message = $messageConsumer->receive($timeout = 1)) {
             $logger->info('Message received');
             $logger->debug('Headers: {headers}', ['headers' => new VarExport($message->getHeaders())]);
@@ -233,5 +207,47 @@ class QueueConsumer
         if ($context->isExecutionInterrupted()) {
             throw new ConsumptionInterruptedException();
         }
+    }
+
+    /**
+     * @param ExtensionInterface $extension
+     * @param Context $context
+     *
+     * @throws \Exception
+     */
+    protected function onInterruptionByException(ExtensionInterface $extension, Context $context)
+    {
+        $logger = $context->getLogger();
+        $logger->error(sprintf('Consuming interrupted by exception'));
+
+        $exception = $context->getException();
+
+        try {
+            $extension->onInterrupted($context);
+        } catch (\Exception $e) {
+            // logic is similar to one in Symfony's ExceptionListener::onKernelException
+            $logger->error(sprintf(
+                'Exception thrown when handling an exception (%s: %s at %s line %s)',
+                get_class($e),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            ));
+
+            $wrapper = $e;
+            while ($prev = $wrapper->getPrevious()) {
+                if ($exception === $wrapper = $prev) {
+                    throw $e;
+                }
+            }
+
+            $prev = new \ReflectionProperty('Exception', 'previous');
+            $prev->setAccessible(true);
+            $prev->setValue($wrapper, $exception);
+
+            throw $e;
+        }
+
+        throw $exception;
     }
 }
