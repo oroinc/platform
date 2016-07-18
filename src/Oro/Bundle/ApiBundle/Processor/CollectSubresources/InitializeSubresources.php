@@ -9,13 +9,13 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
-use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * Initializes sub resources for all API resources based on API configuration and metadata.
+ * Initializes sub-resources for all API resources based on API configuration and metadata.
  */
 class InitializeSubresources implements ProcessorInterface
 {
@@ -72,7 +72,7 @@ class InitializeSubresources implements ProcessorInterface
      */
     protected function getConfigExtras()
     {
-        return [new EntityDefinitionConfigExtra('get_list')];
+        return [new EntityDefinitionConfigExtra()];
     }
 
     /**
@@ -122,23 +122,22 @@ class InitializeSubresources implements ProcessorInterface
         $entitySubresources = new ApiResourceSubresources($entityClass);
         $associations = $metadata->getAssociations();
         foreach ($associations as $associationName => $association) {
-            $subresource = new ApiSubresource();
+            $subresource = $entitySubresources->addSubresource($associationName);
             $subresource->setTargetClassName($association->getTargetClassName());
             $subresource->setAcceptableTargetClassNames($association->getAcceptableTargetClassNames());
             $subresource->setIsCollection($association->isCollection());
             if (!$association->isCollection()) {
                 $excludedActions = $subresourceExcludedActions;
-                if (!in_array('add_relationship', $excludedActions, true)) {
-                    $excludedActions[] = 'add_relationship';
+                if (!in_array(ApiActions::ADD_RELATIONSHIP, $excludedActions, true)) {
+                    $excludedActions[] = ApiActions::ADD_RELATIONSHIP;
                 }
-                if (!in_array('delete_relationship', $excludedActions, true)) {
-                    $excludedActions[] = 'delete_relationship';
+                if (!in_array(ApiActions::DELETE_RELATIONSHIP, $excludedActions, true)) {
+                    $excludedActions[] = ApiActions::DELETE_RELATIONSHIP;
                 }
                 $subresource->setExcludedActions($excludedActions);
             } elseif (!empty($subresourceExcludedActions)) {
                 $subresource->setExcludedActions($subresourceExcludedActions);
             }
-            $entitySubresources->addSubresource($associationName, $subresource);
         }
 
         return $entitySubresources;
@@ -153,12 +152,25 @@ class InitializeSubresources implements ProcessorInterface
     {
         $result = array_intersect(
             $resourceExcludedActions,
-            ['get_subresource', 'get_relationship', 'update_relationship', 'add_relationship', 'delete_relationship']
+            [
+                ApiActions::GET_SUBRESOURCE,
+                ApiActions::GET_RELATIONSHIP,
+                ApiActions::UPDATE_RELATIONSHIP,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
+            ]
         );
 
-        if (in_array('update', $resourceExcludedActions, true)) {
+        if (in_array(ApiActions::UPDATE, $resourceExcludedActions, true)) {
             $result = array_unique(
-                array_merge($result, ['update_relationship', 'add_relationship', 'delete_relationship'])
+                array_merge(
+                    $result,
+                    [
+                        ApiActions::UPDATE_RELATIONSHIP,
+                        ApiActions::ADD_RELATIONSHIP,
+                        ApiActions::DELETE_RELATIONSHIP
+                    ]
+                )
             );
         }
 

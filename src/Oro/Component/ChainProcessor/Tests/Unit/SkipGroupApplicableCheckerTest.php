@@ -14,15 +14,11 @@ class SkipGroupApplicableCheckerTest extends \PHPUnit_Framework_TestCase
     public function testSkipGroupApplicableChecker()
     {
         $context = new Context();
-        $context->setAction('action1');
-
         $processors = [
-            'action1' => [
-                ['processor' => 'processor1', 'attributes' => ['group' => 'group1']],
-                ['processor' => 'processor2', 'attributes' => ['group' => 'group2']],
-                ['processor' => 'processor3', 'attributes' => ['group' => 'group2']],
-                ['processor' => 'processor4', 'attributes' => ['group' => 'group3']]
-            ]
+            ['processor' => 'processor1', 'attributes' => ['group' => 'group1']],
+            ['processor' => 'processor2', 'attributes' => ['group' => 'group2']],
+            ['processor' => 'processor3', 'attributes' => ['group' => 'group2']],
+            ['processor' => 'processor4', 'attributes' => ['group' => 'group3']]
         ];
 
         $iterator = new ProcessorIterator(

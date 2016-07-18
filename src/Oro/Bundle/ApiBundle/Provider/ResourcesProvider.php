@@ -46,7 +46,7 @@ class ResourcesProvider
         /** @var CollectResourcesContext $context */
         $context = $this->processor->createContext();
         $context->setVersion($version);
-        $context->getRequestType()->set($requestType->toArray());
+        $context->getRequestType()->set($requestType);
 
         $this->processor->process($context);
 

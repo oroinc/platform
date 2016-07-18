@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
-use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Bundle\LayoutBundle\Layout\Block\OptionsConfigTrait;
 use Oro\Component\Layout\Block\Type\AbstractType;
-use Oro\Component\Layout\BlockInterface;
-use Oro\Component\Layout\BlockView;
 
 class ConfigurableType extends AbstractType
 {
+    use OptionsConfigTrait;
+
     /**
      * @var string
      */
@@ -20,67 +20,12 @@ class ConfigurableType extends AbstractType
     protected $parent;
 
     /**
-     * Options with settings in this property allow automatically configure options and pass them to view
-     * @see configureOptions()
-     * @see buildView()
-     *
-     * @var array
-     */
-    protected $optionsConfig = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        foreach ($this->optionsConfig as $name => $settings) {
-            $resolver->setDefined($name);
-            if (!is_array($settings)) {
-                continue;
-            }
-            if (isset($settings['required']) && $settings['required']) {
-                $resolver->setRequired($name);
-            }
-            if (array_key_exists('default', $settings)) {
-                $resolver->setDefault($name, $settings['default']);
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
-    {
-        foreach ($this->optionsConfig as $name => $settings) {
-            if (!array_key_exists($name, $options)) {
-                continue;
-            }
-            $define = is_array($settings) && (!empty($settings['required']) || array_key_exists('default', $settings));
-            if ($define || isset($options[$name])) {
-                $view->vars[$name] = $options[$name];
-            }
-        }
-    }
-
-    /**
-     * @param array $options
-     */
-    public function setOptionsConfig(array $options)
-    {
-        foreach ($options as $optionName => $optionSettings) {
-            $this->validateOptionSettings($optionSettings);
-        }
-        $this->optionsConfig = $options;
-    }
-    
-    /**
      * @return mixed
      */
     public function getName()
     {
         if ($this->name === null) {
-            throw new \LogicException('Block type "name" does not configured');
+            throw new \LogicException('Name of block type does not configured');
         }
         return $this->name;
     }
@@ -92,7 +37,9 @@ class ConfigurableType extends AbstractType
     public function setName($name)
     {
         if (!is_string($name)) {
-            throw new \InvalidArgumentException('Block type "name" should be string');
+            throw new \InvalidArgumentException(
+                sprintf('Name of block type should be a string, %s given', gettype($name))
+            );
         }
         $this->name = $name;
         return $this;
@@ -113,32 +60,11 @@ class ConfigurableType extends AbstractType
     public function setParent($parent)
     {
         if (!is_string($parent)) {
-            throw new \InvalidArgumentException('Block type "parent" should be string');
+            throw new \InvalidArgumentException(
+                sprintf('Name of parent block type should be a string, %s given', gettype($parent))
+            );
         }
         $this->parent = $parent;
         return $this;
-    }
-
-    /**
-     * @param array $optionSettings
-     */
-    protected function validateOptionSettings(array $optionSettings = null)
-    {
-        if ($optionSettings === null) {
-            return;
-        }
-        $allowedKeys = [
-            'default',
-            'required',
-        ];
-        foreach ($optionSettings as $key => $value) {
-            if (!in_array($key, $allowedKeys, true)) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Option setting "%s" not supported. Supported settings [%s]',
-                    $key,
-                    implode(', ', $allowedKeys)
-                ));
-            }
-        }
     }
 }

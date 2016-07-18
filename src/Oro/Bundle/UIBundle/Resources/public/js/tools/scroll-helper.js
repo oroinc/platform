@@ -132,10 +132,14 @@ define(function(require) {
                 onAfterGetClientRect(current, rect);
             }
 
-            if (current.scrollHeight > current.clientHeight) {
+            var border = $.fn.getBorders(current);
+            var verticalScrollIsVisible = (current.offsetWidth - border.left - border.right) > current.clientWidth;
+            var horizontalScrollIsVisible = (current.offsetHeight - border.top - border.bottom) > current.clientHeight;
+
+            if (horizontalScrollIsVisible && current.scrollHeight > current.clientHeight) {
                 rect.bottom -= this.scrollbarWidth();
             }
-            if (current.scrollWidth > current.clientWidth) {
+            if (verticalScrollIsVisible && current.scrollWidth > current.clientWidth) {
                 rect.right -= this.scrollbarWidth();
             }
             return rect;
@@ -166,7 +170,7 @@ define(function(require) {
                 visibleRect.right === rect.right;
         },
 
-        scrollIntoView: function(el, onAfterGetClientRect) {
+        scrollIntoView: function(el, onAfterGetClientRect, verticalGap, horizontalGap) {
             if (this.isCompletelyVisible(el, onAfterGetClientRect)) {
                 return {vertical: 0, horizontal: 0};
             }
@@ -185,6 +189,14 @@ define(function(require) {
                 horizontal: rect.left !== visibleRect.left ? visibleRect.left - rect.left :
                     (rect.right !== visibleRect.right ? visibleRect.right - rect.right : 0)
             };
+
+            if (verticalGap && scrolls.vertical) {
+                scrolls.vertical += verticalGap * Math.sign(scrolls.vertical);
+            }
+
+            if (horizontalGap && scrolls.horizontal) {
+                scrolls.horizontal += horizontalGap * Math.sign(scrolls.horizontal);
+            }
 
             return this.applyScrollToParents(el, scrolls);
         },

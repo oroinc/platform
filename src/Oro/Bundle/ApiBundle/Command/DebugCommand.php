@@ -13,6 +13,7 @@ use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -70,9 +71,12 @@ class DebugCommand extends AbstractDebugCommand
      */
     protected function dumpActions(OutputInterface $output)
     {
+        /** @var ActionProcessorBagInterface $processorBag */
+        $actionProcessorBag = $this->getContainer()->get('oro_api.action_processor_bag');
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
 
+        $output->writeln('<info>All Actions:</info>');
         $table = new Table($output);
         $table->setHeaders(['Action', 'Groups']);
 
@@ -86,6 +90,11 @@ class DebugCommand extends AbstractDebugCommand
         }
 
         $table->render();
+
+        $output->writeln('<info>Public Actions:</info>');
+        foreach ($actionProcessorBag->getActions() as $action) {
+            $output->writeln('  ' . $action);
+        }
 
         $output->writeln('');
         $output->writeln(
@@ -195,16 +204,52 @@ class DebugCommand extends AbstractDebugCommand
                 ': ',
                 [
                     'group',
-                    sprintf('<comment>%s</comment>', $this->convertValueToString($attributes['group']))
+                    sprintf(
+                        '<comment>%s</comment>',
+                        $this->convertProcessorAttributeValueToString($attributes['group'])
+                    )
                 ]
             );
             unset($attributes['group']);
         }
 
         foreach ($attributes as $key => $val) {
-            $rows[] = implode(': ', [$key, $this->convertValueToString($val)]);
+            $rows[] = implode(': ', [$key, $this->convertProcessorAttributeValueToString($val)]);
         }
 
         return implode(PHP_EOL, $rows);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    protected function convertProcessorAttributeValueToString($value)
+    {
+        if (!is_array($value)) {
+            return $this->convertValueToString($value);
+        }
+
+        $items = reset($value);
+        if (!is_array($items)) {
+            return sprintf('<comment>%s</comment>%s', key($value), $items);
+        }
+
+        return implode(
+            sprintf(' <comment>%s</comment> ', key($value)),
+            array_map(
+                function ($val) {
+                    if (is_array($val)) {
+                        $item = reset($val);
+
+                        return sprintf('<comment>%s</comment>%s', key($val), $item);
+                    }
+
+                    return $val;
+                },
+                $items
+            )
+        );
     }
 }

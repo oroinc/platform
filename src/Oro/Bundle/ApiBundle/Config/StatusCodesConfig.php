@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 /**
  * Represents a configuration of all possible response status codes.
  */
@@ -17,15 +19,7 @@ class StatusCodesConfig
      */
     public function toArray()
     {
-        $result = [];
-        if (!empty($this->codes)) {
-            foreach ($this->codes as $code => $config) {
-                $codeConfig = $config->toArray();
-                $result[$code] = !empty($codeConfig) ? $codeConfig : null;
-            }
-        }
-
-        return $result;
+        return ConfigUtil::convertObjectsToArray($this->codes, true);
     }
 
     /**
@@ -39,16 +33,11 @@ class StatusCodesConfig
     }
 
     /**
-     * Make a deep copy of object.
+     * Makes a deep copy of the object.
      */
     public function __clone()
     {
-        $this->codes = array_map(
-            function ($config) {
-                return clone $config;
-            },
-            $this->codes
-        );
+        $this->codes = ConfigUtil::cloneObjects($this->codes);
     }
 
     /**
