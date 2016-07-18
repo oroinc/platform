@@ -81,9 +81,9 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($function->getCallable());
         $this->assertEquals(LayoutExtension::RENDER_BLOCK_NODE_CLASS, $function->getNodeClass());
         $function = $functions[3];
-        $this->assertEquals('layout_attr_merge', $function->getName());
+        $this->assertEquals('layout_attr_defaults', $function->getName());
         $this->assertNotNull($function->getCallable());
-        $this->assertEquals([$this->extension, 'mergeAttributes'], $function->getCallable());
+        $this->assertEquals([$this->extension, 'defaultAttributes'], $function->getCallable());
     }
 
     public function testGetFilters()
@@ -133,9 +133,9 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider attributeProvider
      */
-    public function testMergeAttributes($attr, $defaultAttr, $expected)
+    public function testDefaultAttributes($attr, $defaultAttr, $expected)
     {
-        $this->assertEquals($expected, $this->extension->mergeAttributes($attr, $defaultAttr));
+        $this->assertEquals($expected, $this->extension->defaultAttributes($attr, $defaultAttr));
     }
 
     /**

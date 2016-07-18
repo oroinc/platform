@@ -147,6 +147,15 @@ Examples of processor conditions
         - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&json_api }
 ```
 
+-  A processor is executed either for REST requests or requests conform [JSON.API](http://jsonapi.org/) specification.
+
+```yaml
+    tags:
+        - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest|json_api }
+```
+
+**Please note** that a value can contain either `&` (logical AND) or `|` (logical OR) operators, but it is not possible to combine them.
+
 -  A processor is executed for all REST requests excluding requests conform [JSON.API](http://jsonapi.org/) specification.
 
 ```yaml

@@ -5,11 +5,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
 use Nelmio\Alice\Persister\Doctrine as AliceDoctrine;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 
-class FixtureLoader
+class FixtureLoader implements SuiteAwareInterface
 {
     /**
      * @var AliceLoader
@@ -178,7 +179,7 @@ class FixtureLoader
     }
 
     /**
-     * @param Suite $suite
+     * {@inheritdoc}
      */
     public function setSuite(Suite $suite)
     {

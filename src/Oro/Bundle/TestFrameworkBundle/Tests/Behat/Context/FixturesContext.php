@@ -31,7 +31,7 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
      *     | subject      |
      *     | hello world! |
      *     | <sentence()> |
-     * @Given /^the following ([\w ]+):?$/
+     * @Given /^(?:the|there are) following ([\w ]+):?$/
      */
     public function theFollowing($name, TableNode $table)
     {
