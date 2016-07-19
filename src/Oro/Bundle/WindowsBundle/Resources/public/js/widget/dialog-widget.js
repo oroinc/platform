@@ -26,7 +26,8 @@ define(function(require) {
             type: 'dialog',
             dialogOptions: null,
             stateEnabled: true,
-            incrementalPosition: true
+            incrementalPosition: true,
+            preventModelRemoval: false
         }),
 
         // Windows manager global variables
@@ -140,7 +141,7 @@ define(function(require) {
                 return;
             }
             dialogManager.remove(this);
-            if (this.model && !this.options.preventToRemoveModel) {
+            if (this.model && !this.options.preventModelRemoval) {
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
                         // Suppress error if it's 404 response and not debug mode
