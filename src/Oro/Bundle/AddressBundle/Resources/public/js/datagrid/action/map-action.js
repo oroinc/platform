@@ -50,10 +50,18 @@ define(function(require) {
                 html: true,
                 closeButton: true,
                 class: 'map-popover',
-                content: this.$mapContainerFrame,
-                trigger: 'focus'
+                content: this.$mapContainerFrame
             }).on('shown.bs.popover', _.bind(function() {
                 this.mapView.updateMap(this.getAddress(), this.model.get('label'));
+
+                $(document).on('mouseup', _.bind(function(e) {
+                    var $map = this.mapView.$el;
+                    if (!$map.is(e.target) && !$map.has(e.target).length) {
+                        $popoverTrigger.popover('hide');
+                    }
+                }, this));
+            }, this)).on('hidden.bs-popover', _.bind(function() {
+                $(document).off(null, null, this);
             }, this));
         },
 
