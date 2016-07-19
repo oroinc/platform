@@ -2,14 +2,16 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
+use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\FooTransportFactory;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
-use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpConnection;
+use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
+use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\Testing\ClassExtensionTrait;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\HttpKernel\Tests\Fragment\Foo;
 
 class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,69 +27,22 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         new OroMessageQueueExtension();
     }
 
-    public function testShouldConfigureAmqpTransport()
+    public function testThrowIfTransportFactoryNameEmpty()
     {
-        if (false == class_exists(AmqpConnection::class)) {
-            $this->markTestSkipped('Amqp lib is not installed');
-        }
-        
-        $container = new ContainerBuilder();
-
         $extension = new OroMessageQueueExtension();
 
-        $extension->load([[
-            'transport' => [
-                'default' => 'amqp',
-                'amqp' => [
-                    'host' => 'theHost',
-                    'port' => 'thePort',
-                    'user' => 'theUser',
-                    'password' => 'thePassword',
-                    'vhost' => 'theVhost'
-                ]
-            ]
-        ]], $container);
-
-        $this->assertTrue($container->hasDefinition('oro_message_queue.transport.amqp.connection'));
-        $connection = $container->getDefinition('oro_message_queue.transport.amqp.connection');
-        $this->assertEquals(AmqpConnection::class, $connection->getClass());
-        $this->assertEquals([AmqpConnection::class, 'createFromConfig'], $connection->getFactory());
-        $this->assertEquals([
-            'host' => 'theHost',
-            'port' => 'thePort',
-            'user' => 'theUser',
-            'password' => 'thePassword',
-            'vhost' => 'theVhost'
-        ], $connection->getArgument(0));
+        $this->setExpectedException(\LogicException::class, 'Transport factory name cannot be empty');
+        $extension->addTransportFactory(new FooTransportFactory(null));
     }
 
-    public function testShouldUseAmqpTransportAsDefault()
+    public function testThrowIfTransportFactoryWithSameNameAlreadyAdded()
     {
-        if (false == class_exists(AmqpConnection::class)) {
-            $this->markTestSkipped('Amqp lib is not installed');
-        }
-
-        $container = new ContainerBuilder();
-
         $extension = new OroMessageQueueExtension();
 
-        $extension->load([[
-            'transport' => [
-                'default' => 'amqp',
-                'amqp' => [
-                    'host' => 'theHost',
-                    'port' => 'thePort',
-                    'user' => 'theUser',
-                    'password' => 'thePassword',
-                    'vhost' => 'theVhost'
-                ]
-            ]
-        ]], $container);
+        $extension->addTransportFactory(new FooTransportFactory('foo'));
 
-        $this->assertEquals(
-            new Alias('oro_message_queue.transport.amqp.connection'),
-            $container->getAlias('oro_message_queue.transport.connection')
-        );
+        $this->setExpectedException(\LogicException::class, 'Transport factory with such name already added. Name foo');
+        $extension->addTransportFactory(new FooTransportFactory('foo'));
     }
 
     public function testShouldConfigureNullTransport()
@@ -95,10 +50,10 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new NullTransportFactory());
 
         $extension->load([[
             'transport' => [
-                'default' => 'null',
                 'null' => true
             ]
         ]], $container);
@@ -113,6 +68,8 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new NullTransportFactory());
+        $extension->addTransportFactory(new DefaultTransportFactory());
 
         $extension->load([[
             'transport' => [
@@ -122,8 +79,56 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         ]], $container);
 
         $this->assertEquals(
-            new Alias('oro_message_queue.transport.null.connection'),
-            $container->getAlias('oro_message_queue.transport.connection')
+            'oro_message_queue.transport.default.connection',
+            (string) $container->getAlias('oro_message_queue.transport.connection')
+        );
+        $this->assertEquals(
+            'oro_message_queue.transport.null.connection',
+            (string) $container->getAlias('oro_message_queue.transport.default.connection')
+        );
+    }
+
+    public function testShouldConfigureFooTransport()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new FooTransportFactory());
+
+        $extension->load([[
+            'transport' => [
+                'foo' => ['foo_param' => 'aParam'],
+            ]
+        ]], $container);
+
+        $this->assertTrue($container->hasDefinition('foo.connection'));
+        $connection = $container->getDefinition('foo.connection');
+        $this->assertEquals(\stdClass::class, $connection->getClass());
+        $this->assertEquals([['foo_param' => 'aParam']], $connection->getArguments());
+    }
+
+    public function testShouldUseFooTransportAsDefault()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new FooTransportFactory());
+        $extension->addTransportFactory(new DefaultTransportFactory());
+
+        $extension->load([[
+            'transport' => [
+                'default' => 'foo',
+                'foo' => ['foo_param' => 'aParam'],
+            ]
+        ]], $container);
+
+        $this->assertEquals(
+            'oro_message_queue.transport.default.connection',
+            (string) $container->getAlias('oro_message_queue.transport.connection')
+        );
+        $this->assertEquals(
+            'oro_message_queue.transport.foo.connection',
+            (string) $container->getAlias('oro_message_queue.transport.default.connection')
         );
     }
 
@@ -132,12 +137,12 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
 
         $extension->load([[
             'client' => null,
             'transport' => [
-                'default' => 'null',
-                'null' => true
+                'default' => 'foo',
             ]
         ]], $container);
 
@@ -151,12 +156,12 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $container->setParameter('kernel.debug', false);
 
         $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
 
         $extension->load([[
             'client' => null,
             'transport' => [
-                'default' => 'null',
-                'null' => true
+                'default' => 'foo',
             ]
         ]], $container);
 
@@ -170,14 +175,14 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $container->setParameter('kernel.debug', false);
 
         $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
 
         $extension->load([[
             'client' => [
                 'traceable_producer' => false
             ],
             'transport' => [
-                'default' => 'null',
-                'null' => true
+                'default' => 'foo',
             ]
         ]], $container);
 
@@ -191,14 +196,14 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $container->setParameter('kernel.debug', true);
 
         $extension = new OroMessageQueueExtension();
+        $extension->addTransportFactory(new DefaultTransportFactory());
 
         $extension->load([[
             'client' => [
                 'traceable_producer' => true
             ],
             'transport' => [
-                'default' => 'null',
-                'null' => true
+                'default' => 'foo',
             ]
         ]], $container);
 
