@@ -57,6 +57,8 @@ class WidgetFilterType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widgetType'] = $options['widgetType'];
+        $view->vars['collapsible'] = $options['collapsible'];
+        $view->vars['collapsed'] = $options['collapsed'];
         parent::finishView($view, $form, $options);
     }
 
@@ -65,7 +67,9 @@ class WidgetFilterType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['widgetType' => null, 'entity' => null]);
+        $resolver->setDefaults(
+            ['widgetType' => null, 'entity' => null, 'collapsible' => false, 'collapsed' => true]
+        );
     }
 
     public function getDefaultOptions()

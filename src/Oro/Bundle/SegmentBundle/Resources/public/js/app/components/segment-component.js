@@ -50,7 +50,8 @@ define(function(require) {
             select2FieldChoiceTemplate: '',
             select2SegmentChoiceTemplate: '',
             entities: [],
-            metadata: {}
+            metadata: {},
+            initEntityChangeEvents: true
         },
 
         initialize: function(options) {
@@ -68,8 +69,9 @@ define(function(require) {
                 this.initGrouping();
                 this.initColumn();
                 this.configureFilters();
-
-                this.initEntityChangeEvents();
+                if (this.options.initEntityChangeEvents) {
+                    this.initEntityChangeEvents();
+                }
 
                 SegmentComponent.__super__.initialize.call(this, options);
 

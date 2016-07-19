@@ -223,10 +223,10 @@
             conditionBuilder: '#' ~ name ~ '-condition-builder'
         },
         entities:                     oro_query_filter_entities(),
-        metadata:                     oro_query_filter_metadata()
+        metadata:                     oro_query_filter_metadata(),
+        initEntityChangeEvents: false
     } %}
     {% set widgetOptions = update_segment_widget_options(widgetOptions, name) %}
-
-    <div data-page-component-module="orosegment/js/app/components/segment-component"
-         data-page-component-options="{{ widgetOptions|json_encode }}"></div>
+        <div data-page-component-module="orosegment/js/app/components/segment-component"
+             data-page-component-options="{{ widgetOptions|json_encode }}"></div>
 {% endblock oro_dashboard_query_filter_widget %}

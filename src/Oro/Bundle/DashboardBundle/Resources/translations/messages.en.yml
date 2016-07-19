@@ -71,6 +71,7 @@ oro:
             day.label: Day
             time.label: Hour
         date_range.label: Date range
+        query_filter.label: Query Filter
         previous_date_range.label: Compare with previous period
         datagrid:
             columns:
