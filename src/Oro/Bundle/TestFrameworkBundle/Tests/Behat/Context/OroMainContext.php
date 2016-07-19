@@ -8,7 +8,6 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
@@ -262,10 +261,7 @@ class OroMainContext extends MinkContext implements
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t find field with "%s" label', $fieldName),
-            $this->getSession()->getDriver()
-        );
+        self::fail(sprintf('Can\'t find field with "%s" label', $fieldName));
     }
 
     /**

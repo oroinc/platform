@@ -140,8 +140,7 @@ class Grid extends Element
 
     /**
      * @param string $title
-     * @return NodeElement
-     * @throws \Exception
+     * @return NodeElement|null
      */
     public function getMassActionLink($title)
     {

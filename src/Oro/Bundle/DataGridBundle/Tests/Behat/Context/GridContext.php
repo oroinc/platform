@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Mink\Exception\ExpectationException;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -203,17 +202,16 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = $columns[$columnNumber]->getText();
 
-            if ($actualValue != $value) {
-                throw new ExpectationException(
-                    sprintf(
-                        'Expect that %s column should be with "%s" value but "%s" found on grid',
-                        $header,
-                        $value,
-                        $actualValue
-                    ),
-                    $this->getSession()->getDriver()
-                );
-            }
+            self::assertEquals(
+                $value,
+                $actualValue,
+                sprintf(
+                    'Expect that %s column should be with "%s" value but "%s" found on grid',
+                    $header,
+                    $value,
+                    $actualValue
+                )
+            );
         }
     }
 
@@ -320,10 +318,7 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     {
         $flashMessage = $this->getSession()->getPage()->find('css', '.flash-messages-holder');
 
-        if (!$flashMessage) {
-            throw new ExpectationException('Can\'t find flash message', $this->getSession()->getDriver());
-        }
-
+        self::assertNotNull($flashMessage, 'Can\'t find flash message');
 
         $regex = '/\d+ entities were deleted/';
         self::assertRegExp($regex, $flashMessage->getText());
@@ -338,12 +333,10 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     public function iShouldNotSeeDeleteAction($action)
     {
         $grid = $this->getGrid();
-        if ($grid->getMassActionLink($action)) {
-            throw new ExpectationException(
-                sprintf('%s mass action should not be accassable', $action),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertNull(
+            $grid->getMassActionLink($action),
+            sprintf('%s mass action should not be accassable', $action)
+        );
     }
 
     /**
