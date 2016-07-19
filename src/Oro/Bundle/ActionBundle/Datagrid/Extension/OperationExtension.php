@@ -71,9 +71,7 @@ class OperationExtension extends AbstractExtension
     {
         $operationParameters = $this->getParameters()->get(self::OPERATION_ROOT_PARAM);
 
-        return
-            $operationParameters &&
-            !empty($operationParameters[self::DISABLED_PARAM]);
+        return !empty($operationParameters[self::DISABLED_PARAM]);
     }
 
     /**

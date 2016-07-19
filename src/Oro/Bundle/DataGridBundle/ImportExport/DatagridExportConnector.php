@@ -179,7 +179,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
             PagerInterface::PER_PAGE_PARAM => $this->pageSize
         ];
         if (null !== $this->totalCount) {
-            $pagerParameters[PagerInterface::CALCULATED_COUNT] = $this->totalCount;
+            $pagerParameters[PagerInterface::ADJUSTED_COUNT] = $this->totalCount;
         }
         $this->grid->getParameters()->set(PagerInterface::PAGER_ROOT_PARAM, $pagerParameters);
 

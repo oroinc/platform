@@ -78,11 +78,7 @@ class OrmPagerExtension extends AbstractExtension
             $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
             $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
         }
-        $calculatedCount = $this->getOr(PagerInterface::CALCULATED_COUNT);
-
-        if (null !== $calculatedCount && is_int($calculatedCount) && $calculatedCount >= 0) {
-            $this->pager->setCalculatedNbResults($calculatedCount);
-        }
+        $this->tryAdjustTotalCount();
         $this->pager->init();
     }
 
@@ -159,5 +155,18 @@ class OrmPagerExtension extends AbstractExtension
         $pagerParameters = $this->getParameters()->get(PagerInterface::PAGER_ROOT_PARAM, []);
 
         return isset($pagerParameters[$paramName]) ? $pagerParameters[$paramName] : $default;
+    }
+
+    /**
+     * If adjusted count will be provided in parameters this extension will pass it to pager
+     * to prevent unneeded count query.
+     */
+    protected function tryAdjustTotalCount()
+    {
+        $adjustedCount = $this->getOr(PagerInterface::ADJUSTED_COUNT);
+
+        if (null !== $adjustedCount && is_int($adjustedCount) && $adjustedCount >= 0) {
+            $this->pager->adjustTotalCount($adjustedCount);
+        }
     }
 }

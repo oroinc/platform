@@ -160,9 +160,11 @@ class Pager extends AbstractPager implements PagerInterface
     }
 
     /**
+     * Set nbResults with already known value and mark total as calculated.
+     *
      * @param int $nbResults
      */
-    public function setCalculatedNbResults($nbResults)
+    public function adjustTotalCount($nbResults)
     {
         $this->setNbResults($nbResults);
         $this->isTotalCalculated = true;

@@ -162,14 +162,34 @@ class OperationExtensionTest extends AbstractExtensionTest
         }
     }
 
-    public function testExtensionDisabledByParameters()
+    /**
+     * @dataProvider testIsDisabledByParametersDataProvider
+     *
+     * @param bool  $expected
+     * @param array $parameters
+     */
+    public function testIsDisabledByParameters($expected, array $parameters)
     {
-        $this->extension->getParameters()->set(
-            OperationExtension::OPERATION_ROOT_PARAM,
-            [OperationExtension::DISABLED_PARAM => true]
-        );
+        $this->extension->getParameters()->add($parameters);
+        $reflection = new \ReflectionObject($this->extension);
+        $method = $reflection->getMethod('isDisabled');
+        $method->setAccessible(true);
+        $this->assertEquals($expected, $method->invoke($this->extension));
+    }
 
-        $this->assertFalse($this->extension->isApplicable(DatagridConfiguration::create([])));
+    public function testIsDisabledByParametersDataProvider()
+    {
+        return [
+            'disabled' => [
+                true,
+                [OperationExtension::OPERATION_ROOT_PARAM => [OperationExtension::DISABLED_PARAM => true]]
+            ],
+            'not disabled' => [
+                false,
+                [OperationExtension::OPERATION_ROOT_PARAM => [OperationExtension::DISABLED_PARAM => false]]
+            ],
+            'not disabled(no root key)' => [false, []]
+        ];
     }
 
     /**
