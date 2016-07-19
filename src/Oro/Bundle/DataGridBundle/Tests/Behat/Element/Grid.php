@@ -23,22 +23,28 @@ class Grid extends Element
     }
 
     /**
-     * @param string $header
-     * @param int $rowNumber
+     * Get column value by column header and row number
+     *
+     * @param string $header Header of grid column
+     * @param int $rowNumber Number of grid record starting from 1
      * @return string
      * @throws ExpectationException
      */
     public function getRowValue($header, $rowNumber)
     {
         $columns = $this->getRowByNumber($rowNumber)->findAll('css', 'td');
-        $columnNumber = $this->elementFactory->createElement('GridHeader')->getColumnNumber($header);
+        /** @var GridHeader $gridHeader */
+        $gridHeader = $this->elementFactory->createElement('GridHeader');
+        $columnNumber = $gridHeader->getColumnNumber($header);
 
         return $this->normalizeValueByGuessingType($columns[$columnNumber]->getText());
     }
 
     /**
-     * @param $rowNumber
-     * @return NodeElement
+     * Get Element tr by row number
+     *
+     * @param int $rowNumber Number of grid record starting from 1
+     * @return NodeElement tr element of grid
      * @throws ExpectationException
      */
     public function getRowByNumber($rowNumber)
@@ -54,6 +60,29 @@ class Grid extends Element
         }
 
         return $rows[$rowIndex];
+    }
+
+    /**
+     * Get Element tr by row content
+     *
+     * @param string $content Any content that can identify row
+     * @return NodeElement tr element of grid
+     * @throws ExpectationException
+     */
+    public function getRowByContent($content)
+    {
+        $rows = $this->getRows();
+
+        foreach ($rows as $row) {
+            if (false !== strpos($row->getText(), $content)) {
+                return $row;
+            }
+        }
+
+        throw new ExpectationException(
+            sprintf('Grid has no record with "%s" content', $content),
+            $this->session->getDriver()
+        );
     }
 
     /**
@@ -142,7 +171,7 @@ class Grid extends Element
 
     public function assertNoRecords()
     {
-        expect($this->getRows())->toHaveCount(0);
+        \PHPUnit_Framework_Assert::assertCount(0, $this->getRows());
     }
 
     /**
@@ -187,27 +216,6 @@ class Grid extends Element
     public function getRows()
     {
         return $this->findAll('css', 'tbody tr');
-    }
-
-    /**
-     * @param string $content
-     * @return NodeElement
-     * @throws ExpectationException
-     */
-    public function getRowByContent($content)
-    {
-        $rows = $this->getRows();
-
-        foreach ($rows as $row) {
-            if (false !== strpos($row->getText(), $content)) {
-                return $row;
-            }
-        }
-
-        throw new ExpectationException(
-            sprintf('Grid has no record with "%s" content', $content),
-            $this->session->getDriver()
-        );
     }
 
     /**
