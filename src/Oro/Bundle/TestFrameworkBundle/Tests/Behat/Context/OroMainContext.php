@@ -338,21 +338,29 @@ class OroMainContext extends MinkContext implements
      * Assert text by label in page
      *
      * @Then /^(?:|I )should see (?P<entity>[\w\s]+) with:$/
+     * @throws \Behat\Mink\Exception\ExpectationException
      */
     public function assertValuesByLabels($entity, TableNode $table)
     {
         $page = $this->getSession()->getPage();
 
         foreach ($table->getRows() as $row) {
-            $label = $page->find('xpath', sprintf('//label[text()="%s"]', $row[0]));
+            $labels = $page->findAll('xpath', sprintf('//label[text()="%s"]', $row[0]));
 
-            self::assertNotNull($label, sprintf('Can\'t find "%s" label', $row[0]));
+            self::assertNotCount(0, $labels, sprintf('Can\'t find "%s" label', $row[0]));
 
-            $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
+            /** @var NodeElement $label */
+            foreach ($labels as $label) {
+                $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-            self::assertNotFalse(
-                stripos($text, $row[1]),
-                sprintf('Expect "%s" text of "%s" label, but got "%s"', $row[1], $row[0], $text)
+                if (false !== stripos($text, $row[1])) {
+                    continue 2;
+                }
+            }
+
+            throw new ExpectationException(
+                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $row[0], $row[1]),
+                $this->getSession()->getDriver()
             );
         }
     }

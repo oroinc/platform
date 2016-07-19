@@ -24,15 +24,19 @@ class DateTimePicker extends Element
         foreach ($this->getCalendar()->findAll('css', 'tbody a') as $date) {
             if ($date->getText() === $dateValue) {
                 $date->click();
-
-                return;
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t choose "%s" date', $dateTime->format('Y-M-j')),
-            $this->getDriver()
-        );
+        $timePicker = $this->getTimePicker();
+        $timePicker->setValue($dateTime->format('H:i'));
+        $timePicker->click();
+        $this->clickSelectedTime();
+    }
+
+    protected function clickSelectedTime()
+    {
+        $timeSelect = $this->findVisible('css', '.ui-timepicker-wrapper');
+        $timeSelect->find('css', 'li.ui-timepicker-selected')->click();
     }
 
     /**
@@ -57,5 +61,13 @@ class DateTimePicker extends Element
     protected function getCalendar()
     {
         return $this->findVisible('css', '.ui-datepicker-calendar');
+    }
+
+    /**
+     * @return NodeElement|null
+     */
+    protected function getTimePicker()
+    {
+        return $this->findVisible('css', 'input.timepicker-input');
     }
 }
