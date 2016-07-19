@@ -2,6 +2,7 @@
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
+use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -23,7 +24,7 @@ class FixAddressesPrimarySubscriber implements EventSubscriberInterface
     /**
      * @var PropertyAccess
      */
-    protected $addressAccess;
+    protected $addressesAccess;
 
     /**
      * @param string $addressesProperty Address property path like "owner.addresses"
@@ -63,13 +64,12 @@ class FixAddressesPrimarySubscriber implements EventSubscriberInterface
     /**
      * Only one address must be primary.
      *
-     * @param AbstractTypedAddress $address
-     * @param AbstractTypedAddress[] $allAddresses
+     * @param PrimaryItem $address
+     * @param PrimaryItem[] $allAddresses
      */
-    protected function handlePrimary(AbstractTypedAddress $address, $allAddresses)
+    protected function handlePrimary(PrimaryItem $address, $allAddresses)
     {
         if ($address->isPrimary()) {
-            /** @var AbstractTypedAddress[] $allAddresses */
             foreach ($allAddresses as $otherAddresses) {
                 $otherAddresses->setPrimary(false);
             }

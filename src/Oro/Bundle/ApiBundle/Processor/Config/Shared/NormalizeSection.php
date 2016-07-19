@@ -121,19 +121,30 @@ abstract class NormalizeSection implements ProcessorInterface
             return;
         }
 
+        $path = substr($pathPrefix, 0, -1);
+        $metadata = $this->getEntityMetadata($entityClass, $path);
         $isCollectionValuedAssociation = $this->isCollectionValuedAssociation(
-            $entityClass,
-            substr($pathPrefix, 0, -1)
+            $metadata,
+            $this->getLastFieldName($path)
         );
         foreach ($sectionFields as $fieldName => $sectionField) {
-            $field        = $definition->getField($fieldName);
+            $field = $definition->getField($fieldName);
             $propertyPath = $this->getPropertyPath($sectionField, $fieldName, $field);
-            $fieldKey     = $fieldPrefix . $fieldName;
-            $fieldPath    = $pathPrefix . $propertyPath;
+            $fieldPath = $pathPrefix . $propertyPath;
+
+            // skip identifier fields to avoid duplicates
+            $targetMetadata = $this->getEntityMetadata($entityClass, $fieldPath);
+            $targetFieldName = $this->getLastFieldName($fieldPath);
+            if (null !== $targetMetadata
+                && in_array($targetFieldName, $targetMetadata->getIdentifierFieldNames(), true)
+            ) {
+                continue;
+            }
 
             if (!$isCollectionValuedAssociation
-                && !$this->isCollectionValuedAssociation($entityClass, $fieldPath)
+                && !$this->isCollectionValuedAssociation($targetMetadata, $targetFieldName)
             ) {
+                $fieldKey = $fieldPrefix . $fieldName;
                 if (!$section->hasField($fieldKey)) {
                     $section->addField($fieldKey, $sectionField);
                 }
@@ -195,22 +206,16 @@ abstract class NormalizeSection implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
-     * @param string $propertyPath
+     * @param ClassMetadata|null $metadata
+     * @param string             $fieldName
      *
      * @return bool
      */
-    protected function isCollectionValuedAssociation($entityClass, $propertyPath)
+    protected function isCollectionValuedAssociation($metadata, $fieldName)
     {
-        $metadata = $this->getEntityMetadata($entityClass, $propertyPath);
-        if (null === $metadata) {
-            return false;
-        }
-
-        $fieldName = $this->getLastFieldName($propertyPath);
-
         return
-            $metadata->hasAssociation($fieldName)
+            null !== $metadata
+            && $metadata->hasAssociation($fieldName)
             && $metadata->isCollectionValuedAssociation($fieldName);
     }
 

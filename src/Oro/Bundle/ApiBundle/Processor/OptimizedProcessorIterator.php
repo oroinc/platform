@@ -14,7 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorIterator;
 class OptimizedProcessorIterator extends ProcessorIterator
 {
     /** @var array */
-    protected $groups = [];
+    protected $groups;
 
     /**
      * {@inheritdoc}
@@ -61,7 +61,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
 
         $applicable = $this->applicableChecker->isApplicable(
             $this->context,
-            $this->processors[$this->action][$this->index]['attributes']
+            $this->processors[$this->index]['attributes']
         );
 
         return $applicable !== ApplicableCheckerInterface::NOT_APPLICABLE;
@@ -72,7 +72,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
      */
     protected function processFirstGroup($firstGroup)
     {
-        $groups = $this->getGroups($this->getAction());
+        $groups = $this->getGroups();
         if (isset($groups[$firstGroup])) {
             $firstGroupIndex = $groups[$firstGroup];
             $this->index++;
@@ -104,7 +104,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
             $this->index++;
             $group = $this->getGroup();
             if ($group) {
-                $groups = $this->getGroups($this->getAction());
+                $groups = $this->getGroups();
                 if (isset($groups[$lastGroup]) && $groups[$group] > $groups[$lastGroup]) {
                     $this->nextUngrouped();
                 }
@@ -129,40 +129,34 @@ class OptimizedProcessorIterator extends ProcessorIterator
     /**
      * Returns groups for the given action
      *
-     * @param string $action
-     *
      * @return array [group name => group index, ...]
      */
-    protected function getGroups($action)
+    protected function getGroups()
     {
-        if (!isset($this->groups[$action])) {
-            $this->groups[$action] = $this->loadGroups($action);
+        if (null === $this->groups) {
+            $this->groups = $this->loadGroups();
         }
 
-        return $this->groups[$action];
+        return $this->groups;
     }
 
     /**
      * Loads groups for the given action
      *
-     * @param string $action
-     *
      * @return array [group name => group index, ...]
      */
-    protected function loadGroups($action)
+    protected function loadGroups()
     {
         $result = [];
-        if (isset($this->processors[$action])) {
-            $groupIndex = 0;
-            foreach ($this->processors[$action] as $processor) {
-                if (!isset($processor['attributes']['group'])) {
-                    continue;
-                }
-                $group = $processor['attributes']['group'];
-                if (!isset($result[$group])) {
-                    $result[$group] = $groupIndex;
-                    $groupIndex++;
-                }
+        $groupIndex = 0;
+        foreach ($this->processors as $processor) {
+            if (!isset($processor['attributes']['group'])) {
+                continue;
+            }
+            $group = $processor['attributes']['group'];
+            if (!isset($result[$group])) {
+                $result[$group] = $groupIndex;
+                $groupIndex++;
             }
         }
 

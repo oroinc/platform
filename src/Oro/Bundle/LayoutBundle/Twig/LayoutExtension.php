@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Twig;
 
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Layout\BlockView;
 
@@ -74,8 +75,8 @@ class LayoutExtension extends \Twig_Extension
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
             new \Twig_SimpleFunction(
-                'layout_attr_merge',
-                [$this, 'mergeAttributes']
+                'layout_attr_defaults',
+                [$this, 'defaultAttributes']
             )
         ];
     }
@@ -114,14 +115,14 @@ class LayoutExtension extends \Twig_Extension
      * @param array $defaultAttr
      * @return array
      */
-    public function mergeAttributes(array $attr, array $defaultAttr)
+    public function defaultAttributes(array $attr, array $defaultAttr)
     {
         foreach ($defaultAttr as $key => $value) {
             if (strpos($key, '~') === 0) {
                 $key = substr($key, 1);
                 if (array_key_exists($key, $attr)) {
                     if (is_array($value)) {
-                        $attr[$key] = array_merge_recursive($value, (array)$attr[$key]);
+                        $attr[$key] = ArrayUtil::arrayMergeRecursiveDistinct($value, (array)$attr[$key]);
                     } else {
                         $attr[$key] .= $value;
                     }
