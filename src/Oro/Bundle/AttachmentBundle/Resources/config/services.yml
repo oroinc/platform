@@ -28,6 +28,9 @@ parameters:
     oro_attachment.formatter.image_link.class:            Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
     oro_attachment.formatter.image_src.class:             Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
 
+    oro_attachment.imagine.cache.resolver.custom_web_path.class: Oro\Bundle\AttachmentBundle\Imagine\Cache\Resolver\CustomWebPathResolver
+    oro_attachment.imagine.cache.resolver.custom_web_path.name: custom_web_path
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
@@ -180,3 +183,12 @@ services:
           - '@oro_attachment.manager'
         tags:
           - { name: oro_formatter, formatter: image_src }
+
+    oro_attachment.imagine.cache.resolver.custom_web_path:
+        class: %oro_attachment.imagine.cache.resolver.custom_web_path.class%
+        arguments:
+          - '@filesystem'
+          - '@router.request_context'
+          - '%kernel.root_dir%/../web'
+        tags:
+          - { name: liip_imagine.cache.resolver, resolver: %oro_attachment.imagine.cache.resolver.custom_web_path.name% }

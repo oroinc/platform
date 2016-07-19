@@ -8,6 +8,8 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
+use Liip\ImagineBundle\Model\Binary;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -331,7 +333,7 @@ class EmailController extends Controller
     {
         $fileSystemMap = $this->get('knp_gaufrette.filesystem_map');
         $fileSystem = $fileSystemMap->get('attachments');
-        $path = substr($this->getRequest()->getPathInfo(), 1);
+        $path = substr($this->get('request_stack')->getCurrentRequest()->getPathInfo(), 1);
         if (!$fileSystem->has($path)) {
             $filterName = 'attachment_' . $width . '_' . $height;
             $this->get('liip_imagine.filter.configuration')->set(
@@ -348,8 +350,11 @@ class EmailController extends Controller
                 $attachment->getContent()->getContent(),
                 $attachment->getContent()->getContentTransferEncoding()
             );
-            $binary = $this->get('liip_imagine')->load($content);
-            $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
+            $binary = $this->createBinaryFromContent($content, $attachment->getContent());
+            $filteredBinary = $this
+                ->get('liip_imagine.filter.manager')
+                ->applyFilter($binary, $filterName)
+                ->getContent();
             $fileSystem->write($path, $filteredBinary);
         } else {
             $filteredBinary = $fileSystem->read($path);
@@ -792,5 +797,17 @@ class EmailController extends Controller
             ->isGranted('CREATE', 'entity:' . 'Oro\Bundle\AttachmentBundle\Entity\Attachment');
 
         return $enabledAttachment && $createGrant;
+    }
+
+    /**
+     * @param string $content
+     * @param string s$mimeType
+     * @return Binary
+     */
+    protected function createBinaryFromContent($content, $mimeType)
+    {
+        $format = $this->get('liip_imagine.extension_guesser')->guess($mimeType);
+
+        return new Binary($content, $mimeType, $format);
     }
 }

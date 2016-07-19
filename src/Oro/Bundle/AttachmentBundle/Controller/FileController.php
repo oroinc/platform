@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
+use Liip\ImagineBundle\Model\Binary;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -75,8 +77,9 @@ class FileController extends Controller
     public function getResizedAttachmentImageAction($id, $width, $height, $filename)
     {
         $attachment = $this->getFileByIdAndFileName($id, $filename);
-        $path       = substr($this->getRequest()->getPathInfo(), 1);
+        $path       = $this->get('request_stack')->getCurrentRequest()->getPathInfo();
         $filterName = 'attachment_' . $width . '_' . $height;
+        $cacheResolverName = $this->getParameter('oro_attachment.imagine.cache.resolver.custom_web_path.name');
 
         $this->get('liip_imagine.filter.configuration')->set(
             $filterName,
@@ -88,13 +91,18 @@ class FileController extends Controller
                 ]
             ]
         );
-        $binary         = $this->get('liip_imagine')->load(
-            $this->get('oro_attachment.manager')->getContent($attachment)
-        );
-        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
-        $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
 
-        return $this->get('liip_imagine.cache.manager')->store($response, $path, $filterName);
+        $binary = $this->createBinaryFromFile($attachment);
+        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
+        $this->get('liip_imagine.cache.manager')->store($filteredBinary, $path, $filterName, $cacheResolverName);
+
+        return new Response(
+            $filteredBinary->getContent(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => $filteredBinary->getMimeType()
+            ]
+        );
     }
 
     /**
@@ -106,15 +114,22 @@ class FileController extends Controller
     public function getFilteredImageAction($id, $filter, $filename)
     {
         $attachment     = $this->getFileByIdAndFileName($id, $filename);
-        $path           = substr($this->getRequest()->getPathInfo(), 1);
-        $binary         = $this->get('liip_imagine')->load(
-            $this->get('oro_attachment.manager')->getContent($attachment)
-        );
-        $this->get('oro_layout.provider.image_filter')->load();
-        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filter);
-        $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
+        $path           = $this->get('request_stack')->getCurrentRequest()->getPathInfo();
+        $binary         = $this->createBinaryFromFile($attachment);
+        $cacheResolverName = $this->getParameter('oro_attachment.imagine.cache.resolver.custom_web_path.name');
 
-        return $this->get('liip_imagine.cache.manager')->store($response, $path, $filter);
+        $this->get('oro_layout.provider.image_filter')->load();
+
+        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filter);
+        $this->get('liip_imagine.cache.manager')->store($filteredBinary, $path, $filter, $cacheResolverName);
+
+        return new Response(
+            $filteredBinary->getContent(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => $filteredBinary->getMimeType()
+            ]
+        );
     }
 
     /**
@@ -138,5 +153,18 @@ class FileController extends Controller
         }
 
         return $attachment;
+    }
+
+    /**
+     * @param File $file
+     * @return Binary
+     */
+    protected function createBinaryFromFile(File $file)
+    {
+        $mimeType = $file->getMimeType();
+        $format = $this->get('liip_imagine.extension_guesser')->guess($mimeType);
+        $content = $this->get('oro_attachment.manager')->getContent($file);
+
+        return new Binary($content, $mimeType, $format);
     }
 }
