@@ -8,9 +8,12 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 class GridHeader extends Element
 {
     /**
-     * @param string $headerText
-     * @return int
-     * @throws ExpectationException
+     * Try to guess header and return number of column starting from 1
+     *
+     * @param string $headerText Header of grid column
+     * @return int Number of column starting from 1
+     *
+     * @throws ExpectationException Throw exception when can't find header in grid
      */
     public function getColumnNumber($headerText)
     {

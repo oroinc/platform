@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
-use Behat\MinkExtension\Context\RawMinkContext;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 
-class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterface
+class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInterface
 {
     /**
      * @var FixtureLoader
@@ -31,7 +29,7 @@ class FixturesContext extends RawMinkContext implements FixtureLoaderAwareInterf
      *     | subject      |
      *     | hello world! |
      *     | <sentence()> |
-     * @Given /^the following ([\w ]+):?$/
+     * @Given /^(?:the|there are) following ([\w ]+):?$/
      */
     public function theFollowing($name, TableNode $table)
     {

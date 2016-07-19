@@ -6,10 +6,10 @@ default: &default
             default_session: 'first_session'
             sessions:
                 second_session:
-                    selenium2:
+                    oroSelenium2:
                         wd_host: "http://localhost:8643/wd/hub"
                 first_session:
-                    selenium2:
+                    oroSelenium2:
                         wd_host: "http://localhost:8643/wd/hub"
         Behat\Symfony2Extension:
             kernel:
@@ -33,8 +33,8 @@ selenium2:
         Behat\MinkExtension:
             sessions:
                 second_session:
-                    selenium2:
+                    oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
                 first_session:
-                    selenium2:
+                    oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'

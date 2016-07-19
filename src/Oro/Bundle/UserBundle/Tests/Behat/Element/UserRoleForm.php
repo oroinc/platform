@@ -9,23 +9,23 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 class UserRoleForm extends Form
 {
     /**
-     * @param string $entity
-     * @param string $action
-     * @param string $accessLevel
+     * @param string $entity Entity name e.g. Account, Business Customer, Comment etc.
+     * @param string $action e.g. Create, Delete, Edit, View etc.
+     * @param string $accessLevel e.g. System, None, User etc.
+     *
      * @throws ExpectationException
      */
     public function setPermission($entity, $action, $accessLevel)
     {
         $entityRow = $this->getEntityRow($entity);
         $actionRow = $this->getActionRow($entityRow, $action);
-        $actionRow->find('css', 'div.access_level_value a')->click();
         /** todo: Move waitForAjax to driver. BAP-10843 */
         sleep(1);
-        $levels = $this->getPage()->findAll('css', '#select2-drop ul.select2-results li div');
+        $levels = $actionRow->findAll('css', 'ul.dropdown-menu-collection__list li a');
 
         /** @var NodeElement $level */
         foreach ($levels as $level) {
-            if (false !== strpos($level->getText(), $accessLevel)) {
+            if (preg_match(sprintf('/%s/i', $accessLevel), $level->getText())) {
                 $level->mouseOver();
                 $level->click();
                 return;
@@ -46,10 +46,12 @@ class UserRoleForm extends Form
      */
     protected function getActionRow(NodeElement $entityRow, $action)
     {
-        /** @var NodeElement $tr */
-        foreach ($entityRow->findAll('css', 'tr') as $tr) {
-            if (false !== strpos($tr->find('css', 'td')->getText(), $action)) {
-                return $tr;
+        /** @var NodeElement $label */
+        foreach ($entityRow->findAll('css', 'span.action-permissions__label') as $label) {
+            if (preg_match(sprintf('/%s/i', $action), $label->getText())) {
+                $label->click();
+
+                return $label->getParent()->getParent()->find('css', 'div.dropdown-menu');
             }
         }
 
@@ -66,18 +68,12 @@ class UserRoleForm extends Form
      */
     protected function getEntityRow($entity)
     {
-        $entityCells = $this->findAll("css", "div[id^='oro_user_role_form_entity']");
+        $entityTrs = $this->findAll("css", "div[id^=grid-role-permission-grid] table.grid tr.grid-row");
 
-        /** @var NodeElement $entityCell */
-        foreach ($entityCells as $entityCell) {
-            if (false !== strpos($entityCell->getText(), $entity)) {
-                $parent = $entityCell->getParent();
-
-                while ('tr' !== $parent->getTagName()) {
-                    $parent = $parent->getParent();
-                }
-
-                return $parent;
+        /** @var NodeElement $entityTr */
+        foreach ($entityTrs as $entityTr) {
+            if (false !== strpos($entityTr->find('css', 'td.grid-body-cell-entity')->getText(), $entity)) {
+                return $entityTr;
             }
         }
 

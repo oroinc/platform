@@ -40,8 +40,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: create, priority: -45 }
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update, priority: -45 }
+            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create, priority: -45 }
 
     oro_api.get_config.add_owner_not_null_validator:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerNotNullValidator
@@ -58,8 +57,7 @@ services:
             - '@oro_security.owner.ownership_metadata_provider'
             - '@oro_api.validation_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: create, priority: -51 }
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update, priority: -51 }
+            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create, priority: -51 }
 
     oro_api.get_config.json_api.fix_field_naming:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi\FixFieldNaming
@@ -201,22 +199,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -130 }
             - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -130 }
-
-    oro_api.get_config.remove_duplicated_filters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\RemoveDuplicatedFilters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: filters&definition, priority: -140 }
-            - { name: oro.api.processor, action: get_relation_config, extra: filters&definition, priority: -140 }
-
-    oro_api.get_config.remove_duplicated_sorters:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\RemoveDuplicatedSorters
-        arguments:
-            - '@oro_api.doctrine_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: sorters&definition, priority: -140 }
-            - { name: oro.api.processor, action: get_relation_config, extra: sorters&definition, priority: -140 }
 
     oro_api.get_config.set_data_transformers:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetDataTransformers
