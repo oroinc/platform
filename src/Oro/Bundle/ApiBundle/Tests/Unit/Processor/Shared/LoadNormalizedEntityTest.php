@@ -73,7 +73,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
-        $expectedGetContext->getRequestType()->set($this->context->getRequestType()->toArray());
+        $expectedGetContext->getRequestType()->set($this->context->getRequestType());
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
@@ -112,7 +112,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
         $expectedContext = new FormContextStub($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
-        $expectedContext->getRequestType()->set($this->context->getRequestType()->toArray());
+        $expectedContext->getRequestType()->set($this->context->getRequestType());
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setId($this->context->getId());
         $expectedContext->setClassName($this->context->getClassName());
