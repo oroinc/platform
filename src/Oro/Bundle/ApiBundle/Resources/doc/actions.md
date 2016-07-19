@@ -437,44 +437,105 @@ The main processor class: [CustomizeLoadedDataProcessor](../../Processor/Customi
 
 There are no worker processors in ApiBundle. To see existing worker processors from other bundles run `php app/console oro:api:debug customize_loaded_data`.
 
-An example of own processor to modify loaded data:
+An example of a processor to modify loaded data:
 
 ```php
 <?php
 
-namespace Acme\Bundle\UserBundle\Api\Processor;
+namespace Oro\Bundle\AttachmentBundle\Api\Processor;
+
+use Gaufrette\Exception\FileNotFound;
+
+use Psr\Log\LoggerInterface;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
 /**
- * Computes a value of "fullName" field for User entity.
+ * Computes a value of "content" field for File entity.
  */
-class ComputeUserFullName implements ProcessorInterface
+class ComputeFileContent implements ProcessorInterface
 {
+    /** @var AttachmentManager */
+    protected $attachmentManager;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /**
+     * @param AttachmentManager $attachmentManager
+     * @param LoggerInterface   $logger
+     */
+    public function __construct(AttachmentManager $attachmentManager, LoggerInterface $logger)
+    {
+        $this->attachmentManager = $attachmentManager;
+        $this->logger = $logger;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
+        /** @var CustomizeLoadedDataContext $context */
+
         $data = $context->getResult();
-        if (!empty($data)
-            && empty($data['fullName'])
-            && array_key_exists('firstName', $data)
-            && array_key_exists('lastName', $data)
-        ) {
-            $data['fullName'] = $data['firstName'] . ' ' . $data['lastName'];
-            $context->setResult($data);
+        if (!is_array($data)) {
+            return;
         }
+
+        $config = $context->getConfig();
+        $contextFieldName = $config->findFieldNameByPropertyPath('content');
+        if (!$contextFieldName
+            || $config->getField($contextFieldName)->isExcluded()
+            || array_key_exists($contextFieldName, $data)
+        ) {
+            return;
+        }
+
+        $fileNameFieldName = $config->findFieldNameByPropertyPath('filename');
+        $data[$contextFieldName] = $fileNameFieldName && !empty($data[$fileNameFieldName])
+            ? $this->getFileContent($data[$fileNameFieldName])
+            : null;
+        $context->setResult($data);
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return string|null
+     */
+    protected function getFileContent($fileName)
+    {
+        $content = null;
+        try {
+            $content = $this->attachmentManager->getContent($fileName);
+        } catch (FileNotFound $e) {
+            $this->logger->error(
+                sprintf('The content for "%s" file cannot be loaded.', $fileName),
+                ['exception' => $e]
+            );
+        }
+        if (null !== $content) {
+            $content = base64_encode($content);
+        }
+
+        return $content;
     }
 }
 ```
 
 ```yaml
-    acme.api.customize_loaded_data.compute_user_full_name:
-        class: Acme\Bundle\UserBundle\Api\Processor\ComputeUserFullName
+    oro_attachment.api.customize_loaded_data.compute_file_content:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent
+        arguments:
+            - '@oro_attachment.manager'
+            - '@logger'
         tags:
-            - { name: oro.api.processor, action: customize_loaded_data, class: "Oro\Bundle\UserBundle\Entity\User" }
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\AttachmentBundle\Entity\File }
+            - { name: monolog.logger, channel: api }
 ```
 
 get_config Action

@@ -1,0 +1,9 @@
+services:
+    oro_attachment.api.customize_loaded_data.compute_file_content:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent
+        arguments:
+            - '@oro_attachment.manager'
+            - '@logger'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\AttachmentBundle\Entity\File }
+            - { name: monolog.logger, channel: api }

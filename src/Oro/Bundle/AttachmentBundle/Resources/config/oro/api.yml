@@ -5,3 +5,4 @@ oro_api:
             fields:
                 content:
                     data_type: string
+                    depends_on: [filename]

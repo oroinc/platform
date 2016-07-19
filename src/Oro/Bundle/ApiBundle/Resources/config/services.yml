@@ -263,7 +263,7 @@ services:
             - '@oro_api.entity_accessor'
 
     oro_api.entity_serializer.config_normalizer:
-        class: Oro\Component\EntitySerializer\ConfigNormalizer
+        class: Oro\Bundle\ApiBundle\Util\ConfigNormalizer
         public: false
 
     oro_api.entity_serializer.data_normalizer:
