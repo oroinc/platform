@@ -6,6 +6,7 @@ use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 
 class ThemeImageTypeDimensionTest extends \PHPUnit_Framework_TestCase
 {
+    const NAME = 'dim';
     const WIDTH = 100;
     const HEIGHT = 200;
 
@@ -16,17 +17,13 @@ class ThemeImageTypeDimensionTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->imageTypeDimension = new ThemeImageTypeDimension(self::WIDTH, self::HEIGHT);
+        $this->imageTypeDimension = new ThemeImageTypeDimension(self::NAME, self::WIDTH, self::HEIGHT);
     }
 
     public function testAccessors()
     {
+        $this->assertEquals(self::NAME, $this->imageTypeDimension->getName());
         $this->assertEquals(self::WIDTH, $this->imageTypeDimension->getWidth());
         $this->assertEquals(self::HEIGHT, $this->imageTypeDimension->getHeight());
-    }
-
-    public function testToString()
-    {
-        $this->assertEquals(self::WIDTH . '_' . self::HEIGHT, (string) $this->imageTypeDimension);
     }
 }

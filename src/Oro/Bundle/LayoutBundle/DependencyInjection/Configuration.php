@@ -196,6 +196,10 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $widthHeightValidator = function ($value) {
+            return !is_null($value) && !is_int($value);
+        };
+
         $imagesNode
             ->children()
                 ->arrayNode('types')
@@ -205,11 +209,26 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('label')->cannotBeEmpty()->end()
                             ->scalarNode('max_number')->defaultNull()->end()
                             ->arrayNode('dimensions')
-                                ->prototype('array')
-                                    ->children()
-                                        ->integerNode('width')->end()
-                                        ->integerNode('height')->end()
-                                    ->end()
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('dimensions')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('width')
+                                ->validate()
+                                    ->ifTrue($widthHeightValidator)
+                                    ->thenInvalid('Width value can be null or integer only')
+                                ->end()
+                            ->end()
+                            ->scalarNode('height')
+                                ->validate()
+                                    ->ifTrue($widthHeightValidator)
+                                    ->thenInvalid('Height value can be null or integer only')
                                 ->end()
                             ->end()
                         ->end()

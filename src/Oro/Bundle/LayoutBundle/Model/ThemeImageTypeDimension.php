@@ -5,6 +5,11 @@ namespace Oro\Bundle\LayoutBundle\Model;
 class ThemeImageTypeDimension
 {
     /**
+     * @var string
+     */
+    protected $name;
+
+    /**
      * @var int
      */
     private $width;
@@ -15,13 +20,15 @@ class ThemeImageTypeDimension
     private $height;
 
     /**
-     * @param int $width
-     * @param int $height
+     * @param string $name
+     * @param int|null $width
+     * @param int|null $height
      */
-    public function __construct($width, $height)
+    public function __construct($name, $width, $height)
     {
-        $this->width = (int) $width;
-        $this->height = (int) $height;
+        $this->name = $name;
+        $this->width = $width;
+        $this->height = $height;
     }
 
     /**
@@ -41,10 +48,10 @@ class ThemeImageTypeDimension
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function __toString()
+    public function getName()
     {
-        return sprintf('%dx%d', $this->width, $this->height);
+        return $this->name;
     }
 }
