@@ -196,7 +196,9 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
-            ->arrayNode(EntityDefinitionFieldConfig::DEPENDS_ON)->prototype('scalar')->end()->end();
+            ->arrayNode(EntityDefinitionFieldConfig::DEPENDS_ON)
+                ->prototype('scalar')->end()
+            ->end();
     }
 
     /**
