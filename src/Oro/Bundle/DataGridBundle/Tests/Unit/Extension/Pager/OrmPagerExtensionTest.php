@@ -145,19 +145,19 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param null $count
-     * @param bool $isSetCalculatedNbResults
+     * @param bool $adjustTotalCount
      *
-     * @dataProvider calculatedCountDataProvider
+     * @dataProvider adjustedCountDataProvider
      */
-    public function testVisitDatasourceWithCalculatedCount($count, $isSetCalculatedNbResults = false)
+    public function testVisitDatasourceWithAdjustedCount($count, $adjustTotalCount = false)
     {
-        if ($isSetCalculatedNbResults) {
+        if ($adjustTotalCount) {
             $this->pager->expects($this->once())
-                ->method('setCalculatedNbResults')
+                ->method('adjustTotalCount')
                 ->with($count);
         } else {
             $this->pager->expects($this->never())
-                ->method('setCalculatedNbResults')
+                ->method('adjustTotalCount')
                 ->with($count);
         }
 
@@ -166,13 +166,13 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
         $configObject = DatagridConfiguration::create([]);
         $parameters = [];
         if (null !== $count) {
-            $parameters[PagerInterface::PAGER_ROOT_PARAM] = [PagerInterface::CALCULATED_COUNT => $count];
+            $parameters[PagerInterface::PAGER_ROOT_PARAM] = [PagerInterface::ADJUSTED_COUNT => $count];
         }
         $this->extension->setParameters(new ParameterBag($parameters));
         $this->extension->visitDatasource($configObject, $dataSource);
     }
 
-    public function calculatedCountDataProvider()
+    public function adjustedCountDataProvider()
     {
         return [
             'valid value' => [150, true],
