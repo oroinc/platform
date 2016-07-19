@@ -6,10 +6,13 @@ use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use WebDriver\Element;
 
 class OroSelenium2Driver extends Selenium2Driver
 {
+    use AssertTrait;
+
     /**
      * @var Manipulator
      */
@@ -129,7 +132,6 @@ JS;
      *
      * @param string $xpath
      * @param string|array $values Any string(s) for search entity
-     * @throws ExpectationException
      */
     protected function fillSelect2Entities($xpath, $values)
     {
@@ -155,9 +157,11 @@ JS;
             $results = $this->getEntitiesSearchResultXpaths();
             $firstResult = $this->findElement(array_shift($results));
 
-            if ('select2-no-results' === $firstResult->attribute('class')) {
-                throw new ExpectationException(sprintf('Not found result for "%s"', $value), $this);
-            }
+            self::assertNotEquals(
+                'select2-no-results',
+                $firstResult->attribute('class'),
+                sprintf('Not found result for "%s"', $value)
+            );
 
             $firstResult->click();
         }

@@ -6,9 +6,12 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 
 class Element extends NodeElement
 {
+    use AssertTrait;
+
     /**
      * @var OroElementFactory
      */

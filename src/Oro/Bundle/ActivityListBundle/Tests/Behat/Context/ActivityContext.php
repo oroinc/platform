@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
@@ -35,14 +34,11 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
     {
         try {
             $this->getActivityListItem($content);
-        } catch (ExpectationException $e) {
+        } catch (\Exception $e) {
             return;
         }
 
-        throw new ExpectationException(
-            sprintf('Not expect to find "%s" activity item, but was found', $content),
-            $this->getSession()->getDriver()
-        );
+        self::fail(sprintf('Not expect to find "%s" activity item, but was found', $content));
     }
 
     /**
@@ -125,10 +121,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
             }
         }
 
-        throw new ExpectationException(
-            sprintf('"%s" activity item was found, but "%s" action not', $content, $action),
-            $this->getSession()->getDriver()
-        );
+        self::fail(sprintf('"%s" activity item was found, but "%s" action not', $content, $action));
     }
 
     /**
@@ -197,10 +190,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Context with "%s" name not found', $text),
-            $this->getSession()->getDriver()
-        );
+        self::fail(sprintf('Context with "%s" name not found', $text));
     }
 
     /**
@@ -238,10 +228,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t find "%s" context in context selector', $needle),
-            $this->getSession()->getDriver()
-        );
+        self::fail(sprintf('Can\'t find "%s" context in context selector', $needle));
     }
 
     /**
@@ -271,10 +258,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
             return $element->hasClass('in');
         });
 
-        self::assertTrue(
-            0 < count($collapsedItem),
-            'Not found collapsed items in activity list'
-        );
+        self::assertNotCount(0, $collapsedItem, 'Not found collapsed items in activity list');
 
         return array_shift($collapsedItem);
     }
@@ -282,7 +266,6 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
     /**
      * @param string $content
      * @return NodeElement Activity element
-     * @throws ExpectationException
      */
     protected function getActivityListItem($content)
     {
@@ -292,15 +275,11 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Item with "%s" content not found in activity list', $content),
-            $this->getSession()->getDriver()
-        );
+        self::fail(sprintf('Item with "%s" content not found in activity list', $content));
     }
 
     /**
      * @return NodeElement[]
-     * @throws ExpectationException
      */
     protected function getActivityListItems()
     {
@@ -314,10 +293,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t find Activity section on page'),
-            $this->getSession()->getDriver()
-        );
+        self::fail(sprintf('Can\'t find Activity section on page'));
     }
 
     /**

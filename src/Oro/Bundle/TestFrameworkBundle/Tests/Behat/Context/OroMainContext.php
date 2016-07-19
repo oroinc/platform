@@ -229,10 +229,7 @@ class OroMainContext extends MinkContext implements
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t find "%s" item in user menu', $needle),
-            $this->getSession()->getDriver()
-        );
+        self::fail(sprintf('Can\'t find "%s" item in user menu', $needle));
     }
 
     /**
@@ -358,9 +355,8 @@ class OroMainContext extends MinkContext implements
                 }
             }
 
-            throw new ExpectationException(
-                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $row[0], $row[1]),
-                $this->getSession()->getDriver()
+            self::fail(
+                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $row[0], $row[1])
             );
         }
     }

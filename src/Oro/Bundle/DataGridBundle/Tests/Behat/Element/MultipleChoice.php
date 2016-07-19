@@ -10,7 +10,6 @@ class MultipleChoice extends AbstractGridFilterItem
 {
     /**
      * @param array $values Array of checkbox labels for check/uncheck
-     * @throws ExpectationException
      */
     public function checkItems(array $values)
     {
@@ -23,12 +22,7 @@ class MultipleChoice extends AbstractGridFilterItem
         foreach ($values as $value) {
             $item = $this->findElementByText($inputs, $value);
 
-            if (null === $item) {
-                throw new ExpectationException(
-                    sprintf('Cann\'t find checkbox with "%s" text', $value),
-                    $this->getDriver()
-                );
-            }
+            self::assertNotNull($item, sprintf('Cann\'t find checkbox with "%s" text', $value));
 
             $item->click();
             $this->getDriver()->waitForAjax();
@@ -56,10 +50,7 @@ class MultipleChoice extends AbstractGridFilterItem
             }
         }
 
-        throw new ExpectationException(
-            'Can\'t find widget on page or it\'s not visible',
-            $this->getDriver()
-        );
+        self::fail('Can\'t find widget on page or it\'s not visible');
     }
 
     /**
