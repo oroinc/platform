@@ -298,7 +298,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
         $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
 
         if (null === $change[1]) {
-            $change[1] = ['inserted' => [], 'deleted' => []];
+            $change[1] = ['inserted' => [], 'deleted' => [], 'changed' => []];
         }
 
         return $change;

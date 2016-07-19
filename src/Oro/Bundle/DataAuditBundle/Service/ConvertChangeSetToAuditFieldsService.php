@@ -81,6 +81,19 @@ class ConvertChangeSetToAuditFieldsService
                     }
                 }
 
+                if ($new['changed']) {
+                    foreach ($new['changed'] as $entity) {
+                        $field->addEntityChangedInCollection(
+                            $entity['entity_class'],
+                            $entity['entity_id'],
+                            $this->getHumanReadableEntityNameService->getName(
+                                $entity['entity_class'],
+                                $entity['entity_id']
+                            )
+                        );
+                    }
+                }
+
                 $field->calculateNewValue();
             } elseif (isset($entityMeta->associationMappings[$fieldName])) {
                 $newName = $new ?

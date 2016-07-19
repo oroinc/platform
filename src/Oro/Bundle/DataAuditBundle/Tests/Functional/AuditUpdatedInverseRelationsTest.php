@@ -5,7 +5,6 @@ use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseRelationsProcess
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
-use Oro\Bundle\TestFrameworkBundle\Fixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
@@ -493,7 +492,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                                         'entity_class' => TestAuditDataChild::class,
                                         'entity_id' => 124,
                                     ]
-                                ]
+                                ],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -540,7 +540,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                                         'entity_id' => 124,
                                     ]
                                 ],
-                                'inserted' => []
+                                'inserted' => [],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -592,7 +593,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                                         'entity_class' => TestAuditDataChild::class,
                                         'entity_id' => 131,
                                     ]
-                                ]
+                                ],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -615,7 +617,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
                                         'entity_class' => TestAuditDataChild::class,
                                         'entity_id' => 130,
                                     ]
-                                ]
+                                ],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -696,6 +699,8 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertStoredAuditCount(1);
 
         $audit = $this->findLastStoredAudit();
+        $this->assertSame(TestAuditDataOwner::class, $audit->getObjectClass());
+        $this->assertSame($owner->getId(), $audit->getObjectId());
         $this->assertCount(1, $audit->getFields());
 
         $auditField = $audit->getField('childrenOneToMany');
@@ -714,10 +719,10 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
     public function testShouldNotTrackChangedEntityWhichPartOfCollectionIfSourceEntityNoLongerExist()
     {
         $child = $this->createChild();
-        
+
         //gurad
         $this->assertNull($child->getOwnerManyToOne());
-        
+
         $message = $this->createDummyMessage([
             'entities_updated' => [
                 [

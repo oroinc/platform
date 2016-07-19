@@ -87,6 +87,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                     ]
                                 ],
                                 'deleted' => [],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -131,6 +132,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                     ]
                                 ],
                                 'deleted' => [],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -176,6 +178,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                     ]
                                 ],
                                 'inserted' => [],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -226,6 +229,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                         'entity_id' => 567,
                                     ]
                                 ],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -274,6 +278,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                     ]
                                 ],
                                 'inserted' => [],
+                                'changed' => [],
                             ]
                         ]
                     ]
@@ -324,6 +329,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
                                         'entity_id' => 567,
                                     ]
                                 ],
+                                'changed' => [],
                             ]
                         ]
                     ]

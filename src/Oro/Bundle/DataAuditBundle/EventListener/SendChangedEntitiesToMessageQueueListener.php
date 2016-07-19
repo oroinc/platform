@@ -220,7 +220,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
                 }
 
 
-                $new = ['inserted' => [], 'deleted' => []];
+                $new = ['inserted' => [], 'deleted' => [], 'changed' => [],];
                 foreach ($this->allCollectionUpdates[$em][$collection]['insertDiff'] as $entity) {
                     $new['inserted'][] = $this->convertEntityToArray($em, $entity, []);
                 }

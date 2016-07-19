@@ -58,6 +58,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
                 ],
             ],
             'deleted' => [],
+            'changed' => [],
         ]]], $updateCollection['change_set']);
     }
 
@@ -90,6 +91,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
                 ]
             ],
             'deleted' => [],
+            'changed' => [],
         ]]], $updateCollection['change_set']);
     }
 
@@ -121,6 +123,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
                 ]
             ],
             'deleted' => [],
+            'changed' => [],
         ]]], $updateCollection['change_set']);
     }
 
@@ -152,6 +155,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
                 ]
             ],
             'deleted' => [],
+            'changed' => [],
         ]]], $updateCollection['change_set']);
     }
 
@@ -186,6 +190,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
                 ]
             ],
             'inserted' => [],
+            'changed' => [],
         ]],], $updateCollection['change_set']);
     }
 
@@ -222,6 +227,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
                 ]
             ],
             'inserted' => [],
+            'changed' => [],
         ]]], $updateCollection['change_set']);
     }
 
@@ -257,6 +263,7 @@ class SendManyToManyCollectionsChangesToMessageQueueTest extends WebTestCase
                 ]
             ],
             'deleted' => [],
+            'changed' => [],
         ]],], $updateCollection['change_set']);
     }
 
