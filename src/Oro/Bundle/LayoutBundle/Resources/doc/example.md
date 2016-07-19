@@ -2007,9 +2007,9 @@ And the footer like this:
 
 Simplify block attribute configuration
 -------------
-For simplify block attribute configuration use twig function `layout_attr_merge(attr, default_attr)`:
+For simplify block attribute configuration use twig function `layout_attr_defaults(attr, default_attr)`:
 ```twig
-{% set attr = layout_attr_merge(attr, {
+{% set attr = layout_attr_defaults(attr, {
     required: 'required',
     autofocus: true,
     '~class': " input input_block input_md {{ class_prefix }}__form__input"

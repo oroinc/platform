@@ -88,15 +88,16 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     {
         if (null === $this->resources) {
             $this->resources = [];
+            $requestType = $this->docViewDetector->getRequestType();
             $resources = $this->resourcesProvider->getResources(
                 $this->docViewDetector->getVersion(),
-                $this->docViewDetector->getRequestType()
+                $requestType
             );
             foreach ($resources as $resource) {
                 $entityType = $this->valueNormalizer->normalizeValue(
                     $resource->getEntityClass(),
                     DataType::ENTITY_TYPE,
-                    $this->docViewDetector->getRequestType()
+                    $requestType
                 );
                 $this->resources[$entityType] = $resource;
             }
