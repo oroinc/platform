@@ -120,6 +120,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 ['id' => 789, 'name' => 'Role1'],
                 ['id' => 780, 'name' => 'Role2']
             ],
+            'unknown'    => 'test'
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -251,7 +252,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             'roles'      => [
                 ['id' => 789, 'name' => 'Role1'],
                 ['id' => 780, 'name' => 'Role2']
-            ]
+            ],
+            'unknown'    => 'test'
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);

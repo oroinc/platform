@@ -215,4 +215,18 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->getDataTransformers());
         $this->assertEquals([], $config->toArray());
     }
+
+    public function testDependsOn()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getDependsOn());
+
+        $config->setDependsOn(['field1']);
+        $this->assertEquals(['field1'], $config->getDependsOn());
+        $this->assertEquals(['depends_on' => ['field1']], $config->toArray());
+
+        $config->setDependsOn([]);
+        $this->assertNull($config->getDependsOn());
+        $this->assertEquals([], $config->toArray());
+    }
 }

@@ -41,6 +41,9 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /** the form options that should be used for the field */
     const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
 
+    /** a list of fields on which this field depends on */
+    const DEPENDS_ON = 'depends_on';
+
     /**
      * {@inheritdoc}
      */
@@ -171,6 +174,32 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
                 $dataTransformers = [$dataTransformers];
             }
             $this->items[self::DATA_TRANSFORMER] = $dataTransformers;
+        }
+    }
+
+    /**
+     * Gets a list of fields on which this field depends on.
+     *
+     * @return string[]|null
+     */
+    public function getDependsOn()
+    {
+        return array_key_exists(self::DEPENDS_ON, $this->items)
+            ? $this->items[self::DEPENDS_ON]
+            : null;
+    }
+
+    /**
+     * Sets a list of fields on which this field depends on.
+     *
+     * @param string[] $fieldNames
+     */
+    public function setDependsOn(array $fieldNames)
+    {
+        if (!empty($fieldNames)) {
+            $this->items[self::DEPENDS_ON] = $fieldNames;
+        } else {
+            unset($this->items[self::DEPENDS_ON]);
         }
     }
 }
