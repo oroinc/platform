@@ -133,7 +133,7 @@ Special grouping conditions (such as `or`, `and`) could be utilized in order to 
 layout:
     actions:
         ....
-    conditions: '=context["user_agent"].getMobile() == true or context["navbar_position"] == "top"'
+    conditions: 'context["user_agent"].getMobile() == true or context["navbar_position"] == "top"'
 ```
 
 **[Layout context](./layout_context.md)** could be accessed through the condition expressions by referencing to `$context` variable.

@@ -251,7 +251,7 @@ Corresponding block type classes was removed.
 - Added `oro_layout.provider.image_type` service to get image types available across all themes
 - The class Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType was renamed to FormFieldsType
 - New `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` block type was added. This block type creates three child blocks in buildBlock method: `FormStartType`, `FormType`, `FormEndType`.
-- Changed current expression language in layouts on symfony expression language, for details please check out documentation at
+- Changed current expression language in layouts to symfony expression language, for details please check out documentation at
  [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
 
 ####EmbeddedFormBundle:

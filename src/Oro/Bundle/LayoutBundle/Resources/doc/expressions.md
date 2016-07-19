@@ -6,7 +6,7 @@ The idea is to avoid dependency of the layout building process on raw data. Let'
 block depends on data availability. In case when layout are built and rendered on server side data could be accessed 
 directly using DB layer or passed through the [context](./layout_context.md), but for the layout that is rendered for
 some page in a single page application, where the data should be fetched using `AJAX` it will not work. So, in order 
-to unify data access mechanism for different layout renderer **[Symfony expression](http://symfony.com/doc/current/components/expression_language/index.html)** were added.
+to unify data access mechanism for different layout renderer **[Symfony expression](http://symfony.com/doc/current/components/expression_language/index.html)** was added.
 
 Automatically the extension processes **expressions** that are found in **block view** variables during `finishView` method 
 execution. 
@@ -25,8 +25,10 @@ You can access following variables in your expressions:
 
 | Variable name | Description |
 |------- |-------------|
-| `$context` | Refers to current [layout context](./layout_context.md) |
-| `$data` | Refers to [data accessor](./layout_data.md) |
+| `context` | Refers to current [layout context](./layout_context.md) |
+| `data` | Refers to [data accessor](./layout_data.md) |
+
+**NOTE:** expression variables must begin from equals, for example `'=data["backToUrl"]'`
 
 Encoders
 --------

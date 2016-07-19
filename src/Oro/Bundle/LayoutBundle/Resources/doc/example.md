@@ -541,7 +541,7 @@ layout:
             blockType: external_resource
             options:
                 rel:  canonical
-                href: {@value: $data.product.url}
+                href: '=data["product"].getUrl()'
 ```
 Note how we use [Symfony expression syntax](http://symfony.com/doc/current/components/expression_language/syntax.html) to compose the page title from different product fields.
 
