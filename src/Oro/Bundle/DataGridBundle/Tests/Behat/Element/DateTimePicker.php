@@ -14,7 +14,7 @@ class DateTimePicker extends Element
      */
     public function setValue($dateTime)
     {
-        $this->find('css', 'input.datepicker-input')->click();
+        $this->getDatePicker()->click();
 
         $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
@@ -68,6 +68,14 @@ class DateTimePicker extends Element
      */
     protected function getTimePicker()
     {
-        return $this->findVisible('css', 'input.timepicker-input');
+        return $this->find('css', 'input.timepicker-input');
+    }
+
+    /**
+     * @return NodeElement|null
+     */
+    protected function getDatePicker()
+    {
+        return $this->find('css', 'input.datepicker-input');
     }
 }
