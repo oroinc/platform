@@ -204,16 +204,52 @@ class DebugCommand extends AbstractDebugCommand
                 ': ',
                 [
                     'group',
-                    sprintf('<comment>%s</comment>', $this->convertValueToString($attributes['group']))
+                    sprintf(
+                        '<comment>%s</comment>',
+                        $this->convertProcessorAttributeValueToString($attributes['group'])
+                    )
                 ]
             );
             unset($attributes['group']);
         }
 
         foreach ($attributes as $key => $val) {
-            $rows[] = implode(': ', [$key, $this->convertValueToString($val)]);
+            $rows[] = implode(': ', [$key, $this->convertProcessorAttributeValueToString($val)]);
         }
 
         return implode(PHP_EOL, $rows);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    protected function convertProcessorAttributeValueToString($value)
+    {
+        if (!is_array($value)) {
+            return $this->convertValueToString($value);
+        }
+
+        $items = reset($value);
+        if (!is_array($items)) {
+            return sprintf('<comment>%s</comment>%s', key($value), $items);
+        }
+
+        return implode(
+            sprintf(' <comment>%s</comment> ', key($value)),
+            array_map(
+                function ($val) {
+                    if (is_array($val)) {
+                        $item = reset($val);
+
+                        return sprintf('<comment>%s</comment>%s', key($val), $item);
+                    }
+
+                    return $val;
+                },
+                $items
+            )
+        );
     }
 }
