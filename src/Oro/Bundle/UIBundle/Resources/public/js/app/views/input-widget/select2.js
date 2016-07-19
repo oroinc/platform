@@ -4,6 +4,7 @@ define(function(require) {
     var Select2InputWidget;
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
     var $ = require('jquery');
+    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     // current version: http://select2.github.io/select2/
     // last version: http://select2.github.io/examples.html
