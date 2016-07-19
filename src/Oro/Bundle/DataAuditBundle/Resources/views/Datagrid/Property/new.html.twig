@@ -6,13 +6,15 @@
         {% if fieldValue.new|length %}
         {% for collKey, collValue in fieldValue.new %}
             <li>
-                <b>{{ collKey }}: </b> {{ collValue }}
+                <b>{{ oro_field_config_value(record.getValue('objectClass'), collKey, 'label')|default(collKey)|trans }}:</b>
+                {{ collValue }}
             </li>
         {% endfor %}
         {% endif %}
     {% else %}
         <li>
-            <b>{{ fieldKey }}:</b> {{ dataAudit.renderFieldValue(fieldValue.new) }}
+            <b>{{ oro_field_config_value(record.getValue('objectClass'), fieldKey, 'label')|default(fieldKey)|trans }}:</b>
+            {{ dataAudit.renderFieldValue(fieldValue.new) }}
         </li>
     {% endif %}
 {% endfor %}
