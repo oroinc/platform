@@ -7,6 +7,7 @@ use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
@@ -96,9 +97,11 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         
         $this->assertEquals(Topics::ENTITIES_RELATIONS_CHANGED, $traces[0]['topic']);
         $this->assertEquals($expectedMessage, $traces[0]['message']);
+        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
 
         $this->assertEquals(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $traces[1]['topic']);
         $this->assertEquals($expectedMessage, $traces[1]['message']);
+        $this->assertEquals(MessagePriority::VERY_LOW, $traces[1]['priority']);
     }
 
     public function testShouldCreateAuditForInsertedEntity()

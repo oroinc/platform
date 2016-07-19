@@ -15,6 +15,7 @@ use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -241,7 +242,7 @@ class SendChangedEntitiesToMessageQueueListener implements EventSubscriber, Opti
             }
 
             if ($toBeSend) {
-                $this->messageProducer->send(Topics::ENTITIES_CHANGED, $message);
+                $this->messageProducer->send(Topics::ENTITIES_CHANGED, $message, MessagePriority::VERY_LOW);
             }
         } finally {
             $this->allInsertions->detach($em);

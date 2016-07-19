@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -115,6 +116,25 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $this->assertArrayHasKey('collections_updated', $message);
         $this->assertInternalType('array', $message['collections_updated']);
+    }
+
+    public function testShouldSendMessageWithVeryLowPriority()
+    {
+        $em = $this->getEntityManager();
+
+        $owner = new TestAuditDataOwner();
+        $owner->setStringProperty('aString');
+        $em->persist($owner);
+
+        $em->flush();
+
+        $traces = $this->getMessageProducer()->getTraces();
+        $this->assertCount(1, $traces);
+
+        //guard
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $traces[0]['topic']);
+
+        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['priority']);
     }
 
     public function testShouldSetTimestampToMessage()

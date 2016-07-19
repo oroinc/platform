@@ -5,6 +5,7 @@ use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -94,8 +95,8 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $organization
         );
 
-        $this->messageProducer->send(Topics::ENTITIES_RELATIONS_CHANGED, $body);
-        $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $body);
+        $this->messageProducer->send(Topics::ENTITIES_RELATIONS_CHANGED, $body, MessagePriority::VERY_LOW);
+        $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $body, MessagePriority::VERY_LOW);
 
         return self::ACK;
     }
