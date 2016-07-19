@@ -61,6 +61,8 @@ class ApplicableEntitiesType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $resolver->setDefaults(['apply_exclusions' => false]);
+
         $resolver->setNormalizers(
             array(
                 'choices' => function (Options $options, $choices) {
