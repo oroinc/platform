@@ -6,6 +6,7 @@ oro:
 
         export:
             label: Export
+            processor: Processor
 
         export_template:
             label: Export template

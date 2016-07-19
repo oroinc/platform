@@ -4,8 +4,6 @@ namespace Oro\Bundle\ImportExportBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
@@ -14,7 +12,6 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 class ExportType extends AbstractType
 {
     const NAME = 'oro_importexport_export';
-    const CHILD_PROCESSOR_ALIAS = 'processorAlias';
 
     /**
      * @var ProcessorRegistry
@@ -35,24 +32,16 @@ class ExportType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $processorChoices = $this->getExportProcessorsChoices($options['entityName']);
-
         $builder->add(
-            self::CHILD_PROCESSOR_ALIAS,
+            'processorAlias',
             'choice',
             array(
-                'choices' => $processorChoices,
+                'label' => 'oro.importexport.export.processor',
+                'choices' => $this->getExportProcessorsChoices($options['entityName']),
                 'required' => true,
-                'preferred_choices' => $processorChoices ? array(reset($processorChoices)) : array(),
+                'placeholder' => false,
             )
         );
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-            $form = $event->getForm();
-            if ($form->has(self::CHILD_PROCESSOR_ALIAS)) {
-                $processorAlias = $form->get(self::CHILD_PROCESSOR_ALIAS)->getData();
-                $form->getData()->setProcessorAlias($processorAlias);
-            }
-        });
     }
 
     /**

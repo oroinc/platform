@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Form\Type\ExportTemplateType;
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 
 class ExportTemplateTypeTest extends FormIntegrationTestCase
 {
@@ -28,49 +28,38 @@ class ExportTemplateTypeTest extends FormIntegrationTestCase
         $this->exportTemplateType = new ExportTemplateType($this->processorRegistry);
     }
 
-    public function testBuildFormShouldAddEventListener()
+    public function testSubmit()
     {
-        $builder = $this->getBuilderMock();
-        $this->processorRegistry->expects($this->once())
+        $entityName = 'TestEntity';
+        $processorAliases = [
+            'first_alias',
+            'second_alias'
+        ];
+        $expectedChoices = [
+            'first_alias' => 'oro.importexport.export_template.first_alias',
+            'second_alias' => 'oro.importexport.export_template.second_alias',
+        ];
+        $usedAlias = 'second_alias';
+
+        $this->processorRegistry->expects($this->any())
             ->method('getProcessorAliasesByEntity')
-            ->willReturn([]);
+            ->with(ProcessorRegistry::TYPE_EXPORT_TEMPLATE, $entityName)
+            ->willReturn($processorAliases);
 
-        $builder->expects($this->once())
-            ->method('addEventListener');
+        $form = $this->factory->create($this->exportTemplateType, null, ['entityName' => $entityName]);
 
-        $this->exportTemplateType->buildForm($builder, ['entityName' => 'xxx']);
-    }
+        $processorAliasConfig = $form->get('processorAlias')->getConfig();
+        $this->assertEquals('oro.importexport.export.processor', $processorAliasConfig->getOption('label'));
+        $this->assertEquals($expectedChoices, $processorAliasConfig->getOption('choices'));
+        $this->assertTrue($processorAliasConfig->getOption('required'));
+        $this->assertNull($processorAliasConfig->getOption('placeholder'));
 
-    public function testBuildFormShouldCreateCorrectChoices()
-    {
-        $builder = $this->getBuilderMock();
-        $phpunitTestCase = $this;
-        $this->processorRegistry->expects($this->once())
-            ->method('getProcessorAliasesByEntity')
-            ->willReturn(['testProcess1', 'testProcess2']);
+        $form->submit(['processorAlias' => $usedAlias]);
+        $this->assertTrue($form->isValid());
 
-        $builder->expects($this->once())
-            ->method('add')
-            ->will($this->returnCallback(function ($name, $type, $options) use ($phpunitTestCase) {
-                $choices = $options['choices'];
-                $phpunitTestCase->assertArrayHasKey(
-                    'testProcess1',
-                    $choices
-                );
-                $phpunitTestCase->assertArrayHasKey(
-                    'testProcess2',
-                    $choices
-                );
-            }));
-
-        $this->exportTemplateType->buildForm($builder, ['entityName' => 'xxx']);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FormBuilderInterface
-     */
-    protected function getBuilderMock()
-    {
-        return $this->getMockBuilder(FormBuilderInterface::class)->getMock();
+        /** @var ExportData $data */
+        $data = $form->getData();
+        $this->assertInstanceOf(ExportData::class, $data);
+        $this->assertEquals($usedAlias, $data->getProcessorAlias());
     }
 }
