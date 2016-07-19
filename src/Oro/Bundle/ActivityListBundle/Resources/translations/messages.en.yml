@@ -58,3 +58,5 @@ oro:
         merge_modes:
             activity_unite: Append
             activity_replace: Replace
+    activity:
+        merge.label: %activity% Activity
