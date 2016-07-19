@@ -6,11 +6,7 @@ The idea is to avoid dependency of the layout building process on raw data. Let'
 block depends on data availability. In case when layout are built and rendered on server side data could be accessed 
 directly using DB layer or passed through the [context](./layout_context.md), but for the layout that is rendered for
 some page in a single page application, where the data should be fetched using `AJAX` it will not work. So, in order 
-to unify data access mechanism for different layout renderer **expressions** were added. Think about them as a **DSL** 
-language for data accessing.
-
-`ConfigExpressionExtension` extends base `block` type and allows to use 
-**[expressions](../../../../Component/ConfigExpression/README.md)**  as an option for layout blocks.
+to unify data access mechanism for different layout renderer **[Symfony expression](http://symfony.com/doc/current/components/expression_language/index.html)** was added.
 
 Automatically the extension processes **expressions** that are found in **block view** variables during `finishView` method 
 execution. 
@@ -29,8 +25,10 @@ You can access following variables in your expressions:
 
 | Variable name | Description |
 |------- |-------------|
-| `$context` | Refers to current [layout context](./layout_context.md) |
-| `$data` | Refers to [data accessor](./layout_data.md) |
+| `context` | Refers to current [layout context](./layout_context.md) |
+| `data` | Refers to [data accessor](./layout_data.md) |
+
+**NOTE:** expression variables must begin from equals, for example `'=data["backToUrl"]'`
 
 Encoders
 --------
@@ -53,7 +51,7 @@ layout:
             parentId: head
             blockType: script
             options:
-                visible: { @value: $context.debug }
+                visible: '=context["debug"]'
 ```
 
 Here we can see that *visible* option depends on context value, let's review how it could be used in a view layer:
@@ -71,17 +69,7 @@ Here we can see that *visible* option depends on context value, let's review how
        var_dump($view->vars['visible']);
        // a scalar value
        // bool(true)
-       // or an encoded expression string (example json)
-       // {"@value":{"parameters":["$context.debug"]}}
+       // or an encoded expression string
+       // '=context["debug"]'
     }
 ```
-
-Developer reference
--------------------
-
-Here is a list of key classes that work with layout expressions :
-
- - [ConfigExpressionContextConfigurator](../../Layout/Extension/ConfigExpressionContextConfigurator.php) - the **layout context configurator** 
-    responsible for configuring `expressions_encoding` and `expressions_evaluate` options as known for context.
- - [ConfigExpressionExtension](../../Layout/Block/Extension/ConfigExpressionExtension.php) - the block type extension of `block` type.
-    It finds, evaluates or encode *view variables* of all blocks.
