@@ -60,8 +60,8 @@ define(function(require) {
                         $popoverTrigger.popover('hide');
                     }
                 }, this));
-            }, this)).on('hidden.bs-popover', _.bind(function() {
-                $(document).off(null, null, this);
+            }, this)).on('hidden.bs.popover', _.bind(function() {
+                $(document).off('mouseup', null, this);
             }, this));
         },
 
