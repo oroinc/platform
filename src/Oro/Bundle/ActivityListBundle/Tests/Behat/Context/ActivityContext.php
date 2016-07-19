@@ -50,12 +50,12 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function thereIsNoRecordsInActivityList()
     {
-        $itemsCount = count($this->getActivityListItems());
+        $items = $this->getActivityListItems();
 
         self::assertCount(
             0,
-            $itemsCount,
-            sprintf('Expect that Activity list not found items, but found %s', $itemsCount)
+            $items,
+            sprintf('Expect that Activity list not found items, but found %s', count($items))
         );
     }
 
@@ -70,7 +70,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
         $activityListPaginator = $this->createElement('ActivityListPaginator');
         $itemsCount = $activityListPaginator->getTotalRecordsCount();
 
-        self::assertCount(
+        self::assertEquals(
             $this->getCount($number),
             $itemsCount,
             sprintf('Expect that Activity list has %s items, but found %s', $number, $itemsCount)
@@ -142,9 +142,8 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
         $collapsedItem = $this->getCollapsedItem();
         $emailBody = $collapsedItem->find('css', 'div.email-body')->getHtml();
 
-        self::assertStringMatchesFormat(
-            '%d',
-            strpos($emailBody, $content),
+        self::assertNotFalse(
+            stripos($emailBody, $content),
             sprintf('"%s" not found in "%s"', $content, $emailBody)
         );
     }
@@ -176,7 +175,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
 
         self::assertCount(
             $this->getCount($emailsCount),
-            count($threadEmails),
+            $threadEmails,
             sprintf('Expect %s number of emails in thread, but get %s', $emailsCount, count($threadEmails))
         );
     }
@@ -211,8 +210,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     public function iShouldSeeTextInCollapsedActivityItem($text)
     {
-        self::assertStringMatchesFormat(
-            '%d',
+        self::assertNotFalse(
             stripos($this->getCollapsedItem()->getText(), $text),
             sprintf('Can\'t find "%s" image name in collapsed activity item', $text)
         );

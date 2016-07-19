@@ -350,8 +350,7 @@ class OroMainContext extends MinkContext implements
 
             $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-            self::assertStringMatchesFormat(
-                '%d',
+            self::assertNotFalse(
                 stripos($text, $row[1]),
                 sprintf('Expect "%s" text of "%s" label, but got "%s"', $row[1], $row[0], $text)
             );
