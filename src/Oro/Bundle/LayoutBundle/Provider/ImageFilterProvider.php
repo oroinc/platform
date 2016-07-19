@@ -38,7 +38,7 @@ class ImageFilterProvider
     public function load()
     {
         foreach ($this->getAllDimensions() as $dimension) {
-            $filterName = (string) $dimension;
+            $filterName = $dimension->getName();
             $this->filterConfiguration->set(
                 $filterName,
                 $this->buildFilterFromDimension($dimension)
@@ -68,23 +68,36 @@ class ImageFilterProvider
     {
         $width = $dimension->getWidth();
         $height = $dimension->getHeight();
+        $withResize = $dimension->getWidth() && $dimension->getHeight();
 
-        return [
+        $filterSettings = [
             'quality' => self::IMAGE_QUALITY,
             'filters' => [
-                'upscale' => [
-                    'min' => [$width, $height]
-                ],
-                'thumbnail' => [
-                    'size' => [$width, $height],
-                    'mode' => self::RESIZE_MODE
-                ],
-                'background' => [
-                    'size' => [$width, $height],
-                    'color' => self::BACKGROUND_COLOR
-                ],
                 'strip' => []
             ]
         ];
+
+        if ($withResize) {
+            $filterSettings = array_merge_recursive(
+                $filterSettings,
+                [
+                    'filters' => [
+                        'upscale' => [
+                            'min' => [$width, $height]
+                        ],
+                        'thumbnail' => [
+                            'size' => [$width, $height],
+                            'mode' => self::RESIZE_MODE
+                        ],
+                        'background' => [
+                            'size' => [$width, $height],
+                            'color' => self::BACKGROUND_COLOR
+                        ]
+                    ]
+                ]
+            );
+        }
+
+        return $filterSettings;
     }
 }
