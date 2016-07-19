@@ -18,7 +18,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
                     && !empty($field[FieldConfig::DEPENDS_ON])
                     && !ConfigUtil::isExclude($field)
                 ) {
-                    $this->processDependedFields($config, $field[FieldConfig::DEPENDS_ON]);
+                    $this->processDependentFields($config, $field[FieldConfig::DEPENDS_ON]);
                 }
             }
         }
@@ -30,7 +30,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
      * @param array    $config
      * @param string[] $dependsOnFieldNames
      */
-    protected function processDependedFields(array &$config, array $dependsOnFieldNames)
+    protected function processDependentFields(array &$config, array $dependsOnFieldNames)
     {
         foreach ($dependsOnFieldNames as $dependsOnFieldName) {
             if (array_key_exists($dependsOnFieldName, $config[ConfigUtil::FIELDS])
@@ -39,7 +39,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
             ) {
                 $config[ConfigUtil::FIELDS][$dependsOnFieldName][ConfigUtil::EXCLUDE] = false;
                 if (!empty($config[ConfigUtil::FIELDS][$dependsOnFieldName][FieldConfig::DEPENDS_ON])) {
-                    $this->processDependedFields(
+                    $this->processDependentFields(
                         $config,
                         $config[ConfigUtil::FIELDS][$dependsOnFieldName][FieldConfig::DEPENDS_ON]
                     );
