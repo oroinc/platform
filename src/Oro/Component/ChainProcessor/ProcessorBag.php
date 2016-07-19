@@ -109,8 +109,10 @@ class ProcessorBag implements ProcessorBagInterface
     {
         $this->ensureInitialized();
 
+        $action = $context->getAction();
+
         return $this->processorIteratorFactory->createProcessorIterator(
-            $this->processors,
+            isset($this->processors[$action]) ? $this->processors[$action] : [],
             $context,
             $this->processorApplicableChecker,
             $this->processorFactory
