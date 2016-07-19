@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
@@ -42,7 +43,7 @@ class EntityIdAccessor
         if ($idFieldNamesCount === 1) {
             $fieldName = reset($idFieldNames);
             if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     sprintf(
                         'An object of the type "%s" does not have the identifier property "%s".',
                         $metadata->getClassName(),
@@ -57,7 +58,7 @@ class EntityIdAccessor
             $id = [];
             foreach ($idFieldNames as $fieldName) {
                 if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
-                    throw new \RuntimeException(
+                    throw new RuntimeException(
                         sprintf(
                             'An object of the type "%s" does not have the identifier property "%s".',
                             $metadata->getClassName(),
@@ -69,7 +70,7 @@ class EntityIdAccessor
             }
             $result = $this->entityIdTransformer->transform($id);
         } else {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'The "%s" entity does not have an identifier.',
                     $metadata->getClassName()
@@ -78,7 +79,7 @@ class EntityIdAccessor
         }
 
         if (empty($result)) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'The identifier value for "%s" entity must not be empty.',
                     $metadata->getClassName()

@@ -221,7 +221,7 @@ class EmailAddressHelper
             return trim($pureEmailAddress);
         }
 
-        return sprintf('%s <%s>', trim($emailAddressOwnerName), trim($pureEmailAddress));
+        return sprintf('"%s" <%s>', trim($emailAddressOwnerName), trim($pureEmailAddress));
     }
 
     /**

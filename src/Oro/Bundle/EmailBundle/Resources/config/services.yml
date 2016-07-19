@@ -844,6 +844,8 @@ services:
             - '@oro_activity.manager'
             - '@oro_search.index'
             - '@oro_entity.entity_name_resolver'
+        calls:
+            - [setTokenStorage, ['@security.token_storage']]
 
     oro_email.email.flag.manager:
         class: %oro_email.email.flag.manager.class%

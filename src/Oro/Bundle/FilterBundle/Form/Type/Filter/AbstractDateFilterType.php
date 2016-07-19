@@ -12,6 +12,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 
 abstract class AbstractDateFilterType extends AbstractType
 {
@@ -21,6 +22,22 @@ abstract class AbstractDateFilterType extends AbstractType
     const TYPE_LESS_THAN   = 4;
     const TYPE_EQUAL       = 5;
     const TYPE_NOT_EQUAL   = 6;
+
+    const TYPE_TODAY        = 7;
+    const TYPE_THIS_WEEK    = 8;
+    const TYPE_THIS_MONTH   = 9;
+    const TYPE_THIS_QUARTER = 10;
+    const TYPE_THIS_YEAR    = 11;
+    const TYPE_ALL_TIME     = 12;
+
+    public static $valueTypes = [
+        self::TYPE_TODAY,
+        self::TYPE_THIS_WEEK,
+        self::TYPE_THIS_MONTH,
+        self::TYPE_THIS_QUARTER,
+        self::TYPE_THIS_YEAR,
+        self::TYPE_ALL_TIME,
+    ];
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -38,8 +55,8 @@ abstract class AbstractDateFilterType extends AbstractType
     protected $subscriber;
 
     /**
-     * @param TranslatorInterface   $translator
-     * @param DateModifierInterface $dateModifiers
+     * @param TranslatorInterface      $translator
+     * @param DateModifierInterface    $dateModifiers
      * @param EventSubscriberInterface $subscriber
      */
     public function __construct(
@@ -89,9 +106,9 @@ abstract class AbstractDateFilterType extends AbstractType
     {
         $resolver->setDefaults(
             [
-            'date_parts'   => $this->getDateParts(),
-            'date_vars'    => $this->getDateVariables(),
-            'compile_date' => true
+                'date_parts'   => $this->getDateParts(),
+                'date_vars'    => $this->getDateVariables(),
+                'compile_date' => true
             ]
         );
     }

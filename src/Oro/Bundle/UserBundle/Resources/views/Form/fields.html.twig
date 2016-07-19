@@ -41,3 +41,9 @@
         });
     </script>
 {% endblock %}
+
+{% block oro_type_widget_owners_row %}
+    {% for child in form %}
+        {{ form_row(child) }}
+    {% endfor %}
+{% endblock %}

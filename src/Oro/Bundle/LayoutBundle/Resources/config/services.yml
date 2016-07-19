@@ -98,11 +98,6 @@ services:
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
-    oro_layout.block_type_extension.visible:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\VisibleExtension
-        tags:
-            - { name: layout.block_type_extension, alias: block }
-
     oro_layout.layout_context_configurator.config_expression:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionContextConfigurator
         tags:
@@ -121,18 +116,6 @@ services:
             - '@oro_layout.processor.config_expression'
         tags:
             - { name: layout.block_type_extension, alias: block, priority: 255 }
-
-    oro_layout.block_type_extension.class_attribute:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension
-        arguments:
-            - '@oro_layout.expression.encoder_registry'
-        tags:
-            - { name: layout.block_type_extension, alias: block, priority: 260 }
-
-    oro_layout.block_type_extension.option_value_bag:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension
-        tags:
-            - { name: layout.block_type_extension, alias: block, priority: 270 }
 
     oro_layout.expression.encoder_registry:
         class: Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry
@@ -176,6 +159,21 @@ services:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
             - @oro_layout.theme_manager
+
+    oro_layout.provider.requirejs_config:
+        class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider
+        arguments:
+            - '@templating'
+            - '@oro_requirejs.cache'
+            - '%oro_require_js%'
+            - '%kernel.bundles%'
+            - '%oro_require_js.web_root%'
+        calls:
+            - [ setThemeManager, [ '@oro_layout.theme_manager' ] ]
+            - [ setActiveTheme, [ '%oro_layout.default_active_theme%' ] ]
+        tags:
+            - { name: requirejs.config_provider, alias: oro_layout_requirejs_config_provider }
+        lazy: true
 
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
