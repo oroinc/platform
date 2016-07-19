@@ -384,11 +384,11 @@ define([
         for (var ruleName in validationRulesCopy) {
             if (validationRulesCopy.hasOwnProperty(ruleName)) {
                 if (!_.isFunction($.validator.methods[ruleName])) {
-                    logger.warn('Cannot find validator implementation for `' + ruleName + '`');
+                    logger.warn('Cannot find validator implementation for `{{rule}}`', {rule: ruleName});
                     delete validationRulesCopy[ruleName];
                 }
             }
         }
         return validationRulesCopy;
-    }
+    };
 });
