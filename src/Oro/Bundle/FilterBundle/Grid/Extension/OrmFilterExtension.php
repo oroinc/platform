@@ -142,6 +142,7 @@ class OrmFilterExtension extends AbstractExtension
             $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 
+            $filter->setFilterState($value);
             $metadata          = $filter->getMetadata();
             $filtersMetaData[] = array_merge(
                 $metadata,
@@ -152,7 +153,6 @@ class OrmFilterExtension extends AbstractExtension
                     'cacheId' => $this->getFilterCacheId($rawConfig, $metadata),
                 ]
             );
-
         }
 
         $data
