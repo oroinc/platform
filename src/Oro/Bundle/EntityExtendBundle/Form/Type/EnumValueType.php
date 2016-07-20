@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints as ExtendAssert;
@@ -27,6 +28,14 @@ class EnumValueType extends AbstractType
         $this->configProvider = $configProvider;
     }
 
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults([
+            'allow_multiple_selection' => true,
+        ]);
+        parent::setDefaultOptions($resolver);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -41,8 +50,13 @@ class EnumValueType extends AbstractType
                     new Assert\Length(['max' => 255]),
                 ],
             ])
-            ->add('is_default', 'checkbox', ['required' => false])
             ->add('priority', 'hidden', ['empty_data' => 9999]);
+
+        if ($options['allow_multiple_selection']) {
+            $builder->add('is_default', 'checkbox', ['required' => false]);
+        } else {
+            $builder->add('is_default', 'radio', ['required' => false]);
+        }
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options)
