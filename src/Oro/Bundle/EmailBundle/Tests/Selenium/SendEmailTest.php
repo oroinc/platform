@@ -56,10 +56,10 @@ class SendEmailTest extends Selenium2TestCase
 
         $login = $this->login();
         /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
+        $page = $login->openUsers('Oro\Bundle\UserBundle')
             ->assertTitle('All - Users - User Management - System')
-            ->add()
-            ->assertTitle('Create User - Users - User Management - System')
+            ->add();
+        $page->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->setOwner('Main')
             ->enable()
@@ -68,8 +68,11 @@ class SendEmailTest extends Selenium2TestCase
             ->setFirstName('First_'.$username)
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@example.com')
-            ->setRoles(['Administrator'], true)
-            ->setBusinessUnit(['Main'])
+            ->setRoles(['Administrator'], true);
+        if ($page->hasBusinessUnitOrganizationChoice()) {
+            $page->setBusinessUnitOrganization(['OroCRM']);
+        }
+        $page->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->setImap($imapSetting)
             ->save()
@@ -141,6 +144,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setLastName($lastName)
             ->setEmail($username.'@example.com')
             ->setRoles(['Administrator'], true)
+            ->setBusinessUnitOrganization(['OroCRM'])
             ->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->save();
