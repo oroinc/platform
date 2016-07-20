@@ -304,8 +304,10 @@ class User extends AbstractPageEntity
             "//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div//input"
         )->click();
         foreach ($businessUnits as $businessUnit) {
-            $this->test->byXpath("//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div" .
-                "//li[@class='select2-search-field']//input")->value($businessUnit);
+            $this->test->byXpath(
+                "//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div" .
+                "//li[@class='select2-search-field']//input"
+            )->value($businessUnit);
             $this->waitForAjax();
             $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$businessUnit}')]")->click();
         }
@@ -320,16 +322,20 @@ class User extends AbstractPageEntity
      * @param array $organizations
      * @return $this
      */
-    public function setBusinessUnitOrganization($organizations = array()) {
+    public function setBusinessUnitOrganization($organizations = array())
+    {
         foreach ($organizations as $organization) {
-            $this->test->byXpath("//*[@data-ftid='oro_user_user_form_organizations']" .
-                "//b[contains(., '{$organization}')]")->click();
+            $this->test->byXpath(
+                "//*[@data-ftid='oro_user_user_form_organizations']" .
+                "//b[contains(., '{$organization}')]"
+            )->click();
         }
 
         return $this;
     }
 
-    public function hasBusinessUnitOrganizationChoice() {
+    public function hasBusinessUnitOrganizationChoice()
+    {
         return $this->isElementPresent("//*[@data-ftid='oro_user_user_form_organizations']//input[@type='checkbox']");
     }
 
