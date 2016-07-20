@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Test\Unit\Form\Extension;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Extension;
 
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
