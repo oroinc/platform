@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Behat\Mink\Exception\ExpectationException;
 use Behat\Testwork\Suite\Suite;
 
 class FileField extends Element implements SuiteAwareInterface
@@ -17,8 +16,7 @@ class FileField extends Element implements SuiteAwareInterface
      */
     public function setValue($filename)
     {
-        $input = $this->find('css', 'input[type="file"]');
-        $input->attachFile($this->getFilePath($filename));
+        $this->attachFile($this->getFilePath($filename));
     }
 
     /**
@@ -35,7 +33,6 @@ class FileField extends Element implements SuiteAwareInterface
      * @param string $filename Filename of attached file with extension e.g. charlie-sheen.jpg
      * @return string Absolute path to file
      *                e.g. /home/charlie/www/orocrm/src/Oro/UserBundle/Tests/Behat/Feature/Fixtures/charlie-sheen.jpg
-     * @throws ExpectationException If file not found
      */
     protected function getFilePath($filename)
     {
@@ -49,9 +46,6 @@ class FileField extends Element implements SuiteAwareInterface
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t find "%s" file in "%s"', $filename, implode(',', $suitePaths)),
-            $this->getDriver()
-        );
+        self::fail(sprintf('Can\'t find "%s" file in "%s"', $filename, implode(',', $suitePaths)));
     }
 }

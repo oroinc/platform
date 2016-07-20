@@ -180,6 +180,9 @@ See other related information in section `OroUIBundle` of this document.
 - Changed priority in next extensions:
     * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260
     * Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier from -251 to -261
+- The constructor of the `Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionHandler` class was changed.
+    Before: `__construct(EntityManager $entityManager, TranslatorInterface $translator, SecurityFacade $securityFacade, MassDeleteLimiter $limiter, RequestStack $requestStack)`.
+    After: `__construct(RegistryInterface $registry, TranslatorInterface $translator, SecurityFacade $securityFacade, MassDeleteLimiter $limiter, RequestStack $requestStack, OptionalListenerManager $listenerManager)`.
 
 ####ConfigExpression
 - The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
@@ -257,6 +260,8 @@ Corresponding block type classes was removed.
 - Added `oro_layout.provider.image_type` service to get image types available across all themes
 - The class Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType was renamed to FormFieldsType
 - New `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` block type was added. This block type creates three child blocks in buildBlock method: `FormStartType`, `FormType`, `FormEndType`.
+- Added possibility to view layout tree in developer toolbar and include block debug information in HTML, for details please check out documentation at
+ [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
