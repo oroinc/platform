@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Driver;
 
 use Behat\Mink\Driver\Selenium2Driver;
-use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
@@ -88,8 +87,6 @@ class OroSelenium2Driver extends Selenium2Driver
      *
      * @param Element $element Form element that was replaced by TinyMCE
      * @param string  $value   Text for set into tiny
-     *
-     * @throws ExpectationException
      */
     protected function fillTinyMce(Element $element, $value)
     {
@@ -99,12 +96,10 @@ class OroSelenium2Driver extends Selenium2Driver
             sprintf('null != tinyMCE.get("%s");', $fieldId)
         );
 
-        if (!$isTinyMce) {
-            throw new ExpectationException(
-                sprintf('Field was guessed as tinymce, but can\'t find tiny with id "%s" on page', $fieldId),
-                $this
-            );
-        }
+        self::assertNotNull(
+            $isTinyMce,
+            sprintf('Field was guessed as tinymce, but can\'t find tiny with id "%s" on page', $fieldId)
+        );
 
         $this->executeScript(
             sprintf('tinyMCE.get("%s").setContent("%s");', $fieldId, $value)
@@ -197,7 +192,6 @@ JS;
      *
      * @param string $xpath
      * @param string $value
-     * @throws ExpectationException
      * @throws \Exception
      */
     protected function fillSelect2Entity($xpath, $value)
@@ -227,12 +221,10 @@ JS;
                 }
             }
 
-            throw new ExpectationException(sprintf('Too many results for "%s"', $value), $this);
+            self::fail(sprintf('Too many results for "%s"', $value));
         }
 
-        if (0 === count($results)) {
-            throw new ExpectationException(sprintf('Not found result for "%s"', $value), $this);
-        }
+        self::assertNotCount(0, $results, sprintf('Not found result for "%s"', $value));
 
         $this->findElement(array_shift($results))->click();
     }

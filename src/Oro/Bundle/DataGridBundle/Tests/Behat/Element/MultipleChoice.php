@@ -3,8 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\AbstractGridFilterItem;
 
 class MultipleChoice extends AbstractGridFilterItem
 {
@@ -37,7 +35,6 @@ class MultipleChoice extends AbstractGridFilterItem
      * There are only one visible widget can be on the page
      *
      * @return NodeElement
-     * @throws ExpectationException
      */
     protected function getWidget()
     {

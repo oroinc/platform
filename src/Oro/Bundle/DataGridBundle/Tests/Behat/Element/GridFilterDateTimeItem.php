@@ -2,14 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
-use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
-
 class GridFilterDateTimeItem extends AbstractGridFilterItem
 {
     /**
      * @param \DateTime $dateTime
-     * @throws ExpectationException
      */
     public function setStartTime(\DateTime $dateTime)
     {
@@ -19,7 +15,6 @@ class GridFilterDateTimeItem extends AbstractGridFilterItem
 
     /**
      * @param \DateTime $dateTime
-     * @throws ExpectationException
      */
     public function setEndTime(\DateTime $dateTime)
     {
@@ -48,18 +43,12 @@ class GridFilterDateTimeItem extends AbstractGridFilterItem
     /**
      * @param string $locator
      * @return DateTimePicker
-     * @throws ExpectationException
      */
     protected function createDateTimePicker($locator)
     {
         $element = $this->find('css', $locator);
 
-        if (!$element) {
-            throw new ExpectationException(
-                sprintf('Can\'t create datetime picker element with "%s" locator', $locator),
-                $this->getDriver()
-            );
-        }
+        self::assertNotNull($element, sprintf('Can\'t create datetime picker element with "%s" locator', $locator));
 
         return $this->elementFactory->wrapElement('DateTimePicker', $element);
     }

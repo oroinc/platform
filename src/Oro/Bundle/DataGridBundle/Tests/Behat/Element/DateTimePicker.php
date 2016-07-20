@@ -3,14 +3,12 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class DateTimePicker extends Element
 {
     /**
      * @param \DateTime $dateTime
-     * @throws ExpectationException
      */
     public function setValue($dateTime)
     {

@@ -331,7 +331,6 @@ class OroMainContext extends MinkContext implements
      * Assert text by label in page
      *
      * @Then /^(?:|I )should see (?P<entity>[\w\s]+) with:$/
-     * @throws \Behat\Mink\Exception\ExpectationException
      */
     public function assertValuesByLabels($entity, TableNode $table)
     {

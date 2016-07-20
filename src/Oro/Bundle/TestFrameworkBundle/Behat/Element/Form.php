@@ -5,7 +5,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\ExpectationException;
 use Doctrine\Common\Inflector\Inflector;
 
 class Form extends Element
@@ -97,7 +96,6 @@ class Form extends Element
     /**
      * @param string $locator Label text
      * @return NodeElement|null
-     * @throws ExpectationException If label was found but field not
      */
     protected function findFieldByLabel($locator)
     {
@@ -117,10 +115,7 @@ class Form extends Element
             } elseif ($sndParent->hasClass('control-group-checkbox')) {
                 return $sndParent->find('css', 'input[type=checkbox]');
             } else {
-                throw new ExpectationException(
-                    sprintf('Find label "%s", but can\'t determine field type', $locator),
-                    $this->getDriver()
-                );
+                self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }
         }
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Element\NodeElement;
 
 class CollectionField extends Element
@@ -29,7 +28,6 @@ class CollectionField extends Element
      * See phones, emails fields in Contact (CRM) create page
      *
      * @param string $value
-     * @throws ExpectationException
      */
     public function setFieldAsPrimary($value)
     {
@@ -44,10 +42,7 @@ class CollectionField extends Element
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Not found "%s" value', $value),
-            $this->getDriver()
-        );
+        self::fail(sprintf('Not found "%s" value', $value));
     }
 
     /**

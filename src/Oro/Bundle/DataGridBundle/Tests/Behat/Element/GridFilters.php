@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
-use Behat\Mink\Exception\ExpectationException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class GridFilters extends Element
@@ -14,18 +13,12 @@ class GridFilters extends Element
      * @param string $locator Filter title
      *
      * @return null|AbstractGridFilterItem
-     * @throws ExpectationException
      */
     public function getFilterItem($name, $locator)
     {
         $filterItem = $this->tryFindFilterItem($name, $locator);
 
-        if (!$filterItem) {
-            throw new ExpectationException(
-                sprintf('Can\'t find filter with "%s" name', $locator),
-                $this->getDriver()
-            );
-        }
+        self::assertNotNull($filterItem, sprintf('Can\'t find filter with "%s" name', $locator));
 
         return $filterItem;
     }
