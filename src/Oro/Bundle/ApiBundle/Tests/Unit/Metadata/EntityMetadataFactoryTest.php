@@ -151,6 +151,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setName('category');
         $expectedMetadata->setDataType('string');
         $expectedMetadata->setIsNullable(true);
+        $expectedMetadata->setAssociationType('manyToOne');
         $expectedMetadata->setIsCollection(false);
         $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'Category');
         $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'Category']);
@@ -169,6 +170,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setName('category');
         $expectedMetadata->setDataType('string');
         $expectedMetadata->setIsNullable(false);
+        $expectedMetadata->setAssociationType('manyToOne');
         $expectedMetadata->setIsCollection(false);
         $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'Category');
         $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'Category']);
@@ -187,6 +189,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setName('users');
         $expectedMetadata->setDataType('integer');
         $expectedMetadata->setIsNullable(true);
+        $expectedMetadata->setAssociationType('manyToMany');
         $expectedMetadata->setIsCollection(true);
         $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'User');
         $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'User']);
@@ -205,6 +208,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $expectedMetadata->setName('category');
         $expectedMetadata->setDataType('integer');
         $expectedMetadata->setIsNullable(true);
+        $expectedMetadata->setAssociationType('manyToOne');
         $expectedMetadata->setIsCollection(false);
         $expectedMetadata->setTargetClassName(self::ENTITY_NAMESPACE . 'Category');
         $expectedMetadata->setAcceptableTargetClassNames([self::ENTITY_NAMESPACE . 'Category']);

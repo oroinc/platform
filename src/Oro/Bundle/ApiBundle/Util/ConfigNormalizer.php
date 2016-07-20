@@ -10,7 +10,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalizeConfig(array $config)
+    public function normalizeConfig(array $config, $parentField = null)
     {
         if (!empty($config[ConfigUtil::FIELDS])) {
             foreach ($config[ConfigUtil::FIELDS] as $fieldName => $field) {
@@ -23,7 +23,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
             }
         }
 
-        return parent::normalizeConfig($config);
+        return parent::normalizeConfig($config, $parentField);
     }
 
     /**

@@ -15,6 +15,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_metadata_factory'
+            - '@oro_entity_extend.association_manager'
         tags:
             - { name: oro.api.processor, action: get_metadata, priority: -20 }
 

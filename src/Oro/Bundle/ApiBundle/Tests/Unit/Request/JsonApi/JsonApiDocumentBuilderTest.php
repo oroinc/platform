@@ -50,6 +50,10 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The metadata should be provided.
+     */
     public function testSetDataObjectWithoutMetadata()
     {
         $object = [
@@ -58,19 +62,12 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         ];
 
         $this->documentBuilder->setDataObject($object);
-        $this->assertEquals(
-            [
-                'data' => [
-                    'attributes' => [
-                        'id'   => 123,
-                        'name' => 'Name',
-                    ]
-                ]
-            ],
-            $this->documentBuilder->getDocument()
-        );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The metadata should be provided.
+     */
     public function testSetDataCollectionWithoutMetadata()
     {
         $object = [
@@ -79,19 +76,6 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         ];
 
         $this->documentBuilder->setDataCollection([$object]);
-        $this->assertEquals(
-            [
-                'data' => [
-                    [
-                        'attributes' => [
-                            'id'   => 123,
-                            'name' => 'Name',
-                        ]
-                    ]
-                ]
-            ],
-            $this->documentBuilder->getDocument()
-        );
     }
 
     /**
@@ -126,7 +110,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
         $metadata->addField($this->createFieldMetadata('id'));
         $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addField($this->createFieldMetadata('missingField'));
         $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('missingMeta'));
         $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
         $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
         $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
@@ -137,6 +123,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
         $metadata->addAssociation($this->createAssociationMetadata('otherRoles', 'Test\Role', true));
         $metadata->getAssociation('otherRoles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
 
         $this->documentBuilder->setDataObject($object, $metadata);
         $this->assertEquals(
@@ -148,25 +136,26 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                         'meta1' => 'Meta1',
                     ],
                     'attributes'    => [
-                        'name' => 'Name',
+                        'name'         => 'Name',
+                        'missingField' => null
                     ],
                     'relationships' => [
-                        'category'   => [
+                        'category'      => [
                             'data' => [
                                 'type' => 'test_category',
                                 'id'   => '456'
                             ]
                         ],
-                        'group'      => [
+                        'group'         => [
                             'data' => null
                         ],
-                        'role'       => [
+                        'role'          => [
                             'data' => [
                                 'type' => 'test_role',
                                 'id'   => '789'
                             ]
                         ],
-                        'categories' => [
+                        'categories'    => [
                             'data' => [
                                 [
                                     'type' => 'test_category',
@@ -178,13 +167,13 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                                 ]
                             ]
                         ],
-                        'groups'     => [
+                        'groups'        => [
                             'data' => []
                         ],
-                        'products'   => [
+                        'products'      => [
                             'data' => []
                         ],
-                        'roles'      => [
+                        'roles'         => [
                             'data' => [
                                 [
                                     'type' => 'test_role',
@@ -196,7 +185,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                                 ]
                             ]
                         ],
-                        'otherRoles' => [
+                        'otherRoles'    => [
                             'data' => [
                                 [
                                     'type' => 'test_role',
@@ -207,6 +196,12 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                                     'id'   => '780'
                                 ]
                             ]
+                        ],
+                        'missingToOne'  => [
+                            'data' => null
+                        ],
+                        'missingToMany' => [
+                            'data' => []
                         ]
                     ]
                 ],
@@ -259,7 +254,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
         $metadata->addField($this->createFieldMetadata('id'));
         $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addField($this->createFieldMetadata('missingField'));
         $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('missingMeta'));
         $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
         $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
         $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
@@ -268,6 +265,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata->addAssociation($this->createAssociationMetadata('products', 'Test\Product', true));
         $metadata->addAssociation($this->createAssociationMetadata('roles', 'Test\Role', true));
         $metadata->getAssociation('roles')->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToOne', 'Test\Class'));
+        $metadata->addAssociation($this->createAssociationMetadata('missingToMany', 'Test\Class', true));
 
         $this->documentBuilder->setDataCollection([$object], $metadata);
         $this->assertEquals(
@@ -280,25 +279,26 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                             'meta1' => 'Meta1',
                         ],
                         'attributes'    => [
-                            'name' => 'Name',
+                            'name'         => 'Name',
+                            'missingField' => null
                         ],
                         'relationships' => [
-                            'category'   => [
+                            'category'      => [
                                 'data' => [
                                     'type' => 'test_category',
                                     'id'   => '456'
                                 ]
                             ],
-                            'group'      => [
+                            'group'         => [
                                 'data' => null
                             ],
-                            'role'       => [
+                            'role'          => [
                                 'data' => [
                                     'type' => 'test_role',
                                     'id'   => '789'
                                 ]
                             ],
-                            'categories' => [
+                            'categories'    => [
                                 'data' => [
                                     [
                                         'type' => 'test_category',
@@ -310,13 +310,13 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                                     ]
                                 ]
                             ],
-                            'groups'     => [
+                            'groups'        => [
                                 'data' => []
                             ],
-                            'products'   => [
+                            'products'      => [
                                 'data' => []
                             ],
-                            'roles'      => [
+                            'roles'         => [
                                 'data' => [
                                     [
                                         'type' => 'test_role',
@@ -327,6 +327,12 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                                         'id'   => '780'
                                     ]
                                 ]
+                            ],
+                            'missingToOne'  => [
+                                'data' => null
+                            ],
+                            'missingToMany' => [
+                                'data' => []
                             ]
                         ]
                     ]
