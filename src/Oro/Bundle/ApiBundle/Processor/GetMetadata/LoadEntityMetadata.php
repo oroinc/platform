@@ -15,7 +15,10 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * Loads metadata for an entity.
@@ -31,14 +34,22 @@ class LoadEntityMetadata implements ProcessorInterface
     /** @var EntityMetadataFactory */
     protected $entityMetadataFactory;
 
+    /** @var AssociationManager */
+    protected $associationManager;
+
     /**
      * @param DoctrineHelper        $doctrineHelper
      * @param EntityMetadataFactory $entityMetadataFactory
+     * @param AssociationManager    $associationManager
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EntityMetadataFactory $entityMetadataFactory)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EntityMetadataFactory $entityMetadataFactory,
+        AssociationManager $associationManager
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityMetadataFactory = $entityMetadataFactory;
+        $this->associationManager = $associationManager;
     }
 
     /**
@@ -208,43 +219,49 @@ class LoadEntityMetadata implements ProcessorInterface
         EntityMetadata $entityMetadata,
         EntityDefinitionConfig $config
     ) {
+        $entityClass = $entityMetadata->getClassName();
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->isExcluded()) {
                 continue;
             }
-            if ($field->isMetaProperty()) {
-                if (!$entityMetadata->hasMetaProperty($fieldName)) {
-                    $metaPropertyMetadata = new MetaPropertyMetadata($fieldName);
-                    $metaPropertyMetadata->setDataType(
-                        $this->assertDataType($field->getDataType(), $entityMetadata->getClassName(), $fieldName)
-                    );
-                    $entityMetadata->addMetaProperty($metaPropertyMetadata);
-                }
-            } else {
+            if (!$field->isMetaProperty()) {
                 $isField = $entityMetadata->hasField($fieldName);
                 $isAssociation = !$isField && $entityMetadata->hasAssociation($fieldName);
                 if (!$isField && !$isAssociation) {
                     $targetClass = $field->getTargetClass();
-                    if (!$targetClass) {
-                        $fieldMetadata = new FieldMetadata($fieldName);
-                        $fieldMetadata->setDataType(
-                            $this->assertDataType($field->getDataType(), $entityMetadata->getClassName(), $fieldName)
-                        );
-                        $fieldMetadata->setIsNullable(true);
-                        $entityMetadata->addField($fieldMetadata);
-                    } else {
-                        $associationMetadata = new AssociationMetadata($fieldName);
-                        $associationMetadata->setDataType(
-                            $this->assertDataType($field->getDataType(), $entityMetadata->getClassName(), $fieldName)
-                        );
-                        $associationMetadata->setIsNullable(true);
+                    $dataType = $this->assertDataType($field->getDataType(), $entityClass, $fieldName);
+                    if ($targetClass) {
+                        $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata($fieldName));
                         $associationMetadata->setTargetClassName($targetClass);
-                        $associationMetadata->addAcceptableTargetClassName($targetClass);
-                        $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
-                        $entityMetadata->addAssociation($associationMetadata);
+                        $associationMetadata->setIsNullable(true);
+                        if (0 !== strpos($dataType, 'association:')) {
+                            $associationMetadata->setDataType($dataType);
+                            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
+                            $associationMetadata->addAcceptableTargetClassName($targetClass);
+                        } else {
+                            list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
+                            $targets = $this->getExtendedAssociationTargets(
+                                $entityClass,
+                                $associationType,
+                                $associationKind
+                            );
+                            $this->setAssociationDataType($associationMetadata, $field);
+                            $associationMetadata->setAssociationType($associationType);
+                            $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
+                            $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
+                        }
+                    } else {
+                        $fieldMetadata = $entityMetadata->addField(new FieldMetadata($fieldName));
+                        $fieldMetadata->setDataType($dataType);
+                        $fieldMetadata->setIsNullable(true);
                     }
                 }
+            } elseif (!$entityMetadata->hasMetaProperty($fieldName)) {
+                $metaPropertyMetadata = $entityMetadata->addMetaProperty(new MetaPropertyMetadata($fieldName));
+                $metaPropertyMetadata->setDataType(
+                    $this->assertDataType($field->getDataType(), $entityClass, $fieldName)
+                );
             }
         }
     }
@@ -270,6 +287,25 @@ class LoadEntityMetadata implements ProcessorInterface
         }
 
         return $dataType;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $associationType
+     * @param string $associationKind
+     *
+     * @return array [class name => field name, ...]
+     */
+    protected function getExtendedAssociationTargets($entityClass, $associationType, $associationKind)
+    {
+        $targets = $this->associationManager->getAssociationTargets(
+            $entityClass,
+            null,
+            $associationType,
+            $associationKind
+        );
+
+        return $targets;
     }
 
     /**
@@ -309,36 +345,65 @@ class LoadEntityMetadata implements ProcessorInterface
                 continue;
             }
             $targetClass = $field->getTargetClass();
-            if (!$targetClass) {
-                if ($field->isMetaProperty()) {
-                    $metaPropertyMetadata = $entityMetadata->addMetaProperty(new MetaPropertyMetadata($fieldName));
-                    $metaPropertyMetadata->setDataType($field->getDataType());
-                } else {
-                    $fieldMetadata = $entityMetadata->addField(new FieldMetadata($fieldName));
-                    $fieldMetadata->setDataType($field->getDataType());
-                    $fieldMetadata->setIsNullable(!in_array($fieldName, $idFieldNames, true));
-                }
-            } else {
+            if ($targetClass) {
                 $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata($fieldName));
-                $associationMetadata->setIsCollection($field->isCollectionValuedAssociation());
+                if (!$field->getDataType()) {
+                    $this->setAssociationDataType($associationMetadata, $field);
+                }
+                $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
+                $associationMetadata->setIsNullable(true);
                 $associationMetadata->setTargetClassName($targetClass);
                 $associationMetadata->addAcceptableTargetClassName($targetClass);
-                $associationMetadata->setIsNullable(true);
-                $targetEntity = $field->getTargetEntity();
-                if ($targetEntity && !$field->getDataType()) {
-                    $associationDataType = DataType::STRING;
-                    $targetIdFieldNames = $targetEntity->getIdentifierFieldNames();
-                    if (1 === count($targetIdFieldNames)) {
-                        $targetIdField = $targetEntity->getField(reset($targetIdFieldNames));
-                        if ($targetIdField) {
-                            $associationDataType = $targetIdField->getDataType();
-                        }
-                    }
-                    $associationMetadata->setDataType($associationDataType);
+            } elseif ($field->isMetaProperty()) {
+                $metaPropertyMetadata = $entityMetadata->addMetaProperty(new MetaPropertyMetadata($fieldName));
+                $metaPropertyMetadata->setDataType($field->getDataType());
+                if (ConfigUtil::CLASS_NAME === $fieldName) {
+                    $entityMetadata->setInheritedType(true);
                 }
+            } else {
+                $fieldMetadata = $entityMetadata->addField(new FieldMetadata($fieldName));
+                $fieldMetadata->setDataType($field->getDataType());
+                $fieldMetadata->setIsNullable(!in_array($fieldName, $idFieldNames, true));
             }
         }
 
         return $entityMetadata;
+    }
+
+    /**
+     * @param AssociationMetadata         $associationMetadata
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function setAssociationDataType(
+        AssociationMetadata $associationMetadata,
+        EntityDefinitionFieldConfig $field
+    ) {
+        $targetEntity = $field->getTargetEntity();
+        if ($targetEntity) {
+            $associationDataType = DataType::STRING;
+            $targetIdFieldNames = $targetEntity->getIdentifierFieldNames();
+            if (1 === count($targetIdFieldNames)) {
+                $targetIdField = $targetEntity->getField(reset($targetIdFieldNames));
+                if ($targetIdField) {
+                    $associationDataType = $targetIdField->getDataType();
+                }
+            }
+            $associationMetadata->setDataType($associationDataType);
+        }
+    }
+
+    /**
+     * @param AssociationMetadata $associationMetadata
+     * @param bool                $isCollection
+     */
+    protected function setAssociationType(AssociationMetadata $associationMetadata, $isCollection)
+    {
+        if ($isCollection) {
+            $associationMetadata->setAssociationType(RelationType::MANY_TO_MANY);
+            $associationMetadata->setIsCollection(true);
+        } else {
+            $associationMetadata->setAssociationType(RelationType::MANY_TO_ONE);
+            $associationMetadata->setIsCollection(false);
+        }
     }
 }

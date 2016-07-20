@@ -66,39 +66,21 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function transformObjectToArray($object, EntityMetadata $metadata = null)
+    protected function convertObjectToArray($object, EntityMetadata $metadata = null)
     {
-        $result = [];
         if (null === $metadata) {
-            $result[self::ATTRIBUTES] = $this->objectAccessor->toArray($object);
-        } else {
-            $className = $this->objectAccessor->getClassName($object);
-            $entityType = $className
-                ? $this->getEntityType($className, $metadata->getClassName())
-                : $this->getEntityType($metadata->getClassName());
-
-            $result = $this->getResourceIdObject(
-                $entityType,
-                $this->entityIdAccessor->getEntityId($object, $metadata)
-            );
-
-            $data = $this->objectAccessor->toArray($object);
-            foreach ($data as $name => $value) {
-                if (in_array($name, $metadata->getIdentifierFieldNames(), true)) {
-                    continue;
-                }
-                if ($metadata->hasField($name)) {
-                    $result[self::ATTRIBUTES][$name] = $value;
-                } elseif ($metadata->hasAssociation($name)) {
-                    $associationMetadata = $metadata->getAssociation($name);
-                    $result[self::RELATIONSHIPS][$name][self::DATA] = $associationMetadata->isCollection()
-                        ? $this->handleRelatedCollection($value, $associationMetadata)
-                        : $this->handleRelatedObject($value, $associationMetadata);
-                } elseif ($metadata->hasMetaProperty($name)) {
-                    $result[self::META][$name] = $value;
-                }
-            }
+            throw new \InvalidArgumentException('The metadata should be provided.');
         }
+
+        $result = $this->getResourceIdObject(
+            $this->getEntityTypeForObject($object, $metadata),
+            $this->entityIdAccessor->getEntityId($object, $metadata)
+        );
+
+        $data = $this->objectAccessor->toArray($object);
+        $this->addMeta($result, $data, $metadata);
+        $this->addAttributes($result, $data, $metadata);
+        $this->addRelationships($result, $data, $metadata);
 
         return $result;
     }
@@ -106,7 +88,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function transformErrorToArray(Error $error)
+    protected function convertErrorToArray(Error $error)
     {
         $result = [];
 
@@ -135,38 +117,81 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     }
 
     /**
-     * @param mixed               $object
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return array|null
+     * {@inheritdoc}
      */
-    protected function handleRelatedObject($object, AssociationMetadata $associationMetadata)
+    protected function convertToEntityType($entityClass, $throwException = true)
     {
-        if (null === $object) {
-            return null;
-        }
-
-        return $this->processRelatedObject($object, $associationMetadata);
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $this->requestType,
+            $throwException
+        );
     }
 
     /**
-     * @param mixed               $collection
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return array
+     * @param array          $result
+     * @param array          $data
+     * @param EntityMetadata $metadata
      */
-    protected function handleRelatedCollection($collection, AssociationMetadata $associationMetadata)
+    protected function addMeta(array &$result, array $data, EntityMetadata $metadata)
     {
-        if (null === $collection) {
-            return [];
+        $properties = $metadata->getMetaProperties();
+        foreach ($properties as $name => $property) {
+            if (array_key_exists($name, $data)) {
+                $result[self::META][$name] = $data[$name];
+            }
         }
+    }
 
-        $data = [];
-        foreach ($collection as $object) {
-            $data[] = $this->processRelatedObject($object, $associationMetadata);
+    /**
+     * @param array          $result
+     * @param array          $data
+     * @param EntityMetadata $metadata
+     */
+    protected function addAttributes(array &$result, array $data, EntityMetadata $metadata)
+    {
+        $idFieldNames = $metadata->getIdentifierFieldNames();
+        $fields = $metadata->getFields();
+        foreach ($fields as $name => $field) {
+            if (!in_array($name, $idFieldNames, true)) {
+                $result[self::ATTRIBUTES][$name] = array_key_exists($name, $data)
+                    ? $data[$name]
+                    : null;
+            }
         }
+    }
 
-        return $data;
+    /**
+     * @param array          $result
+     * @param array          $data
+     * @param EntityMetadata $metadata
+     */
+    protected function addRelationships(array &$result, array $data, EntityMetadata $metadata)
+    {
+        $associations = $metadata->getAssociations();
+        foreach ($associations as $name => $association) {
+            if ($association->isCollection()) {
+                $value = [];
+                if (array_key_exists($name, $data)) {
+                    $val = $data[$name];
+                    if (!empty($val)) {
+                        foreach ($val as $object) {
+                            $value[] = $this->processRelatedObject($object, $association);
+                        }
+                    }
+                }
+            } else {
+                $value = null;
+                if (array_key_exists($name, $data)) {
+                    $val = $data[$name];
+                    if (null !== $val) {
+                        $value = $this->processRelatedObject($val, $association);
+                    }
+                }
+            }
+            $result[self::RELATIONSHIPS][$name][self::DATA] = $value;
+        }
     }
 
     /**
@@ -195,7 +220,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 $preparedValue['entityType'],
                 $this->entityIdAccessor->getEntityId($targetObject, $targetMetadata)
             );
-            $this->addRelatedObject($this->transformObjectToArray($targetObject, $targetMetadata));
+            $this->addRelatedObject($this->convertObjectToArray($targetObject, $targetMetadata));
         }
 
         return $resourceId;
@@ -221,13 +246,18 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                     );
                 }
 
-                $data = $this->objectAccessor->toArray($object);
-                if ($this->isIdentity($data, $targetMetadata)) {
+                if ($this->isIdentity($targetMetadata)) {
                     $idOnly = true;
-
-                    $object = count($data) === 1
-                        ? reset($data)
-                        : $data;
+                    $idFieldNames = $targetMetadata->getIdentifierFieldNames();
+                    if (count($idFieldNames) === 1) {
+                        $object = $this->objectAccessor->getValue($object, reset($idFieldNames));
+                    } else {
+                        $data = [];
+                        foreach ($idFieldNames as $fieldName) {
+                            $data[$fieldName] = $this->objectAccessor->getValue($object, $fieldName);
+                        }
+                        $object = $data;
+                    }
                 }
             }
         } else {
@@ -275,59 +305,5 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
             self::TYPE => $entityType,
             self::ID   => $entityId
         ];
-    }
-
-    /**
-     * @param string      $entityClass
-     * @param string|null $fallbackEntityClass
-     *
-     * @return string
-     */
-    protected function getEntityType($entityClass, $fallbackEntityClass = null)
-    {
-        if (null === $fallbackEntityClass) {
-            $entityType = $this->convertToEntityType($entityClass);
-        } else {
-            $entityType = $this->convertToEntityType($entityClass, false);
-            if (!$entityType) {
-                $entityType = $this->convertToEntityType($fallbackEntityClass);
-            }
-        }
-
-        return $entityType;
-    }
-
-    /**
-     * @param string $entityClass
-     * @param bool   $throwException
-     *
-     * @return string|null
-     */
-    protected function convertToEntityType($entityClass, $throwException = true)
-    {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $this->requestType,
-            $throwException
-        );
-    }
-
-    /**
-     * Checks whether a given object has only identity property(s)
-     * or any other properties as well.
-     *
-     * @param array          $object
-     * @param EntityMetadata $metadata
-     *
-     * @return bool
-     */
-    protected function isIdentity(array $object, EntityMetadata $metadata)
-    {
-        $idFields = $metadata->getIdentifierFieldNames();
-
-        return
-            count($object) === count($idFields)
-            && count(array_diff_key($object, array_flip($idFields))) === 0;
     }
 }

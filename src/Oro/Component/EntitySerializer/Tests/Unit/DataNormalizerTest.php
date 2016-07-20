@@ -13,7 +13,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeData($config, $data, $expectedData)
     {
         $configConverter = new ConfigConverter();
-        $normalizer      = new DataNormalizer();
+        $normalizer = new DataNormalizer();
 
         $configObject = $configConverter->convertConfig($config);
 
@@ -29,7 +29,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
     public function normalizeDataProvider()
     {
         return [
-            'single_property_path'                                    => [
+            'single_property_path'                                       => [
                 'config'       => [
                     'fields' => [
                         'phones' => [
@@ -59,7 +59,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'metadata_property_path'                                  => [
+            'metadata_property_path'                                     => [
                 'config'       => [
                     'fields' => [
                         'entity'    => ['property_path' => '__class__'],
@@ -79,7 +79,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'field_name_equals_to_metadata_property_path'             => [
+            'field_name_equals_to_metadata_property_path'                => [
                 'config'       => [
                     'fields' => [
                         '__class__' => ['property_path' => '__class__'],
@@ -98,7 +98,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'metadata_field_name_with_property_path'                  => [
+            'metadata_field_name_with_property_path'                     => [
                 'config'       => [
                     'fields' => [
                         '__class__' => null,
@@ -117,7 +117,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'property_path'                                           => [
+            'property_path'                                              => [
                 'config'       => [
                     'fields' => [
                         'contactName' => ['property_path' => 'contact.name'],
@@ -148,7 +148,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'property_path_with_null_child'                           => [
+            'property_path_with_null_child'                              => [
                 'config'       => [
                     'fields' => [
                         'contactName' => ['property_path' => 'contact.name'],
@@ -174,14 +174,13 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'property_path_with_null_child_id'                        => [
+            'property_path_with_null_child_id'                           => [
                 'config'       => [
                     'fields' => [
                         'id'      => null,
                         'contact' => [
                             'exclusion_policy' => 'all',
                             'fields'           => ['id' => null],
-                            'property_path'    => 'id'
                         ]
                     ]
                 ],
@@ -198,7 +197,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'property_path_without_child'                             => [
+            'property_path_without_child'                                => [
                 'config'       => [
                     'fields' => [
                         'contactName' => ['property_path' => 'contact.name'],
@@ -222,13 +221,13 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'property_path_with_id_only_child'                        => [
+            'property_path_with_id_only_child'                           => [
                 'config'       => [
                     'fields' => [
                         'contactName' => ['property_path' => 'contact.name'],
                         'contact'     => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'fields'           => [
                                 'id'   => null,
                                 'name' => null
@@ -253,7 +252,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'property_path_with_exclusion'                            => [
+            'property_path_with_exclusion'                               => [
                 'config'       => [
                     'fields' => [
                         'contactName' => ['property_path' => 'contact.name'],
@@ -280,7 +279,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'deep_property_path'                                      => [
+            'deep_property_path'                                         => [
                 'config'       => [
                     'fields' => [
                         'newField'    => ['property_path' => 'field'],
@@ -334,7 +333,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'deep_property_path_with_null_last_relation'              => [
+            'deep_property_path_with_null_last_relation'                 => [
                 'config'       => [
                     'fields' => [
                         'newField'    => ['property_path' => 'field'],
@@ -381,7 +380,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'deep_property_path_with_null_immediate_relation'         => [
+            'deep_property_path_with_null_immediate_relation'            => [
                 'config'       => [
                     'fields' => [
                         'newField'    => ['property_path' => 'field'],
@@ -420,13 +419,13 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'deep_property_path_with_id_only_child'                   => [
+            'deep_property_path_with_id_only_child'                      => [
                 'config'       => [
                     'fields' => [
                         'accountName' => ['property_path' => 'contact.account.name'],
                         'contact'     => [
                             'exclusion_policy' => 'all',
-                            'property_path'    => 'id',
+                            'property_path'    => 'contact.id',
                             'fields'           => [
                                 'id'      => null,
                                 'account' => [
@@ -457,7 +456,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'deep_property_path_with_exclusion'                       => [
+            'deep_property_path_with_exclusion'                          => [
                 'config'       => [
                     'fields' => [
                         'accountName' => ['property_path' => 'contact.account.name'],
@@ -491,7 +490,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'deep_property_path_with_relation'                        => [
+            'deep_property_path_with_relation'                           => [
                 'config'       => [
                     'fields' => [
                         'id'      => null,
@@ -503,7 +502,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'account' => [
                                     'exclusion_policy' => 'all',
                                     'fields'           => ['id' => null],
-                                    'property_path'    => 'id',
+                                    'property_path'    => 'account.id',
                                     'collapse'         => true
                                 ]
                             ]
@@ -533,7 +532,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'deep_property_path_with_excluded_relation'               => [
+            'deep_property_path_with_excluded_relation'                  => [
                 'config'       => [
                     'fields' => [
                         'id'      => null,
@@ -572,13 +571,12 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'invalid config (relation in config, but scalar in data)' => [
+            'invalid config (relation in config, but scalar in data)'    => [
                 'config'       => [
                     'fields' => [
                         'contact' => [
                             'exclusion_policy' => 'all',
                             'fields'           => ['id' => null],
-                            'property_path'    => 'id'
                         ]
                     ]
                 ],
@@ -595,7 +593,27 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'invalid config (a config for not existing relation)'     => [
+            'invalid config (a config for not existing relation)'        => [
+                'config'       => [
+                    'fields' => [
+                        'contact' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id' => 123,
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id' => 123,
+                    ]
+                ]
+            ],
+            'a config for not existing relation, but with property path' => [
                 'config'       => [
                     'fields' => [
                         'contact' => [
@@ -612,7 +630,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedData' => [
                     [
-                        'id' => 123,
+                        'contact' => 123,
                     ]
                 ]
             ],

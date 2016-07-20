@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
@@ -52,6 +54,7 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
     /**
      * @param string        $associationName
      * @param string        $targetClass
+     * @param string        $associationType
      * @param bool|null     $isCollection
      * @param string|null   $dataType
      * @param string[]|null $acceptableTargetClasses
@@ -61,6 +64,7 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
     protected function createAssociationMetadata(
         $associationName,
         $targetClass,
+        $associationType = null,
         $isCollection = null,
         $dataType = null,
         $acceptableTargetClasses = null
@@ -68,6 +72,9 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
+        if (null !== $associationType) {
+            $associationMetadata->setAssociationType($associationType);
+        }
         if (null !== $isCollection) {
             $associationMetadata->setIsCollection($isCollection);
         }
@@ -162,6 +169,10 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
             ->method('isCollectionValuedAssociation')
             ->with('association411')
             ->willReturn(false);
+        $association41ClassMetadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with('association411')
+            ->willReturn(['type' => ClassMetadata::MANY_TO_ONE]);
 
         $association411ClassMetadata = $this->getClassMetadataMock('Test\Association411Target');
         $association411ClassMetadata->expects($this->once())
@@ -215,6 +226,7 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
         $expectedAssociation4 = $this->createAssociationMetadata(
             'association4',
             'Test\Association411Target',
+            'manyToOne',
             false,
             'integer',
             ['Test\Association411Target']

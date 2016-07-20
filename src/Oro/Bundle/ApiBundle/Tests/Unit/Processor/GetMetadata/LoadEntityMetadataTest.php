@@ -9,12 +9,16 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadEntityMetadata;
 
 class LoadEntityMetadataTest extends MetadataProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $associationManager;
 
     /** @var LoadEntityMetadata */
     protected $processor;
@@ -27,10 +31,15 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             ->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->associationManager = $this
+            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->processor = new LoadEntityMetadata(
             $this->doctrineHelper,
-            new EntityMetadataFactory($this->doctrineHelper)
+            new EntityMetadataFactory($this->doctrineHelper),
+            $this->associationManager
         );
     }
 
@@ -68,6 +77,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
     /**
      * @param string   $associationName
      * @param string   $targetClass
+     * @param string   $associationType
      * @param bool     $isCollection
      * @param string   $dataType
      * @param string[] $acceptableTargetClasses
@@ -77,6 +87,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
     protected function createAssociationMetadata(
         $associationName,
         $targetClass,
+        $associationType,
         $isCollection,
         $dataType,
         array $acceptableTargetClasses
@@ -84,6 +95,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
+        $associationMetadata->setAssociationType($associationType);
         $associationMetadata->setIsCollection($isCollection);
         $associationMetadata->setDataType($dataType);
         $associationMetadata->setAcceptableTargetClassNames($acceptableTargetClasses);
@@ -202,6 +214,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata(
                 'association1',
                 'Test\Association1Target',
+                'manyToOne',
                 false,
                 'integer',
                 ['Test\Association1Target']
@@ -356,6 +369,14 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
                     ['realAssociation3', true],
                 ]
             );
+        $classMetadata->expects($this->exactly(2))
+            ->method('getAssociationMapping')
+            ->willReturnMap(
+                [
+                    ['association1', ['type' => ClassMetadata::MANY_TO_ONE]],
+                    ['realAssociation3', ['type' => ClassMetadata::MANY_TO_MANY]],
+                ]
+            );
 
         $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
         $association1ClassMetadata->expects($this->once())
@@ -410,6 +431,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata(
                 'association1',
                 'Test\Association1Target',
+                'manyToOne',
                 false,
                 'integer',
                 ['Test\Association1Target']
@@ -419,6 +441,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata(
                 'association3',
                 'Test\Association3Target',
+                'manyToMany',
                 true,
                 'string',
                 ['Test\Association3Target1', 'Test\Association3Target2']
@@ -505,6 +528,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata(
                 'association1',
                 'Test\Association1Target',
+                'manyToOne',
                 false,
                 'integer',
                 ['Test\Association1Target']
@@ -514,6 +538,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata(
                 'association2',
                 'Test\Association2Target',
+                'manyToMany',
                 true,
                 'integer',
                 ['Test\Association2Target']
@@ -583,6 +608,13 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
                     ['association1', false],
                 ]
             );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->willReturnMap(
+                [
+                    ['association1', ['type' => ClassMetadata::MANY_TO_ONE]],
+                ]
+            );
 
         $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
         $association1ClassMetadata->expects($this->never())
@@ -619,6 +651,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata(
                 'association1',
                 'Test\Association1Target',
+                'manyToOne',
                 false,
                 'string',
                 ['Test\Association1Target']
@@ -863,5 +896,86 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
 
         $this->context->setConfig($this->createConfigObject($config));
         $this->processor->process($this->context);
+    }
+
+    public function testProcessForExtendedAssociation()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'            => null,
+                'association1'  => [
+                    'exclusion_policy'       => 'all',
+                    'data_type'              => 'association:manyToOne',
+                    'target_class'           => EntityIdentifier::class,
+                    'target_type'            => 'to-one',
+                    'identifier_field_names' => ['id'],
+                    'depends_on'             => ['field1'],
+                    'collapse'               => true,
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+        $this->associationManager->expects($this->once())
+            ->method('getAssociationTargets')
+            ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
+            ->willReturn(['Test\Association1Target' => 'field1']);
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field1']);
+        $classMetadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('id')
+            ->willReturn('integer');
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['id']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+        $expectedMetadata->addField($this->createFieldMetadata('id', 'integer'));
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                EntityIdentifier::class,
+                'manyToOne',
+                false,
+                'string',
+                ['Test\Association1Target']
+            )
+        );
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 }

@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class EntityMetadataFactory
 {
@@ -96,6 +97,9 @@ class EntityMetadataFactory
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
+        $associationMetadata->setAssociationType(
+            $this->getAssociationType($classMetadata->getAssociationMapping($associationName))
+        );
         $associationMetadata->setIsCollection($classMetadata->isCollectionValuedAssociation($associationName));
 
         $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
@@ -126,5 +130,26 @@ class EntityMetadataFactory
         $associationMetadata->setIsNullable($isNullable);
 
         return $associationMetadata;
+    }
+
+    /**
+     * @param array $associationMapping
+     *
+     * @return string|null
+     */
+    protected function getAssociationType(array $associationMapping)
+    {
+        switch ($associationMapping['type']) {
+            case ClassMetadata::MANY_TO_ONE:
+                return RelationType::MANY_TO_ONE;
+            case ClassMetadata::MANY_TO_MANY:
+                return RelationType::MANY_TO_MANY;
+            case ClassMetadata::ONE_TO_MANY:
+                return RelationType::ONE_TO_MANY;
+            case ClassMetadata::ONE_TO_ONE:
+                return RelationType::ONE_TO_ONE;
+            default:
+                return null;
+        }
     }
 }

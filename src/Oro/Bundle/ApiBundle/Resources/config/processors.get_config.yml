@@ -149,6 +149,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_exclusion_provider'
             - '@oro_api.config_provider'
+            - '@oro_entity_extend.association_manager'
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: -30 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -30 }

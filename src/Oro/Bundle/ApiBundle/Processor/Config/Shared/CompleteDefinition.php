@@ -4,24 +4,28 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * Makes sure that identifier field names are set for ORM entities.
  * Updates configuration to ask the EntitySerializer that the entity class should be returned
  * together with related entity data in case if the entity implemented using Doctrine table inheritance.
+ * Completes configuration if extended associations (associations with data_type=association:...[:...]).
  * If "identifier_fields_only" config extra is not exist:
  * * Adds fields and associations which were not configured yet based on an entity metadata.
  * * Marks all not accessible fields and associations as excluded.
@@ -31,6 +35,8 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  * * Adds identifier fields which were not configured yet based on an entity metadata.
  * * Removes all other fields and association.
  * By performance reasons all these actions are done in one processor.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CompleteDefinition implements ProcessorInterface
 {
@@ -43,19 +49,25 @@ class CompleteDefinition implements ProcessorInterface
     /** @var ConfigProvider */
     protected $configProvider;
 
+    /** @var AssociationManager */
+    protected $associationManager;
+
     /**
      * @param DoctrineHelper             $doctrineHelper
      * @param ExclusionProviderInterface $exclusionProvider
      * @param ConfigProvider             $configProvider
+     * @param AssociationManager         $associationManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ExclusionProviderInterface $exclusionProvider,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        AssociationManager $associationManager
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->exclusionProvider = $exclusionProvider;
         $this->configProvider = $configProvider;
+        $this->associationManager = $associationManager;
     }
 
     /**
@@ -78,6 +90,12 @@ class CompleteDefinition implements ProcessorInterface
             if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
                 $this->completeIdentifierFields($definition, $metadata, $existingFields);
             } else {
+                $this->completeExtendedAssociations(
+                    $definition,
+                    $metadata->name,
+                    $context->getVersion(),
+                    $context->getRequestType()
+                );
                 $this->completeFields($definition, $metadata, $existingFields);
                 $this->completeAssociations(
                     $definition,
@@ -172,6 +190,80 @@ class CompleteDefinition implements ProcessorInterface
                 $definition->addField($propertyPath);
             }
         }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param string                 $version
+     * @param RequestType            $requestType
+     */
+    protected function completeExtendedAssociations(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        $version,
+        RequestType $requestType
+    ) {
+        if ($definition->hasFields()) {
+            $fields = $definition->getFields();
+            foreach ($fields as $fieldName => $field) {
+                $dataType = $field->getDataType();
+                if ($dataType && 0 === strpos($dataType, 'association:')) {
+                    list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
+                    $targetClass = $field->getTargetClass();
+                    if (!$targetClass) {
+                        $targetClass = EntityIdentifier::class;
+                        $field->setTargetClass($targetClass);
+                    }
+                    if (!$field->getTargetType()) {
+                        $field->setTargetType($this->getExtendedAssociationTargetType($associationType));
+                    }
+                    if (!$field->getDependsOn()) {
+                        $field->setDependsOn(
+                            $this->getExtendedAssociationTargetFields(
+                                $entityClass,
+                                $associationType,
+                                $associationKind
+                            )
+                        );
+                    }
+                    $this->completeAssociation($field, $targetClass, $version, $requestType);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $associationType
+     *
+     * @return string
+     */
+    protected function getExtendedAssociationTargetType($associationType)
+    {
+        $isCollection =
+            in_array($associationType, RelationType::$toManyRelations, true)
+            || RelationType::MULTIPLE_MANY_TO_ONE === $associationType;
+
+        return $isCollection ? 'to-many' : 'to-one';
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $associationType
+     * @param string $associationKind
+     *
+     * @return string[]
+     */
+    protected function getExtendedAssociationTargetFields($entityClass, $associationType, $associationKind)
+    {
+        $targets = $this->associationManager->getAssociationTargets(
+            $entityClass,
+            null,
+            $associationType,
+            $associationKind
+        );
+
+        return array_values($targets);
     }
 
     /**
@@ -276,7 +368,7 @@ class CompleteDefinition implements ProcessorInterface
         $idFieldNames = $definition->getIdentifierFieldNames();
         $fieldNames = array_keys($definition->getFields());
         foreach ($fieldNames as $fieldName) {
-            if (!in_array($fieldName, $idFieldNames, true)) {
+            if (!in_array($fieldName, $idFieldNames, true) && !ConfigUtil::isMetadataProperty($fieldName)) {
                 $definition->removeField($fieldName);
             }
         }
