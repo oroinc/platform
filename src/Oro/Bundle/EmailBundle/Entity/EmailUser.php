@@ -18,7 +18,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  * EmailUser
  *
  * @ORM\Table(
- *      name="oro_email_user"
+ *      name="oro_email_user",
+ *      indexes={
+ *        @ORM\Index(name="mailbox_seen_idx", columns={"mailbox_owner_id", "is_seen"})
+ *     }
  * )
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository")

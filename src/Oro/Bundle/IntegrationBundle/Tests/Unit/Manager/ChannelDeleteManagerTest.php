@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
 
@@ -29,8 +31,15 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $connection;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     */
+    protected $entityMetadata;
+
     protected function setUp()
     {
+        $this->entityMetadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()->getMock();
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -50,6 +59,9 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteChannelWithoutErrors()
     {
+        $this->entityMetadata->expects(self::once())->method('getTableName')->willReturn('table');
+        $this->em->expects(self::once())->method('getClassMetadata')->with('OroIntegrationBundle:Status')
+            ->willReturn($this->entityMetadata);
         $this->connection->expects($this->once())
             ->method('commit');
         $this->em->expects($this->any())
@@ -63,6 +75,9 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteIntegrationWithErrors()
     {
+        $this->entityMetadata->expects(self::once())->method('getTableName')->willReturn('table');
+        $this->em->expects(self::once())->method('getClassMetadata')->with('OroIntegrationBundle:Status')
+            ->willReturn($this->entityMetadata);
         $this->em->expects($this->any())
             ->method('remove')
             ->with($this->equalTo($this->testIntegration))

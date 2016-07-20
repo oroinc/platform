@@ -468,9 +468,9 @@ services:
         arguments:
             - @oro_security.link.ownership_tree_provider
         calls:
-            - ['setContainer', [@service_container]]
-            - ['addSupportedClass', [%oro_user.entity.class%]]
-            - ['addSupportedClass', [%oro_organization.business_unit.entity.class%]]
+            - ['setContainer', ['@service_container']]
+            - ['addSupportedClass', [%oro_user.entity.class%, [owner, organization], [businessUnits, organizations]]]
+            - ['addSupportedClass', [%oro_organization.business_unit.entity.class%, [owner, organization], [users]]]
             - ['addSupportedClass', [%oro_organization.organization.entity.class%]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
