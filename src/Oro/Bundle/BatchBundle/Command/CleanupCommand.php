@@ -105,29 +105,35 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     protected function deleteRecords(DeletionQueryResultIterator $iterator, $className)
     {
         $iteration = 0;
-        $em        = $this->getEntityManager();
 
+        $ids = [];
         foreach ($iterator as $row) {
-            $id = reset($row);
-            $em->remove($em->getReference($className, $id));
+            $ids[] = reset($row);
 
             $iteration++;
             if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
-                $this->finishBatch();
+                $this->processBatch($ids, $className);
             }
         }
         if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
-            $this->finishBatch();
+            $this->processBatch($ids, $className);
         }
     }
 
     /**
-     * Finish processed batch
+     * @param array $ids
+     * @param string $className
      */
-    protected function finishBatch()
+    protected function processBatch($ids, $className)
     {
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $this->getEntityManager()
+            ->getRepository($className)
+            ->createQueryBuilder('entity')
+            ->delete($className, 'entity')
+            ->where('entity.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
     }
 
     /**
