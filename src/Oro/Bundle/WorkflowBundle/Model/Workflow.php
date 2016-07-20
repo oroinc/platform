@@ -297,7 +297,6 @@ class Workflow
 
         $this->aclManager->updateAclIdentities($workflowItem);
         $this->restrictionManager->updateEntityRestrictions($workflowItem);
-
     }
 
     /**
