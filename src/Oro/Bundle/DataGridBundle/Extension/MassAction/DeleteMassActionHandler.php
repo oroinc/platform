@@ -98,7 +98,8 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     protected function finishBatch(EntityManager $manager, $entityName, array $deletedIds)
     {
         $jobManager = $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
-        $jobManager->persist(new Job(IndexCommand::NAME, [$entityName, implode(' ', $deletedIds)]));
+        $args = array_merge([$entityName], $deletedIds);
+        $jobManager->persist(new Job(IndexCommand::NAME, $args));
         $manager->flush();
         $manager->clear();
         if ($jobManager !== $manager) {
