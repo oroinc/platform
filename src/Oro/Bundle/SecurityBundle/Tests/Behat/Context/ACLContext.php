@@ -3,16 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\MinkExtension\Context\RawMinkContext;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm;
 
-class ACLContext extends RawMinkContext implements OroElementFactoryAware
+class ACLContext extends OroFeatureContext implements OroElementFactoryAware
 {
     use ElementFactoryDictionary;
 
