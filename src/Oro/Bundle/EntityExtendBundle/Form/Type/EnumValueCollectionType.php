@@ -39,10 +39,17 @@ class EnumValueCollectionType extends AbstractType
             ]
         );
 
+        $typeHelper = $this->typeHelper;
+
         $resolver->setNormalizers(
             [
                 'disabled'          => function (Options $options, $value) {
                     return $this->isDisabled($options) ? true : $value;
+                },
+                'options'           => function (Options $options, $value) use ($typeHelper) {
+                    return [
+                        'allow_multiple_selection' => ($typeHelper->getFieldType($options['config_id']) === 'multiEnum')
+                    ];
                 },
                 'allow_add'         => function (Options $options, $value) {
                     return $options['disabled'] || $this->isDisabled($options, 'add') ? false : $value;
