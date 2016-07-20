@@ -3,8 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Mink\Exception\ExpectationException;
-use Behat\MinkExtension\Context\RawMinkContext;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -12,10 +10,11 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
-class GridContext extends RawMinkContext implements OroElementFactoryAware
+class GridContext extends OroFeatureContext implements OroElementFactoryAware
 {
     use ElementFactoryDictionary;
 
@@ -46,7 +45,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfRecordsShouldBe($number)
     {
-        expect($this->getGridPaginator()->getTotalRecordsCount())->toBe((int) $number);
+        self::assertEquals((int) $number, $this->getGridPaginator()->getTotalRecordsCount());
     }
 
     /**
@@ -54,7 +53,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfPagesShouldBe($number)
     {
-        expect($this->getGridPaginator()->getTotalPageCount())->toBe((int) $number);
+        self::assertEquals((int) $number, $this->getGridPaginator()->getTotalPageCount());
     }
 
     /**
@@ -96,8 +95,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsDecreasedBy($number)
     {
-        expect($this->gridRecordsNumber - $number)
-            ->toBeEqualTo($this->getGridPaginator()->getTotalRecordsCount());
+        self::assertEquals(
+            $this->gridRecordsNumber - $number,
+            $this->getGridPaginator()->getTotalRecordsCount()
+        );
     }
 
     /**
@@ -106,8 +107,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsRemainedTheSame()
     {
-        expect($this->gridRecordsNumber)
-            ->toBeEqualTo($this->getGridPaginator()->getTotalRecordsCount());
+        self::assertEquals(
+            $this->gridRecordsNumber,
+            $this->getGridPaginator()->getTotalRecordsCount()
+        );
     }
 
     /**
@@ -132,8 +135,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfPageShouldBe($number)
     {
-        expect($this->getGridPaginator()->find('css', 'input[type="number"]')->getAttribute('value'))
-            ->toBe($number);
+        self::assertEquals(
+            (int) $number,
+            (int) $this->getGridPaginator()->find('css', 'input[type="number"]')->getAttribute('value')
+        );
     }
 
     /**
@@ -164,13 +169,13 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
 
         switch ($comparison) {
             case 'lower':
-                expect($value1 < $value2)->toBe(true);
+                self::assertGreaterThan($value1, $value2);
                 break;
             case 'greater':
-                expect($value1 > $value2)->toBe(true);
+                self::assertLessThan($value1, $value2);
                 break;
             case 'equal':
-                expect($value1 == $value2)->toBe(true);
+                self::assertEquals($value1, $value2);
                 break;
         }
     }
@@ -197,17 +202,16 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = $columns[$columnNumber]->getText();
 
-            if ($actualValue != $value) {
-                throw new ExpectationException(
-                    sprintf(
-                        'Expect that %s column should be with "%s" value but "%s" found on grid',
-                        $header,
-                        $value,
-                        $actualValue
-                    ),
-                    $this->getSession()->getDriver()
-                );
-            }
+            self::assertEquals(
+                $value,
+                $actualValue,
+                sprintf(
+                    'Expect that %s column should be with "%s" value but "%s" found on grid',
+                    $header,
+                    $value,
+                    $actualValue
+                )
+            );
         }
     }
 
@@ -217,7 +221,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function assertRowContent($content, $rowNumber)
     {
         $row = $this->getGrid()->getRowByNumber($this->getNumberFromString($rowNumber));
-        expect($row->getText())->toMatch(sprintf('/%s/i', $content));
+        self::assertRegExp(sprintf('/%s/i', $content), $row->getText());
     }
 
     /**
@@ -314,13 +318,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     {
         $flashMessage = $this->getSession()->getPage()->find('css', '.flash-messages-holder');
 
-        if (!$flashMessage) {
-            throw new ExpectationException('Can\'t find flash message', $this->getSession()->getDriver());
-        }
-
+        self::assertNotNull($flashMessage, 'Can\'t find flash message');
 
         $regex = '/\d+ entities were deleted/';
-        expect($flashMessage->getText())->toMatch($regex);
+        self::assertRegExp($regex, $flashMessage->getText());
     }
 
     /**
@@ -332,12 +333,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function iShouldNotSeeDeleteAction($action)
     {
         $grid = $this->getGrid();
-        if ($grid->getMassActionLink($action)) {
-            throw new ExpectationException(
-                sprintf('%s mass action should not be accassable', $action),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertNull(
+            $grid->getMassActionLink($action),
+            sprintf('%s mass action should not be accassable', $action)
+        );
     }
 
     /**

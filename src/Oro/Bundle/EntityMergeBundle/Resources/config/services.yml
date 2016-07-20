@@ -35,6 +35,7 @@ parameters:
     oro_entity_merge.listener.metadata.merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\Metadata\MergeModesListener
 
     oro_entity_merge.listener.merge_field.cascade_remove_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeField\CascadeRemoveAssociationListener
+    oro_entity_merge.listener.merge_field.stale_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeField\StaleAssociationListener
     oro_entity_merge.listener.render.localized_value_render.class: Oro\Bundle\EntityMergeBundle\EventListener\Render\LocalizedValueRenderListener
 
     # Validator
@@ -174,6 +175,14 @@ services:
 
     oro_entity_merge.listener.merge_field.cascade_remove_association:
         class: %oro_entity_merge.listener.merge_field.cascade_remove_association.class%
+        arguments:
+            - '@oro_entity_merge.accessor'
+            - '@oro_entity_merge.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_merge.after_merge_field, method: afterMergeField }
+
+    oro_entity_merge.listener.merge_field.stale_association:
+        class: %oro_entity_merge.listener.merge_field.stale_association.class%
         arguments:
             - '@oro_entity_merge.accessor'
             - '@oro_entity_merge.doctrine_helper'

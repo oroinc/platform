@@ -140,8 +140,7 @@ class Grid extends Element
 
     /**
      * @param string $title
-     * @return NodeElement
-     * @throws \Exception
+     * @return NodeElement|null
      */
     public function getMassActionLink($title)
     {
@@ -171,7 +170,7 @@ class Grid extends Element
 
     public function assertNoRecords()
     {
-        expect($this->getRows())->toHaveCount(0);
+        \PHPUnit_Framework_Assert::assertCount(0, $this->getRows());
     }
 
     /**
