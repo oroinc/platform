@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\FormBuilderInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -108,7 +108,7 @@ class RestrictionsExtension extends AbstractTypeExtension
         $field = $restriction['field'];
         $mode  = $restriction['mode'];
         if ($mode === 'full') {
-            FormUtils::replaceField($form, $field, ['disabled' => true]);
+            FormUtils::replaceField($form, $field, ['read_only' => true]);
         } else {
             $values = $restriction['values'];
             if ($mode === 'disallow') {
@@ -133,7 +133,7 @@ class RestrictionsExtension extends AbstractTypeExtension
         if ($fieldForm->getConfig()->hasOption('disabled_values')) {
             FormUtils::replaceField($form, $field, ['disabled_values' => $disabledValues]);
         } else {
-            FormUtils::replaceField($form, $field, ['disabled' => true]);
+            FormUtils::replaceField($form, $field, ['read_only' => true]);
         }
     }
 }

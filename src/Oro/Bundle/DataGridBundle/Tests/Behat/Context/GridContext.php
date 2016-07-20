@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -232,7 +233,7 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterStringItem', $filterName);
 
-        $filterItem->activate();
+        $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setFilterValue($value);
         $filterItem->submit();
@@ -240,7 +241,12 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
 
     //@codingStandardsIgnoreStart
     /**
-     * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>([\w\s]+))" and "(?P<end>([\w\s]+))"/
+     * Filter grid by to dates between or not between
+     * Date must be valid format for DateTime php class e.g. 2015-12-24, 2015-12-26 8:30:00, 30 Jun 2015
+     * Example: When I filter Date Range as between "2015-12-24" and "2015-12-26"
+     * Example: But when I filter Created At as not between "25 Jun 2015" and "30 Jun 2015"
+     *
+     * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      */
     //@codingStandardsIgnoreEnd
     public function appllyDateTimeFilter($filterName, $type, $start, $end)
@@ -248,11 +254,26 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
         /** @var GridFilterDateTimeItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
 
-        $filterItem->activate();
+        $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setStartTime(new \DateTime($start));
         $filterItem->setEndTime(new \DateTime($end));
         $filterItem->submit();
+    }
+
+    /**
+     * Check checkboxes in multiple select filter
+     * Example: When I check "Task, Email" in Activity Type filter
+     *
+     * @When /^(?:|I )check "(?P<filterItems>.+)" in (?P<filterName>([\w\s]+)) filter$/
+     */
+    public function iCheckCheckboxesInFilter($filterName, $filterItems)
+    {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
+        $filterItems = array_map('trim', explode(',', $filterItems));
+
+        $filterItem->checkItems($filterItems);
     }
 
     /**
@@ -288,11 +309,16 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     }
 
     /**
+     * Click on row in grid
+     * Example: When click on Charlie in grid
+     *
      * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickOnRow($content)
     {
         $this->getGrid()->getRowByContent($content)->click();
+        // Keep this check for sure that ajax is finish
+        $this->getSession()->getDriver()->waitForAjax();
     }
 
     /**
