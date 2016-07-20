@@ -357,9 +357,20 @@ define([
             _.each(rules, function(param) {
                 param.depends = function() {
                     // all fields in a group failed a required rule (have empty value) - stop group validation
-                    return _.some(validator.elementsOf(optionalGroup), function(elem) {
-                        return $.validator.methods.required.call(validator, validator.elementValue(elem), elem);
+                    var isValidFound = false;
+                    var isInvalidFound = false;
+                    _.each(validator.elementsOf(optionalGroup), function(elem) {
+                        if ($(elem).prop('willValidate')) {
+                            if ($.validator.methods.required.call(validator, validator.elementValue(elem), elem)) {
+                                isValidFound = true;
+                            } else {
+                                isInvalidFound = true;
+                            }
+                        }
+
                     });
+
+                    return isValidFound && isInvalidFound;
                 };
             });
         }
