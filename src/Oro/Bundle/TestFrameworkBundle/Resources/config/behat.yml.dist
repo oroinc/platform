@@ -21,6 +21,7 @@ default: &default
             shared_contexts:
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
+                - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
                 - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
                 - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
     autoload:
