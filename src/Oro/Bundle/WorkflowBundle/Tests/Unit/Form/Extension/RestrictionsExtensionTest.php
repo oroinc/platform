@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Test\Unit\Form\Extension;
 
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -62,7 +64,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
     public function testBuildView(array $options, array $fields = [], array $restrictions = [])
     {
         $hasRestrictions = !empty($restrictions);
-        $data            = [1];
+        $data            = (object)[1];
 
         if (!empty($options['data_class']) &&
             empty($options['disable_workflow_restrictions']) &&
@@ -83,11 +85,12 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         foreach ($fields as $field) {
             $builder->add($field['name'], null, []);
         }
-
         $form = $builder->getForm();
-        $form->setData($data);
-        $formView = $form->createView();
-        $this->extension->buildView($formView, $form, $options);
+        $this->extension->buildForm($builder, $options);
+        $dispatcher = $form->getConfig()->getEventDispatcher();
+        $event = new FormEvent($form, $data);
+        $dispatcher->dispatch(FormEvents::POST_SET_DATA, $event);
+
         foreach ($fields as $field) {
             $this->assertEquals(
                 $field['disabled'],
