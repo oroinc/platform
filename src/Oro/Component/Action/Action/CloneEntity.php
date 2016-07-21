@@ -2,11 +2,15 @@
 
 namespace Oro\Component\Action\Action;
 
+use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Component\Action\Exception\ActionException;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\Action\Model\ContextAccessor;
 
@@ -20,15 +24,29 @@ class CloneEntity extends CloneObject
     /** @var ManagerRegistry */
     protected $registry;
 
+    /** @var FlashBagInterface */
+    protected $flashBag;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param ContextAccessor $contextAccessor
      * @param ManagerRegistry $registry
+     * @param FlashBagInterface $flashBag
+     * @param LoggerInterface $logger
      */
-    public function __construct(ContextAccessor $contextAccessor, ManagerRegistry $registry)
-    {
+    public function __construct(
+        ContextAccessor $contextAccessor,
+        ManagerRegistry $registry,
+        FlashBagInterface $flashBag = null,
+        LoggerInterface $logger = null
+    ) {
         parent::__construct($contextAccessor);
 
         $this->registry = $registry;
+        $this->flashBag = $flashBag;
+        $this->logger   = $logger != null ? $logger : new NullLogger();
     }
 
     /** {@inheritdoc} */
@@ -62,9 +80,11 @@ class CloneEntity extends CloneObject
                 $entityManager->flush($entity);
             }
         } catch (\Exception $e) {
-            throw new ActionException(
-                sprintf('Can\'t create entity %s. %s', $entityClassName, $e->getMessage())
-            );
+            if ($this->flashBag) {
+                $this->flashBag()->add('error', sprintf('Could not clone entity due to an error.'));
+            }
+
+            $this->logger->error($e->getMessage());
         }
 
         return $entity;
@@ -93,6 +113,6 @@ class CloneEntity extends CloneObject
      */
     protected function doFlush()
     {
-        return $this->getOption($this->options, self::OPTION_KEY_FLUSH, false);
+        return $this->getOption($this->options, self::OPTION_KEY_FLUSH, true);
     }
 }
