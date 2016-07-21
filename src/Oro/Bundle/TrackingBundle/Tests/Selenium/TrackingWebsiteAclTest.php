@@ -56,7 +56,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
         if ($page->hasBusinessUnitOrganizationChoice()) {
             $page->setBusinessUnitOrganization(['OroCRM']);
         }
-         $page->setBusinessUnit()
+        $page->setBusinessUnit()
             ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')
