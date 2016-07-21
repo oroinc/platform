@@ -15,3 +15,4 @@ Table of content
 * [Layout update file](./Resources/doc/layout_update.md)
 * [Layout implementation example of a product page](./Resources/doc/example.md)
 * [RequireJS definition](./Resources/doc/requirejs_definition.md)
+* [Debug Information](./Resources/doc/debug_information.md)

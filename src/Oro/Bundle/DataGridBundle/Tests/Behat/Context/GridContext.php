@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Mink\Exception\ExpectationException;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -203,17 +203,16 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = $columns[$columnNumber]->getText();
 
-            if ($actualValue != $value) {
-                throw new ExpectationException(
-                    sprintf(
-                        'Expect that %s column should be with "%s" value but "%s" found on grid',
-                        $header,
-                        $value,
-                        $actualValue
-                    ),
-                    $this->getSession()->getDriver()
-                );
-            }
+            self::assertEquals(
+                $value,
+                $actualValue,
+                sprintf(
+                    'Expect that %s column should be with "%s" value but "%s" found on grid',
+                    $header,
+                    $value,
+                    $actualValue
+                )
+            );
         }
     }
 
@@ -234,7 +233,7 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterStringItem', $filterName);
 
-        $filterItem->activate();
+        $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setFilterValue($value);
         $filterItem->submit();
@@ -242,7 +241,12 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
 
     //@codingStandardsIgnoreStart
     /**
-     * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>([\w\s]+))" and "(?P<end>([\w\s]+))"/
+     * Filter grid by to dates between or not between
+     * Date must be valid format for DateTime php class e.g. 2015-12-24, 2015-12-26 8:30:00, 30 Jun 2015
+     * Example: When I filter Date Range as between "2015-12-24" and "2015-12-26"
+     * Example: But when I filter Created At as not between "25 Jun 2015" and "30 Jun 2015"
+     *
+     * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      */
     //@codingStandardsIgnoreEnd
     public function appllyDateTimeFilter($filterName, $type, $start, $end)
@@ -250,11 +254,26 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
         /** @var GridFilterDateTimeItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
 
-        $filterItem->activate();
+        $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setStartTime(new \DateTime($start));
         $filterItem->setEndTime(new \DateTime($end));
         $filterItem->submit();
+    }
+
+    /**
+     * Check checkboxes in multiple select filter
+     * Example: When I check "Task, Email" in Activity Type filter
+     *
+     * @When /^(?:|I )check "(?P<filterItems>.+)" in (?P<filterName>([\w\s]+)) filter$/
+     */
+    public function iCheckCheckboxesInFilter($filterName, $filterItems)
+    {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
+        $filterItems = array_map('trim', explode(',', $filterItems));
+
+        $filterItem->checkItems($filterItems);
     }
 
     /**
@@ -290,11 +309,16 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     }
 
     /**
+     * Click on row in grid
+     * Example: When click on Charlie in grid
+     *
      * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickOnRow($content)
     {
         $this->getGrid()->getRowByContent($content)->click();
+        // Keep this check for sure that ajax is finish
+        $this->getSession()->getDriver()->waitForAjax();
     }
 
     /**
@@ -320,10 +344,7 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     {
         $flashMessage = $this->getSession()->getPage()->find('css', '.flash-messages-holder');
 
-        if (!$flashMessage) {
-            throw new ExpectationException('Can\'t find flash message', $this->getSession()->getDriver());
-        }
-
+        self::assertNotNull($flashMessage, 'Can\'t find flash message');
 
         $regex = '/\d+ entities were deleted/';
         self::assertRegExp($regex, $flashMessage->getText());
@@ -338,12 +359,10 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     public function iShouldNotSeeDeleteAction($action)
     {
         $grid = $this->getGrid();
-        if ($grid->getMassActionLink($action)) {
-            throw new ExpectationException(
-                sprintf('%s mass action should not be accassable', $action),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertNull(
+            $grid->getMassActionLink($action),
+            sprintf('%s mass action should not be accassable', $action)
+        );
     }
 
     /**

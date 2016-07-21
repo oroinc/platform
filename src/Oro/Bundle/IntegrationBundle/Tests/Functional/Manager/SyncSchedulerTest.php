@@ -8,20 +8,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector;
 
+/**
+ * @dbIsolationPerTest
+ */
 class SyncSchedulerTest extends WebTestCase
 {
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        self::$loadedFixtures = [];
-        $this->rollbackTransaction();
     }
 
     public function testScheduleWithoutFlush()

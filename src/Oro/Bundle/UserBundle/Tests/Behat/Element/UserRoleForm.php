@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
 class UserRoleForm extends Form
@@ -12,8 +11,6 @@ class UserRoleForm extends Form
      * @param string $entity Entity name e.g. Account, Business Customer, Comment etc.
      * @param string $action e.g. Create, Delete, Edit, View etc.
      * @param string $accessLevel e.g. System, None, User etc.
-     *
-     * @throws ExpectationException
      */
     public function setPermission($entity, $action, $accessLevel)
     {
@@ -32,17 +29,13 @@ class UserRoleForm extends Form
             }
         }
 
-        throw new ExpectationException(
-            sprintf('There is no "%s" entity row', $accessLevel),
-            $this->session->getDriver()
-        );
+        self::fail(sprintf('There is no "%s" entity row', $accessLevel));
     }
 
     /**
      * @param NodeElement $entityRow
      * @param string $action
      * @return NodeElement
-     * @throws ExpectationException
      */
     protected function getActionRow(NodeElement $entityRow, $action)
     {
@@ -55,16 +48,12 @@ class UserRoleForm extends Form
             }
         }
 
-        throw new ExpectationException(
-            sprintf('There is no "%s" action', $action),
-            $this->session->getDriver()
-        );
+        self::fail(sprintf('There is no "%s" action', $action));
     }
 
     /**
      * @param string $entity
      * @return NodeElement
-     * @throws ExpectationException
      */
     protected function getEntityRow($entity)
     {
@@ -77,9 +66,6 @@ class UserRoleForm extends Form
             }
         }
 
-        throw new ExpectationException(
-            sprintf('There is no "%s" entity row', $entity),
-            $this->session->getDriver()
-        );
+        self::fail(sprintf('There is no "%s" entity row', $entity));
     }
 }

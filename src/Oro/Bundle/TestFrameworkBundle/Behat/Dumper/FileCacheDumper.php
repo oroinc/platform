@@ -44,7 +44,7 @@ class FileCacheDumper implements DumperInterface
             $this->cacheDir
         ));
         $this->runProcess(sprintf(
-            'tar -xf %scache.tar -C %s .',
+            'tar -pxf %scache.tar -C %s .',
             $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
             $this->cacheDir
         ));
