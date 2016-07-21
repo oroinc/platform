@@ -20,10 +20,10 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
         if ($container->hasDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY)
             && $container->hasDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY)
             && $container->hasDefinition(self::DATE_FORMAT_EXTENSION_SERVICE_KEY)) {
-            // register 'calendar_date_range' function
+            // register 'calendar_date_range' and 'calendar_date_range_organization' functions
             $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
             $functions = $securityPolicyDef->getArgument(4);
-            $functions = array_merge($functions, array('calendar_date_range'));
+            $functions = array_merge($functions, ['calendar_date_range', 'calendar_date_range_organization']);
             $securityPolicyDef->replaceArgument(4, $functions);
             // register an twig extension implements this function
             $rendererDef = $container->getDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY);

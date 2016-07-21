@@ -12,7 +12,7 @@ class LoadLocalizationData extends AbstractFixture
     /**
      * @var array
      */
-    protected $localizations = [
+    protected static $localizations = [
         [
             'language' => 'en_US',
             'formatting' => 'en_US',
@@ -39,7 +39,7 @@ class LoadLocalizationData extends AbstractFixture
     public function load(ObjectManager $manager)
     {
         $registry = [];
-        foreach ($this->localizations as $item) {
+        foreach (self::$localizations as $item) {
             $code = $item['language'];
             $localization = new Localization();
             $localization
@@ -60,5 +60,13 @@ class LoadLocalizationData extends AbstractFixture
 
         $manager->flush();
         $manager->clear();
+    }
+
+    /**
+     * @return array
+     */
+    public static function getLocalizations()
+    {
+        return self::$localizations;
     }
 }

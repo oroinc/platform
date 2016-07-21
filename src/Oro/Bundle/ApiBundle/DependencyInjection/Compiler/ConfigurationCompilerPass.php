@@ -14,8 +14,6 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 class ConfigurationCompilerPass implements CompilerPassInterface
 {
     const PROCESSOR_BAG_SERVICE_ID          = 'oro_api.processor_bag';
-    const ACTION_PROCESSOR_BAG_SERVICE_ID   = 'oro_api.action_processor_bag';
-    const ACTION_PROCESSOR_TAG              = 'oro.api.action_processor';
     const FILTER_FACTORY_SERVICE_ID         = 'oro_api.filter_factory';
     const FILTER_FACTORY_TAG                = 'oro.api.filter_factory';
     const DEFAULT_FILTER_FACTORY_SERVICE_ID = 'oro_api.filter_factory.default';
@@ -41,30 +39,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     {
         $config = DependencyInjectionUtil::getConfig($container);
 
-        $this->registerActionProcessors($container);
         $this->registerProcessingGroups($container, $config);
         $this->registerFilters($container, $config);
         $this->configureForms($container, $config);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function registerActionProcessors(ContainerBuilder $container)
-    {
-        $actionProcessorBagServiceDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::ACTION_PROCESSOR_BAG_SERVICE_ID
-        );
-        if (null !== $actionProcessorBagServiceDef) {
-            $taggedServices = $container->findTaggedServiceIds(self::ACTION_PROCESSOR_TAG);
-            foreach ($taggedServices as $id => $attributes) {
-                $actionProcessorBagServiceDef->addMethodCall(
-                    'addProcessor',
-                    [new Reference($id)]
-                );
-            }
-        }
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
 
 class GridFilterStringItem extends AbstractGridFilterItem
 {
@@ -11,7 +10,6 @@ class GridFilterStringItem extends AbstractGridFilterItem
      * Select type of filter e.g. Contains, Ends With etc.
      *
      * @param string $filterType
-     * @throws ExpectationException
      */
     public function selectType($filterType)
     {
@@ -26,10 +24,7 @@ class GridFilterStringItem extends AbstractGridFilterItem
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t find filter with "%s" type', $filterType),
-            $this->getDriver()
-        );
+        self::fail(sprintf('Can\'t find filter with "%s" type', $filterType));
     }
 
     /**
@@ -40,5 +35,13 @@ class GridFilterStringItem extends AbstractGridFilterItem
     public function setFilterValue($value)
     {
         $this->find('css', 'div.value-field-frame input')->setValue($value);
+    }
+
+    /**
+     * Apply filter to the grid
+     */
+    public function submit()
+    {
+        $this->find('css', '.filter-update')->click();
     }
 }

@@ -2,18 +2,20 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
-use Behat\Mink\Exception\ExpectationException;
-use Behat\MinkExtension\Context\RawMinkContext;
+use Behat\Gherkin\Node\TableNode;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
 
-class GridContext extends RawMinkContext implements OroElementFactoryAware
+class GridContext extends OroFeatureContext implements OroElementFactoryAware
 {
     use ElementFactoryDictionary;
 
@@ -44,7 +46,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfRecordsShouldBe($number)
     {
-        expect($this->getGridPaginator()->getTotalRecordsCount())->toBe((int) $number);
+        self::assertEquals((int) $number, $this->getGridPaginator()->getTotalRecordsCount());
     }
 
     /**
@@ -52,7 +54,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfPagesShouldBe($number)
     {
-        expect($this->getGridPaginator()->getTotalPageCount())->toBe((int) $number);
+        self::assertEquals((int) $number, $this->getGridPaginator()->getTotalPageCount());
     }
 
     /**
@@ -94,8 +96,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsDecreasedBy($number)
     {
-        expect($this->gridRecordsNumber - $number)
-            ->toBeEqualTo($this->getGridPaginator()->getTotalRecordsCount());
+        self::assertEquals(
+            $this->gridRecordsNumber - $number,
+            $this->getGridPaginator()->getTotalRecordsCount()
+        );
     }
 
     /**
@@ -104,8 +108,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function theNumberOfRecordsRemainedTheSame()
     {
-        expect($this->gridRecordsNumber)
-            ->toBeEqualTo($this->getGridPaginator()->getTotalRecordsCount());
+        self::assertEquals(
+            $this->gridRecordsNumber,
+            $this->getGridPaginator()->getTotalRecordsCount()
+        );
     }
 
     /**
@@ -130,8 +136,10 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
      */
     public function numberOfPageShouldBe($number)
     {
-        expect($this->getGridPaginator()->find('css', 'input[type="number"]')->getAttribute('value'))
-            ->toBe($number);
+        self::assertEquals(
+            (int) $number,
+            (int) $this->getGridPaginator()->find('css', 'input[type="number"]')->getAttribute('value')
+        );
     }
 
     /**
@@ -162,14 +170,49 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
 
         switch ($comparison) {
             case 'lower':
-                expect($value1 < $value2)->toBe(true);
+                self::assertGreaterThan($value1, $value2);
                 break;
             case 'greater':
-                expect($value1 > $value2)->toBe(true);
+                self::assertLessThan($value1, $value2);
                 break;
             case 'equal':
-                expect($value1 == $value2)->toBe(true);
+                self::assertEquals($value1, $value2);
                 break;
+        }
+    }
+
+    /**
+     * Assert column values by given row
+     * Example: Then I should see Charlie Sheen in grid with following data:
+     *            | Email   | charlie@gmail.com   |
+     *            | Phone   | +1 415-731-9375     |
+     *            | Country | Ukraine             |
+     *            | State   | Kharkivs'ka Oblast' |
+     *
+     * @Then /^(?:|I )should see (?P<content>([\w\s]+)) in grid with following data:$/
+     */
+    public function assertRowValues($content, TableNode $table)
+    {
+        /** @var Grid $grid */
+        $grid = $this->elementFactory->createElement('Grid');
+        /** @var GridHeader $gridHeader */
+        $gridHeader = $this->elementFactory->createElement('GridHeader');
+        $columns = $grid->getRowByContent($content)->findAll('css', 'td');
+
+        foreach ($table->getRows() as list($header, $value)) {
+            $columnNumber = $gridHeader->getColumnNumber($header);
+            $actualValue = $columns[$columnNumber]->getText();
+
+            self::assertEquals(
+                $value,
+                $actualValue,
+                sprintf(
+                    'Expect that %s column should be with "%s" value but "%s" found on grid',
+                    $header,
+                    $value,
+                    $actualValue
+                )
+            );
         }
     }
 
@@ -179,7 +222,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     public function assertRowContent($content, $rowNumber)
     {
         $row = $this->getGrid()->getRowByNumber($this->getNumberFromString($rowNumber));
-        expect($row->getText())->toMatch(sprintf('/%s/i', $content));
+        self::assertRegExp(sprintf('/%s/i', $content), $row->getText());
     }
 
     /**
@@ -190,7 +233,7 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterStringItem', $filterName);
 
-        $filterItem->activate();
+        $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setFilterValue($value);
         $filterItem->submit();
@@ -198,7 +241,12 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
 
     //@codingStandardsIgnoreStart
     /**
-     * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>([\w\s]+))" and "(?P<end>([\w\s]+))"/
+     * Filter grid by to dates between or not between
+     * Date must be valid format for DateTime php class e.g. 2015-12-24, 2015-12-26 8:30:00, 30 Jun 2015
+     * Example: When I filter Date Range as between "2015-12-24" and "2015-12-26"
+     * Example: But when I filter Created At as not between "25 Jun 2015" and "30 Jun 2015"
+     *
+     * @When /^(?:|when )(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>(between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
      */
     //@codingStandardsIgnoreEnd
     public function appllyDateTimeFilter($filterName, $type, $start, $end)
@@ -206,11 +254,26 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
         /** @var GridFilterDateTimeItem $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
 
-        $filterItem->activate();
+        $filterItem->open();
         $filterItem->selectType($type);
         $filterItem->setStartTime(new \DateTime($start));
         $filterItem->setEndTime(new \DateTime($end));
         $filterItem->submit();
+    }
+
+    /**
+     * Check checkboxes in multiple select filter
+     * Example: When I check "Task, Email" in Activity Type filter
+     *
+     * @When /^(?:|I )check "(?P<filterItems>.+)" in (?P<filterName>([\w\s]+)) filter$/
+     */
+    public function iCheckCheckboxesInFilter($filterName, $filterItems)
+    {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
+        $filterItems = array_map('trim', explode(',', $filterItems));
+
+        $filterItem->checkItems($filterItems);
     }
 
     /**
@@ -246,15 +309,20 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     }
 
     /**
+     * Click on row in grid
+     * Example: When click on Charlie in grid
+     *
      * @Given /^(?:|I )click on (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickOnRow($content)
     {
         $this->getGrid()->getRowByContent($content)->click();
+        // Keep this check for sure that ajax is finish
+        $this->getSession()->getDriver()->waitForAjax();
     }
 
     /**
-     * @When confirm deletion
+     * @When /^(?:|I )confirm deletion$/
      */
     public function confirmDeletion()
     {
@@ -276,27 +344,25 @@ class GridContext extends RawMinkContext implements OroElementFactoryAware
     {
         $flashMessage = $this->getSession()->getPage()->find('css', '.flash-messages-holder');
 
-        if (!$flashMessage) {
-            throw new ExpectationException('Can\'t find flash message', $this->getSession()->getDriver());
-        }
-
+        self::assertNotNull($flashMessage, 'Can\'t find flash message');
 
         $regex = '/\d+ entities were deleted/';
-        expect($flashMessage->getText())->toMatch($regex);
+        self::assertRegExp($regex, $flashMessage->getText());
     }
 
     /**
+     * Check that mass action link is not available in grid mass actions
+     * Example: Then I shouldn't see Delete action
+     *
      * @Then /^(?:|I )shouldn't see (?P<action>(?:[^"]|\\")*) action$/
      */
     public function iShouldNotSeeDeleteAction($action)
     {
         $grid = $this->getGrid();
-        if ($grid->getMassActionLink($action)) {
-            throw new ExpectationException(
-                sprintf('%s mass action should not be accassable', $action),
-                $this->getSession()->getDriver()
-            );
-        }
+        self::assertNull(
+            $grid->getMassActionLink($action),
+            sprintf('%s mass action should not be accassable', $action)
+        );
     }
 
     /**

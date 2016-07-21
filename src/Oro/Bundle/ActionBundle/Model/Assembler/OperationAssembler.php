@@ -130,12 +130,12 @@ class OperationAssembler extends AbstractAssembler
             return;
         }
 
+        $aclDefinition = ['@acl_granted' => $aclResource];
         $definition = $operationDefinition->getConditions(OperationDefinition::PRECONDITIONS);
-
-        $newDefinition = ['@and' => [['@acl_granted' => $aclResource]]];
         if ($definition) {
             $newDefinition['@and'][] = $definition;
         }
+        $newDefinition['@and'][] = $aclDefinition;
 
         $operationDefinition->setConditions(OperationDefinition::PRECONDITIONS, $newDefinition);
     }

@@ -79,10 +79,14 @@ abstract class ApiTestCase extends WebTestCase
         $this->initClient();
 
         $result = [];
+        $doctrineHelper = $this->getContainer()->get('oro_api.doctrine_helper');
         $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
         $resources = $resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
+            if (!$doctrineHelper->isManageableEntityClass($entityClass)) {
+                continue;
+            }
             $result[$entityClass] = [$entityClass, $resource->getExcludedActions()];
         }
 
@@ -203,11 +207,43 @@ abstract class ApiTestCase extends WebTestCase
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $e = new \PHPUnit_Framework_ExpectationFailedException(
                 sprintf(
-                    'Wrong %s response for "%s" request for entity: "%s". Error message: %s',
+                    'Expects %s status code for "%s" request for entity: "%s". Error message: %s',
                     $statusCode,
                     $requestType,
                     $entityName,
                     $e->getMessage()
+                ),
+                $e->getComparisonFailure()
+            );
+            throw $e;
+        }
+    }
+
+    /**
+     * @param Response   $response
+     * @param integer    $statusCode
+     * @param string     $entityName
+     * @param string     $requestType
+     * @param array|null $content
+     */
+    protected function assertUpdateApiResponseStatusCodeEquals(
+        Response $response,
+        $statusCode,
+        $entityName,
+        $requestType,
+        $content
+    ) {
+        try {
+            $this->assertResponseStatusCodeEquals($response, $statusCode);
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            $e = new \PHPUnit_Framework_ExpectationFailedException(
+                sprintf(
+                    'Expects %s status code for "%s" request for entity: "%s". Error message: %s. Content: %s',
+                    $statusCode,
+                    $requestType,
+                    $entityName,
+                    $e->getMessage(),
+                    is_array($content) ? json_encode($content) : (string)$content
                 ),
                 $e->getComparisonFailure()
             );

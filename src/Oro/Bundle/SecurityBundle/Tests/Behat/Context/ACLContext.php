@@ -3,17 +3,18 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\MinkExtension\Context\RawMinkContext;
 use Doctrine\Common\Inflector\Inflector;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
+use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
-use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\WaitingDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm;
 
-class ACLContext extends RawMinkContext implements OroElementFactoryAware
+class ACLContext extends OroFeatureContext implements OroElementFactoryAware
 {
-    use WaitingDictionary, ElementFactoryDictionary;
+    use ElementFactoryDictionary;
 
     /**
      * @Given /^(?:|I am )logged in under (?P<organization>(\D*)) organization$/
@@ -46,7 +47,7 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
         $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
         $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
         $userRoleForm->saveAndClose();
-        $this->waitForAjax();
+        $this->getSession()->getDriver()->waitForAjax();
 
         $this->getSession('second_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
@@ -73,7 +74,7 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
         $userRoleForm->setPermission($singularizedEntity, $action1, $accessLevel1);
         $userRoleForm->setPermission($singularizedEntity, $action2, $accessLevel2);
         $userRoleForm->saveAndClose();
-        $this->waitForAjax();
+        $this->getSession()->getDriver()->waitForAjax();
 
         $this->getSession('second_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
@@ -82,10 +83,11 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
     protected function loginAsAdmin()
     {
         $this->visitPath('/user/login');
-        $login = $this->elementFactory->createElement('Login');
+        /** @var Form $login */
+        $login = $this->createElement('Login');
         $login->fill(new TableNode([['Username', 'admin'], ['Password', 'admin']]));
         $login->pressButton('Log in');
-        $this->waitForAjax();
+        $this->getSession()->getDriver()->waitForAjax();
     }
 
     /**
@@ -93,9 +95,14 @@ class ACLContext extends RawMinkContext implements OroElementFactoryAware
      */
     protected function openRoleEditForm($role)
     {
-        $this->elementFactory->createElement('MainMenu')->openAndClick('System -> User Management', 'Roles');
-        $this->waitForAjax();
-        $this->elementFactory->createElement('Grid')->clickActionLink($role, 'Edit');
-        $this->waitForAjax();
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $mainMenu->openAndClick('System/ User Management/ Roles');
+        $this->getSession()->getDriver()->waitForAjax();
+
+        /** @var Grid $grid */
+        $grid = $this->createElement('Grid');
+        $grid->clickActionLink($role, 'Edit');
+        $this->getSession()->getDriver()->waitForAjax();
     }
 }

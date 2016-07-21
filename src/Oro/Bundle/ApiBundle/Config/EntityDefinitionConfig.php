@@ -13,22 +13,25 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 {
     use Traits\ConfigTrait;
     use Traits\FindFieldTrait;
-    use Traits\LabelTrait;
-    use Traits\PluralLabelTrait;
     use Traits\DescriptionTrait;
-    use Traits\FormTrait;
+    use Traits\DocumentationTrait;
     use Traits\AclResourceTrait;
     use Traits\MaxResultsTrait;
+    use Traits\PageSizeTrait;
+    use Traits\SortingTrait;
+    use Traits\InclusionTrait;
+    use Traits\FieldsetTrait;
+    use Traits\FormTrait;
     use Traits\StatusCodesTrait;
 
-    /** a human-readable representation of the entity */
-    const LABEL = 'label';
-
-    /** a human-readable representation in plural of the entity */
-    const PLURAL_LABEL = 'plural_label';
-
-    /** a human-readable description of the entity */
+    /** a short, human-readable description of API resource */
     const DESCRIPTION = 'description';
+
+    /** a detailed documentation of API resource */
+    const DOCUMENTATION = 'documentation';
+
+    /** the name of ACL resource */
+    const ACL_RESOURCE = 'acl_resource';
 
     /** the default page size */
     const PAGE_SIZE = 'page_size';
@@ -36,20 +39,26 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /** a flag indicates whether a sorting is disabled */
     const DISABLE_SORTING = 'disable_sorting';
 
-    /** the name of ACL resource */
-    const ACL_RESOURCE = 'acl_resource';
+    /** a flag indicates whether an inclusion of related entities is disabled */
+    const DISABLE_INCLUSION = 'disable_inclusion';
+
+    /** a flag indicates whether a requesting of a restricted set of fields is disabled */
+    const DISABLE_FIELDSET = 'disable_fieldset';
 
     /** a handler that should be used to delete the entity */
     const DELETE_HANDLER = 'delete_handler';
-
-    /** response status codes */
-    const STATUS_CODES = 'status_codes';
 
     /** the form type that should be used for the entity */
     const FORM_TYPE = 'form_type';
 
     /** the form options that should be used for the entity */
     const FORM_OPTIONS = 'form_options';
+
+    /** the names of identifier fields of the entity */
+    const IDENTIFIER_FIELD_NAMES = 'identifier_field_names';
+
+    /** response status codes */
+    const STATUS_CODES = 'status_codes';
 
     /**
      * A string that unique identify this instance of entity definition config.
@@ -93,7 +102,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     {
         $result = parent::toArray();
         $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
-        $this->removeItemWithDefaultValue($result, self::DISABLE_PARTIAL_LOAD);
         $this->removeItemWithDefaultValue($result, FieldConfig::COLLAPSE);
 
         $keys = array_keys($result);
@@ -205,92 +213,29 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
-     * Indicates whether the default page size is set.
+     * Gets the names of identifier fields of the entity.
      *
-     * @return bool
+     * @return string[]
      */
-    public function hasPageSize()
+    public function getIdentifierFieldNames()
     {
-        return array_key_exists(EntityDefinitionConfig::PAGE_SIZE, $this->items);
+        return array_key_exists(self::IDENTIFIER_FIELD_NAMES, $this->items)
+            ? $this->items[self::IDENTIFIER_FIELD_NAMES]
+            : [];
     }
 
     /**
-     * Gets the default page size.
+     * Sets the names of identifier fields of the entity.
      *
-     * @return int|null A positive number
-     *                  NULL if the default page size should be set be a processor
-     *                  -1 if the pagination should be disabled
+     * @param string[] $fields
      */
-    public function getPageSize()
+    public function setIdentifierFieldNames(array $fields)
     {
-        return array_key_exists(self::PAGE_SIZE, $this->items)
-            ? $this->items[self::PAGE_SIZE]
-            : null;
-    }
-
-    /**
-     * Sets the default page size.
-     * Set NULL if the default page size should be set be a processor.
-     * Set -1 if the pagination should be disabled.
-     * Set a positive number to set own page size that should be used as a default one.
-     *
-     * @param int|null $pageSize A positive number, NULL or -1
-     */
-    public function setPageSize($pageSize = null)
-    {
-        if (null === $pageSize) {
-            unset($this->items[self::PAGE_SIZE]);
+        if (empty($fields)) {
+            unset($this->items[self::IDENTIFIER_FIELD_NAMES]);
         } else {
-            $pageSize = (int)$pageSize;
-
-            $this->items[self::PAGE_SIZE] = $pageSize >= 0 ? $pageSize : -1;
+            $this->items[self::IDENTIFIER_FIELD_NAMES] = $fields;
         }
-    }
-
-    /**
-     * Indicates whether a sorting is enabled.
-     *
-     * @return bool
-     */
-    public function isSortingEnabled()
-    {
-        return array_key_exists(self::DISABLE_SORTING, $this->items)
-            ? !$this->items[self::DISABLE_SORTING]
-            : true;
-    }
-
-    /**
-     * Enables a sorting.
-     */
-    public function enableSorting()
-    {
-        unset($this->items[self::DISABLE_SORTING]);
-    }
-
-    /**
-     * Disables a sorting.
-     */
-    public function disableSorting()
-    {
-        $this->items[self::DISABLE_SORTING] = true;
-    }
-
-    /**
-     * Indicates whether the partial load flag is set explicitly.
-     *
-     * @return bool
-     */
-    public function hasPartialLoad()
-    {
-        return array_key_exists(self::DISABLE_PARTIAL_LOAD, $this->items);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enablePartialLoad()
-    {
-        $this->items[self::DISABLE_PARTIAL_LOAD] = false;
     }
 
     /**
