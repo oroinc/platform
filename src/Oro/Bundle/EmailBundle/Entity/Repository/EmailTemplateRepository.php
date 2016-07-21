@@ -111,7 +111,9 @@ class EmailTemplateRepository extends EntityRepository
     public function getSystemTemplatesQueryBuilder()
     {
         $qb = $this->createQueryBuilder('e')
-            ->where('e.entityName IS NULL');
+            ->where('e.entityName IS NULL')
+            ->andWhere('e.isSystem = :isSystem')
+            ->setParameter('isSystem', true);
 
         return $qb;
     }
