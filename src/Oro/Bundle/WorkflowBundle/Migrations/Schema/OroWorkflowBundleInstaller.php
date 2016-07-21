@@ -192,6 +192,8 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('entity_attribute_name', 'string', ['length' => 255]);
         $table->addColumn('steps_display_ordered', 'boolean', []);
         $table->addColumn('system', 'boolean', []);
+        $table->addColumn('active', 'boolean', []);
+        $table->addColumn('priority', 'integer', []);
         $table->addColumn('configuration', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);

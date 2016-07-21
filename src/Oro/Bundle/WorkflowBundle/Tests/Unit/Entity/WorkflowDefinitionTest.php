@@ -53,6 +53,20 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->workflowDefinition->getStartStep());
     }
 
+    public function testActive()
+    {
+        $this->assertFalse($this->workflowDefinition->isActive());
+        $this->workflowDefinition->setActive(true);
+        $this->assertTrue($this->workflowDefinition->isActive());
+    }
+
+    public function testPriority()
+    {
+        $this->assertEquals(0, $this->workflowDefinition->getPriority());
+        $this->workflowDefinition->setPriority(42);
+        $this->assertEquals(42, $this->workflowDefinition->getPriority());
+    }
+
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      * @expectedExceptionMessage Workflow "test" does not contain step "start_step"

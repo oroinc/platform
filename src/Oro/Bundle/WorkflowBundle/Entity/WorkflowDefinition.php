@@ -40,6 +40,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * )
  * @ORM\HasLifecycleCallbacks()
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class WorkflowDefinition implements DomainObjectInterface
 {
@@ -84,6 +85,20 @@ class WorkflowDefinition implements DomainObjectInterface
      * @ORM\Column(name="system", type="boolean")
      */
     protected $system = false;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="active", type="boolean")
+     */
+    protected $active = false;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="priority", type="integer")
+     */
+    protected $priority = 0;
 
     /**
      * @var array
@@ -480,7 +495,7 @@ class WorkflowDefinition implements DomainObjectInterface
         foreach ($newRestrictions as $newRestriction) {
             $this->addRestriction($newRestriction);
         }
-        
+
         return $this;
     }
 
@@ -503,9 +518,9 @@ class WorkflowDefinition implements DomainObjectInterface
         if ($restriction->getStep()) {
             $restriction->setStep($this->getStepByName($restriction->getStep()->getName()));
         }
-            
+
         $this->restrictions->add($restriction);
-        
+
         return $this;
     }
 
@@ -584,7 +599,8 @@ class WorkflowDefinition implements DomainObjectInterface
             ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
             ->setEntityAcls($definition->getEntityAcls())
             ->setRestrictions($definition->getRestrictions())
-            ->setSystem($definition->isSystem());
+            ->setSystem($definition->isSystem())
+            ->setPriority($definition->getPriority());
 
         return $this;
     }
@@ -678,5 +694,45 @@ class WorkflowDefinition implements DomainObjectInterface
     public function getObjectIdentifier()
     {
         return $this->getName();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param boolean $active
+     *
+     * @return $this
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param mixed $priority
+     *
+     * @return $this
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+
+        return $this;
     }
 }

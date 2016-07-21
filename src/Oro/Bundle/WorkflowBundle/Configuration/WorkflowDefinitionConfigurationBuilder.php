@@ -67,6 +67,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setRelatedEntity($configuration['entity'])
             ->setStepsDisplayOrdered($stepsDisplayOrdered)
             ->setSystem($system)
+            ->setActive($configuration['defaults']['active'])
+            ->setPriority($configuration['priority'])
             ->setEntityAttributeName($entityAttributeName)
             ->setConfiguration($this->filterConfiguration($configuration));
 
