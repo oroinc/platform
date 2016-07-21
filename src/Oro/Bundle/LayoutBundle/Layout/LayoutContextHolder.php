@@ -20,7 +20,7 @@ class LayoutContextHolder
     /**
      * @param LayoutContext $context
      */
-    public function setContext(LayoutContext $context = null)
+    public function setContext(LayoutContext $context)
     {
         $this->context = $context;
     }

@@ -17,7 +17,6 @@ class LayoutContextHolderTest extends \PHPUnit_Framework_TestCase
      */
     protected $context;
 
-
     protected function setUp()
     {
         $this->layoutContextHolder = new LayoutContextHolder();

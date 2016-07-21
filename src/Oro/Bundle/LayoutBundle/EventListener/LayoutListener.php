@@ -32,31 +32,31 @@ class LayoutListener
     protected $layoutManager;
 
     /**
-     * @var LayoutDataCollector
-     */
-    protected $layoutDataCollector;
-
-    /**
      * @var LayoutContextHolder
      */
     protected $layoutContextHolder;
 
     /**
+     * @var LayoutDataCollector
+     */
+    protected $layoutDataCollector;
+
+    /**
      * @param LayoutHelper $layoutHelper
      * @param LayoutManager $layoutManager
-     * @param LayoutDataCollector $layoutDataCollector
      * @param LayoutContextHolder $layoutContextHolder
+     * @param LayoutDataCollector $layoutDataCollector
      */
     public function __construct(
         LayoutHelper $layoutHelper,
         LayoutManager $layoutManager,
-        LayoutDataCollector $layoutDataCollector,
-        LayoutContextHolder $layoutContextHolder
+        LayoutContextHolder $layoutContextHolder,
+        LayoutDataCollector $layoutDataCollector
     ) {
         $this->layoutHelper = $layoutHelper;
         $this->layoutManager = $layoutManager;
-        $this->layoutDataCollector = $layoutDataCollector;
         $this->layoutContextHolder = $layoutContextHolder;
+        $this->layoutDataCollector = $layoutDataCollector;
     }
 
     /**
