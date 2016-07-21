@@ -40,7 +40,7 @@ operations:
                         method: getEntities
                         attribute: $.systemEntities
                     - '@trans':
-                        id: oro.workflow.workflowdefinition.clone.label
+                        id: oro.action.clone.label
                         attribute: $.clone.label
                         params:
                             '{label}': $.clone.label

@@ -8,3 +8,4 @@ oro:
         delete_confirm: Are you sure you want to delete this %entityLabel%?
         clone:          Clone
         clone_entity:   Clone
+        clone.label:    Copy of {label}

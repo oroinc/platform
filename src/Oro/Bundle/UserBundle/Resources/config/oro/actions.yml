@@ -19,7 +19,7 @@ operations:
                         - '@eq': [$.requestRoute, 'oro_action_widget_form']
                 actions:
                     - '@trans':
-                        id: oro.user.role.clone.label
+                        id: oro.action.clone.label
                         attribute: $.clone.label
                         params:
                             '{label}': $.clone.label
