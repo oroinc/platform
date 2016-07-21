@@ -45,6 +45,25 @@ operations:
                         service: service_container
                         method: getParameter
                         method_parameters: ['oro_user.privileges']
+                    - '@call_service_method':
+                        attribute: $.categoryProvider
+                        service: service_container
+                        method: get
+                        method_parameters: ['oro_user.provider.role_privilege_category_provider']
+                    - '@call_method':
+                        attribute: $.tabs
+                        object: $.categoryProvider
+                        method: getTabs
+                    - '@call_service_method':
+                        attribute: $.privilegeCapabilityProvider
+                        service: service_container
+                        method: get
+                        method_parameters: ['oro_user.provider.role_privilege_capability_provider']
+                    - '@call_method':
+                        attribute: $.capabilitySetOptions
+                        object: $.privilegeCapabilityProvider
+                        method: getCapabilitySetOptions
+                        method_parameters: [$.data]
         frontend_options:
             show_dialog: false
             template: 'OroUserBundle:Role:clone.html.twig'

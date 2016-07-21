@@ -350,6 +350,8 @@ services:
 
     oro_user.provider.role_privilege_category_provider:
         class: %oro_user.provider.role_privilege_category_provider.class%
+        arguments:
+            - '@translator'
 
     oro_user.provider.privilege_category_provider:
         class: %oro_user.provider.privilege_category_provider.class%
