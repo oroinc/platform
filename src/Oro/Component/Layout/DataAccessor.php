@@ -32,23 +32,6 @@ class DataAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getIdentifier($name)
-    {
-        $dataProvider = $this->getDataProvider($name);
-        if ($dataProvider === false) {
-            throw new Exception\InvalidArgumentException(
-                sprintf('Could not load the data provider "%s".', $name)
-            );
-        } elseif ($dataProvider instanceof DataProviderInterface) {
-            return $dataProvider->getIdentifier();
-        } else {
-            return $dataProvider;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function get($name)
     {
         return $this->offsetGet($name);
@@ -60,15 +43,16 @@ class DataAccessor implements DataAccessorInterface
     public function offsetGet($name)
     {
         $dataProvider = $this->getDataProvider($name);
-        if ($dataProvider === false) {
-            throw new Exception\InvalidArgumentException(
-                sprintf('Could not load the data provider "%s".', $name)
-            );
-        } elseif ($dataProvider instanceof DataProviderInterface) {
-            return $dataProvider->getData($this->context);
-        } else {
+
+        if (is_object($dataProvider)) {
+            return new DataProviderDecorator($dataProvider, ['get']);
+        } elseif ($dataProvider !== false) {
             return $this->context->data()->get($name);
         }
+
+        throw new Exception\InvalidArgumentException(
+            sprintf('Could not load the data provider "%s".', $name)
+        );
     }
 
     /**
@@ -82,7 +66,8 @@ class DataAccessor implements DataAccessorInterface
     /**
      * Implements \ArrayAccess
      *
-     * @throws \BadMethodCallException always as changing data providers is not allowed
+     * @param mixed $name
+     * @param mixed $value
      */
     public function offsetSet($name, $value)
     {
@@ -92,7 +77,7 @@ class DataAccessor implements DataAccessorInterface
     /**
      * Implements \ArrayAccess
      *
-     * @throws \BadMethodCallException always as removing data providers is not allowed
+     * @param mixed $name
      */
     public function offsetUnset($name)
     {
@@ -109,18 +94,16 @@ class DataAccessor implements DataAccessorInterface
      */
     protected function getDataProvider($name)
     {
-        if (isset($this->dataProviders[$name])) {
-            return $this->dataProviders[$name];
+        if (!isset($this->dataProviders[$name])) {
+            $dataProvider = $this->registry->findDataProvider($name);
+
+            if ($dataProvider === null) {
+                $dataProvider = $this->context->data()->has($name) ? true : false;
+            }
+
+            $this->dataProviders[$name] = $dataProvider;
         }
 
-        $dataProvider = $this->registry->findDataProvider($name);
-        if ($dataProvider === null) {
-            $dataProvider = $this->context->data()->has($name)
-                ? $this->context->data()->getIdentifier($name)
-                : false;
-        }
-        $this->dataProviders[$name] = $dataProvider;
-
-        return $dataProvider;
+        return $this->dataProviders[$name];
     }
 }
