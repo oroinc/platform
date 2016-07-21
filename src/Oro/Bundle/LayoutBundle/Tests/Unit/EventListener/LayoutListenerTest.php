@@ -59,8 +59,8 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener = new LayoutListener(
             $this->layoutHelper,
             $this->layoutManager,
-            $this->layoutDataCollector,
-            $this->layoutContextHolder
+            $this->layoutContextHolder,
+            $this->layoutDataCollector
         );
     }
 
