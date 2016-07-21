@@ -180,3 +180,6 @@ services:
         arguments:
             - '@request_stack'
             - '@oro_config.user'
+
+    oro_layout.layout_context_holder:
+        class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder

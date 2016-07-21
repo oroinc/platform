@@ -14,6 +14,7 @@ use Oro\Component\Layout\Exception\LogicException;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
+use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 
 /**
  * The LayoutListener class handles the @Layout annotation.
@@ -36,18 +37,26 @@ class LayoutListener
     protected $layoutDataCollector;
 
     /**
+     * @var LayoutContextHolder
+     */
+    protected $layoutContextHolder;
+
+    /**
      * @param LayoutHelper $layoutHelper
      * @param LayoutManager $layoutManager
      * @param LayoutDataCollector $layoutDataCollector
+     * @param LayoutContextHolder $layoutContextHolder
      */
     public function __construct(
         LayoutHelper $layoutHelper,
         LayoutManager $layoutManager,
-        LayoutDataCollector $layoutDataCollector
+        LayoutDataCollector $layoutDataCollector,
+        LayoutContextHolder $layoutContextHolder
     ) {
         $this->layoutHelper = $layoutHelper;
         $this->layoutManager = $layoutManager;
         $this->layoutDataCollector = $layoutDataCollector;
+        $this->layoutContextHolder = $layoutContextHolder;
     }
 
     /**
@@ -81,10 +90,12 @@ class LayoutListener
             $this->configureContext($context, $layoutAnnotation);
             $layout = $this->getLayout($context, $layoutAnnotation);
             $this->layoutDataCollector->collectContextItems($context);
+            $this->layoutContextHolder->setContext($context);
         } elseif ($parameters instanceof ContextInterface) {
             $this->configureContext($parameters, $layoutAnnotation);
             $layout = $this->getLayout($parameters, $layoutAnnotation);
             $this->layoutDataCollector->collectContextItems($parameters);
+            $this->layoutContextHolder->setContext($parameters);
         } elseif ($parameters instanceof Layout) {
             if (!$layoutAnnotation->isEmpty()) {
                 throw new LogicException(
