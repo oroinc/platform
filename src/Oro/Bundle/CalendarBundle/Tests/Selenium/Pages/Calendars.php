@@ -55,7 +55,7 @@ class Calendars extends AbstractPage
     public function checkEventPresent($event)
     {
         $this->assertElementPresent(
-            "//div[@class='fc-event-container']/a[contains(., '{$event}')]",
+            "//*[@class='fc-event-container']/a[contains(., '{$event}')]",
             'Event not found at calendar'
         );
 

@@ -73,7 +73,7 @@ class User extends AbstractPageEntity
         $this->email = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_email']");
         $this->groups = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_groups']");
         $this->roles = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_roles']");
-        $this->owner = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_owner']"));
+        $this->owner = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_owner']/preceding-sibling::div/a");
         $this->inviteUser = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_inviteUser']");
 
         return $this;
@@ -88,7 +88,9 @@ class User extends AbstractPageEntity
 
     public function setOwner($owner)
     {
-        $this->owner->selectOptionByLabel($owner);
+        $this->owner->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
     }
@@ -298,13 +300,43 @@ class User extends AbstractPageEntity
      */
     public function setBusinessUnit($businessUnits = array('Main'))
     {
+        $this->test->byXpath(
+            "//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div//input"
+        )->click();
         foreach ($businessUnits as $businessUnit) {
             $this->test->byXpath(
-                "//div[@data-ftid='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]"
+                "//*[@data-ftid='oro_user_user_form_organizations_businessUnits']//preceding-sibling::div" .
+                "//li[@class='select2-search-field']//input"
+            )->value($businessUnit);
+            $this->waitForAjax();
+            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$businessUnit}')]")->click();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Select one or more organizations in business unit selector. This method should be used before
+     * business unit selection when multiple organizations is used
+     *
+     * @param array $organizations
+     * @return $this
+     */
+    public function setBusinessUnitOrganization($organizations = array())
+    {
+        foreach ($organizations as $organization) {
+            $this->test->byXpath(
+                "//*[@data-ftid='oro_user_user_form_organizations']" .
+                "//b[contains(., '{$organization}')]"
             )->click();
         }
 
         return $this;
+    }
+
+    public function hasBusinessUnitOrganizationChoice()
+    {
+        return $this->isElementPresent("//*[@data-ftid='oro_user_user_form_organizations']//input[@type='checkbox']");
     }
 
     public function edit()

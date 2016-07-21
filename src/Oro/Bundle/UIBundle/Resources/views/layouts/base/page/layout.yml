@@ -33,6 +33,10 @@ layout:
                     blockType: container
                 require_js:
                     blockType: container
+                requirejs_scripts:
+                    blockType: requires
+                requirejs_scripts_after:
+                    blockType: block
                 require_modules:
                     blockType: container
                 app_script:
@@ -48,7 +52,9 @@ layout:
                         theme_icon: ~
                         styles: ~
                         scripts_before: ~
-                        require_js: ~
+                        require_js:
+                            requirejs_scripts: ~
+                            requirejs_scripts_after: ~
                         require_modules:
                             app_script: ~
                     body: ~
