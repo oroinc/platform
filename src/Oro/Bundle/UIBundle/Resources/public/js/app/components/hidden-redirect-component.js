@@ -75,7 +75,7 @@ define(function(require) {
             var form = $('form[data-collect=true]');
             var actionInput = form.find('input[name="input_action"]');
             $.ajax({
-                url: self.element.attr('href'),
+                url: this.element.attr('href'),
                 type: 'GET',
                 success: function(response) {
                     actionInput.val(JSON.stringify({
@@ -90,11 +90,12 @@ define(function(require) {
         },
 
         startRedirect: function() {
+            var _this = this;
             $.ajax({
                 url: this.element.attr('href'),
                 type: 'GET',
                 success: function(response) {
-                    this._processResponse(response.url, response.message);
+                    _this._processResponse(response.url, response.message);
                 },
                 error: function(xhr) {
                     Error.handle({}, xhr, {enforce: true});
