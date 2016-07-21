@@ -130,6 +130,10 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $minimumConfiguration = array(
             'label'  => 'Test Workflow',
             'entity' => 'My\Entity',
+            'priority' => 0,
+            'defaults' => [
+                'active' => false,
+            ],
         );
 
         $maximumConfiguration = array(
@@ -139,6 +143,10 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             'start_step' => 'test_step',
             'entity_attribute' => 'my_entity',
             'steps_display_ordered' => true,
+            'priority' => 1,
+            'defaults' => [
+                'active' => true,
+            ],
             WorkflowConfiguration::NODE_STEPS => array(
                 array(
                     'name' => 'first',

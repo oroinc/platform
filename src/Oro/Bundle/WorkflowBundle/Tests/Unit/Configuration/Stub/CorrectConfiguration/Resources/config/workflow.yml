@@ -6,6 +6,9 @@ workflows:
         start_step: first_step
         entity_attribute: my_entity
         steps_display_ordered: true
+        priority: 1
+        defaults:
+            active: true
         steps:
             first_step:
                 label: 'First Step'

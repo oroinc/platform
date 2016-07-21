@@ -75,9 +75,12 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $bundles = array(new CorrectSplitConfigurationBundle(), new EmptyConfigurationBundle());
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+        $expectedConfiguration = $this->getExpectedWokflowConfiguration('CorrectConfiguration');
+        $expectedConfiguration['first_workflow']['priority'] = 0;
+        $expectedConfiguration['first_workflow']['defaults']['active'] = false;
 
         $this->assertEquals(
-            $this->getExpectedWokflowConfiguration('CorrectConfiguration'),
+            $expectedConfiguration,
             $configurationProvider->getWorkflowDefinitionConfiguration()
         );
     }
