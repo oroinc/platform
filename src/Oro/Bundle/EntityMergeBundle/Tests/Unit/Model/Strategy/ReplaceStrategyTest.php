@@ -69,6 +69,11 @@ class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->will($this->returnValue('setId'));
 
+        $fieldMetadataData
+            ->expects($this->at(4))
+            ->method('get')
+            ->will($this->returnValue('setId'));
+
         $fieldData
             ->expects($this->once())
             ->method('getMetadata')

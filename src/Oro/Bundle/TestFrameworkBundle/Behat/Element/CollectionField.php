@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Behat\Mink\Exception\ExpectationException;
+use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 
 class CollectionField extends Element
@@ -12,16 +12,10 @@ class CollectionField extends Element
      */
     public function setValue($values)
     {
-        /** @var Element $removeRawButton */
-        while ($removeRawButton = $this->find('css', '.removeRow')) {
-            $removeRawButton->click();
-        }
+        $this->removeAllRows();
+        $this->addNewRows($values);
 
-        array_walk($values, function () {
-            $this->clickLink('Add');
-        });
-
-        $inputs = $inputs = $this->findAllTextFields();
+        $inputs = $this->findAllTextFields();
 
         foreach ($values as $value) {
             $input = array_shift($inputs);
@@ -34,7 +28,6 @@ class CollectionField extends Element
      * See phones, emails fields in Contact (CRM) create page
      *
      * @param string $value
-     * @throws ExpectationException
      */
     public function setFieldAsPrimary($value)
     {
@@ -49,10 +42,7 @@ class CollectionField extends Element
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Not found "%s" value', $value),
-            $this->getDriver()
-        );
+        self::fail(sprintf('Not found "%s" value', $value));
     }
 
     /**
@@ -72,5 +62,23 @@ class CollectionField extends Element
             .':not([type=reset])'
             .':not([type=submit])'
         );
+    }
+
+    protected function removeAllRows()
+    {
+        /** @var Element $removeRawButton */
+        while ($removeRawButton = $this->find('css', '.removeRow')) {
+            $removeRawButton->click();
+        }
+    }
+
+    /**
+     * @param array|TableNode $values
+     */
+    protected function addNewRows($values)
+    {
+        array_walk($values, function () {
+            $this->clickLink('Add');
+        });
     }
 }
