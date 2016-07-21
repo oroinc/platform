@@ -271,6 +271,7 @@ define(function(require) {
 
         _clearActionsContainer: function() {
             this.widget.dialog('actionsContainer').empty();
+            this.actionsEl = null;
         },
 
         _renderActions: function() {
