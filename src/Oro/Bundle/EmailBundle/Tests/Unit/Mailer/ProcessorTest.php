@@ -192,9 +192,13 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array  $data
+     * @param string $exception
+     * @param string $exceptionMessage
+     *
      * @dataProvider invalidModelDataProvider
      */
-    public function testProcessEmptyToException($data, $exception, $exceptionMessage)
+    public function testProcessEmptyToException(array $data, $exception, $exceptionMessage)
     {
         $this->mailer->expects($this->never())
             ->method('createMessage');
@@ -407,6 +411,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         return $origin;
     }
 
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function messageDataProvider()
     {
         return [
