@@ -6,11 +6,11 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
-use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 
-use Oro\Component\Testing\DbIsolationExtension;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Component\Testing\DbIsolationExtension;
 
 /**
  * Abstract class for functional and integration tests
@@ -285,6 +286,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function runCommand($name, array $params = [])
     {
+        /** @var KernelInterface $kernel */
         $kernel = self::getContainer()->get('kernel');
 
         $application = new Application($kernel);
@@ -339,6 +341,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $loader = $this->getFixtureLoader($classNames);
         $fixtures = array_values($loader->getFixtures());
 
+        /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManager();
         $executor = new ORMExecutor($em, new ORMPurger($em));
         $executor->execute($fixtures, true);
@@ -349,7 +352,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @param string $referenceUID
      *
-     * @return object
+     * @return object|mixed
      */
     protected function getReference($referenceUID)
     {
