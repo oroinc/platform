@@ -20,7 +20,7 @@ In this example 'account_user_role_form_actions' is the name of the folder in la
 It means, that all layout updates will be loaded from layouts/{theme_name}/imports/account_user_role_form_actions folder on import statement.
 As result all actions will be executed if condition (if exists) of imported layout update is true. At this case you don't need any special syntax in layout updates.
 
-If you want import same layout update repeatedly you face should provide unique ids for all layout blocks. For this case use special syntax:
+If you want import same layout update repeatedly you should provide unique ids for all layout blocks. For this case use special syntax:
 
 Layout update in imports folder:
 ```yaml
