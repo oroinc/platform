@@ -6,12 +6,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-
-use Symfony\Component\Form\CallbackTransformer;
 
 class SystemEmailTemplateSelectType extends AbstractType
 {

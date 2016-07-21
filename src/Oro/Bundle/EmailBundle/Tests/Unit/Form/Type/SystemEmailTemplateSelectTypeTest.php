@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormView;
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
