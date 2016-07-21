@@ -154,8 +154,8 @@ class RendererTest extends LayoutTestCase
                 'head',
                 'style',
                 [
-                    'src' => ['@asset' => 'test.css'],
-                    'scoped' => new Condition\FalseCondition()
+                    'src' => '=data["asset"].getUrl("test.css")',
+                    'scoped' => '=false'
                 ]
             )
             ->add(
@@ -165,7 +165,7 @@ class RendererTest extends LayoutTestCase
                 [
                     'content' => 'alert(\'test\');',
                     'async'   => true,
-                    'defer'   => new Condition\FalseCondition()
+                    'defer'   => '=false'
                 ]
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
@@ -270,7 +270,7 @@ class RendererTest extends LayoutTestCase
                 'invisible_by_expr_raw_container',
                 'root',
                 'head',
-                ['visible' => ['@false' => null]]
+                ['visible' => '=false']
             )
             ->add(
                 'invisible_by_expr_raw_child',
@@ -279,7 +279,7 @@ class RendererTest extends LayoutTestCase
                 ['charset' => 'invisible_by_expr_raw']
             )
             // test 'visible' option when its value is already assembled expression
-            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => new Condition\FalseCondition()])
+            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => '=false'])
             ->add('invisible_by_expr_child', 'invisible_by_expr_container', 'meta', ['charset' => 'invisible_by_expr'])
             // test buttons
             ->add(
@@ -305,8 +305,8 @@ class RendererTest extends LayoutTestCase
                 'button'
             )
             // test manipulations of 'class' attribute
-            ->appendOption('content', 'attr.class', ['@join' => [' ', 'class1', 'class2']])
-            ->replaceOption('content', 'attr.class', 'class1', ['@value' => ['$context.body_class']])
+            ->appendOption('content', 'attr.class', '="class1"~" "~"class2"')
+            ->replaceOption('content', 'attr.class', 'class1', '=context["body_class"]')
             ->getLayout($context);
 
         return $layout;
