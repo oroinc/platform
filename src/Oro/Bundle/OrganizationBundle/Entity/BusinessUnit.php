@@ -450,4 +450,24 @@ class BusinessUnit extends ExtendBusinessUnit implements
 
         return $emails;
     }
+
+    /**
+     * @return BusinessUnit
+     */
+    public function getParentBusinessUnit()
+    {
+        return $this->getOwner();
+    }
+
+    /**
+     * @param BusinessUnit $value
+     *
+     * @return BusinessUnit
+     */
+    public function setParentBusinessUnit(BusinessUnit $value = null)
+    {
+        $this->setOwner($value);
+
+        return $this;
+    }
 }

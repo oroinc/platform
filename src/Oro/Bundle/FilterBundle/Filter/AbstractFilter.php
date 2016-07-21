@@ -26,6 +26,8 @@ abstract class AbstractFilter implements FilterInterface
     /** @var array */
     protected $unresolvedOptions = [];
 
+    protected $state;
+
     /**
      * Constructor
      *
@@ -124,6 +126,30 @@ abstract class AbstractFilter implements FilterInterface
             )
         );
         $this->unresolvedOptions = [];
+    }
+
+    /**
+     * Set state of filter
+     *
+     * @param $state
+     *
+     * @return $this
+     */
+    public function setFilterState($state)
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * Get state of filter
+     *
+     * @return mixed
+     */
+    public function getFilterState()
+    {
+        return $this->state;
     }
 
     /**
