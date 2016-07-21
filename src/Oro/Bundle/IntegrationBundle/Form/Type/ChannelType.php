@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -95,9 +94,10 @@ class ChannelType extends AbstractType
             'defaultUserOwner',
             'oro_user_organization_acl_select',
             [
-                'required' => true,
-                'label'    => 'oro.integration.integration.default_user_owner.label',
-                'tooltip'  => 'oro.integration.integration.default_user_owner.description',
+                'required'    => true,
+                'label'       => 'oro.integration.integration.default_user_owner.label',
+                'tooltip'     => 'oro.integration.integration.default_user_owner.description',
+                'constraints' => new NotBlank()
             ]
         );
     }

@@ -180,7 +180,7 @@ class Reminder extends ExtendReminder
      * @ORM\Column(name="failure_exception", type="array", nullable=true)
      */
     protected $failureException;
-
+    
     public function __construct()
     {
         parent::__construct();
@@ -437,7 +437,7 @@ class Reminder extends ExtendReminder
 
         return $this;
     }
-
+    
     /**
      * Sets reminder data
      *

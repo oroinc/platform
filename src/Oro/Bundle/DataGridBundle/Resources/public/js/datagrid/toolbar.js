@@ -47,6 +47,10 @@ define([
             sortingDropdown: '[data-grid-sorting]'
         },
 
+        themeOptions: {
+            optionPrefix: 'toolbar'
+        },
+
         /**
          * Initializer.
          *
@@ -92,7 +96,11 @@ define([
                 this.hide();
             }
 
-            this.template = _.template($(options.template || this.template).html());
+            if (_.isFunction(options.template)) {
+                this.template = options.template;
+            } else {
+                this.template = _.template($(options.template || this.template).html());
+            }
 
             Toolbar.__super__.initialize.call(this, options);
         },

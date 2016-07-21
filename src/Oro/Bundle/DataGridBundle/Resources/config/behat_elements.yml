@@ -18,11 +18,19 @@ GridFilterDateTimeItem:
   selector: 'div.filter-item:contains("%s")'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem
 
+MultipleChoice:
+  selector: 'div.filter-item:contains("%s")'
+  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice
+
 DateTimePicker:
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker
 
 GridPaginator:
   selector: 'div.toolbar div.pagination'
+  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
+
+ActivityListPaginator:
+  selector: 'div.activity-list div.pagination'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
 
 GridFloatingMenu:

@@ -254,7 +254,7 @@ define(function(require) {
                 if (typeDefinedValues.indexOf(type) > -1) {
                     this.$('.filter-separator, .filter-start-date, .filter-end-date').hide();
                     this.subview('start').setValue('');
-                    this.subview('end').setValue('');                    
+                    this.subview('end').setValue('');
                 } else if (this.typeValues.moreThan === type) {
                     this.$('.filter-separator, .filter-end-date').hide();
                     this.subview('end').setValue('');
@@ -552,7 +552,7 @@ define(function(require) {
          * Converts the date value from Raw to Display
          *
          * @param {string} value
-         * @param {string{ part
+         * @param {string} part
          * @returns {string}
          * @protected
          */

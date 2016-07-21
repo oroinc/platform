@@ -52,6 +52,13 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
                 messageType = 'error';
             }
             messenger.notificationMessage(messageType, message);
+        },
+
+        handleDataTemplateDownloadErrorMessage: function() {
+            return messenger.notificationMessage(
+                'error',
+                __('Errors occured while downloading the template.')
+            );
         }
     };
 });

@@ -593,6 +593,7 @@ define(function(require) {
             };
             _.defaults(toolbarOptions, options);
 
+            this.columns.trigger('configureInitializeOptions', this.toolbar, toolbarOptions);
             this.trigger('beforeToolbarInit', toolbarOptions);
             toolbar = new this.toolbar(toolbarOptions);
             this.trigger('afterToolbarInit', toolbar);
@@ -1114,7 +1115,7 @@ define(function(require) {
          */
         findCellByIndex: function(modelI, columnI) {
             try {
-                return _.findWhere(this.body.rows[modelI].subviews, {
+                return _.findWhere(this.body.subviews[modelI].subviews, {
                     column: this.columns.at(columnI)
                 });
             } catch (e) {

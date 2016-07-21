@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use WebDriver\Exception\ElementNotVisible;
@@ -23,57 +22,73 @@ class Grid extends Element
     }
 
     /**
-     * @param string $header
-     * @param int $rowNumber
+     * Get column value by column header and row number
+     *
+     * @param string $header Header of grid column
+     * @param int $rowNumber Number of grid record starting from 1
      * @return string
-     * @throws ExpectationException
      */
     public function getRowValue($header, $rowNumber)
     {
         $columns = $this->getRowByNumber($rowNumber)->findAll('css', 'td');
-        $columnNumber = $this->elementFactory->createElement('GridHeader')->getColumnNumber($header);
+        /** @var GridHeader $gridHeader */
+        $gridHeader = $this->elementFactory->createElement('GridHeader');
+        $columnNumber = $gridHeader->getColumnNumber($header);
 
         return $this->normalizeValueByGuessingType($columns[$columnNumber]->getText());
     }
 
     /**
-     * @param $rowNumber
-     * @return NodeElement
-     * @throws ExpectationException
+     * Get Element tr by row number
+     *
+     * @param int $rowNumber Number of grid record starting from 1
+     * @return NodeElement tr element of grid
      */
     public function getRowByNumber($rowNumber)
     {
         $rowIndex = $rowNumber - 1;
         $rows = $this->getRows();
 
-        if (!isset($rows[$rowIndex])) {
-            throw new ExpectationException(
-                sprintf('Can\'t get %s row, because there are only %s rows in grid', $rowNumber, count($rows)),
-                $this->getDriver()
-            );
-        }
+        self::assertArrayHasKey(
+            $rowIndex,
+            $rows,
+            sprintf('Can\'t get %s row, because there are only %s rows in grid', $rowNumber, count($rows))
+        );
 
         return $rows[$rowIndex];
     }
 
     /**
+     * Get Element tr by row content
+     *
+     * @param string $content Any content that can identify row
+     * @return NodeElement tr element of grid
+     */
+    public function getRowByContent($content)
+    {
+        $rows = $this->getRows();
+
+        foreach ($rows as $row) {
+            if (false !== strpos($row->getText(), $content)) {
+                return $row;
+            }
+        }
+
+        self::fail(sprintf('Grid has no record with "%s" content', $content));
+    }
+
+    /**
      * @param int $number
-     * @throws ExpectationException
      */
     public function checkFirstRecords($number)
     {
         $rows = $this->getRows();
 
-        if (count($rows) < $number) {
-            throw new ExpectationException(
-                sprintf(
-                    'Can\'t check %s records, because grid has only %s records',
-                    $number,
-                    count($rows)
-                ),
-                $this->session->getDriver()
-            );
-        }
+        self::assertGreaterThan(
+            $number,
+            count($rows),
+            sprintf('Can\'t check %s records, because grid has only %s records', $number, count($rows))
+        );
 
         for ($i = 0; $i < $number; $i++) {
             /** @var NodeElement $row */
@@ -111,8 +126,7 @@ class Grid extends Element
 
     /**
      * @param string $title
-     * @return NodeElement
-     * @throws \Exception
+     * @return NodeElement|null
      */
     public function getMassActionLink($title)
     {
@@ -142,7 +156,7 @@ class Grid extends Element
 
     public function assertNoRecords()
     {
-        expect($this->getRows())->toHaveCount(0);
+        \PHPUnit_Framework_Assert::assertCount(0, $this->getRows());
     }
 
     /**
@@ -190,27 +204,6 @@ class Grid extends Element
     }
 
     /**
-     * @param string $content
-     * @return NodeElement
-     * @throws ExpectationException
-     */
-    public function getRowByContent($content)
-    {
-        $rows = $this->getRows();
-
-        foreach ($rows as $row) {
-            if (false !== strpos($row->getText(), $content)) {
-                return $row;
-            }
-        }
-
-        throw new ExpectationException(
-            sprintf('Grid has no record with "%s" content', $content),
-            $this->session->getDriver()
-        );
-    }
-
-    /**
      * Try to guess type of value and return that data in that type
      * @param string $value
      * @return \DateTime|int|string
@@ -238,12 +231,7 @@ class Grid extends Element
     {
         $rowCheckbox = $row->find('css', '[type="checkbox"]');
 
-        if (!$rowCheckbox) {
-            throw new ExpectationException(
-                sprintf('No mass action checkbox found for "%s"', $row->getText()),
-                $this->getDriver()
-            );
-        }
+        self::assertNotNull($rowCheckbox, sprintf('No mass action checkbox found for "%s"', $row->getText()));
 
         $rowCheckbox->click();
     }

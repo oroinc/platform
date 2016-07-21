@@ -6,6 +6,7 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DumperInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer;
@@ -20,6 +21,9 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     /** @var FixtureLoader */
     protected $fixtureLoader;
 
+    /** @var  OroElementFactory */
+    protected $elementFactory;
+
     /** @var KernelServiceFactory */
     protected $kernelServiceFactory;
 
@@ -29,17 +33,20 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     /**
      * @param DumperInterface[] $dumpers
      * @param FixtureLoader $fixtureLoader
+     * @param OroElementFactory $elementFactory
      * @param KernelServiceFactory $kernelServiceFactory
      * @param ReferenceRepositoryInitializer $referenceRepositoryInitializer
      */
     public function __construct(
         array $dumpers,
         FixtureLoader $fixtureLoader,
+        OroElementFactory $elementFactory,
         KernelServiceFactory $kernelServiceFactory,
         ReferenceRepositoryInitializer $referenceRepositoryInitializer
     ) {
         $this->dumpers = $dumpers;
         $this->fixtureLoader = $fixtureLoader;
+        $this->elementFactory = $elementFactory;
         $this->kernelServiceFactory = $kernelServiceFactory;
         $this->referenceRepositoryInitializer = $referenceRepositoryInitializer;
     }
@@ -63,6 +70,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     public function injectSuite(BeforeSuiteTested $event)
     {
         $this->fixtureLoader->setSuite($event->getSuite());
+        $this->elementFactory->setSuite($event->getSuite());
     }
 
     /**

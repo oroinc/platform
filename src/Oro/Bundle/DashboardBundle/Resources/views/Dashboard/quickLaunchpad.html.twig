@@ -5,7 +5,7 @@
 {% block content %}
     <ul class="quick-launchpad-toolbar">
         {% for item in items %}
-            <li>
+            <li{% if (item.class is defined) %} class="{{ item.class }}"{% endif %}>
                 <span class="title-box">{{ item.label|trans }}</span>
                 <span class="list-content">
                     <i class="icon-{{ item.icon }}"></i>
