@@ -12,6 +12,10 @@ namespace Oro\Component\ChainProcessor;
  */
 class MatchApplicableChecker implements ApplicableCheckerInterface
 {
+    const OPERATOR_AND = '&';
+    const OPERATOR_OR  = '|';
+    const OPERATOR_NOT = '!';
+
     /** @var string[] */
     protected $ignoredAttributes;
 
@@ -37,15 +41,15 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
     public function isApplicable(ContextInterface $context, array $processorAttributes)
     {
         $result = self::APPLICABLE;
-        foreach ($processorAttributes as $key => $value) {
-            if (in_array($key, $this->ignoredAttributes, true)
+        foreach ($processorAttributes as $name => $value) {
+            if (in_array($name, $this->ignoredAttributes, true)
                 || (!is_scalar($value) && !is_array($value))
             ) {
                 continue;
             }
-            if (!$context->has($key)) {
+            if (!$context->has($name)) {
                 $result = self::ABSTAIN;
-            } elseif (!$this->isMatch($value, $context->get($key))) {
+            } elseif (!$this->isMatch($value, $context->get($name), $name)) {
                 $result = self::NOT_APPLICABLE;
                 break;
             }
@@ -57,91 +61,158 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
     /**
      * Checks if a value of a processor attribute matches a corresponding value from the context
      *
-     * @param mixed $value        Array or Scalar
-     * @param mixed $contextValue Array or Scalar
+     * @param mixed  $value        Array or Scalar
+     * @param mixed  $contextValue Array or Scalar
+     * @param string $name         The name of an attribute
      *
      * @return bool
      */
-    protected function isMatch($value, $contextValue)
+    protected function isMatch($value, $contextValue, $name)
     {
         if ($contextValue instanceof ToArrayInterface) {
-            return $this->isMatchAnyInArray($value, $contextValue->toArray());
+            return $this->isMatchAnyInArray($value, $contextValue->toArray(), $name);
         }
 
         return is_array($contextValue)
-            ? $this->isMatchAnyInArray($value, $contextValue)
-            : $this->isMatchAnyWithScalar($value, $contextValue);
+            ? $this->isMatchAnyInArray($value, $contextValue, $name)
+            : $this->isMatchAnyWithScalar($value, $contextValue, $name);
     }
 
     /**
-     * @param mixed $value        Array or Scalar
-     * @param mixed $contextValue Array
+     * @param mixed  $value        Array or Scalar
+     * @param mixed  $contextValue Array
+     * @param string $name         The name of an attribute
      *
      * @return bool
      */
-    protected function isMatchAnyInArray($value, $contextValue)
+    protected function isMatchAnyInArray($value, $contextValue, $name)
     {
         if (!is_array($value)) {
-            return $this->isMatchScalarInArray($value, $contextValue);
+            return $this->isMatchScalarInArray($value, $contextValue, $name);
         }
 
-        $result = true;
-        foreach ($value as $val) {
-            if (!$this->isMatchScalarInArray($val, $contextValue)) {
-                $result = false;
-                break;
+        $operator = key($value);
+        if (self::OPERATOR_NOT === $operator) {
+            $result = !$this->isMatchScalarInArray(current($value), $contextValue, $name);
+        } elseif (self::OPERATOR_AND === $operator) {
+            $result = true;
+            foreach (current($value) as $val) {
+                if (!$this->isMatchScalarWithArray($val, $contextValue, $name)) {
+                    $result = false;
+                    break;
+                }
             }
+        } elseif (self::OPERATOR_OR === $operator) {
+            $result = false;
+            foreach (current($value) as $val) {
+                if ($this->isMatchScalarWithArray($val, $contextValue, $name)) {
+                    $result = true;
+                    break;
+                }
+            }
+        } else {
+            $result = false;
         }
 
         return $result;
     }
 
     /**
-     * @param mixed $value        Scalar
-     * @param mixed $contextValue Array
+     * @param mixed  $value        Scalar or ['!' => Scalar]
+     * @param mixed  $contextValue Array
+     * @param string $name         The name of an attribute
      *
      * @return bool
      */
-    protected function isMatchScalarInArray($value, $contextValue)
+    protected function isMatchScalarWithArray($value, $contextValue, $name)
     {
-        return is_string($value) && 0 === strpos($value, '!')
-            ? !in_array(substr($value, 1), $contextValue, true)
-            : in_array($value, $contextValue, true);
+        if (!is_array($value)) {
+            return $this->isMatchScalarInArray($value, $contextValue, $name);
+        }
+
+        return self::OPERATOR_NOT === key($value)
+            ? !$this->isMatchScalarInArray(current($value), $contextValue, $name)
+            : false;
     }
 
     /**
-     * @param mixed $value        Array or Scalar
-     * @param mixed $contextValue Scalar
+     * @param mixed  $value        Scalar
+     * @param mixed  $contextValue Array
+     * @param string $name         The name of an attribute
      *
      * @return bool
      */
-    protected function isMatchAnyWithScalar($value, $contextValue)
+    protected function isMatchScalarInArray($value, $contextValue, $name)
+    {
+        return in_array($value, $contextValue, true);
+    }
+
+    /**
+     * @param mixed  $value        Array or Scalar
+     * @param mixed  $contextValue Scalar
+     * @param string $name         The name of an attribute
+     *
+     * @return bool
+     */
+    protected function isMatchAnyWithScalar($value, $contextValue, $name)
     {
         if (!is_array($value)) {
-            return $this->isMatchScalars($value, $contextValue);
+            return $this->isMatchScalars($value, $contextValue, $name);
         }
 
-        $result = true;
-        foreach ($value as $val) {
-            if (!$this->isMatchScalars($val, $contextValue)) {
-                $result = false;
-                break;
+        $operator = key($value);
+        if (self::OPERATOR_NOT === $operator) {
+            $result = !$this->isMatchScalars(current($value), $contextValue, $name);
+        } elseif (self::OPERATOR_AND === $operator) {
+            $result = true;
+            foreach (current($value) as $val) {
+                if (!$this->isMatchScalarWithScalar($val, $contextValue, $name)) {
+                    $result = false;
+                    break;
+                }
             }
+        } elseif (self::OPERATOR_OR === $operator) {
+            $result = false;
+            foreach (current($value) as $val) {
+                if ($this->isMatchScalarWithScalar($val, $contextValue, $name)) {
+                    $result = true;
+                    break;
+                }
+            }
+        } else {
+            $result = false;
         }
 
         return $result;
     }
 
     /**
-     * @param mixed $value        Scalar
-     * @param mixed $contextValue Scalar
+     * @param mixed  $value        Scalar or ['!' => Scalar]
+     * @param mixed  $contextValue Scalar
+     * @param string $name         The name of an attribute
      *
      * @return bool
      */
-    protected function isMatchScalars($value, $contextValue)
+    protected function isMatchScalarWithScalar($value, $contextValue, $name)
     {
-        return is_string($value) && 0 === strpos($value, '!')
-            ? $contextValue !== substr($value, 1)
-            : $contextValue === $value;
+        if (!is_array($value)) {
+            return $this->isMatchScalars($value, $contextValue, $name);
+        }
+
+        return self::OPERATOR_NOT === key($value)
+            ? !$this->isMatchScalars(current($value), $contextValue, $name)
+            : false;
+    }
+
+    /**
+     * @param mixed  $value        Scalar
+     * @param mixed  $contextValue Scalar
+     * @param string $name         The name of an attribute
+     *
+     * @return bool
+     */
+    protected function isMatchScalars($value, $contextValue, $name)
+    {
+        return $contextValue === $value;
     }
 }

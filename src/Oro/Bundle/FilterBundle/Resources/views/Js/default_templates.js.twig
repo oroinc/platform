@@ -103,11 +103,6 @@
 </script>
 
 <script type="text/template" id="select-field-template">
-    <% if (obj.popoverContent) { %>
-    <div class="select-field-date-popover">
-        <i class="icon-info-sign" data-content="<%= popoverContent %>" data-placement="bottom" data-toggle="popover" data-container="body"></i>
-    </div>
-    <% } %>
     <div class="horizontal clearfix">
         <span class="filter-select-oro-wrapper">
             <select name="<%= name %>" class="filter-select-oro">
@@ -200,12 +195,6 @@
 </script>
 <script type="text/template" id="choice-tree-template">
     <div class="filter-item oro-drop choice-tree-filter">
-        <input type="text" name="search" value="" class="choice-tree-filter-search"/>
-        <div class="buttons">
-            <span class="button-all active" data-mode="all'"><%- _.__("oro.filter.choice-tree.all") %></span> |
-            <span class="button-selected" data-mode="selected"><%- _.__("oro.filter.choice-tree.selected") %></span>
-        </div>
-        <div class="list"></div>
         <input type="hidden" name="value">
         <input type="hidden" name="type">
         <div class="oro-action">

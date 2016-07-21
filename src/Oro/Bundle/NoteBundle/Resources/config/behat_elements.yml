@@ -1,0 +1,7 @@
+Note:
+  selector: {type: 'xpath', locator: '//form[@class="note-form"]'}
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+  options:
+    mapping:
+      Message: oro_note_form[message]
+      Attachment: oro_note_form[attachment][file]

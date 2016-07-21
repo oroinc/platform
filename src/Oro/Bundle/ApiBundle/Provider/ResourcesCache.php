@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
-use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class ResourcesCache
@@ -71,13 +71,13 @@ class ResourcesCache
     }
 
     /**
-     * Fetches an entity sub resources from the cache.
+     * Fetches an entity sub-resources from the cache.
      *
      * @param string      $entityClass The FQCN of an entity
      * @param string      $version     The Data API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
-     * @return ApiResourceSubresources[]|null The list of sub resources or NULL if it is not cached yet
+     * @return ApiResourceSubresources[]|null The list of sub-resources or NULL if it is not cached yet
      */
     public function getSubresources($entityClass, $version, RequestType $requestType)
     {
@@ -105,7 +105,7 @@ class ResourcesCache
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
             $allResources[$entityClass] = $this->serializeApiResource($resource);
-            if (!in_array('get', $resource->getExcludedActions(), true)) {
+            if (!in_array(ApiActions::GET, $resource->getExcludedActions(), true)) {
                 $accessibleResources[] = $entityClass;
             }
         }
@@ -116,11 +116,11 @@ class ResourcesCache
     }
 
     /**
-     * Puts sub resources for all entities into the cache.
+     * Puts sub-resources for all entities into the cache.
      *
      * @param string                    $version      The Data API version
      * @param RequestType               $requestType  The request type, for example "rest", "soap", etc.
-     * @param ApiResourceSubresources[] $subresources The list of sub resources
+     * @param ApiResourceSubresources[] $subresources The list of sub-resources
      */
     public function saveSubresources($version, RequestType $requestType, array $subresources)
     {
@@ -188,12 +188,11 @@ class ResourcesCache
     {
         $resource = new ApiResourceSubresources($entityClass);
         foreach ($cachedData[0] as $associationName => $serializedSubresource) {
-            $subresource = new ApiSubresource();
+            $subresource = $resource->addSubresource($associationName);
             $subresource->setTargetClassName($serializedSubresource[0]);
             $subresource->setAcceptableTargetClassNames($serializedSubresource[1]);
             $subresource->setIsCollection($serializedSubresource[2]);
             $subresource->setExcludedActions($serializedSubresource[3]);
-            $resource->addSubresource($associationName, $subresource);
         }
 
         return $resource;

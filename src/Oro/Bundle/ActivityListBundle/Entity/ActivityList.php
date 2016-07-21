@@ -49,7 +49,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          }
  *      }
  * )

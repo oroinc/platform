@@ -49,6 +49,11 @@ class Acl implements \Serializable
     private $description;
 
     /**
+     * @var string
+     */
+    private $category;
+
+    /**
      * Constructor
      *
      * @param  array $data
@@ -78,6 +83,7 @@ class Acl implements \Serializable
         $this->group          = isset($data['group_name']) ? $data['group_name'] : '';
         $this->label          = isset($data['label']) ? $data['label'] : '';
         $this->description    = isset($data['description']) ? $data['description'] : '';
+        $this->category       = isset($data['category']) ? $data['category'] : '';
     }
 
     /**
@@ -183,6 +189,22 @@ class Acl implements \Serializable
     }
 
     /**
+     * @return string
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param string $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -197,6 +219,7 @@ class Acl implements \Serializable
                 $this->group,
                 $this->label,
                 $this->description,
+                $this->category
             )
         );
     }
@@ -215,6 +238,7 @@ class Acl implements \Serializable
             $this->group,
             $this->label,
             $this->description,
+            $this->category
             ) = unserialize($serialized);
     }
 
@@ -236,6 +260,7 @@ class Acl implements \Serializable
         $result->group          = $data['group'];
         $result->label          = $data['label'];
         $result->description    = $data['description'];
+        $result->category       = $data['category'];
 
         return $result;
     }

@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -110,7 +111,7 @@ class RequestActionProcessor extends ActionProcessor
             if ($detail) {
                 $exceptionMessage .= ' ' . $detail;
             }
-            $exception = new \RuntimeException($exceptionMessage);
+            $exception = new RuntimeException($exceptionMessage);
         }
 
         return $exception;

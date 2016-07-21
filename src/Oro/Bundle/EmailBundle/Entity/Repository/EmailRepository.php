@@ -91,9 +91,9 @@ class EmailRepository extends EntityRepository
      */
     public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        $qb = $this->createQueryBuilder('e')
-            ->select('COUNT(DISTINCT e)')
-            ->leftJoin('e.emailUsers', 'eu')
+        $repository = $this->getEntityManager()->getRepository('OroEmailBundle:EmailUser');
+        $qb = $repository->createQueryBuilder('eu')
+            ->select('COUNT(DISTINCT IDENTITY(eu.email))')
             ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
             ->setParameter('organization', $organization)
@@ -137,15 +137,16 @@ class EmailRepository extends EntityRepository
      */
     public function getCountNewEmailsPerFolders(User $user, Organization $organization)
     {
-        $qb = $this->createQueryBuilder('e')
-            ->select('COUNT(DISTINCT e) num, f.id')
-            ->leftJoin('e.emailUsers', 'eu')
+        $repository = $this->getEntityManager()->getRepository('OroEmailBundle:EmailUser');
+
+        $qb = $repository->createQueryBuilder('eu')
+            ->select('COUNT(DISTINCT IDENTITY(eu.email)) num, f.id')
+            ->leftJoin('eu.folders', 'f')
             ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
             ->setParameter('organization', $organization)
             ->setParameter('owner', $user)
             ->setParameter('seen', false)
-            ->leftJoin('eu.folders', 'f')
             ->groupBy('f.id');
 
         return $qb->getQuery()->getResult();

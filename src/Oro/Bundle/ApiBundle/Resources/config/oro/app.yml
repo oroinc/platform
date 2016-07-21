@@ -46,6 +46,7 @@ oro_api:
         - form.type.percent
         - form.type.date
         - form.type.time
+        - form.type.duration
         - form.type.datetime
         - form.type.timezone
         - form.type.birthday
@@ -92,6 +93,8 @@ oro_api:
                 view_timezone: UTC
                 with_seconds: true
                 widget: single_text
+        duration:
+            form_type: oro_duration
         datetime:
             form_type: datetime
             options:

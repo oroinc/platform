@@ -102,6 +102,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $object = [
             'id'         => 123,
             'name'       => 'Name',
+            'meta1'      => 'Meta1',
             'category'   => 456,
             'group'      => null,
             'role'       => ['id' => 789],
@@ -124,6 +125,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
         $metadata->addField($this->createFieldMetadata('id'));
         $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
         $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
         $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
         $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
@@ -141,6 +143,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'data'     => [
                     'type'          => 'test_entity',
                     'id'            => '123',
+                    'meta'          => [
+                        'meta1' => 'Meta1',
+                    ],
                     'attributes'    => [
                         'name' => 'Name',
                     ],
@@ -233,6 +238,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $object = [
             'id'         => 123,
             'name'       => 'Name',
+            'meta1'      => 'Meta1',
             'category'   => 456,
             'group'      => null,
             'role'       => ['id' => 789],
@@ -251,6 +257,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
         $metadata->addField($this->createFieldMetadata('id'));
         $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
         $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
         $metadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
         $metadata->addAssociation($this->createAssociationMetadata('role', 'Test\Role'));
@@ -267,6 +274,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     [
                         'type'          => 'test_entity',
                         'id'            => '123',
+                        'meta'          => [
+                            'meta1' => 'Meta1',
+                        ],
                         'attributes'    => [
                             'name' => 'Name',
                         ],
@@ -469,9 +479,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
-        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorObject($error, $metadata);
+        $this->documentBuilder->setErrorObject($error);
         $this->assertEquals(
             [
                 'errors' => [
@@ -494,9 +503,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
-        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
 
-        $this->documentBuilder->setErrorCollection([$error], $metadata);
+        $this->documentBuilder->setErrorCollection([$error]);
         $this->assertEquals(
             [
                 'errors' => [

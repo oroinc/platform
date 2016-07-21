@@ -70,29 +70,6 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testLabel()
-    {
-        $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-
-        $config->setLabel('text');
-        $this->assertTrue($config->hasLabel());
-        $this->assertEquals('text', $config->getLabel());
-        $this->assertEquals(['label' => 'text'], $config->toArray());
-
-        $config->setLabel(null);
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-
-        $config->setLabel('text');
-        $config->setLabel('');
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-    }
-
     public function testDescription()
     {
         $config = new EntityDefinitionFieldConfig();
@@ -113,6 +90,20 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config->setDescription('');
         $this->assertFalse($config->hasDescription());
         $this->assertNull($config->getDescription());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testMetaProperty()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertFalse($config->isMetaProperty());
+
+        $config->setMetaProperty(true);
+        $this->assertTrue($config->isMetaProperty());
+        $this->assertEquals(['meta_property' => true], $config->toArray());
+
+        $config->setMetaProperty(false);
+        $this->assertFalse($config->isMetaProperty());
         $this->assertEquals([], $config->toArray());
     }
 
@@ -144,6 +135,46 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $targetEntity1 = $config->createAndSetTargetEntity();
         $this->assertNotSame($targetEntity, $targetEntity1);
         $this->assertSame($targetEntity1, $config->getTargetEntity());
+    }
+
+    public function testTargetClass()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getTargetClass());
+
+        $config->setTargetClass('Test\Class');
+        $this->assertEquals('Test\Class', $config->getTargetClass());
+        $this->assertEquals(['target_class' => 'Test\Class'], $config->toArray());
+
+        $config->setTargetClass(null);
+        $this->assertNull($config->getTargetClass());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testTargetType()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertFalse($config->hasTargetType());
+        $this->assertNull($config->getTargetType());
+        $this->assertNull($config->isCollectionValuedAssociation());
+
+        $config->setTargetType('to-one');
+        $this->assertTrue($config->hasTargetType());
+        $this->assertEquals('to-one', $config->getTargetType());
+        $this->assertFalse($config->isCollectionValuedAssociation());
+        $this->assertEquals(['target_type' => 'to-one'], $config->toArray());
+
+        $config->setTargetType('to-many');
+        $this->assertTrue($config->hasTargetType());
+        $this->assertEquals('to-many', $config->getTargetType());
+        $this->assertTrue($config->isCollectionValuedAssociation());
+        $this->assertEquals(['target_type' => 'to-many'], $config->toArray());
+
+        $config->setTargetType(null);
+        $this->assertFalse($config->hasTargetType());
+        $this->assertNull($config->getTargetType());
+        $this->assertNull($config->isCollectionValuedAssociation());
+        $this->assertEquals([], $config->toArray());
     }
 
     public function testCollapsed()

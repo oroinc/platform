@@ -119,12 +119,48 @@ define(function(require) {
                     self.value.value = reposne.results;
                     self._writeDOMValue(self.value);
                     self.applySelect2();
+                    self._updateCriteriaHint();
                     self.renderDeferred.resolve();
                 },
                 error: function(jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 }
             });
+        },
+
+        _updateCriteriaLabels: function() {
+            var self = this;
+            $.ajax({
+                url: routing.generate(
+                    'oro_dictionary_value',
+                    {
+                        dictionary: this.dictionaryClass
+                    }
+                ),
+                data: {
+                    'keys': this.value.value
+                },
+                success: function(reposne) {
+                    self.value.value = reposne.results;
+                    self._updateCriteriaHint(true);
+                },
+                error: function(jqXHR) {
+                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                }
+            });
+        },
+
+        /**
+         * Updates criteria hint element with actual criteria hint value
+         *
+         * @protected
+         * @return {*}
+         */
+        _updateCriteriaHint: function(renderedCriteria) {
+            this.subview('hint').update(this._getCriteriaHint(renderedCriteria));
+            this.$el.find('.filter-criteria-selector')
+                .toggleClass('filter-default-value', this.isEmptyValue());
+            return this;
         },
 
         /**
@@ -135,7 +171,7 @@ define(function(require) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                    return (choice.value === value.type);
+                    return (parseInt(choice.value) === parseInt(value.type));
                 });
                 selectedChoiceLabel = foundChoice.label;
             }
@@ -324,8 +360,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function() {
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+        _getCriteriaHint: function(criteriaRendered) {
+            var value = this._getDisplayValue();
             var option = null;
 
             if (!_.isUndefined(value.type)) {
@@ -342,9 +378,14 @@ define(function(require) {
             }
 
             var data = this.$(this.elementSelector).inputWidget('data');
-            if (!data.length) {
+            if (!data || !data.length) {
                 data = this.previousData.length ? this.previousData : this.initialData;
             }
+
+            if (!criteriaRendered) {
+                this._updateCriteriaLabels();
+            }
+
             var hintRawValue = _.isObject(_.first(value.value)) ?
                 _.map(value.value, _.property('text')) :
                 _.chain(value.value)
