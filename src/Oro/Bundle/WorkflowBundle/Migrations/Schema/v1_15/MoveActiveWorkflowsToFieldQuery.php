@@ -73,7 +73,15 @@ class MoveActiveWorkflowsToFieldQuery extends ParametrizedMigrationQuery
                     }
                 }
                 unset($data['workflow']);
-                $this->connection->update('oro_entity_config', ['data' => $data], $row['id'], ['data' => 'array']);
+                $this->connection->update(
+                    'oro_entity_config',
+                    ['data' => $data],
+                    ['id' => $row['id']],
+                    [
+                        'data' => 'array',
+                        'id' => 'integer'
+                    ]
+                );
             }
         }
     }
