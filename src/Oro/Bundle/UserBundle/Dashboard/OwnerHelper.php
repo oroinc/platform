@@ -52,12 +52,17 @@ class OwnerHelper
         $key = spl_object_hash($widgetOptions);
         if (!isset($this->ownerIds[$key])) {
             $ownerIdsGroups = $this->collectOwnerIdsGroups($widgetOptions);
-            $ownerIds = $ownerIdsGroups
-                ? ((count($ownerIdsGroups) === 1
-                    ? reset($ownerIdsGroups)
-                    : call_user_func_array('array_intersect', $ownerIdsGroups)
-                ) ?: [0])
-                : [];
+            $ownerIds = [];
+            if ($ownerIdsGroups) {
+                if (count($ownerIdsGroups) === 1) {
+                    $ownerIds = reset($ownerIdsGroups);
+                } else {
+                    $ownerIds = call_user_func_array('array_intersect', $ownerIdsGroups);
+                }
+                if (empty($ownerIds)) {
+                    $ownerIds = [0];
+                }
+            }
 
             $this->ownerIds[$key] = $ownerIds;
         }
