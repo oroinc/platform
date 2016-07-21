@@ -50,7 +50,9 @@
                     {% set encodeBitmask = constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_APOS') %}
                     var metadata = JSON.parse('{{ form.vars.datetime_range_metadata|json_encode(encodeBitmask)|raw }}');
                     var DatetimeFilterWithMeta = WidgetConfigDateRangeFilter.extend(metadata);
-                    var dateRangeFilter = new DatetimeFilterWithMeta();
+                    var dateRangeFilter = new DatetimeFilterWithMeta({
+                        $form: $('[name="' + '{{ form.vars.full_name }}[part]"]').closest('form')
+                    });
 
                     var valueConfig = {start: '', end: ''};
                     {% if form.vars.value.value != null %}
@@ -61,13 +63,15 @@
 
                     var value = {
                         part: 'value',
-                        type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
+                        type: {{ (form.vars.value.type != '')
+                            ? form.vars.value.type
+                            : (form.vars.datetime_range_metadata.valueTypes ? constant('Oro\\Bundle\\FilterBundle\\Form\\Type\\Filter\\AbstractDateFilterType::TYPE_THIS_MONTH') : 1) }},
                         value: valueConfig
                     };
                     dateRangeFilter.updateValue(value);
                     dateRangeFilter.render();
 
-                    $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
+                    $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el).trigger('content:changed');
                     $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
                     $('div.widget-configuration').closest('.ui-widget-content').trigger('dialogresize');
                 });

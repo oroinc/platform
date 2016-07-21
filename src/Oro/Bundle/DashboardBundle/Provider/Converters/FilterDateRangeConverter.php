@@ -86,7 +86,16 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             return $this->processValueTypes($value, $cretePreviousPeriod);
         }
         if (null === $value || ($value['value']['start'] === null && $value['value']['end'] === null)) {
-            list($start, $end) = $this->dateHelper->getDateTimeInterval('P1M');
+            return $this->processValueTypes(
+                [
+                    'type' => empty($config['options']['value_types'])
+                        ? AbstractDateFilterType::TYPE_ALL_TIME
+                        : AbstractDateFilterType::TYPE_THIS_MONTH,
+                    'value' => ['start' => null, 'end' => null],
+                    'part' => 'value',
+                ],
+                $cretePreviousPeriod
+            );
         } else {
             $saveOpenRange = !empty($config['converter_attributes']['save_open_range']);
             list($start, $end, $type) = $this->getPeriodValues($value, $saveOpenRange);
