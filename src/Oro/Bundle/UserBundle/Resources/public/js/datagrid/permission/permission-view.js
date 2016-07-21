@@ -55,7 +55,15 @@ define(function(require) {
                 this.$el.append(dropdown.$el);
             }
             if (!accessLevels.length) {
-                accessLevels.fetch();
+                accessLevels.fetch({
+                    success: function (collection) {
+                        _.each(collection.models, function (model) {
+                            if (isNaN(model.get('access_level'))) {
+                                collection.remove(model);
+                            }
+                        });
+                    }
+                });
             }
         },
 
