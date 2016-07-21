@@ -18,13 +18,71 @@ class MoveActiveWorkflowsToFieldQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
+     * @throws \Exception
      */
     public function execute(LoggerInterface $logger)
     {
-        $configs = $this->getEntitiesConfigs($logger);
+        $this->connection->beginTransaction();
+        try {
+            //inactivate all
+            $this->connection->executeUpdate(
+                'UPDATE oro_workflow_definition SET active=:is_active WHERE name IS NOT NULL',
+                ['is_active' => false],
+                ['is_active' => 'boolean']
+            );
 
-        $activeWorkflows = $this->extractWorkflows($configs);
+            $activationStatement = $this->connection->prepare(
+                'UPDATE oro_workflow_definition SET active=:is_active WHERE name = :workflow_name'
+            );
 
+            $activationStatement->bindValue(':is_active', true, 'boolean');
+
+            foreach ($this->unshiftActiveWorkflows($logger) as $workflow) {
+                $activationStatement->bindValue(':workflow_name', $workflow, 'string');
+                $activationStatement->execute();
+            }
+
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @return \Generator
+     */
+    private function unshiftActiveWorkflows(LoggerInterface $logger)
+    {
+        $query = 'SELECT id, data FROM oro_entity_config config';
+
+        $params = $types = $workflows = [];
+
+        $this->logQuery($logger, $query, $params, $types);
+
+        $statement = $this->connection->executeQuery($query, $params, $types);
+
+        while (($row = $statement->fetch()) !== null) {
+            $data = $this->connection->convertToPHPValue($row['data'], 'array');
+            if (array_key_exists('workflow', $data) && array_key_exists('active_workflows', $data['workflow'])) {
+                foreach ($data['workflow']['active_workflows'] as $workflow) {
+                    if (!array_key_exists($workflow, $workflows)) {
+                        $workflows[$workflow] = null;
+                        yield $workflow;
+                    }
+                }
+                unset($data['workflow']);
+                $this->connection->update('oro_entity_config', ['data' => $data], $row['id'], ['data' => 'array']);
+            }
+        }
+    }
+
+    /**
+     * @param $activeWorkflows
+     */
+    private function updateWorkflowDefinitions($activeWorkflows)
+    {
         //inactive
         $this->connection->executeQuery(
             'UPDATE oro_workflow_definition SET active=:is_active WHERE name NOT IN (:active_workflows)',
@@ -38,39 +96,5 @@ class MoveActiveWorkflowsToFieldQuery extends ParametrizedMigrationQuery
             ['active_workflows' => $activeWorkflows, 'is_active' => true],
             ['active_workflows' => Connection::PARAM_STR_ARRAY, 'is_active' => 'boolean']
         );
-    }
-
-    /**
-     * @param array $configs
-     * @return array
-     */
-    private function extractWorkflows(array $configs)
-    {
-        $activeWorkflows = [];
-        foreach ($configs as $config) {
-            $data = $this->connection->convertToDatabaseValue($config['data'], 'array');
-            if (array_key_exists('workflow', $data) && array_key_exists('active_workflows', $data['workflow'])) {
-                $activeWorkflows = array_merge($activeWorkflows, $data['workflow']['active_workflows']);
-            }
-        }
-
-        return array_unique($activeWorkflows);
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     * @return array
-     */
-    private function getEntitiesConfigs(LoggerInterface $logger)
-    {
-        $query = 'SELECT config.id, config.data from oro_entity_config config
-          INNER JOIN oro_workflow_definition workflow on workflow.related_entity = config.class_name';
-
-        $params = [];
-        $types = [];
-
-        $this->logQuery($logger, $query, $params, $types);
-
-        return $this->connection->fetchAll($query, $params, $types);
     }
 }

@@ -16,8 +16,6 @@ class MutuallyExclusiveWorkflowsMigration implements Migration
         $table->addColumn('priority', 'integer');
 
 
-        $queries->addPostQuery(
-            new MoveActiveWorkflowsToFieldQuery()
-        );
+        $queries->addPostQuery(new MoveActiveWorkflowsToFieldQuery());
     }
 }
