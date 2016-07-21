@@ -171,6 +171,22 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testProcessSend()
+    {
+        $message = new \Swift_Message();
+        $this->mailer->expects($this->once())
+            ->method('send')
+            ->with($message)
+            ->will($this->returnValue(true));
+        $emailOrigin = $this->userEmailOrigin;
+
+        $oldMessageId = $message->getId();
+        $this->emailProcessor->processSend($message, $emailOrigin);
+        $messageId = $message->getId();
+
+        $this->assertEquals($oldMessageId, $messageId);
+    }
+
     /**
      * @expectedException \Swift_SwiftException
      * @expectedExceptionMessage An email was not delivered.
@@ -238,6 +254,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($message)
             ->will($this->returnValue(true));
 
+        $oldMessageId = $message->getId();
+
         $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->setMethods(['addFolder', 'getEmail'])
             ->getMock();
@@ -300,6 +318,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data['cc'], $model->getCc());
         $this->assertEquals($data['bcc'], $model->getBcc());
         $this->assertEquals($expectedMessageData['subject'], $model->getSubject());
+        $this->assertEquals($oldMessageId, $message->getId());
+
         if ($needConverting) {
             $id = $model->getAttachments()->first()->getEmailAttachment()->getEmbeddedContentId();
             $this->assertEquals(sprintf($expectedMessageData['body'], 'cid:' . $id), $message->getBody());
