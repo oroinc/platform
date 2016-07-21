@@ -111,6 +111,7 @@ define([
                 cellOptions = {
                     column: column,
                     themeOptions: {
+                        optionPrefix: 'cell',
                         className: 'grid-cell grid-body-cell'
                     }
                 };

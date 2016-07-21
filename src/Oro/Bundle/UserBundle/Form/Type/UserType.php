@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
@@ -105,15 +104,7 @@ class UserType extends AbstractType
                 ]
             );
         }
-        if ($this->securityFacade->isGranted('oro_organization_view')
-            && $this->securityFacade->isGranted('oro_business_unit_view')
-        ) {
-            $builder->add(
-                'organizations',
-                'oro_organizations_select',
-                ['required' => false, 'label' => 'oro.user.form.access_settings.label']
-            );
-        }
+        $this->addOrganizationField($builder);
         $builder
             ->add(
                 'plainPassword',
@@ -219,5 +210,24 @@ class UserType extends AbstractType
                 'data'     => true
             ]
         );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addOrganizationField(FormBuilderInterface $builder)
+    {
+        if ($this->securityFacade->isGranted('oro_organization_view')
+            && $this->securityFacade->isGranted('oro_business_unit_view')
+        ) {
+            $builder->add(
+                'organizations',
+                'oro_organizations_select',
+                [
+                    'required' => false,
+                    'label' => 'oro.user.form.access_settings.label',
+                ]
+            );
+        }
     }
 }

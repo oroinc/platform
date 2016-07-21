@@ -83,6 +83,7 @@ config:
         'oroform/js/app/views/datepair-view': 'bundles/oroform/js/app/views/datepair-view.js'
         'oro/autocomplete-component': 'bundles/oroform/js/app/components/autocomplete-component.js'
         'oro/select2-component': 'bundles/oroform/js/app/components/select2-component.js'
+        'oro/select2-tree-autocomplete-component': 'bundles/oroform/js/app/components/select2-tree-autocomplete-component.js'
         'oro/select2-autocomplete-component': 'bundles/oroform/js/app/components/select2-autocomplete-component.js'
         'oro/select2-relation-component': 'bundles/oroform/js/app/components/select2-relation-component.js'
         'oro/select2-grid-component': 'bundles/oroform/js/app/components/select2-grid-component.js'

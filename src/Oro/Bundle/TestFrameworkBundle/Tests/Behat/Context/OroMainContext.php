@@ -13,8 +13,10 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
@@ -83,6 +85,21 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then /^(?:|I )click update schema$/
+     */
+    public function iClickUpdateSchema()
+    {
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $page = $this->getSession()->getPage();
+
+        $page->clickLink('Update schema');
+        $driver->waitForAjax();
+        $page->clickLink('Yes, Proceed');
+        $driver->waitForAjax(120000);
+    }
+
+    /**
      * Assert form error message
      * Example: Then I should see "At least one of the fields First name, Last name must be defined." error message
      *
@@ -109,6 +126,23 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Fill form with data
+     * Example: And fill form with:
+     *            | Subject     | Simple text     |
+     *            | Users       | [Charlie, Pitt] |
+     *            | Date        | 2017-08-24      |
+     *
+     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
+     * @When /^(?:|I )fill form with:$/
+     */
+    public function iFillFormWith(TableNode $table, $formName = "OroForm")
+    {
+        /** @var Form $form */
+        $form = $this->createElement($formName);
+        $form->fill($table);
+    }
+
+    /**
      * Fill embed form
      * Example: And I fill in address:
      *            | Primary         | check         |
@@ -123,6 +157,22 @@ class OroMainContext extends MinkContext implements
         /** @var Form $fieldSet */
         $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
         $fieldSet->fill($table);
+    }
+
+    /**
+     * Set collection field with set of values
+     * Example: And set Reminders with:
+     *            | Method        | Interval unit | Interval number |
+     *            | Email         | days          | 1               |
+     *            | Flash message | minutes       | 30              |
+     *
+     * @Given /^(?:|I )set (?P<field>[^"]+) with:$/
+     */
+    public function setCollectionFieldWith($field, TableNode $table)
+    {
+        /** @var Form $form */
+        $form = $this->createElement('OroForm');
+        $form->fillField($field, $table);
     }
 
     /**
@@ -159,6 +209,29 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Given I click My Emails in user menu
+     *
+     * @Given /^(?:|I )click (?P<needle>[\w\s]+) in user menu$/
+     */
+    public function iClickLinkInUserMenu($needle)
+    {
+        $userMenu = $this->createElement('UserMenu');
+        $userMenu->find('css', 'i.icon-sort-down')->click();
+        $links = $userMenu->findAll('css', 'ul.dropdown-menu li a');
+
+        /** @var NodeElement $link */
+        foreach ($links as $link) {
+            if (preg_match(sprintf('/%s/i', $needle), $link->getText())) {
+                $link->click();
+
+                return;
+            }
+        }
+
+        self::fail(sprintf('Can\'t find "%s" item in user menu', $needle));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function pressButton($button)
@@ -175,22 +248,12 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
-     * @When /^(?:|I )fill form with:$/
-     */
-    public function iFillFormWith(TableNode $table, $formName = "OroForm")
-    {
-        /** @var Form $form */
-        $form = $this->createElement($formName);
-        $form->fill($table);
-    }
-
-    /**
      * Navigate through menu navigation
      * Every menu link must be separated by slash symbol "/"
      * Example: Given I go to System/ Channels
      * Example: And go to System/ User Management/ Users
-     * @Given /^(?:|I )go to (?P<path>[^"]*)$/
+     *
+     * @Given /^(?:|I )go to (?P<path>(?:(?!\d+ page of activity list)([^"]*)))$/
      */
     public function iOpenTheMenuAndClick($path)
     {
@@ -262,6 +325,35 @@ class OroMainContext extends MinkContext implements
         }
 
         self::fail(sprintf('Can\'t find field with "%s" label', $fieldName));
+    }
+
+    /**
+     * Assert text by label in page
+     *
+     * @Then /^(?:|I )should see (?P<entity>[\w\s]+) with:$/
+     */
+    public function assertValuesByLabels($entity, TableNode $table)
+    {
+        $page = $this->getSession()->getPage();
+
+        foreach ($table->getRows() as $row) {
+            $labels = $page->findAll('xpath', sprintf('//label[text()="%s"]', $row[0]));
+
+            self::assertNotCount(0, $labels, sprintf('Can\'t find "%s" label', $row[0]));
+
+            /** @var NodeElement $label */
+            foreach ($labels as $label) {
+                $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
+
+                if (false !== stripos($text, $row[1])) {
+                    continue 2;
+                }
+            }
+
+            self::fail(
+                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $row[0], $row[1])
+            );
+        }
     }
 
     /**
