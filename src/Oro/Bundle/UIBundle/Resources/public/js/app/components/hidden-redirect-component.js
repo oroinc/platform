@@ -105,8 +105,8 @@ define(function(require) {
 
         createModal: function() {
             return new Modal({
-                title: __('Refresh Confirmation'),
-                content: __('You have unsaved changes. Do you want to save them?'),
+                title: __('oro.ui.leave_page_save_data_or_discard_title'),
+                content: __('oro.ui.leave_page_save_data_or_discard'),
                 okText: __('Save'),
                 secondaryText: __('Discard'),
                 className: 'modal modal-primary',
