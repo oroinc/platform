@@ -45,23 +45,21 @@ class OwnerHelper
     /**
      * @param WidgetOptionBag $widgetOptions
      *
-     * @return int[] Returns array of user ids, [] if filter is empty
-     * or [0] if intersection among options wasn't found
+     * @return int[] Returns array of user ids, [] if filter is empty or [0] if intersection wasn't found among options
      */
     public function getOwnerIds(WidgetOptionBag $widgetOptions)
     {
         $key = spl_object_hash($widgetOptions);
         if (!isset($this->ownerIds[$key])) {
-            $parts = $this->collectParts($widgetOptions);
-            $array = $parts
-                ? ($this->replaceCurrentValues(
-                    array_unique(
-                        count($parts) === 1 ? $parts[0] : call_user_func_array('array_intersect', $parts)
-                    )
+            $ownerIdsGroups = $this->collectOwnerIdsGroups($widgetOptions);
+            $ownerIds = $ownerIdsGroups
+                ? ((count($ownerIdsGroups) === 1
+                    ? reset($ownerIdsGroups)
+                    : call_user_func_array('array_intersect', $ownerIdsGroups)
                 ) ?: [0])
                 : [];
 
-            $this->ownerIds[$key] = $array;
+            $this->ownerIds[$key] = $ownerIds;
         }
 
         return $this->ownerIds[$key];
@@ -72,23 +70,23 @@ class OwnerHelper
      *
      * @return array
      */
-    protected function collectParts(WidgetOptionBag $widgetOptions)
+    protected function collectOwnerIdsGroups(WidgetOptionBag $widgetOptions)
     {
-        $parts = [];
+        $ownerIdsGroups = [];
 
-        if ($userIds = $this->getUsersIds($widgetOptions)) {
-            $parts[] = $userIds;
+        if ($userIds = $this->replaceCurrentValues($this->getUsersIds($widgetOptions))) {
+            $ownerIdsGroups[] = array_unique($userIds);
         }
 
-        if ($businessUnitIds = $this->getBusinessUnitsIds($widgetOptions)) {
-            $parts[] = $this->getUserOwnerIds($businessUnitIds);
+        if ($businessUnitIds = $this->replaceCurrentValues($this->getBusinessUnitsIds($widgetOptions))) {
+            $ownerIdsGroups[] = $this->getUserOwnerIds($businessUnitIds);
         }
 
         if ($roleIds = $this->getRoleIds($widgetOptions)) {
-            $parts[] = $this->getUserOwnerIdsByRoles($roleIds);
+            $ownerIdsGroups[] = $this->getUserOwnerIdsByRoles($roleIds);
         }
 
-        return $parts;
+        return $ownerIdsGroups;
     }
 
     /**
@@ -175,7 +173,9 @@ class OwnerHelper
             return [];
         }
 
-        return $this->ownerTreeProvider->getTree()->getUsersAssignedToBusinessUnits($businessUnitIds) ?: [0];
+        return $this->ownerTreeProvider->getTree()->getUsersAssignedToBusinessUnits(
+            $this->replaceCurrentValues($businessUnitIds)
+        ) ?: [0];
     }
 
     /**
