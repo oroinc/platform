@@ -20,25 +20,8 @@ class EnumSelectType extends AbstractEnumType
     {
         parent::buildView($view, $form, $options);
 
-        $disabledChoices = $options['disabled_values'];
-
-        if (!empty($disabledChoices)) {
-            $choices         = $view->vars['choices'];
-            array_walk(
-                $choices,
-                function (ChoiceView $choiceView) use ($disabledChoices) {
-                    if (is_array($disabledChoices)) {
-                        if (in_array($choiceView->value, $disabledChoices)) {
-                            $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
-                        }
-                    } elseif (is_callable($disabledChoices)) {
-                        if (!$disabledChoices($choiceView->value)) {
-                            $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
-                        }
-                    }
-                }
-            );
-        }
+        $this->disableChoices($view, $options['disabled_values']);
+        $this->excludeChoices($view, $options['excluded_values']);
     }
 
     /**
@@ -58,10 +41,14 @@ class EnumSelectType extends AbstractEnumType
                 'empty_value' => null,
                 'empty_data'  => null,
                 'configs'     => $defaultConfigs,
-                'disabled_values' => []
+                'disabled_values' => [],
+                'excluded_values' => [],
             ]
         );
-        $resolver->setAllowedTypes('disabled_values', ['array', 'callable']);
+        $resolver->setAllowedTypes([
+            'disabled_values' => ['array', 'callable'],
+            'excluded_values' => ['array', 'callable'],
+        ]);
         $resolver->setNormalizers(
             [
                 'empty_value' => function (Options $options, $value) {
@@ -91,5 +78,54 @@ class EnumSelectType extends AbstractEnumType
     public function getName()
     {
         return 'oro_enum_select';
+    }
+
+    /**
+     * @param FormView       $view
+     * @param array|callable $disabledChoices
+     */
+    protected function disableChoices(FormView $view, $disabledChoices)
+    {
+        if (empty($disabledChoices)) {
+            return;
+        }
+
+        $choices         = $view->vars['choices'];
+        array_walk(
+            $choices,
+            function (ChoiceView $choiceView) use ($disabledChoices) {
+                if (is_array($disabledChoices)) {
+                    if (in_array($choiceView->value, $disabledChoices)) {
+                        $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
+                    }
+                } elseif (is_callable($disabledChoices)) {
+                    if (!$disabledChoices($choiceView->value)) {
+                        $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
+                    }
+                }
+            }
+        );
+    }
+
+    /**
+     * @param FormView       $view
+     * @param array|callable $excludedChoices
+     */
+    protected function excludeChoices(FormView $view, $excludedChoices)
+    {
+        if (empty($excludedChoices)) {
+            return;
+        }
+
+        $view->vars['choices'] = array_filter(
+            $view->vars['choices'],
+            function (ChoiceView $choiceView) use ($excludedChoices) {
+                if (is_array($excludedChoices)) {
+                    return !in_array($choiceView->value, $excludedChoices);
+                } elseif (is_callable($excludedChoices)) {
+                    return $excludedChoices($choiceView->value);
+                }
+            }
+        );
     }
 }
