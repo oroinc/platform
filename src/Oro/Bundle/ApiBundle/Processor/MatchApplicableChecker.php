@@ -41,12 +41,8 @@ class MatchApplicableChecker extends BaseMatchApplicableChecker
      */
     protected function isMatchScalars($value, $contextValue, $name)
     {
-        if (!isset($this->classAttributes[$name]) || !is_string($value) || !$value) {
-            return parent::isMatchScalars($value, $contextValue, $name);
-        }
-
-        return 0 === strpos($value, '!')
-            ? !is_a($contextValue, substr($value, 1), true)
-            : is_a($contextValue, $value, true);
+        return isset($this->classAttributes[$name]) && is_string($value) && $value
+            ? is_a($contextValue, $value, true)
+            : parent::isMatchScalars($value, $contextValue, $name);
     }
 }

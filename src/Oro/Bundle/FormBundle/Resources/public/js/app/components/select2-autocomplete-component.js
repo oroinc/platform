@@ -13,8 +13,8 @@ define(function(require) {
             config = Select2AutocompleteComponent.__super__.preConfig.apply(this, arguments);
             if (config.allowCreateNew) {
                 var propName = config.renderedPropertyName || 'name';
-                config.result_template = config.result_template || this.makeItemTemplate(propName, false);
-                config.selection_template = config.selection_template || this.makeItemTemplate(propName, true);
+                config.result_template = config.result_template || this.makeItemTemplate(propName, true);
+                config.selection_template = config.selection_template || this.makeItemTemplate(propName, false);
             }
             return config;
         },
