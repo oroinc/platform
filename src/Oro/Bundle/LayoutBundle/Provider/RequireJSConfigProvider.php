@@ -73,6 +73,7 @@ class RequireJSConfigProvider extends AbstractConfigProvider
             $this->currentTheme = $theme->getName();
 
             $this->config = $baseConfig;
+            $this->collectBundlesConfig();
 
             $configPath = implode(
                 DIRECTORY_SEPARATOR,
