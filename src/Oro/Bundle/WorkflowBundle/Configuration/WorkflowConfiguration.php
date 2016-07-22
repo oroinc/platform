@@ -18,6 +18,8 @@ class WorkflowConfiguration implements ConfigurationInterface
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
+    const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
+    const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -81,6 +83,10 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->defaultFalse()
                     ->end()
                 ->end()
+            ->end()
+            ->arrayNode(self::NODE_EXCLUSIVE_ACTIVE_GROUPS)
+            ->end()
+            ->arrayNode(self::NODE_EXCLUSIVE_RECORD_GROUPS)
             ->end()
             ->integerNode('priority')
                 ->defaultValue(0)

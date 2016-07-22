@@ -152,6 +152,22 @@ class WorkflowDefinition implements DomainObjectInterface
     protected $restrictions;
 
     /**
+     * @var $workflowGroup[]|Collection
+     *
+     * @ORM\ManyToMany(targetEntity="WorkflowGroup", inversedBy="definitions")
+     * @ORM\JoinTable(
+     *      name="oro_workflow_def_to_group",
+     *      joinColumns={
+     *          @ORM\JoinColumn(name="workflow_definition_name", referencedColumnName="name", onDelete="CASCADE")
+     *      },
+     *      inverseJoinColumns={
+     *          @ORM\JoinColumn(name="workflow_group_id", referencedColumnName="id", onDelete="CASCADE")
+     *      }
+     * )
+     */
+    protected $groups;
+
+    /**
      * @var \DateTime $created
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -187,6 +203,7 @@ class WorkflowDefinition implements DomainObjectInterface
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
         $this->restrictions = new ArrayCollection();
+        $this->groups = new ArrayCollection();
     }
 
     /**
@@ -732,6 +749,40 @@ class WorkflowDefinition implements DomainObjectInterface
     public function setPriority($priority)
     {
         $this->priority = $priority;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param WorkflowGroup $group
+     * @return $this
+     */
+    public function addGroup(WorkflowGroup $group)
+    {
+        if (!$this->groups->contains($group)) {
+            $this->groups->add($group);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowGroup $group
+     * @return $this
+     */
+    public function removeGroup(WorkflowGroup $group)
+    {
+        if ($this->groups->contains($group)) {
+            $this->groups->removeElement($group);
+        }
 
         return $this;
     }
