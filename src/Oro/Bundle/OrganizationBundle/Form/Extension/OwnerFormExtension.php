@@ -399,26 +399,19 @@ class OwnerFormExtension extends AbstractTypeExtension
              */
             $builder->add(
                 $this->fieldName,
-                'oro_business_unit_tree_select',
-                array_merge(
-                    [
-                        'empty_value'          => $emptyValueLabel,
-                        'mapped'               => true,
-                        'label'                => $this->fieldLabel,
-                        'business_unit_ids'    => $this->getBusinessUnitIds(),
-                        'configs'              => [
-                            'is_safe' => true,
-                        ],
-                        'translatable_options' => false,
-                        'choices'              => $this->businessUnitManager->getTreeOptions(
-                            $this->businessUnitManager->getBusinessUnitsTree(
-                                null,
-                                $this->getOrganizationContextId()
-                            )
-                        )
-                    ],
-                    $validation
-                )
+                'oro_type_business_unit_select_autocomplete',
+                [
+                    'required' => false,
+                    'label' => $this->fieldLabel,
+                    'autocomplete_alias' => 'business_units_owner_search_handler',
+                    'empty_value' => $emptyValueLabel,
+                    'configs' => [
+                        'multiple' => false,
+                        'allowClear'  => false,
+                        'autocomplete_alias' => 'business_units_owner_search_handler',
+                        'component'   => 'tree-autocomplete',
+                    ]
+                ]
             );
         } else {
             $businessUnits = $user->getBusinessUnits();

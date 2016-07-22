@@ -4,15 +4,21 @@ namespace Oro\Component\Layout\Extension\Theme;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextAwareInterface;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
-use Oro\Component\Layout\Extension\Theme\Model\ResourceIterator;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
+use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
+use Oro\Component\Layout\LayoutUpdateImportInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
+use Oro\Component\Layout\Model\LayoutUpdateImport;
 
 class ThemeExtension extends AbstractExtension
 {
+    const THEME_KEY = 'theme';
+    const IMPORT_FOLDER = 'imports';
+
     /** @var array */
     protected $resources;
 
@@ -25,11 +31,14 @@ class ThemeExtension extends AbstractExtension
     /** @var PathProviderInterface */
     protected $pathProvider;
 
+    /** @var  array */
+    protected $updates;
+
     /**
-     * @param array                       $resources
+     * @param array $resources
      * @param LayoutUpdateLoaderInterface $loader
-     * @param DependencyInitializer       $dependencyInitializer
-     * @param PathProviderInterface       $provider
+     * @param DependencyInitializer $dependencyInitializer
+     * @param PathProviderInterface $provider
      */
     public function __construct(
         array $resources,
@@ -37,10 +46,10 @@ class ThemeExtension extends AbstractExtension
         DependencyInitializer $dependencyInitializer,
         PathProviderInterface $provider
     ) {
-        $this->resources             = $resources;
-        $this->loader                = $loader;
+        $this->resources = $resources;
+        $this->loader = $loader;
         $this->dependencyInitializer = $dependencyInitializer;
-        $this->pathProvider          = $provider;
+        $this->pathProvider = $provider;
     }
 
     /**
@@ -48,40 +57,120 @@ class ThemeExtension extends AbstractExtension
      */
     protected function loadLayoutUpdates(ContextInterface $context)
     {
-        $updates = [];
+        $this->updates = [];
+        if ($context->getOr(static::THEME_KEY)) {
+            $paths = $this->getPaths($context);
+            $files = $this->findApplicableResources($paths);
+            foreach ($files as $file) {
+                $this->loadLayoutUpdate($file, $context);
+            }
+        }
 
-        if ($context->getOr('theme')) {
-            $iterator = new ResourceIterator($this->findApplicableResources($context));
-            foreach ($iterator as $file) {
-                $update = $this->loader->load($file);
-                if ($update) {
-                    $this->dependencyInitializer->initialize($update);
-                    $el             = $update instanceof ElementDependentLayoutUpdateInterface
-                        ? $update->getElement()
-                        : 'root';
-                    $updates[$el][] = $update;
+        return $this->updates;
+    }
+
+    /**
+     * @param string $file
+     * @param ContextInterface $context
+     *
+     * @return array
+     */
+    protected function loadLayoutUpdate($file, ContextInterface $context)
+    {
+        $update = $this->loader->load($file);
+        if ($update) {
+            $el = $update instanceof ElementDependentLayoutUpdateInterface
+                ? $update->getElement()
+                : 'root';
+            $this->updates[$el][] = $update;
+
+            $this->dependencyInitializer->initialize($update);
+
+            if ($update instanceof ImportsAwareLayoutUpdateInterface) {
+                // load imports
+                $imports = $update->getImports();
+                if (!is_array($imports)) {
+                    throw new LogicException(
+                        sprintf('Imports statement should be an array, %s given', gettype($imports))
+                    );
+                }
+                foreach ($imports as $importData) {
+                    $import = $this->createImport($importData);
+                    $importPaths = $this->getImportPaths($context, $import->getId());
+                    $files = $this->findApplicableResources($importPaths);
+                    foreach ($files as $file) {
+                        $importUpdate = $this->loadLayoutUpdate($file, $context);
+                        if ($importUpdate instanceof LayoutUpdateImportInterface) {
+                            $importUpdate->setImport($import);
+                        }
+                    }
                 }
             }
         }
 
-        return $updates;
+        return $update;
     }
 
     /**
-     * Filters resources by paths that comes from provider and returns array of resource files
+     * Return paths that comes from provider and returns array of resource files
      *
      * @param ContextInterface $context
      *
      * @return array
      */
-    protected function findApplicableResources(ContextInterface $context)
+    protected function getPaths(ContextInterface $context)
     {
         if ($this->pathProvider instanceof ContextAwareInterface) {
             $this->pathProvider->setContext($context);
         }
 
+        return $this->pathProvider->getPaths([]);
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @param string $importId
+     *
+     * @return string
+     */
+    protected function getImportPaths(ContextInterface $context, $importId)
+    {
+        return [
+            implode(
+                PathProviderInterface::DELIMITER,
+                [
+                    $context->get(static::THEME_KEY),
+                    static::IMPORT_FOLDER,
+                    $importId,
+                ]
+            )
+        ];
+    }
+
+    /**
+     * @param $importProperties
+     *
+     * @return LayoutUpdateImport
+     */
+    protected function createImport($importProperties)
+    {
+        if (!is_array($importProperties)) {
+            $importProperties = [ImportsAwareLayoutUpdateInterface::ID_KEY => $importProperties];
+        }
+
+        return LayoutUpdateImport::createFromArray($importProperties);
+    }
+
+    /**
+     * Filters resources by paths
+     *
+     * @param array $paths
+     *
+     * @return array
+     */
+    protected function findApplicableResources(array $paths)
+    {
         $result = [];
-        $paths  = $this->pathProvider->getPaths([]);
         foreach ($paths as $path) {
             $pathArray = explode(PathProviderInterface::DELIMITER, $path);
 
@@ -103,7 +192,7 @@ class ThemeExtension extends AbstractExtension
     }
 
     /**
-     * @param array  $array
+     * @param array $array
      * @param string $property
      *
      * @return mixed
