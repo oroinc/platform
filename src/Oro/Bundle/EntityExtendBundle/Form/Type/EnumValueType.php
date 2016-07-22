@@ -28,14 +28,6 @@ class EnumValueType extends AbstractType
         $this->configProvider = $configProvider;
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults([
-            'allow_multiple_selection' => true,
-        ]);
-        parent::setDefaultOptions($resolver);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -108,6 +100,7 @@ class EnumValueType extends AbstractType
             'constraints' => [
                 new ExtendAssert\EnumValue(),
             ],
+            'allow_multiple_selection' => true
         ]);
     }
 
