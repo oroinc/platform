@@ -84,8 +84,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         $cretePreviousPeriod = !empty($config['converter_attributes']['create_previous_period']);
         if (isset($value['type']) && in_array($value['type'], AbstractDateFilterType::$valueTypes)) {
             return $this->processValueTypes($value, $cretePreviousPeriod);
-        }
-        if (null === $value || ($value['value']['start'] === null && $value['value']['end'] === null)) {
+        } elseif (null === $value || ($value['value']['start'] === null && $value['value']['end'] === null)) {
             return $this->processValueTypes(
                 [
                     'type' => empty($config['options']['value_types'])
