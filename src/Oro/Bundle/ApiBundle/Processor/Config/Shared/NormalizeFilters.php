@@ -10,6 +10,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  * Removes all filters marked as excluded.
  * Updates the property path attribute for existing filters.
  * Extracts filters from the definitions of related entities.
+ * Removes filters by identifier field if they duplicate a filter by related entity.
+ * For example if both "product" and "product.id" filters exist, the "product.id" filter will be removed.
  */
 class NormalizeFilters extends NormalizeSection
 {
