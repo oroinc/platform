@@ -6,7 +6,7 @@ use Oro\Component\Layout\LayoutContext;
 
 class LayoutContextHolder
 {
-    /** @var null */
+    /** @var LayoutContext|null */
     protected $context;
 
     /**

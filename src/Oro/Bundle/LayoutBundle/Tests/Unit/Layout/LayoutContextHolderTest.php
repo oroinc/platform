@@ -25,7 +25,7 @@ class LayoutContextHolderTest extends \PHPUnit_Framework_TestCase
         $this->context = $this->getMock(LayoutContext::class);
     }
 
-    public function testGetContext()
+    public function testContextAccessor()
     {
         $this->layoutContextHolder->setContext($this->context);
 
