@@ -21,10 +21,12 @@ class CleanupCommandTest extends WebTestCase
      * @param string $expectedContent
      * @param array  $params
      */
-    public function testCommandOutput($expectedContent, $params)
+    public function testCommandOutput($expectedContent, $params, $rowsCount)
     {
         $result = $this->runCommand('oro:cron:integration:cleanup', $params);
         $this->assertContains($expectedContent, $result);
+        $totalRows = $this->getContainer()->get('doctrine')->getRepository('OroIntegrationBundle:Status')->findAll();
+        $this->assertCount($rowsCount, $totalRows);
     }
 
     /**
@@ -38,21 +40,25 @@ class CleanupCommandTest extends WebTestCase
         return [
             'should show help'                             => [
                 '$expectedContent' => "Usage:\n  oro:cron:integration:cleanup [options]",
-                '$params'          => ['--help']
+                '$params'          => ['--help'],
+                '$rowsCount'       => 5
             ],
             'should show success output and records count for failed statuses' => [
                 '$expectedContent' => "Integration statuses will be deleted: 1" . PHP_EOL
                     . "Integration statuses history cleanup completed",
-                '$params'          => ['-i' => ((int)$interval->format('%a') + 3) . ' day']
+                '$params'          => ['-i' => ((int)$interval->format('%a') + 3) . ' day'],
+                '$rowsCount'       => 4
             ],
             'should show no records found'                 => [
                 '$expectedContent' => 'There are no integration statuses eligible for clean up',
-                '$params'          => ['-i' => ((int)$interval->format('%a') + 3) . ' day']
+                '$params'          => ['-i' => ((int)$interval->format('%a') + 3) . ' day'],
+                '$rowsCount'       => 4
             ],
             'should show success output and records count for completed statuses' => [
                 '$expectedContent' => "Integration statuses will be deleted: 4" . PHP_EOL
                     . "Integration statuses history cleanup completed",
-                '$params'          => []
+                '$params'          => [],
+                '$rowsCount'       => 0
             ]
         ];
     }

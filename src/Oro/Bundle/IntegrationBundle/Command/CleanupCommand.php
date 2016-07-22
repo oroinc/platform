@@ -45,7 +45,8 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                 'interval',
                 'i',
                 InputOption::VALUE_OPTIONAL,
-                'Time interval to keep the integration statuses records. Example "2 weeks"'
+                'Time interval to keep the integration statuses records. Example "2 weeks"',
+                self::DEFAULT_COMPLETED_STATUSES_INTERVAL
             );
     }
 
@@ -57,8 +58,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
         $interval = $input->getOption('interval');
 
         $completedInterval = new \DateTime('now', new \DateTimeZone('UTC'));
-        $intervalString = $interval ?: self::DEFAULT_COMPLETED_STATUSES_INTERVAL;
-        $completedInterval->sub(\DateInterval::createFromDateString($intervalString));
+        $completedInterval->sub(\DateInterval::createFromDateString($interval));
 
         $failedInterval = new \DateTime('now', new \DateTimeZone('UTC'));
         $failedInterval->sub(\DateInterval::createFromDateString(self::FAILED_STATUSES_INTERVAL));
@@ -142,11 +142,11 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
             ->where(
                 $expr->orX(
                     $expr->andX(
-                        $expr->eq('status.code', Status::STATUS_COMPLETED),
+                        $expr->eq('status.code', "'" . Status::STATUS_COMPLETED . "'"),
                         $expr->lt('status.date', "'{$completedInterval->format('Y-m-d H:i:s')}'")
                     ),
                     $expr->andX(
-                        $expr->eq('status.code', Status::STATUS_FAILED),
+                        $expr->eq('status.code', "'" . Status::STATUS_FAILED . "'"),
                         $expr->lt('status.date', "'{$failedInterval->format('Y-m-d H:i:s')}'")
                     )
                 )
