@@ -184,3 +184,6 @@ services:
     oro_layout.imports_storage:
         class: Doctrine\Common\Collections\ArrayCollection
         public: false
+
+    oro_layout.layout_context_holder:
+        class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder
