@@ -2,10 +2,13 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
+
+use Psr\Log\LoggerInterface;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\Action\Action\CloneEntity;
@@ -25,6 +28,16 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
      */
     protected $registry;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FlashBagInterface
+     */
+    protected $flashBag;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     */
+    protected $logger;
+
     protected function setUp()
     {
         $this->contextAccessor = new ContextAccessor();
@@ -33,7 +46,20 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->action = new CloneEntity($this->contextAccessor, $this->registry);
+        $this->flashBag = $this->getMockBuilder(FlashBagInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->logger = $this->getMockBuilder(LoggerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->action = new CloneEntity(
+            $this->contextAccessor,
+            $this->registry,
+            $this->flashBag,
+            $this->logger
+        );
 
         /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
@@ -67,12 +93,12 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
             ->method('getClassMetadata')
             ->will($this->returnValue($meta));
 
-        if (!empty($options[CloneEntity::OPTION_KEY_FLUSH])) {
+        if (isset($options[CloneEntity::OPTION_KEY_FLUSH]) && false === $options[CloneEntity::OPTION_KEY_FLUSH]) {
+            $em->expects($this->never())->method('flush');
+        } else {
             $em->expects($this->once())
                 ->method('flush')
                 ->with($this->isInstanceOf(ClassUtils::getClass($options[CloneEntity::OPTION_KEY_TARGET])));
-        } else {
-            $em->expects($this->never())->method('flush');
         }
 
         $this->registry->expects($this->once())
@@ -150,10 +176,6 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\ActionException
-     * @expectedExceptionMessage Can't create entity stdClass. Test exception.
-     */
     public function testExecuteCantCreateEntity()
     {
         $meta = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
@@ -185,9 +207,12 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->will($this->returnValue($em));
 
+        $this->flashBag->expects($this->once())->method('add');
+        $this->logger->expects($this->once())->method('error');
+
         $options = array(
             CloneEntity::OPTION_KEY_TARGET    => new \stdClass(),
-            CloneEntity::OPTION_KEY_ATTRIBUTE => $this->getPropertyPath()
+            CloneEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('[test_attribute]')
         );
         $context = array();
         $this->action->initialize($options);

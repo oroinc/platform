@@ -81,7 +81,7 @@ class CloneEntity extends CloneObject
             }
         } catch (\Exception $e) {
             if ($this->flashBag) {
-                $this->flashBag()->add('error', sprintf('Could not clone entity due to an error.'));
+                $this->flashBag->add('error', sprintf('Could not clone entity due to an error.'));
             }
 
             $this->logger->error($e->getMessage());
