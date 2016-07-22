@@ -7,7 +7,6 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProce
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
-use Oro\Component\AmqpMessageQueue\DependencyInjection\AmqpTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
 use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,8 +29,5 @@ class OroMessageQueueBundle extends Bundle
         $extension = $container->getExtension('oro_message_queue');
         $extension->addTransportFactory(new DefaultTransportFactory());
         $extension->addTransportFactory(new NullTransportFactory());
-
-        // TODO Remove
-        $extension->addTransportFactory(new AmqpTransportFactory());
     }
 }
