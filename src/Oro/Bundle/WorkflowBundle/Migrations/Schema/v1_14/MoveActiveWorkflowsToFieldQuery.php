@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_15;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -13,7 +13,7 @@ class MoveActiveWorkflowsToFieldQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return 'Moves from entities config "active_workflows" to corresponded workflow "active" field.';
+        return 'Moves from entities config "active_workflow" to corresponded workflow "active" field.';
     }
 
     /**
@@ -65,12 +65,10 @@ class MoveActiveWorkflowsToFieldQuery extends ParametrizedMigrationQuery
 
         while (($row = $statement->fetch()) !== null) {
             $data = $this->connection->convertToPHPValue($row['data'], 'array');
-            if (array_key_exists('workflow', $data) && array_key_exists('active_workflows', $data['workflow'])) {
-                foreach ($data['workflow']['active_workflows'] as $workflow) {
-                    if (!array_key_exists($workflow, $workflows)) {
-                        $workflows[$workflow] = null;
-                        yield $workflow;
-                    }
+            if (array_key_exists('workflow', $data) && array_key_exists('active_workflow', $data['workflow'])) {
+                if (!array_key_exists($data['workflow']['active_workflow'], $workflows)) {
+                    $workflows[$data['workflow']['active_workflow']] = null;
+                    yield $data['workflow']['active_workflow'];
                 }
                 unset($data['workflow']);
                 $this->connection->update(
@@ -84,25 +82,5 @@ class MoveActiveWorkflowsToFieldQuery extends ParametrizedMigrationQuery
                 );
             }
         }
-    }
-
-    /**
-     * @param $activeWorkflows
-     */
-    private function updateWorkflowDefinitions($activeWorkflows)
-    {
-        //inactive
-        $this->connection->executeQuery(
-            'UPDATE oro_workflow_definition SET active=:is_active WHERE name NOT IN (:active_workflows)',
-            ['active_workflows' => $activeWorkflows, 'is_active' => false],
-            ['active_workflows' => Connection::PARAM_STR_ARRAY, 'is_active' => 'boolean']
-        );
-
-        //active
-        $this->connection->executeQuery(
-            'UPDATE oro_workflow_definition SET active=:is_active WHERE name IN (:active_workflows)',
-            ['active_workflows' => $activeWorkflows, 'is_active' => true],
-            ['active_workflows' => Connection::PARAM_STR_ARRAY, 'is_active' => 'boolean']
-        );
     }
 }

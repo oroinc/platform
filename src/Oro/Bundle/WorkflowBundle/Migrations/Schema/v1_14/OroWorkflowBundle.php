@@ -25,6 +25,7 @@ class OroWorkflowBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $this->updateWorkflowDefinitionFields($schema);
         $this->updateReportsDefinitions($queries);
         $queries->addQuery(new UpdateEntityConfigsQuery());
         $queries->addQuery(new RemoveExtendedFieldsQuery());
@@ -49,5 +50,15 @@ class OroWorkflowBundle implements Migration
                 self::NEW_STEPS_RELATION
             )
         );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    private function updateWorkflowDefinitionFields(Schema $schema)
+    {
+        $table = $schema->getTable('oro_workflow_definition');
+        $table->addColumn('active', 'boolean');
+        $table->addColumn('priority', 'integer');
     }
 }
