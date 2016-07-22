@@ -56,7 +56,7 @@ class DashboardExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'oro_filter_date_range';
+        return 'oro_dashboard';
     }
 
     public function getQueryFilterMetadata()

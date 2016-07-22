@@ -1703,4 +1703,12 @@ abstract class AbstractQueryConverter
             $functionExpr
         );
     }
+
+    /**
+     * @param string $rootEntity
+     */
+    public function setRootEntity($rootEntity)
+    {
+        $this->rootEntity = $rootEntity;
+    }
 }

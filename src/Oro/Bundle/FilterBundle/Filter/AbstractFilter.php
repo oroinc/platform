@@ -140,11 +140,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * Set state of filter
-     *
-     * @param $state
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setFilterState($state)
     {
@@ -154,9 +150,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * Get state of filter
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getFilterState()
     {
