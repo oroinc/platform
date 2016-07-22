@@ -24,7 +24,9 @@ define(function(require) {
         onCollapseToggle: function() {
             var $controls = this.$('.controls');
             if (this.$el.hasClass('collapsed')) {
-                $controls.slideDown();
+                $controls.slideDown(_.bind(function() {
+                    this.$el.trigger('content:changed');
+                }, this));
             } else {
                 $controls.slideUp();
             }
