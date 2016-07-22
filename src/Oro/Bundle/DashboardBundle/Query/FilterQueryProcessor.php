@@ -2,20 +2,30 @@
 namespace Oro\Bundle\DashboardBundle\Query;
 
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 
 class FilterQueryProcessor extends SegmentQueryConverter
 {
+    /** @var string */
     protected $rootEntityAlias;
 
+    /**
+     * @param QueryBuilder $qb
+     * @param string       $rootEntity
+     * @param array        $filters
+     * @param string       $rootEntityAlias
+     *
+     * @return QueryBuilder
+     */
     public function process(QueryBuilder $qb, $rootEntity, array $filters, $rootEntityAlias)
     {
         $this->setRootEntity($rootEntity);
-        $this->rootEntityAlias = $rootEntityAlias;
-        $this->definition['filters'] = $filters;
-        $this->definition['columns'] = [];
-        $this->qb = $qb;
+        $this->rootEntityAlias          = $rootEntityAlias;
+        $this->definition['filters']    = $filters;
+        $this->definition['columns']    = [];
+        $this->qb                       = $qb;
         $this->joinIdHelper             = new JoinIdentifierHelper($this->getRootEntity());
         $this->joins                    = [];
         $this->tableAliases             = [];
@@ -29,17 +39,22 @@ class FilterQueryProcessor extends SegmentQueryConverter
         $this->tableAliases             = null;
         $this->joins                    = null;
         $this->joinIdHelper             = null;
+
         return $this->qb;
     }
-
+    /**
+     * {@inheritdoc}
+     */
     protected function buildQuery()
     {
         $this->prepareTableAliases();
         $this->addJoinStatements();
         $this->addWhereStatement();
-        $this->addGroupByStatement();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function prepareTableAliases()
     {
         $this->addTableAliasForRootEntity();
@@ -48,22 +63,13 @@ class FilterQueryProcessor extends SegmentQueryConverter
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function addTableAliasForRootEntity()
     {
-        $joinId = self::ROOT_ALIAS_KEY;
-        $this->tableAliases[$joinId] = $this->rootEntityAlias;
+        $joinId                              = self::ROOT_ALIAS_KEY;
+        $this->tableAliases[$joinId]         = $this->rootEntityAlias;
         $this->joins[$this->rootEntityAlias] = $joinId;
-    }
-
-    protected function prepareColumnAliases()
-    {
-    }
-
-    protected function addSelectStatement()
-    {
-    }
-
-    protected function addFromStatements()
-    {
     }
 }

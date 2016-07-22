@@ -61,7 +61,7 @@ class DashboardExtension extends \Twig_Extension
 
     public function getQueryFilterMetadata()
     {
-        return $this->manager->getMetadata('all');
+        return $this->manager->getMetadata('segment');
     }
 
     public function getQueryFilterEntities()
