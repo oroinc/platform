@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider;
 
+use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\RequireJSBundle\Provider\AbstractConfigProvider;
 
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Layout\LayoutContext;
 
 class RequireJSConfigProvider extends AbstractConfigProvider
 {
@@ -19,9 +21,9 @@ class RequireJSConfigProvider extends AbstractConfigProvider
     protected $themeManager;
 
     /**
-     * @var
+     * @var LayoutContextHolder
      */
-    protected $activeTheme;
+    protected $contextHolder;
 
     /**
      * @var string
@@ -37,11 +39,11 @@ class RequireJSConfigProvider extends AbstractConfigProvider
     }
 
     /**
-     * @param string $themeName
+     * @param LayoutContextHolder $contextHolder
      */
-    public function setActiveTheme($themeName)
+    public function setContextHolder(LayoutContextHolder $contextHolder)
     {
-        $this->activeTheme = $themeName;
+        $this->contextHolder = $contextHolder;
     }
 
     /**
@@ -51,7 +53,12 @@ class RequireJSConfigProvider extends AbstractConfigProvider
     {
         $configs = $this->getConfigs();
 
-        return $configs[$this->activeTheme];
+        $theme = $this->getActiveTheme();
+        if (!array_key_exists($theme, $configs)) {
+            throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $theme));
+        };
+
+        return $configs[$theme];
     }
 
     /**
@@ -84,6 +91,25 @@ class RequireJSConfigProvider extends AbstractConfigProvider
         }
 
         return $configs;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getActiveTheme()
+    {
+        $context = $this->contextHolder->getContext();
+        if (!$context instanceof LayoutContext) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Context must be "%s" instance, "%s" given.',
+                    LayoutContext::class,
+                    gettype($context)
+                )
+            );
+        }
+
+        return $context->get('theme');
     }
 
     /**
