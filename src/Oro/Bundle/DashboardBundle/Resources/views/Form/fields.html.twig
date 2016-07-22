@@ -189,7 +189,22 @@
     </script>
 {% endblock oro_type_widget_date_widget %}
 
-{% block oro_dashboard_query_filter_widget %}
+{% block oro_dashboard_query_filter_row %}
+{% if collapsible %}
+<div class="control-group collapsible{% if collapsed %} collapsed{% endif %}"
+     data-page-component-module="oroui/js/app/components/view-component"
+     data-page-component-options="{{ {'view': 'oroform/js/app/views/collapsible-form-row-view'}|json_encode }}">
+    <label class="control-label">
+        <div class="collapse-expand-action-container">
+            <a class="collapse-action" data-name="collapse" href="#"></a>
+        </div>
+        {{ label|trans }}
+    </label>
+{% else %}
+    <div class="control-group">
+        <label class="control-label">{{ label|trans }}</label>
+{% endif %}
+    <div class="controls">
     {{ form_row(form.entity) }}
     {{ form_row(form.definition) }}
     {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
@@ -230,4 +245,6 @@
     {% set widgetOptions = update_segment_widget_options(widgetOptions, name) %}
         <div data-page-component-module="orosegment/js/app/components/segment-component"
              data-page-component-options="{{ widgetOptions|json_encode }}"></div>
-{% endblock oro_dashboard_query_filter_widget %}
+    </div>
+</div>
+{% endblock oro_dashboard_query_filter_row %}
