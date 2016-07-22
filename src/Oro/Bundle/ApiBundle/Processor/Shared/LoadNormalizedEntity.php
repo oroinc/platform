@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 
 /**
  * Loads whole entity by its id using "get" action.
@@ -47,7 +48,7 @@ class LoadNormalizedEntity implements ProcessorInterface
             return;
         }
 
-        $getProcessor = $this->processorBag->getProcessor('get');
+        $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
 
         /** @var GetContext $getContext */
         $getContext = $getProcessor->createContext();
@@ -69,7 +70,7 @@ class LoadNormalizedEntity implements ProcessorInterface
     protected function prepareGetContext(GetContext $getContext, SingleItemContext $context)
     {
         $getContext->setVersion($context->getVersion());
-        $getContext->getRequestType()->set($context->getRequestType()->toArray());
+        $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
         $getContext->setClassName($context->getClassName());
         if ($this->reuseExistingEntity && $context->hasResult()) {

@@ -1,0 +1,272 @@
+empty:
+    config: []
+    expected: []
+
+null_subresources:
+    config:
+        subresources: ~
+    expected: []
+
+all_options_except_actions:
+    config:
+        testSubresource:
+            exclude: true
+            target_class: Test\Class
+            target_type: to-many
+    expected:
+        testSubresource:
+            exclude: true
+            target_class: Test\Class
+            target_type: to-many
+
+exclude:
+    config:
+        testSubresource1:
+            exclude: true
+        testSubresource2:
+            exclude: false
+    expected:
+        testSubresource1:
+            exclude: true
+        testSubresource2:
+            exclude: false
+
+empty_actions:
+    config:
+        testSubresource:
+            actions: []
+    expected: []
+
+null_action:
+    config:
+        testSubresource:
+            actions:
+                get: ~
+    expected: []
+
+empty_status_codes:
+    config:
+        testSubresource:
+            actions:
+                get:
+                    status_codes: []
+    expected: []
+
+add_status_codes_full_syntax:
+    config:
+        testSubresource:
+            actions:
+                get:
+                    status_codes:
+                        '417':
+                            description: 'Returned when expectations failed'
+    expected:
+        testSubresource:
+            actions:
+                get:
+                    status_codes:
+                        '417':
+                            description: 'Returned when expectations failed'
+
+delete_status_codes_full_syntax:
+    config:
+        testSubresource:
+            actions:
+                get:
+                    status_codes:
+                        '417':
+                            exclude: true
+    expected:
+        testSubresource:
+            actions:
+                get:
+                    status_codes:
+                        '417':
+                            exclude: true
+
+actions:
+    config:
+        testSubresource:
+            actions:
+                get: ~
+                create: []
+                get_list:
+                    order_by:
+                        id: DESC
+                update:
+                    acl_resource: update_action_acl_resource
+                delete:
+                    exclude: false
+                    acl_resource: delete_action_acl_resource
+    expected:
+        testSubresource:
+            actions:
+                get_list:
+                    order_by:
+                        id: DESC
+                update:
+                    acl_resource: update_action_acl_resource
+                delete:
+                    exclude: false
+                    acl_resource: delete_action_acl_resource
+
+action_empty_order_by:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    order_by: []
+    expected: []
+
+action_exclude:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    exclude: true
+                update:
+                    exclude: false
+    expected:
+        testSubresource:
+            actions:
+                create:
+                    exclude: true
+                update:
+                    exclude: false
+
+action_sorting:
+    config:
+        testSubresource:
+            actions:
+                actions:
+                    get_list:
+                        disable_sorting: false
+                    get_subresource:
+                        disable_sorting: true
+    expected:
+        testSubresource:
+            actions:
+                actions:
+                    get_list:
+                        disable_sorting: false
+                    get_subresource:
+                        disable_sorting: true
+
+action_null_form_type:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    form_type: ~
+    expected: []
+
+action_empty_form_type:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    form_type: ""
+    expected: []
+
+action_form_type:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    form_type: integer
+    expected:
+        testSubresource:
+            actions:
+                create:
+                    form_type: integer
+
+action_null_form_options:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    form_options: ~
+    expected: []
+
+action_empty_form_options:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    form_options: []
+    expected: []
+
+action_form:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    form_type: integer
+                    form_options:
+                        option1: value1
+    expected:
+        testSubresource:
+            actions:
+                create:
+                    form_type: integer
+                    form_options:
+                        option1: value1
+
+action_field_exclude:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    fields:
+                        field1:
+                            exclude: true
+                        field2:
+                            exclude: false
+    expected:
+        testSubresource:
+            actions:
+                create:
+                    fields:
+                        field1:
+                            exclude: true
+                        field2: ~
+
+action_field_form:
+    config:
+        testSubresource:
+            actions:
+                create:
+                    fields:
+                        field1:
+                            form_type: ~
+                        field2:
+                            form_type: ""
+                        field3:
+                            form_type: integer
+                        field4:
+                            form_type: integer
+                            form_options: ~
+                        field5:
+                            form_type: integer
+                            form_options: []
+                        field6:
+                            form_type: integer
+                            form_options:
+                                option1: value1
+    expected:
+        testSubresource:
+            actions:
+                create:
+                    fields:
+                        field1: ~
+                        field2: ~
+                        field3:
+                            form_type: integer
+                        field4:
+                            form_type: integer
+                        field5:
+                            form_type: integer
+                        field6:
+                            form_type: integer
+                            form_options:
+                                option1: value1

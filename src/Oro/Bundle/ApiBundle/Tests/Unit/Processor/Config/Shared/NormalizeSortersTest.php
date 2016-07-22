@@ -25,6 +25,33 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
         $this->processor = new NormalizeSorters($this->doctrineHelper);
     }
 
+    public function testRemoveExcludedSorters()
+    {
+        $sorters = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null,
+                'field2' => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject([]));
+        $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => null
+                ]
+            ],
+            $this->context->getSorters()
+        );
+    }
+
     /**
      * @dataProvider processNotManageableEntityProvider
      */
@@ -209,11 +236,15 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
      */
     public function testProcessForManageableEntity($definition, $sorters, $expectedSorters)
     {
-        $rootMetadata           = $this->getClassMetadataMock();
-        $toOne1Metadata         = $this->getClassMetadataMock();
-        $toOne1toOne11Metadata  = $this->getClassMetadataMock();
+        $rootMetadata = $this->getClassMetadataMock();
+        $toOne1Metadata = $this->getClassMetadataMock();
+        $toOne1Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toOne1_id']);
+        $toOne1toOne11Metadata = $this->getClassMetadataMock();
+        $toOne1toOne11Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toOne11_id']);
         $toOne1toMany11Metadata = $this->getClassMetadataMock();
-        $toMany1Metadata        = $this->getClassMetadataMock();
+        $toOne1toMany11Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toMany11_id']);
+        $toMany1Metadata = $this->getClassMetadataMock();
+        $toMany1Metadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['toMany1_id']);
 
         $rootMetadata->expects($this->any())
             ->method('hasAssociation')
@@ -288,6 +319,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                                 'toOne1_toOne11'  => [
                                     'sorters' => [
                                         'fields' => [
+                                            'toOne11_id'              => null,
                                             'toOne1_toOne11_field111' => null
                                         ]
                                     ]
@@ -295,6 +327,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                                 'toOne1_toMany11' => [
                                     'sorters' => [
                                         'fields' => [
+                                            'toMany11_id'              => null,
                                             'toOne1_toMany11_field111' => null
                                         ]
                                     ]
@@ -302,6 +335,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                             ],
                             'sorters'    => [
                                 'fields' => [
+                                    'toOne1_id'       => null,
                                     'toOne1_field1'   => null,
                                     'toOne1_toOne11'  => null,
                                     'toOne1_toMany11' => null
@@ -311,6 +345,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                         'toMany1' => [
                             'sorters' => [
                                 'fields' => [
+                                    'toMany1_id'     => null,
                                     'toMany1_field1' => null
                                 ]
                             ]

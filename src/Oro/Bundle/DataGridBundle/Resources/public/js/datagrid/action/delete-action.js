@@ -43,8 +43,25 @@ define([
             this.model.destroy({
                 url: this.getLink(),
                 wait: true,
-                error: function() {
-                    var messageText = __('You do not have permission to perform this action.');
+                error: function(req, resp) {
+                    var messageText;
+                    if (resp) {
+                        var errorCode = 'responseJSON' in resp ? resp.responseJSON.code : resp.status;
+                        switch (errorCode) {
+                            case 403:
+                                messageText = __('You do not have permission to perform this action.');
+                                break;
+                            case 500:
+                                if (resp.responseJSON.message) {
+                                    messageText = __(resp.responseJSON.message);
+                                } else {
+                                    messageText = __('oro.ui.unexpected_error');
+                                }
+                                break;
+                            default:
+                                messageText = __('oro.ui.unexpected_error');
+                        }
+                    }
                     messenger.notificationFlashMessage('error', messageText);
                 },
                 success: function() {

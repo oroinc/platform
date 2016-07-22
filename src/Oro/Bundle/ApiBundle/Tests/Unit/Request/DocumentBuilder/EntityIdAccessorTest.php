@@ -43,7 +43,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage An object of the type "Test\Entity" does not have the identifier property "id".
      */
     public function testGetEntityIdForEntityWithSingleIdAndEntityDoesNotHaveIdProperty()
@@ -78,7 +78,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage An object of the type "Test\Entity" does not have the identifier property "id1".
      */
     public function testGetEntityIdForEntityWithCompositeIdAndEntityDoesNotHaveOneOfIdProperty()
@@ -95,7 +95,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The "Test\Entity" entity does not have an identifier.
      */
     public function testGetEntityIdWhenMetadataDoesNotHaveIdInfo()
@@ -108,7 +108,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The identifier value for "Test\Entity" entity must not be empty.
      */
     public function testGetEntityIdWhenIdValueIsNull()
@@ -127,7 +127,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage The identifier value for "Test\Entity" entity must not be empty.
      */
     public function testGetEntityIdWhenIdValueIsEmpty()

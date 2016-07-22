@@ -2,26 +2,27 @@
 
 namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
 class EntityIdAccessor
 {
-    /** @var ObjectAccessorInterface */
-    protected $objectAccessor;
+    /** @var ObjectPropertyAccessorInterface */
+    protected $propertyAccessor;
 
     /** @var EntityIdTransformerInterface */
     protected $entityIdTransformer;
 
     /**
-     * @param ObjectAccessorInterface      $objectAccessor
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param ObjectPropertyAccessorInterface $propertyAccessor
+     * @param EntityIdTransformerInterface    $entityIdTransformer
      */
     public function __construct(
-        ObjectAccessorInterface $objectAccessor,
+        ObjectPropertyAccessorInterface $propertyAccessor,
         EntityIdTransformerInterface $entityIdTransformer
     ) {
-        $this->objectAccessor = $objectAccessor;
+        $this->propertyAccessor = $propertyAccessor;
         $this->entityIdTransformer = $entityIdTransformer;
     }
 
@@ -41,8 +42,8 @@ class EntityIdAccessor
         $idFieldNamesCount = count($idFieldNames);
         if ($idFieldNamesCount === 1) {
             $fieldName = reset($idFieldNames);
-            if (!$this->objectAccessor->hasProperty($entity, $fieldName)) {
-                throw new \RuntimeException(
+            if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
+                throw new RuntimeException(
                     sprintf(
                         'An object of the type "%s" does not have the identifier property "%s".',
                         $metadata->getClassName(),
@@ -51,13 +52,13 @@ class EntityIdAccessor
                 );
             }
             $result = $this->entityIdTransformer->transform(
-                $this->objectAccessor->getValue($entity, $fieldName)
+                $this->propertyAccessor->getValue($entity, $fieldName)
             );
         } elseif ($idFieldNamesCount > 1) {
             $id = [];
             foreach ($idFieldNames as $fieldName) {
-                if (!$this->objectAccessor->hasProperty($entity, $fieldName)) {
-                    throw new \RuntimeException(
+                if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
+                    throw new RuntimeException(
                         sprintf(
                             'An object of the type "%s" does not have the identifier property "%s".',
                             $metadata->getClassName(),
@@ -65,11 +66,11 @@ class EntityIdAccessor
                         )
                     );
                 }
-                $id[$fieldName] = $this->objectAccessor->getValue($entity, $fieldName);
+                $id[$fieldName] = $this->propertyAccessor->getValue($entity, $fieldName);
             }
             $result = $this->entityIdTransformer->transform($id);
         } else {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'The "%s" entity does not have an identifier.',
                     $metadata->getClassName()
@@ -78,7 +79,7 @@ class EntityIdAccessor
         }
 
         if (empty($result)) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'The identifier value for "%s" entity must not be empty.',
                     $metadata->getClassName()

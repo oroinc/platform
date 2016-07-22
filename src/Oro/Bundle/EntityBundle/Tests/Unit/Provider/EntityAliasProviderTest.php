@@ -32,6 +32,14 @@ class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetClassNames()
+    {
+        $this->assertEntityAlias(
+            ['Test\EntityWithCustomAlias'],
+            $this->entityAliasProvider->getClassNames()
+        );
+    }
+
     /**
      * @dataProvider getEntityAliasDataProvider
      */

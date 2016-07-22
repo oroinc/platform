@@ -31,6 +31,57 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
         );
     }
 
+    /**
+     * @param string      $fieldName
+     * @param string|null $dataType
+     *
+     * @return FieldMetadata
+     */
+    protected function createFieldMetadata($fieldName, $dataType = null)
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName($fieldName);
+        if ($dataType) {
+            $fieldMetadata->setDataType($dataType);
+        }
+        $fieldMetadata->setIsNullable(false);
+
+        return $fieldMetadata;
+    }
+
+    /**
+     * @param string        $associationName
+     * @param string        $targetClass
+     * @param bool|null     $isCollection
+     * @param string|null   $dataType
+     * @param string[]|null $acceptableTargetClasses
+     *
+     * @return AssociationMetadata
+     */
+    protected function createAssociationMetadata(
+        $associationName,
+        $targetClass,
+        $isCollection = null,
+        $dataType = null,
+        $acceptableTargetClasses = null
+    ) {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName($associationName);
+        $associationMetadata->setTargetClassName($targetClass);
+        if (null !== $isCollection) {
+            $associationMetadata->setIsCollection($isCollection);
+        }
+        if (null !== $dataType) {
+            $associationMetadata->setDataType($dataType);
+        }
+        if (null !== $acceptableTargetClasses) {
+            $associationMetadata->setAcceptableTargetClassNames($acceptableTargetClasses);
+        }
+        $associationMetadata->setIsNullable(false);
+
+        return $associationMetadata;
+    }
+
     public function testProcessWithoutMetadata()
     {
         $this->doctrineHelper->expects($this->never())
@@ -89,24 +140,14 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
 
         $metadata = new EntityMetadata();
         $metadata->setClassName(self::TEST_CLASS_NAME);
-        $field1 = new FieldMetadata();
-        $field1->setName('field1');
-        $field1->setIsNullable(false);
-        $metadata->addField($field1);
-        $field2 = new FieldMetadata();
-        $field2->setName('field2');
-        $field2->setIsNullable(false);
-        $metadata->addField($field2);
-        $association3 = new AssociationMetadata();
-        $association3->setTargetClassName('Test\Association3Target');
-        $association3->setName('association3');
-        $association3->setIsNullable(false);
-        $metadata->addAssociation($association3);
-        $association411 = new AssociationMetadata();
-        $association411->setTargetClassName('Test\Association411Target');
-        $association411->setName('association411');
-        $association411->setIsNullable(false);
-        $metadata->addAssociation($association411);
+        $metadata->addField($this->createFieldMetadata('field1'));
+        $metadata->addField($this->createFieldMetadata('field2'));
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('association3', 'Test\Association3Target')
+        );
+        $metadata->addAssociation(
+            $this->createAssociationMetadata('association411', 'Test\Association411Target')
+        );
 
         $association41ClassMetadata = $this->getClassMetadataMock('Test\Association41Target');
         $association41ClassMetadata->expects($this->once())
@@ -165,37 +206,24 @@ class NormalizeLinkedPropertiesTest extends MetadataProcessorTestCase
 
         $expectedMetadata = new EntityMetadata();
         $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
-        $expectedField1 = new FieldMetadata();
-        $expectedField1->setName('field1');
-        $expectedField1->setIsNullable(false);
-        $expectedMetadata->addField($expectedField1);
-        $expectedField2 = new FieldMetadata();
-        $expectedField2->setName('field2');
-        $expectedField2->setIsNullable(false);
-        $expectedMetadata->addField($expectedField2);
-        $expectedAssociation3 = new AssociationMetadata();
-        $expectedAssociation3->setTargetClassName('Test\Association3Target');
-        $expectedAssociation3->setName('association3');
-        $expectedAssociation3->setIsNullable(false);
-        $expectedMetadata->addAssociation($expectedAssociation3);
-        $expectedField5 = new FieldMetadata();
-        $expectedField5->setName('field5');
-        $expectedField5->setDataType('string');
-        $expectedField5->setIsNullable(false);
-        $expectedMetadata->addField($expectedField5);
-        $expectedAssociation4 = new AssociationMetadata();
-        $expectedAssociation4->setTargetClassName('Test\Association411Target');
-        $expectedAssociation4->setAcceptableTargetClassNames(['Test\Association411Target']);
-        $expectedAssociation4->setName('association4');
-        $expectedAssociation4->setDataType('integer');
+        $expectedMetadata->addField($this->createFieldMetadata('field1'));
+        $expectedMetadata->addField($this->createFieldMetadata('field2'));
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata('association3', 'Test\Association3Target')
+        );
+        $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
+        $expectedAssociation4 = $this->createAssociationMetadata(
+            'association4',
+            'Test\Association411Target',
+            false,
+            'integer',
+            ['Test\Association411Target']
+        );
         $expectedAssociation4->setIsNullable(true);
-        $expectedAssociation4->setIsCollection(false);
         $expectedMetadata->addAssociation($expectedAssociation4);
-        $expectedAssociation411 = new AssociationMetadata();
-        $expectedAssociation411->setTargetClassName('Test\Association411Target');
-        $expectedAssociation411->setName('association411');
-        $expectedAssociation411->setIsNullable(false);
-        $expectedMetadata->addAssociation($expectedAssociation411);
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata('association411', 'Test\Association411Target')
+        );
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
