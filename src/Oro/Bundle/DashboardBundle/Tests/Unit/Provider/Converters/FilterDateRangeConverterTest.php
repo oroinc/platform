@@ -59,13 +59,21 @@ class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetConvertedValueDefaultValues()
+    public function testGetConvertedValueDefaultValuesWithoutValueTypes()
+    {
+        $result = $this->converter->getConvertedValue([]);
+
+        $this->assertNull($result['start']);
+        $this->assertNull($result['end']);
+    }
+
+    public function testGetConvertedValueDefaultValuesWithValueTypes()
     {
         $this->dateCompiler->expects($this->once())
             ->method('compile')
             ->with('{{4}}')
             ->will($this->returnValue(new \DateTime('01-01-2016 00:00:00')));
-        $result = $this->converter->getConvertedValue([]);
+        $result = $this->converter->getConvertedValue([], null, ['options' => ['value_types' => true]]);
 
         $this->assertEquals('2016-01-01 00:00:00', $result['start']->format('Y-m-d H:i:s'));
         $this->assertEquals('2016-01-31 23:59:59', $result['end']->format('Y-m-d H:i:s'));
