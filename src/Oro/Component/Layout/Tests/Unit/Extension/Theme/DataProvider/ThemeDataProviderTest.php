@@ -26,14 +26,6 @@ class ThemeDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->dataProvider = new ThemeDataProvider($this->themeManager);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
-    public function testGetIdentifier()
-    {
-        $this->dataProvider->getIdentifier();
-    }
-
     public function testGetData()
     {
         $themeName = 'test';

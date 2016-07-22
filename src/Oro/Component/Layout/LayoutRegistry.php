@@ -16,7 +16,7 @@ class LayoutRegistry implements LayoutRegistryInterface
     /** @var BlockTypeInterface[] */
     private $types = [];
 
-    /** @var DataProviderInterface[] */
+    /** @var object[] */
     private $dataProviders = [];
 
     /** @var BlockTypeExtensionInterface[] */
