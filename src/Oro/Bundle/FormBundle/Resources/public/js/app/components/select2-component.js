@@ -173,7 +173,7 @@ define(function(require) {
                     if (typeof response.results !== 'undefined') {
                         handleResults(response.results);
                     }
-                    element.trigger('select2-data-loaded');
+                    element.trigger({type: 'select2-data-loaded', items: response});
                 }
             });
         }

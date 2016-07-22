@@ -15,6 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class OrganizationsSelectType extends AbstractType
 {
@@ -74,9 +76,17 @@ class OrganizationsSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            $event->setData(json_decode($event->getData(), true));
-        });
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = is_string($event->getData()) ? json_decode($event->getData(), true) : $event->getData();
+
+                $organizations = json_decode(reset($data['organizations']));
+                $data['organizations'] = $organizations->organizations;
+
+                $event->setData($data);
+            }
+        );
 
         $builder->add(
             'organizations',
@@ -84,16 +94,23 @@ class OrganizationsSelectType extends AbstractType
             [
                 'class'    => 'OroOrganizationBundle:Organization',
                 'property' => 'name',
-                'multiple' => true,
-                'choices'  => $this->getOrganizationOptions(),
+                'multiple' => true
             ]
         );
         $builder->add(
             'businessUnits',
-            'oro_business_unit_tree',
+            'oro_type_business_unit_select_autocomplete',
             [
-                'multiple' => true,
                 'required' => false,
+                'label' => 'oro.user.form.access_settings.label',
+                'autocomplete_alias' => 'business_units_tree_search_handler',
+                'configs'            => [
+                    'multiple'    => true,
+                    'width'       => '400px',
+                    'component'   => 'bu-tree-autocomplete',
+                    'placeholder' => 'oro.dashboard.form.choose_business_unit',
+                    'allowClear'  => true,
+                ]
             ]
         );
     }
@@ -126,12 +143,10 @@ class OrganizationsSelectType extends AbstractType
     }
 
     /**
-     * Prepare choice options for a select
-     *
-     * @return array
+     * @return User
      */
-    protected function getOrganizationOptions()
+    protected function getLoggedInUser()
     {
-        return $this->em->getRepository('OroOrganizationBundle:Organization')->getEnabled();
+        return $this->securityFacade->getLoggedUser();
     }
 }

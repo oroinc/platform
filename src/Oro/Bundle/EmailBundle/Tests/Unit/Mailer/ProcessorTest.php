@@ -192,9 +192,13 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array  $data
+     * @param string $exception
+     * @param string $exceptionMessage
+     *
      * @dataProvider invalidModelDataProvider
      */
-    public function testProcessEmptyToException($data, $exception, $exceptionMessage)
+    public function testProcessEmptyToException(array $data, $exception, $exceptionMessage)
     {
         $this->mailer->expects($this->never())
             ->method('createMessage');
@@ -211,6 +215,22 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             [[], '\InvalidArgumentException', 'Sender can not be empty'],
             [['from' => 'test@test.com'], '\InvalidArgumentException', 'Recipient can not be empty'],
         ];
+    }
+
+    public function testProcessSend()
+    {
+        $message = new \Swift_Message();
+        $this->mailer->expects($this->once())
+            ->method('send')
+            ->with($message)
+            ->will($this->returnValue(true));
+        $emailOrigin = $this->userEmailOrigin;
+
+        $oldMessageId = $message->getId();
+        $this->emailProcessor->processSend($message, $emailOrigin);
+        $messageId = $message->getId();
+
+        $this->assertEquals($oldMessageId, $messageId);
     }
 
     /**
@@ -288,6 +308,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($message)
             ->will($this->returnValue(true));
 
+        $oldMessageId = $message->getId();
+
         $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->setMethods(['addFolder', 'getEmail'])
             ->getMock();
@@ -352,6 +374,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data['cc'], $model->getCc());
         $this->assertEquals($data['bcc'], $model->getBcc());
         $this->assertEquals($expectedMessageData['subject'], $model->getSubject());
+        $this->assertEquals($oldMessageId, $message->getId());
+
         if ($needConverting) {
             $id = $model->getAttachments()->first()->getEmailAttachment()->getEmbeddedContentId();
             $this->assertEquals(sprintf($expectedMessageData['body'], 'cid:' . $id), $message->getBody());
@@ -387,6 +411,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         return $origin;
     }
 
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function messageDataProvider()
     {
         return [

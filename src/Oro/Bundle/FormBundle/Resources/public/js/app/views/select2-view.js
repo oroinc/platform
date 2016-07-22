@@ -28,6 +28,12 @@ define(function(require) {
             this.undelegateEvents();
             this.$el.select2(this.select2Config).trigger('select2-init');
             this.$el.select2('readonly', this.$el.is('[readonly]'));
+            if (this.select2Config.className) {
+                this.$el.parent().find('.select2-container').addClass(this.select2Config.className);
+            }
+            if (this.select2Config.onAfterInit) {
+                this.select2Config.onAfterInit(this.$el.data('select2'));
+            }
             this.delegateEvents();
         },
 
