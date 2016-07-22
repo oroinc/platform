@@ -1180,8 +1180,8 @@ layout:
                     'searh_form:end': ~
 ```
 
-Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block)
-For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form.
+Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block).
+For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form. Also we can use only one block type `form` which will create three child block: `form_start`, `form_fields`, `form_end`.
 
 All that is left is to define the search autocomplete block in our block theme file we'll:
 ```twig
@@ -1397,7 +1397,7 @@ services:
             - [setOptionsConfig, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
             - [setName, ['datetime']]
         tags:
-             - { name: layout.block_type, alias: datetime }
+            - { name: layout.block_type, alias: datetime }
 ```
 
 `setOptions` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
@@ -1410,7 +1410,7 @@ services:
         calls:
             - [setName, ['sidebar']]
         tags:
-             - { name: layout.block_type, alias: sidebar }
+            - { name: layout.block_type, alias: sidebar }
 ```
 
 Block type inherited from "text" type:
@@ -1423,10 +1423,23 @@ services:
             - [setName, ['title']]
             - [setParent, ['text']]
         tags:
-             - { name: layout.block_type, alias: title }
+            - { name: layout.block_type, alias: title }
 ```
 
-Usually the definition of layout block types are located in `Resource\config\block_types.yml`, but you can use any file.
+Also you can create block type extension via DI configuration. This configuration allows to setup additional options for block types.
+
+```yaml
+services:
+    custom_acme_demo.block_type.extension.sidebar:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{minimized: {default: false}]]
+            - [setExtendedType, ['sidebar']]
+        tags:
+            - { name: layout.block_type_extension, alias: sidebar }
+```
+
+Usually the definition of layout block types and types extension are located in `Resource\config\block_types.yml`, but you can use any file.
 
 If you want to create block type with custom properties mapping extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType` or implement `Oro\Component\Layout\BlockTypeInterface`.
 
@@ -1994,9 +2007,9 @@ And the footer like this:
 
 Simplify block attribute configuration
 -------------
-For simplify block attribute configuration use twig function `layout_attr_merge(attr, default_attr)`:
+For simplify block attribute configuration use twig function `layout_attr_defaults(attr, default_attr)`:
 ```twig
-{% set attr = layout_attr_merge(attr, {
+{% set attr = layout_attr_defaults(attr, {
     required: 'required',
     autofocus: true,
     '~class': " input input_block input_md {{ class_prefix }}__form__input"

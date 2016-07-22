@@ -19,6 +19,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
+use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\DataGridBundle\Exception\BadMethodCallException;
 use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
 
@@ -115,6 +116,11 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
      */
     public function getResults()
     {
+        $this->eventDispatcher->dispatch(
+            OrmResultBeforeQuery::NAME,
+            new OrmResultBeforeQuery($this->datagrid, $this->qb)
+        );
+
         $query = $this->qb->getQuery();
 
         $this->queryHintResolver->resolveHints(

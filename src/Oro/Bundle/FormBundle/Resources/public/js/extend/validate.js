@@ -3,9 +3,10 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/tools',
+    'oroui/js/tools/logger',
     './../optional-validation-handler',
     'jquery.validate'
-], function($, _, __, tools, validationHandler) {
+], function($, _, __, tools, logger, validationHandler) {
     'use strict';
 
     var console = window.console;
@@ -71,9 +72,11 @@ define([
         var $widgetContainer = $target.inputWidget('container');
         if ($widgetContainer) {
             $target = $widgetContainer;
-        } else if ($target.parent().is('.input-append, .input-prepend')) {
+        }
+        if ($target.parent().is('.input-append, .input-prepend')) {
             $target = $target.parent();
         }
+
         return $target;
     }
 
@@ -355,9 +358,20 @@ define([
             _.each(rules, function(param) {
                 param.depends = function() {
                     // all fields in a group failed a required rule (have empty value) - stop group validation
-                    return _.some(validator.elementsOf(optionalGroup), function(elem) {
-                        return $.validator.methods.required.call(validator, validator.elementValue(elem), elem);
+                    var isValidFound = false;
+                    var isInvalidFound = false;
+                    _.each(validator.elementsOf(optionalGroup), function(elem) {
+                        if ($(elem).prop('willValidate')) {
+                            if ($.validator.methods.required.call(validator, validator.elementValue(elem), elem)) {
+                                isValidFound = true;
+                            } else {
+                                isInvalidFound = true;
+                            }
+                        }
+
                     });
+
+                    return isValidFound && isInvalidFound;
                 };
             });
         }
@@ -369,4 +383,23 @@ define([
             return this[0] && this[0].form && $.data(this[0].form, 'validator') && handler.apply(this, arguments);
         });
     });
+
+    /**
+     * Filters unsupported validation rules from validator configuration object
+     *
+     * @param {Object} validationRules - validator configuration object
+     * @returns {Object} filtered validation rules
+     */
+    $.validator.filterUnsupportedValidators = function(validationRules) {
+        var validationRulesCopy = $.extend(true,  {}, validationRules);
+        for (var ruleName in validationRulesCopy) {
+            if (validationRulesCopy.hasOwnProperty(ruleName)) {
+                if (!_.isFunction($.validator.methods[ruleName])) {
+                    logger.warn('Cannot find validator implementation for `{{rule}}`', {rule: ruleName});
+                    delete validationRulesCopy[ruleName];
+                }
+            }
+        }
+        return validationRulesCopy;
+    };
 });

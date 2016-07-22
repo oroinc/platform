@@ -8,14 +8,10 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 class DeleteManager
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var DeleteProviderInterface[]
-     */
+    /** @var DeleteProviderInterface[] */
     protected $deleteProviders;
 
     /**
@@ -39,7 +35,7 @@ class DeleteManager
     /**
      * Delete integration
      *
-     * @param integration $integration
+     * @param Integration $integration
      *
      * @return bool
      */
@@ -53,14 +49,39 @@ class DeleteManager
                     $deleteProvider->deleteRelatedData($integration);
                 }
             }
+
+            $this->removeFromEntityByChannelId('OroIntegrationBundle:Status', $integration);
+
             $this->em->remove($integration);
             $this->em->flush();
             $this->em->getConnection()->commit();
         } catch (\Exception $e) {
             $this->em->getConnection()->rollback();
+
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Remove records from given entity type related to channel
+     *
+     * @param string      $entityClassName
+     * @param Integration $integration
+     *
+     * @return $this
+     */
+    protected function removeFromEntityByChannelId($entityClassName, Integration $integration)
+    {
+        $this->em->getConnection()->executeQuery(
+            sprintf(
+                'DELETE FROM %s WHERE channel_id=%s',
+                $this->em->getClassMetadata($entityClassName)->getTableName(),
+                $integration->getId()
+            )
+        );
+
+        return $this;
     }
 }

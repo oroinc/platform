@@ -6,41 +6,33 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
-use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * Checks that the "class" attribute of the Context represents FQCN of an entity
- * and this entity is accessible through Data API.
+ * Makes sure that an entity class name exists in the Context,
+ * if required converts it to FQCN of an entity
+ * and check that this entity is accessible through Data API.
  */
 class NormalizeEntityClass implements ProcessorInterface
 {
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var ResourcesLoader */
-    protected $resourcesLoader;
-
-    /** @var ResourcesCache */
-    protected $resourcesCache;
+    /** @var ResourcesProvider */
+    protected $resourcesProvider;
 
     /**
-     * @param ValueNormalizer $valueNormalizer
-     * @param ResourcesLoader $resourcesLoader
-     * @param ResourcesCache  $resourcesCache
+     * @param ValueNormalizer   $valueNormalizer
+     * @param ResourcesProvider $resourcesProvider
      */
-    public function __construct(
-        ValueNormalizer $valueNormalizer,
-        ResourcesLoader $resourcesLoader,
-        ResourcesCache $resourcesCache
-    ) {
+    public function __construct(ValueNormalizer $valueNormalizer, ResourcesProvider $resourcesProvider)
+    {
         $this->valueNormalizer = $valueNormalizer;
-        $this->resourcesLoader = $resourcesLoader;
-        $this->resourcesCache = $resourcesCache;
+        $this->resourcesProvider = $resourcesProvider;
     }
 
     /**
@@ -51,6 +43,17 @@ class NormalizeEntityClass implements ProcessorInterface
         /** @var Context $context */
 
         $entityClass = $context->getClassName();
+        if (!$entityClass) {
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::ENTITY_TYPE,
+                    'The entity class must be set in the context.'
+                )
+            );
+
+            return;
+        }
+
         if (false !== strpos($entityClass, '\\')) {
             // an entity class is already normalized
             return;
@@ -89,28 +92,12 @@ class NormalizeEntityClass implements ProcessorInterface
             $requestType,
             false
         );
-        if (null !== $entityClass && !$this->isResourceAccessible($entityClass, $version, $requestType)) {
+        if (null !== $entityClass
+            && !$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)
+        ) {
             $entityClass = null;
         }
 
         return $entityClass;
-    }
-
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
-    protected function isResourceAccessible($entityClass, $version, RequestType $requestType)
-    {
-        $accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
-        if (null === $accessibleResources) {
-            $this->resourcesLoader->getResources($version, $requestType);
-            $accessibleResources = $this->resourcesCache->getAccessibleResources($version, $requestType);
-        }
-
-        return in_array($entityClass, $accessibleResources, true);
     }
 }

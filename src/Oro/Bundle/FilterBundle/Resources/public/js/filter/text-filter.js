@@ -254,7 +254,7 @@ define([
          * @protected
          */
         _focusCriteria: function() {
-            this.$(this.criteriaSelector + ' input').focus().select();
+            this.$(this.criteriaSelector + ' input[type=text]').focus().select();
         },
 
         /**

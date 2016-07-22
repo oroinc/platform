@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 
 class EntityMetadataFactoryTest extends OrmRelatedTestCase
@@ -52,6 +53,35 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $this->assertEquals($expectedMetadata, $metadata);
     }
 
+    public function testCreateMetaPropertyMetadata()
+    {
+        $expectedMetadata = new MetaPropertyMetadata();
+        $expectedMetadata->setName('name');
+        $expectedMetadata->setDataType('string');
+
+        $metadata = $this->metadataFactory->createMetaPropertyMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            'name'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateMetaPropertyMetadataWhenDataTypeIsSpecified()
+    {
+        $expectedMetadata = new MetaPropertyMetadata();
+        $expectedMetadata->setName('name');
+        $expectedMetadata->setDataType('integer');
+
+        $metadata = $this->metadataFactory->createMetaPropertyMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            'name',
+            'integer'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
+
     public function testCreateFieldMetadataForIdentifier()
     {
         $expectedMetadata = new FieldMetadata();
@@ -67,7 +97,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $this->assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateFieldMetadataForString()
+    public function testCreateFieldMetadata()
     {
         $expectedMetadata = new FieldMetadata();
         $expectedMetadata->setName('name');
@@ -78,6 +108,23 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $metadata = $this->metadataFactory->createFieldMetadata(
             $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
             'name'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateFieldMetadataWhenDataTypeIsSpecified()
+    {
+        $expectedMetadata = new FieldMetadata();
+        $expectedMetadata->setName('name');
+        $expectedMetadata->setDataType('integer');
+        $expectedMetadata->setIsNullable(false);
+        $expectedMetadata->setMaxLength(50);
+
+        $metadata = $this->metadataFactory->createFieldMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            'name',
+            'integer'
         );
 
         $this->assertEquals($expectedMetadata, $metadata);

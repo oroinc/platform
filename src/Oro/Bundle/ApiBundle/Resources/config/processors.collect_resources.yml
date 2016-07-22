@@ -41,7 +41,8 @@ services:
     oro_api.collect_resources.add_excluded_actions:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActions
         arguments:
-            - '@oro_api.config_provider'
+            - '@oro_api.config_loader_factory'
+            - '@oro_api.config_bag'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -110 }
 

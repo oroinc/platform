@@ -42,6 +42,18 @@ oro_system_configuration:
                                         children:
                                             - oro_data_grid.default_per_page
                                             - oro_data_grid.full_screen_layout_enabled
+        user_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                priority: 210
+                                children:
+                                    grid_settings:
+                                        children:
+                                            - oro_data_grid.default_per_page
+                                            - oro_data_grid.full_screen_layout_enabled
 
     api_tree:
         look-and-feel:
