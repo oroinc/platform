@@ -17,10 +17,12 @@ parameters:
     oro_dashboard.datetime.helper.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
     oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
     oro_dashboard.event_listener.widget_items_load_data.class: Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener
+    oro_dashboard.event_listener.widget_sort_by.class: Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener
 
     oro_dashboard.widget_config_value.previous_date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
     oro_dashboard.widget_config_value.widget_title.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter
     oro_dashboard.widget_config_value.widget_items_choice.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter
+    oro_dashboard.widget_config_value.widget_sort_by.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetSortByConverter
 
     oro_dashboard.form.type.widget_date_range.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType
     oro_dashboard.form.type.date_range_value.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeValueType
@@ -31,6 +33,7 @@ parameters:
     oro_dashboard.form.type.widget_item.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemType
     oro_dashboard.event_listener.widget_items_form_subscriber.class: Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber
     oro_dashboard.form.type.widget_date.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType
+    oro_dashboard.form.type.widget_sort_by.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetSortByType
 
     # BigNumber
     oro_dashboard.provider.big_number.processor.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
@@ -134,6 +137,12 @@ services:
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItemsByItemsChoice }
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItems }
 
+    oro_dashboard.event_listener.widget_sort_by:
+        class: %oro_dashboard.event_listener.widget_sort_by.class%
+        arguments:
+            - '@oro_dashboard.widget_configs'
+        abstract: true
+
     oro_dashboard.type.widget_jqueryselect2_hidden:
         class: Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType
         arguments:
@@ -232,10 +241,25 @@ services:
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_items_choice" }
 
+    oro_dashboard.widget_config_value.widget_sort_by.converter:
+        class: %oro_dashboard.widget_config_value.widget_sort_by.converter.class%
+        arguments:
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
+        tags:
+            - { name: oro_dashboard.value.converter, alias: oro_type_widget_sort_by }
+
     oro_dashboard.form.type.widget_date:
         class: %oro_dashboard.form.type.widget_date.class%
         tags:
             - { name: form.type, alias: "oro_type_widget_date" }
+
+    oro_dashboard.form.type.widget_sort_by:
+        class: %oro_dashboard.form.type.widget_sort_by.class%
+        arguments:
+            - '@oro_entity.entity_field_provider'
+        tags:
+            - { name: form.type, alias: oro_type_widget_sort_by }
 
     # BigNumber
     oro_dashboard.provider.big_number.processor:

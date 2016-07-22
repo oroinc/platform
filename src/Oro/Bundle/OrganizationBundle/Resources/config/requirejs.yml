@@ -1,4 +1,5 @@
 config:
     paths:
         'oroorganization/js/app/components/organization-structure-tree-component': 'bundles/oroorganization/js/app/components/organization-structure-tree-component.js'
+        'oro/select2-bu-tree-autocomplete-component': 'bundles/oroorganization/js/app/components/select2-bu-tree-autocomplete-component.js'
         'oroorganization/js/app/views/organization-structure-tree-view': 'bundles/oroorganization/js/app/views/organization-structure-tree-view.js'

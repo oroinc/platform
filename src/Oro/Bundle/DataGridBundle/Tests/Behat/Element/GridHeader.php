@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
-use Behat\Mink\Exception\ExpectationException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class GridHeader extends Element
@@ -12,19 +11,12 @@ class GridHeader extends Element
      *
      * @param string $headerText Header of grid column
      * @return int Number of column starting from 1
-     *
-     * @throws ExpectationException Throw exception when can't find header in grid
      */
     public function getColumnNumber($headerText)
     {
         $header = $this->tryGuessHeaderLink($headerText);
 
-        if (!$header) {
-            throw new ExpectationException(
-                sprintf('Can\'t find link with "%s" header', $headerText),
-                $this->getDriver()
-            );
-        }
+        self::assertNotNull($header, sprintf('Can\'t find link with "%s" header', $headerText));
 
         $headerText = $header->getText();
         $headers = $this->getHeaders();
@@ -35,16 +27,12 @@ class GridHeader extends Element
             }
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t find link with "%s" header', $headerText),
-            $this->getDriver()
-        );
+        self::fail(sprintf('Can\'t find link with "%s" header', $headerText));
     }
 
     /**
      * @param string $header
      * @return Element
-     * @throws ExpectationException
      */
     public function getHeaderLink($header)
     {
@@ -52,10 +40,7 @@ class GridHeader extends Element
             return $link;
         }
 
-        throw new ExpectationException(
-            sprintf('Can\'t find link with "%s" header', $header),
-            $this->getDriver()
-        );
+        self::fail(sprintf('Can\'t find link with "%s" header', $header));
     }
 
     /**
