@@ -88,7 +88,7 @@ class DataAccessor implements DataAccessorInterface
      * @param string $name The name of the data provider
      *
      * @return mixed The returned values:
-     *               DataProviderInterface if the data provider is loaded
+     *               data provider object if the data provider is loaded
      *               mixed if data should be loaded from the layout context
      *               false if the requested data cannot be loaded
      */
