@@ -171,7 +171,9 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                 $this->formatter->formatDate($start)
             );
         }
-        if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN) {
+        if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
+            || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$start
+        ) {
             return sprintf(
                 '%s %s',
                 $this->translator->trans('oro.filter.form.label_date_type_less_than'),
