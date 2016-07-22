@@ -27,8 +27,8 @@ class OroWorkflowBundle implements Migration
     {
         $this->updateWorkflowDefinitionFields($schema);
         $this->updateReportsDefinitions($queries);
-        $queries->addQuery(new UpdateEntityConfigsQuery());
         $queries->addQuery(new RemoveExtendedFieldsQuery());
+        $queries->addPostQuery(new MoveActiveFromConfigToFieldQuery());
     }
 
     /**
