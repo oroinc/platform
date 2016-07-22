@@ -13,13 +13,29 @@ class JobProcessor
     private $em;
 
     /**
+     * @param EntityManager $em
+     */
+    public function __construct(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
+    /**
      * @param string $id
      *
      * @return Job
      */
     public function findJobById($id)
     {
-        return $this->em->getRepository(Job::class)->find($id);
+        $em = $this->em->getRepository(Job::class)->createQueryBuilder('job');
+
+        return $em
+            ->addSelect('rootJob')
+            ->innerJoin('job.rootJob', 'rootJob')
+            ->where('job = :id')
+            ->setParameter('id', $id)
+            ->getQuery()->getOneOrNullResult()
+        ;
     }
     
     /**
@@ -59,7 +75,7 @@ class JobProcessor
             return $job;
         } catch (UniqueConstraintViolationException $e) {
             if ($unique) {
-                return false;
+                return;
             }
 
             throw $e;
@@ -98,7 +114,7 @@ class JobProcessor
     public function stopChildJob(Job $job, $status)
     {
         if ($job->isRoot()) {
-            throw new \LogicException(sprintf('Can\'t success root jobs. id: "%s"', $job->getId()));
+            throw new \LogicException(sprintf('Can\'t stop root jobs. id: "%s"', $job->getId()));
         }
 
         if ($job->getStatus() !== Job::STATUS_RUNNING) {
@@ -112,8 +128,9 @@ class JobProcessor
         $validStopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED];
         if (! in_array($status, $validStopStatuses)) {
             throw new \LogicException(sprintf(
-                'This status is not valid stop status. status: "%s", valid: [%s]',
-                $job->getStatus(),
+                'This status is not valid stop status. id: "%s", status: "%s", valid: [%s]',
+                $job->getId(),
+                $status,
                 implode(', ', $validStopStatuses)
             ));
         }
@@ -131,15 +148,23 @@ class JobProcessor
      * @param Job  $job
      * @param bool $force
      */
-    public function interruptRootJob(Job $job, $force)
+    public function interruptRootJob(Job $job, $force = false)
     {
         if (! $job->isRoot()) {
             throw new \LogicException(sprintf('Can interrupt only root jobs. id: "%s"', $job->getId()));
         }
 
+        if ($job->isInterrupted()) {
+            return;
+        }
+
         $this->em->transactional(function (EntityManager $em) use ($job, $force) {
             /** @var Job $job */
             $job = $em->find(Job::class, $job->getId(), LockMode::PESSIMISTIC_WRITE);
+
+            if ($job->isInterrupted()) {
+                return;
+            }
 
             $job->setInterrupted(true);
 

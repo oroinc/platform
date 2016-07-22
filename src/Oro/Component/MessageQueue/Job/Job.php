@@ -75,6 +75,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param int $id
      */
     public function setId($id)
@@ -91,6 +93,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param string $name
      */
     public function setName($name)
@@ -99,6 +103,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @return string
      */
     public function getUniqueName()
@@ -125,6 +131,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param string $status
      */
     public function setStatus($status)
@@ -159,6 +167,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param Job $rootJob
      */
     public function setRootJob($rootJob)
@@ -175,6 +185,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param \DateTime $createdAt
      */
     public function setCreatedAt(\DateTime $createdAt)
@@ -191,6 +203,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param \DateTime $startedAt
      */
     public function setStartedAt(\DateTime $startedAt)
@@ -207,6 +221,8 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param \DateTime $stoppedAt
      */
     public function setStoppedAt(\DateTime $stoppedAt)
@@ -219,7 +235,7 @@ class Job
      */
     public function isRoot()
     {
-        return null === $this->rootJob;
+        return null === $this->getRootJob();
     }
 
     /**
@@ -231,9 +247,11 @@ class Job
     }
 
     /**
+     * @internal
+     *
      * @param Job[] $childJobs
      */
-    public function setChildJobs($childJobs)
+    public function setChildJobs(array $childJobs)
     {
         $this->childJobs = $childJobs;
     }

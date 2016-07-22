@@ -13,11 +13,19 @@ class CalculateRootJobStatusCase
     private $em;
 
     /**
+     * @param EntityManager $em
+     */
+    public function __construct(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
+    /**
      * @param Job $job
      */
     public function calculate(Job $job)
     {
-        $rootJob = $job->getRootJob();
+        $rootJob = $job->isRoot() ? $job : $job->getRootJob();
         $stopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED];
 
         if (in_array($rootJob->getStatus(), $stopStatuses)) {
@@ -84,20 +92,23 @@ class CalculateRootJobStatusCase
                 default:
                     throw new \LogicException(sprintf(
                         'Got unsupported job status: id: "%s" status: "%s"',
+                        $job->getId(),
                         $job->getStatus()
                     ));
             }
         }
 
         $status = Job::STATUS_NEW;
-        if ($running) {
+        if (! $new && ! $running) {
+            if ($cancelled) {
+                $status = Job::STATUS_CANCELLED;
+            } elseif ($failed) {
+                $status = Job::STATUS_FAILED;
+            } else {
+                $status = Job::STATUS_SUCCESS;
+            }
+        } elseif ($running || $cancelled || $failed || $success) {
             $status = Job::STATUS_RUNNING;
-        } elseif ($cancelled) {
-            $status = Job::STATUS_CANCELLED;
-        } elseif ($failed) {
-            $status = Job::STATUS_FAILED;
-        } elseif (! $new) {
-            $status = Job::STATUS_SUCCESS;
         }
 
         return $status;
