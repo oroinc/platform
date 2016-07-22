@@ -612,10 +612,10 @@ define(function(require) {
                     filters: metadata.filters
                 });
             }
-
             $builder.conditionBuilder({
                 criteriaListSelector: options.criteriaList
             });
+
             $builder.conditionBuilder('setValue', this.load('filters'));
             $builder.on('changed', function() {
                 self.save($builder.conditionBuilder('getValue'), 'filters');
@@ -627,7 +627,9 @@ define(function(require) {
             });
 
             this.once('dispose:before', function() {
-                $builder.conditionBuilder('destroy');
+                if ($builder.conditionBuilder('instance')) {
+                    $builder.conditionBuilder('destroy');
+                }
             }, this);
         }
     }, {
