@@ -1,8 +1,6 @@
 oro_api:
     entities:
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
-            page_size: -1 # disable pagination
-            disable_sorting: true
             identifier_field_names: [id]
             fields:
                 id:
@@ -20,6 +18,8 @@ oro_api:
                 get_list:
                     description: Get System Configuration Sections
                     acl_resource: oro_config_system
+                    page_size: -1 # disable paging
+                    disable_sorting: true
                 create: false
                 update: false
                 delete: false
@@ -28,8 +28,6 @@ oro_api:
                 get_relationship: false
 
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
-            page_size: -1 # disable pagination
-            disable_sorting: true
             identifier_field_names: [key]
             fields:
                 key:

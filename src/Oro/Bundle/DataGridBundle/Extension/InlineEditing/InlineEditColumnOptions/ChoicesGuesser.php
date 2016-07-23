@@ -58,7 +58,9 @@ class ChoicesGuesser implements GuesserInterface
                 $targetEntityMetadata = $entityManager->getClassMetadata($targetEntity);
                 $labelField = $this->getLabelField($columnName, $column, $targetEntityMetadata);
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
-                $result[Configuration::CHOICES_KEY] = $this->getChoices($targetEntity, $keyField, $labelField);
+                if (empty($column[Configuration::CHOICES_KEY])) {
+                    $result[Configuration::CHOICES_KEY] = $this->getChoices($targetEntity, $keyField, $labelField);
+                }
 
                 $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
                 $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);

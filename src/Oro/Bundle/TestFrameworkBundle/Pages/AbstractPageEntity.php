@@ -200,9 +200,9 @@ abstract class AbstractPageEntity extends AbstractPage
     public function setOrganization($organization)
     {
         if (isset($this->organization)) {
-            $element = $this->test->select($this->test->byXPath($this->organization));
-            $this->test->moveto($element);
-            $element->selectOptionByLabel($organization);
+            $this->test->byXpath($this->organization)->click();
+            $this->waitForAjax();
+            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$organization}')]")->click();
         }
         return $this;
     }

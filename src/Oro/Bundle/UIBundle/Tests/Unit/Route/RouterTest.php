@@ -4,10 +4,17 @@ namespace Oro\Bundle\UIBundle\Tests\Route;
 
 use Oro\Bundle\UIBundle\Route\Router;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $request;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $requestQuery;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $requestStack;
@@ -25,7 +32,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->requestQuery = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $this->request->query = $this->requestQuery;
 
         $this->symfonyRouter = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()
@@ -250,13 +259,19 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider redirectDataProvider
+     * @param array $expected
+     * @param array $data
      */
-    public function testRedirectWorks($expected, $data)
+    public function testRedirectWorks(array $expected, array $data)
     {
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
             ->willReturn(json_encode($data['actionParameters']));
+
+        $this->requestQuery->expects($this->once())
+            ->method('all')
+            ->will($this->returnValue($data['queryParameters']));
 
         $expectedUrl = 'http://expected.com';
         $this->symfonyRouter->expects($this->once())
@@ -269,68 +284,108 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return array
      */
     public function redirectDataProvider()
     {
-        $expectedRoute = 'test_route';
-        $expectedStaticParameterValue = 'OroCRM\Bundle\CallBundle\Entity\Call';
-        $expectedStaticParameter = 'testStaticParameter';
-        $expectedEntityIdParameter = 'id';
         $expectedId = 42;
         $entity = $this->getEntityStub($expectedId);
-        $entityAsContextTestCase = [
-            'expected' => [
-                'route' => $expectedRoute,
-                'parameters' => [
-                    $expectedStaticParameter => $expectedStaticParameterValue,
-                    $expectedEntityIdParameter => $expectedId
-                ]
-            ],
-            'data' => [
-                'actionParameters' => [
-                    'route' => $expectedRoute,
-                    'params' => [
-                        $expectedStaticParameter => $expectedStaticParameterValue,
-                        $expectedEntityIdParameter => '$id'
-                    ]
-                ],
-                'context' => $entity
-            ]
-        ];
 
-        $expectedSecondEntityIdParameter = 'secondId';
         $expectedSecondEntityId = 21;
-        $firstEntityContextKey = 'firstEntity';
-        $secondEntityContextKey = 'secondEntity';
-        $arrayAsContextTestCase = [
-            'expected' => [
-                'route' => $expectedRoute,
-                'parameters' => [
-                    $expectedStaticParameter => $expectedStaticParameterValue,
-                    $expectedEntityIdParameter => $expectedId,
-                    $expectedSecondEntityIdParameter => $expectedSecondEntityId
-                ]
-            ],
-            'data' => [
-                'actionParameters' => [
-                    'route' => $expectedRoute,
-                    'params' => [
-                        $expectedStaticParameter => $expectedStaticParameterValue,
-                        $expectedEntityIdParameter => '$'.$firstEntityContextKey.'.id',
-                        $expectedSecondEntityIdParameter => '$'.$secondEntityContextKey.'.id'
-                    ]
-                ],
-                'context' => [
-                    $firstEntityContextKey => $entity,
-                    $secondEntityContextKey => $this->getEntityStub($expectedSecondEntityId)
-                ]
-            ]
-        ];
 
         return [
-            'with entity as context' => $entityAsContextTestCase,
-            'with array as context' => $arrayAsContextTestCase,
+            'with query parameters' => [
+                'expected' => [
+                    'route' => 'test_route',
+                    'parameters' => [
+                        'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                        'id' => $expectedId,
+                        'testQueryParameter' => 'foo'
+                    ]
+                ],
+                'data' => [
+                    'actionParameters' => [
+                        'route' => 'test_route',
+                        'params' => [
+                            'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                            'id' => '$id'
+                        ]
+                    ],
+                    'context' => $entity,
+                    'queryParameters' => [
+                        'testQueryParameter' => 'foo'
+                    ],
+                ]
+            ],
+            'with query parameters overridden by route parameter' => [
+                'expected' => [
+                    'route' => 'test_route',
+                    'parameters' => [
+                        'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                        'id' => $expectedId,
+                    ]
+                ],
+                'data' => [
+                    'actionParameters' => [
+                        'route' => 'test_route',
+                        'params' => [
+                            'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                            'id' => '$id'
+                        ]
+                    ],
+                    'context' => $entity,
+                    'queryParameters' => [
+                        'testStaticParameter' => 'foo'
+                    ],
+                ]
+            ],
+            'with dynamic parameters and entity as context' => [
+                'expected' => [
+                    'route' => 'test_route',
+                    'parameters' => [
+                        'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                        'id' => $expectedId
+                    ]
+                ],
+                'data' => [
+                    'actionParameters' => [
+                        'route' => 'test_route',
+                        'params' => [
+                            'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                            'id' => '$id'
+                        ]
+                    ],
+                    'context' => $entity,
+                    'queryParameters' => [],
+                ]
+            ],
+            'with dynamic parameters and array as context' => [
+                'expected' => [
+                    'route' => 'test_route',
+                    'parameters' => [
+                        'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                        'id' => $expectedId,
+                        'secondId' => $expectedSecondEntityId
+                    ]
+                ],
+                'data' => [
+                    'actionParameters' => [
+                        'route' => 'test_route',
+                        'params' => [
+                            'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                            'id' => '$firstEntity.id',
+                            'secondId' => '$secondEntity.id'
+                        ]
+                    ],
+                    'context' => [
+                        'firstEntity' => $entity,
+                        'secondEntity' => $this->getEntityStub($expectedSecondEntityId)
+                    ],
+                    'queryParameters' => [],
+                ]
+            ],
         ];
     }
 

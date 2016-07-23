@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -86,7 +87,16 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $this->registerActionProcessors($container);
         $this->registerConfigExtensions($container);
 
-        $this->loadApiConfiguration($container);
+        try {
+            $this->loadApiConfiguration($container);
+        } catch (InvalidConfigurationException $e) {
+            // we have to rethrow the configuration exception but without an inner exception,
+            // otherwise a message of the root exception is displayed
+            if (null !== $e->getPrevious()) {
+                $e = new InvalidConfigurationException($e->getMessage());
+            }
+            throw $e;
+        }
     }
 
     /**

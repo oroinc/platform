@@ -62,9 +62,9 @@ class FiltersConfiguration extends AbstractConfigurationSection
 
         $node
             ->booleanNode(FilterFieldConfig::EXCLUDE)->end()
+            ->scalarNode(FilterFieldConfig::DESCRIPTION)->cannotBeEmpty()->end()
             ->scalarNode(FilterFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->scalarNode(FilterFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
-            ->booleanNode(FilterFieldConfig::ALLOW_ARRAY)->end()
-            ->scalarNode(FilterFieldConfig::DESCRIPTION)->cannotBeEmpty()->end();
+            ->booleanNode(FilterFieldConfig::ALLOW_ARRAY)->end();
     }
 }

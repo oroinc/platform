@@ -86,20 +86,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             $parentNode,
             $sectionName,
             function ($value) {
-                if (empty($value[ActionConfig::STATUS_CODES])) {
-                    unset($value[ActionConfig::STATUS_CODES]);
-                }
-                if (empty($value[ActionConfig::FORM_TYPE])) {
-                    unset($value[ActionConfig::FORM_TYPE]);
-                }
-                if (empty($value[ActionConfig::FORM_OPTIONS])) {
-                    unset($value[ActionConfig::FORM_OPTIONS]);
-                }
-                if (empty($value[ActionConfig::FIELDS])) {
-                    unset($value[ActionConfig::FIELDS]);
-                }
-
-                return $value;
+                return $this->postProcessActionConfig($value);
             }
         );
 
@@ -107,15 +94,21 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->scalarNode(ActionConfig::DESCRIPTION)->cannotBeEmpty()->end()
             ->scalarNode(ActionConfig::DOCUMENTATION)->cannotBeEmpty()->end()
             ->scalarNode(ActionConfig::ACL_RESOURCE)->end()
-            ->integerNode(ActionConfig::MAX_RESULTS)
-                ->min(-1)
+            ->integerNode(ActionConfig::MAX_RESULTS)->min(-1)->end()
+            ->integerNode(ActionConfig::PAGE_SIZE)->min(-1)->end()
+            ->arrayNode(ActionConfig::ORDER_BY)
+                ->performNoDeepMerging()
+                ->useAttributeAsKey('name')
+                ->prototype('enum')->values(['ASC', 'DESC'])->end()
             ->end()
+            ->booleanNode(ActionConfig::DISABLE_SORTING)->end()
+            ->booleanNode(ActionConfig::DISABLE_INCLUSION)->end()
+            ->booleanNode(ActionConfig::DISABLE_FIELDSET)->end()
             ->scalarNode(ActionConfig::FORM_TYPE)->end()
             ->arrayNode(ActionConfig::FORM_OPTIONS)
                 ->useAttributeAsKey('name')
                 ->performNoDeepMerging()
-                ->prototype('variable')
-                ->end()
+                ->prototype('variable')->end()
             ->end();
         $this->addStatusCodesNode($node);
         $fieldNode = $node
@@ -125,6 +118,36 @@ class ActionsConfiguration extends AbstractConfigurationSection
                 ->prototype('array')
                     ->children();
         $this->configureFieldNode($fieldNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function postProcessActionConfig(array $config)
+    {
+        if (array_key_exists(ActionConfig::PAGE_SIZE, $config)
+            && -1 === $config[ActionConfig::PAGE_SIZE]
+            && !array_key_exists(ActionConfig::MAX_RESULTS, $config)
+        ) {
+            $config[ActionConfig::MAX_RESULTS] = -1;
+        }
+        if (empty($config[ActionConfig::ORDER_BY])) {
+            unset($config[ActionConfig::ORDER_BY]);
+        }
+        if (empty($config[ActionConfig::STATUS_CODES])) {
+            unset($config[ActionConfig::STATUS_CODES]);
+        }
+        if (empty($config[ActionConfig::FORM_TYPE])) {
+            unset($config[ActionConfig::FORM_TYPE]);
+        }
+        if (empty($config[ActionConfig::FORM_OPTIONS])) {
+            unset($config[ActionConfig::FORM_OPTIONS]);
+        }
+        if (empty($config[ActionConfig::FIELDS])) {
+            unset($config[ActionConfig::FIELDS]);
+        }
+
+        return $config;
     }
 
     /**
@@ -184,14 +207,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             $parentNode,
             $sectionName,
             function ($value) {
-                if (empty($value[ActionFieldConfig::FORM_TYPE])) {
-                    unset($value[ActionFieldConfig::FORM_TYPE]);
-                }
-                if (empty($value[ActionFieldConfig::FORM_OPTIONS])) {
-                    unset($value[ActionFieldConfig::FORM_OPTIONS]);
-                }
-
-                return $value;
+                return $this->postProcessFieldConfig($value);
             }
         );
 
@@ -201,8 +217,24 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->arrayNode(ActionFieldConfig::FORM_OPTIONS)
                 ->useAttributeAsKey('name')
                 ->performNoDeepMerging()
-                ->prototype('variable')
-                ->end()
+                ->prototype('variable')->end()
             ->end();
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    protected function postProcessFieldConfig(array $config)
+    {
+        if (empty($config[ActionFieldConfig::FORM_TYPE])) {
+            unset($config[ActionFieldConfig::FORM_TYPE]);
+        }
+        if (empty($config[ActionFieldConfig::FORM_OPTIONS])) {
+            unset($config[ActionFieldConfig::FORM_OPTIONS]);
+        }
+
+        return $config;
     }
 }

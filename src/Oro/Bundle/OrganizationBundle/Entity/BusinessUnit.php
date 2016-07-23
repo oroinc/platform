@@ -45,7 +45,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "grid"={
  *              "default"="business-unit-grid"
@@ -449,5 +450,25 @@ class BusinessUnit extends ExtendBusinessUnit implements
         $emails[] = $this->getEmail();
 
         return $emails;
+    }
+
+    /**
+     * @return BusinessUnit
+     */
+    public function getParentBusinessUnit()
+    {
+        return $this->getOwner();
+    }
+
+    /**
+     * @param BusinessUnit $value
+     *
+     * @return BusinessUnit
+     */
+    public function setParentBusinessUnit(BusinessUnit $value = null)
+    {
+        $this->setOwner($value);
+
+        return $this;
     }
 }

@@ -100,6 +100,13 @@ services:
         tags:
             - { name: form.type, alias: oro_email_emailtemplate_translatation }
 
+    oro_email.form.type.emailtemplate_rich_text:
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType
+        arguments:
+            - %kernel.cache_dir%
+        tags:
+            - { name: form.type, alias: oro_email_template_rich_text }
+
     oro_email.form.type.emailtemplate_select:
         class: %oro_email.form.type.emailtemplate_select.class%
         tags:
@@ -109,7 +116,6 @@ services:
         class: %oro_email.form.type.system_emailtemplate_select.class%
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '@oro_security.security_facade'
         tags:
             - { name: form.type, alias: oro_email_system_template_list }
 

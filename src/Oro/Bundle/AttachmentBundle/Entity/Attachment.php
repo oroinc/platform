@@ -32,7 +32,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
- *              "type"="ACL"
+ *              "type"="ACL",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true

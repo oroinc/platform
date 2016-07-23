@@ -15,6 +15,9 @@ class FilterFieldConfig implements FieldConfigInterface
     /** a flag indicates whether the field should be excluded */
     const EXCLUDE = EntityDefinitionFieldConfig::EXCLUDE;
 
+    /** a human-readable description of the filter */
+    const DESCRIPTION = EntityDefinitionFieldConfig::DESCRIPTION;
+
     /** the path of the field value */
     const PROPERTY_PATH = EntityDefinitionFieldConfig::PROPERTY_PATH;
 
@@ -23,9 +26,6 @@ class FilterFieldConfig implements FieldConfigInterface
 
     /** a flag indicates whether the filter value can be an array */
     const ALLOW_ARRAY = 'allow_array';
-
-    /** a human-readable description of the filter */
-    const DESCRIPTION = EntityDefinitionFieldConfig::DESCRIPTION;
 
     /** @var array */
     protected $items = [];

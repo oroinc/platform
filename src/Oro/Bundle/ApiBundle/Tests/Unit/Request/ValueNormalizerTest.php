@@ -636,7 +636,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             $attributes['dataType'] = $dataType;
         }
         if (null !== $requestType) {
-            $attributes['requestType'] = $requestType;
+            $attributes['requestType'] = is_array($requestType) ? ['&' => $requestType] : $requestType;
         }
         $processorBag->addProcessor($processorId, $attributes, 'normalize_value', null, -10);
 
