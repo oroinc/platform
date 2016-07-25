@@ -20,24 +20,6 @@ define(function(require) {
             return 'ActionPermissionsCell-' + this.cid;
         },
 
-        /**
-         * @type {AccessLevelsCollection}
-         */
-        accessLevels: null,
-
-        initialize: function(options) {
-            _.extend(this, _.pick(options, ['accessLevels']));
-            PermissionView.__super__.initialize.call(this, options);
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            delete this.accessLevels;
-            PermissionView.__super__.dispose.call(this);
-        },
-
         getTemplateData: function() {
             var data = PermissionView.__super__.getTemplateData.call(this);
             data.dropdownTarget = '#' + _.result(this, 'id');
@@ -59,9 +41,10 @@ define(function(require) {
 
         onDropdownOpen: function(e) {
             var dropdown = this.subview('dropdown');
+            var accessLevels = this.model.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
-                    collection: this.accessLevels,
+                    collection: accessLevels,
                     keysMap: {
                         id: 'access_level',
                         text: 'access_level_label'
@@ -71,8 +54,8 @@ define(function(require) {
                 this.subview('dropdown', dropdown);
                 this.$el.append(dropdown.$el);
             }
-            if (!this.accessLevels.length) {
-                this.accessLevels.fetch();
+            if (!accessLevels.length) {
+                accessLevels.fetch();
             }
         },
 
