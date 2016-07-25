@@ -145,7 +145,7 @@ class MassNotificationSender
         $qb = $this->em->getRepository('OroUserBundle:User')->getPrimaryEmailsQb(
             $this->dqlNameFormatter->getFormattedNameDQL('u', 'Oro\Bundle\UserBundle\Entity\User')
         );
-        $qb->where('u.enabled = 1');
+        $qb->andWhere('u.enabled = :enabled')->setParameter('enabled', true);
         $users = $qb->getQuery()->getResult();
         $users = array_map(function ($user) {
             return [$user['email'] => $user['name']];
