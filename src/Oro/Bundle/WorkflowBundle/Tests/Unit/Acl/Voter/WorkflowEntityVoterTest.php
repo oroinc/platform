@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter;
 
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -27,9 +28,9 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowManager
      */
-    protected $configProvider;
+    protected $workflowManager;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowPermissionRegistry
@@ -42,10 +43,9 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->permissionRegistry = new WorkflowPermissionRegistry($this->doctrineHelper, $this->configProvider);
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
+
+        $this->permissionRegistry = new WorkflowPermissionRegistry($this->doctrineHelper, $this->workflowManager);
 
         $this->voter = new WorkflowEntityVoter($this->doctrineHelper, $this->permissionRegistry);
     }
@@ -308,19 +308,9 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
 
-        $config->expects($this->any())
-            ->method('get')
-            ->with('active_workflows', false, false)
+        $this->workflowManager->expects($this->any())->method('hasApplicableWorkflows')
             ->willReturn(true);
-
-        $this->configProvider
-            ->expects($this->any())
-            ->method('getConfig')
-            ->willReturn($config);
     }
 
     /**

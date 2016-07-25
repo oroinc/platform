@@ -19,9 +19,6 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
  */
 class WorkflowControllerTest extends WebTestCase
 {
-    const CONFIG_PROVIDER_NAME = 'workflow';
-    const CONFIG_KEY = 'active_workflows';
-
     /** @var string */
     protected $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
 
