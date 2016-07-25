@@ -504,7 +504,7 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                     'fields_acl' => [
                         'columns' => [
-                            self::FIELD_NAME => [
+                            'testFieldSnapshot' => [
                                 'data_name' => $alias . '.' . self::FIELD_NAME
                             ]
                         ]

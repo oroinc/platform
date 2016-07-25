@@ -1,17 +1,17 @@
 Field ACL extension
 ===================
 
-Field ACL extension allows to check access to fields that uses in the grid's ORM query.
+[Field ACL extension](../../../Extension/FieldAcl/FieldAclExtension.php) allows to check access to grid columns. Currently it is implemented only for ORM datasource.
 
-To enable field ACL protection of your field, you should add configuration in `field_acl` section:
+To enable field ACL protection for a column, you should use `field_acl` section in a datagrid declaration:
 
 ```
         fields_acl:                     #section name
             columns:
                  name:                  #column name
-                    data_name: a.name   #path that determinate field in query that should be checked
+                    data_name: a.name   #the path to a field which ACL should be used to protect the column
 ```
 
-Please note that now supports only fields from the root entity of your datagrid's ORM query.
+Please note that now only fields from the root entity of a datagrid's ORM query are supported.
 
-Enabling Field ACL for datagrid wil automatically turn off inline editing for this datagrid.
+Enabling Field ACL for a datagrid will automatically turns off inline editing for this datagrid.
