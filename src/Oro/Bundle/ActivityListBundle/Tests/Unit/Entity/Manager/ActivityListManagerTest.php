@@ -103,50 +103,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->activityListManager->getRepository();
     }
 
-    public function testGetList()
-    {
-        $classMeta     = new ClassMetadata('Oro\Bundle\ActivityListBundle\Entity\ActivityList');
-        $repo          = new ActivityListRepository($this->em, $classMeta);
-        $testClass     = 'Acme\TestBundle\Entity\TestEntity';
-        $testId        = 12;
-        $page          = 2;
-        $filter        = [];
-
-        $this->config->expects($this->any())->method('get')
-            ->willReturnCallback(
-                function ($configKey) {
-                    if ($configKey === 'oro_activity_list.per_page') {
-                        return 10;
-                    }
-                    if ($configKey === 'oro_activity_list.sorting_field') {
-                        return 'createdBy';
-                    }
-                    if ($configKey === 'oro_activity_list.grouping') {
-                        return false;
-                    }
-                    return 'ASC';
-                }
-            );
-
-        $this->aclHelper->expects($this->any())->method('applyAclCriteria')->willReturn('');
-
-        $qb = new QueryBuilder($this->em);
-        $this->em->expects($this->any())->method('createQueryBuilder')->willReturn($qb);
-        $this->doctrineHelper->expects($this->any())->method('getEntityRepository')->willReturn($repo);
-        $this->activityListFilterHelper->expects($this->once())->method('addFiltersToQuery')->with($qb, $filter);
-
-        $this->provider->expects($this->once())->method('getProviders')->willReturn([]);
-
-        $this->activityListManager->getList($testClass, $testId, $filter, $page);
-
-        $expectedDQL = 'SELECT activity FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
-            . 'LEFT JOIN activity.test_entity_9d8125dd r LEFT JOIN activity.activityOwners ao '
-            . 'WHERE r.id = :entityId GROUP BY activity.id ORDER BY activity.createdBy ASC';
-
-        $this->assertEquals($expectedDQL, $qb->getDQL());
-        $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
-    }
-
     public function testGetNonExistItem()
     {
         $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
