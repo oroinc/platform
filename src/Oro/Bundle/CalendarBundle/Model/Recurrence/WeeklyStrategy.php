@@ -50,7 +50,7 @@ class WeeklyStrategy extends AbstractStrategy
                 $next = $this->getNextOccurrence($day, $afterFullWeeksDate);
                 if ($next > $end
                     || $next > $recurrence->getCalculatedEndTime()
-                    || ($recurrence->getOccurrences() && $fromStartInterval > $recurrence->getOccurrences())
+                    || ($recurrence->getOccurrences() && $fromStartInterval >= $recurrence->getOccurrences())
                 ) {
                     return $result;
                 }
