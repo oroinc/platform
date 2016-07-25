@@ -22,6 +22,8 @@ class ConfigProvider extends AbstractConfigProvider
      */
     public function collectConfigs()
     {
+        $this->collectBundlesConfig();
+
         return [
             $this->createRequireJSConfig(self::REQUIREJS_CONFIG_FILE, $this->config['build_path'])
         ];

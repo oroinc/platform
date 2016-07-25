@@ -265,6 +265,8 @@ Corresponding block type classes was removed.
 - New `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` block type was added. This block type creates three child blocks in buildBlock method: `FormStartType`, `FormType`, `FormEndType`.
 - Added possibility to view layout tree in developer toolbar and include block debug information in HTML, for details please check out documentation at
  [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
+- Added possibility to create layout update imports, for details please check out documentation [Imports](./src/Oro/Bundle/LayoutBundle/Resources/doc/imports.md).
+- Added new `\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface`.
 - Changed current expression language in layouts to symfony expression language, for details please check out documentation at
  [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
 
