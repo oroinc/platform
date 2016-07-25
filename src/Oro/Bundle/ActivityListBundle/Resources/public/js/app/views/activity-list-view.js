@@ -265,7 +265,10 @@ define(function(require) {
 
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(this._initPager, this),
+                    success: _.bind(function() {
+                        this._initPager();
+                        this._hideLoading();
+                    }, this),
                     error: _.bind(function(collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
                     }, this)
@@ -437,7 +440,9 @@ define(function(require) {
         },
 
         _hideLoading: function() {
-            this.subview('loading').hide();
+            if (this.subview('loading')) {
+                this.subview('loading').hide();
+            }
         },
 
         _showLoadItemsError: function(err) {

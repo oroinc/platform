@@ -30,7 +30,7 @@ define([
                 this.route,
                 _.extend(
                     _.extend([], this.routeParameters),
-                    _.extend({page: this.getPage()}, {filter: this.filter}, {pageFilter: this.pageFilter})
+                    _.extend({filter: this.filter}, {pageFilter: this.pageFilter})
                 )
             );
         },
@@ -84,6 +84,12 @@ define([
         },
 
         reset: function(models, options) {
+            if (this.getPage() > 1 && models.count == 0) {
+                this.setPage(this.getPage() - 1);
+                this.setCount(0);
+                return;
+            }
+
             var i;
             var newModel;
             var oldModel;
