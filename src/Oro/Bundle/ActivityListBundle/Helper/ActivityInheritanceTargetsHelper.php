@@ -88,7 +88,7 @@ class ActivityInheritanceTargetsHelper
      *
      * @return array
      */
-    protected function getInheritanceTargetsRelations($entityClass)
+    public function getInheritanceTargetsRelations($entityClass)
     {
         $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
         $filteredTargets = $this->prepareTargetData($configValues['inheritance_targets']);
@@ -142,7 +142,7 @@ class ActivityInheritanceTargetsHelper
      *
      * @return QueryBuilder
      */
-    protected function getSubQuery($target, $path, $entityId, $uniqueKey)
+    public function getSubQuery($target, $path, $entityId, $uniqueKey)
     {
         $alias = 'inherit_' . $uniqueKey;
         $subQueryBuilder = $this->registry->getManagerForClass($target)->createQueryBuilder();

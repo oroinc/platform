@@ -73,7 +73,7 @@ define(function(require) {
             /**
              * on adding activity item listen to "widget:doRefresh:activity-list-widget"
              */
-            mediator.on('widget:doRefresh:activity-list-widget', this._reload, this);
+            mediator.on('widget:doRefresh:activity-list-widget', this._reloadOnAdd, this);
 
             /**
              * on editing activity item listen to "widget_success:activity_list:item:update"
@@ -97,7 +97,7 @@ define(function(require) {
 
             delete this.itemEditDialog;
 
-            mediator.off('widget:doRefresh:activity-list-widget', this._reload, this);
+            mediator.off('widget:doRefresh:activity-list-widget', this._reloadOnAdd, this);
             mediator.off('widget_success:activity_list:item:update', this._reload, this);
 
             ActivityListView.__super__.dispose.call(this);
@@ -120,24 +120,37 @@ define(function(require) {
 
         refresh: function() {
             this.collection.setPage(1);
-            this._setPageNumber();
+            this.collection.resetPageFilter();
+
             this._reload();
 
             mediator.trigger('widget_success:activity_list:refresh');
         },
 
         _initPager: function() {
-            this._refreshStateButtons();
+            debugger;
 
-            $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
-            $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
-            $('.activity-list-widget .pagination-current').val(this.collection.getPage());
+            if (this.collection.getCount() && this.collection.getPage() == 1) {
+                this._toggleNext(true);
+            }
 
-            if (this.collection.getCount() === 0 && this.isFiltersEmpty) {
+            if (this.collection.getPage() == 1) {
+                this._togglePrevious();
+            } else {
+                this._togglePrevious(true);
+            }
+
+            if (this.collection.getCount() < this.collection.getPageSize()) {
+                this._toggleNext();
+            }
+
+            if (this.collection.getCount() === 0 && this.isFiltersEmpty && this.collection.getPage() == 1) {
                 this.gridToolbar.hide();
             } else {
                 this.gridToolbar.show();
             }
+
+            this.collection.setPageFilterAction();
         },
 
         /**
@@ -165,75 +178,49 @@ define(function(require) {
 
         goto_previous: function() {
             var currentPage = this.collection.getPage();
-            if (currentPage > 1) {
-                var nextPage = currentPage - 1;
-                this.collection.setPage(nextPage);
-                this._setPageNumber(nextPage);
-                this._refreshStateButtons();
-                this._reload();
-            }
-        },
-
-        goto_page: function(e) {
-            var that = this.list;
-            var currentPage = that.collection.getPage();
-            var maxPage = that.collection.pager.total;
-            var nextPage = parseInt($(e.target).val());
-
-            if (_.isNaN(nextPage) || nextPage <= 0 || nextPage > maxPage || nextPage === currentPage) {
-                $(e.target).val(currentPage);
+            if (currentPage == 1) {
                 return;
             }
 
-            that.collection.setPage(nextPage);
-            that._setPageNumber(nextPage);
+            if (currentPage == 2) {
+                this.collection.setPage(1);
+                this.collection.resetPageFilter();
 
-            that._refreshStateButtons();
-            that._reload();
+                this._reload();
+            } else {
+                var nextPage = currentPage - 1;
+                this.collection.setPage(nextPage);
+
+                var listFirstModel = this.collection.models[0];
+                var listFirstModelId = listFirstModel.attributes.id;
+
+                this.collection.setPageFilterDate(listFirstModel.attributes.updatedAt);
+                this.collection.setPageFilterIds([listFirstModelId]);
+                this.collection.setPageFilterAction('prev');
+
+                this._reload();
+            }
+
+            this._toggleNext(true);
         },
 
         goto_next: function() {
+            if (this.collection.getCount() < this.collection.getPageSize()) {
+                return;
+            }
             var currentPage = this.collection.getPage();
-            if (currentPage < this.collection.pager.total) {
-                var nextPage = currentPage + 1;
-                this.collection.setPage(nextPage);
-                this._setPageNumber(nextPage);
 
-                this._refreshStateButtons();
-                this._reload();
-            }
-        },
+            this.collection.setPage(currentPage + 1);
+            this.collection.setPageTotal(this.collection.getPageTotal() + 1);
 
-        _setPageNumber: function(pageNumber) {
-            if (_.isUndefined(pageNumber)) {
-                pageNumber = 1;
-            }
-            $('.activity-list-widget .pagination-current').val(pageNumber);
-        },
+            var listLastModel = this.collection.models[this.collection.getCount()-1];
+            var listLastModelId = listLastModel.attributes.id;
 
-        _refreshStateButtons: function() {
-            this._updateStateButtonPreviousPage();
-            this._updateStateButtonNextPage();
-        },
+            this.collection.setPageFilterDate(listLastModel.attributes.updatedAt);
+            this.collection.setPageFilterIds([listLastModelId]);
+            this.collection.setPageFilterAction('next');
 
-        _updateStateButtonPreviousPage: function() {
-            if (this.collection.getPage() === 1) {
-                this._togglePrevious();
-            } else {
-                this._togglePrevious(true);
-            }
-        },
-
-        _updateStateButtonNextPage: function() {
-            if (this.collection.getPageSize() < this.collection.getCount()) {
-                if (this.collection.getPage() === this.collection.pager.total) {
-                    this._toggleNext();
-                } else {
-                    this._toggleNext(true);
-                }
-            } else {
-                this._toggleNext();
-            }
+            this._reload();
         },
 
         _togglePrevious: function(enable) {
@@ -252,6 +239,12 @@ define(function(require) {
             }
         },
 
+        _reloadOnAdd: function() {
+            if (this.collection.getPage() == 1) {
+                this._reload();
+            }
+        },
+
         _reload: function() {
             var itemViews;
             // please note that _hideLoading will be called in renderAllItems() function
@@ -261,6 +254,8 @@ define(function(require) {
                 return;
             }
             try {
+                debugger;
+
                 // store views state
                 this.oldViewStates = {};
                 itemViews = this.getItemViews();
