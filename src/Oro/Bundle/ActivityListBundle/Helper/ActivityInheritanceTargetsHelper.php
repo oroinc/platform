@@ -90,10 +90,43 @@ class ActivityInheritanceTargetsHelper
      */
     public function getInheritanceTargetsRelations($entityClass)
     {
+        $filteredTargets = [];
+
         $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
-        $filteredTargets = $this->prepareTargetData($configValues['inheritance_targets']);
+        if (isset($configValues['inheritance_targets'])) {
+            $filteredTargets = $this->prepareTargetData($configValues['inheritance_targets']);
+        }
 
         return $filteredTargets;
+    }
+
+    /**
+     * @param string $target
+     * @param string[] $path
+     * @param integer $entityId
+     * @param integer $uniqueKey
+     *
+     * @return QueryBuilder
+     */
+    public function getSubQuery($target, $path, $entityId, $uniqueKey)
+    {
+        $alias = 'inherit_' . $uniqueKey;
+
+        /** @var QueryBuilder $subQueryBuilder */
+        $subQueryBuilder = $this->registry->getManagerForClass($target)->createQueryBuilder();
+        $subQueryBuilder->select($alias . '.id')->from($target, $alias);
+
+        foreach ($path as $key => $field) {
+            $newAlias = 't_' . $uniqueKey . '_' . $key;
+            $subQueryBuilder->join($alias . '.' . $field, $newAlias);
+            $alias = $newAlias;
+        }
+
+        $subQueryBuilder
+            ->where($alias . '.id = :entityId')
+            ->setParameter('entityId', $entityId);
+
+        return $subQueryBuilder;
     }
 
     /**
@@ -132,33 +165,6 @@ class ActivityInheritanceTargetsHelper
         }
 
         return $filteredTargets;
-    }
-
-    /**
-     * @param string $target
-     * @param string[] $path
-     * @param integer $entityId
-     * @param integer $uniqueKey
-     *
-     * @return QueryBuilder
-     */
-    public function getSubQuery($target, $path, $entityId, $uniqueKey)
-    {
-        $alias = 'inherit_' . $uniqueKey;
-        $subQueryBuilder = $this->registry->getManagerForClass($target)->createQueryBuilder();
-        $subQueryBuilder->select($alias . '.id')->from($target, $alias);
-
-        foreach ($path as $key => $field) {
-            $newAlias = 't_' . $uniqueKey . '_' . $key;
-            $subQueryBuilder->join($alias . '.' . $field, $newAlias);
-            $alias = $newAlias;
-        }
-
-        $subQueryBuilder
-            ->where($alias . '.id = :entityId')
-            ->setParameter('entityId', $entityId);
-
-        return $subQueryBuilder;
     }
 
     /**
