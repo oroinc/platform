@@ -1,12 +1,12 @@
 <?php
-namespace Oro\Bundle\DashboardBundle\Query;
+
+namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 
-class FilterQueryProcessor extends SegmentQueryConverter
+class FilterProcessor extends SegmentQueryConverter
 {
     /** @var string */
     protected $rootEntityAlias;
