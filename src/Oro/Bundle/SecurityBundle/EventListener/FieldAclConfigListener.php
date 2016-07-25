@@ -4,12 +4,25 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadataProvider;
 
 /**
  * Sets field_acl_supported to true for custom entities to be able to turn Field level ACL
+ * Cleanup fields security metadata in case if field_acl_enabled parameter was changed
  */
 class FieldAclConfigListener
 {
+    /** @var FieldSecurityMetadataProvider */
+    protected $metadataProvider;
+
+    /**
+     * @param FieldSecurityMetadataProvider $metadataProvider
+     */
+    public function __construct(FieldSecurityMetadataProvider $metadataProvider)
+    {
+        $this->metadataProvider = $metadataProvider;
+    }
+
     /**
      * @param PreFlushConfigEvent $event
      */
@@ -20,17 +33,23 @@ class FieldAclConfigListener
             return;
         }
 
-        $config = $event->getConfig('extend');
-        // supports only custom entities
-        if (null === $config || $config->get('owner') !== ExtendScope::OWNER_CUSTOM) {
-            return;
-        }
-
         $securityConfig = $event->getConfig('security');
         if (null === $securityConfig) {
             return;
         }
 
+        // check if was changed field_acl_enabled parameter and clear cache
+        $changeSet = $event->getConfigManager()->getConfigChangeSet($securityConfig);
+        if (isset($changeSet['field_acl_enabled'])) {
+            $this->metadataProvider->clearCache();
+        }
+
+        // set field_acl_supported in true for custom entities
+        $config = $event->getConfig('extend');
+        // supports only custom entities
+        if (null === $config || $config->get('owner') !== ExtendScope::OWNER_CUSTOM) {
+            return;
+        }
         $securityConfig->set('field_acl_supported', true);
     }
 }

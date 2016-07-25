@@ -716,5 +716,7 @@ services:
 
     oro_security.listener.config_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\FieldAclConfigListener
+        arguments:
+            - '@oro_security.field_security_metadata_provider'
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
