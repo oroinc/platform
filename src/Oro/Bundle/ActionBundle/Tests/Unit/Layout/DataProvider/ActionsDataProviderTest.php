@@ -87,7 +87,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
 
         $layoutContext = new LayoutContext();
-        $layoutContext->data()->set('entity', 'entity', $entity);
+        $layoutContext->data()->set('entity', $entity);
 
         $actionContext = ['entityId' => null, 'entityClass' => '\stdClass'];
 
