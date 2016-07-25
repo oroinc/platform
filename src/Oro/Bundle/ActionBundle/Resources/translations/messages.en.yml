@@ -9,3 +9,5 @@ oro:
         clone:          Clone
         clone_entity:   Clone
         clone.label:    Copy of {label}
+        clone.success:  Entity cloned successfully.
+        clone.error:    Cloning entity failed.

@@ -112,8 +112,6 @@ services:
         arguments:
             - '@oro_action.context_accessor'
             - '@doctrine'
-            - '@session.flash_bag'
-            - '@logger'
         tags:
             - { name: oro_action.action, alias: create_entity }
 
@@ -264,5 +262,8 @@ services:
         arguments:
             - '@oro_action.context_accessor'
             - '@doctrine'
+            - '@translator'
+            - '@session.flash_bag'
+            - '@logger'
         tags:
             - { name: oro_action.action, alias: clone_entity }

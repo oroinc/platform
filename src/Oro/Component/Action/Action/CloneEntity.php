@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 use Oro\Component\Action\Exception\NotManageableEntityException;
@@ -24,6 +25,9 @@ class CloneEntity extends CloneObject
     /** @var ManagerRegistry */
     protected $registry;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /** @var FlashBagInterface */
     protected $flashBag;
 
@@ -33,20 +37,23 @@ class CloneEntity extends CloneObject
     /**
      * @param ContextAccessor $contextAccessor
      * @param ManagerRegistry $registry
+     * @param TranslatorInterface $translator
      * @param FlashBagInterface $flashBag
      * @param LoggerInterface $logger
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         ManagerRegistry $registry,
+        TranslatorInterface $translator,
         FlashBagInterface $flashBag = null,
         LoggerInterface $logger = null
     ) {
         parent::__construct($contextAccessor);
 
-        $this->registry = $registry;
-        $this->flashBag = $flashBag;
-        $this->logger   = $logger != null ? $logger : new NullLogger();
+        $this->registry   = $registry;
+        $this->translator = $translator;
+        $this->flashBag   = $flashBag;
+        $this->logger     = $logger != null ? $logger : new NullLogger();
     }
 
     /** {@inheritdoc} */
@@ -72,6 +79,7 @@ class CloneEntity extends CloneObject
             $classMeta->setIdentifierValues($entity, array_fill_keys(array_keys($entityId), null));
         }
 
+        $saved = false;
         try {
             // save
             $entityManager->persist($entity);
@@ -79,12 +87,18 @@ class CloneEntity extends CloneObject
             if ($this->doFlush()) {
                 $entityManager->flush($entity);
             }
+            $saved = true;
         } catch (\Exception $e) {
+            $saved = false;
             if ($this->flashBag) {
-                $this->flashBag->add('error', sprintf('Could not clone entity due to an error.'));
+                $this->flashBag->add('error', $this->translator->trans('oro.action.clone.error'));
             }
 
             $this->logger->error($e->getMessage());
+        }
+
+        if ($saved && $this->flashBag) {
+            $this->flashBag->add('success', $this->translator->trans('oro.action.clone.success'));
         }
 
         return $entity;

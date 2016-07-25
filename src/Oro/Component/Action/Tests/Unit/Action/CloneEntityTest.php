@@ -8,6 +8,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -29,6 +30,11 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
     protected $registry;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @var \PHPUnit_Framework_MockObject_MockObject|FlashBagInterface
      */
     protected $flashBag;
@@ -46,6 +52,10 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->translator = $this->getMockBuilder(TranslatorInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->flashBag = $this->getMockBuilder(FlashBagInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -57,6 +67,7 @@ class CloneEntityTest extends \PHPUnit_Framework_TestCase
         $this->action = new CloneEntity(
             $this->contextAccessor,
             $this->registry,
+            $this->translator,
             $this->flashBag,
             $this->logger
         );
