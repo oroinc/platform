@@ -179,14 +179,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             $('.hasDatepicker').datepicker('hide');
         });
 
-        var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
+        var openDropdownsSelector = '.dropdown.open, .dropdown .open, .dropup.open, .dropup .open, ' +
+            '.oro-drop.open, .oro-drop .open';
         $('html').click(function(e) {
             var $target = $(e.target);
             var clickingTarget = null;
-            if ($target.hasClass('dropdown') || $target.hasClass('oro-drop')) {
+            if ($target.is('.dropdown, .dropup, .oro-drop')) {
                 clickingTarget = $target;
             } else {
-                clickingTarget = $target.closest('.dropdown, .oro-drop');
+                clickingTarget = $target.closest('.dropdown, .dropup, .oro-drop');
             }
             $(openDropdownsSelector).not(clickingTarget).trigger('tohide.bs.dropdown');
         });

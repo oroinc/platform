@@ -160,7 +160,7 @@ define(function(require) {
 
     $(document)
         .on('click.dropdown.data-api', toggleDropdown, Dropdown.prototype.toggle)
-        .on('tohide.bs.dropdown', toggleDropdown + ', .dropdown.open', function(e) {
+        .on('tohide.bs.dropdown', toggleDropdown + ', .dropdown.open, .dropup.open', function(e) {
             /**
              * Performs safe hide action for dropdown and triggers 'hide.bs.dropdown'
              * (the event 'tohide.bs.dropdown' have to be triggered on toggleDropdown or dropdown elements)
@@ -169,7 +169,7 @@ define(function(require) {
             if ($target.is(toggleDropdown)) {
                 $target = getParent($target);
             }
-            if ($target.is('.dropdown.open')) {
+            if ($target.is('.dropdown.open, .dropup.open')) {
                 $target.trigger('hide.bs.dropdown');
             }
             $target.removeClass('open');
@@ -255,7 +255,7 @@ define(function(require) {
         }
 
         $(document)
-            .on('shown.bs.dropdown', '.dropdown', function() {
+            .on('shown.bs.dropdown', '.dropdown, .dropup', function() {
                 var $toggle = $(toggleDropdown, this);
                 var $dropdownMenu = $('>.dropdown-menu', this);
                 var options = $dropdownMenu.data('options');
@@ -267,7 +267,7 @@ define(function(require) {
                     makeFloating($toggle, $dropdownMenu);
                 }
             })
-            .on('hide.bs.dropdown', '.dropdown.open', function() {
+            .on('hide.bs.dropdown', '.dropdown.open, .dropup.open', function() {
                 var $toggle = $(toggleDropdown, this);
                 var $dropdownMenu = $('>.dropdown-menu__placeholder', this).data('related-menu');
                 if ($dropdownMenu && $dropdownMenu.length) {
