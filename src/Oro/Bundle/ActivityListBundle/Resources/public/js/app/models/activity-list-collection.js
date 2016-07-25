@@ -19,15 +19,43 @@ define([
             pagesize: 1, //items per page
             total:    1  //total pages
         },
+        pageFilter: {
+            date: null,
+            ids: [],
+            action: null //'next' or 'prev' or null (refresh action)
+         },
 
         url: function() {
             return routing.generate(
                 this.route,
                 _.extend(
                     _.extend([], this.routeParameters),
-                    _.extend({page: this.getPage()}, {filter: this.filter})
+                    _.extend({page: this.getPage()}, {filter: this.filter}, {pageFilter: this.pageFilter})
                 )
             );
+        },
+
+        setPageFilterDate: function(value) {
+            this.pageFilter.date = value;
+        },
+        setPageFilterIds: function(value) {
+            this.pageFilter.ids = value ? value : [];
+        },
+        getPageFilterIds: function() {
+            return this.pageFilter.ids;
+        },
+        setPageFilterAction: function(value) {
+            this.pageFilter.action = value ? value : null;
+        },
+        getPageFilterAction: function() {
+            return this.pageFilter.action;
+        },
+        resetPageFilter: function() {
+            this.pageFilter = {
+                date: null,
+                ids: [],
+                action: null
+            };
         },
 
         setFilter: function(filter) {
@@ -46,6 +74,13 @@ define([
         },
         setPageSize: function(pagesize) {
             this.pager.pagesize = pagesize;
+        },
+
+        getPageTotal: function() {
+            return parseInt(this.pager.total);
+        },
+        setPageTotal: function(value) {
+            this.pager.total = value;
         },
 
         reset: function(models, options) {
