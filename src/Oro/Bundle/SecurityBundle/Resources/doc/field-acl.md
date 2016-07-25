@@ -1,12 +1,13 @@
 Field ACL
 =========
 
-Field ACL allow to check permission on specific field of entity.
+Field ACL allows to check an access to an entity field.
 
 Field ACL supports next permissions: VIEW, CREATE, EDIT. 
 
-By default, Field ACL is disabled. To turn the ability to check fields for some entity, it should have `field_acl_supported` parameter of entity config
-in `security` scope for this entity:
+By default, entity fields are not protected by ACL. To be able to manage field ACL you should add the `field_acl_supported` attribute to 'security' scope of entity config.
+
+If you need to allow manage ACL for field of your entity you can set `field_acl_supported` in entity config:
 
 ```
 
@@ -39,8 +40,7 @@ in `security` scope for this entity:
  
  ```
  
- If you have existing entity, additionally new migration should be created that will set `field_acl_supported` property for entity:
- 
+If you need to allow manage ACL for field of an entity for which you cannot modify @Config annotation you can set `field_acl_supported` with migration:
  
 ```
  
@@ -79,12 +79,11 @@ After that, in entity config page of this entity will be two additional paramete
 
 WIth `Field Level ACL` parameter, system manager will be able to turn on Field ACL for given entity. 
 
-With `Show Restricted` parameter, if Field ACL enabled and user have no access to field, on create and edit pages this field will be shown as disabled field.
-
+When both Show Restricted and Field ACL options are enabled and an user does not have an access to a field this field will be read-only on create and edit pages.
 Check Field ACL in php code
 ---------------------------
 
-You can check access to some field with `oro_security.security_facade` service. To do this, you should create `FieldVote` instance and set is as the second parameter of isGranted method:
+You can check access to some field with `oro_security.security_facade` service. To do this, you should create an instance of FieldVote class and pass it as the second parameter of isGranted method:
 
 
 ```
@@ -102,7 +101,7 @@ As result, $isGranted variable will contain true value if access is granted and 
 
 $entity parameter should contain an instance of entity you want to check.
 
-In case if you does not have entity instance but have the class name, id of record, owners and organization ids of this record, you can use  object of `EntityObjectReference` class:
+In case if you does not have entity instance but have the class name, id of record, owner and organization ids of this record, you can use `EntityObjectReference` class:
  
 ```
 <?php

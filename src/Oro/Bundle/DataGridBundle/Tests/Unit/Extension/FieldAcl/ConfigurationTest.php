@@ -54,7 +54,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'columns' => [
-                    'first' => ['disabled' => true],
+                    'first' => ['disabled' => false],
                     'second' => ['disabled' => true],
                     'third' => ['disabled' => false],
                     'fourth' => ['data_name' => 'a.fourth', 'disabled' => false],
