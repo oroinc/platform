@@ -86,6 +86,15 @@ services:
         tags:
             - { name: form.type, alias: oro_business_unit_select }
 
+    oro_organization.form.type.businesS_unit_select_autocomplete:
+        class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - %oro_organization.business_unit.entity.class%
+            - '@oro_organization.business_unit_manager'
+        tags:
+            - { name: form.type, alias: "oro_type_business_unit_select_autocomplete" }
+
     #
     # Organization
     #

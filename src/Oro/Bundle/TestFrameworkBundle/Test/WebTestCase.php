@@ -33,6 +33,7 @@ abstract class WebTestCase extends BaseWebTestCase
     
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
+    const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
     const DB_REINDEX_ANNOTATION   = 'dbReindex';
 
     /** Default WSSE credentials */
@@ -48,6 +49,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @var bool[]
      */
     private static $dbIsolation;
+
+    /**
+     * @var bool[]
+     */
+    private static $dbIsolationPerTest;
 
     /**
      * @var bool[]
@@ -86,6 +92,11 @@ abstract class WebTestCase extends BaseWebTestCase
 
     protected function tearDown()
     {
+        if (self::getDbIsolationPerTestSetting()) {
+            $this->rollbackTransaction();
+            self::$loadedFixtures = [];
+        }
+        
         $refClass = new \ReflectionClass($this);
         foreach ($refClass->getProperties() as $prop) {
             if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
@@ -97,7 +108,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
     public static function tearDownAfterClass()
     {
-        if (self::getDbIsolationSetting()) {
+        if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
             self::rollbackTransaction();
         }
 
@@ -121,6 +132,10 @@ abstract class WebTestCase extends BaseWebTestCase
             $this->resetClient();
         }
 
+        if (self::getDbIsolationPerTestSetting()) {
+            $this->resetClient();
+        }
+
         if (!self::$clientInstance) {
             // Fix for: The "native_profiler" extension is not enabled in "*.html.twig".
             // If you still getting this exception please run "php app/console cache:clear --env=test --no-debug".
@@ -131,7 +146,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
             $this->client = self::$clientInstance = static::createClient($options, $server);
 
-            if (self::getDbIsolationSetting()) {
+            if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
                 //This is a workaround for MyISAM search tables that are not transactional
                 if (self::getDbReindexSetting()) {
                     self::getContainer()->get('oro_search.search.engine')->reindex();
@@ -152,7 +167,7 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function resetClient()
     {
         if (self::$clientInstance) {
-            if (self::getDbIsolationSetting()) {
+            if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
                 self::$loadedFixtures = [];
                 $this->rollbackTransaction();
             }
@@ -198,6 +213,24 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$dbIsolation[$calledClass];
+    }
+
+    /**
+     * Get value of dbIsolationPerTest option from annotation of called class
+     *
+     * @return bool
+     */
+    private static function getDbIsolationPerTestSetting()
+    {
+        $calledClass = get_called_class();
+        if (!isset(self::$dbIsolationPerTest[$calledClass])) {
+            self::$dbIsolationPerTest[$calledClass] = self::isClassHasAnnotation(
+                $calledClass,
+                self::DB_ISOLATION_PER_TEST_ANNOTATION
+            );
+        }
+
+        return self::$dbIsolationPerTest[$calledClass];
     }
 
     /**

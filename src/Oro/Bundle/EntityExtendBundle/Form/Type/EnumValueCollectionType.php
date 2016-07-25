@@ -44,6 +44,12 @@ class EnumValueCollectionType extends AbstractType
                 'disabled'          => function (Options $options, $value) {
                     return $this->isDisabled($options) ? true : $value;
                 },
+                'options'           => function (Options $options, $value) {
+                    return array_replace(
+                        ['allow_multiple_selection' => ($this->isMultipleSelectEnable($options['config_id']))],
+                        $value
+                    );
+                },
                 'allow_add'         => function (Options $options, $value) {
                     return $options['disabled'] || $this->isDisabled($options, 'add') ? false : $value;
                 },
@@ -62,7 +68,16 @@ class EnumValueCollectionType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['multiple'] = $this->typeHelper->getFieldType($options['config_id']) === 'multiEnum';
+        $view->vars['multiple'] = $this->isMultipleSelectEnable($options['config_id']);
+    }
+
+    /**
+     * @param $field
+     * @return bool
+     */
+    protected function isMultipleSelectEnable($field)
+    {
+        return $this->typeHelper->getFieldType($field) === 'multiEnum';
     }
 
     /**
