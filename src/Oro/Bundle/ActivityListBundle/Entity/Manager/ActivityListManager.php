@@ -159,11 +159,13 @@ class ActivityListManager
      */
     protected function getListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter)
     {
-        $orderFieldName = $this->config->get('oro_activity_list.sorting_field');
+        $pageSize = $this->config->get('oro_activity_list.per_page');
+        $orderBy = $this->config->get('oro_activity_list.sorting_field');
+        $orderDirection = $this->config->get('oro_activity_list.sorting_direction');
 
-        $qb->setMaxResults($this->config->get('oro_activity_list.per_page') * self::ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER);
+        $qb->setMaxResults($pageSize * self::ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER);
         $qb->resetDQLParts(['select', 'groupBy']);
-        $qb->addSelect('activity.id, activity.' . $orderFieldName);
+        $qb->addSelect('activity.id, activity.' . $orderBy);
 
         $this->applyPageFilter($qb, $pageFilter);
 
@@ -175,20 +177,27 @@ class ActivityListManager
             $this->getListDataIdsForInheritances(clone $qb, $entityClass, $entityId, $filter, $pageFilter)
         );
 
-        if ($pageFilter['action'] === 'prev') {
+        if ((!$pageFilter && $orderDirection === 'ASC')
+            ||($orderDirection === 'DESC' && $pageFilter['action'] === 'prev')
+            || ($orderDirection === 'ASC' && $pageFilter['action'] === 'next')
+        ) {
             // ASC sorting
-            usort($ids, function ($a, $b) use ($orderFieldName) {
-                return $a[$orderFieldName]->getTimestamp() - $b[$orderFieldName]->getTimestamp();
+            usort($ids, function ($a, $b) use ($orderBy) {
+                return $a[$orderBy]->getTimestamp() - $b[$orderBy]->getTimestamp();
             });
-        } else {
+        }
+        if ((!$pageFilter && $orderDirection === 'DESC')
+            ||($orderDirection === 'DESC' && $pageFilter['action'] === 'next')
+            || ($orderDirection === 'ASC' && $pageFilter['action'] === 'prev')
+        ) {
             //DESC sorting
-            usort($ids, function ($a, $b) use ($orderFieldName) {
-                return $b[$orderFieldName]->getTimestamp() - $a[$orderFieldName]->getTimestamp();
+            usort($ids, function ($a, $b) use ($orderBy) {
+                return $b[$orderBy]->getTimestamp() - $a[$orderBy]->getTimestamp();
             });
         }
 
         $ids = array_unique(array_column($ids, 'id'));
-        $ids = array_slice($ids, 0, $this->config->get('oro_activity_list.per_page'));
+        $ids = array_slice($ids, 0, $pageSize);
 
         return $ids;
     }
@@ -202,17 +211,33 @@ class ActivityListManager
         $orderBy = $this->config->get('oro_activity_list.sorting_field');
         $orderDirection = $this->config->get('oro_activity_list.sorting_direction');
 
-        if (isset($pageFilter['date']) && isset($pageFilter['ids'])) {
-            $updatedAt = new \DateTime($pageFilter['date'], new \DateTimeZone('UTC'));
+        if (!empty($pageFilter['date']) && !empty($pageFilter['ids'])) {
+            $dateFilter = new \DateTime($pageFilter['date'], new \DateTimeZone('UTC'));
+
             if ($pageFilter['action'] === 'next') {
-                $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':d'))
-                    ->setParameter(':d', $updatedAt->format('Y-m-d H:i:s'));
-                $qb->orderBy('activity.' . $orderBy, $orderDirection);
+                if ($orderDirection === 'DESC') {
+                    $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':dateFilter'))
+                        ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
+                    $qb->orderBy('activity.' . $orderBy, $orderDirection);
+                }
+                if ($orderDirection === 'ASC') {
+                    $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':dateFilter'))
+                        ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
+                    $qb->orderBy('activity.' . $orderBy, $orderDirection);
+                }
             }
+
             if ($pageFilter['action'] === 'prev') {
-                $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':d'))
-                    ->setParameter(':d', $updatedAt->format('Y-m-d H:i:s'));
-                $qb->orderBy('activity.' . $orderBy, $orderDirection === 'DESC' ? 'ASC' : 'DESC');
+                if ($orderDirection === 'DESC') {
+                    $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':dateFilter'))
+                        ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
+                    $qb->orderBy('activity.' . $orderBy, $orderDirection === 'DESC' ? 'ASC' : 'DESC');
+                }
+                if ($orderDirection === 'ASC') {
+                    $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':dateFilter'))
+                        ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
+                    $qb->orderBy('activity.' . $orderBy, $orderDirection === 'DESC' ? 'ASC' : 'DESC');
+                }
             }
 
             $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
