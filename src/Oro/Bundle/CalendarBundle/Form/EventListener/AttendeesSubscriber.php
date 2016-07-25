@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\EventListener;
 
-use Doctrine\Common\Collections\Collection;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -45,40 +43,51 @@ class AttendeesSubscriber implements EventSubscriberInterface
      */
     public function fixSubmittedData(FormEvent $event)
     {
-        /** @var Attendee[]|Collection $data */
-        $data      = $event->getData();
+        /**
+         * Fix case when submitted data is empty string
+         */
+        $data = $event->getData();
+        if (empty($data)) {
+            $event->setData([]);
+
+            return;
+        }
+
+        /** @var Attendee[] $attendees */
         $attendees = $event->getForm()->getData();
-        if (!$attendees || !$data) {
+        if (!$attendees) {
             return;
         }
 
         $attendeeKeysByEmail = [];
         foreach ($attendees as $key => $attendee) {
-            $id = $attendee->getEmail() ?: $attendee->getDisplayName();
-            if (!$id) {
+            if ($attendee->getEmail()) {
+                $attendeeKeysByEmail[$attendee->getEmail()] = $key;
+            } elseif ($attendee->getDisplayName()) {
+                $attendeeKeysByEmail[$attendee->getDisplayName()] = $key;
+            } else {
                 return;
             }
-
-            $attendeeKeysByEmail[$id] = $key;
         }
 
         $nextNewKey = count($attendeeKeysByEmail);
-        $fixedData = [];
+        $attendeesWithFixedKeys = [];
         foreach ($data as $attendee) {
-            if (empty($attendee['email']) && empty($attendee['displayName'])) {
-                return;
+            $id = null;
+            if (!empty($attendee['email'])) {
+                $id = $attendee['email'];
+            } elseif (!empty($attendee['displayName'])) {
+                $id = $attendee['displayName'];
             }
 
-            $id = empty($attendee['email']) ? $attendee['displayName'] : $attendee['email'];
-
-            $key = isset($attendeeKeysByEmail[$id])
-                ? $attendeeKeysByEmail[$id]
-                : $nextNewKey++;
-
-            $fixedData[$key] = $attendee;
+            if ($id && isset($attendeeKeysByEmail[$id])) {
+                $attendeesWithFixedKeys[$attendeeKeysByEmail[$id]] = $attendee;
+            } else {
+                $attendeesWithFixedKeys[$nextNewKey++] = $attendee;
+            }
         }
 
-        $event->setData($fixedData);
+        $event->setData($attendeesWithFixedKeys);
     }
 
     /**
