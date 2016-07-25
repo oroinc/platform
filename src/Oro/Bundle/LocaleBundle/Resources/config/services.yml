@@ -56,8 +56,8 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
         public: false
         arguments:
-            - "@oro_locale.provider.localization"
-            - "@oro_locale.provider.current_localization"
+            - '@oro_locale.provider.localization'
+            - '@oro_locale.provider.current_localization'
 
     oro_locale.listener.orm.localization_listener:
         class: 'Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener'

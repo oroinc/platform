@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+
 /**
- * @method LocalizedFallbackValue getTitle()
+ * @method LocalizedFallbackValue getTitle(Localization $localization = null)
  * @method LocalizedFallbackValue getDefaultTitle()
  */
 class ExtendLocalization

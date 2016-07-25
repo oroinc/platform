@@ -38,8 +38,6 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
      */
     public function generate(array $schema, PhpClass $class)
     {
-        error_log('generate1: ' . $schema['class']);
-
         if (!isset($schema['class']) || !isset($this->methodExtensions[$schema['class']])) {
             return false;
         }

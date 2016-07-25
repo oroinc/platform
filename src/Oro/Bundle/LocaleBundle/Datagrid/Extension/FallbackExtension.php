@@ -113,6 +113,7 @@ class FallbackExtension extends AbstractExtension
                 ->innerJoin($join, $joinAlias, Expr\Join::WITH, $joinAlias . '.localization IS NULL');
         }
     }
+
     /**
      * {@inheritdoc}
      */

@@ -24,6 +24,10 @@ class LocalizationHelper
      */
     protected $currentLocalizationProvider;
 
+    /**
+     * @param LocalizationProvider $localizationProvider
+     * @param CurrentLocalizationProvider $currentLocalizationProvider
+     */
     public function __construct(
         LocalizationProvider $localizationProvider,
         CurrentLocalizationProvider $currentLocalizationProvider
