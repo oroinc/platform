@@ -156,6 +156,11 @@ class CalendarEventApiHandler
                 $childEvent->setCancelled(true);
             }
         }
+
+        if ($originalAttendees->count() != $entity->getAttendees()->count()) {
+            $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        }
+
         $this->manager->persist($entity);
         $this->manager->flush();
 
