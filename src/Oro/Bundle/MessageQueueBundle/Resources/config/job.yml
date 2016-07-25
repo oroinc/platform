@@ -1,0 +1,17 @@
+services:
+    oro_message_queue.job.repository:
+        class: Doctrine\ORM\EntityRepository
+        factory: ['@doctrine.orm.default_entity_manager', 'getRepository']
+        arguments:
+            - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
+
+    oro_message_queue.job.storage:
+        class: Oro\Component\MessageQueue\Job\JobStorage
+        arguments:
+            - '@doctrine.orm.default_entity_manager'
+            - '@oro_message_queue.job.repository'
+
+    oro_message_queue.job.processor:
+        class: Oro\Component\MessageQueue\Job\JobProcessor
+        arguments:
+            - '@oro_message_queue.job.storage'

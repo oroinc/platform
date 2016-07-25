@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
-class EntityJob extends Job
+class JobEntity extends Job
 {
     /**
      * @internal

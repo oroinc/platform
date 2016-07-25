@@ -4,6 +4,7 @@ namespace Oro\Component\MessageQueue\Job;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 
 class JobStorage
 {
@@ -13,23 +14,30 @@ class JobStorage
     private $em;
 
     /**
-     * @param EntityManager $em
+     * @var EntityRepository
      */
-    public function __construct(EntityManager $em)
+    private $repository;
+
+    /**
+     * @param EntityManager    $em
+     * @param EntityRepository $repository
+     */
+    public function __construct(EntityManager $em, EntityRepository $repository)
     {
         $this->em = $em;
+        $this->repository = $repository;
     }
 
     /**
      * @param int $id
      *
-     * @return EntityJob
+     * @return JobEntity
      */
     public function findJobById($id)
     {
-        $em = $this->em->getRepository(EntityJob::class)->createQueryBuilder('job');
+        $qb = $this->repository->createQueryBuilder('job');
 
-        return $em
+        return $qb
             ->addSelect('rootJob')
             ->innerJoin('job.rootJob', 'rootJob')
             ->where('job = :id')
@@ -46,10 +54,10 @@ class JobStorage
      */
     public function saveJob(Job $job, \Closure $lockCallback = null)
     {
-        if (! $job instanceof EntityJob) {
+        if (! $job instanceof JobEntity) {
             throw new \LogicException(sprintf(
                 'Got unexpected job instance: expected: "%s", actual" "%s"',
-                EntityJob::class,
+                JobEntity::class,
                 get_class($job)
             ));
         }
@@ -57,8 +65,8 @@ class JobStorage
         try {
             if ($lockCallback) {
                 $this->em->transactional(function (EntityManager $em) use ($job, $lockCallback) {
-                    /** @var EntityJob $job */
-                    $job = $em->find(EntityJob::class, $job->getId(), LockMode::PESSIMISTIC_WRITE);
+                    /** @var JobEntity $job */
+                    $job = $this->repository->find($job->getId(), LockMode::PESSIMISTIC_WRITE);
 
                     $lockCallback($job);
 
@@ -75,9 +83,9 @@ class JobStorage
     }
 
     /**
-     * @param EntityJob $job
+     * @param JobEntity $job
      */
-    protected function updateUniqueNameField(EntityJob $job)
+    protected function updateUniqueNameField(JobEntity $job)
     {
         if (! $job->isUnique()) {
             return;
