@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\SecurityBundle\Metadata\EntityFieldSecurityMetadata;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
@@ -19,6 +18,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
+use Oro\Bundle\SecurityBundle\Metadata\EntityFieldSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
@@ -146,7 +146,6 @@ class AclPrivilegeRepository
                     ->setCategory($category);
 
                 $this->addPermissions($sid, $privilege, $oid, $acls, $extension, $rootAcl);
-
 
                 if ($fieldExtension) {
                     $className = $oid->getType();

@@ -4,14 +4,10 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 
 class FieldSecurityMetadata implements \Serializable
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $fieldName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $label;
 
     /**

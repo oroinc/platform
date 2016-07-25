@@ -178,14 +178,6 @@ class AclRoleHandler
             $this->privilegeConfig[$configName]['permissions']
                 = $this->privilegeRepository->getPermissionNames($config['types']);
         }
-
-//        if ($className) {
-//            // leave only fields privileges config
-//            $this->privilegeConfig = array_intersect_key($this->privilegeConfig, array_flip(['field']));
-//        } else {
-//            // unset field privileges config
-//            unset($this->privilegeConfig['field']);
-//        }
     }
 
     /**

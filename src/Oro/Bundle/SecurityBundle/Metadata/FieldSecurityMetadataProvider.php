@@ -22,22 +22,16 @@ class FieldSecurityMetadataProvider
     /** @var ConfigProvider */
     protected $securityConfigProvider;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $extendConfigProvider;
 
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var CacheProvider */
     protected $cache;
 
     /**

@@ -109,7 +109,6 @@ class FieldAclExtension extends AbstractAclExtension
     public static function isDecodedKey($key)
     {
         return (bool)strpos($key, '::');
-
     }
 
     /**

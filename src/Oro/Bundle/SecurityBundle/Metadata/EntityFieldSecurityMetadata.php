@@ -6,29 +6,19 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 
 class EntityFieldSecurityMetadata implements AclClassInfo, \Serializable
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $securityType;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $className;
 
-    /**
-     * @var array|FieldSecurityMetadata[]
-     */
+    /** @var array|FieldSecurityMetadata[] */
     protected $fields;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $group;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $label;
 
     /**
@@ -94,7 +84,6 @@ class EntityFieldSecurityMetadata implements AclClassInfo, \Serializable
     {
         return $this->label;
     }
-
 
     /**
      * {@inheritdoc}
