@@ -130,7 +130,6 @@
 }
 
 .filter-criteria {
-  padding: 0 @contentPadding*0.5 @contentPadding*0.5-4;
   .hint {
     text-transform: uppercase;
     margin: 5px 0 3px 0;
@@ -230,11 +229,9 @@
     & > div, .dropdown, .filter-select{
       display: inline;
     }
-    .datefilter{
+    .fields-row > .datefilter{
       display: inline-block;
-      input[type="text"]{
-        margin-bottom: 11px;
-      }
+      margin-bottom: 11px;
     }
     .caret {
       display: none;
@@ -253,7 +250,8 @@
   & > div {
     display: flex;
   }
-  .left-area {
+  .left-area.filter-criteria {
+    padding: 0 @contentPadding*0.5 @contentPadding*0.5-4;
     width: 150px;
   }
   .right-area {
