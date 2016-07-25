@@ -35,9 +35,6 @@ class ActivityListManager
      */
     const ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER = 3;
 
-    /** @var int Activity list configured page size */
-    protected $pageSize;
-
     /** @var SecurityFacade */
     protected $securityFacade;
 
@@ -101,8 +98,6 @@ class ActivityListManager
         $this->activityListAclHelper = $aclHelper;
         $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
         $this->eventDispatcher = $eventDispatcher;
-
-        $this->pageSize = $this->config->get('oro_activity_list.per_page');
     }
 
     /**
@@ -111,19 +106,6 @@ class ActivityListManager
     public function getRepository()
     {
         return $this->doctrineHelper->getEntityRepository(ActivityList::ENTITY_NAME);
-    }
-
-    /**
-     * @param string  $entityClass
-     * @param integer $entityId
-     * @param array   $filter
-     * @param integer $page
-     *
-     * @return ActivityList[]
-     */
-    public function getList($entityClass, $entityId, $filter, $page)
-    {
-        return $this->getListData($entityClass, $entityId, $filter, $page)['data'];
     }
 
     /**
@@ -149,8 +131,7 @@ class ActivityListManager
                 'activity.' . $this->config->get('oro_activity_list.sorting_field'),
                 $this->config->get('oro_activity_list.sorting_direction')
             );
-            $qb->setFirstResult(0);
-            $qb->setMaxResults($this->pageSize);
+            $qb->setMaxResults($this->config->get('oro_activity_list.per_page'));
 
             $result = $qb->getQuery()->getResult();
         }
@@ -178,10 +159,11 @@ class ActivityListManager
      */
     protected function getListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter)
     {
-        $qb->setFirstResult(0);
-        $qb->setMaxResults($this->pageSize * self::ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER);
+        $orderFieldName = $this->config->get('oro_activity_list.sorting_field');
+
+        $qb->setMaxResults($this->config->get('oro_activity_list.per_page') * self::ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER);
         $qb->resetDQLParts(['select', 'groupBy']);
-        $qb->addSelect('activity.id, activity.updatedAt');
+        $qb->addSelect('activity.id, activity.' . $orderFieldName);
 
         $this->applyPageFilter($qb, $pageFilter);
 
@@ -195,18 +177,18 @@ class ActivityListManager
 
         if ($pageFilter['action'] === 'prev') {
             // ASC sorting
-            usort($ids, function ($a, $b) {
-                return $a['updatedAt']->getTimestamp() - $b['updatedAt']->getTimestamp();
+            usort($ids, function ($a, $b) use ($orderFieldName) {
+                return $a[$orderFieldName]->getTimestamp() - $b[$orderFieldName]->getTimestamp();
             });
         } else {
             //DESC sorting
-            usort($ids, function ($a, $b) {
-                return $b['updatedAt']->getTimestamp() - $a['updatedAt']->getTimestamp();
+            usort($ids, function ($a, $b) use ($orderFieldName) {
+                return $b[$orderFieldName]->getTimestamp() - $a[$orderFieldName]->getTimestamp();
             });
         }
 
         $ids = array_unique(array_column($ids, 'id'));
-        $ids = array_slice($ids, 0, $this->pageSize);
+        $ids = array_slice($ids, 0, $this->config->get('oro_activity_list.per_page'));
 
         return $ids;
     }
@@ -376,7 +358,6 @@ class ActivityListManager
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
             'updatedAt'            => $entity->getUpdatedAt()->format('c'),
-            //'upd'            => $entity->getUpdatedAt()->format('Y-m-d H:i:s'),
             'editable'             => $this->securityFacade->isGranted('EDIT', $activity),
             'removable'            => $this->securityFacade->isGranted('DELETE', $activity),
             'commentCount'         => $numberOfComments,
