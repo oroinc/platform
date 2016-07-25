@@ -1,0 +1,5 @@
+ContextSelector:
+  selector:
+    type: 'xpath'
+    locator: '//div[contains(@class, "ui-dialog")]/div[contains(@class, "widget-content")]/div[contains(@class, "btn-group")]'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

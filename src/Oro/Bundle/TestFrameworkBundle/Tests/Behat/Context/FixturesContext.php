@@ -29,6 +29,7 @@ class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInt
      *     | subject      |
      *     | hello world! |
      *     | <sentence()> |
+     *
      * @Given /^(?:the|there are) following ([\w ]+):?$/
      */
     public function theFollowing($name, TableNode $table)
@@ -43,7 +44,8 @@ class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInt
      * Example: I have 1 task
      * Example: And there are 5 calls
      * Example: I have 3 accounts
-     * @Given /^there (?:is|are) (\d+) ([\w ]+)$/
+     *
+     * @Given /^there (?:is|are) (?P<numberOfEntities>(?:\d+)) (?P<name>(?:(?!from|records in activity list)(\D*)))$/
      * @Given /^(?:|I )have (?P<numberOfEntities>(?:\d+)) (?P<name>(?:(?!from)(\D*)))$/
      */
     public function thereIs($numberOfEntities, $name)
@@ -57,6 +59,7 @@ class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInt
      * It can be used for load random entities with specific owner
      * Example: And there are two users with their own 3 Tasks
      * Example: And there is user with its own Account
+     *
      * @Given /^there (?:are|is) (?P<userCount>(?:|one|two|\d+))(?:|\s)user(?: |s )with (?:their|its) own(?:|\s+)(?P<entitiesCount>(?:|\d+)) (?P<entity>(\D*))$/
      */
     //@codingStandardsIgnoreEnd

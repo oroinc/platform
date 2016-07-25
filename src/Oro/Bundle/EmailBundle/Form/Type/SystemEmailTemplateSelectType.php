@@ -6,14 +6,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-
-use Symfony\Component\Form\CallbackTransformer;
 
 class SystemEmailTemplateSelectType extends AbstractType
 {
@@ -22,17 +18,12 @@ class SystemEmailTemplateSelectType extends AbstractType
      */
     protected $em;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     /**
      * @param ObjectManager $objectManager
-     * @param SecurityFacade $securityFacade
      */
-    public function __construct(ObjectManager $objectManager, SecurityFacade $securityFacade)
+    public function __construct(ObjectManager $objectManager)
     {
         $this->em  = $objectManager;
-        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -41,11 +32,7 @@ class SystemEmailTemplateSelectType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'query_builder' => $this->getRepository()->getEntityTemplatesQueryBuilder(
-                '',
-                $this->securityFacade->getOrganization(),
-                true
-            ),
+            'query_builder' => $this->getRepository()->getSystemTemplatesQueryBuilder(),
             'class' => 'OroEmailBundle:EmailTemplate',
             'choice_value' => 'name',
         ]);
@@ -61,11 +48,11 @@ class SystemEmailTemplateSelectType extends AbstractType
                 function ($name) {
                     return $this->getRepository()->findByName($name);
                 },
-                function ($emailtTemplate) {
-                    if (is_null($emailtTemplate)) {
+                function ($emailTemplate) {
+                    if (is_null($emailTemplate)) {
                         return '';
                     }
-                    return $emailtTemplate->getName();
+                    return $emailTemplate->getName();
                 }
             )
         );

@@ -1337,4 +1337,14 @@ trait AssertTrait
     {
         Assert::markTestSkipped($message);
     }
+
+    /**
+     * Fails a test with the given message.
+     *
+     * @param string $message
+     */
+    public static function fail($message)
+    {
+        Assert::fail($message);
+    }
 }
