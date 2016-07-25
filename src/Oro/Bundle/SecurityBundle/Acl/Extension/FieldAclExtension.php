@@ -656,7 +656,7 @@ class FieldAclExtension extends AbstractAclExtension
         } elseif (is_string($object)) {
             $className = $id = $group = null;
             if (self::isDecodedKey($object)) {
-                return self::decodeEntityFieldInfo($object)[0];
+                $object = self::decodeEntityFieldInfo($object)[0];
             }
             $this->parseDescriptor($object, $className, $id, $group);
         } elseif ($object instanceof EntityObjectReference) {
