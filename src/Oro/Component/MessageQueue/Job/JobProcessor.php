@@ -1,23 +1,19 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\DBAL\LockMode;
-use Doctrine\ORM\EntityManager;
-
 class JobProcessor
 {
     /**
-     * @var EntityManager
+     * @var JobStorage
      */
-    private $em;
+    private $jobStorage;
 
     /**
-     * @param EntityManager $em
+     * @param JobStorage $jobStorage
      */
-    public function __construct(EntityManager $em)
+    public function __construct(JobStorage $jobStorage)
     {
-        $this->em = $em;
+        $this->jobStorage = $jobStorage;
     }
 
     /**
@@ -27,15 +23,7 @@ class JobProcessor
      */
     public function findJobById($id)
     {
-        $em = $this->em->getRepository(Job::class)->createQueryBuilder('job');
-
-        return $em
-            ->addSelect('rootJob')
-            ->innerJoin('job.rootJob', 'rootJob')
-            ->where('job = :id')
-            ->setParameter('id', $id)
-            ->getQuery()->getOneOrNullResult()
-        ;
+        return $this->jobStorage->findJobById($id);
     }
     
     /**
@@ -44,6 +32,8 @@ class JobProcessor
      * @param bool   $unique
      *
      * @return Job
+     *
+     * @throws DuplicateJobException
      */
     public function createJob($name, Job $root = null, $unique = false)
     {
@@ -63,17 +53,13 @@ class JobProcessor
         $job->setName($name);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($root);
-
-        if ($unique) {
-            $job->setUniqueName($name);
-        }
+        $job->setUnique((bool) $unique);
 
         try {
-            $this->em->persist($job);
-            $this->em->flush();
+            $this->jobStorage->saveJob($job);
 
             return $job;
-        } catch (UniqueConstraintViolationException $e) {
+        } catch (DuplicateJobException $e) {
             if ($unique) {
                 return;
             }
@@ -102,8 +88,7 @@ class JobProcessor
         $job->setStatus(Job::STATUS_RUNNING);
         $job->setStartedAt(new \DateTime());
 
-        $this->em->persist($job);
-        $this->em->flush();
+        $this->jobStorage->saveJob($job);
 
         // send job to analyze root status
     }
@@ -138,8 +123,7 @@ class JobProcessor
         $job->setStatus($status);
         $job->setStoppedAt(new \DateTime());
 
-        $this->em->persist($job);
-        $this->em->flush();
+        $this->jobStorage->saveJob($job);
 
         // send job to analyze root status
     }
@@ -158,10 +142,7 @@ class JobProcessor
             return;
         }
 
-        $this->em->transactional(function (EntityManager $em) use ($job, $force) {
-            /** @var Job $job */
-            $job = $em->find(Job::class, $job->getId(), LockMode::PESSIMISTIC_WRITE);
-
+        $this->jobStorage->saveJob($job, function (Job $job) use ($force) {
             if ($job->isInterrupted()) {
                 return;
             }
@@ -169,7 +150,6 @@ class JobProcessor
             $job->setInterrupted(true);
 
             if ($force) {
-                $job->setUniqueName(null);
                 $job->setStoppedAt(new \DateTime());
             }
         });

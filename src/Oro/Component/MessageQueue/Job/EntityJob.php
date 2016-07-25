@@ -1,0 +1,32 @@
+<?php
+namespace Oro\Component\MessageQueue\Job;
+
+class EntityJob extends Job
+{
+    /**
+     * @internal
+     *
+     * @var string
+     */
+    private $uniqueName;
+
+    /**
+     * @internal
+     *
+     * @return string
+     */
+    public function getUniqueName()
+    {
+        return $this->uniqueName;
+    }
+
+    /**
+     * @internal
+     *
+     * @param string $uniqueName
+     */
+    public function setUniqueName($uniqueName)
+    {
+        $this->uniqueName = $uniqueName;
+    }
+}

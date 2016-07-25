@@ -20,13 +20,6 @@ class Job
     private $name;
 
     /**
-     * @internal
-     *
-     * @var string
-     */
-    private $uniqueName;
-
-    /**
      * @var string
      */
     private $status;
@@ -35,6 +28,11 @@ class Job
      * @var bool
      */
     private $interrupted;
+
+    /**
+     * @var bool;
+     */
+    private $unique;
 
     /**
      * @var Job
@@ -64,6 +62,7 @@ class Job
     public function __construct()
     {
         $this->interrupted = false;
+        $this->unique = false;
     }
 
     /**
@@ -103,26 +102,6 @@ class Job
     }
 
     /**
-     * @internal
-     *
-     * @return string
-     */
-    public function getUniqueName()
-    {
-        return $this->uniqueName;
-    }
-
-    /**
-     * @internal
-     *
-     * @param string $uniqueName
-     */
-    public function setUniqueName($uniqueName)
-    {
-        $this->uniqueName = $uniqueName;
-    }
-
-    /**
      * @return string
      */
     public function getStatus()
@@ -156,6 +135,24 @@ class Job
     public function setInterrupted($interrupted)
     {
         $this->interrupted = $interrupted;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isUnique()
+    {
+        return $this->unique;
+    }
+
+    /**
+     * @internal
+     *
+     * @param boolean $unique
+     */
+    public function setUnique($unique)
+    {
+        $this->unique = $unique;
     }
 
     /**

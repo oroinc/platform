@@ -2,22 +2,20 @@
 namespace Oro\Component\MessageQueue\Job;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\LockMode;
-use Doctrine\ORM\EntityManager;
 
 class CalculateRootJobStatusCase
 {
     /**
-     * @var EntityManager
+     * @var JobStorage
      */
-    private $em;
+    private $jobStorage;
 
     /**
-     * @param EntityManager $em
+     * @param JobStorage $jobStorage
      */
-    public function __construct(EntityManager $em)
+    public function __construct(JobStorage $jobStorage)
     {
-        $this->em = $em;
+        $this->jobStorage = $jobStorage;
     }
 
     /**
@@ -32,10 +30,7 @@ class CalculateRootJobStatusCase
             return;
         }
 
-        $this->em->transactional(function (EntityManager $em) use ($rootJob, $stopStatuses) {
-            /** @var Job $rootJob */
-            $rootJob = $em->find(Job::class, $rootJob->getId(), LockMode::PESSIMISTIC_WRITE);
-
+        $this->jobStorage->saveJob($rootJob, function (Job $rootJob) use ($stopStatuses) {
             if (in_array($rootJob->getStatus(), $stopStatuses)) {
                 return;
             }
@@ -50,8 +45,6 @@ class CalculateRootJobStatusCase
             $rootJob->setStatus($status);
 
             if (in_array($status, $stopStatuses)) {
-                $rootJob->setUniqueName(null);
-
                 if (! $rootJob->getStoppedAt()) {
                     $rootJob->setStoppedAt(new \DateTime());
                 }

@@ -1,17 +1,16 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\DBAL\LockMode;
-use Doctrine\ORM\EntityManager;
+use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
+use Oro\Component\MessageQueue\Job\JobStorage;
 
 class JobProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeCreatedWithRequiredArguments()
     {
-        new JobProcessor($this->createEntityManagerMock());
+        new JobProcessor($this->createJobStorage());
     }
 
     public function testCreateJobShouldThrowIfRootJobIsNotRoot()
@@ -25,7 +24,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             'You can append jobs only to root job but it is not. id: "12345"'
         );
 
-        $processor = new JobProcessor($this->createEntityManagerMock());
+        $processor = new JobProcessor($this->createJobStorage());
         $processor->createJob('name', $notRootJob);
     }
 
@@ -39,30 +38,26 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             'Can create only root unique jobs.'
         );
 
-        $processor = new JobProcessor($this->createEntityManagerMock());
+        $processor = new JobProcessor($this->createJobStorage());
         $processor->createJob('name', $rootJob, true);
     }
 
     public function testCreateJobShouldCreateRootJob()
     {
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('persist')
+            ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
-        $em
-            ->expects($this->once())
-            ->method('flush')
-        ;
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $job = $processor->createJob('name');
 
         $this->assertEquals('name', $job->getName());
         $this->assertEquals(Job::STATUS_NEW, $job->getStatus());
         $this->assertNull($job->getRootJob());
-        $this->assertNull($job->getUniqueName());
+        $this->assertFalse($job->isUnique());
         $this->assertEquals(new \DateTime(), $job->getCreatedAt(), '', 1);
         $this->assertNull($job->getStartedAt());
         $this->assertNull($job->getStoppedAt());
@@ -70,26 +65,22 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateJobShouldCreateChildJob()
     {
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('persist')
+            ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
-        ;
-        $em
-            ->expects($this->once())
-            ->method('flush')
         ;
 
         $rootJob = new Job();
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $job = $processor->createJob('name', $rootJob);
 
         $this->assertEquals('name', $job->getName());
         $this->assertEquals(Job::STATUS_NEW, $job->getStatus());
         $this->assertSame($rootJob, $job->getRootJob());
-        $this->assertNull($job->getUniqueName());
+        $this->assertFalse($job->isUnique());
         $this->assertEquals(new \DateTime(), $job->getCreatedAt(), '', 1);
         $this->assertNull($job->getStartedAt());
         $this->assertNull($job->getStoppedAt());
@@ -97,24 +88,20 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateJobShouldCreateUniqueRootJob()
     {
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('persist')
+            ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
-        $em
-            ->expects($this->once())
-            ->method('flush')
-        ;
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $job = $processor->createJob('name', null, true);
 
         $this->assertEquals('name', $job->getName());
         $this->assertEquals(Job::STATUS_NEW, $job->getStatus());
         $this->assertNull($job->getRootJob());
-        $this->assertEquals('name', $job->getUniqueName());
+        $this->assertTrue($job->isUnique());
         $this->assertEquals(new \DateTime(), $job->getCreatedAt(), '', 1);
         $this->assertNull($job->getStartedAt());
         $this->assertNull($job->getStoppedAt());
@@ -122,47 +109,40 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateJobShouldReturnFalseIfJobIsUniqueAndAlreadyExists()
     {
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('persist')
+            ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
-        ;
-        $em
-            ->expects($this->once())
-            ->method('flush')
-            ->will($this->throwException($this->createUniqueConstraintViolationExceptionMock()))
+            ->will($this->throwException(new DuplicateJobException()))
         ;
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $job = $processor->createJob('name', null, true);
 
         $this->assertNull($job);
     }
 
-    public function testCreateJobShouldNotCatchUniqueConstraintViolationExceptionIfNotUnique()
+    public function testCreateJobShouldNotCatchDuplicateJobExceptionIfNotUnique()
     {
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('persist')
+            ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
-        ;
-        $em
-            ->expects($this->once())
-            ->method('flush')
-            ->will($this->throwException($this->createUniqueConstraintViolationExceptionMock()))
+            ->will($this->throwException(new DuplicateJobException()))
         ;
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
 
-        $this->setExpectedException(UniqueConstraintViolationException::class);
+        $this->setExpectedException(DuplicateJobException::class);
+
         $processor->createJob('name');
     }
 
     public function testStartChildJobShouldThrowIfRootJob()
     {
-        $processor = new JobProcessor($this->createEntityManagerMock());
+        $processor = new JobProcessor($this->createJobStorage());
 
         $rootJob = new Job();
         $rootJob->setId(12345);
@@ -174,7 +154,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStartChildJobShouldThrowIfJobHasNotNewStatus()
     {
-        $processor = new JobProcessor($this->createEntityManagerMock());
+        $processor = new JobProcessor($this->createJobStorage());
 
         $job = new Job();
         $job->setId(12345);
@@ -191,22 +171,18 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStartJobShouldUpdateJobWithRunningStatusAndStartAtTime()
     {
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('persist')
+            ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
-        ;
-        $em
-            ->expects($this->once())
-            ->method('flush')
         ;
 
         $job = new Job();
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_NEW);
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $processor->startChildJob($job);
 
         $this->assertEquals(Job::STATUS_RUNNING, $job->getStatus());
@@ -215,7 +191,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStopChildJobShouldThrowIfRootJob()
     {
-        $processor = new JobProcessor($this->createEntityManagerMock());
+        $processor = new JobProcessor($this->createJobStorage());
 
         $rootJob = new Job();
         $rootJob->setId(12345);
@@ -227,7 +203,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStopChildJobShouldThrowIfJobHasNotRunningStatus()
     {
-        $processor = new JobProcessor($this->createEntityManagerMock());
+        $processor = new JobProcessor($this->createJobStorage());
 
         $job = new Job();
         $job->setId(12345);
@@ -244,7 +220,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStopChildJobShouldThrowIfStatusIsNotOneOfStopStatuses()
     {
-        $processor = new JobProcessor($this->createEntityManagerMock());
+        $processor = new JobProcessor($this->createJobStorage());
 
         $job = new Job();
         $job->setId(12345);
@@ -275,22 +251,18 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testStopJobShouldUpdateJobWithStopStatusAndStopAtTime($stopStatus)
     {
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('persist')
+            ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
-        ;
-        $em
-            ->expects($this->once())
-            ->method('flush')
         ;
 
         $job = new Job();
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_RUNNING);
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $processor->stopChildJob($job, $stopStatus);
 
         $this->assertEquals($stopStatus, $job->getStatus());
@@ -303,7 +275,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $notRootJob->setId(123);
         $notRootJob->setRootJob(new Job());
 
-        $processor = new JobProcessor($this->createEntityManagerMock());
+        $processor = new JobProcessor($this->createJobStorage());
 
         $this->setExpectedException(\LogicException::class, 'Can interrupt only root jobs. id: "123"');
 
@@ -316,13 +288,13 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $rootJob->setId(123);
         $rootJob->setInterrupted(true);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->never())
-            ->method('transactional')
+            ->method('saveJob')
         ;
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $processor->interruptRootJob($rootJob);
     }
 
@@ -330,73 +302,49 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $rootJob = new Job();
         $rootJob->setId(123);
-        $rootJob->setUniqueName('name');
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->with(Job::class, 123, LockMode::PESSIMISTIC_WRITE)
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $processor->interruptRootJob($rootJob);
 
         $this->assertTrue($rootJob->isInterrupted());
         $this->assertNull($rootJob->getStoppedAt());
-        $this->assertEquals('name', $rootJob->getUniqueName());
     }
 
-    public function testInterruptRootJobShouldUpdateJobAndSetInterruptedTrueAndUniqueNameNullAndStoppedTimeIfForceTrue()
+    public function testInterruptRootJobShouldUpdateJobAndSetInterruptedTrueAndStoppedTimeIfForceTrue()
     {
         $rootJob = new Job();
         $rootJob->setId(123);
-        $rootJob->setUniqueName('name');
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorage();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->with(Job::class, 123, LockMode::PESSIMISTIC_WRITE)
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $processor = new JobProcessor($em);
+        $processor = new JobProcessor($storage);
         $processor->interruptRootJob($rootJob, true);
 
         $this->assertTrue($rootJob->isInterrupted());
         $this->assertEquals(new \DateTime(), $rootJob->getStoppedAt(), '', 1);
-        $this->assertNull($rootJob->getUniqueName());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobStorage
      */
-    private function createEntityManagerMock()
+    private function createJobStorage()
     {
-        return $this->getMock(EntityManager::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|UniqueConstraintViolationException
-     */
-    private function createUniqueConstraintViolationExceptionMock()
-    {
-        return $this->getMock(UniqueConstraintViolationException::class, [], [], '', false);
+        return $this->getMock(JobStorage::class, [], [], '', false);
     }
 }

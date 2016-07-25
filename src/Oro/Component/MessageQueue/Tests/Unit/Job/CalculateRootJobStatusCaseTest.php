@@ -1,16 +1,15 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Doctrine\DBAL\LockMode;
-use Doctrine\ORM\EntityManager;
 use Oro\Component\MessageQueue\Job\CalculateRootJobStatusCase;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobStorage;
 
 class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new CalculateRootJobStatusCase($this->createEntityManagerMock());
+        new CalculateRootJobStatusCase($this->createJobStorageMock());
     }
 
     public function stopStatusProvider()
@@ -33,13 +32,13 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
         $notRootJob = new Job();
         $notRootJob->setRootJob($rootJob);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->never())
-            ->method('transactional')
+            ->method('saveJob')
         ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($notRootJob);
     }
 
@@ -54,22 +53,16 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->with(Job::class, 123, LockMode::PESSIMISTIC_WRITE)
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($childJob);
 
         $this->assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
@@ -79,11 +72,10 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider stopStatusProvider
      */
-    public function testShouldCalculateRootJobStatusAndSetUniqueNameNullAndSetStoppedAtTimeIfGotStopStatus($stopStatus)
+    public function testShouldCalculateRootJobStatusAndSetStoppedAtTimeIfGotStopStatus($stopStatus)
     {
         $rootJob = new Job();
         $rootJob->setId(123);
-        $rootJob->setUniqueName('unique-name');
 
         $childJob = new Job();
         $childJob->setRootJob($rootJob);
@@ -91,34 +83,26 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->with(Job::class, 123, LockMode::PESSIMISTIC_WRITE)
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($childJob);
 
         $this->assertEquals($stopStatus, $rootJob->getStatus());
         $this->assertEquals(new \DateTime(), $rootJob->getStoppedAt(), '', 1);
-        $this->assertNull($rootJob->getUniqueName());
     }
 
     public function testShouldSetStoppedAtOnlyIfWasNotSet()
     {
         $rootJob = new Job();
         $rootJob->setId(123);
-        $rootJob->setUniqueName('unique-name');
         $rootJob->setStoppedAt(new \DateTime('2012-12-12 12:12:12'));
 
         $childJob = new Job();
@@ -127,19 +111,13 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob]);
 
-        $em = $this->createEntityManagerMock();
+        $em = $this->createJobStorageMock();
         $em
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
-        ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->with(Job::class, 123, LockMode::PESSIMISTIC_WRITE)
-            ->will($this->returnValue($rootJob))
         ;
 
         $case = new CalculateRootJobStatusCase($em);
@@ -159,21 +137,16 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
 
         $this->setExpectedException(
             \LogicException::class,
@@ -197,21 +170,16 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob1, $childJob2]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_NEW, $rootJob->getStatus());
@@ -235,21 +203,16 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
@@ -273,21 +236,16 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
@@ -311,21 +269,16 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_CANCELLED, $rootJob->getStatus());
@@ -349,21 +302,16 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_FAILED, $rootJob->getStatus());
@@ -387,31 +335,26 @@ class CalculateRootJobStatusCaseTest extends \PHPUnit_Framework_TestCase
 
         $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
 
-        $em = $this->createEntityManagerMock();
-        $em
+        $storage = $this->createJobStorageMock();
+        $storage
             ->expects($this->once())
-            ->method('transactional')
-            ->will($this->returnCallback(function ($callback) use ($em) {
-                $callback($em);
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
             }))
         ;
-        $em
-            ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue($rootJob))
-        ;
 
-        $case = new CalculateRootJobStatusCase($em);
+        $case = new CalculateRootJobStatusCase($storage);
         $case->calculate($rootJob);
 
         $this->assertEquals(Job::STATUS_SUCCESS, $rootJob->getStatus());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobStorage
      */
-    private function createEntityManagerMock()
+    private function createJobStorageMock()
     {
-        return $this->getMock(EntityManager::class, [], [], '', false);
+        return $this->getMock(JobStorage::class, [], [], '', false);
     }
 }
