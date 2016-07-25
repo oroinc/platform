@@ -55,6 +55,11 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData, $event->getData());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array
+     */
     public function preSubmitProvider()
     {
         return [
@@ -84,11 +89,11 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
                         'email' => 'existing@example.com',
                     ],
                     [
-                        'displayname' => 'new',
+                        'displayName' => 'new',
                         'email' => 'existing@example.com',
                     ],
                     [
-                        'displayname' => 'new2',
+                        'displayName' => 'new2',
                         'email' => 'new2@example.com',
                     ],
                 ],
@@ -104,11 +109,11 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
                         'email' => 'existing@example.com',
                     ],
                     [
-                        'displayname' => 'new',
+                        'displayName' => 'new',
                         'email' => 'existing@example.com',
                     ],
                     [
-                        'displayname' => 'new2',
+                        'displayName' => 'new2',
                         'email' => 'new2@example.com',
                     ],
                 ],
@@ -120,47 +125,10 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
                         'email' => 'existing@example.com',
                     ],
                     [
-                        'displayname' => 'new',
+                        'displayName' => 'new',
                     ],
                     [
-                        'displayname' => 'new2',
-                        'email' => 'new2@example.com',
-                    ],
-                ],
-                new ArrayCollection([
-                    (new Attendee())
-                        ->setDisplayName('existing')
-                        ->setEmail('existing@example.com'),
-                    (new Attendee())
-                        ->setDisplayName('toBeRemoved')
-                        ->setEmail('toBeRemoved@example.com'),
-                ]),
-                [
-                    [
-                        'displayName' => 'existing',
-                        'email' => 'existing@example.com',
-                    ],
-                    [
-                        'displayname' => 'new',
-                    ],
-                    [
-                        'displayname' => 'new2',
-                        'email' => 'new2@example.com',
-                    ],
-                ],
-            ],
-            'valid data' => [
-                [
-                    [
-                        'displayName' => 'existing',
-                        'email' => 'existing@example.com',
-                    ],
-                    [
-                        'displayname' => 'new',
-                        'email' => 'new@example.com',
-                    ],
-                    [
-                        'displayname' => 'new2',
+                        'displayName' => 'new2',
                         'email' => 'new2@example.com',
                     ],
                 ],
@@ -178,11 +146,48 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
                         'email' => 'existing@example.com',
                     ],
                     2 => [
-                        'displayname' => 'new',
+                        'displayName' => 'new',
+                    ],
+                    3 => [
+                        'displayName' => 'new2',
+                        'email' => 'new2@example.com',
+                    ],
+                ],
+            ],
+            'valid data' => [
+                [
+                    [
+                        'displayName' => 'existing',
+                        'email' => 'existing@example.com',
+                    ],
+                    [
+                        'displayName' => 'new',
+                        'email' => 'new@example.com',
+                    ],
+                    [
+                        'displayName' => 'new2',
+                        'email' => 'new2@example.com',
+                    ],
+                ],
+                new ArrayCollection([
+                    (new Attendee())
+                        ->setDisplayName('existing')
+                        ->setEmail('existing@example.com'),
+                    (new Attendee())
+                        ->setDisplayName('toBeRemoved')
+                        ->setEmail('toBeRemoved@example.com'),
+                ]),
+                [
+                    0 => [
+                        'displayName' => 'existing',
+                        'email' => 'existing@example.com',
+                    ],
+                    2 => [
+                        'displayName' => 'new',
                         'email' => 'new@example.com',
                     ],
                     3 => [
-                        'displayname' => 'new2',
+                        'displayName' => 'new2',
                         'email' => 'new2@example.com',
                     ],
                 ],
