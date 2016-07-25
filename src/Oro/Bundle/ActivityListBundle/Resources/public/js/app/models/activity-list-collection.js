@@ -23,7 +23,7 @@ define([
             date: null,
             ids: [],
             action: null //'next' or 'prev' or null (refresh action)
-         },
+        },
 
         url: function() {
             return routing.generate(

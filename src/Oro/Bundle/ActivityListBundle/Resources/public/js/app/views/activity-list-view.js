@@ -128,8 +128,6 @@ define(function(require) {
         },
 
         _initPager: function() {
-            debugger;
-
             if (this.collection.getCount() && this.collection.getPage() == 1) {
                 this._toggleNext(true);
             }
@@ -213,7 +211,7 @@ define(function(require) {
             this.collection.setPage(currentPage + 1);
             this.collection.setPageTotal(this.collection.getPageTotal() + 1);
 
-            var listLastModel = this.collection.models[this.collection.getCount()-1];
+            var listLastModel = this.collection.models[this.collection.getCount() - 1];
             var listLastModelId = listLastModel.attributes.id;
 
             this.collection.setPageFilterDate(listLastModel.attributes.updatedAt);
@@ -254,8 +252,6 @@ define(function(require) {
                 return;
             }
             try {
-                debugger;
-
                 // store views state
                 this.oldViewStates = {};
                 itemViews = this.getItemViews();
