@@ -767,6 +767,16 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
+     * Pre update event listener
+     *
+     * @ORM\PreUpdate
+     */
+    public function beforeUpdate()
+    {
+        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
      * @param ExecutionContextInterface $context
      * @deprecated since 1.9  Use \Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator instead
      */

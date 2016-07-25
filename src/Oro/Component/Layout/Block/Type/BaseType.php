@@ -22,6 +22,7 @@ class BaseType extends AbstractType
             'label_attr',
             'translation_domain',
             'class_prefix',
+            'additional_block_prefix'
         ]);
     }
 
@@ -70,6 +71,9 @@ class BaseType extends AbstractType
         // due to limitations of block names in TWIG
         $uniqueBlockPrefix = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $id);
         $blockPrefixes     = $block->getTypeHelper()->getTypeNames($name);
+        if (isset($options['additional_block_prefix'])) {
+            $blockPrefixes[] = $options['additional_block_prefix'];
+        }
         $blockPrefixes[]   = $uniqueBlockPrefix;
 
         $view->vars['id']                  = $id;
