@@ -103,8 +103,12 @@ define([
             var onDelete = _.bind(function(e) {
                     var $el = $(e.currentTarget);
                     var deleteUrl = $el.data('url');
+                    var deleteConfirmationMessage = $el.data('message');
+                    if (this.model.toJSON().recurringEventId) {
+                        deleteConfirmationMessage += "<br/>" + __('Only this particular event will be deleted from the series.');
+                    }
                     var confirm = new DeleteConfirmation({
-                        content: $el.data('message')
+                        content: deleteConfirmationMessage
                     });
                     e.preventDefault();
                     confirm.on('ok', _.bind(function() {
