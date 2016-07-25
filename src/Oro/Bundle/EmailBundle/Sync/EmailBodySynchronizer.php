@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -34,7 +34,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     /** @var array */
     protected $emailBodyLoaders = [];
 
-    /** @var ObjectManager */
+    /** @var EntityManager */
     protected $manager = null;
 
     /**
@@ -61,7 +61,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
      */
     public function syncOneEmailBody(Email $email)
     {
-        if ($email->isBodySynced() !== true && $email->getEmailBody() === null) {
+        if ($this->isBodyNotLoaded($email)) {
             // body loader can load email from any folder
             // todo: refactor to use correct emailuser and origin
             // to use active origin and get correct folder from this origin
@@ -72,12 +72,20 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 throw new LoadEmailBodyFailedException($email);
             }
 
-            $loader = $this->getBodyLoader($origin);
-            $email->setBodySynced(true);
-            $emailBody = null;
+            $loader    = $this->getBodyLoader($origin);
+            $bodyLoaded = false;
             try {
-                $emailBody = $loader->loadEmailBody($folder, $email, $this->getManager());
-                $email->setEmailBody($emailBody);
+                $em        = $this->getManager();
+                $emailBody = $loader->loadEmailBody($folder, $email, $em);
+                $em->refresh($email);
+                // double check
+                if ($this->isBodyNotLoaded($email)) {
+                    $email->setEmailBody($emailBody);
+                    $email->setBodySynced(true);
+                    $bodyLoaded = true;
+                    $em->persist($email);
+                    $em->flush($email);
+                }
             } catch (LoadEmailBodyException $loadEx) {
                 $this->logger->notice(
                     sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
@@ -91,10 +99,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 );
                 throw new LoadEmailBodyFailedException($email, $ex);
             }
-
-            $this->getManager()->persist($email);
-
-            if ($emailBody) {
+            if ($bodyLoaded) {
                 $event = new EmailBodyAdded($email);
                 $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
             }
@@ -127,7 +132,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
             $emails = $repo->getEmailsWithoutBody($batchSize);
             if (count($emails) === 0) {
-                $this->logger->notice('All emails was processed');
+                $this->logger->info('All emails was processed');
                 break;
             }
 
@@ -146,8 +151,6 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                     continue;
                 }
             }
-
-            $this->getManager()->flush();
             $this->getManager()->clear();
 
             $currentTime = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -157,7 +160,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     }
 
     /**
-     * @return ObjectManager
+     * @return EntityManager
      */
     protected function getManager()
     {
@@ -181,5 +184,15 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         }
 
         return $this->emailBodyLoaders[$originId];
+    }
+
+    /**
+     * @param Email $email
+     *
+     * @return bool
+     */
+    protected function isBodyNotLoaded(Email $email)
+    {
+        return $email->isBodySynced() !== true && $email->getEmailBody() === null;
     }
 }

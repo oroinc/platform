@@ -245,6 +245,7 @@ class Indexer
     protected function prepareQuery(Query $query)
     {
         $this->applyModesBehavior($query);
+
         if ($this->isAllowedApplyAcl) {
             $this->searchAclHelper->apply($query);
         }

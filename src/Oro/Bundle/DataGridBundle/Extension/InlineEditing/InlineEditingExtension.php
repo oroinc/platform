@@ -83,10 +83,16 @@ class InlineEditingExtension extends AbstractExtension
         // add inline editing where it is possible, do not use ACL, because additional parameters for columns needed
         $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
         $blackList = $configuration->getBlackList();
+        $behaviour = $config->offsetGetByPath(Configuration::BEHAVIOUR_CONFIG_PATH);
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
-                $newColumn = $this->guesser->getColumnOptions($columnName, $configItems['entity_name'], $column);
+                $newColumn = $this->guesser->getColumnOptions(
+                    $columnName,
+                    $configItems['entity_name'],
+                    $column,
+                    $behaviour
+                );
 
                 // frontend type key must not be replaced with default value
                 $frontendTypeKey = PropertyInterface::FRONTEND_TYPE_KEY;

@@ -7,18 +7,40 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Form\EventListener\UserApiSubscriber;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class UserApiType extends UserType
 {
+     /** ConfigManager */
+    protected $userConfigManager;
+
+    /**
+     * @param ConfigManager $userConfigManager
+     */
+    public function setUserConfigManager(ConfigManager $userConfigManager)
+    {
+        $this->userConfigManager = $userConfigManager;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function addEntityFields(FormBuilderInterface $builder)
     {
         parent::addEntityFields($builder);
-
+        /**
+         * For API, imap configuration is updated from user form
+         * with imap config subform without buttons
+         */
+        if ($this->userConfigManager && !$this->userConfigManager->get('oro_imap.enable_google_imap')) {
+            $builder->add(
+                'imapConfiguration',
+                'oro_imap_configuration',
+                ['add_check_button' => false]
+            );
+        }
         $builder
             ->addEventSubscriber(new UserApiSubscriber($builder->getFormFactory()))
             ->addEventSubscriber(new PatchSubscriber());

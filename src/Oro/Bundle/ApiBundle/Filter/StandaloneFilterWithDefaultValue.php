@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Filter;
 /**
  * A base class for filters that can be used independently from other filters
  * and can have predefined default value.
+ * Also this class can be used for some custom filters.
  */
-abstract class StandaloneFilterWithDefaultValue extends StandaloneFilter
+class StandaloneFilterWithDefaultValue extends StandaloneFilter
 {
     /** @var mixed|null */
     protected $defaultValue;
@@ -29,6 +30,16 @@ abstract class StandaloneFilterWithDefaultValue extends StandaloneFilter
         parent::__construct($dataType, $description);
         $this->defaultValue = $defaultValue;
         $this->defaultValueToStringConverter = $defaultValueToStringConverter;
+    }
+
+    /**
+     * Checks if the filter default value is set.
+     *
+     * @return bool
+     */
+    public function hasDefaultValue()
+    {
+        return null !== $this->defaultValue;
     }
 
     /**

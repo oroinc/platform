@@ -200,9 +200,9 @@ abstract class AbstractPageEntity extends AbstractPage
     public function setOrganization($organization)
     {
         if (isset($this->organization)) {
-            $element = $this->test->select($this->test->byXPath($this->organization));
-            $this->test->moveto($element);
-            $element->selectOptionByLabel($organization);
+            $this->test->byXpath($this->organization)->click();
+            $this->waitForAjax();
+            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$organization}')]")->click();
         }
         return $this;
     }
@@ -253,9 +253,10 @@ abstract class AbstractPageEntity extends AbstractPage
     /**
      * @param string $fieldName
      * @param string $value
+     * @param string|null $fieldType
      * @return $this
      */
-    public function checkEntityFieldData($fieldName, $value)
+    public function checkEntityFieldData($fieldName, $value, $fieldType = null)
     {
         $this->assertElementPresent(
             "//div[contains(@class,'control-group')]/label[contains(., '{$fieldName}')]".
@@ -266,6 +267,10 @@ abstract class AbstractPageEntity extends AbstractPage
             "//div[contains(@class,'control-group')]/label[contains(., '{$fieldName}')]".
             "/following-sibling::div/div"
         )->text();
+
+        if ($fieldType) {
+            list($value, $actualValue) = $this->prepareValues($value, $actualValue, $fieldType);
+        }
 
         \PHPUnit_Framework_Assert::assertEquals($value, $actualValue, "Field '{$fieldName}' has incorrect value");
         return $this;
@@ -341,5 +346,31 @@ abstract class AbstractPageEntity extends AbstractPage
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
+    }
+
+    /**
+     * Prepare values for comparing to make tests independent from server configuration
+     *
+     * @param  mixed $value
+     * @param  mixed $actualValue
+     * @param  string $type
+     * @return array
+     */
+    protected function prepareValues($value, $actualValue, $type)
+    {
+        switch ($type) {
+            case 'DateTime':
+                /**
+                 * Use timestamps for datetime comparission to make sure we don't depend on ICU lib version,
+                 * which may give different datetime format (e.g. with/without coma after year)
+                 */
+                $value = new \DateTime($value);
+                $value = $value->getTimestamp();
+                $actualValue = new \DateTime($actualValue);
+                $actualValue = $actualValue->getTimestamp();
+                break;
+        }
+
+        return [$value, $actualValue];
     }
 }

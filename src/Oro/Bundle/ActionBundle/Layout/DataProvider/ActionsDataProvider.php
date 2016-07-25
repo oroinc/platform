@@ -10,9 +10,8 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataProviderInterface;
 
-class ActionsDataProvider implements DataProviderInterface
+class ActionsDataProvider
 {
     /**
      * @var OperationManager
@@ -55,14 +54,6 @@ class ActionsDataProvider implements DataProviderInterface
         $this->contextHelper = $contextHelper;
         $this->restrictHelper = $restrictHelper;
         $this->translator = $translator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifier()
-    {
-        return 'oro_action';
     }
 
     /**

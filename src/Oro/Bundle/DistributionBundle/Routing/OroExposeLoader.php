@@ -4,6 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Routing;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 
@@ -34,6 +35,16 @@ class OroExposeLoader extends AbstractLoader
     {
         $routes = parent::load($file, $type);
 
+        return $this->dispatchEvent(RouteCollectionEvent::EXPOSE, $routes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function loadRoutes(RouteCollection $routes)
+    {
+        parent::loadRoutes($routes);
+
         $toRemove = [];
         /** @var Route $route */
         foreach ($routes->all() as $name => $route) {
@@ -42,7 +53,5 @@ class OroExposeLoader extends AbstractLoader
             }
         }
         $routes->remove($toRemove);
-
-        return $this->dispatchEvent(RouteCollectionEvent::EXPOSE, $routes);
     }
 }

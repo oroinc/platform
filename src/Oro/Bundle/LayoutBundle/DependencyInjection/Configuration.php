@@ -6,6 +6,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+
 class Configuration implements ConfigurationInterface
 {
     const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
@@ -18,6 +20,15 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_layout');
+
+        SettingsBuilder::append($rootNode, [
+            'debug_block_info' => [
+                'value' => false
+            ],
+            'debug_developer_toolbar' => [
+                'value' => true
+            ],
+        ]);
 
         $rootNode
             ->children()
@@ -175,6 +186,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $assetsNode = $treeBuilder->root('assets');
+        $imagesNode = $treeBuilder->root('images');
 
         $assetsNode
             ->useAttributeAsKey('asset-identifier')
@@ -195,6 +207,21 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $imagesNode
+            ->children()
+                ->arrayNode('types')
+                ->useAttributeAsKey('image-type-identifier')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('label')->cannotBeEmpty()->end()
+                            ->scalarNode('dimensions')->defaultNull()->end()
+                            ->scalarNode('max_number')->defaultNull()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
         $dataNode->append($assetsNode);
+        $dataNode->append($imagesNode);
     }
 }

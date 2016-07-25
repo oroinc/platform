@@ -1,0 +1,12 @@
+OroForm:
+  selector: 'form'
+  class: Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm
+
+FileField:
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
+
+CollectionField:
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField
+
+FieldSet:
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
