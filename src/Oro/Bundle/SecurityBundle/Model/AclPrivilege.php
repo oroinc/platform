@@ -36,6 +36,11 @@ class AclPrivilege
      */
     private $category;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $fields;
+
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
@@ -186,5 +191,21 @@ class AclPrivilege
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param ArrayCollection $fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
     }
 }

@@ -167,6 +167,10 @@ class TestHelper
         $entityMetadataProvider->expects($this->testCase->any())
             ->method('isProtectedEntity')
             ->will($this->testCase->returnValue(true));
+        $fieldAclExtension = $this->testCase
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         return new EntityAclExtension(
             $idAccessor,
@@ -175,7 +179,8 @@ class TestHelper
             $metadataProvider,
             $decisionMaker,
             $permissionManager ?: $this->getPermissionManagerMock($this->testCase),
-            $groupProvider ?: $this->getGroupProviderMock($this->testCase)
+            $groupProvider ?: $this->getGroupProviderMock($this->testCase),
+            $fieldAclExtension
         );
     }
 
@@ -269,18 +274,15 @@ class TestHelper
                 )
             );
 
-        $entityMetadataProvider =
-            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
+        $fieldMetadataProvider =
+            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadataProvider')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $entityMetadataProvider->expects($this->testCase->any())
-            ->method('isProtectedEntity')
-            ->will($this->testCase->returnValue(true));
 
         return new FieldAclExtension(
             $idAccessor,
             new EntityClassResolver($doctrine),
-            $entityMetadataProvider,
+            $fieldMetadataProvider,
             $metadataProvider,
             $decisionMaker,
             $entityOwnerAccessor,

@@ -6,10 +6,8 @@ parameters:
     oro_security.acl.sid_manager.class:                        Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
     oro_security.acl.ace_provider.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper
     oro_security.acl.privilege_repository.class:               Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository
-    oro_security.acl.field_privilege_repository.class:         Oro\Bundle\SecurityBundle\Acl\Persistence\FieldAclPrivilegeRepository
     oro_security.acl.extension_selector.class:                 Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
     oro_security.acl.extension.entity.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension
-    oro_security.acl.extension.field.class:                    Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension
     oro_security.acl.extension.action.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension
     oro_security.acl.voter.class:                              Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter
     oro_security.acl.provider.class:                           Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider
@@ -128,13 +126,6 @@ services:
             - '@oro_security.acl.manager'
             - '@translator'
 
-    oro_security.acl.field_privilege_repository:
-        class: %oro_security.acl.field_privilege_repository.class%
-        arguments:
-            - '@oro_security.acl.manager'
-            - '@translator'
-            - '@oro_entity.entity_field_provider'
-
     oro_security.acl.sid_manager:
         class: %oro_security.acl.sid_manager.class%
         arguments:
@@ -173,6 +164,7 @@ services:
             - '@oro_security.owner.ownership_decision_maker.chain'
             - '@oro_security.acl.permission_manager'
             - '@oro_security.acl.group_provider.chain'
+            - '@oro_security.acl.extension.field'
         calls:
             - [setEntityOwnerAccessor, ['@oro_security.owner.entity_owner_accessor']]
         tags:
@@ -318,6 +310,22 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_acl_entities' ] ]
+
+    oro_security.field_security_metadata_provider:
+        public: false
+        class: Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadataProvider
+        arguments:
+            - '@oro_entity_config.provider.security'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.provider.extend'
+            - '@doctrine'
+            - '@oro_security.field_security_metadata_provider.cache'
+
+    oro_security.field_security_metadata_provider.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_acl_fields' ] ]
 
     oro_security.action_metadata_provider:
         public: false
@@ -682,20 +690,19 @@ services:
         tags:
             - { name: form.type_extension, alias: form }
 
-
     oro_security.acl.extension.field:
         public: false
-        class: %oro_security.acl.extension.field.class%
+        class: Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension
         arguments:
             - '@oro_security.acl.object_id_accessor'
             - '@oro_entity.orm.entity_class_resolver'
-            - '@oro_security.entity_security_metadata_provider'
+            - '@oro_security.field_security_metadata_provider'
             - '@oro_security.owner.metadata_provider.chain'
             - '@oro_security.owner.ownership_decision_maker.chain'
             - '@oro_security.owner.entity_owner_accessor'
             - '@oro_entity_config.provider.security'
-        tags:
-            - { name: oro_security.acl.extension, priority: 15 } # should be before EntityAclExtension
+#        tags:
+#            - { name: oro_security.acl.extension, priority: 15 } # should be before EntityAclExtension
 
     oro_security.serializer.acl_filter:
         class: %oro_security.serializer.acl_filter%

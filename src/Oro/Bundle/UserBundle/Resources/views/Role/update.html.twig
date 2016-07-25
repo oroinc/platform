@@ -51,7 +51,7 @@
     {{ UI.dropdownSaveButton({'html': html}) }}
     {% set fields = [] %}
     {% for name, child in form %}
-        {% if name not in ['appendUsers', 'removeUsers', 'entity', 'privileges', 'action'] %}
+        {% if name not in ['appendUsers', 'removeUsers', 'privileges'] %}
             {% set fields = fields|merge({(name): '#' ~ child.vars.id}) %}
         {% endif %}
     {% endfor %}

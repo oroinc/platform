@@ -443,6 +443,10 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $extension = new EntityAclExtension(
             new ObjectIdAccessor($doctrineHelper),
             $entityClassResolver,
@@ -450,7 +454,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $this->metadataProvider,
             $this->decisionMaker,
             $this->permissionManager,
-            $this->groupProvider
+            $this->groupProvider,
+            $fieldAclExtension
         );
 
         $this->assertEquals($expectedData, $extension->getAllowedPermissions(
@@ -1156,6 +1161,10 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
+
 
         $extension = new EntityAclExtension(
             new ObjectIdAccessor($this->doctrineHelper),
@@ -1164,7 +1173,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $this->metadataProvider,
             $this->decisionMaker,
             $this->permissionManager,
-            $this->groupProvider
+            $this->groupProvider,
+            $fieldAclExtension
         );
 
         $this->assertEquals($expected, $extension->supports($type, $id));

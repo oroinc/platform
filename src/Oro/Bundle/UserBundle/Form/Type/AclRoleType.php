@@ -38,23 +38,6 @@ class AclRoleType extends AbstractType
             ]
         );
 
-        foreach ($this->privilegeConfig as $fieldName => $config) {
-            $builder->add(
-                $fieldName,
-                PrivilegeCollectionType::NAME,
-                [
-                    'type'         => AclPrivilegeType::NAME,
-                    'allow_add'    => true,
-                    'prototype'    => false,
-                    'allow_delete' => false,
-                    'mapped'       => false,
-                    'options'      => [
-                        'privileges_config' => $config,
-                    ]
-                ]
-            );
-        }
-
         $builder->add(
             'appendUsers',
             'oro_entity_identifier',

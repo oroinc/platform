@@ -82,14 +82,24 @@ class AclExtensionSelector
             return new NullAclExtension();
         }
 
+        $isField = false;
         $type = $id = null;
         if (is_string($val)) {
             $delim = strpos($val, ':');
             if ($delim) {
                 $type = ltrim(substr($val, $delim + 1), ' ');
                 $id = strtolower(substr($val, 0, $delim));
+                if (FieldAclExtension::isDecodedKey($type)) {
+                    $isField = true;
+                    $type = FieldAclExtension::decodeEntityFieldInfo($type)[0];
+                }
             }
         } elseif (is_object($val)) {
+            if ($val instanceof FieldVote) {
+                $val = $val->getDomainObject();
+                $isField = true;
+            }
+
             if ($val instanceof ObjectIdentityInterface) {
                 $type = $val->getType();
                 $id = $val->getIdentifier();
@@ -99,29 +109,33 @@ class AclExtensionSelector
                     $type = $val->getId();
                 }
                 $id = $val->getType();
-            } elseif ($val instanceof FieldVote) {
-                // field extension shouldn't depend on actual entity identifier
-                $type = get_class($val->getDomainObject());
-                $id = 'field';
             } else {
                 $type = get_class($val);
                 $id = $this->objectIdAccessor->getId($val);
             }
         }
 
+        $foundExtension = null;
         if ($type !== null) {
             $cacheKey = ($id ?: 'null') . '!' . $type;
             if (isset($this->localCache[$cacheKey])) {
-                return $this->localCache[$cacheKey];
+                $foundExtension = $this->localCache[$cacheKey];
             }
 
-            foreach ($this->extensions as $extension) {
-                if ($extension->supports($type, $id)) {
-                    $this->localCache[$cacheKey] = $extension;
+            if ($foundExtension === null) {
+                foreach ($this->extensions as $extension) {
+                    if ($extension->supports($type, $id)) {
+                        $this->localCache[$cacheKey] = $extension;
 
-                    return $extension;
+                        $foundExtension = $extension;
+                        break;
+                    }
                 }
             }
+        }
+
+        if ($foundExtension) {
+            return $isField ? $foundExtension->getFieldExtension() : $foundExtension;
         }
 
         throw $this->createAclExtensionNotFoundException($val, $type, $id);

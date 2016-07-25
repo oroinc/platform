@@ -56,6 +56,9 @@ class EntityAclExtension extends AbstractAclExtension
     /** @var AclGroupProviderInterface */
     protected $groupProvider;
 
+    /** @var FieldAclExtension */
+    protected $fieldAclExtension;
+
     /**
      * key = Permission
      * value = The identity of a permission mask builder
@@ -68,13 +71,14 @@ class EntityAclExtension extends AbstractAclExtension
     protected $maskBuilderIdentityToPermissions;
 
     /**
-     * @param ObjectIdAccessor $objectIdAccessor
-     * @param EntityClassResolver $entityClassResolver
-     * @param EntitySecurityMetadataProvider $entityMetadataProvider
-     * @param MetadataProviderInterface $metadataProvider
+     * @param ObjectIdAccessor                           $objectIdAccessor
+     * @param EntityClassResolver                        $entityClassResolver
+     * @param EntitySecurityMetadataProvider             $entityMetadataProvider
+     * @param MetadataProviderInterface                  $metadataProvider
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param PermissionManager $permissionManager
-     * @param AclGroupProviderInterface $groupProvider
+     * @param PermissionManager                          $permissionManager
+     * @param AclGroupProviderInterface                  $groupProvider
+     * @param FieldAclExtension                          $fieldAclExtension
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
@@ -83,7 +87,8 @@ class EntityAclExtension extends AbstractAclExtension
         MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         PermissionManager $permissionManager,
-        AclGroupProviderInterface $groupProvider
+        AclGroupProviderInterface $groupProvider,
+        FieldAclExtension $fieldAclExtension
     ) {
         $this->objectIdAccessor       = $objectIdAccessor;
         $this->entityClassResolver    = $entityClassResolver;
@@ -92,6 +97,15 @@ class EntityAclExtension extends AbstractAclExtension
         $this->decisionMaker          = $decisionMaker;
         $this->permissionManager      = $permissionManager;
         $this->groupProvider          = $groupProvider;
+        $this->fieldAclExtension      = $fieldAclExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFieldExtension()
+    {
+        return $this->fieldAclExtension;
     }
 
     /**

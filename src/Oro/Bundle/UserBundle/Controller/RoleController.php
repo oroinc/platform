@@ -54,62 +54,6 @@ class RoleController extends Controller
     }
 
     /**
-     * @Acl(
-     *      id="oro_field_acl_update",
-     *      type="entity",
-     *      class="OroUserBundle:Role",
-     *      permission="EDIT"
-     * )
-     * @Route(
-     *     "/update-field/{id}/{className}",
-     *     name="oro_field_acl_update",
-     *     requirements={"id"="\d+", "className"="\S+"},
-     *     defaults={"id"=0}
-     * )
-     * @Template
-     *
-     * @param Role   $entity
-     * @param string $className
-     *
-     * @return array
-     */
-    public function updateFieldAction(Role $entity, $className)
-    {
-        $className = $this->get('oro_entity.entity_class_name_helper')->resolveEntityClass($className);
-        $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
-        $aclRoleHandler->setAclPrivilegeRepository($this->get('oro_security.acl.field_privilege_repository'));
-
-        $aclRoleHandler->createForm($entity, $className);
-
-        $privilegesConfig = $this->container->getParameter('oro_user.privileges');
-        $privilegesConfig = array_intersect_key($privilegesConfig, array_flip(['field']));
-
-        if ($aclRoleHandler->process($entity, $className)) {
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.user.controller.role.message.saved')
-            );
-
-            return $this->get('oro_ui.router')->redirectAfterSave(
-                [
-                    'route'      => 'oro_field_acl_update',
-                    'parameters' => ['id' => $entity->getId(), 'className' => $className]
-                ],
-                ['route' => 'oro_user_role_update', 'parameters' => ['id' => $entity->getId()]],
-                $entity
-            );
-        }
-
-        return [
-            'entity'           => $entity,
-            'className'        => $className,
-            'entityName'       => substr($className, strrpos($className, '\\') + 1), // short entity name
-            'form'             => $aclRoleHandler->createView(),
-            'privilegesConfig' => $privilegesConfig,
-        ];
-    }
-
-    /**
      * @Route(
      *      "/clone/{id}",
      *      name="oro_user_role_clone",

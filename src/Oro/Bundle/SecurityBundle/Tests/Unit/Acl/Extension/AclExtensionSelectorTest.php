@@ -17,7 +17,6 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
 
     protected $entityExtension;
     protected $actionExtension;
-    protected $fieldExtension;
 
     protected function setUp()
     {
@@ -33,8 +32,9 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
 
         $this->selector->addAclExtension($this->entityExtension);
         $this->selector->addAclExtension($this->actionExtension);
-        $this->selector->addAclExtension($this->fieldExtension);
-
+        $this->entityExtension->expects($this->any())
+            ->method('getFieldExtension')
+            ->willReturn($this->fieldExtension);
     }
 
     public function testSelectByExtensionKey()
@@ -112,14 +112,14 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             $this->fieldExtension,
-            $this->selector->select(new FieldVote(new \stdClass(), 'test'))
+            $this->selector->select(new FieldVote(new ObjectIdentity('entity', '\test\entity'), 'test'))
         );
     }
 
     public function testAll()
     {
         $result = $this->selector->all();
-        $this->assertCount(3, $result);
+        $this->assertCount(2, $result);
     }
 
     /**
