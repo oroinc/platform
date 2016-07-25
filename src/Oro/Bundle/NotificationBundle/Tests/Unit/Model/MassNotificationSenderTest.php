@@ -135,11 +135,15 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(['getQuery', 'where'])
+            ->setMethods(['getQuery', 'andWhere', 'setParameter'])
             ->getMock();
         $queryBuilder->expects($this->once())
-            ->method('where')
-            ->with('u.enabled = 1');
+            ->method('andWhere')
+            ->with('u.enabled = :enabled')
+            ->will($this->returnSelf());
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('enabled', true);
         $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));

@@ -11,6 +11,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
  * Manage field tooltips from the UI
  * Override calendar-view.js in customizations
  * Profiler of duplicated queries
+ * Importing layout updates
 
 CHANGELOG for 1.8.0
 ===================

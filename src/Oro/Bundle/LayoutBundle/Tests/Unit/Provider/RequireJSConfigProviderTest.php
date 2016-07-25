@@ -6,9 +6,11 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
+use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider;
 use Oro\Bundle\RequireJSBundle\Config\Config;
 
+use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
@@ -113,10 +115,6 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('default'));
 
-        $theme->expects($this->any())
-            ->method('getParentTheme')
-            ->will($this->returnValue(null));
-
         $this->themeManager
             ->expects($this->any())
             ->method('getTheme')
@@ -145,7 +143,65 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
             ->will($this->returnValue(['default' => $config]));
 
-        $this->provider->setActiveTheme('default');
+        /** @var LayoutContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        $context = $this->getMock(LayoutContext::class);
+        $context->expects($this->once())
+            ->method('get')
+            ->with('theme')
+            ->will($this->returnValue('default'));
+
+        $contextHolder = new LayoutContextHolder();
+        $contextHolder->setContext($context);
+
+        $this->provider->setContextHolder($contextHolder);
         $this->assertEquals($config, $this->provider->getConfig());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetConfigInvalidArgumentException()
+    {
+        $this->cache
+            ->expects($this->once())
+            ->method('contains')
+            ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
+            ->will($this->returnValue(true));
+
+        $contextHolder = new LayoutContextHolder();
+
+        $this->provider->setContextHolder($contextHolder);
+        $this->provider->getConfig();
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     */
+    public function testGetConfigOutOfBoundsException()
+    {
+        $this->cache
+            ->expects($this->once())
+            ->method('contains')
+            ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
+            ->will($this->returnValue(true));
+
+        $this->cache
+            ->expects($this->once())
+            ->method('fetch')
+            ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
+            ->will($this->returnValue(['default' => []]));
+
+        /** @var LayoutContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        $context = $this->getMock(LayoutContext::class);
+        $context->expects($this->once())
+            ->method('get')
+            ->with('theme')
+            ->will($this->returnValue('another'));
+
+        $contextHolder = new LayoutContextHolder();
+        $contextHolder->setContext($context);
+
+        $this->provider->setContextHolder($contextHolder);
+        $this->provider->getConfig();
     }
 }
