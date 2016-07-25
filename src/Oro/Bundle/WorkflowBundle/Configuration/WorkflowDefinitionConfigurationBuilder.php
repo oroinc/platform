@@ -7,22 +7,25 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowGroup;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Model\GroupAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilder
 {
-    /**
-     * @var WorkflowAssembler
-     */
+    /** @var WorkflowAssembler */
     protected $workflowAssembler;
+
+    /** @var GroupAssembler */
+    protected $groupAssembler;
 
     /**
      * @param WorkflowAssembler $workflowAssembler
      */
-    public function __construct(WorkflowAssembler $workflowAssembler)
+    public function __construct(WorkflowAssembler $workflowAssembler, GroupAssembler $groupAssembler)
     {
         $this->workflowAssembler = $workflowAssembler;
+        $this->groupAssembler = $groupAssembler;
     }
 
     /**
@@ -60,6 +63,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             'steps_display_ordered',
             false
         );
+        $groups = $this->groupAssembler->assemble($configuration);
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -71,6 +75,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setActive($configuration['defaults']['active'])
             ->setPriority($configuration['priority'])
             ->setEntityAttributeName($entityAttributeName)
+            ->setGroups($groups)
             ->setConfiguration($this->filterConfiguration($configuration));
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
@@ -142,7 +147,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     protected function setEntityRestrictions(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $restrictions = $workflow->getRestrictions();
-        $workflowDefinition->getConfiguration();
         $workflowRestrictions = [];
         foreach ($restrictions as $restriction) {
             $workflowRestriction = new WorkflowRestriction();
@@ -171,8 +175,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             WorkflowConfiguration::NODE_TRANSITIONS,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
             WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
-            WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
-            WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
         );
 
         return array_intersect_key($configuration, array_flip($configurationKeys));

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -67,6 +68,11 @@ class WorkflowGroup
      */
     protected $definitions;
 
+    public function __construct()
+    {
+        $this->definitions = new ArrayCollection();
+    }
+
     /**
      * @return integer
      */
@@ -111,5 +117,37 @@ class WorkflowGroup
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @return Collection|WorkflowDefinition[]
+     */
+    public function getDefinitions()
+    {
+        return $this->definitions;
+    }
+
+    /**
+     * @param Collection|WorkflowDefinition[] $definitions
+     * @return $this
+     */
+    public function setDefinitions($definitions)
+    {
+        $this->definitions = $definitions;
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @return $this
+     */
+    public function addDefinition(WorkflowDefinition $definition)
+    {
+        if (!$this->definitions->contains($definition)) {
+            $this->definitions->add($definition);
+        }
+
+        return $this;
     }
 }

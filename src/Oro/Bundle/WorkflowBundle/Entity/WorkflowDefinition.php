@@ -154,14 +154,14 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @var $workflowGroup[]|Collection
      *
-     * @ORM\ManyToMany(targetEntity="WorkflowGroup", inversedBy="definitions")
+     * @ORM\ManyToMany(targetEntity="WorkflowGroup", inversedBy="definitions", cascade={"persist"}, orphanRemoval=true)
      * @ORM\JoinTable(
      *      name="oro_workflow_def_to_group",
      *      joinColumns={
-     *          @ORM\JoinColumn(name="workflow_definition_name", referencedColumnName="name", onDelete="CASCADE")
+     *          @ORM\JoinColumn(name="workflow_definition_name", referencedColumnName="name")
      *      },
      *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="workflow_group_id", referencedColumnName="id", onDelete="CASCADE")
+     *          @ORM\JoinColumn(name="workflow_group_id", referencedColumnName="id")
      *      }
      * )
      */
@@ -617,7 +617,8 @@ class WorkflowDefinition implements DomainObjectInterface
             ->setEntityAcls($definition->getEntityAcls())
             ->setRestrictions($definition->getRestrictions())
             ->setSystem($definition->isSystem())
-            ->setPriority($definition->getPriority());
+            ->setPriority($definition->getPriority())
+            ->setGroups($definition->getGroups());
 
         return $this;
     }
@@ -754,7 +755,18 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
-     * @return Collection|
+     * @param WorkflowGroup[]|Collection $groups
+     * @return $this
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+
+        return $this;
+    }
+
+    /**
+     * @return WorkflowGroup[]|Collection]
      */
     public function getGroups()
     {

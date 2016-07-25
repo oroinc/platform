@@ -65,3 +65,8 @@ services:
 
     oro_workflow.restriction_assembler:
         class: Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler
+
+    oro_workflow.group_assembler:
+        class: 'Oro\Bundle\WorkflowBundle\Model\GroupAssembler'
+        arguments:
+            - '@oro_workflow.repository.workflow_group'

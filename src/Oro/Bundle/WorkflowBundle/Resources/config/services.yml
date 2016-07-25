@@ -11,6 +11,7 @@ parameters:
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
     oro_workflow.workflow_item.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
+    oro_workflow.workflow_group.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowGroup
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
     oro_workflow.handler.transition_helper.class: Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper
     oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
@@ -239,6 +240,12 @@ services:
         factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
         arguments:
             - '%oro_workflow.workflow_item.entity.class%'
+
+    oro_workflow.repository.workflow_group:
+        class: Doctrine\ORM\EntityRepository
+        factory:  ["@oro_entity.doctrine_helper", getEntityRepository]
+        arguments:
+            - '%oro_workflow.workflow_group.entity.class%'
 
     oro_workflow.transition_schedule.items_fetcher:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher

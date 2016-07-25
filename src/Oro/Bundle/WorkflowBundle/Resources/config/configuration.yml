@@ -6,7 +6,7 @@ parameters:
     oro_workflow.configuration.handler.attribute.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\AttributeHandler
     oro_workflow.configuration.handler.transition.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\TransitionHandler
     oro_workflow.configuration.handler.workflow.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\WorkflowHandler
-    
+
     oro_workflow.configuration.config.process_definition_sole.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionConfiguration
     oro_workflow.configuration.config.process_definition_list.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionListConfiguration
     oro_workflow.configuration.config.process_trigger_sole.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration
@@ -77,6 +77,7 @@ services:
         class: %oro_workflow.configuration.builder.workflow_definition.class%
         arguments:
             - '@oro_workflow.workflow_assembler'
+            - '@oro_workflow.group_assembler'
 
     oro_workflow.configuration.builder.workflow_definition.handle:
         class: %oro_workflow.configuration.builder.workflow_definition.handle.class%
