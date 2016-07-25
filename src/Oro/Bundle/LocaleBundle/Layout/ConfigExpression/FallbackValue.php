@@ -8,6 +8,8 @@ use Oro\Component\ConfigExpression\Func\GetValue;
 
 class FallbackValue extends GetValue
 {
+    const NAME = 'fallback_value';
+
     /**
      * @var LocalizationHelper
      */
@@ -26,7 +28,7 @@ class FallbackValue extends GetValue
      */
     public function getName()
     {
-        return 'fallback_value';
+        return self::NAME;
     }
 
     /**

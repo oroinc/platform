@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property;
 
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\AbstractProperty;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\AbstractProperty;
 
 class FallbackProperty extends AbstractProperty
 {

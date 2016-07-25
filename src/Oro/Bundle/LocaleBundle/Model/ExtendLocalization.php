@@ -7,6 +7,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 /**
  * @method LocalizedFallbackValue getTitle(Localization $localization = null)
  * @method LocalizedFallbackValue getDefaultTitle()
+ * @method LocalizedFallbackValue setDefaultTitle($string)
  */
 class ExtendLocalization
 {
