@@ -44,6 +44,8 @@ oro:
                         threaded.label: Threaded
 
         pagination:
+            next: Next
+            prev: Prev
             page: Page:
             total: of {{ pages }} | Total of {{ records }} records
             total_mobile: 'of {{ pages }} | Total: {{ records }}'
