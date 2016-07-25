@@ -2,38 +2,34 @@
 
 namespace Oro\Bundle\LocaleBundle\Helper;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
+
+use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
+use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 
 class LocalizationHelper
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
+    use FallbackTrait;
 
     /**
-     * @var string
+     * @var LocalizationProvider
      */
-    protected $entityClass;
+    protected $localizationProvider;
 
     /**
-     * LocaleHelper constructor.
-     * @param ManagerRegistry $registry
+     * @var CurrentLocalizationProvider
      */
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
+    protected $currentLocalizationProvider;
 
-    /**
-     * @param string $entityClass
-     */
-    public function setEntityClass($entityClass)
-    {
-        $this->entityClass = $entityClass;
+    public function __construct(
+        LocalizationProvider $localizationProvider,
+        CurrentLocalizationProvider $currentLocalizationProvider
+    ) {
+        $this->localizationProvider = $localizationProvider;
+        $this->currentLocalizationProvider = $currentLocalizationProvider;
     }
 
     /**
@@ -41,35 +37,24 @@ class LocalizationHelper
      */
     public function getCurrentLocalization()
     {
-        $items = $this->getRepository()->findBy([], ['id' => 'ASC']);
-
-        $withEnglish = array_filter(
-            $items,
-            function (Localization $localization) {
-                return $localization->getLanguageCode() === 'en';
-            }
-        );
-
-        return $withEnglish ? reset($withEnglish) : reset($items);
+        return $this->currentLocalizationProvider->getCurrentLocalization();
     }
 
     /**
      * @return Localization[]
      */
-    public function getAll()
+    public function getLocalizations()
     {
-        return $this->getRepository()->getBatchIterator();
+        return $this->localizationProvider->getLocalizations();
     }
 
     /**
-     * @return LocalizationRepository
+     * @param Collection|LocalizedFallbackValue[] $values
+     * @param Localization|null $localization
+     * @return LocalizedFallbackValue
      */
-    protected function getRepository()
+    public function getLocalizedValue(Collection $values, Localization $localization = null)
     {
-        $repo = $this->registry
-            ->getManagerForClass($this->entityClass)
-            ->getRepository($this->entityClass);
-
-        return $repo;
+        return $this->getFallbackValue($values, $localization ?: $this->getCurrentLocalization());
     }
 }

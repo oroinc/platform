@@ -10,11 +10,52 @@ trait FallbackTrait
     /**
      * @param Collection|LocalizedFallbackValue[] $values
      * @param Localization|null $localization
+     * @return LocalizedFallbackValue
+     */
+    public function getFallbackValue(Collection $values, Localization $localization = null)
+    {
+        return $this->getLocalizedFallbackValue($values, $localization);
+    }
+
+    /**
+     * @param Collection|LocalizedFallbackValue[] $values
+     * @return LocalizedFallbackValue
+     */
+    public function getDefaultFallbackValue(Collection $values)
+    {
+        return $this->getLocalizedFallbackValue($values);
+    }
+
+    /**
+     * @param Collection|LocalizedFallbackValue[] $values
+     * @param string $value
+     * @return $this
+     */
+    public function setDefaultFallbackValue(Collection $values, $value)
+    {
+        $oldValue = $this->getLocalizedFallbackValue($values);
+
+        if ($oldValue && $values->contains($oldValue)) {
+            $values->removeElement($oldValue);
+        }
+        $newValue = new LocalizedFallbackValue();
+        $newValue->setString($value);
+
+        if (!$values->contains($newValue)) {
+            $values->add($newValue);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Collection|LocalizedFallbackValue[] $values
+     * @param Localization $localization
      *
      * @throws \LogicException
      * @return LocalizedFallbackValue
      */
-    protected function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
+    private function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
     {
         $filteredValues = $values->filter(
             function (LocalizedFallbackValue $title) use ($localization) {
@@ -23,7 +64,6 @@ trait FallbackTrait
         );
 
         if ($filteredValues->count() > 1) {
-            //$title = $localization ? $localization->getTitle() : 'default';
             $title = $localization ? $localization->getName() : 'default';
             throw new \LogicException(sprintf('There must be only one %s title', $title));
         }

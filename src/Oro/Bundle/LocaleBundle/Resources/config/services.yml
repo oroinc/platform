@@ -35,8 +35,6 @@ parameters:
 
     oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
 
-    oro_locale.entity_generator.extension.class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
-
 services:
     oro_locale.cache:
             parent: oro.cache.abstract
@@ -58,9 +56,8 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
         public: false
         arguments:
-            - "@doctrine"
-        calls:
-            - [setEntityClass, ['%oro_locale.entity.localization.class%']]
+            - "@oro_locale.provider.localization"
+            - "@oro_locale.provider.current_localization"
 
     oro_locale.listener.orm.localization_listener:
         class: 'Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener'
@@ -70,6 +67,19 @@ services:
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postPersist }
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postUpdate }
+
+    oro_locale.datagrid.extension.fallback:
+        class: 'Oro\Bundle\LocaleBundle\Datagrid\Extension\FallbackExtension'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_locale.datagird.formatter.fallback_property:
+        class: 'Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\FallbackProperty'
+        tags:
+            - { name:  oro_datagrid.extension.formatter.property, type: fallback }
 
     oro_locale.translation.strategy.localization_fallback_strategy:
         class: 'Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy'
@@ -234,6 +244,7 @@ services:
         arguments:
             - '@oro_locale.formatter.language_code'
             - '@oro_locale.formatter.formatting_code'
+            - '@oro_locale.helper.localization'
         tags:
             - { name: twig.extension }
 
@@ -305,6 +316,15 @@ services:
             - '@oro_locale.formatter.language_code'
             - '@oro_locale.formatter.formatting_code'
 
+    oro_locale.provider.localization:
+        class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationProvider'
+        arguments:
+            - '@oro_locale.repository.localization'
+            - '@oro_config.global'
+
+    oro_locale.provider.current_localization:
+        class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
+
     oro_locale.entity_generator.extension:
         class: %oro_locale.entity_generator.extension.class%
         tags:
@@ -319,8 +339,9 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_locale.provider.localization:
-        class: Oro\Bundle\LocaleBundle\Provider\LocalizationProvider
+    oro_locale.expression.fallback_value:
+        class: Oro\Bundle\LocaleBundle\Layout\ConfigExpression\FallbackValue
         arguments:
-            - '@oro_locale.repository.localization'
-            - '@oro_config.global'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: oro_layout.expression, alias: fallback_value }
