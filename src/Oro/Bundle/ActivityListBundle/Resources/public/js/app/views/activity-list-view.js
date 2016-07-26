@@ -128,11 +128,11 @@ define(function(require) {
         },
 
         _initPager: function() {
-            if (this.collection.getCount() && this.collection.getPage() == 1) {
+            if (this.collection.getCount() && this.collection.getPage() === 1) {
                 this._toggleNext(true);
             }
 
-            if (this.collection.getPage() == 1) {
+            if (this.collection.getPage() === 1) {
                 this._togglePrevious();
             } else {
                 this._togglePrevious(true);
@@ -142,17 +142,15 @@ define(function(require) {
                 this._toggleNext();
             }
 
-            if (this.collection.getCount() === 0
-                && this.isFiltersEmpty
-                && this.collection.getPage() == 1
-                && !this.collection.models.length
+            if (this.collection.getCount() === 0 &&
+                this.isFiltersEmpty &&
+                this.collection.getPage() === 1 &&
+                !this.collection.models.length
             ) {
                 this.gridToolbar.hide();
             } else {
                 this.gridToolbar.show();
             }
-
-            this.collection.setPageFilterAction();
         },
 
         /**
@@ -180,11 +178,11 @@ define(function(require) {
 
         goto_previous: function() {
             var currentPage = this.collection.getPage();
-            if (currentPage == 1) {
+            if (currentPage === 1) {
                 return;
             }
 
-            if (currentPage == 2) {
+            if (currentPage === 2) {
                 this.collection.setPage(1);
                 this.collection.resetPageFilter();
 
@@ -193,21 +191,14 @@ define(function(require) {
                 var nextPage = currentPage - 1;
                 this.collection.setPage(nextPage);
 
-                var listFirstModel = this.collection.models[0];
-                var listFirstModelId = listFirstModel.attributes.id;
-
-                this.collection.setPageFilterDate(listFirstModel.attributes.updatedAt);
-                this.collection.setPageFilterIds([listFirstModelId]);
-                this.collection.setPageFilterAction('prev');
+                this._setupPageFilterForPrevAction();
 
                 this._reload();
             }
 
             this._toggleNext(true);
         },
-
         goto_next: function() {
-            debugger;
             if (this.collection.getCount() < this.collection.getPageSize()) {
                 return;
             }
@@ -216,14 +207,27 @@ define(function(require) {
             this.collection.setPage(currentPage + 1);
             this.collection.setPageTotal(this.collection.getPageTotal() + 1);
 
+            this._setupPageFilterForNextAction();
+
+            this._reload();
+        },
+
+        _setupPageFilterForPrevAction: function() {
+            var listFirstModel = this.collection.models[0];
+            var listFirstModelId = listFirstModel.attributes.id;
+
+            this.collection.setPageFilterDate(listFirstModel.attributes.updatedAt);
+            this.collection.setPageFilterIds([listFirstModelId]);
+            this.collection.setPageFilterAction('prev');
+
+        },
+        _setupPageFilterForNextAction: function() {
             var listLastModel = this.collection.models[this.collection.getCount() - 1];
             var listLastModelId = listLastModel.attributes.id;
 
             this.collection.setPageFilterDate(listLastModel.attributes.updatedAt);
             this.collection.setPageFilterIds([listLastModelId]);
             this.collection.setPageFilterAction('next');
-
-            this._reload();
         },
 
         _togglePrevious: function(enable) {
@@ -243,7 +247,8 @@ define(function(require) {
         },
 
         _reloadOnAdd: function() {
-            if (this.collection.getPage() == 1) {
+            if (this.collection.getPage() === 1) {
+                this.collection.resetPageFilter();
                 this._reload();
             }
         },
@@ -398,6 +403,19 @@ define(function(require) {
         _onItemDelete: function(model) {
             this._showLoading();
             try {
+                //in case deleting the last item on page - will show the previous one
+                if (this.collection.getCount() === 1) {
+                    //the first page never has pageFilters
+                    //in case 2nd page and last item deletion - just reset pageFilter, this will give the 1st page
+                    //in all other cases simulate `Prev` action
+                    if (this.collection.getPage() <= 2) {
+                        this.collection.resetPageFilter();
+                    } else {
+                        this.collection.setPage(this.collection.getPage() - 1);
+                        this._setupPageFilterForPrevAction();
+                    }
+                }
+
                 model.destroy({
                     wait: true,
                     url: this._getUrl('itemDelete', model),
