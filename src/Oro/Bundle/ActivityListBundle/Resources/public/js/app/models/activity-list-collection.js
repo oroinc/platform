@@ -1,4 +1,4 @@
-ine([
+define([
     'oroui/js/app/models/base/collection',
     './activity-list-model',
     'underscore',
