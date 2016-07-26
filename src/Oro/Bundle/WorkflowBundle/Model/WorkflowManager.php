@@ -9,7 +9,10 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -27,23 +30,23 @@ class WorkflowManager
     protected $doctrineHelper;
 
     /**
-     * @var WorkflowSystemConfigManager
+     * @var EventDispatcherInterface
      */
-    protected $config;
+    private $eventDispatcher;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowSystemConfigManager $workflowSystemConfigManager
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         DoctrineHelper $doctrineHelper,
-        WorkflowSystemConfigManager $workflowSystemConfigManager
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->doctrineHelper = $doctrineHelper;
-        $this->config = $workflowSystemConfigManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -398,8 +401,13 @@ class WorkflowManager
     {
         $definition = $this->getDefinition($workflowIdentifier);
 
-        if (!$this->config->isActiveWorkflow($definition)) {
-            $this->config->setWorkflowActive($definition);
+        if (!$definition->isActive()) {
+            $definition->setActive(true);
+            $this->doctrineHelper->getEntityManager(WorkflowDefinition::class)->flush($definition);
+            $this->eventDispatcher->dispatch(
+                WorkflowEvents::WORKFLOW_ACTIVATED,
+                new WorkflowChangesEvent($definition)
+            );
         }
     }
 
@@ -411,8 +419,13 @@ class WorkflowManager
     {
         $definition = $this->getDefinition($workflowIdentifier);
 
-        if ($this->config->isActiveWorkflow($definition)) {
-            $this->config->setWorkflowInactive($definition);
+        if ($definition->isActive()) {
+            $definition->setActive(true);
+            $this->doctrineHelper->getEntityManager(WorkflowDefinition::class)->flush($definition);
+            $this->eventDispatcher->dispatch(
+                WorkflowEvents::WORKFLOW_DEACTIVATED,
+                new WorkflowChangesEvent($definition)
+            );
         }
     }
 
@@ -424,7 +437,7 @@ class WorkflowManager
     {
         $definition = $this->getDefinition($workflowIdentifier);
 
-        return $this->config->isActiveWorkflow($definition);
+        return $definition->isActive();
     }
 
     /**

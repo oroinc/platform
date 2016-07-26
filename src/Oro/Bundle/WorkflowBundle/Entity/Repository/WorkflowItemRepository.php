@@ -35,7 +35,7 @@ class WorkflowItemRepository extends EntityRepository
      * @param $entityClass
      * @param $entityIdentifier
      * @param $workflowName
-     * @return array|WorkflowItem[]
+     * @return null|object|WorkflowItem
      */
     public function findOneByEntityMetadata($entityClass, $entityIdentifier, $workflowName)
     {

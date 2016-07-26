@@ -18,25 +18,19 @@ class WorkflowRegistry
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
-    /** @var WorkflowSystemConfigManager */
-    protected $configManager;
-
     /** @var Workflow[] */
     protected $workflowByName = [];
 
     /**
      * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
-     * @param WorkflowSystemConfigManager $configManager
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
-        WorkflowAssembler $workflowAssembler,
-        WorkflowSystemConfigManager $configManager
+        WorkflowAssembler $workflowAssembler
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;
-        $this->configManager = $configManager;
     }
 
     /**
@@ -75,7 +69,7 @@ class WorkflowRegistry
     protected function getAssembledWorkflow(WorkflowDefinition $definition)
     {
         $workflowName = $definition->getName();
-        if (!isset($this->workflowByName[$workflowName])) {
+        if (!array_key_exists($workflowName, $this->workflowByName)) {
             $workflow = $this->workflowAssembler->assemble($definition);
             $this->workflowByName[$workflowName] = $workflow;
         }
@@ -93,15 +87,16 @@ class WorkflowRegistry
     {
         $class = ClassUtils::getRealClass($entityClass);
 
+        $criteria = [
+            'relatedEntity' => $class,
+            'active' => true
+        ];
+
         $workflows = [];
-
-        foreach ($this->configManager->getActiveWorkflowNamesByEntity($entityClass) as $activeWorkflow) {
-            $workflow = $this->getWorkflow($activeWorkflow, false);
-            if ($workflow instanceof Workflow && $workflow->getDefinition()->getRelatedEntity() === $class) {
-                $workflows[$activeWorkflow] = $workflow;
-            }
+        foreach ($this->getEntityRepository()->findBy($criteria) as $definition) {
+            /** @var WorkflowDefinition $definition */
+            $workflows[$definition->getName()] = $this->getAssembledWorkflow($definition);
         }
-
         return $workflows;
     }
 

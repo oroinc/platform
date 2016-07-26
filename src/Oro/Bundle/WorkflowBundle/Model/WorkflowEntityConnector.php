@@ -13,9 +13,6 @@ class WorkflowEntityConnector
     /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var WorkflowSystemConfigManager */
-    protected $workflowConfigManager;
-
     /** @var array */
     protected $supportedIdentifierTypes = [
         Type::BIGINT,
@@ -30,12 +27,10 @@ class WorkflowEntityConnector
 
     /**
      * @param ManagerRegistry $managerRegistry
-     * @param WorkflowSystemConfigManager $workflowConfigManager
      */
-    public function __construct(ManagerRegistry $managerRegistry, WorkflowSystemConfigManager $workflowConfigManager)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
         $this->registry = $managerRegistry;
-        $this->workflowConfigManager = $workflowConfigManager;
     }
 
     /**
@@ -47,8 +42,7 @@ class WorkflowEntityConnector
         $entityClass = is_object($entity) ? ClassUtils::getClass($entity) : ClassUtils::getRealClass($entity);
 
         if (!array_key_exists($entityClass, $this->cache)) {
-            $this->cache[$entityClass] = $this->workflowConfigManager->isConfigurable($entityClass) &&
-                $this->isSupportedIdentifierType($entityClass);
+            $this->cache[$entityClass] = $this->isSupportedIdentifierType($entityClass);
         }
 
         return $this->cache[$entityClass];
