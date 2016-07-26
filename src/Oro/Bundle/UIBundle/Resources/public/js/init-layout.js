@@ -159,7 +159,10 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }
         });
         $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function(e) {
-            $(e.target).parent().find('input[type=text]').first().focus();
+            var $focusTarget = $(e.target).parent().find('input[type=text]').first();
+            if (!$focusTarget.is(e.target)) {
+                $focusTarget.focus();
+            }
         }, 10));
 
         $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function(e) {
