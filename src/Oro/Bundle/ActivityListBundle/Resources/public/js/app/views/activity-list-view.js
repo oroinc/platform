@@ -213,21 +213,39 @@ define(function(require) {
         },
 
         _setupPageFilterForPrevAction: function() {
-            var listFirstModel = this.collection.models[0];
-            var listFirstModelId = listFirstModel.attributes.id;
+            var model = this.collection.first();
+            var sameModelIds = this._findSameModelsBySortingField(model);
 
-            this.collection.setPageFilterDate(listFirstModel.attributes.updatedAt);
-            this.collection.setPageFilterIds([listFirstModelId]);
+            this.collection.setPageFilterDate(model.attributes[this.collection.pager.sortingField]);
+            this.collection.setPageFilterIds(sameModelIds.length ? sameModelIds : [model.id]);
             this.collection.setPageFilterAction('prev');
 
         },
         _setupPageFilterForNextAction: function() {
-            var listLastModel = this.collection.models[this.collection.getCount() - 1];
-            var listLastModelId = listLastModel.attributes.id;
+            var model = this.collection.last();
+            var sameModelIds = this._findSameModelsBySortingField(model);
 
-            this.collection.setPageFilterDate(listLastModel.attributes.updatedAt);
-            this.collection.setPageFilterIds([listLastModelId]);
+            this.collection.setPageFilterDate(model.attributes[this.collection.pager.sortingField]);
+            this.collection.setPageFilterIds(sameModelIds.length ? sameModelIds : [model.id]);
             this.collection.setPageFilterAction('next');
+        },
+        /**
+         * Finds the same models in collection by sorting field
+         * @param model ActivityModel to be used for comparison
+         */
+        _findSameModelsBySortingField: function(model) {
+            var modelIds = [];
+            var sortingField = this.collection.pager.sortingField;
+            var sameModels = _.filter(this.collection.models, function(collectionModel) {
+                return collectionModel.attributes[sortingField] === model.attributes[sortingField];
+            }, this);
+            if (sameModels.length) {
+                modelIds = _.map(sameModels, function(collectionModel) {
+                    return collectionModel.id;
+                });
+            }
+
+            return modelIds;
         },
 
         _togglePrevious: function(enable) {
