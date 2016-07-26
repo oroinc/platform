@@ -1,15 +1,12 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
+use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class DoctrineClearIdentityMapExtension implements ExtensionInterface
+class DoctrineClearIdentityMapExtension extends AbstractExtension
 {
-    use ExtensionTrait;
-
     /**
      * @var RegistryInterface
      */

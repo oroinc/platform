@@ -65,6 +65,11 @@ datagrid:
                 route: oro_api_delete_user
                 params:
                     - id
+            config_link:
+                type: url
+                route: oro_user_config
+                params:
+                    - id
         sorters:
             columns:
                 username:
@@ -127,6 +132,12 @@ datagrid:
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_user_update
+            config:
+                type:          navigate
+                label:         oro.user.user_configuration.grid.action.config
+                link:          config_link
+                icon:          cog
+                acl_resource:  oro_user_user_config
             delete:
                 type:          delete
                 label:         oro.grid.action.delete
@@ -384,6 +395,42 @@ datagrid:
                 selectors:
                     included: '#roleAppendUsers'
                     excluded: '#roleRemoveUsers'
+
+    role-permission-grid:
+            acl_resource: oro_user_role_update
+            source:
+                type: role-permission-provider
+            columns:
+                entity:
+                    label: "Entity"
+                    data_name: entity
+                    frontend_type: string
+                    translatable: true
+                permissions:
+                    label: "Permissions"
+                    data_name: permissions
+                    frontend_type: action-permissions
+                identity:
+                    data_name: identity
+                    frontend_type: string
+                    renderable: false
+                group:
+                    data_name: group
+                    frontend_type: string
+                    renderable: false
+            actions:
+                role-premissions:
+                    type: frontend
+                    frontend_type: role-permissions
+            filters: ~
+            sorters: ~
+            options:
+                requireJSModules:
+                    - orouser/js/datagrid/roles-datagrid-builder
+                toolbarOptions:
+                    placement:
+                        top: false
+                        bottom: false
 
     group-users-grid:
         extends: user-relation-grid

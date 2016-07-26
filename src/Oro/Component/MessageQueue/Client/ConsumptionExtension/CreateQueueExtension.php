@@ -1,15 +1,12 @@
 <?php
 namespace Oro\Component\MessageQueue\Client\ConsumptionExtension;
 
+use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 
-class CreateQueueExtension implements ExtensionInterface
+class CreateQueueExtension extends AbstractExtension
 {
-    use ExtensionTrait;
-    
     /**
      * @var DriverInterface
      */

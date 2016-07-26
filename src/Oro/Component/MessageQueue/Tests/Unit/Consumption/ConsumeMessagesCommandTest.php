@@ -2,7 +2,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand;
-use Oro\Component\MessageQueue\Consumption\Extensions;
+use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
@@ -83,7 +83,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer
             ->expects($this->once())
             ->method('consume')
-            ->with($this->isInstanceOf(Extensions::class))
+            ->with($this->isInstanceOf(ChainExtension::class))
         ;
         $consumer
             ->expects($this->once())

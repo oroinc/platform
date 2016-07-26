@@ -1,6 +1,6 @@
 services:
     oro_message_queue.consumption.extensions:
-        class: 'Oro\Component\MessageQueue\Consumption\Extensions'
+        class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
         public: false
         arguments:
             - []

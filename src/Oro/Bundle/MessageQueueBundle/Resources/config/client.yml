@@ -27,7 +27,7 @@ services:
             - []
 
     oro_message_queue.client.route_message_processor:
-        class: 'Oro\Component\MessageQueue\Router\RouterMessageProcessor'
+        class: 'Oro\Component\MessageQueue\Router\RouteRecipientListProcessor'
         public: true
         arguments:
             - '@oro_message_queue.client.router'

@@ -1,18 +1,13 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
-declare(ticks = 1);
-
+use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 use Psr\Log\LoggerInterface;
 
-class SignalExtension implements ExtensionInterface
+class SignalExtension extends AbstractExtension
 {
-    use ExtensionTrait;
-
     /**
      * @var bool
      */
@@ -46,6 +41,8 @@ class SignalExtension implements ExtensionInterface
     {
         $this->logger = $context->getLogger();
 
+        pcntl_signal_dispatch();
+
         $this->interruptExecutionIfNeeded($context);
     }
 
@@ -62,6 +59,8 @@ class SignalExtension implements ExtensionInterface
      */
     public function onPostReceived(Context $context)
     {
+        pcntl_signal_dispatch();
+
         $this->interruptExecutionIfNeeded($context);
     }
 
@@ -70,6 +69,8 @@ class SignalExtension implements ExtensionInterface
      */
     public function onIdle(Context $context)
     {
+        pcntl_signal_dispatch();
+
         $this->interruptExecutionIfNeeded($context);
     }
 
@@ -99,6 +100,7 @@ class SignalExtension implements ExtensionInterface
             case SIGTERM:  // 15 : supervisor default stop
             case SIGQUIT:  // 3  : kill -s QUIT
             case SIGINT:   // 2  : ctrl+c
+                $this->logger->debug('[SignalExtension] Interrupt consumption');
                 $this->interruptConsumption = true;
                 break;
             default:

@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
-use Oro\Component\MessageQueue\Consumption\Extensions;
+use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -81,7 +81,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer
             ->expects($this->once())
             ->method('consume')
-            ->with($this->isInstanceOf(Extensions::class))
+            ->with($this->isInstanceOf(ChainExtension::class))
         ;
         $consumer
             ->expects($this->once())
@@ -118,7 +118,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer
             ->expects($this->once())
             ->method('consume')
-            ->with($this->isInstanceOf(Extensions::class))
+            ->with($this->isInstanceOf(ChainExtension::class))
         ;
         $consumer
             ->expects($this->once())
@@ -157,7 +157,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer
             ->expects($this->once())
             ->method('consume')
-            ->with($this->isInstanceOf(Extensions::class))
+            ->with($this->isInstanceOf(ChainExtension::class))
         ;
         $consumer
             ->expects($this->once())

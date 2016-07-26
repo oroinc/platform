@@ -38,6 +38,19 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($messageConsumer, $context->getMessageConsumer());
     }
 
+    public function testThrowOnTryToChangeMessageConsumerIfAlreadySet()
+    {
+        $messageConsumer = $this->createMessageConsumer();
+        $anotherMessageConsumer = $this->createMessageConsumer();
+
+        $context = new Context($this->createSession());
+
+        $context->setMessageConsumer($messageConsumer);
+
+        $this->setExpectedException(IllegalContextModificationException::class);
+        $context->setMessageConsumer($anotherMessageConsumer);
+    }
+
     public function testShouldAllowGetMessageProducerPreviouslySet()
     {
         $messageProcessor = $this->createMessageProcessor();
@@ -46,6 +59,19 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $context->setMessageProcessor($messageProcessor);
 
         $this->assertSame($messageProcessor, $context->getMessageProcessor());
+    }
+
+    public function testThrowOnTryToChangeMessageProcessorIfAlreadySet()
+    {
+        $messageProcessor = $this->createMessageProcessor();
+        $anotherMessageProcessor = $this->createMessageProcessor();
+
+        $context = new Context($this->createSession());
+
+        $context->setMessageProcessor($messageProcessor);
+
+        $this->setExpectedException(IllegalContextModificationException::class);
+        $context->setMessageProcessor($anotherMessageProcessor);
     }
 
     public function testShouldAllowGetLoggerPreviouslySet()
@@ -86,7 +112,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             IllegalContextModificationException::class,
-            'The message modification is not allowed'
+            'The message could be set once'
         );
 
         $context->setMessage($message);

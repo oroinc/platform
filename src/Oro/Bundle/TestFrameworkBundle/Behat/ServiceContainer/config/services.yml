@@ -26,6 +26,7 @@ services:
         arguments:
             - ~
             - '@oro_test.context.fixture_loader'
+            - '@oro_element_factory'
             - '@oro_test.kernel_service_factory'
             - '@oro_test.reference_repository_initializer'
         tags:

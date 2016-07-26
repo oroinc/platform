@@ -26,7 +26,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     public function __construct(QueueConsumer $consumer)
     {
-        parent::__construct($name = 'oro:message-queue:transport:consume');
+        parent::__construct('oro:message-queue:transport:consume');
         
         $this->consumer = $consumer;
     }
@@ -57,7 +57,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
 
         /** @var MessageProcessorInterface $messageProcessor */
         $messageProcessor = $this->container->get($input->getArgument('processor-service'));
-        if (false == $messageProcessor instanceof  MessageProcessorInterface) {
+        if (!$messageProcessor instanceof  MessageProcessorInterface) {
             throw new \LogicException(sprintf(
                 'Invalid message processor service given. It must be an instance of %s but %s',
                 MessageProcessorInterface::class,
@@ -65,7 +65,10 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
             ));
         }
 
-        $runtimeExtensions = new Extensions($this->getLimitsExtensions($input, $output));
+        $extensions = $this->getLimitsExtensions($input, $output);
+        array_unshift($extensions, new LoggerExtension(new ConsoleLogger($output)));
+
+        $runtimeExtensions = new ChainExtension($extensions);
 
         try {
             $this->consumer->bind($queueName, $messageProcessor);

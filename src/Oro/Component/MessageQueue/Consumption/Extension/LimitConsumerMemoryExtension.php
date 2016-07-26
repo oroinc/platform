@@ -1,14 +1,11 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
+use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\ExtensionTrait;
 
-class LimitConsumerMemoryExtension implements ExtensionInterface
+class LimitConsumerMemoryExtension extends AbstractExtension
 {
-    use ExtensionTrait;
-
     /**
      * @var int
      */

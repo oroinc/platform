@@ -9,6 +9,7 @@ use Oro\Component\Testing\SearchExtensionTrait;
 
 /**
  * @outputBuffering enabled
+ * @group soap
  */
 class SoapSearchApiTest extends WebTestCase
 {

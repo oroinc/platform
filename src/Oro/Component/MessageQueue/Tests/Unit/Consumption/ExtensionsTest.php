@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\Extensions;
+use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\Testing\ClassExtensionTrait;
 
 class ExtensionsTest extends \PHPUnit_Framework_TestCase
@@ -12,12 +12,12 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldImplementExtensionInterface()
     {
-        $this->assertClassImplements(ExtensionInterface::class, Extensions::class);
+        $this->assertClassImplements(ExtensionInterface::class, ChainExtension::class);
     }
 
     public function testCouldBeConstructedWithExtensionsArray()
     {
-        new Extensions([$this->createExtension(), $this->createExtension()]);
+        new ChainExtension([$this->createExtension(), $this->createExtension()]);
     }
 
     public function testShouldProxyOnStartToAllInternalExtensions()
@@ -37,7 +37,7 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($context))
         ;
 
-        $extensions = new Extensions([$fooExtension, $barExtension]);
+        $extensions = new ChainExtension([$fooExtension, $barExtension]);
 
         $extensions->onStart($context);
     }
@@ -59,7 +59,7 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($context))
         ;
 
-        $extensions = new Extensions([$fooExtension, $barExtension]);
+        $extensions = new ChainExtension([$fooExtension, $barExtension]);
 
         $extensions->onBeforeReceive($context);
     }
@@ -81,7 +81,7 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($context))
         ;
 
-        $extensions = new Extensions([$fooExtension, $barExtension]);
+        $extensions = new ChainExtension([$fooExtension, $barExtension]);
 
         $extensions->onPreReceived($context);
     }
@@ -103,7 +103,7 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($context))
         ;
 
-        $extensions = new Extensions([$fooExtension, $barExtension]);
+        $extensions = new ChainExtension([$fooExtension, $barExtension]);
 
         $extensions->onPostReceived($context);
     }
@@ -125,7 +125,7 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($context))
         ;
 
-        $extensions = new Extensions([$fooExtension, $barExtension]);
+        $extensions = new ChainExtension([$fooExtension, $barExtension]);
 
         $extensions->onIdle($context);
     }
@@ -147,7 +147,7 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($context))
         ;
 
-        $extensions = new Extensions([$fooExtension, $barExtension]);
+        $extensions = new ChainExtension([$fooExtension, $barExtension]);
 
         $extensions->onInterrupted($context);
     }
