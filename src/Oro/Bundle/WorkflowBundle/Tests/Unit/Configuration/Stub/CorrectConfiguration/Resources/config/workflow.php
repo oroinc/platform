@@ -1,6 +1,5 @@
 <?php
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 return array(
@@ -11,6 +10,8 @@ return array(
         'start_step' => 'first_step',
         'entity_attribute' => 'my_entity',
         'steps_display_ordered' => true,
+        'priority' => 0,
+        'defaults' => ['active' => false],
         'steps' => array(
             'first_step' => array(
                 'label' => 'First Step',
@@ -116,6 +117,8 @@ return array(
         'label' => 'Second Workflow',
         'entity' => 'Second\Entity',
         'start_step' => 'second_step',
+        'priority' => 0,
+        'defaults' => ['active' => false],
         'steps' => array(
             'second_step' => array(
                 'label' => 'Second Step',
