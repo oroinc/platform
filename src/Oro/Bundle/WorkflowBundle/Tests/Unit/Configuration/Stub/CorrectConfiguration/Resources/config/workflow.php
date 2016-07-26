@@ -10,8 +10,10 @@ return array(
         'start_step' => 'first_step',
         'entity_attribute' => 'my_entity',
         'steps_display_ordered' => true,
-        'priority' => 0,
-        'defaults' => ['active' => false],
+        'priority' => 1,
+        'defaults' => [
+            'active' => true,
+        ],
         'steps' => array(
             'first_step' => array(
                 'label' => 'First Step',
@@ -118,7 +120,9 @@ return array(
         'entity' => 'Second\Entity',
         'start_step' => 'second_step',
         'priority' => 0,
-        'defaults' => ['active' => false],
+        'defaults' => [
+            'active' => false,
+        ],
         'steps' => array(
             'second_step' => array(
                 'label' => 'Second Step',

@@ -141,7 +141,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             'is_system' => true,
             'entity' => 'My\Entity',
             'defaults' => ['active' => false],
-            'priority' => 0,
+            'priority' => 1,
             'start_step' => 'test_step',
             'entity_attribute' => 'my_entity',
             'steps_display_ordered' => true,
@@ -198,7 +198,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'start_step' => 'test_step',
                     'entity' => 'My\Entity',
                     'defaults' => ['active' => false],
-                    'priority' => 0,
+                    'priority' => 1,
                     'configuration' => $this->filterConfiguration($maximumConfiguration),
                 ),
                 'expected_acls' => array(
