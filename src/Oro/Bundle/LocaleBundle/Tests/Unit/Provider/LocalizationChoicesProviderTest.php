@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Persistence\ObjectRepository;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
+use Oro\Bundle\LocaleBundle\Provider\LocalizationProvider;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -16,8 +15,8 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
-    /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
-    protected $repository;
+    /** @var LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $localizationProvider;
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -33,25 +32,27 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
-
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->localizationProvider = $this->getMockBuilder(LocalizationProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->languageFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter')
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formattingFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter')
+        $this->languageFormatter = $this->getMockBuilder(LanguageCodeFormatter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->formattingFormatter = $this->getMockBuilder(FormattingCodeFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->provider = new LocalizationChoicesProvider(
-            $this->repository,
             $this->configManager,
             $this->languageFormatter,
-            $this->formattingFormatter
+            $this->formattingFormatter,
+            $this->localizationProvider
         );
     }
 
@@ -59,7 +60,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->provider,
-            $this->repository,
+            $this->localizationProvider,
             $this->configManager,
             $this->languageFormatter,
             $this->formattingFormatter
@@ -97,9 +98,9 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
         /** @var Localization $entity2 */
         $entity2 = $this->getEntity(Localization::class, ['id' => 42, 'name' => 'test2']);
 
-        $this->repository->expects($this->once())
-            ->method('findBy')
-            ->with([], ['name' => 'ASC'])
+        $this->localizationProvider->expects($this->once())
+            ->method('getLocalizations')
+            ->with(null)
             ->willReturn([$entity1, $entity2]);
 
         $this->assertEquals(
