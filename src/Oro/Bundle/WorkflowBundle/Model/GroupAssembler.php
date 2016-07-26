@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\Common\Persistence\ObjectRepository;
+
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowGroup;
 
@@ -26,7 +26,6 @@ class GroupAssembler extends BaseAbstractAssembler
 
     /**
      * @param array $configuration
-     * @param Attribute[]|Collection $attributes
      * @return ArrayCollection
      */
     public function assemble(array $configuration)
