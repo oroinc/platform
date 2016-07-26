@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Dashboard;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
-
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
 class OwnerHelper
 {
@@ -18,6 +18,9 @@ class OwnerHelper
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
+    /** @var OwnerTreeProviderInterface */
+    protected $ownerTreeProvider;
+
     const CURRENT_USER          = 'current_user';
     const CURRENT_BUSINESS_UNIT = 'current_business_unit';
 
@@ -25,39 +28,70 @@ class OwnerHelper
     protected $ownerIds;
 
     /**
-     * @param RegistryInterface     $registry
-     * @param TokenStorageInterface $tokenStorage
+     * @param RegistryInterface          $registry
+     * @param TokenStorageInterface      $tokenStorage
+     * @param OwnerTreeProviderInterface $ownerTreeProvider
      */
-    public function __construct(RegistryInterface $registry, TokenStorageInterface $tokenStorage)
-    {
-        $this->registry     = $registry;
-        $this->tokenStorage = $tokenStorage;
+    public function __construct(
+        RegistryInterface $registry,
+        TokenStorageInterface $tokenStorage,
+        OwnerTreeProviderInterface $ownerTreeProvider
+    ) {
+        $this->registry          = $registry;
+        $this->tokenStorage      = $tokenStorage;
+        $this->ownerTreeProvider = $ownerTreeProvider;
     }
 
     /**
      * @param WidgetOptionBag $widgetOptions
      *
-     * @return int[]
+     * @return int[] Returns array of user ids, [] if filter is empty or [0] if intersection wasn't found among options
      */
     public function getOwnerIds(WidgetOptionBag $widgetOptions)
     {
         $key = spl_object_hash($widgetOptions);
         if (!isset($this->ownerIds[$key])) {
-            $businessUnitIds = $this->getBusinessUnitsIds($widgetOptions);
+            $ownerIdsGroups = $this->collectOwnerIdsGroups($widgetOptions);
+            $ownerIds = [];
+            if ($ownerIdsGroups) {
+                if (count($ownerIdsGroups) === 1) {
+                    $ownerIds = reset($ownerIdsGroups);
+                } else {
+                    $ownerIds = call_user_func_array('array_intersect', $ownerIdsGroups);
+                }
+                if (empty($ownerIds)) {
+                    $ownerIds = [0];
+                }
+            }
 
-            $array = array_unique(
-                array_merge($this->getUserOwnerIds($businessUnitIds), $this->getUsersIds($widgetOptions))
-            );
-
-            $roleIds = $this->getRoleIds($widgetOptions);
-            $array   = array_unique(array_merge($this->getUserOwnerIdsByRoles($roleIds), $array));
-
-            $array = $this->replaceCurrentValues($array);
-
-            $this->ownerIds[$key] = $array;
+            $this->ownerIds[$key] = $ownerIds;
         }
 
         return $this->ownerIds[$key];
+    }
+
+    /**
+     * @param WidgetOptionBag $widgetOptions
+     *
+     * @return array
+     */
+    protected function collectOwnerIdsGroups(WidgetOptionBag $widgetOptions)
+    {
+        $ownerIdsGroups = [];
+
+        if ($userIds = $this->replaceCurrentValues($this->getUsersIds($widgetOptions))) {
+            $ownerIdsGroups[] = array_unique($userIds);
+        }
+
+        if ($businessUnitIds = $this->replaceCurrentValues($this->getBusinessUnitsIds($widgetOptions))) {
+            $ownerIdsGroups[] = $this->getUserOwnerIds($businessUnitIds);
+        }
+
+        if ($roleIds = $this->getRoleIds($widgetOptions)) {
+            $ownerIdsGroups[] = $this->getUserOwnerIdsByRoles($roleIds);
+        }
+
+        return $ownerIdsGroups;
     }
 
     /**
@@ -144,21 +178,9 @@ class OwnerHelper
             return [];
         }
 
-        $businessUnitIds = $this->replaceCurrentValues($businessUnitIds);
-
-        $qb = $this->registry->getRepository('OroUserBundle:User')
-            ->createQueryBuilder('u')
-            ->select('DISTINCT(u.id)')
-            ->join('u.businessUnits', 'bu');
-        QueryUtils::applyOptimizedIn($qb, 'bu.id', $businessUnitIds);
-
-        $result = array_map('current', $qb->getQuery()->getResult());
-
-        if (empty($result)) {
-            $result = [0];
-        }
-
-        return $result;
+        return $this->ownerTreeProvider->getTree()->getUsersAssignedToBusinessUnits(
+            $this->replaceCurrentValues($businessUnitIds)
+        ) ?: [0];
     }
 
     /**

@@ -115,6 +115,9 @@ UPGRADE FROM 1.9 to 1.10
 - Added class `Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator`
     **IMPORTANT**: Configuration must provide full list of triggers for mentioned process definition. If list under definition key comes empty - triggers would be removed. See more in `\Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator::configureTriggers` doc-block.
     **IMPORTANT**: Changing of process cron triggers configuration will not keep all old cron triggers in database. E.g. old triggers would be removed and new created.
+- Added class `Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler` (`oro_workflow.handler.workflow_definition` service) for single point of `WorkflowDefinition` entity management.
+    All manipulations with `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity persistence should be provided through the handler.
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` construction signature was changed: additional (fifth) argument `Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher` was added.
 
 ####CronBundle
 - Added action `@create_job` for instance of `JMS\JobQueueBundle\Entity\Job` creation and persistence through actions (Class `Oro\Bundle\CronBundle\Action\CreateJobAction`).
@@ -262,6 +265,8 @@ Corresponding block type classes was removed.
 - New `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` block type was added. This block type creates three child blocks in buildBlock method: `FormStartType`, `FormType`, `FormEndType`.
 - Added possibility to view layout tree in developer toolbar and include block debug information in HTML, for details please check out documentation at
  [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
+- Added possibility to create layout update imports, for details please check out documentation [Imports](./src/Oro/Bundle/LayoutBundle/Resources/doc/imports.md).
+- Added new `\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface`.
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
