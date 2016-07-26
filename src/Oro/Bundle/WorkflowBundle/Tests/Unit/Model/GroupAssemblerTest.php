@@ -30,12 +30,17 @@ class GroupAssemblerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider assembleDataProvider
+     * @param $configuration
+     * @param Collection $expectedGroups
      */
     public function testAssemble($configuration, Collection $expectedGroups)
     {
         $this->assertEquals($expectedGroups, $this->assembler->assemble($configuration));
     }
 
+    /**
+     * @return array
+     */
     public function assembleDataProvider()
     {
         /** @var WorkflowGroup $activeGroup */

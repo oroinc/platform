@@ -66,7 +66,7 @@ class GroupAssembler extends BaseAbstractAssembler
                     ->setType($type)
                     ->setName($groupName);
             }
-            if(!$groups->contains($group)) {
+            if (!$groups->contains($group)) {
                 $groups->add($group);
             }
         }
