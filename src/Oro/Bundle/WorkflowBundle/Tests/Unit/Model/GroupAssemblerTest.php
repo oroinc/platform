@@ -56,7 +56,6 @@ class GroupAssemblerTest extends \PHPUnit_Framework_TestCase
             'name'=> 'test_group1',
         ]);
 
-
         return [
             'empty' => [
                 [],
