@@ -36,9 +36,10 @@ class ConfigExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
 <<<CLASS
-class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface
+class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface, \Oro\Component\Layout\IsApplicableLayoutUpdateInterface
 {
     private \$expressionFactory;
+    private \$applicable = false;
 
     public function updateLayout(\$layoutManipulator, \$item)
     {
@@ -49,6 +50,7 @@ class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionFac
         \$expr = \$this->expressionFactory->create('true', []);
         \$context = ['context' => \$item->getContext()];
         if (\$expr->evaluate(\$context)) {
+            \$this->isApplicable = true;
             echo 123;
         }
     }
@@ -56,6 +58,11 @@ class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionFac
     public function setExpressionFactory(\Oro\Component\ConfigExpression\ExpressionFactoryInterface \$expressionFactory)
     {
         \$this->expressionFactory = \$expressionFactory;
+    }
+
+    public function isApplicable()
+    {
+        return \$this->applicable;
     }
 }
 CLASS
