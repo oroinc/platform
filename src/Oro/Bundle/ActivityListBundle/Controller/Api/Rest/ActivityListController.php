@@ -29,7 +29,7 @@ class ActivityListController extends RestController
      *
      * @QueryParam(
      *     name="pageFilter", nullable=true,
-     *     description="Array of pagination filters, e.g. [last item updatedAt date, array of ids with similar date]"
+     *     description="Array with pager filters, e.g. [first|last item date, array of ids with same date, action type]"
      * )
      * @QueryParam(
      *      name="filter", nullable=true,

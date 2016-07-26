@@ -142,7 +142,11 @@ define(function(require) {
                 this._toggleNext();
             }
 
-            if (this.collection.getCount() === 0 && this.isFiltersEmpty && this.collection.getPage() == 1) {
+            if (this.collection.getCount() === 0
+                && this.isFiltersEmpty
+                && this.collection.getPage() == 1
+                && !this.collection.models.length
+            ) {
                 this.gridToolbar.hide();
             } else {
                 this.gridToolbar.show();
@@ -203,6 +207,7 @@ define(function(require) {
         },
 
         goto_next: function() {
+            debugger;
             if (this.collection.getCount() < this.collection.getPageSize()) {
                 return;
             }
