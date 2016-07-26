@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
-use Doctrine\DBAL\Connection;
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class MoveActiveFromConfigToFieldQuery extends ParametrizedMigrationQuery
 {

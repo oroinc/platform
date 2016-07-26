@@ -94,11 +94,11 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-//        $this->assertEmpty(
-//            $configurationProvider->getWorkflowDefinitionConfiguration(
-//                array(__DIR__ . '/Stub/EmptyConfiguration')
-//            )
-//        );
+        $this->assertEmpty(
+            $configurationProvider->getWorkflowDefinitionConfiguration(
+                array(__DIR__ . '/Stub/EmptyConfiguration')
+            )
+        );
     }
 
     public function testGetWorkflowDefinitionsFilterByWorkflow()
