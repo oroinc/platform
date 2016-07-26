@@ -172,7 +172,7 @@ define(function(require) {
                     if (item !== void 0) {
                         if (item.treePath) {
                             var path = [];
-                            _.each(item.treePath, function (item) {
+                            _.each(item.treePath, function(item) {
                                 path.push(item[renderedPropertyName]);
                             });
                             label.push(path.join(' / '));
@@ -197,7 +197,7 @@ define(function(require) {
                 query = value.value;
             } else {
                 var ids = [];
-                _.each(value.value, function (val) {
+                _.each(value.value, function(val) {
                     ids.push(val.id);
                 });
                 query = ids.join(',');
