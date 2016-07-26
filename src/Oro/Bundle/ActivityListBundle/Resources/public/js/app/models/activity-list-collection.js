@@ -1,4 +1,4 @@
-define([
+ine([
     'oroui/js/app/models/base/collection',
     './activity-list-model',
     'underscore',
@@ -17,7 +17,8 @@ define([
             count:    1, //total activities count
             current:  1, //current page
             pagesize: 1, //items per page
-            total:    1  //total pages
+            total:    1, //total pages
+            sortingField: 'updatedAt' //the activity list item attribute being used for data sorting
         },
         pageFilter: {
             date: null,
@@ -128,8 +129,6 @@ define([
 
         setCount: function(count) {
             this.pager.count = count;
-            //this.pager.total = count === 0 ? 1 : Math.ceil(count / this.pager.pagesize);
-
             this.count = count;
         },
 
