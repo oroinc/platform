@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -103,6 +104,20 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getExtensionInstanceForObject($object)
+    {
+        if ((is_string($object) && ObjectIdentityHelper::isFieldDecodedKey($object))
+            || (is_object($object) && $object instanceof FieldVote)
+        ) {
+            return $this->fieldAclExtension;
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFieldExtension()
     {
         return $this->fieldAclExtension;
@@ -160,6 +175,10 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function supports($type, $id)
     {
+        if (ObjectIdentityHelper::isFieldDecodedKey($type)) {
+            $type = ObjectIdentityHelper::decodeEntityFieldInfo($type)[0];
+        }
+
         if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE && $id === $this->getExtensionKey()) {
             return true;
         }

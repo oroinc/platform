@@ -172,4 +172,12 @@ final class NullAclExtension implements AclExtensionInterface
     {
         return null;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtensionInstanceForObject($object)
+    {
+        return $this;
+    }
 }

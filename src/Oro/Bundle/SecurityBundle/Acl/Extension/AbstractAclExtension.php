@@ -20,6 +20,14 @@ abstract class AbstractAclExtension implements AclExtensionInterface
     /**
      * {@inheritdoc}
      */
+    public function getExtensionInstanceForObject($object)
+    {
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFieldExtension()
     {
         return null;

@@ -223,6 +223,15 @@ interface AclExtensionInterface
     public function getAccessLevelNames($object, $permissionName = null);
 
     /**
+     * Returns ACL extension instance for given object. In case of field object, will return Field ACL extension
+     *
+     * @param mixed $object
+     *
+     * @return AclExtensionInterface
+     */
+    public function getExtensionInstanceForObject($object);
+
+    /**
      * Returns Field ACL extension
      *
      * @return AclExtensionInterface|null

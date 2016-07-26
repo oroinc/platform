@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
@@ -32,9 +33,22 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
 
         $this->selector->addAclExtension($this->entityExtension);
         $this->selector->addAclExtension($this->actionExtension);
+        $this->actionExtension->expects($this->any())
+            ->method('getExtensionInstanceForObject')
+            ->willReturn($this->actionExtension);
         $this->entityExtension->expects($this->any())
-            ->method('getFieldExtension')
-            ->willReturn($this->fieldExtension);
+            ->method('getExtensionInstanceForObject')
+            ->willReturnCallback(
+                function ($val) {
+                    if ((is_string($val) && ObjectIdentityHelper::isFieldDecodedKey($val))
+                        || (is_object($val) && $val instanceof FieldVote)
+                    ) {
+                        return $this->fieldExtension;
+                    }
+
+                    return $this->entityExtension;
+                }
+            );
     }
 
     public function testSelectByExtensionKey()

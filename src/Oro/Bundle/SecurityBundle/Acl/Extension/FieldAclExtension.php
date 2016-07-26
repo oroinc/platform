@@ -14,7 +14,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -128,36 +127,7 @@ class FieldAclExtension extends AbstractAclExtension
      */
     public function supports($type, $id)
     {
-        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE
-            || $type === 'Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference'
-        ) {
-            return $id === $this->getExtensionKey();
-        }
-
-        if ($id === $this->getExtensionKey()) {
-            $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
-        } else {
-            $type = ClassUtils::getRealClass($type);
-        }
-
-        if (!$this->entityClassResolver->isEntity($type)) {
-            return false;
-        }
-
-        if (!$this->securityConfigProvider->hasConfig($type)) {
-            return false;
-        }
-
-        $securityConfig = $this->securityConfigProvider->getConfig($type);
-        // check if FACL is enabled for given object. If FACL not enabled - grant access
-        if (!$securityConfig->get('field_acl_supported') || !$securityConfig->get('field_acl_enabled')) {
-            return false;
-        }
-
-        // either id starts with 'field' (e.g. field+fieldName)
-        // or id is null (checking for new entity)
-
-        return (0 === strpos($id, self::NAME) || null === $id);
+        return true;
     }
 
     /**
@@ -165,7 +135,7 @@ class FieldAclExtension extends AbstractAclExtension
      */
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
     {
-        return array_keys($this->getPermissionsToIdentityMap());
+        return array_keys($this->permissionToMaskBuilderIdentity);
     }
 
     /**
@@ -421,6 +391,27 @@ class FieldAclExtension extends AbstractAclExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getObjectIdentity($val)
+    {
+        if (is_string($val)) {
+            $identity = $this->fromDescriptor($val);
+        } elseif ($val instanceof AclAnnotation) {
+            $class = $this->entityClassResolver->getEntityClass($val->getClass());
+            $identity = new ObjectIdentity($val->getType(), $class);
+        } else {
+            $identity = $this->fromDomainObject($val);
+        }
+
+        if (null === $identity->getIdentifier()) {
+            $identity = new ObjectIdentity('entity', $identity->getType());
+        }
+
+        return $identity;
+    }
+
+    /**
      * Gets all valid bitmasks for the given object
      *
      * @param string $permission
@@ -466,48 +457,10 @@ class FieldAclExtension extends AbstractAclExtension
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function parseDescriptor($descriptor, &$type, &$id, &$group)
-    {
-        parent::parseDescriptor($descriptor, $type, $id, $group);
-
-        if (strpos($id, '+')) {
-            $id = explode('+', $id)[0];
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getObjectIdentity($val)
-    {
-        if (is_string($val)) {
-            $identity = $this->fromDescriptor($val);
-        } elseif ($val instanceof AclAnnotation) {
-            $class = $this->entityClassResolver->getEntityClass($val->getClass());
-            $identity = new ObjectIdentity($val->getType(), $class);
-        } else {
-            $identity = $this->fromDomainObject($val);
-        }
-
-        if (null === $identity->getIdentifier()) {
-            $identity = new ObjectIdentity('entity', $identity->getType());
-        }
-
-        return $identity;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPermissionsToIdentityMap($byCurrentGroup = false)
-    {
-        return $this->permissionToMaskBuilderIdentity;
-    }
-
-    /**
-     * {@inheritdoc}
+     * @param string $maskBuilderIdentity
+     * @param string $constName
+     *
+     * @return mixed
      */
     protected function getMaskBuilderConst($maskBuilderIdentity, $constName)
     {
