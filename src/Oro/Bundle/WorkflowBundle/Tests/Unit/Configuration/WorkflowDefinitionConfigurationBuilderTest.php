@@ -51,6 +51,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             'name' => $definition->getName(),
             'label' => $definition->getLabel(),
             'entity' => $definition->getRelatedEntity(),
+            'defaults' => ['active' => $definition->isActive()],
+            'priority' => $definition->getPriority(),
             'configuration' => $definition->getConfiguration(),
         );
 
@@ -181,23 +183,19 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $minimumConfiguration = array(
             'label'  => 'Test Workflow',
             'entity' => 'My\Entity',
+            'defaults' => ['active' => false],
             'priority' => 0,
-            'defaults' => [
-                'active' => false,
-            ],
         );
 
         $maximumConfiguration = array(
             'label' => 'Test Workflow',
             'is_system' => true,
             'entity' => 'My\Entity',
+            'defaults' => ['active' => false],
+            'priority' => 1,
             'start_step' => 'test_step',
             'entity_attribute' => 'my_entity',
             'steps_display_ordered' => true,
-            'priority' => 1,
-            'defaults' => [
-                'active' => true,
-            ],
             WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS => [
                 'active_group1',
                 'active_group2',
@@ -244,6 +242,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'name'  => 'test_workflow',
                     'label' => 'Test Workflow',
                     'entity'     => 'My\Entity',
+                    'defaults' => ['active' => false],
+                    'priority' => 0,
                     'configuration' => $this->filterConfiguration($minimumConfiguration),
                 ),
             ),
@@ -256,6 +256,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'label' => 'Test Workflow',
                     'start_step' => 'test_step',
                     'entity' => 'My\Entity',
+                    'defaults' => ['active' => false],
+                    'priority' => 1,
                     'configuration' => $this->filterConfiguration($maximumConfiguration),
                 ),
                 'expected_acls' => array(

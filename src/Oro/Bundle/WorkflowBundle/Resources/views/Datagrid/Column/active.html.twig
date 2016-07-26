@@ -1,7 +1,4 @@
-{% set config = oro_entity_config(record.getValue('relatedEntity'), 'workflow') %}
-{% set workflowName = record.getValue('name') %}
-{% set activeWorkflows = config.active_workflows|default([]) %}
-{% if workflowName in activeWorkflows %}
+{% if record.getValue('active') %}
     {{ 'Yes'|trans }}
 {% else %}
     {{ 'No'|trans }}
