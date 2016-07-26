@@ -164,29 +164,31 @@
     <div class="widget-date-widget">
         {{ form_widget(form.useDate) }}
     </div>
-    <div class="widget-date-input-widget">
-        {{ form_widget(form.date) }}
-    </div>
-    <script type="text/javascript">
-        require(['jquery'], function ($) {
-            $(function () {
-                var useDate = $('input#{{ form.useDate.vars.id }}');
+    {% if form.date is defined %}
+        <div class="widget-date-input-widget">
+            {{ form_widget(form.date) }}
+        </div>
+        <script type="text/javascript">
+            require(['jquery'], function ($) {
+                $(function () {
+                    var useDate = $('input#{{ form.useDate.vars.id }}');
 
-                if (useDate.prop('checked') !== true) {
-                    $('input#{{ form.date.vars.id }}').attr('readonly', 'readonly');
-                }
-
-                $(useDate).change(function() {
-                    var date    = $('input#date_selector_{{ form.date.vars.id }}');
-                    if ($(this).is(':checked')) {
-                        $(date).datepicker('enable');
-                    } else {
-                        $(date).datepicker('disable');
+                    if (useDate.prop('checked') !== true) {
+                        $('input#{{ form.date.vars.id }}').attr('readonly', 'readonly');
                     }
+
+                    $(useDate).change(function() {
+                        var date    = $('input#date_selector_{{ form.date.vars.id }}');
+                        if ($(this).is(':checked')) {
+                            $(date).datepicker('enable');
+                        } else {
+                            $(date).datepicker('disable');
+                        }
+                    });
                 });
-            });
-        })
-    </script>
+            })
+        </script>
+    {% endif %}
 {% endblock oro_type_widget_date_widget %}
 
 {% block oro_dashboard_query_filter_row %}
