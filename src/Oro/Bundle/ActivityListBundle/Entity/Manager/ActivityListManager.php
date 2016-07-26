@@ -178,18 +178,14 @@ class ActivityListManager
         );
 
         if ((!$pageFilter && $orderDirection === 'ASC')
-            ||($orderDirection === 'DESC' && $pageFilter['action'] === 'prev')
+            || ($orderDirection === 'DESC' && $pageFilter['action'] === 'prev')
             || ($orderDirection === 'ASC' && $pageFilter['action'] === 'next')
         ) {
             // ASC sorting
             usort($ids, function ($a, $b) use ($orderBy) {
                 return $a[$orderBy]->getTimestamp() - $b[$orderBy]->getTimestamp();
             });
-        }
-        if ((!$pageFilter && $orderDirection === 'DESC')
-            ||($orderDirection === 'DESC' && $pageFilter['action'] === 'next')
-            || ($orderDirection === 'ASC' && $pageFilter['action'] === 'prev')
-        ) {
+        } else {
             //DESC sorting
             usort($ids, function ($a, $b) use ($orderBy) {
                 return $b[$orderBy]->getTimestamp() - $a[$orderBy]->getTimestamp();
@@ -219,8 +215,7 @@ class ActivityListManager
                     $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':dateFilter'))
                         ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
                     $qb->orderBy('activity.' . $orderBy, $orderDirection);
-                }
-                if ($orderDirection === 'ASC') {
+                } else {
                     $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':dateFilter'))
                         ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
                     $qb->orderBy('activity.' . $orderBy, $orderDirection);
@@ -232,8 +227,7 @@ class ActivityListManager
                     $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':dateFilter'))
                         ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
                     $qb->orderBy('activity.' . $orderBy, $orderDirection === 'DESC' ? 'ASC' : 'DESC');
-                }
-                if ($orderDirection === 'ASC') {
+                } else {
                     $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':dateFilter'))
                         ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
                     $qb->orderBy('activity.' . $orderBy, $orderDirection === 'DESC' ? 'ASC' : 'DESC');
