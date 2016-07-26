@@ -167,7 +167,7 @@ define(function(require) {
             } else {
                 var renderedPropertyName = this.renderedPropertyName || 'name';
                 var label = [];
-                _.each(value.value.split(','), function (val) {
+                _.each(value.value.split(','), function(val) {
                     var item = _.findWhere(this.data, {id: parseInt(val)});
                     if (item !== void 0) {
                         if (item.treePath) {

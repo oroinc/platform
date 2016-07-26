@@ -22,7 +22,7 @@ define([
         pageFilter: {
             date: null,
             ids: [],
-            action: null //'next' or 'prev' or null (refresh action)
+            action: null //'next' or 'prev' or '' (refresh action)
         },
 
         url: function() {
@@ -84,7 +84,7 @@ define([
         },
 
         reset: function(models, options) {
-            if (this.getPage() > 1 && models.count == 0) {
+            if (this.getPage() > 1 && models.count === 0 && this.models.length) {
                 this.setPage(this.getPage() - 1);
                 this.setCount(0);
                 return;
@@ -128,7 +128,7 @@ define([
 
         setCount: function(count) {
             this.pager.count = count;
-            this.pager.total = count === 0 ? 1 : Math.ceil(count / this.pager.pagesize);
+            //this.pager.total = count === 0 ? 1 : Math.ceil(count / this.pager.pagesize);
 
             this.count = count;
         },
