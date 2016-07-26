@@ -24,9 +24,9 @@ class Group extends AbstractPageEntity
 
     public function setOwner($owner)
     {
-        $this->test
-            ->select($this->test->byXpath("//*[@data-ftid='oro_user_group_form_owner']"))
-            ->selectOptionByLabel($owner);
+        $this->test->byXpath('//*[@data-ftid="oro_user_group_form_owner"]/preceding-sibling::div/a')->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
     }

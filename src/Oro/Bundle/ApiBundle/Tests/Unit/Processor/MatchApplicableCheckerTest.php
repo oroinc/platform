@@ -18,24 +18,22 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $context->set('class', 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
 
         $processors = [
-            'action1' => [
-                [
-                    'processor'  => 'processor1',
-                    'attributes' => []
-                ],
-                [
-                    'processor'  => 'processor2',
-                    'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User']
-                ],
-                [
-                    'processor'  => 'processor3',
-                    'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserInterface']
-                ],
-                [
-                    'processor'  => 'processor3',
-                    'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Role']
-                ],
-            ]
+            [
+                'processor'  => 'processor1',
+                'attributes' => []
+            ],
+            [
+                'processor'  => 'processor2',
+                'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User']
+            ],
+            [
+                'processor'  => 'processor3',
+                'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserInterface']
+            ],
+            [
+                'processor'  => 'processor3',
+                'attributes' => ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Role']
+            ],
         ];
 
         $iterator = new ProcessorIterator(

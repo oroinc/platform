@@ -20,6 +20,11 @@ class LocalizationHelper
     protected $localizationProvider;
 
     /**
+     * @var Localization
+     */
+    protected $currentLocalization;
+
+    /**
      * @var CurrentLocalizationProvider
      */
     protected $currentLocalizationProvider;

@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension;
 
 class GridController extends Controller
 {
@@ -140,7 +141,7 @@ class GridController extends Controller
         $writer            = $this->has($writerId) ? $this->get($writerId) : $this->get($csvWriterId);
         $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
         $parameters        = $parametersFactory->createParameters($gridName);
-
+        $parameters->set(OperationExtension::OPERATION_ROOT_PARAM, [OperationExtension::DISABLED_PARAM => true]);
         $response = $this->get('oro_datagrid.handler.export')->handle(
             $this->get('oro_datagrid.importexport.export_connector'),
             $this->get('oro_datagrid.importexport.processor.export'),

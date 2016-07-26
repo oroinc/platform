@@ -1,5 +1,9 @@
 Add another email: Add another email
 Additional: Additional
+"Opportunity Information": "Opportunity Information"
+"New contact": "New contact"
+"Information": "Information"
+"Contact Details": "Contact Details"
 
 "%groups% and %roles%": "%groups% and %roles%"
 
@@ -64,12 +68,17 @@ oro:
             shortcut_new_group.label: Create new group
             shortcut_new_group.description: Create new group instance
             oro_user_profile_view.label: My User
+            oro_user_profile_configuration.label: My Configuration
         controller:
             group.message.saved: "Group saved"
             role.message.saved: "Role saved"
             user.message.saved: "User saved"
             status.message.saved: "Status saved"
             invite.fail.message: An invitation email sending was failed
+        user_configuration:
+            label: Configuration
+            use_default: Use System
+            grid.action.config: Configuration
         #
         # Oro/Bundle/UserBundle/Entity/User
         #
@@ -100,6 +109,7 @@ oro:
         id.label:                    Id
         avatar.label:                Avatar
         imap_configuration.label:    Email synchronization settings
+        imap_configuration.update:   Update settings
         last_login.label:            Last logged in
         last_name.label:             Last name
         login_count.label:           Login count
@@ -151,12 +161,19 @@ oro:
             clone.label: 'Copy of %name%'
             clone: 'Clone'
             extend_description.label: Description
+
         invite:
             label: Send an Email Invitation
         privileges:
             entity.label: Entity
             action.label: Capabilities
-
+        privilege:
+            category:
+                account_management.label: Account Management
+                address.label: Address
+                application.label: Application
+                calendar.label: Calendar
+                entity.label: Entity
         password:
             change_dialog.title: Change password
             reset_dialog.title: Reset password
@@ -174,6 +191,15 @@ oro:
             password_management:
                 label: Manage passwords
                 description: Reset or change passwords of other users
+            update_profile:
+                label: Update User Profile
+                description: Allows the user to update their own profile regardless of Edit permissions for User entity.
+            update_configuration:
+                label: Access personal configuration
+                description: Enables access to personal application configurations, such as language, locale, email settings, etc. regardless of Configure permissions for User entity.
+        permission:
+            update_configuration:
+                label: Configure
 
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email

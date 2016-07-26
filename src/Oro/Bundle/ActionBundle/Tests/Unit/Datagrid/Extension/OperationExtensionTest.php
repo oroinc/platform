@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 
@@ -77,6 +78,7 @@ class OperationExtensionTest extends AbstractExtensionTest
             $optionsHelper,
             $this->gridConfigurationHelper
         );
+        $this->extension->setParameters(new ParameterBag());
     }
 
     protected function tearDown()
@@ -158,6 +160,36 @@ class OperationExtensionTest extends AbstractExtensionTest
 
             $this->assertEquals($expectedActions, call_user_func($actionConfigurationCallback, $record, []));
         }
+    }
+
+    /**
+     * @dataProvider testIsDisabledByParametersDataProvider
+     *
+     * @param bool  $expected
+     * @param array $parameters
+     */
+    public function testIsDisabledByParameters($expected, array $parameters)
+    {
+        $this->extension->getParameters()->add($parameters);
+        $reflection = new \ReflectionObject($this->extension);
+        $method = $reflection->getMethod('isDisabled');
+        $method->setAccessible(true);
+        $this->assertEquals($expected, $method->invoke($this->extension));
+    }
+
+    public function testIsDisabledByParametersDataProvider()
+    {
+        return [
+            'disabled' => [
+                true,
+                [OperationExtension::OPERATION_ROOT_PARAM => [OperationExtension::DISABLED_PARAM => true]]
+            ],
+            'not disabled' => [
+                false,
+                [OperationExtension::OPERATION_ROOT_PARAM => [OperationExtension::DISABLED_PARAM => false]]
+            ],
+            'not disabled(no root key)' => [false, []]
+        ];
     }
 
     /**
