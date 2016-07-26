@@ -142,4 +142,45 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->setParameters(new ParameterBag());
         $this->extension->visitDatasource($configObject, $dataSource);
     }
+
+    /**
+     * @param null $count
+     * @param bool $adjustTotalCount
+     *
+     * @dataProvider adjustedCountDataProvider
+     */
+    public function testVisitDatasourceWithAdjustedCount($count, $adjustTotalCount = false)
+    {
+        if ($adjustTotalCount) {
+            $this->pager->expects($this->once())
+                ->method('adjustTotalCount')
+                ->with($count);
+        } else {
+            $this->pager->expects($this->never())
+                ->method('adjustTotalCount')
+                ->with($count);
+        }
+
+        /** @var DatasourceInterface $dataSource */
+        $dataSource = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        $configObject = DatagridConfiguration::create([]);
+        $parameters = [];
+        if (null !== $count) {
+            $parameters[PagerInterface::PAGER_ROOT_PARAM] = [PagerInterface::ADJUSTED_COUNT => $count];
+        }
+        $this->extension->setParameters(new ParameterBag($parameters));
+        $this->extension->visitDatasource($configObject, $dataSource);
+    }
+
+    public function adjustedCountDataProvider()
+    {
+        return [
+            'valid value' => [150, true],
+            'no value' => [null],
+            'not valid value(negative)' => [-100],
+            'not valid value(string)' => ['test'],
+            'not valid value(false)' => [false],
+            'not valid value(true)' => [true]
+        ];
+    }
 }

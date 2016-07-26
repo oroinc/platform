@@ -12,7 +12,7 @@
             </div>
             <span class="separator">/</span>
             {% else %}
-            <h1 class="user-name">{{ title }}</h1>
+            <h1 class="user-name">{{ title|raw }}</h1>
             {% endif %}
         {% endfor %}
         </div>

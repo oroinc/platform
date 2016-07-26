@@ -1,9 +1,13 @@
+@import "role/permissions-grid";
+@import "role/capabilities";
+
 .api-block #btn-apigen {
   display: inline;
   line-height: 1.2em;
   vertical-align: baseline;
   padding: 4px 12px;
 }
+
 form.change-password-form span.icon-eye-close, form.change-password-form span.icon-eye-open {
   padding-left: 5px;
 }
@@ -16,4 +20,20 @@ form.change-password-form span.icon-eye-close, form.change-password-form span.ic
       height: 30px;
     }
   }
+}
+
+.form-horizontal .control-group-oro_user_emailsettings > .controls,
+.form-horizontal .control-group-oro_user_emailsettings > .controls > div > .control-group > .controls
+{
+  margin-left:0;
+}
+.form-horizontal .control-group-oro_user_emailsettings .controls .control-label.wrap {
+  width: 230px;
+  text-align: right;
+}
+
+h1 .popover .oro-popover-content {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: normal;
 }

@@ -222,16 +222,16 @@ Find Entity
     conditions:
         # optional condition configuration
     parameters:
-        class: OroCRM\Bundle\SalesBundle\Entity\LeadStatus
-        identifier: 'canceled'
-        attribute: $lead.status
+        class: OroCRM\Bundle\SalesBundle\Entity\OpportunityCloseReason
+        identifier: 'won'
+        attribute: $close_reason
 
 OR
 
 - @find_entity:
-    class: OroCRM\Bundle\SalesBundle\Entity\LeadStatus
-    identifier: 'canceled'
-    attribute: $lead.status
+    class: OroCRM\Bundle\SalesBundle\Entity\OpportunityCloseReason
+    identifier: 'won'
+    attribute: $close_reason
 
 OR
 

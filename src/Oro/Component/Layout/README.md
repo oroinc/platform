@@ -107,3 +107,4 @@ Here is a list of most important classes of Oro Layout component:
  - [AbstractContainerType](./Block/Type/AbstractContainerType.php) can be used as a base class for all **container** block types.
  - [BlockFactory](./BlockFactory.php) implements the logic for building layout blocks and their views.
  - [DataProviderInterface](./DataProviderInterface.php) provides the interface for all data providers.
+ - [ThemeExtension](./Extension/Theme/ThemeExtension.php) loads layout updates with imports.
