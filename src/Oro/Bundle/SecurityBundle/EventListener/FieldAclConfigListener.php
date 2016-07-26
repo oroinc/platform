@@ -4,21 +4,21 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadataProvider;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
 /**
  * Sets field_acl_supported to true for custom entities to be able to turn Field level ACL
- * Cleanup fields security metadata in case if field_acl_enabled parameter was changed
+ * Cleanup entity security metadata in case if field_acl_enabled parameter was changed
  */
 class FieldAclConfigListener
 {
-    /** @var FieldSecurityMetadataProvider */
+    /** @var EntitySecurityMetadataProvider */
     protected $metadataProvider;
 
     /**
-     * @param FieldSecurityMetadataProvider $metadataProvider
+     * @param EntitySecurityMetadataProvider $metadataProvider
      */
-    public function __construct(FieldSecurityMetadataProvider $metadataProvider)
+    public function __construct(EntitySecurityMetadataProvider $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
     }

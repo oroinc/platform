@@ -638,11 +638,10 @@ class AclManager extends AbstractAclManager
         $key = $this->getKey($oid);
         if ($this->items[$key]->getState() !== BatchItem::STATE_DELETE) {
             $extension = $this->extensionSelector->select($oid);
-            $maskChecker = $extension;
             if ($field) {
-                $maskChecker = $extension->getFieldExtension();
+                $extension = $extension->getFieldExtension();
             }
-            $maskChecker->validateMask($mask, $oid);
+            $extension->validateMask($mask, $oid);
             if ($acl === null && $this->items[$key]->getState() === BatchItem::STATE_CREATE) {
                 $this->items[$key]->addAce($type, $field, $sid, $granting, $mask, $strategy);
             } else {

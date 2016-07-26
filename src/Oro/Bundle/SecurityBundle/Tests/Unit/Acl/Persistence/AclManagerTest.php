@@ -294,7 +294,7 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
             ->method('setPermission')
             ->with(
                 $this->identicalTo($acl),
-                $this->identicalTo($this->extension),
+                $this->identicalTo($this->fieldExtension),
                 $this->equalTo(true),
                 $this->equalTo(AclManager::OBJECT_ACE),
                 $this->equalTo($field),
@@ -328,7 +328,7 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
             ->method('setPermission')
             ->with(
                 $this->identicalTo($acl),
-                $this->identicalTo($this->extension),
+                $this->identicalTo($this->fieldExtension),
                 $this->equalTo(true),
                 $this->equalTo(AclManager::CLASS_ACE),
                 $this->equalTo($field),

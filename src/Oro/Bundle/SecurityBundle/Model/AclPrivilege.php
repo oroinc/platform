@@ -44,6 +44,7 @@ class AclPrivilege
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
+        $this->fields = new ArrayCollection();
     }
 
     /**

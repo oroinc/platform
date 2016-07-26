@@ -225,7 +225,7 @@ interface AclExtensionInterface
     /**
      * Returns Field ACL extension
      *
-     * @return mixed
+     * @return AclExtensionInterface|null
      */
     public function getFieldExtension();
 }

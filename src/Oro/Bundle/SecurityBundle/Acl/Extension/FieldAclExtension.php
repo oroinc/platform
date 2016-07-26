@@ -18,8 +18,6 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Metadata\EntityFieldSecurityMetadata;
-use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
@@ -30,9 +28,6 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 class FieldAclExtension extends AbstractAclExtension
 {
     const NAME = 'field';
-
-    /** @var FieldSecurityMetadataProvider */
-    protected $fieldMetadataProvider;
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
@@ -75,56 +70,22 @@ class FieldAclExtension extends AbstractAclExtension
     protected $maskBuilderIdentityToPermissions;
 
     /**
-     * Decode identity string to array with class and field names
-     *
-     * @param string $key
-     *
-     * @return array [className, fieldName]
-     */
-    public static function decodeEntityFieldInfo($key)
-    {
-        return explode('::', $key);
-    }
-
-    /**
-     * Encode array with class and field names to identity string
-     *
-     * @param string $entityClassName
-     * @param string $fieldName
-     *
-     * @return string
-     */
-    public static function encodeEntityFieldInfo($entityClassName, $fieldName)
-    {
-        return sprintf('%s::%s', $entityClassName, $fieldName);
-    }
-
-    /**
-     * Return true if given identity string contains class and field information
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public static function isDecodedKey($key)
-    {
-        return (bool)strpos($key, '::');
-    }
-
-    /**
-     * {@inheritdoc}
+     * @param ObjectIdAccessor                           $objectIdAccessor
+     * @param EntityClassResolver                        $entityClassResolver
+     * @param MetadataProviderInterface                  $metadataProvider
+     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
+     * @param EntityOwnerAccessor                        $entityOwnerAccessor
+     * @param ConfigProvider                             $configProvider
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
-        FieldSecurityMetadataProvider $fieldMetadataProvider,
         MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         EntityOwnerAccessor $entityOwnerAccessor,
         ConfigProvider $configProvider
     ) {
         $this->entityClassResolver = $entityClassResolver;
-        $this->fieldMetadataProvider = $fieldMetadataProvider;
         $this->metadataProvider = $metadataProvider;
         $this->entityOwnerAccessor = $entityOwnerAccessor;
         $this->decisionMaker = $decisionMaker;
@@ -174,10 +135,6 @@ class FieldAclExtension extends AbstractAclExtension
         }
 
         if ($id === $this->getExtensionKey()) {
-            if (is_string($type) && self::isDecodedKey($type)) {
-                return $this->fieldMetadataProvider->supports($this->getObjectClassName($type));
-            }
-
             $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
         } else {
             $type = ClassUtils::getRealClass($type);
@@ -216,17 +173,7 @@ class FieldAclExtension extends AbstractAclExtension
      */
     public function getClasses()
     {
-        return $this->fieldMetadataProvider->getEntities();
-    }
-
-    /**
-     * @param $className
-     *
-     * @return null|EntityFieldSecurityMetadata
-     */
-    public function getClassFieldsMetadata($className)
-    {
-        return $this->fieldMetadataProvider->getClassFields($className);
+        throw new \Exception('Field ACL Extension does not supports getClasses method');
     }
 
     /**
@@ -654,8 +601,8 @@ class FieldAclExtension extends AbstractAclExtension
             $className = $object->getType();
         } elseif (is_string($object)) {
             $className = $id = $group = null;
-            if (self::isDecodedKey($object)) {
-                $object = self::decodeEntityFieldInfo($object)[0];
+            if (ObjectIdentityHelper::isFieldDecodedKey($object)) {
+                $object = ObjectIdentityHelper::decodeEntityFieldInfo($object)[0];
             }
             $this->parseDescriptor($object, $className, $id, $group);
         } elseif ($object instanceof EntityObjectReference) {

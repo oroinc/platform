@@ -89,9 +89,9 @@ class AclExtensionSelector
             if ($delim) {
                 $type = ltrim(substr($val, $delim + 1), ' ');
                 $id = strtolower(substr($val, 0, $delim));
-                if (FieldAclExtension::isDecodedKey($type)) {
+                if (ObjectIdentityHelper::isFieldDecodedKey($type)) {
                     $isField = true;
-                    $type = FieldAclExtension::decodeEntityFieldInfo($type)[0];
+                    $type = ObjectIdentityHelper::decodeEntityFieldInfo($type)[0];
                 }
             }
         } elseif (is_object($val)) {

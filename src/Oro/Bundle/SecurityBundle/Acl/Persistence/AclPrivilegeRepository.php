@@ -12,13 +12,12 @@ use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
-use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
-use Oro\Bundle\SecurityBundle\Metadata\EntityFieldSecurityMetadata;
+use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
@@ -115,8 +114,6 @@ class AclPrivilegeRepository
 
             // find ACL for the root object identity
             $rootAcl = $this->findAclByOid($acls, $rootOid);
-
-            $fieldExtension = $extension->getFieldExtension();
             foreach ($oids as $oid) {
                 if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
                     continue;
@@ -136,7 +133,7 @@ class AclPrivilegeRepository
                 $privilege
                     ->setIdentity(
                         new AclPrivilegeIdentity(
-                            $oid->getIdentifier() . ':' . $oid->getType(),
+                            ObjectIdentityHelper::encodeIdentityString($oid->getIdentifier(), $oid->getType()),
                             $name
                         )
                     )
@@ -147,16 +144,9 @@ class AclPrivilegeRepository
 
                 $this->addPermissions($sid, $privilege, $oid, $acls, $extension, $rootAcl);
 
-                if ($fieldExtension) {
-                    $className = $oid->getType();
-                    $privilege->setFields(
-                        $this->getFieldsPrivileges(
-                            $sid,
-                            $className,
-                            $fieldExtension,
-                            $extensionKey
-                        )
-                    );
+                // add fields in case if class metadata have not empty fields array
+                if ($class->getFields()) {
+                    $privilege->setFields($this->getFieldsPrivileges($sid, $class, $extension));
                 }
                 $privileges->add($privilege);
             }
@@ -189,7 +179,7 @@ class AclPrivilegeRepository
         foreach ($privileges as $key => $privilege) {
             $identity = $privilege->getIdentity()->getId();
             if (strpos($identity, ObjectIdentityFactory::ROOT_IDENTITY_TYPE)) {
-                $extensionKey = substr($identity, 0, strpos($identity, ':'));
+                $extensionKey = ObjectIdentityHelper::getExtensionKeyFromIdentityString($identity);
                 $rootKeys[$extensionKey] = $key;
             }
         }
@@ -266,55 +256,42 @@ class AclPrivilegeRepository
     }
 
     /**
-     * @param SID               $sid
-     * @param string            $className
-     * @param FieldAclExtension $extension
-     * @param string            $extensionKey Parent ACL extension key
+     * @param SID                   $sid
+     * @param AclClassInfo          $classInfo
+     * @param AclExtensionInterface $extension
      *
      * @return ArrayCollection
      */
     protected function getFieldsPrivileges(
         SID $sid,
-        $className,
-        FieldAclExtension
-        $extension,
-        $extensionKey
+        AclClassInfo $classInfo,
+        AclExtensionInterface $extension
     ) {
         $privileges = new ArrayCollection();
-        if (!$extension->supports($className, 'field')) {
-            return $privileges;
-        }
-
-        /** @var EntityFieldSecurityMetadata $classFieldsMetadata */
-        $classFieldsMetadata = $extension->getClassFieldsMetadata($className);
-        if (!$classFieldsMetadata) {
-            return $privileges;
-        }
-
+        $className = $classInfo->getClassName();
+        $extensionKey = $extension->getExtensionKey();
         $objectIdentity = new OID($extensionKey, $className);
         $acls = $this->findAcls($sid, [$objectIdentity]);
 
         /** @var FieldSecurityMetadata $fieldInfo */
-        foreach ($classFieldsMetadata->getFields() as $fieldInfo) {
+        foreach ($classInfo->getFields() as $fieldInfo) {
             $privilege = new AclPrivilege();
             $privilege->setIdentity(
                 new AclPrivilegeIdentity(
-                    sprintf(
-                        '%s:%s',
+                    ObjectIdentityHelper::encodeIdentityString(
                         $extensionKey,
-                        FieldAclExtension::encodeEntityFieldInfo($className, $fieldInfo->getFieldName())
+                        ObjectIdentityHelper::encodeEntityFieldInfo($className, $fieldInfo->getFieldName())
                     ),
                     $fieldInfo->getLabel()
                 )
             );
-            $privilege->setGroup($classFieldsMetadata->getGroup())->setExtensionKey($extensionKey);
 
             $this->addFieldPermissions(
                 $sid,
                 $privilege,
                 $objectIdentity,
                 $acls,
-                $extension,
+                $extension->getFieldExtension(),
                 $fieldInfo->getFieldName()
             );
             $privileges->add($privilege);
@@ -346,7 +323,7 @@ class AclPrivilegeRepository
 
             // compile masks
             $masks = $this->getPermissionMasks($privilege->getPermissions(), $extension, $maskBuilders);
-            $fieldName = FieldAclExtension::decodeEntityFieldInfo($privilege->getIdentity()->getId())[1];
+            $fieldName = ObjectIdentityHelper::decodeEntityFieldInfo($privilege->getIdentity()->getId())[1];
 
             foreach ($this->manager->getFieldAces($sid, $oid, $fieldName) as $ace) {
                 if (!$ace->isGranting()) {

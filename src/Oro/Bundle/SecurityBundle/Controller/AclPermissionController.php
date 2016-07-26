@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchAfter;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchBefore;
@@ -35,20 +35,23 @@ class AclPermissionController extends Controller
      */
     public function aclAccessLevelsAction($oid, $permission = null)
     {
-        if (strpos($oid, 'entity:') === 0) {
-            $entity = substr($oid, 7);
+        if (ObjectIdentityHelper::getExtensionKeyFromIdentityString($oid) === 'entity') {
+            $entity = ObjectIdentityHelper::getClassFromIdentityString($oid);
             if ($entity !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-                if (FieldAclExtension::isDecodedKey($entity)) {
-                    list($className, $fieldName) = FieldAclExtension::decodeEntityFieldInfo($entity);
-                    $oid = sprintf(
-                        'entity:%s',
-                        FieldAclExtension::encodeEntityFieldInfo(
+                if (ObjectIdentityHelper::isFieldDecodedKey($entity)) {
+                    list($className, $fieldName) = ObjectIdentityHelper::decodeEntityFieldInfo($entity);
+                    $oid = ObjectIdentityHelper::encodeIdentityString(
+                        'entity',
+                        ObjectIdentityHelper::encodeEntityFieldInfo(
                             $this->get('oro_entity.routing_helper')->resolveEntityClass($className),
                             $fieldName
                         )
                     );
                 } else {
-                    $oid = 'entity:' . $this->get('oro_entity.routing_helper')->resolveEntityClass($entity);
+                    $oid = ObjectIdentityHelper::encodeIdentityString(
+                        'entity',
+                        $this->get('oro_entity.routing_helper')->resolveEntityClass($entity)
+                    );
                 }
             }
         }

@@ -16,12 +16,20 @@ class FieldAclConfigListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $metadataProvider;
+
+
     protected function setUp()
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->listener = new FieldAclConfigListener();
+        $this->metadataProvider = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->listener = new FieldAclConfigListener($this->metadataProvider);
     }
 
     public function testPreFlushOnFieldConfig()

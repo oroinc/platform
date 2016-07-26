@@ -38,4 +38,11 @@ interface AclClassInfo
      * @return string
      */
     public function getCategory();
+
+    /**
+     * Gets the fields array in case if given class supports fields
+     *
+     * @return array
+     */
+    public function getFields();
 }
