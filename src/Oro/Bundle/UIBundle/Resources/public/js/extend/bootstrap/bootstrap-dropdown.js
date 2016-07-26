@@ -200,14 +200,18 @@ define(function(require) {
     $.fn.dropdown.Constructor = Dropdown;
 
     /**
-     * Implements floating dropdown-menu (attaches the menu to body)
-     * if a menu has data attribute "data-options="{&quot;html&quot;: true}""
+     * Extends Bootstrap.Dropdown to process options passed over data-attribute
+     *   <div class="dropdown-menu" data-options="{&quot;container&quot;: true}"> ... </div>
+     * to configure additional behavior
+     *
+     * @param {Object} options
+     * @param {string|boolean} options.container specifies selector of container that dropdown-menu have to be attached
+     *   on open for floating menu. Or just have boolean value that says - container have to be defined automatically.
+     * @param {string} options.align specifies align for floating dropdown-menu,
+     *   by default menu left aligned, and this option allows to set 'right' aligning.
      */
     (function() {
         function makeFloating($toggle, $dropdownMenu) {
-            if (!$toggle.data('container')) {
-                $toggle.data('container', 'body, .ui-dialog');
-            }
             $toggle.dropdown('detach', true);
             var $placeholder = $toggle.data('related-data').$placeholder;
             $dropdownMenu
@@ -259,7 +263,12 @@ define(function(require) {
                 var $toggle = $(toggleDropdown, this);
                 var $dropdownMenu = $('>.dropdown-menu', this);
                 var options = $dropdownMenu.data('options');
-                if (options && options.html) {
+                if (options && options.container) {
+                    if (options.container === true) {
+                        // automatic definition of container selector
+                        options.container = 'body, .ui-dialog';
+                    }
+                    $toggle.data('container', options.container);
                     var handlePositionChange = _.partial(updatePosition, $toggle, $dropdownMenu);
                     $(window).on('resize.floating-dropdown', handlePositionChange);
                     $dropdownMenu.parents().on('scroll.floating-dropdown', handlePositionChange);
