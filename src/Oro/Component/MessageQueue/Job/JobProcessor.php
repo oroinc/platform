@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
+use Oro\Component\MessageQueue\Client\MessageProducer;
+
 class JobProcessor
 {
     /**
@@ -9,11 +11,18 @@ class JobProcessor
     private $jobStorage;
 
     /**
-     * @param JobStorage $jobStorage
+     * @var MessageProducer
      */
-    public function __construct(JobStorage $jobStorage)
+    private $producer;
+
+    /**
+     * @param JobStorage      $jobStorage
+     * @param MessageProducer $producer
+     */
+    public function __construct(JobStorage $jobStorage, MessageProducer $producer)
     {
         $this->jobStorage = $jobStorage;
+        $this->producer = $producer;
     }
 
     /**
@@ -58,6 +67,12 @@ class JobProcessor
         try {
             $this->jobStorage->saveJob($job);
 
+            if ($root) {
+                $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
+                    'id' => $job->getId()
+                ]);
+            }
+
             return $job;
         } catch (DuplicateJobException $e) {
             if ($unique) {
@@ -90,7 +105,9 @@ class JobProcessor
 
         $this->jobStorage->saveJob($job);
 
-        // send job to analyze root status
+        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
+            'id' => $job->getId()
+        ]);
     }
 
     /**
@@ -125,7 +142,9 @@ class JobProcessor
 
         $this->jobStorage->saveJob($job);
 
-        // send job to analyze root status
+        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
+            'id' => $job->getId()
+        ]);
     }
 
     /**

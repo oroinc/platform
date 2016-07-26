@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
@@ -10,7 +11,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeCreatedWithRequiredArguments()
     {
-        new JobProcessor($this->createJobStorage());
+        new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
     }
 
     public function testCreateJobShouldThrowIfRootJobIsNotRoot()
@@ -24,7 +25,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             'You can append jobs only to root job but it is not. id: "12345"'
         );
 
-        $processor = new JobProcessor($this->createJobStorage());
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
         $processor->createJob('name', $notRootJob);
     }
 
@@ -38,7 +39,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             'Can create only root unique jobs.'
         );
 
-        $processor = new JobProcessor($this->createJobStorage());
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
         $processor->createJob('name', $rootJob, true);
     }
 
@@ -51,7 +52,13 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(Job::class))
         ;
 
-        $processor = new JobProcessor($storage);
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->never())
+            ->method('send')
+        ;
+
+        $processor = new JobProcessor($storage, $producer);
         $job = $processor->createJob('name');
 
         $this->assertEquals('name', $job->getName());
@@ -72,9 +79,15 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(Job::class))
         ;
 
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+        ;
+
         $rootJob = new Job();
 
-        $processor = new JobProcessor($storage);
+        $processor = new JobProcessor($storage, $producer);
         $job = $processor->createJob('name', $rootJob);
 
         $this->assertEquals('name', $job->getName());
@@ -95,7 +108,13 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(Job::class))
         ;
 
-        $processor = new JobProcessor($storage);
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->never())
+            ->method('send')
+        ;
+
+        $processor = new JobProcessor($storage, $producer);
         $job = $processor->createJob('name', null, true);
 
         $this->assertEquals('name', $job->getName());
@@ -117,7 +136,13 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new DuplicateJobException()))
         ;
 
-        $processor = new JobProcessor($storage);
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->never())
+            ->method('send')
+        ;
+
+        $processor = new JobProcessor($storage, $producer);
         $job = $processor->createJob('name', null, true);
 
         $this->assertNull($job);
@@ -133,7 +158,13 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new DuplicateJobException()))
         ;
 
-        $processor = new JobProcessor($storage);
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->never())
+            ->method('send')
+        ;
+
+        $processor = new JobProcessor($storage, $producer);
 
         $this->setExpectedException(DuplicateJobException::class);
 
@@ -142,7 +173,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStartChildJobShouldThrowIfRootJob()
     {
-        $processor = new JobProcessor($this->createJobStorage());
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
         $rootJob = new Job();
         $rootJob->setId(12345);
@@ -154,7 +185,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStartChildJobShouldThrowIfJobHasNotNewStatus()
     {
-        $processor = new JobProcessor($this->createJobStorage());
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
         $job = new Job();
         $job->setId(12345);
@@ -178,11 +209,17 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(Job::class))
         ;
 
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+        ;
+
         $job = new Job();
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_NEW);
 
-        $processor = new JobProcessor($storage);
+        $processor = new JobProcessor($storage, $producer);
         $processor->startChildJob($job);
 
         $this->assertEquals(Job::STATUS_RUNNING, $job->getStatus());
@@ -191,7 +228,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStopChildJobShouldThrowIfRootJob()
     {
-        $processor = new JobProcessor($this->createJobStorage());
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
         $rootJob = new Job();
         $rootJob->setId(12345);
@@ -203,7 +240,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStopChildJobShouldThrowIfJobHasNotRunningStatus()
     {
-        $processor = new JobProcessor($this->createJobStorage());
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
         $job = new Job();
         $job->setId(12345);
@@ -220,7 +257,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStopChildJobShouldThrowIfStatusIsNotOneOfStopStatuses()
     {
-        $processor = new JobProcessor($this->createJobStorage());
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
         $job = new Job();
         $job->setId(12345);
@@ -258,11 +295,17 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(Job::class))
         ;
 
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+        ;
+
         $job = new Job();
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_RUNNING);
 
-        $processor = new JobProcessor($storage);
+        $processor = new JobProcessor($storage, $producer);
         $processor->stopChildJob($job, $stopStatus);
 
         $this->assertEquals($stopStatus, $job->getStatus());
@@ -275,7 +318,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $notRootJob->setId(123);
         $notRootJob->setRootJob(new Job());
 
-        $processor = new JobProcessor($this->createJobStorage());
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
         $this->setExpectedException(\LogicException::class, 'Can interrupt only root jobs. id: "123"');
 
@@ -294,7 +337,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('saveJob')
         ;
 
-        $processor = new JobProcessor($storage);
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
         $processor->interruptRootJob($rootJob);
     }
 
@@ -312,7 +355,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $processor = new JobProcessor($storage);
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
         $processor->interruptRootJob($rootJob);
 
         $this->assertTrue($rootJob->isInterrupted());
@@ -333,7 +376,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $processor = new JobProcessor($storage);
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
         $processor->interruptRootJob($rootJob, true);
 
         $this->assertTrue($rootJob->isInterrupted());
@@ -346,5 +389,13 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     private function createJobStorage()
     {
         return $this->getMock(JobStorage::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducer
+     */
+    private function createMessageProducerMock()
+    {
+        return $this->getMock(MessageProducer::class, [], [], '', false);
     }
 }
