@@ -7,12 +7,12 @@ use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 
 class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowSystemConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowManager;
 
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
@@ -26,7 +26,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -41,7 +41,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     public function testIsVirtualRelationAndUnknownRelationFieldName()
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
-        $this->workflowManager->expects($this->never())->method('hasApplicableWorkflowsByEntityClass');
+        $this->workflowManager->expects($this->never())->method('getActiveWorkflowNamesByEntity');
 
         $this->assertFalse($this->provider->isVirtualRelation('stdClass', 'unknown_relation'));
     }
@@ -50,8 +50,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
-        $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflows')->willReturn(false);
+        $this->assertWorkflowManagerCalled(false);
 
         $this->assertFalse(
             $this->provider->isVirtualRelation('stdClass', WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME)
@@ -62,10 +61,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
-        $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflows')
-            ->with('stdClass')
-            ->willReturn(true);
+        $this->assertWorkflowManagerCalled(true, 'stdClass');
 
         $this->assertTrue(
             $this->provider->isVirtualRelation('stdClass', WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME)
@@ -76,10 +72,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
-        $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflows')
-            ->with('stdClass')
-            ->willReturn(true);
+        $this->assertWorkflowManagerCalled(true, 'stdClass');
 
         $this->assertTrue(
             $this->provider->isVirtualRelation('stdClass', WorkflowVirtualRelationProvider::STEPS_RELATION_NAME)
@@ -90,8 +83,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
-        $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflows')->willReturn(false);
+        $this->assertWorkflowManagerCalled(false);
 
         $this->assertEquals([], $this->provider->getVirtualRelations('stdClass'));
     }
@@ -100,10 +92,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
-        $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflows')
-            ->with('stdClass')
-            ->willReturn(true);
+        $this->assertWorkflowManagerCalled(true, 'stdClass');
 
         $this->assertEquals(
             [
@@ -127,8 +116,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
-        $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflows')->willReturn(false);
+        $this->assertWorkflowManagerCalled(false);
 
         $this->assertEquals(
             [],
@@ -139,7 +127,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetVirtualRelationQueryAndUnknownRelationFieldName()
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
-        $this->workflowManager->expects($this->never())->method('hasApplicableWorkflows');
+        $this->workflowManager->expects($this->never())->method('getActiveWorkflowNamesByEntity');
 
         $this->assertEquals([], $this->provider->getVirtualRelationQuery('stdClass', 'unknown_field'));
     }
@@ -151,8 +139,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
             ->with('stdClass')
             ->willReturn('id');
 
-        $this->workflowManager->expects($this->once())
-            ->method('hasApplicableWorkflows')->willReturn(true);
+        $this->assertWorkflowManagerCalled(true);
 
         $this->assertEquals(
             [
@@ -185,5 +172,25 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetTargetJoinAlias()
     {
         $this->assertEquals('virtual_relation', $this->provider->getTargetJoinAlias('', 'virtual_relation'));
+    }
+
+    /**
+     * @param bool $result
+     * @param string $class
+     */
+    protected function assertWorkflowManagerCalled($result, $class = null)
+    {
+        $data = [];
+        if ($result) {
+            $data = ['test_workflow'];
+        }
+
+        $moker = $this->workflowManager->expects($this->once())
+            ->method('getActiveWorkflowNamesByEntity')
+            ->willReturn($data);
+
+        if ($class) {
+            $moker->with($class);
+        }
     }
 }

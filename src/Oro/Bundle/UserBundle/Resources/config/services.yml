@@ -389,6 +389,7 @@ services:
         arguments:
           - '@doctrine'
           - '@security.token_storage'
+          - '@oro_security.ownership_tree_provider'
 
     oro_user.listener.choice_tree_filter_load_data_listener:
         class: '%oro_user.listener.choice_tree_filter_load_data_listener.class%'
