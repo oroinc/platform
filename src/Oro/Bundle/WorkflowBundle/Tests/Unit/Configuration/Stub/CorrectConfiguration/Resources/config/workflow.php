@@ -114,7 +114,9 @@ return array(
                 )
             )
         ),
-        'entity_restrictions' => array()
+        'entity_restrictions' => array(),
+        'exclusive_active_groups' => ['active_group1'],
+        'exclusive_record_groups' => ['record_group1'],
     ),
     'second_workflow' => array(
         'label' => 'Second Workflow',
@@ -167,6 +169,8 @@ return array(
         'is_system' => false,
         'entity_attribute' => 'entity',
         'steps_display_ordered' => false,
-        'entity_restrictions' => array()
+        'entity_restrictions' => array(),
+        'exclusive_active_groups' => [],
+        'exclusive_record_groups' => [],
     )
 );

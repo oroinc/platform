@@ -766,7 +766,7 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
-     * @return WorkflowGroup[]|Collection]
+     * @return WorkflowGroup[]|Collection
      */
     public function getGroups()
     {

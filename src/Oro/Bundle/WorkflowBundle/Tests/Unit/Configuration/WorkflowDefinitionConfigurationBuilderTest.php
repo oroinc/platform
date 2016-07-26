@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 
@@ -9,11 +11,36 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowGroup;
+use Oro\Bundle\WorkflowBundle\Model\GroupAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowAssembler;
+
+    /** @var GroupAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    protected $groupAssembler;
+
+    /** @var WorkflowDefinitionConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    protected $builder;
+
+    protected function setUp()
+    {
+        $this->workflowAssembler = $this->getMockBuilder(WorkflowAssembler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->groupAssembler = $this->getMockBuilder(GroupAssembler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->builder = new WorkflowDefinitionConfigurationBuilder($this->workflowAssembler, $this->groupAssembler);
+    }
+
     /**
      * @param WorkflowDefinition $definition
      * @return array
@@ -79,6 +106,28 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         }
         $attributeManager = new AttributeManager($attributes);
 
+        $groups = [];
+        if (!empty($workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS])) {
+            $groups = array_merge(
+                $groups,
+                $this->getGroups(
+                    WorkflowGroup::TYPE_EXCLUSIVE_ACTIVE,
+                    $workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS]
+                )
+            );
+        }
+
+        if (!empty($workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS])) {
+            $groups = array_merge(
+                $groups,
+                $this->getGroups(
+                    WorkflowGroup::TYPE_EXCLUSIVE_RECORD,
+                    $workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS]
+                )
+            );
+        }
+        $groups = new ArrayCollection($groups);
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
             ->setMethods(array('getStepManager', 'getAttributeManager', 'getRestrictions'))
@@ -92,23 +141,25 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $workflow->expects($this->any())
             ->method('getRestrictions')
             ->will($this->returnValue([]));
-        
-        $workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
-            ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
-            ->getMock();
-        $workflowAssembler->expects($this->once())
+
+        $this->workflowAssembler->expects($this->once())
             ->method('assemble')
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'), false)
             ->will($this->returnValue($workflow));
 
-        $builder = new WorkflowDefinitionConfigurationBuilder($workflowAssembler);
-        $workflowDefinitions = $builder->buildFromConfiguration($inputData);
+        $this->groupAssembler->expects($this->once())
+            ->method('assemble')
+            ->willReturn($groups);
+
+
+        $workflowDefinitions = $this->builder->buildFromConfiguration($inputData);
         $this->assertCount(1, $workflowDefinitions);
 
         /** @var WorkflowDefinition $workflowDefinition */
         $workflowDefinition = current($workflowDefinitions);
         $this->assertEquals($expectedData, $this->getDataAsArray($workflowDefinition));
+
+        $this->assertEquals($workflowDefinition->getGroups(), $groups);
 
         $actualAcls = $workflowDefinition->getEntityAcls()->toArray();
         $this->assertSameSize($expectedAcls, $actualAcls);
@@ -146,6 +197,14 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             'priority' => 1,
             'defaults' => [
                 'active' => true,
+            ],
+            WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS => [
+                'active_group1',
+                'active_group2',
+            ],
+            WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS => [
+                'record_group1',
+                'record_group2',
             ],
             WorkflowConfiguration::NODE_STEPS => array(
                 array(
@@ -241,12 +300,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
     {
         $this->setExpectedException($expectedException, $expectedMessage);
 
-        $workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $builder = new WorkflowDefinitionConfigurationBuilder($workflowAssembler);
-        $builder->buildFromConfiguration($inputData);
+        $this->builder->buildFromConfiguration($inputData);
     }
 
     /**
@@ -272,5 +326,24 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                 ),
             ),
         );
+    }
+
+    /**
+     * @param int $type
+     * @param array $groupNames
+     * @return array|WorkflowGroup[]
+     */
+    private function getGroups($type, array $groupNames)
+    {
+        $groups = [];
+        foreach ($groupNames as $groupName) {
+            $group = new WorkflowGroup();
+            $group
+                ->setType($type)
+                ->setName($groupName);
+            $groups[] = $group;
+        }
+
+        return $groups;
     }
 }
