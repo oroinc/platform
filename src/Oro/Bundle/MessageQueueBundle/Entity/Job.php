@@ -18,42 +18,42 @@ class Job extends JobEntity
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="unique_name", type="string", unique=true, nullable=true)
      */
-    private $uniqueName;
+    protected $uniqueName;
 
     /**
      * @var string
      *
      * @ORM\Column(name="status", type="string", nullable=false)
      */
-    private $status;
+    protected $status;
 
     /**
      * @var bool
      *
      * @ORM\Column(name="interrupted", type="boolean")
      */
-    private $interrupted;
+    protected $interrupted;
 
     /**
      * @var bool;
      *
-     * @ORM\Column(name="unique", type="boolean")
+     * @ORM\Column(name="`unique`", type="boolean")
      */
-    private $unique;
+    protected $unique;
 
     /**
      * @var Job
@@ -61,35 +61,35 @@ class Job extends JobEntity
      * @ORM\ManyToOne(targetEntity="Job", inversedBy="childJobs")
      * @ORM\JoinColumn(name="root_job_id", referencedColumnName="id")
      */
-    private $rootJob;
+    protected $rootJob;
 
     /**
      * @var Job[]
      *
      * @ORM\OneToMany(targetEntity="Job", mappedBy="rootJob")
      */
-    private $childJobs;
+    protected $childJobs;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="started_at", type="datetime", nullable=true)
      */
-    private $startedAt;
+    protected $startedAt;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="stopped_at", type="datetime", nullable=true)
      */
-    private $stoppedAt;
+    protected $stoppedAt;
 
     public function __construct()
     {

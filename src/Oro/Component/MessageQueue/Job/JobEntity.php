@@ -8,7 +8,7 @@ class JobEntity extends Job
      *
      * @var string
      */
-    private $uniqueName;
+    protected $uniqueName;
 
     /**
      * @internal

@@ -39,7 +39,7 @@ class JobStorage
 
         return $qb
             ->addSelect('rootJob')
-            ->innerJoin('job.rootJob', 'rootJob')
+            ->leftJoin('job.rootJob', 'rootJob')
             ->where('job = :id')
             ->setParameter('id', $id)
             ->getQuery()->getOneOrNullResult()
@@ -64,6 +64,10 @@ class JobStorage
 
         try {
             if ($lockCallback) {
+                if (! $job->getId()) {
+                    throw new \LogicException('Is not possible to create new job with lock, only update is allowed');
+                }
+
                 $this->em->transactional(function (EntityManager $em) use ($job, $lockCallback) {
                     /** @var JobEntity $job */
                     $job = $this->repository->find($job->getId(), LockMode::PESSIMISTIC_WRITE);

@@ -12,52 +12,52 @@ class Job
     /**
      * @var int
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      */
-    private $status;
+    protected $status;
 
     /**
      * @var bool
      */
-    private $interrupted;
+    protected $interrupted;
 
     /**
      * @var bool;
      */
-    private $unique;
+    protected $unique;
 
     /**
      * @var Job
      */
-    private $rootJob;
+    protected $rootJob;
 
     /**
      * @var Job[]
      */
-    private $childJobs;
+    protected $childJobs;
 
     /**
      * @var \DateTime
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var \DateTime
      */
-    private $startedAt;
+    protected $startedAt;
 
     /**
      * @var \DateTime
      */
-    private $stoppedAt;
+    protected $stoppedAt;
 
     public function __construct()
     {
