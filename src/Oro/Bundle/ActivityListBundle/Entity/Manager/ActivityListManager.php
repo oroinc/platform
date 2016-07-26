@@ -209,30 +209,21 @@ class ActivityListManager
 
         if (!empty($pageFilter['date']) && !empty($pageFilter['ids'])) {
             $dateFilter = new \DateTime($pageFilter['date'], new \DateTimeZone('UTC'));
+            $whereComparison = 'lte';
 
-            if ($pageFilter['action'] === 'next') {
-                if ($orderDirection === 'DESC') {
-                    $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':dateFilter'))
-                        ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
-                    $qb->orderBy('activity.' . $orderBy, $orderDirection);
-                } else {
-                    $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':dateFilter'))
-                        ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
-                    $qb->orderBy('activity.' . $orderBy, $orderDirection);
-                }
+            if (($pageFilter['action'] === 'next' && $orderDirection === 'ASC')
+                || ($pageFilter['action'] === 'prev' && $orderDirection === 'DESC')
+            ) {
+                $whereComparison = 'gte';
             }
 
             if ($pageFilter['action'] === 'prev') {
-                if ($orderDirection === 'DESC') {
-                    $qb->andWhere($qb->expr()->gte('activity.' . $orderBy, ':dateFilter'))
-                        ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
-                    $qb->orderBy('activity.' . $orderBy, $orderDirection === 'DESC' ? 'ASC' : 'DESC');
-                } else {
-                    $qb->andWhere($qb->expr()->lte('activity.' . $orderBy, ':dateFilter'))
-                        ->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
-                    $qb->orderBy('activity.' . $orderBy, $orderDirection === 'DESC' ? 'ASC' : 'DESC');
-                }
+                $orderDirection = ($orderDirection === 'DESC') ? 'ASC' : 'DESC';
             }
+
+            $qb->andWhere($qb->expr()->{$whereComparison}('activity.' . $orderBy, ':dateFilter'));
+            $qb->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
+            $qb->orderBy('activity.' . $orderBy, $orderDirection);
 
             $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
 
