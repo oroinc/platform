@@ -30,6 +30,9 @@ abstract class AbstractFilter implements FilterInterface
     /** @var array [array, ...] */
     protected $additionalOptions = [];
 
+    /** @var array */
+    protected $state;
+
     /**
      * Constructor
      *
@@ -134,6 +137,30 @@ abstract class AbstractFilter implements FilterInterface
         }
         $this->params[FilterUtility::FORM_OPTIONS_KEY] = $options;
         $this->additionalOptions = [];
+    }
+
+    /**
+     * Set state of filter
+     *
+     * @param $state
+     *
+     * @return $this
+     */
+    public function setFilterState($state)
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * Get state of filter
+     *
+     * @return mixed
+     */
+    public function getFilterState()
+    {
+        return $this->state;
     }
 
     /**

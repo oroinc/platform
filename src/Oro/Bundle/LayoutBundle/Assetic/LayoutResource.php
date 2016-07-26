@@ -6,6 +6,7 @@ use Assetic\Factory\Resource\ResourceInterface;
 
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class LayoutResource implements ResourceInterface
 {
@@ -87,7 +88,7 @@ class LayoutResource implements ResourceInterface
         $parentTheme = $theme->getParentTheme();
         if ($parentTheme) {
             $parentTheme = $this->themeManager->getTheme($parentTheme);
-            $assets = array_merge_recursive($this->collectThemeAssets($parentTheme), $assets);
+            $assets = ArrayUtil::arrayMergeRecursiveDistinct($this->collectThemeAssets($parentTheme), $assets);
         }
 
         return $assets;

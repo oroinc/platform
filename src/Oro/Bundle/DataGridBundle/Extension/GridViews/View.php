@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
-class View
+class View implements ViewInterface
 {
     /** @var string */
     protected $name;
@@ -18,6 +18,9 @@ class View
 
     /** @var string */
     protected $type = 'system';
+
+    /** @var string */
+    protected $gridName;
 
     /** @var bool */
     protected $editable = false;
@@ -105,13 +108,9 @@ class View
     }
 
     /**
-     * Setter for sorters data
-     *
-     * @param array $sortersData
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function setSortersData(array $sortersData)
+    public function setSortersData(array $sortersData = [])
     {
         $this->sortersData = $sortersData;
 
@@ -119,9 +118,7 @@ class View
     }
 
     /**
-     * Getter for sorters data
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getSortersData()
     {
@@ -129,11 +126,7 @@ class View
     }
 
     /**
-     * Setter for filter data
-     *
-     * @param array $filtersData
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setFiltersData(array $filtersData)
     {
@@ -143,9 +136,7 @@ class View
     }
 
     /**
-     * Getter for filter data
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getFiltersData()
     {
@@ -181,7 +172,7 @@ class View
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getColumnsData()
     {
@@ -193,7 +184,7 @@ class View
     }
 
     /**
-     * @param array $columnsData
+     * {@inheritdoc}
      */
     public function setColumnsData(array $columnsData = [])
     {
@@ -234,6 +225,24 @@ class View
     public function setSharedBy($sharedBy)
     {
         $this->sharedBy = $sharedBy;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setGridName($gridName)
+    {
+        $this->gridName = $gridName;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridName()
+    {
+        return $this->gridName;
     }
 
     /**

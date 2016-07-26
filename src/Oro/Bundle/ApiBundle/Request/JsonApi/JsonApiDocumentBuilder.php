@@ -23,6 +23,14 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     const ID            = 'id';
     const TYPE          = 'type';
 
+    const ERROR_STATUS    = 'status';
+    const ERROR_CODE      = 'code';
+    const ERROR_TITLE     = 'title';
+    const ERROR_DETAIL    = 'detail';
+    const ERROR_SOURCE    = 'source';
+    const ERROR_POINTER   = 'pointer';
+    const ERROR_PARAMETER = 'parameter';
+
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
@@ -104,23 +112,23 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $result = [];
 
         if ($error->getStatusCode()) {
-            $result['status'] = (string)$error->getStatusCode();
+            $result[self::ERROR_STATUS] = (string)$error->getStatusCode();
         }
         if ($error->getCode()) {
-            $result['code'] = (string)$error->getCode();
+            $result[self::ERROR_CODE] = (string)$error->getCode();
         }
         if ($error->getTitle()) {
-            $result['title'] = $error->getTitle();
+            $result[self::ERROR_TITLE] = $error->getTitle();
         }
         if ($error->getDetail()) {
-            $result['detail'] = $error->getDetail();
+            $result[self::ERROR_DETAIL] = $error->getDetail();
         }
         $source = $error->getSource();
         if ($source) {
             if ($source->getPointer()) {
-                $result['source']['pointer'] = $source->getPointer();
+                $result[self::ERROR_SOURCE][self::ERROR_POINTER] = $source->getPointer();
             } elseif ($source->getParameter()) {
-                $result['source']['parameter'] = $source->getParameter();
+                $result[self::ERROR_SOURCE][self::ERROR_PARAMETER] = $source->getParameter();
             }
         }
 

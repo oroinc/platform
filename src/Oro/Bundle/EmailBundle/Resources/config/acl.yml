@@ -1,6 +1,6 @@
 oro_email_email_view:
     type: entity
-    class: OroEmailBundle:Email
+    class: OroEmailBundle:EmailUser
     permission: VIEW
     group_name: ""
 

@@ -210,10 +210,13 @@ class Processor
                 $this->mailer->prepareSmtpTransport($emailOrigin);
             }
         }
-
+        $messageId = $message->getId();
         if (!$this->mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');
         }
+
+        // To save old id, as after the message is sent, it's id is regenerated immediately.
+        $message->setId($messageId);
     }
 
     /**
@@ -468,7 +471,7 @@ class Processor
      */
     protected function prepareEmailUser(EmailModel $model, $origin, $message, $messageDate, $parentMessageId)
     {
-        $messageId = '<' . $message->generateId() . '>';
+        $messageId = '<' . $message->getId() . '>';
         $emailUser = $this->createEmailUser($model, $messageDate, $origin);
         if ($origin) {
             $emailUser->addFolder($this->getFolder($model->getFrom(), $origin));
