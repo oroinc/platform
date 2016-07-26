@@ -28,3 +28,5 @@ services:
             - '@oro_message_queue.job.storage'
             - '@oro_message_queue.job.calculate_root_job_status_case'
             - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
