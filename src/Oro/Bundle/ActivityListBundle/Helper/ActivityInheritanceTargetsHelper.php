@@ -48,39 +48,26 @@ class ActivityInheritanceTargetsHelper
 
     /**
      * Apply to given query builder object additional conditions
-     * for integrate activity lists from inheritance targets
+     * for integrate activity lists from inheritance target
      *
      * @param QueryBuilder $qb
-     * @param string  $entityClass
-     * @param integer $entityId
+     * @param array        $inheritanceTarget
+     * @param string       $aliasSuffix
+     * @param string       $entityIdExpr
      */
-    public function applyInheritanceActivity(QueryBuilder $qb, $entityClass, $entityId)
+    public function applyInheritanceActivity(QueryBuilder $qb, $inheritanceTarget, $aliasSuffix, $entityIdExpr)
     {
-        if (!$this->hasInheritances($entityClass)) {
-            return;
-        }
-        $inheritanceTargets = $this->getInheritanceTargetsRelations($entityClass);
-
-        foreach ($inheritanceTargets as $key => $inheritanceTarget) {
-            $alias = 'ta_' . $key;
-            $qb->leftJoin('activity.' . $inheritanceTarget['targetClassAlias'], $alias);
-
-            $qb->orWhere(
-                $qb->expr()->andX(
-                    $qb->expr()->andX(
-                        $qb->expr()->in(
-                            $alias . '.id',
-                            $this->getSubQuery(
-                                $inheritanceTarget['targetClass'],
-                                $inheritanceTarget['path'],
-                                $entityId,
-                                $key
-                            )->getDQL()
-                        )
-                    )
-                )
-            );
-        }
+        $alias = 'ta_' . $aliasSuffix;
+        $qb->leftJoin('activity.' . $inheritanceTarget['targetClassAlias'], $alias);
+        $qb->andWhere($qb->expr()->in(
+            $alias . '.id',
+            $this->getSubQuery(
+                $inheritanceTarget['targetClass'],
+                $inheritanceTarget['path'],
+                $entityIdExpr,
+                $aliasSuffix
+            )->getDQL()
+        ));
     }
 
     /**
@@ -101,14 +88,14 @@ class ActivityInheritanceTargetsHelper
     }
 
     /**
-     * @param string $target
+     * @param string   $target
      * @param string[] $path
-     * @param integer $entityId
-     * @param integer $uniqueKey
+     * @param string   $entityIdExpr
+     * @param integer  $uniqueKey
      *
      * @return QueryBuilder
      */
-    public function getSubQuery($target, $path, $entityId, $uniqueKey)
+    protected function getSubQuery($target, $path, $entityIdExpr, $uniqueKey)
     {
         $alias = 'inherit_' . $uniqueKey;
 
@@ -122,9 +109,7 @@ class ActivityInheritanceTargetsHelper
             $alias = $newAlias;
         }
 
-        $subQueryBuilder
-            ->where($alias . '.id = :entityId')
-            ->setParameter('entityId', $entityId);
+        $subQueryBuilder->where($alias . '.id = '. $entityIdExpr);
 
         return $subQueryBuilder;
     }
