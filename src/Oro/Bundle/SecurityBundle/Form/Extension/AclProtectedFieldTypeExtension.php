@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -115,6 +116,8 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         }
 
         $entity = $this->getEntityByForm($form);
+        $hiddenFieldsWithErrors = false;
+        /** @var FormInterface $childForm */
         foreach ($form as $childName => $childForm) {
             if ($this->isFormGranted($childForm)) {
                 continue;
@@ -131,7 +134,24 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                 $view->children[$childName]->vars['read_only'] = true;
             } else {
                 $view->children[$childName]->setRendered();
+                if ($childForm->getErrors()->count()) {
+                    $hiddenFieldsWithErrors = true;
+                }
             }
+        }
+
+        // in case if we have error in the non accessable fields - add validation error.
+        if ($hiddenFieldsWithErrors) {
+            $viewErrors = $view->vars['errors'];
+            $errorsArray = [];
+            foreach ($viewErrors as $error) {
+                $errorsArray[] = $error;
+            }
+            $errorsArray[] = $error = new FormError(
+                'The form contains fields that are required or not valid but you have no access to them. '
+                .'Please contact your administrator to solve this issue.'
+            );
+            $view->vars['errors'] = new FormErrorIterator($viewErrors->getForm(), $errorsArray);
         }
     }
 
@@ -151,13 +171,8 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                 continue;
             }
 
-            if ($this->showRestricted) {
-                // reset existing value instead of submitted
-                $data[$childForm->getName()] = $childForm->getData();
-                $event->setData($data);
-            } else {
-                $form->remove($childForm->getName());
-            }
+            $data[$childForm->getName()] = $childForm->getData();
+            $event->setData($data);
         }
     }
 
