@@ -82,50 +82,53 @@ class AclExtensionSelector
             return new NullAclExtension();
         }
 
+        $fieldName = null;
         $type = $id = null;
         if (is_string($val)) {
-            $delim = strpos($val, ':');
-            if ($delim) {
-                $type = ltrim(substr($val, $delim + 1), ' ');
-                $id = strtolower(substr($val, 0, $delim));
-            }
+            list($id, $type, $fieldName) = ObjectIdentityHelper::parseIdentityString($val);
         } elseif (is_object($val)) {
-            $object = $val;
             if ($val instanceof FieldVote) {
-                $object = $val->getDomainObject();
+                $fieldName = $val->getField();
+                $val = $val->getDomainObject();
             }
 
-            if ($object instanceof ObjectIdentityInterface) {
-                $type = $object->getType();
-                $id = $object->getIdentifier();
-            } elseif ($object instanceof AclAnnotation) {
-                $type = $object->getClass();
+            if ($val instanceof ObjectIdentityInterface) {
+                $type = $val->getType();
+                $id = $val->getIdentifier();
+            } elseif ($val instanceof AclAnnotation) {
+                $type = $val->getClass();
                 if (empty($type)) {
-                    $type = $object->getId();
+                    $type = $val->getId();
                 }
-                $id = $object->getType();
+                $id = $val->getType();
             } else {
-                $type = get_class($object);
-                $id = $this->objectIdAccessor->getId($object);
+                $type = get_class($val);
+                $id = $this->objectIdAccessor->getId($val);
             }
         }
 
         if ($type !== null) {
-            $cacheKey = ($id ?: 'null') . '!' . $type;
+            $cacheKey = $this->getStringValue($id) . '!' . $type . '::' . $this->getStringValue($fieldName);
             if (isset($this->localCache[$cacheKey])) {
-                return $this->localCache[$cacheKey]->getExtensionInstanceForObject($val);
+                return $this->localCache[$cacheKey];
             }
 
             foreach ($this->extensions as $extension) {
                 if ($extension->supports($type, $id)) {
+                    $extension = $fieldName ? $extension->getFieldExtension() : $extension;
                     $this->localCache[$cacheKey] = $extension;
 
-                    return $extension->getExtensionInstanceForObject($val);
+                    return $extension;
                 }
             }
         }
 
         throw $this->createAclExtensionNotFoundException($val, $type, $id);
+    }
+
+    protected function getStringValue($value)
+    {
+        return $value ? (string)$value : 'null';
     }
 
     /**

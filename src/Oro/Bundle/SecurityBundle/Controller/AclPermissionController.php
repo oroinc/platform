@@ -38,7 +38,7 @@ class AclPermissionController extends Controller
         if (ObjectIdentityHelper::getExtensionKeyFromIdentityString($oid) === 'entity') {
             $entity = ObjectIdentityHelper::getClassFromIdentityString($oid);
             if ($entity !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-                if (ObjectIdentityHelper::isFieldDecodedKey($entity)) {
+                if (ObjectIdentityHelper::isFieldEncodedKey($entity)) {
                     list($className, $fieldName) = ObjectIdentityHelper::decodeEntityFieldInfo($entity);
                     $oid = ObjectIdentityHelper::encodeIdentityString(
                         'entity',

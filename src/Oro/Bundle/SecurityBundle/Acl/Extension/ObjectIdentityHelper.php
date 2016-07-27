@@ -10,6 +10,31 @@ class ObjectIdentityHelper
     const IDENTITY_TYPE_DELIMITER = ':';
 
     /**
+     * Parse identity string to array of values: id, type, and fieldName
+     * Supported string formats:
+     *  entity:Acme\DemoBundle\SomeEntity:fieldName
+     *  action:name_of_action
+     *  entity:Acme\DemoBundle\SomeEntity
+     *
+     * @param string $val
+     *
+     * @return array [id, type, fieldName]
+     */
+    public static function parseIdentityString($val)
+    {
+        $type = $id = $fieldName = null;
+        if (self::isEncodedIdentityString($val)) {
+            $type = self::getClassFromIdentityString($val);
+            $id = self::getExtensionKeyFromIdentityString($val);
+            if (self::isFieldEncodedKey($type)) {
+                list($type, $fieldName) = self::decodeEntityFieldInfo($type);
+            }
+        }
+
+        return [$id, $type, $fieldName];
+    }
+
+    /**
      * Return full identity string by extension key and class name.
      *
      * @param string $extensionKey
@@ -31,19 +56,31 @@ class ObjectIdentityHelper
      */
     public static function getExtensionKeyFromIdentityString($identityString)
     {
-        return substr($identityString, 0, strpos($identityString, self::IDENTITY_TYPE_DELIMITER));
+        return strtolower(substr($identityString, 0, strpos($identityString, self::IDENTITY_TYPE_DELIMITER)));
     }
 
     /**
      * Return class from the identity string.
      *
-     * @param $identityString
+     * @param string $identityString
      *
      * @return string
      */
     public static function getClassFromIdentityString($identityString)
     {
-        return substr($identityString, strpos($identityString, self::IDENTITY_TYPE_DELIMITER) +1);
+        return ltrim(substr($identityString, strpos($identityString, self::IDENTITY_TYPE_DELIMITER) + 1), ' ');
+    }
+
+    /**
+     * Return true if given string is encoded identity (f.e. entity:\Acme\Demo\Entity::some_field or action:some_action)
+     *
+     * @param string $identityString
+     *
+     * @return bool
+     */
+    public static function isEncodedIdentityString($identityString)
+    {
+        return strpos($identityString, self::IDENTITY_TYPE_DELIMITER) > 0;
     }
 
     /**
@@ -78,7 +115,7 @@ class ObjectIdentityHelper
      *
      * @return bool
      */
-    public static function isFieldDecodedKey($key)
+    public static function isFieldEncodedKey($key)
     {
         return (bool)strpos($key, self::FIELD_DELIMITER);
     }

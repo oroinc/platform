@@ -104,20 +104,6 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtensionInstanceForObject($object)
-    {
-        if ((is_string($object) && ObjectIdentityHelper::isFieldDecodedKey($object))
-            || (is_object($object) && $object instanceof FieldVote)
-        ) {
-            return $this->fieldAclExtension;
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFieldExtension()
     {
         return $this->fieldAclExtension;
@@ -175,7 +161,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function supports($type, $id)
     {
-        if (ObjectIdentityHelper::isFieldDecodedKey($type)) {
+        if (ObjectIdentityHelper::isFieldEncodedKey($type)) {
             $type = ObjectIdentityHelper::decodeEntityFieldInfo($type)[0];
         }
 
