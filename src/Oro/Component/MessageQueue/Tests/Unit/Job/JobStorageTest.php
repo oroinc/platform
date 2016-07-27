@@ -17,6 +17,21 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
         new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock());
     }
 
+    public function testShouldCreateJobObject()
+    {
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue(Job::class))
+        ;
+
+        $storage = new JobStorage($this->createEntityManagerMock(), $repository);
+        $job = $storage->createJob();
+
+        $this->assertInstanceOf(Job::class, $job);
+    }
+
     public function testShouldThrowIfGotUnexpectedJobInstance()
     {
         $storage = new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock());

@@ -57,12 +57,16 @@ class JobProcessor
             throw new \LogicException('Can create only root unique jobs.');
         }
 
-        $job = new Job();
+        $job = $this->jobStorage->createJob();
         $job->setStatus(Job::STATUS_NEW);
         $job->setName($name);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($root);
         $job->setUnique((bool) $unique);
+
+        if (! $root) {
+            $job->setStartedAt(new \DateTime());
+        }
 
         try {
             $this->jobStorage->saveJob($job);

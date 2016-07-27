@@ -47,6 +47,16 @@ class JobStorage
     }
 
     /**
+     * @return JobEntity
+     */
+    public function createJob()
+    {
+        $class = $this->repository->getClassName();
+
+        return new $class;
+    }
+
+    /**
      * @param Job           $job
      * @param \Closure|null $lockCallback
      *

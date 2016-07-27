@@ -48,6 +48,11 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $storage = $this->createJobStorage();
         $storage
             ->expects($this->once())
+            ->method('createJob')
+            ->will($this->returnValue(new Job()))
+        ;
+        $storage
+            ->expects($this->once())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -66,13 +71,18 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($job->getRootJob());
         $this->assertFalse($job->isUnique());
         $this->assertEquals(new \DateTime(), $job->getCreatedAt(), '', 1);
-        $this->assertNull($job->getStartedAt());
+        $this->assertEquals(new \DateTime(), $job->getStartedAt(), '', 1);
         $this->assertNull($job->getStoppedAt());
     }
 
     public function testCreateJobShouldCreateChildJob()
     {
         $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('createJob')
+            ->will($this->returnValue(new Job()))
+        ;
         $storage
             ->expects($this->once())
             ->method('saveJob')
@@ -104,6 +114,11 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $storage = $this->createJobStorage();
         $storage
             ->expects($this->once())
+            ->method('createJob')
+            ->will($this->returnValue(new Job()))
+        ;
+        $storage
+            ->expects($this->once())
             ->method('saveJob')
             ->with($this->isInstanceOf(Job::class))
         ;
@@ -122,13 +137,18 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($job->getRootJob());
         $this->assertTrue($job->isUnique());
         $this->assertEquals(new \DateTime(), $job->getCreatedAt(), '', 1);
-        $this->assertNull($job->getStartedAt());
+        $this->assertEquals(new \DateTime(), $job->getStartedAt(), '', 1);
         $this->assertNull($job->getStoppedAt());
     }
 
     public function testCreateJobShouldReturnFalseIfJobIsUniqueAndAlreadyExists()
     {
         $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('createJob')
+            ->will($this->returnValue(new Job()))
+        ;
         $storage
             ->expects($this->once())
             ->method('saveJob')
@@ -151,6 +171,11 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     public function testCreateJobShouldNotCatchDuplicateJobExceptionIfNotUnique()
     {
         $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('createJob')
+            ->will($this->returnValue(new Job()))
+        ;
         $storage
             ->expects($this->once())
             ->method('saveJob')
