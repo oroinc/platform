@@ -558,31 +558,27 @@ To implement a language switcher we'll create a separate data provider class, si
 ```php
 namespace Acme\Bundle\LocaleBundle\Layout\Extension\Provider;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataProviderInterface;
-
-class LocaleDataProvider implements DataProviderInterface
+class LocaleDataProvider
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function getIdentifier()
+    public function getDefaultLanguage()
     {
-        throw new \BadMethodCallException('Not implemented');
+        $this->options['default_language'] = 'english';
+        return $this->options['default_language'];
     }
 
     /**
-     * {@inheritdoc}
+     * @return mixed
      */
-    public function getData(ContextInterface $context)
+    public function getAvailableLanguages()
     {
-        return [
-            'default_language'    => 'english',
-            'available_languages' => [
-                'english' => 'English',
-                'french'  => 'French'
-            ]
+        $this->options['available_languages'] = [
+            'english' => 'English',
+            'french'  => 'French'
         ];
+        return $this->options['available_languages'];
     }
 }
 ```

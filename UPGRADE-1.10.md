@@ -267,6 +267,11 @@ Corresponding block type classes was removed.
  [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
 - Added possibility to create layout update imports, for details please check out documentation [Imports](./src/Oro/Bundle/LayoutBundle/Resources/doc/imports.md).
 - Added new `\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface`.
+- Interface `Oro\Component\Layout\DataProviderInterface` was removed.
+- Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
+- Methods `Oro\Component\Layout\DataAccessorInterface::getIdentifier()` and `Oro\Component\Layout\DataAccessorInterface::get()`  was removed.
+- Added class `Oro\Component\Layout\DataProviderDecorator`.
+- Add possibility to use parameters in data providers, for details please check out documentation [Layout data](./src/Oro/Bundle/LayoutBundle/Resources/doc/layout_data.md).
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
