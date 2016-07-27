@@ -122,6 +122,8 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     *
      * Creates/removes calendar events based on attendee changes
      *
      * @param CalendarEvent $calendarEvent
@@ -173,10 +175,9 @@ class ChildEventsSubscriber implements EventSubscriberInterface
                     // otherwise it should be removed
                     $calendarEvent->removeChildEvent($childEvent);
                 }
-                continue;
+            } else {
+                $calendarEventOwnerIds[] = $childEventOwnerId;
             }
-
-            $calendarEventOwnerIds[] = $childEventOwnerId;
         }
 
         $this->createChildEvent(

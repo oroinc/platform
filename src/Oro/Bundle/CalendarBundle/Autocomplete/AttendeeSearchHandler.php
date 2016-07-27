@@ -2,60 +2,16 @@
 
 namespace Oro\Bundle\CalendarBundle\Autocomplete;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler;
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class AttendeeSearchHandler extends ContextSearchHandler
 {
     /** @var AttendeeRelationManager */
     protected $attendeeRelationManager;
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param AttendeeRelationManager $attendeeRelationManager
-     * @param string|null             $class
-     */
-    public function __construct(
-        TokenStorageInterface $token,
-        TranslatorInterface $translator,
-        Indexer $indexer,
-        ActivityManager $activityManager,
-        ConfigManager $configManager,
-        EntityClassNameHelper $entityClassNameHelper,
-        ObjectManager $objectManager,
-        ObjectMapper $mapper,
-        EventDispatcherInterface $dispatcher,
-        AttendeeRelationManager $attendeeRelationManager,
-        $class = null
-    ) {
-        parent::__construct(
-            $token,
-            $translator,
-            $indexer,
-            $activityManager,
-            $configManager,
-            $entityClassNameHelper,
-            $objectManager,
-            $mapper,
-            $dispatcher,
-            $class
-        );
-        $this->attendeeRelationManager = $attendeeRelationManager;
-    }
 
     /**
      * {@inheritdoc}
@@ -123,5 +79,17 @@ class AttendeeSearchHandler extends ContextSearchHandler
     protected function getSearchAliases()
     {
         return ['oro_user'];
+    }
+
+    /**
+     * @param AttendeeRelationManager $attendeeRelationManager
+     *
+     * @return AttendeeSearchHandler
+     */
+    public function setAttendeeRelationManager(AttendeeRelationManager $attendeeRelationManager)
+    {
+        $this->attendeeRelationManager = $attendeeRelationManager;
+
+        return $this;
     }
 }

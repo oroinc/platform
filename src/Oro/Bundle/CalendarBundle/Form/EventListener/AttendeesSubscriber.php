@@ -36,6 +36,8 @@ class AttendeesSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     *
      * Makes sure indexes of attendees from request are equal to indexes of the same
      * attendees so that in the end we end up with correct data.
      *
