@@ -100,10 +100,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 // set seen flags from previously synchronized emails
                 $this->checkFlags($imapFolder, $checkStartDate);
 
-                $this->em->flush($folder);
             } catch (UnselectableFolderException $e) {
-                $this->logger->info(sprintf('The folder "%s" cannot be selected and was skipped.', $folderName));
+                $folder->setSyncEnabled(false);
+                $this->logger->info(
+                    sprintf('The folder "%s" cannot be selected and was skipped and disabled.', $folderName)
+                );
             }
+            $this->em->flush($folder);
 
             $this->cleanUp(true, $imapFolder->getFolder());
 
