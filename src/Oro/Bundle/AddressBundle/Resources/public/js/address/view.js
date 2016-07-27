@@ -4,8 +4,9 @@ define([
     'oroui/js/app/views/base/view',
     'oroui/js/mediator',
     'orolocale/js/formatter/address',
-    'oroui/js/delete-confirmation'
-], function($, _, BaseView, mediator, addressFormatter, deleteConfirmation) {
+    'oroui/js/delete-confirmation',
+    'orotranslation/js/translator'
+], function($, _, BaseView, mediator, addressFormatter, deleteConfirmation, __) {
     'use strict';
 
     var AddressView;
@@ -25,10 +26,10 @@ define([
         confirmRemoveComponent: deleteConfirmation,
 
         confirmRemoveMessages: {
-            title: _.__('Delete Confirmation'),
-            content: _.__('Are you sure you want to delete this item?'),
-            okText: _.__('Yes, Delete'),
-            cancelText: _.__('Cancel')
+            title: __('Delete Confirmation'),
+            content: __('Are you sure you want to delete this item?'),
+            okText: __('Yes, Delete'),
+            cancelText: __('Cancel')
         },
 
         events: {
@@ -37,31 +38,34 @@ define([
             'click .item-remove-button': 'close'
         },
 
+        defaultMapping: {
+            'namePrefix': 'prefix',
+            'nameSuffix': 'suffix',
+            'firstName': 'first_name',
+            'middleName': 'middle_name',
+            'lastName': 'last_name',
+            'organization': 'organization',
+            'street': 'street',
+            'street2': 'street2',
+            'city': 'city',
+            'country': 'country',
+            'countryIso2': 'country_iso2',
+            'countryIso3': 'country_iso3',
+            'postalCode': 'postal_code',
+            'region': 'region',
+            'regionText': 'region',
+            'regionCode': 'region_code'
+        },
+
         options: {
-            map: {
-                'namePrefix': 'prefix',
-                'nameSuffix': 'suffix',
-                'firstName': 'first_name',
-                'middleNamem': 'iddle_name',
-                'lastName': 'last_name',
-                'organization': 'organization',
-                'street': 'street',
-                'street2': 'street2',
-                'city': 'city',
-                'country': 'country',
-                'countryIso2': 'country_iso2',
-                'countryIso3': 'country_iso3',
-                'postalCode': 'postal_code',
-                'region': 'region',
-                'regionText': 'region',
-                'regionCode': 'region_code'
-            },
+            map: {},
             'allowToRemovePrimary': false,
             'confirmRemove': false
         },
 
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
+            this.mapping = _.extend({}, this.defaultMapping, this.options.map || {});
             if (this.options.confirmRemoveComponent) {
                 this.confirmRemoveComponent = this.options.confirmRemoveComponent;
                 if (_.isString(this.confirmRemoveComponent)) {
@@ -76,6 +80,10 @@ define([
         },
 
         dispose: function(options) {
+            if (this.disposed) {
+                return;
+            }
+
             delete this.confirmRemoveComponent;
             return AddressView.__super__.dispose.apply(this, arguments);
         },
@@ -98,7 +106,7 @@ define([
 
         close: function() {
             if (this.model.get('primary') && !this.options.allowToRemovePrimary) {
-                mediator.execute('showErrorMessage', _.__('Primary address can not be removed'));
+                mediator.execute('showErrorMessage', __('Primary address can not be removed'));
             } else {
                 this.confirmClose(_.bind(this.model.destroy, this.model, {wait: true}));
             }
@@ -128,7 +136,7 @@ define([
 
         prepareData: function(data) {
             var mappedData = {};
-            var map = this.options.map;
+            var map = this.mapping;
 
             if (data) {
                 _.each(data, function(value, key) {
