@@ -10,6 +10,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -90,12 +92,12 @@ class WidgetController extends Controller
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param string $workflowName
-     * @return array
-     * @throws BadRequestHttpException
+     * @param Request $request
+     * @return Response
      */
-    public function startTransitionFormAction($transitionName, $workflowName)
+    public function startTransitionFormAction($transitionName, $workflowName, Request $request)
     {
-        $entityId = $this->getRequest()->get('entityId', 0);
+        $entityId = $request->get('entityId', 0);
 
         /** @var DoctrineHelper $doctrineHelper */
         $doctrineHelper = $this->get('oro_entity.doctrine_helper');
@@ -113,7 +115,7 @@ class WidgetController extends Controller
 
         $data = null;
         $saved = false;
-        if ($this->getRequest()->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $transitionForm->submit($this->getRequest());
 
             if ($transitionForm->isValid()) {
@@ -174,9 +176,10 @@ class WidgetController extends Controller
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
-     * @return array
+     * @param Request $request
+     * @return Response
      */
-    public function transitionFormAction($transitionName, WorkflowItem $workflowItem)
+    public function transitionFormAction($transitionName, WorkflowItem $workflowItem, Request $request)
     {
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
@@ -186,7 +189,7 @@ class WidgetController extends Controller
         $transitionForm = $this->getTransitionForm($workflowItem, $transition);
 
         $saved = false;
-        if ($this->getRequest()->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $transitionForm->submit($this->getRequest());
 
             if ($transitionForm->isValid()) {
@@ -315,10 +318,8 @@ class WidgetController extends Controller
     protected function getAvailableStartTransitionsData(Workflow $workflow, $entity)
     {
         $transitionsData = [];
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
 
-        $transitions = $workflowManager->getStartTransitions($workflow);
+        $transitions = $workflow->getTransitionManager()->getStartTransitions();
         /** @var Transition $transition */
         foreach ($transitions as $transition) {
             if (!$transition->isHidden()) {
@@ -351,15 +352,11 @@ class WidgetController extends Controller
      */
     protected function getStartTransitionData(Workflow $workflow, Transition $transition, $entity)
     {
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
-
         $errors = new ArrayCollection();
-        $isAllowed = $workflowManager
-            ->isStartTransitionAvailable($workflow, $transition, $entity, array(), $errors);
+        $isAllowed = $workflow->isStartTransitionAvailable($transition, $entity, array(), $errors);
         if ($isAllowed || !$transition->isUnavailableHidden()) {
             return array(
-                'workflow' => $workflowManager->getWorkflow($workflow),
+                'workflow' => $workflow,
                 'transition' => $transition,
                 'isAllowed' => $isAllowed,
                 'errors' => $errors

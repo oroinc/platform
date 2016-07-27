@@ -224,8 +224,8 @@ class WorkflowDefinitionController extends Controller
                 if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
                     $workflow = $workflowManager->getWorkflow($workflowName);
 
-                    $workflowManager->resetWorkflowData($workflow->getDefinition());
-                    $workflowManager->deactivateWorkflow($workflow);
+                    $workflowManager->resetWorkflowData($workflow->getName());
+                    $workflowManager->deactivateWorkflow($workflow->getName());
 
                     $deactivated[] = $workflow->getLabel();
                 }

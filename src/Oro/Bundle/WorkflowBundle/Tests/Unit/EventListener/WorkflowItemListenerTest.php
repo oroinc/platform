@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
 class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -250,14 +251,16 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \stdClass();
         $childEntity = new \DateTime();
+        $workflowName = 'test_workflow';
+        $childWorkflowName = 'test_child_workflow';
 
-        list($event, $workflow) = $this->prepareEventForWorkflow($entity);
+        list($event, $workflow) = $this->prepareEventForWorkflow($entity, $workflowName);
         $this->workflowManager->expects($this->at(0))
             ->method('getApplicableWorkflows')
             ->with($entity)
             ->willReturn([$workflow]);
 
-        list($childEvent, $childWorkflow) = $this->prepareEventForWorkflow($childEntity);
+        list($childEvent, $childWorkflow) = $this->prepareEventForWorkflow($childEntity, $childWorkflowName);
         $this->workflowManager->expects($this->at(2))
             ->method('getApplicableWorkflows')
             ->with($childEntity)
@@ -267,24 +270,18 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 
         $expectedSchedule = array(
             0 => array(
-                array(
-                    'entity' => $entity,
-                    'workflow' => $workflow
-                ),
+                new WorkflowStartArguments($workflowName, $entity),
             ),
         );
         $this->assertAttributeEquals(0, 'deepLevel', $this->listener);
         $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->listener);
 
-        $startChildWorkflow = function () use ($childEvent, $childEntity, $childWorkflow) {
+        $startChildWorkflow = function () use ($childEvent, $childEntity, $childWorkflow, $childWorkflowName) {
             $this->listener->postPersist($childEvent);
 
             $expectedSchedule = array(
                 1 => array(
-                    array(
-                        'entity' => $childEntity,
-                        'workflow' => $childWorkflow
-                    ),
+                    new WorkflowStartArguments($childWorkflowName, $childEntity)
                 ),
             );
             $this->assertAttributeEquals(1, 'deepLevel', $this->listener);
@@ -298,11 +295,11 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowManager->expects($this->at(0))
             ->method('massStartWorkflow')
-            ->with(array(array('workflow' => $workflow, 'entity' => $entity)))
+            ->with([new WorkflowStartArguments($workflowName, $entity)])
             ->will($this->returnCallback($startChildWorkflow));
         $this->workflowManager->expects($this->at(1))
             ->method('massStartWorkflow')
-            ->with(array(array('workflow' => $childWorkflow, 'entity' => $childEntity)));
+            ->with([new WorkflowStartArguments($childWorkflowName, $childEntity)]);
 
         $this->listener->postFlush();
 
@@ -312,9 +309,10 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param object $entity
+     * @param string $workflowName
      * @return array
      */
-    protected function prepareEventForWorkflow($entity)
+    protected function prepareEventForWorkflow($entity, $workflowName)
     {
         $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
@@ -333,6 +331,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->any())
             ->method('getStepManager')
             ->will($this->returnValue($stepManager));
+        $workflow->expects($this->any())->method('getName')->willReturn($workflowName);
 
         return array($event, $workflow);
     }

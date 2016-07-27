@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
 class WorkflowItemListener
 {
@@ -74,10 +75,10 @@ class WorkflowItemListener
         if ($activeWorkflows) {
             foreach ($activeWorkflows as $activeWorkflow) {
                 if ($activeWorkflow->getStepManager()->hasStartStep()) {
-                    $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = [
-                        'entity' => $entity,
-                        'workflow' => $activeWorkflow
-                    ];
+                    $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = new WorkflowStartArguments(
+                        $activeWorkflow->getName(),
+                        $entity
+                    );
                 }
             }
         }
@@ -138,13 +139,13 @@ class WorkflowItemListener
     public function preRemove(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        
+
         if (!$this->entityConnector->isApplicableEntity($entity)) {
             return;
         }
 
         $workflowItems = $this->workflowManager->getWorkflowItemsByEntity($entity);
-        
+
         if ($workflowItems) {
             $em = $args->getEntityManager();
             foreach ($workflowItems as $workflowItem) {

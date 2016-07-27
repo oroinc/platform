@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
 class WorkflowRegistry
@@ -43,6 +45,15 @@ class WorkflowRegistry
      */
     public function getWorkflow($name, $exceptionOnNotFound = true)
     {
+        if (!is_string($name)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Expected value is workflow name string. But got %s',
+                    is_object($name) ? get_class($name) : gettype($name)
+                )
+            );
+        }
+
         if (!isset($this->workflowByName[$name])) {
             /** @var WorkflowDefinition $definition */
             $definition = $this->getEntityRepository()->find($name);
@@ -81,7 +92,7 @@ class WorkflowRegistry
      * Get Active Workflows that applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow[] named array of active Workflow instances
+     * @return Workflow[]|ArrayCollection named array of active Workflow instances
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
@@ -92,23 +103,13 @@ class WorkflowRegistry
             'active' => true
         ];
 
-        $workflows = [];
+        $workflows = new ArrayCollection();
         foreach ($this->getEntityRepository()->findBy($criteria) as $definition) {
             /** @var WorkflowDefinition $definition */
-            $workflows[$definition->getName()] = $this->getAssembledWorkflow($definition);
+            $workflows->set($definition->getName(), $this->getAssembledWorkflow($definition));
         }
-        return $workflows;
-    }
 
-    /**
-     * Check is there an active workflow for entity class
-     *
-     * @param string $entityClass
-     * @return bool
-     */
-    public function hasActiveWorkflowsByEntityClass($entityClass)
-    {
-        return count($this->getActiveWorkflowsByEntityClass($entityClass)) > 0;
+        return $workflows;
     }
 
     /**
