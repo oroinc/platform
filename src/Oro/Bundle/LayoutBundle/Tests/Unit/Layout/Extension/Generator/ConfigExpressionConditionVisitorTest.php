@@ -9,7 +9,6 @@ use CG\Core\DefaultGeneratorStrategy;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 

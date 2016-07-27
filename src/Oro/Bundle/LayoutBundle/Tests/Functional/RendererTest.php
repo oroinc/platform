@@ -5,7 +5,6 @@ namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
-use Oro\Component\ConfigExpression\Func;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;

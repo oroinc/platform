@@ -5,7 +5,6 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Encoder;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\Action;
 
 use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
