@@ -95,9 +95,10 @@ class AttendeeSearchHandlerTest extends \PHPUnit_Framework_TestCase
             $entityClassNameHelper,
             $this->om,
             $mapper,
-            $dispatcher,
-            $this->attendeeRelationManager
+            $dispatcher
         );
+
+        $this->attendeeSearchHandler->setAttendeeRelationManager($this->attendeeRelationManager);
     }
 
     public function testSearch()
