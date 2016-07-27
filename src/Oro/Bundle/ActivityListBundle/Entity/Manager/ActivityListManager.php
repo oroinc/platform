@@ -125,7 +125,7 @@ class ActivityListManager
         $ids = $this->getListDataIds(clone $qb, $entityClass, $entityId, $filter, $pageFilter);
         if ($ids) {
             $qb->setParameters([]);
-            $qb->resetDQLParts(['join', 'where', 'groupBy']);
+            $qb->resetDQLParts(['join', 'where']);
             $qb->where($qb->expr()->in('activity.id', implode(',', $ids)));
             $qb->orderBy(
                 'activity.' . $this->config->get('oro_activity_list.sorting_field'),
@@ -210,7 +210,6 @@ class ActivityListManager
         if (!empty($pageFilter['date']) && !empty($pageFilter['ids'])) {
             $dateFilter = new \DateTime($pageFilter['date'], new \DateTimeZone('UTC'));
             $whereComparison = 'lte';
-
             if (($pageFilter['action'] === 'next' && $orderDirection === 'ASC')
                 || ($pageFilter['action'] === 'prev' && $orderDirection === 'DESC')
             ) {
@@ -221,15 +220,12 @@ class ActivityListManager
                 $orderDirection = ($orderDirection === 'DESC') ? 'ASC' : 'DESC';
             }
 
+            $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
             $qb->andWhere($qb->expr()->{$whereComparison}('activity.' . $orderBy, ':dateFilter'));
             $qb->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
-            $qb->orderBy('activity.' . $orderBy, $orderDirection);
-
-            $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
-
-        } else {
-            $qb->orderBy('activity.' . $orderBy, $orderDirection);
         }
+
+        $qb->orderBy('activity.' . $orderBy, $orderDirection);
     }
 
     /**
@@ -255,18 +251,12 @@ class ActivityListManager
 
             $this->applyPageFilter($inheritanceQb, $pageFilter);
 
-            $alias = 'ta_' . $key;
-            $inheritanceQb->leftJoin('activity.' . $inheritanceTarget['targetClassAlias'], $alias);
-
-            $inheritanceQb->andWhere($inheritanceQb->expr()->in(
-                $alias . '.id',
-                $this->activityInheritanceTargetsHelper->getSubQuery(
-                    $inheritanceTarget['targetClass'],
-                    $inheritanceTarget['path'],
-                    $entityId,
-                    $key
-                )->getDQL()
-            ));
+            $this->activityInheritanceTargetsHelper->applyInheritanceActivity(
+                $inheritanceQb,
+                $inheritanceTarget,
+                $key,
+                ':entityId'
+            );
 
             $this->activityListFilterHelper->addFiltersToQuery($inheritanceQb, $filter);
             $this->activityListAclHelper->applyAclCriteria($inheritanceQb, $this->chainProvider->getProviders());
@@ -520,6 +510,10 @@ class ActivityListManager
         $newTargetId,
         $activityClass = null
     ) {
+        if (empty($activityIds)) {
+            return $this;
+        }
+
         if (is_null($activityClass)) {
             $associationName = $this->getActivityListAssociationName($targetClass);
             $entityClass = ActivityList::ENTITY_NAME;
@@ -529,7 +523,7 @@ class ActivityListManager
         }
 
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
-        if (!empty($activityIds) && $entityMetadata->hasAssociation($associationName)) {
+        if ($entityMetadata->hasAssociation($associationName)) {
             $association = $entityMetadata->getAssociationMapping($associationName);
             $tableName = $association['joinTable']['name'];
             $activityField = current(array_keys($association['relationToSourceKeyColumns']));
