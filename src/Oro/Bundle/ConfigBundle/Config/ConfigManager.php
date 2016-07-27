@@ -331,6 +331,62 @@ class ConfigManager
             }
         }
 
+        if ($this->isArrayValue($value, $full)) {
+            // merge missing subvalues with those defined in the parent scopes
+            $currentValue = (array) $this->getPlainValue($value, $full);
+
+            foreach ($managers as $scopeName => $manager) {
+                $scopeValue = $manager->getSettingValue($name, $full);
+                $currentValue = array_merge((array) $this->getPlainValue($scopeValue, $full), $currentValue);
+            }
+
+            $value = $this->updateWithPlainValue($value, $currentValue, $full);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @param bool $full
+     *
+     * @return bool
+     */
+    protected function isArrayValue($value, $full)
+    {
+        if ($full) {
+            return is_array($value['value']);
+        }
+
+        return is_array($value);
+    }
+
+    /**
+     * @param mixed $value
+     * @param bool $full
+     *
+     * @return mixed
+     */
+    protected function getPlainValue($value, $full)
+    {
+        return $full ? $value['value'] : $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @param mixed $newValue
+     * @param bool $full
+     *
+     * @return mixed
+     */
+    protected function updateWithPlainValue($value, $newValue, $full)
+    {
+        if (!$full) {
+            return $newValue;
+        }
+
+        $value['value'] = $newValue;
+
         return $value;
     }
 
