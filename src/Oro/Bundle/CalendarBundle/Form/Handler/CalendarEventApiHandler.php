@@ -156,6 +156,7 @@ class CalendarEventApiHandler
                 $childEvent->setCancelled(true);
             }
         }
+
         $this->manager->persist($entity);
         $this->manager->flush();
 
