@@ -133,6 +133,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'), false)
             ->will($this->returnValue($workflow));
 
+
         $workflowDefinitions = $this->builder->buildFromConfiguration($inputData);
         $this->assertCount(1, $workflowDefinitions);
 
