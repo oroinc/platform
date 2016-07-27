@@ -142,6 +142,9 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testGetCalendarEvents()
     {
         $organizationId = 1;

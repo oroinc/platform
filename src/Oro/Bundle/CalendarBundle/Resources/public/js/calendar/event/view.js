@@ -105,7 +105,9 @@ define([
                     var deleteUrl = $el.data('url');
                     var deleteConfirmationMessage = $el.data('message');
                     if (this.model.toJSON().recurringEventId) {
-                        deleteConfirmationMessage += "<br/>" + __('Only this particular event will be deleted from the series.');
+                        deleteConfirmationMessage = deleteConfirmationMessage +
+                            '<br/>' +
+                            __('Only this particular event will be deleted from the series.');
                     }
                     var confirm = new DeleteConfirmation({
                         content: deleteConfirmationMessage
