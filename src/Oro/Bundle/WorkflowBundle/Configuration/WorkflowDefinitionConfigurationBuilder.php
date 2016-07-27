@@ -4,10 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowGroup;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\GroupAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
@@ -16,16 +14,12 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
-    /** @var GroupAssembler */
-    protected $groupAssembler;
-
     /**
      * @param WorkflowAssembler $workflowAssembler
      */
-    public function __construct(WorkflowAssembler $workflowAssembler, GroupAssembler $groupAssembler)
+    public function __construct(WorkflowAssembler $workflowAssembler)
     {
         $this->workflowAssembler = $workflowAssembler;
-        $this->groupAssembler = $groupAssembler;
     }
 
     /**
@@ -63,7 +57,18 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             'steps_display_ordered',
             false
         );
-        $groups = $this->groupAssembler->assemble($configuration);
+        $groups = [
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => $this->getConfigurationOption(
+                $configuration,
+                WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
+                []
+            ),
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => $this->getConfigurationOption(
+                $configuration,
+                WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
+                []
+            ),
+        ];
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition

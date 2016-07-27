@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(name="oro_workflow_definition")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
  * @Config(
  *      routeName="oro_workflow_definition_index",
  *      routeView="oro_workflow_definition_view",
@@ -44,6 +44,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  */
 class WorkflowDefinition implements DomainObjectInterface
 {
+    const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
+    const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
+
     /**
      * @var string
      *
@@ -152,20 +155,11 @@ class WorkflowDefinition implements DomainObjectInterface
     protected $restrictions;
 
     /**
-     * @var $workflowGroup[]|Collection
+     * @var array
      *
-     * @ORM\ManyToMany(targetEntity="WorkflowGroup", inversedBy="definitions", cascade={"persist"}, orphanRemoval=true)
-     * @ORM\JoinTable(
-     *      name="oro_workflow_def_to_group",
-     *      joinColumns={
-     *          @ORM\JoinColumn(name="workflow_definition_name", referencedColumnName="name")
-     *      },
-     *      inverseJoinColumns={
-     *          @ORM\JoinColumn(name="workflow_group_id", referencedColumnName="id")
-     *      }
-     * )
+     * @ORM\Column(name="groups", type="array")
      */
-    protected $groups;
+    protected $groups = [];
 
     /**
      * @var \DateTime $created
@@ -203,7 +197,6 @@ class WorkflowDefinition implements DomainObjectInterface
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
         $this->restrictions = new ArrayCollection();
-        $this->groups = new ArrayCollection();
     }
 
     /**
@@ -755,10 +748,10 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
-     * @param WorkflowGroup[]|Collection $groups
+     * @param array $groups
      * @return $this
      */
-    public function setGroups($groups)
+    public function setGroups(array $groups)
     {
         $this->groups = $groups;
 
@@ -766,36 +759,10 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
-     * @return WorkflowGroup[]|Collection
+     * @return array
      */
     public function getGroups()
     {
         return $this->groups;
-    }
-
-    /**
-     * @param WorkflowGroup $group
-     * @return $this
-     */
-    public function addGroup(WorkflowGroup $group)
-    {
-        if (!$this->groups->contains($group)) {
-            $this->groups->add($group);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param WorkflowGroup $group
-     * @return $this
-     */
-    public function removeGroup(WorkflowGroup $group)
-    {
-        if ($this->groups->contains($group)) {
-            $this->groups->removeElement($group);
-        }
-
-        return $this;
     }
 }

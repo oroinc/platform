@@ -84,14 +84,6 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
-            ->arrayNode(self::NODE_EXCLUSIVE_ACTIVE_GROUPS)
-                ->prototype('scalar')
-                ->end()
-            ->end()
-            ->arrayNode(self::NODE_EXCLUSIVE_RECORD_GROUPS)
-                ->prototype('scalar')
-                ->end()
-            ->end()
             ->integerNode('priority')
                 ->defaultValue(0)
             ->end()
@@ -99,7 +91,9 @@ class WorkflowConfiguration implements ConfigurationInterface
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
             ->append($this->getTransitionDefinitionsNode())
-            ->append($this->getEntityRestrictionsNode());
+            ->append($this->getEntityRestrictionsNode())
+            ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_ACTIVE_GROUPS))
+            ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_RECORD_GROUPS));
 
         return $nodeBuilder;
     }
@@ -371,6 +365,26 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    protected function getGroupsNode($nodeName)
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root($nodeName);
+        $rootNode
+            ->beforeNormalization()
+                ->always()
+                ->then(function ($v) {
+                    return array_map('strtolower', $v);
+                })
+            ->end()
+            ->prototype('scalar')
             ->end();
 
         return $rootNode;

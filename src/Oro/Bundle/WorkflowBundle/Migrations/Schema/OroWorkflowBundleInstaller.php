@@ -36,8 +36,6 @@ class OroWorkflowBundleInstaller implements Installation
         $this->createOroWorkflowDefinitionTable($schema);
         $this->createOroProcessDefinitionTable($schema);
         $this->createOroWorkflowStepTable($schema);
-        $this->createOroWorkflowGroupTable($schema);
-        $this->createOroWorkflowDefToGroupTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroWorkflowItemForeignKeys($schema);
@@ -48,7 +46,6 @@ class OroWorkflowBundleInstaller implements Installation
         $this->addOroWorkflowEntityAclIdentForeignKeys($schema);
         $this->addOroWorkflowDefinitionForeignKeys($schema);
         $this->addOroWorkflowStepForeignKeys($schema);
-        $this->addOroWorkflowDefToGroupForeignKeys($schema);
 
         CreateEntityRestrictionsTable::createOroWorkflowEntityRestrictionsTable($schema);
     }
@@ -198,6 +195,7 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('active', 'boolean', []);
         $table->addColumn('priority', 'integer', []);
         $table->addColumn('configuration', 'array', ['comment' => '(DC2Type:array)']);
+        $table->addColumn('groups', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->addIndex(['start_step_id'], 'idx_6f737c368377424f', []);
@@ -251,36 +249,6 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addIndex(['workflow_name'], 'idx_4a35528c1bbc6e3d', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['workflow_name', 'name'], 'oro_workflow_step_unique_idx');
-    }
-
-    /**
-     * Create oro_workflow_group table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroWorkflowGroupTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_workflow_group');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('type', 'smallint', []);
-        $table->addColumn('name', 'string', ['length' => 255]);
-        $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['type', 'name'], 'oro_workflow_group_unique_idx');
-    }
-
-    /**
-     * Create oro_workflow_def_to_group table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroWorkflowDefToGroupTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_workflow_def_to_group');
-        $table->addColumn('workflow_definition_name', 'string', ['length' => 255]);
-        $table->addColumn('workflow_group_id', 'integer', []);
-        $table->addIndex(['workflow_group_id'], 'idx_315122013537265d', []);
-        $table->setPrimaryKey(['workflow_definition_name', 'workflow_group_id']);
-        $table->addIndex(['workflow_definition_name'], 'idx_3151220193298d04', []);
     }
 
     /**
@@ -436,28 +404,6 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_workflow_definition'),
             ['workflow_name'],
-            ['name'],
-            ['onUpdate' => null, 'onDelete' => 'CASCADE']
-        );
-    }
-
-    /**
-     * Add oro_workflow_def_to_group foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroWorkflowDefToGroupForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_workflow_def_to_group');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_workflow_group'),
-            ['workflow_group_id'],
-            ['id'],
-            ['onUpdate' => null, 'onDelete' => 'CASCADE']
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_workflow_definition'),
-            ['workflow_definition_name'],
             ['name'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
