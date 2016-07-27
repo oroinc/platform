@@ -144,7 +144,7 @@ class AclPrivilegeRepository
 
                 $this->addPermissions($sid, $privilege, $oid, $acls, $extension, $rootAcl);
 
-                // add fields in case if class metadata have not empty fields array
+                // add fields in case if class metadata has not empty fields array
                 if ($class->getFields()) {
                     $privilege->setFields($this->getFieldsPrivileges($sid, $class, $extension));
                 }
@@ -381,7 +381,7 @@ class AclPrivilegeRepository
     protected function getFieldPermissionMasks($permissions, AclExtensionInterface $extension, array $maskBuilders)
     {
         // check if there are no full field permissions and add missing to calculate correct masks.
-        // This case can be if some field have no all the permissions. In this case we should grant access to the
+        // This case can be if some field does not have all the permissions. In this case we should grant access to the
         // absent permissions.
         $permissionNames = array_keys($maskBuilders);
         foreach ($permissionNames as $permissionName) {

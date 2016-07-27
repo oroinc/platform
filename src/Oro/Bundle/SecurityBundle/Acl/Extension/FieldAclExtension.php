@@ -127,7 +127,7 @@ class FieldAclExtension extends AbstractAclExtension
      */
     public function supports($type, $id)
     {
-        return true;
+        throw new \LogicException('Field ACL Extension does not supports supports method');
     }
 
     /**
@@ -143,7 +143,7 @@ class FieldAclExtension extends AbstractAclExtension
      */
     public function getClasses()
     {
-        throw new \Exception('Field ACL Extension does not supports getClasses method');
+        throw new \LogicException('Field ACL Extension does not supports getClasses method');
     }
 
     /**

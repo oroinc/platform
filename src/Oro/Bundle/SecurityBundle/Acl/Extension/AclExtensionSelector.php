@@ -126,11 +126,6 @@ class AclExtensionSelector
         throw $this->createAclExtensionNotFoundException($val, $type, $id);
     }
 
-    protected function getStringValue($value)
-    {
-        return $value ? (string)$value : 'null';
-    }
-
     /**
      * Gets all ACL extension
      *
@@ -158,5 +153,15 @@ class AclExtensionSelector
         return new InvalidDomainObjectException(
             sprintf('An ACL extension was not found for: %s. Type: %s. Id: %s', $objInfo, $type, (string)$id)
         );
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    protected function getStringValue($value)
+    {
+        return $value ? (string)$value : 'null';
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
+use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
+
 interface AclClassInfo
 {
     /**
@@ -42,7 +44,7 @@ interface AclClassInfo
     /**
      * Gets the fields array in case if given class supports fields
      *
-     * @return array
+     * @return array|FieldSecurityMetadata[]
      */
     public function getFields();
 }

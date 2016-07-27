@@ -11,8 +11,8 @@ class ObjectIdentityHelper
 
     /**
      * Parse identity string to array of values: id, type, and fieldName
-     * Supported string formats:
-     *  entity:Acme\DemoBundle\SomeEntity:fieldName
+     * Examples of string formats:
+     *  entity:Acme\DemoBundle\SomeEntity::fieldName
      *  action:name_of_action
      *  entity:Acme\DemoBundle\SomeEntity
      *
