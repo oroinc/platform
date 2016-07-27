@@ -44,6 +44,19 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getMetadata()
+    {
+        $metadata = parent::getMetadata();
+
+        if (!$metadata['autocomplete_alias']) {
+            $metadata['autocomplete_alias'] = 'business_units_tree_search_handler';
+        }
+
+        return $metadata;
+    }
+    /**
      * {@inheritDoc}
      */
     public function parseData($data)

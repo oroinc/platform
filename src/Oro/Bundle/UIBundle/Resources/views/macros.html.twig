@@ -272,13 +272,15 @@
             groupKey: parameters.groupKey is defined ? parameters.groupKey : '',
             useMainButtonsClone: true
         }) %}
-        <div class="pull-right pinned-dropdown"
-             {{ _self.renderAttributes(parameters.dataAttributes|default({})|merge({
-                 'page-component-module': 'oroui/js/app/components/jquery-widget-component',
-                 'page-component-options': options
-             })) }}>
-            {{ parameters.html|raw }}
-        </div>
+        {% spaceless %}
+            <div class="pull-right pinned-dropdown"
+                 {{ _self.renderAttributes(parameters.dataAttributes|default({})|merge({
+                     'page-component-module': 'oroui/js/app/components/jquery-widget-component',
+                     'page-component-options': options
+                 })) }}>
+                {{ parameters.html|raw }}
+            </div>
+        {% endspaceless %}
     {% else %}
         {{ parameters.html|raw }}
     {% endif %}
@@ -491,49 +493,50 @@
         ]
 #}
 {% macro clientLink(parameters) %}
-    <a href="javascript: void(0);" class="{{ parameters.class is defined ? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
-        {% if (parameters.id is defined) %}
-        id="{{ parameters.id }}"
-        {% endif %}
-        {% if (parameters.dataId is defined) %}
-        data-id="{{ parameters.dataId }}"
-        {% endif %}
-        {% if (parameters.dataUrlRaw is defined) %}
-        data-url="{{ parameters.dataUrlRaw|raw }}"
-        {% elseif (parameters.dataUrl is defined) %}
-        data-url="{{ parameters.dataUrl }}"
-        {% endif %}
-        {% if (parameters.successMessage is defined) %}
-        data-success-message="{{ parameters.successMessage }}"
-        {% endif %}
-        {% if parameters.dataRedirect is defined %}
-        data-redirect="{{ parameters.dataRedirect  }}"
-        {% endif %}
-        title="{{ parameters.title is defined ? parameters.title : (parameters.label is defined ? parameters.label : '') }}"
-        {% if (parameters.visible is defined and not parameters.visible) %}
-        style="display: none"
-        {% endif -%}
-        {% if parameters.widget is defined and parameters.widget|length %}
-            {% set options = parameters.widget %}
-            {% if (options.createOnEvent is not defined) %}
-                {% set options = options|merge({
-                    'createOnEvent' : options.event|default('click')
-                }) %}
+    {% spaceless %}
+        <a href="javascript: void(0);" class="{{ parameters.class is defined ? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
+            title="{{ parameters.title is defined ? parameters.title : (parameters.label is defined ? parameters.label : '') }}"
+            {% if (parameters.id is defined) %}
+                id="{{ parameters.id }}"
             {% endif %}
-            {{ _self.renderWidgetAttributes(options) }}
-        {% endif %}
-        {% if parameters.pageComponent is defined %}
-            {{ _self.renderPageComponentAttributes(parameters.pageComponent) }}
-        {% endif %}
-        {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
-            {{ _self.renderAttributes(parameters.dataAttributes) }}
-        {% endif %}
-    >
-        {%- if (parameters.iCss is defined) -%}
-            <i class="{{ parameters.iCss }} hide-text">{{ parameters.label is defined ? parameters.label : '' }}</i>
-        {%- endif %}
-        {{- parameters.label is defined ? parameters.label : '' -}}
-    </a>
+            {%- if (parameters.dataId is defined) -%}
+                data-id ="{{ parameters.dataId }}"
+            {%- endif -%}
+            {%- if (parameters.dataUrlRaw is defined) -%}
+                data-url="{{ parameters.dataUrlRaw|raw }}"
+            {% elseif (parameters.dataUrl is defined) %}
+                data-url="{{ parameters.dataUrl }}"
+            {%- endif -%}
+            {%- if (parameters.successMessage is defined) -%}
+                data-success-message="{{ parameters.successMessage }}"
+            {%- endif -%}
+            {%- if parameters.dataRedirect is defined -%}
+                data-redirect="{{ parameters.dataRedirect }}"
+            {%- endif -%}
+            {%- if (parameters.visible is defined and not parameters.visible) -%}
+                style="display: none"
+            {%- endif -%}
+            {%- if parameters.widget is defined and parameters.widget|length -%}
+                {% set options = parameters.widget %}
+                {%- if (options.createOnEvent is not defined) -%}
+                    {% set options = options|merge({
+                        'createOnEvent' : options.event|default('click')
+                    }) %}
+                {%- endif -%}
+                {{ _self.renderWidgetAttributes(options) }}
+            {%- endif -%}
+            {%- if parameters.pageComponent is defined -%}
+                {{ _self.renderPageComponentAttributes(parameters.pageComponent) }}
+            {%- endif -%}
+            {%- if parameters.dataAttributes is defined and parameters.dataAttributes|length -%}
+                {{ _self.renderAttributes(parameters.dataAttributes) }}
+            {%- endif -%}>
+            {%- if (parameters.iCss is defined) -%}
+                <i class="{{ parameters.iCss }} hide-text">{{ parameters.label is defined ? parameters.label : '' }}</i>
+            {%- endif %}
+            {{- parameters.label is defined ? parameters.label : '' -}}
+        </a>
+    {% endspaceless %}
 {% endmacro %}
 
 {#
@@ -612,9 +615,11 @@
         ]
 #}
 {% macro clientButton(parameters) %}
-    <div class="pull-left btn-group icons-holder">
-        {{ _self.clientLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
-    </div>
+    {#{% espaceless %}#}
+        <div class="pull-left btn-group icons-holder">
+            {{ _self.clientLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
+        </div>
+    {#{% endspaceless %}#}
 {% endmacro %}
 
 {#

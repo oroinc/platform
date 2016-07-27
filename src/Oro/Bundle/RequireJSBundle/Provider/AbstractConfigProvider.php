@@ -98,8 +98,6 @@ abstract class AbstractConfigProvider implements ConfigProviderInterface
      */
     protected function createRequireJSConfig($configFilePath, $outputFilePath)
     {
-        $this->collectBundlesConfig();
-
         $config = new RequireJSConfig();
         $config->setConfigFilePath($configFilePath);
         $config->setOutputFilePath($outputFilePath);
