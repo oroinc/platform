@@ -355,7 +355,7 @@ define(function(require) {
                 $dropdown.is('.dropup') && scrollableRect.top > toggleRect.top
             ) {
                 // dropdown menu is completely hidden behind scrollable container
-                $dropdownMenu.css({position: 'absolute', top: '', left: ''});
+                $dropdownMenu.css({position: 'absolute', top: '', left: '', bottom: '', right: ''});
                 return;
             }
 
