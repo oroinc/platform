@@ -34,34 +34,13 @@ class EmailOriginHelper
     /** @var EntityManager */
     protected $em;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
-    /** @var  EmailOwnerProvider */
-    protected $emailOwnerProvider;
-
-    /** @var EmailAddressHelper */
-    protected $emailAddressHelper;
-
-    /** @var array */
-    protected $origins = [];
-
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param ServiceLink $serviceLink
-     * @param EmailOwnerProvider $emailOwnerProvider
-     * @param EmailAddressHelper $emailAddressHelper
      */
     public function __construct(
-        DoctrineHelper $doctrineHelper,
-        ServiceLink $serviceLink,
-        EmailOwnerProvider $emailOwnerProvider,
-        EmailAddressHelper $emailAddressHelper
+        DoctrineHelper $doctrineHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->securityFacade = $serviceLink->getService();
-        $this->emailOwnerProvider = $emailOwnerProvider;
-        $this->emailAddressHelper = $emailAddressHelper;
     }
 
     /**
@@ -93,41 +72,6 @@ class EmailOriginHelper
         }
 
         return $origin;
-    }
-    
-    /**
-     * Find existing email origin entity by email string or create and persist new one.
-     *
-     * @param string                $email
-     * @param OrganizationInterface $organization
-     * @param string                $originName
-     * @param boolean               $enableUseUserEmailOrigin
-     *
-     * @return EmailOrigin
-     */
-    public function getEmailOrigin(
-        $email,
-        OrganizationInterface $organization = null,
-        $originName = InternalEmailOrigin::BAP,
-        $enableUseUserEmailOrigin = true
-    ) {
-        $originKey = $originName . $email;
-        if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
-            $organization = $this->securityFacade->getOrganization();
-        }
-        if (!array_key_exists($originKey, $this->origins)) {
-            $emailOwner = $this->emailOwnerProvider->findEmailOwner(
-                $this->getEntityManager(),
-                $this->emailAddressHelper->extractPureEmailAddress($email)
-            );
-
-            $origin = $this
-                ->findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin);
-
-            $this->origins[$originKey] = $origin;
-        }
-
-        return $this->origins[$originKey];
     }
 
     /**
