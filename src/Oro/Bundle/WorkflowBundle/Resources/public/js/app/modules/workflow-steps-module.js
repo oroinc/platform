@@ -12,8 +12,7 @@ define(function(require) {
 
     mediator.on('page:update', function() {
         workflowStepsModel.set({
-            steps: [],
-            currentStep: false
+            stepsData: {}
         });
     });
 
