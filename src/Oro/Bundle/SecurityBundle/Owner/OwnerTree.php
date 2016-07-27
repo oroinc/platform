@@ -152,7 +152,7 @@ class OwnerTree implements OwnerTreeInterface
     /**
      * Gets ids of all users assigned to the given business unit
      *
-     * @param int|string $businessUnitId
+     * @param int[]|string[] $businessUnitId
      *
      * @return array of int|string
      */
@@ -161,6 +161,27 @@ class OwnerTree implements OwnerTreeInterface
         return isset($this->assignedBusinessUnitUserIds[$businessUnitId])
             ? $this->assignedBusinessUnitUserIds[$businessUnitId]
             : [];
+    }
+
+    /**
+     * Gets ids of all users assigned to the given business units
+     *
+     * @param int[]|string[] $businessUnitIds
+     *
+     * @return int[]|string[]
+     */
+    public function getUsersAssignedToBusinessUnits(array $businessUnitIds)
+    {
+        $userIds = array_intersect_key($this->assignedBusinessUnitUserIds, array_flip($businessUnitIds));
+
+        return !$userIds ? [] :array_values(
+            array_unique(
+                call_user_func_array(
+                    'array_merge',
+                    $userIds
+                )
+            )
+        );
     }
 
     /**
