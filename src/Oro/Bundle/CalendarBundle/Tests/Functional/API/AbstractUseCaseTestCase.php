@@ -16,8 +16,8 @@ class AbstractUseCaseTestCase extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader(), true);
-        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData'], true);
+        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
     }
 
     /**

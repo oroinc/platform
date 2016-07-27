@@ -10,6 +10,12 @@ use Oro\Bundle\CalendarBundle\Model\Recurrence;
  */
 class RecurringEventWithAttendeesAndExceptionTest extends AbstractUseCaseTestCase
 {
+    protected function setUp()
+    {
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData'], true);
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
