@@ -37,12 +37,6 @@ class OroLayoutExtension extends Extension
         }
         $excludedPaths = $this->getExcludedPaths($resources);
 
-        $resources = $this->loadCumulativeResources(
-            $container,
-            'requirejs.yml'
-        );
-        $excludedPaths = array_merge($excludedPaths, $this->getExcludedPaths($resources));
-
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
         $container->prependExtensionConfig($this->getAlias(), $config);
@@ -114,9 +108,33 @@ class OroLayoutExtension extends Extension
             $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resourceThemeLayoutUpdates);
         }
 
+        $foundThemeLayoutUpdates = $this->removeConfigsDirs($foundThemeLayoutUpdates, $config['themes']);
+
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
 
         $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
+    }
+
+    /**
+     * Removes resources placed in Resources/views/layouts/{$theme}/config from layout updates
+     *
+     * @param array $foundThemeLayoutUpdates
+     * @param array $themes
+     * @return array
+     */
+    protected function removeConfigsDirs(array $foundThemeLayoutUpdates, array $themes)
+    {
+        foreach ($themes as $theme => $value) {
+            if (isset($foundThemeLayoutUpdates[$theme]['config'])) {
+                unset($foundThemeLayoutUpdates[$theme]['config']);
+            }
+
+            if (empty($foundThemeLayoutUpdates[$theme])) {
+                unset($foundThemeLayoutUpdates[$theme]);
+            }
+        }
+
+        return $foundThemeLayoutUpdates;
     }
 
     /**
