@@ -305,13 +305,3 @@ services:
         class: Oro\Bundle\DashboardBundle\Form\Type\WidgetFilterType
         tags:
             - { name: form.type, alias: oro_dashboard_query_filter }
-
-    oro_dashboard.query.filter_processor:
-        class: Oro\Bundle\DashboardBundle\Query\FilterQueryProcessor
-        arguments:
-            - '@oro_query_designer.query_designer.manager'
-            - '@oro_entity.virtual_field_provider.chain'
-            - '@doctrine'
-            - '@oro_query_designer.query_designer.restriction_builder'
-        calls:
-            - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]

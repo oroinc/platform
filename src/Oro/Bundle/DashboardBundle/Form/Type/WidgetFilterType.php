@@ -19,17 +19,17 @@ class WidgetFilterType extends AbstractType
     {
         $builder
             ->add(
-            'entity',
-            'hidden',
-            [
-                'data' => $options['entity'],
-            ]
-        );
+                'entity',
+                'hidden',
+                [
+                    'data' => $options['entity'],
+                ]
+            );
         $builder->add('definition', 'hidden', ['required' => false]);
         $factory = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event)  use ($factory) {
+            function (FormEvent $event) use ($factory) {
                 $form = $event->getForm();
                 $data = $event->getData();
                 if ($data) {
@@ -42,23 +42,26 @@ class WidgetFilterType extends AbstractType
                         'filter',
                         'oro_query_designer_filter',
                         null,
-                        array(
+                        [
                             'mapped'             => false,
                             'column_choice_type' => 'oro_entity_field_select',
                             'entity'             => $entity,
                             'auto_initialize'    => false
-                        )
+                        ]
                     )
                 );
             }
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['widgetType'] = $options['widgetType'];
+        $view->vars['widgetType']  = $options['widgetType'];
         $view->vars['collapsible'] = $options['collapsible'];
-        $view->vars['collapsed'] = $options['collapsed'];
+        $view->vars['collapsed']   = $options['collapsed'];
         parent::finishView($view, $form, $options);
     }
 
@@ -72,6 +75,9 @@ class WidgetFilterType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOptions()
     {
         return [
@@ -79,6 +85,9 @@ class WidgetFilterType extends AbstractType
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'oro_dashboard_query_filter';
