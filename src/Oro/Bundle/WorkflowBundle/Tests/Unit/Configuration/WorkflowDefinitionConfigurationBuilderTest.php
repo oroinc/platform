@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 
@@ -99,16 +97,16 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         }
         $attributeManager = new AttributeManager($attributes);
 
-        $groups = [];
+        $activeGroups = [];
+        $recordGroups = [];
         if (!empty($workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS])) {
-            $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE] = array_map(
+            $activeGroups = array_map(
                 'strtolower',
                 $workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS]
             );
         }
-
         if (!empty($workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS])) {
-            $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD] = array_map(
+            $recordGroups = array_map(
                 'strtolower',
                 $workflowConfiguration[WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS]
             );
@@ -140,7 +138,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         /** @var WorkflowDefinition $workflowDefinition */
         $workflowDefinition = current($workflowDefinitions);
         $this->assertEquals($expectedData, $this->getDataAsArray($workflowDefinition));
-        $this->assertEquals($workflowDefinition->getGroups(), $groups);
+        $this->assertEquals($workflowDefinition->getActiveGroups(), $activeGroups);
+        $this->assertEquals($workflowDefinition->getRecordGroups(), $recordGroups);
 
         $actualAcls = $workflowDefinition->getEntityAcls()->toArray();
         $this->assertSameSize($expectedAcls, $actualAcls);
@@ -307,24 +306,5 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                 ),
             ),
         );
-    }
-
-    /**
-     * @param int $type
-     * @param array $groupNames
-     * @return array|WorkflowGroup[]
-     */
-    private function getGroups($type, array $groupNames)
-    {
-        $groups = [];
-        foreach ($groupNames as $groupName) {
-            $group = new WorkflowGroup();
-            $group
-                ->setType($type)
-                ->setName($groupName);
-            $groups[] = $group;
-        }
-
-        return $groups;
     }
 }

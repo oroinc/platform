@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(name="oro_workflow_definition")
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
+ * @ORM\Entity
  * @Config(
  *      routeName="oro_workflow_definition_index",
  *      routeView="oro_workflow_definition_view",
@@ -611,7 +611,7 @@ class WorkflowDefinition implements DomainObjectInterface
             ->setRestrictions($definition->getRestrictions())
             ->setSystem($definition->isSystem())
             ->setPriority($definition->getPriority())
-            ->setGroups($definition->getGroups());
+            ->setGroups($definition->groups);
 
         return $this;
     }
@@ -761,8 +761,20 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @return array
      */
-    public function getGroups()
+    public function getActiveGroups()
     {
-        return $this->groups;
+        return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE])
+            ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE]
+            : [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRecordGroups()
+    {
+        return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD])
+            ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD]
+            : [];
     }
 }

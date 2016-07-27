@@ -7,7 +7,6 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
@@ -118,7 +117,7 @@ class WorkflowRegistry
     }
 
     /**
-     * Get Active Workflows by active group
+     * Get Active Workflows by active groups
      *
      * @param array $groupNames
      * @return Workflow[]|array
@@ -127,12 +126,9 @@ class WorkflowRegistry
     {
         $groupNames = array_map('strtolower', $groupNames);
         $definitions = array_filter(
-            $this->getEntityRepository()->getActiveWorkflowDefinitions(),
+            $this->getEntityRepository()->findBy(['active' => true]),
             function (WorkflowDefinition $definition) use ($groupNames) {
-                $groups = $definition->getGroups();
-                $groups = array_key_exists(WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE, $groups)
-                    ? $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE]
-                    : [];
+                $groups = $definition->getActiveGroups();
                 foreach ($groupNames as $groupName) {
                     if (in_array($groupName, $groups, true)) {
                         return true;
@@ -160,7 +156,7 @@ class WorkflowRegistry
     }
 
     /**
-     * @return WorkflowDefinitionRepository
+     * @return EntityRepository
      */
     protected function getEntityRepository()
     {

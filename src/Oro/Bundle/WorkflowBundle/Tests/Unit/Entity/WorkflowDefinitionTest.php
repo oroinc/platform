@@ -67,6 +67,26 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(42, $this->workflowDefinition->getPriority());
     }
 
+    public function testGroups()
+    {
+        $this->assertEquals([], $this->workflowDefinition->getActiveGroups());
+        $this->assertEquals([], $this->workflowDefinition->getRecordGroups());
+        $groups = [
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['active1', 'active2'],
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => ['record1', 'record2'],
+        ];
+        $this->workflowDefinition->setGroups($groups);
+
+        $this->assertEquals(
+            $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE],
+            $this->workflowDefinition->getActiveGroups()
+        );
+        $this->assertEquals(
+            $groups[WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD],
+            $this->workflowDefinition->getRecordGroups()
+        );
+    }
+
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      * @expectedExceptionMessage Workflow "test" does not contain step "start_step"
@@ -99,16 +119,24 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
             'steps' => new ArrayCollection(array($startStep)),
             'start_step' => $startStep,
             'configuration' => array('test', 'configuration'),
+            'active_groups' => ['active1', 'active2'],
+            'record_groups' => ['record1', 'record2'],
         );
 
         $this->assertNotEquals($expectedData, $this->getDefinitionAsArray($this->workflowDefinition));
+
+        $groups = [
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['active1', 'active2'],
+            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => ['record1', 'record2'],
+        ];
 
         $newDefinition = new WorkflowDefinition();
         $newDefinition->setName($expectedData['name'])
             ->setSteps($expectedData['steps'])
             ->setLabel($expectedData['label'])
             ->setStartStep($expectedData['start_step'])
-            ->setConfiguration($expectedData['configuration']);
+            ->setConfiguration($expectedData['configuration'])
+            ->setGroups($groups);
 
         $this->assertEquals($this->workflowDefinition, $this->workflowDefinition->import($newDefinition));
         $this->assertEquals($expectedData, $this->getDefinitionAsArray($this->workflowDefinition));
@@ -229,6 +257,8 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
             'steps' => $definition->getSteps(),
             'start_step' => $definition->getStartStep(),
             'configuration' => $definition->getConfiguration(),
+            'active_groups' => $definition->getActiveGroups(),
+            'record_groups' => $definition->getRecordGroups(),
         );
     }
 }

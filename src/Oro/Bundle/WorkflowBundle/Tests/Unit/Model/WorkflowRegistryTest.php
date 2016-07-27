@@ -252,6 +252,56 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $groups
+     * @param array $activeDefinitions
+     * @param array|Workflow[] $expectedWorkflows
+     * @dataProvider getActiveWorkflowsByActiveGroupsDataProvider
+     */
+    public function testGetActiveWorkflowsByActiveGroups(
+        array $groups,
+        array $activeDefinitions,
+        array $expectedWorkflows
+    ) {
+        foreach ($expectedWorkflows as $workflow) {
+            $this->prepareAssemblerMock($workflow->getDefinition(), $workflow);
+            $this->setUpEntityManagerMock($workflow->getDefinition());
+        }
+
+        $this->entityRepository->expects($this->once())
+            ->method('findBy')
+            ->willReturn($activeDefinitions);
+
+        $this->assertEquals($expectedWorkflows, $this->registry->getActiveWorkflowsByActiveGroups($groups));
+    }
+
+    /**
+     * @return array
+     */
+    public function getActiveWorkflowsByActiveGroupsDataProvider()
+    {
+        $workflow1 = $this->createWorkflow('test_workflow1', 'testEntityClass');
+        $workflowDefinition1 = $workflow1->getDefinition();
+        $workflowDefinition1->setGroups([WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['group1']]);
+
+        $workflow2 = $this->createWorkflow('test_workflow2', 'testEntityClass');
+        $workflowDefinition2 = $workflow2->getDefinition();
+        $workflowDefinition2->setGroups([WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['group2', 'group3']]);
+
+        return [
+            'empty' => [
+                'groups' => [],
+                'activeDefinitions' => [],
+                'expectedWorkflows' => [],
+            ],
+            'filled' => [
+                'groups' => ['group1'],
+                'activeDefinitions' => [$workflowDefinition1, $workflowDefinition2],
+                'expectedWorkflows' => [$workflow1],
+            ],
+        ];
+    }
+
+    /**
      * @param WorkflowDefinition $workflowDefinition
      * @param boolean $isEntityKnown
      */
