@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
 
+use Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
@@ -45,6 +46,11 @@ class CronCommandTest extends WebTestCase
 
         $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
         $this->checkMessage('AllJobAdded', $result);
+
+        for ($i = 1; $i < EmailSyncCommand::MAX_JOBS_COUNT; $i++) {
+            $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+            $this->assertRegexp('/Processing command "oro:cron:imap-sync": added to job queue/', $result);
+        }
 
         $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
         $this->checkMessage('AllJobAlreadyExist', $result);
