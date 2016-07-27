@@ -12,7 +12,7 @@ trait FallbackTrait
      * @param Localization|null $localization
      * @return LocalizedFallbackValue
      */
-    public function getFallbackValue(Collection $values, Localization $localization = null)
+    protected function getFallbackValue(Collection $values, Localization $localization = null)
     {
         return $this->getLocalizedFallbackValue($values, $localization);
     }
@@ -21,7 +21,7 @@ trait FallbackTrait
      * @param Collection|LocalizedFallbackValue[] $values
      * @return LocalizedFallbackValue
      */
-    public function getDefaultFallbackValue(Collection $values)
+    protected function getDefaultFallbackValue(Collection $values)
     {
         return $this->getLocalizedFallbackValue($values);
     }
@@ -31,7 +31,7 @@ trait FallbackTrait
      * @param string $value
      * @return $this
      */
-    public function setDefaultFallbackValue(Collection $values, $value)
+    protected function setDefaultFallbackValue(Collection $values, $value)
     {
         $oldValue = $this->getLocalizedFallbackValue($values);
 
@@ -68,7 +68,7 @@ trait FallbackTrait
             throw new \LogicException(sprintf('There must be only one %s title', $title));
         }
 
-        $value = $filteredValues->first();
+        $value = $filteredValues->count() ? $filteredValues->first() : null;
         if ($value) {
             switch ($value->getFallback()) {
                 case FallbackType::PARENT_LOCALIZATION:

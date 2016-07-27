@@ -4,6 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Tools\GeneratorExtensions;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
+use CG\Generator\PhpParameter;
+
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension;
 
 class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
@@ -67,34 +70,73 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     public function testMethodGenerated()
     {
         $class = PhpClass::create('Test\Entity');
-        $fieldName = 'testFields';
         $schema = [
             'class' => 'Test\Entity'
         ];
 
         $this->extension->addDefaultMethodFields('Test\Entity', [
-            'testField'=> $fieldName
+            'name'=> 'names',
         ]);
-
-        $expectedBody = [
-            '$values = $this->'. $fieldName .
-            '->filter(function (\Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue $value) {',
-            '   return null === $value->getLocalization();',
-            '});',
-            'if ($values->count() > 1) {',
-            '   throw new \LogicException(\'There must be only one default localized fallback value\');',
-            '} elseif ($values->count() === 1) {',
-            '   return $values->first();',
-            '}',
-            'return null;'
-        ];
-
-        $expectedBody = implode("\n", $expectedBody);
 
         $this->extension->generate($schema, $class);
 
-        /* @var PhpMethod $method */
-        $method = $class->getMethod('getDefaultTestField');
-        $this->assertEquals($expectedBody, $method->getBody());
+        $this->assertMethod(
+            $class,
+            'getName',
+            'return $this->getFallbackValue($this->names, $localization);',
+            [
+                $this->getParameter('localization', Localization::class, true),
+            ]
+        );
+
+        $this->assertMethod(
+            $class,
+            'getDefaultName',
+            'return $this->getDefaultFallbackValue($this->names);'
+        );
+
+        $this->assertMethod(
+            $class,
+            'setDefaultName',
+            'return $this->setDefaultFallbackValue($this->names, $value);',
+            [
+                $this->getParameter('value'),
+            ]
+        );
+    }
+
+    /**
+     * @param string $name
+     * @param string|null $type
+     * @param bool|false $nullable
+     * @return PhpParameter
+     */
+    protected function getParameter($name, $type = null, $nullable = false)
+    {
+        $parameter = PhpParameter::create($name)
+            ->setType($type);
+
+        if ($nullable) {
+            $parameter->setDefaultValue(null);
+        }
+
+        return $parameter;
+    }
+
+    /**
+     * @param PhpClass $class
+     * @param string $methodName
+     * @param string $methodBody
+     * @param array $parameters
+     */
+    protected function assertMethod(PhpClass $class, $methodName, $methodBody, array $parameters = [])
+    {
+        $this->assertTrue($class->hasMethod($methodName));
+
+        /* @var $method PhpMethod */
+        $method = $class->getMethod($methodName);
+
+        $this->assertEquals($methodBody, $method->getBody());
+        $this->assertEquals($parameters, $method->getParameters());
     }
 }

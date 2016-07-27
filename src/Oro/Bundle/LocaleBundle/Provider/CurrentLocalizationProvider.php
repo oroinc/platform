@@ -28,7 +28,6 @@ class CurrentLocalizationProvider
     public function getCurrentLocalization()
     {
         if (false === $this->currentLocalization) {
-
             $this->currentLocalization = null;
 
             if (!$this->extensions) {

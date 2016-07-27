@@ -68,18 +68,18 @@ services:
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postPersist }
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postUpdate }
 
-    oro_locale.datagrid.extension.fallback:
-        class: 'Oro\Bundle\LocaleBundle\Datagrid\Extension\FallbackExtension'
+    oro_locale.datagrid.extension.localized_value:
+        class: 'Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_locale.helper.localization'
         tags:
             - { name: oro_datagrid.extension }
 
-    oro_locale.datagird.formatter.fallback_property:
-        class: 'Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\FallbackProperty'
+    oro_locale.datagird.formatter.localized_value_property:
+        class: 'Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty'
         tags:
-            - { name:  oro_datagrid.extension.formatter.property, type: fallback }
+            - { name:  oro_datagrid.extension.formatter.property, type: localized_value }
 
     oro_locale.translation.strategy.localization_fallback_strategy:
         class: 'Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy'
@@ -339,9 +339,9 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_locale.expression.fallback_value:
-        class: Oro\Bundle\LocaleBundle\Layout\ConfigExpression\FallbackValue
+    oro_locale.expression.localized_value:
+        class: Oro\Bundle\LocaleBundle\Layout\ConfigExpression\LocalizedValue
         arguments:
             - '@oro_locale.helper.localization'
         tags:
-            - { name: oro_layout.expression, alias: fallback_value }
+            - { name: oro_layout.expression, alias: localized_value }

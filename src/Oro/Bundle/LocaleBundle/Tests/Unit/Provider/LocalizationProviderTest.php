@@ -18,7 +18,7 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    /** @var LocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationProvider */
     protected $provider;
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */

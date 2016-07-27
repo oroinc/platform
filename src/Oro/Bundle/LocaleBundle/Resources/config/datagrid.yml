@@ -21,7 +21,7 @@ datagrid:
         properties:
             id: ~
             title:
-                type: fallback
+                type: localized_value
                 data_name: titles
             view_link:
                 type:  url

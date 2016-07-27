@@ -15,12 +15,12 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\FallbackProperty;
+use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
-class FallbackExtension extends AbstractExtension
+class LocalizedValueExtension extends AbstractExtension
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -72,11 +72,11 @@ class FallbackExtension extends AbstractExtension
             return;
         }
 
-        $properties = $this->getProperties($config);
+        $properties = array_keys($this->getProperties($config));
 
-        foreach (array_keys($properties) as $name) {
-            $config->offsetUnsetByPath(sprintf('[sorters][columns][%s]', $name));
-            $config->offsetUnsetByPath(sprintf('[filters][columns][%s]', $name));
+        foreach ($properties as $propertyName) {
+            $config->offsetUnsetByPath(sprintf('[sorters][columns][%s]', $propertyName));
+            $config->offsetUnsetByPath(sprintf('[filters][columns][%s]', $propertyName));
         }
     }
 
@@ -100,7 +100,7 @@ class FallbackExtension extends AbstractExtension
         $queryBuilder = $datasource->getQueryBuilder();
 
         foreach ($properties as $name => $definition) {
-            $propertyPath = $definition[FallbackProperty::DATA_NAME_KEY];
+            $propertyPath = $definition[LocalizedValueProperty::DATA_NAME_KEY];
             if (false === strpos($propertyPath, '.')) {
                 $propertyPath = sprintf('%s.%s', $rootEntityAlias, $propertyPath);
             }
@@ -111,6 +111,10 @@ class FallbackExtension extends AbstractExtension
             $queryBuilder
                 ->addSelect(sprintf('%s.string as %s', $joinAlias, $name))
                 ->innerJoin($join, $joinAlias, Expr\Join::WITH, $joinAlias . '.localization IS NULL');
+
+            if ($queryBuilder->getDQLPart('groupBy')) {
+                $queryBuilder->addGroupBy($name);
+            }
         }
     }
 
@@ -144,7 +148,7 @@ class FallbackExtension extends AbstractExtension
 
             $data = [];
             foreach ($properties as $name => $definition) {
-                $data[$name] = $this->resolveValue($entity, $definition[FallbackProperty::DATA_NAME_KEY]);
+                $data[$name] = $this->resolveValue($entity, $definition[LocalizedValueProperty::DATA_NAME_KEY]);
             }
             $record->addData($data);
         }
@@ -183,16 +187,16 @@ class FallbackExtension extends AbstractExtension
         $properties = array_filter(
             $config->offsetGetOr(Configuration::PROPERTIES_KEY, []),
             function ($property) {
-                return isset($property[FallbackProperty::TYPE_KEY]) &&
-                    $property[FallbackProperty::TYPE_KEY] == FallbackProperty::NAME;
+                return isset($property[LocalizedValueProperty::TYPE_KEY]) &&
+                    $property[LocalizedValueProperty::TYPE_KEY] == LocalizedValueProperty::NAME;
             }
         );
 
         foreach ($properties as $name => &$property) {
-            $property[FallbackProperty::NAME_KEY] = $name;
+            $property[LocalizedValueProperty::NAME_KEY] = $name;
 
-            if (!isset($property[FallbackProperty::DATA_NAME_KEY])) {
-                $property[FallbackProperty::DATA_NAME_KEY] = $name;
+            if (!isset($property[LocalizedValueProperty::DATA_NAME_KEY])) {
+                $property[LocalizedValueProperty::DATA_NAME_KEY] = $name;
             }
         }
 
@@ -212,7 +216,7 @@ class FallbackExtension extends AbstractExtension
         if ($from) {
             $firstFrom = current($from);
             if (!empty($firstFrom['table']) && !empty($firstFrom['alias'])) {
-                $rootEntity = $this->updateEntityClass($firstFrom['table']);
+                $rootEntity = $this->getEntityClassName($firstFrom['table']);
                 $rootEntityAlias = $firstFrom['alias'];
             }
         }
@@ -224,7 +228,7 @@ class FallbackExtension extends AbstractExtension
      * @param string $entity
      * @return string
      */
-    protected function updateEntityClass($entity)
+    protected function getEntityClassName($entity)
     {
         return $this->doctrineHelper->getEntityMetadata($entity)->getName();
     }

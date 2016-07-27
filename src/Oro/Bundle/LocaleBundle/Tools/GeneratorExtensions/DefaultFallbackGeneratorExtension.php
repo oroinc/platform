@@ -76,6 +76,8 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
     }
 
     /**
+     * Generate the code for getter method
+     *
      * @param string $singularName
      * @param string $fieldName
      * @param PhpClass $class
@@ -90,15 +92,19 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
             ->setDefaultValue(null);
 
         $method = $this->generateClassMethod($getter, $methodBody);
-        $method->setDocblock($this->generateDocblock(
-            ['Localization|null' =>'$localization'],
-            'LocalizedFallbackValue|null')
+        $method->setDocblock(
+            $this->generateDocblock(
+                ['Localization|null' =>'$localization'],
+                'LocalizedFallbackValue|null'
+            )
         );
         $method->setParameters([$localization]);
         $class->setMethod($method);
     }
 
     /**
+     * Generate the code for default getter method
+     *
      * @param string $singularName
      * @param string $fieldName
      * @param PhpClass $class
@@ -114,6 +120,8 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
     }
 
     /**
+     * Generate the code for default setter method
+     *
      * @param string $singularName
      * @param string $fieldName
      * @param PhpClass $class

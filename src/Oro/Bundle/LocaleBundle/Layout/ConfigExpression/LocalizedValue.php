@@ -6,9 +6,9 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 
 use Oro\Component\ConfigExpression\Func\GetValue;
 
-class FallbackValue extends GetValue
+class LocalizedValue extends GetValue
 {
-    const NAME = 'fallback_value';
+    const NAME = 'localized_value';
 
     /**
      * @var LocalizationHelper
