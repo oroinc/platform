@@ -259,7 +259,11 @@ define(function(require) {
         }
 
         $(document)
-            .on('shown.bs.dropdown', '.dropdown, .dropup', function() {
+            .on('shown.bs.dropdown', '.dropdown, .dropup', function(e) {
+                if (e.namespace !== 'bs.dropdown') {
+                    // handle only events triggered with proper NS (omit just any shown events)
+                    return;
+                }
                 var $toggle = $(toggleDropdown, this);
                 var $dropdownMenu = $('>.dropdown-menu', this);
                 var options = $dropdownMenu.data('options');
@@ -276,7 +280,11 @@ define(function(require) {
                     makeFloating($toggle, $dropdownMenu);
                 }
             })
-            .on('hide.bs.dropdown', '.dropdown.open, .dropup.open', function() {
+            .on('hide.bs.dropdown', '.dropdown.open, .dropup.open', function(e) {
+                if (e.namespace !== 'bs.dropdown') {
+                    // handle only events triggered with proper NS (omit just any hide events)
+                    return;
+                }
                 var $toggle = $(toggleDropdown, this);
                 var $dropdownMenu = $('>.dropdown-menu__placeholder', this).data('related-menu');
                 if ($dropdownMenu && $dropdownMenu.length) {
@@ -296,5 +304,123 @@ define(function(require) {
             return event.handler.name === 'clearMenus';
         });
         clickEvents.splice(clickEvents.indexOf(clearMenusHandler), 0, clickEvents.pop());
+    })();
+
+    /**
+     * Extends Bootstrap.Dropdown and makes dropdown floating with "position: fixed",
+     * - update its position if it was with "position: absolute"
+     * - converts dropdown to dropup and vice versa if it better fit visible area
+     */
+    (function() {
+        function isInRange(parent, child) {
+            var parentRect = parent.getBoundingClientRect();
+            var childRect = child.getBoundingClientRect();
+            return parentRect.top < childRect.top &&
+                parentRect.left < childRect.left &&
+                parentRect.right > childRect.right &&
+                parentRect.bottom > childRect.bottom;
+        }
+
+        function flipToInitial($dropdown) {
+            var originalDropState = $dropdown.data('original-dropstate');
+            $dropdown
+                .toggleClass('dropdown', originalDropState === 'dropdown')
+                .toggleClass('dropup', originalDropState === 'dropup');
+        }
+
+        function flipToOpposite($dropdown) {
+            $dropdown.toggleClass('dropdown').toggleClass('dropup');
+        }
+
+        function updatePosition($dropdown, e) {
+            var eventData = e && e.data || {};
+            var $toggle = $(toggleDropdown, $dropdown);
+            var $dropdownMenu = $('>.dropdown-menu', $dropdown);
+
+            var scrollableRect = scrollHelper.getFinalVisibleRect($toggle.closest('.ui-dialog-content')[0]);
+            var toggleRect = $toggle[0].getBoundingClientRect();
+
+            if ($dropdown.is('.dropdown') && scrollableRect.top > toggleRect.bottom) {
+                // whole toggle-item is hidden at the top of scrollable container
+                flipToOpposite($dropdown);
+            }
+
+            if ($dropdown.is('.dropup') && scrollableRect.bottom < toggleRect.top) {
+                // whole toggle-item is hidden at the bottom of scrollable container
+                flipToOpposite($dropdown);
+            }
+
+            if (
+                $dropdown.is('.dropdown') && scrollableRect.bottom < toggleRect.bottom ||
+                $dropdown.is('.dropup') && scrollableRect.top > toggleRect.top
+            ) {
+                // dropdown menu is completely hidden behind scrollable container
+                $dropdownMenu.css({position: 'absolute', top: '', left: ''});
+                return;
+            }
+
+            if (!eventData.preferCurrentState) {
+                flipToInitial($dropdown);
+            }
+
+            $dropdownMenu.css({position: 'absolute', top: '', left: '', bottom: '', right: ''});
+
+            if (!isInRange(document.body, $dropdownMenu[0])) {
+                flipToOpposite($dropdown);
+                if (!isInRange(document.body, $dropdownMenu[0])) {
+                    flipToInitial($dropdown);
+                }
+            }
+
+            var dropdownRect = $dropdownMenu[0].getBoundingClientRect();
+            $dropdownMenu.css({
+                position: 'fixed',
+                top: dropdownRect.top,
+                left: dropdownRect.left,
+                bottom: 'auto',
+                right: 'auto'
+            });
+        }
+
+        /**
+         * On open/close dropdown-menu initializes/disposes auto flip menu functionality
+         */
+        $(document)
+            .on('shown.bs.dropdown', '.dropdown, .dropup', function(e) {
+                if (e.namespace !== 'bs.dropdown') {
+                    // handle only events triggered with proper NS (omit just any shown events)
+                    return;
+                }
+                var $dropdown = $(this);
+                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup')) {
+                    // handles only case when dropdown id opened in dialog
+                    return;
+                }
+
+                $dropdown.data('original-dropstate', $dropdown.hasClass('dropup') ? 'dropup' : 'dropdown');
+
+                var dialogEvents = _.map(['dialogresize', 'dialogdrag', 'dialogreposition'], function(item) {
+                    return item + '.autoflip-dropdown';
+                });
+                var handlePositionChange = _.partial(updatePosition, $dropdown);
+
+                $dropdown.on('shown.autoflip-dropdown', null, {preferCurrentState: true}, handlePositionChange);
+                $dropdown.closest('.ui-dialog').on(dialogEvents.join(' '), handlePositionChange);
+                $dropdown.parents().on('scroll.autoflip-dropdown', handlePositionChange);
+                $(window).on('resize.autoflip-dropdown', handlePositionChange);
+                handlePositionChange();
+            })
+            .on('hide.bs.dropdown', '.dropdown.open, .dropup.open', function(e) {
+                if (e.namespace !== 'bs.dropdown') {
+                    // handle only events triggered with proper NS (omit just any hide events)
+                    return;
+                }
+                var $dropdown = $(this);
+                var originalDropState = $dropdown.data('original-dropstate');
+                if (originalDropState) {
+                    flipToInitial($dropdown);
+                    $dropdown.parents().andSelf().add(window).off('.autoflip-dropdown');
+                }
+            });
     })();
 });

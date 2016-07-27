@@ -324,7 +324,11 @@ define(function(require) {
         /**
          * Opens dropdown with date-picker + variable-picker
          */
-        onOpen: function() {
+        onOpen: function(e) {
+            if (e.namespace !== 'bs.dropdown') {
+                // handle only events triggered with proper NS (omit just any show events)
+                return;
+            }
             var value = this.$frontDateField.val();
             if (!this.dateVariableHelper.isDateVariable(value)) {
                 this.$calendar.datepicker('setDate', value);
