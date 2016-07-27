@@ -119,7 +119,26 @@ class JobProcessor
      */
     public function successChildJob(Job $job)
     {
-        $this->stopChildJob($job, Job::STATUS_SUCCESS);
+        if ($job->isRoot()) {
+            throw new \LogicException(sprintf('Can\'t success root jobs. id: "%s"', $job->getId()));
+        }
+
+        if ($job->getStatus() !== Job::STATUS_RUNNING) {
+            throw new \LogicException(sprintf(
+                'Can success only running jobs. id: "%s", status: "%s"',
+                $job->getId(),
+                $job->getStatus()
+            ));
+        }
+
+        $job->setStatus(Job::STATUS_SUCCESS);
+        $job->setStoppedAt(new \DateTime());
+
+        $this->jobStorage->saveJob($job);
+
+        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
+            'id' => $job->getId()
+        ]);
     }
 
     /**
@@ -127,7 +146,26 @@ class JobProcessor
      */
     public function failChildJob(Job $job)
     {
-        $this->stopChildJob($job, Job::STATUS_FAILED);
+        if ($job->isRoot()) {
+            throw new \LogicException(sprintf('Can\'t fail root jobs. id: "%s"', $job->getId()));
+        }
+
+        if ($job->getStatus() !== Job::STATUS_RUNNING) {
+            throw new \LogicException(sprintf(
+                'Can fail only running jobs. id: "%s", status: "%s"',
+                $job->getId(),
+                $job->getStatus()
+            ));
+        }
+
+        $job->setStatus(Job::STATUS_FAILED);
+        $job->setStoppedAt(new \DateTime());
+
+        $this->jobStorage->saveJob($job);
+
+        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
+            'id' => $job->getId()
+        ]);
     }
 
     /**
@@ -150,43 +188,6 @@ class JobProcessor
         $job->setStatus(Job::STATUS_CANCELLED);
         $job->setStoppedAt($stoppedAt = new \DateTime());
         $job->setStartedAt($stoppedAt);
-
-        $this->jobStorage->saveJob($job);
-
-        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
-            'id' => $job->getId()
-        ]);
-    }
-
-    /**
-     * @param Job $job
-     */
-    private function stopChildJob(Job $job, $status)
-    {
-        if ($job->isRoot()) {
-            throw new \LogicException(sprintf('Can\'t stop root jobs. id: "%s"', $job->getId()));
-        }
-
-        if ($job->getStatus() !== Job::STATUS_RUNNING) {
-            throw new \LogicException(sprintf(
-                'Can stop only running jobs. id: "%s", status: "%s"',
-                $job->getId(),
-                $job->getStatus()
-            ));
-        }
-
-        $validStopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED];
-        if (! in_array($status, $validStopStatuses)) {
-            throw new \LogicException(sprintf(
-                'This status is not valid stop status. id: "%s", status: "%s", valid: [%s]',
-                $job->getId(),
-                $status,
-                implode(', ', $validStopStatuses)
-            ));
-        }
-
-        $job->setStatus($status);
-        $job->setStoppedAt(new \DateTime());
 
         $this->jobStorage->saveJob($job);
 

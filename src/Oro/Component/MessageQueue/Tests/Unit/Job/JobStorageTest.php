@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
@@ -33,11 +34,18 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowIfGotUnexpectedJobInstance()
     {
-        $storage = new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock());
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue('expected\class\name'))
+        ;
+
+        $storage = new JobStorage($this->createEntityManagerMock(), $repository);
 
         $this->setExpectedException(
             \LogicException::class,
-            'Got unexpected job instance: expected: "Oro\Component\MessageQueue\Job\JobEntity", '.
+            'Got unexpected job instance: expected: "expected\class\name", '.
             'actual" "Oro\Component\MessageQueue\Job\Job"'
         );
 
@@ -63,7 +71,14 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->method('transactional')
         ;
 
-        $storage = new JobStorage($em, $this->createRepositoryMock());
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue(Job::class))
+        ;
+
+        $storage = new JobStorage($em, $repository);
         $storage->saveJob($job);
     }
 
@@ -87,7 +102,14 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->method('transactional')
         ;
 
-        $storage = new JobStorage($em, $this->createRepositoryMock());
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue(Job::class))
+        ;
+
+        $storage = new JobStorage($em, $repository);
         $storage->saveJob($job, function () {
 
         });
@@ -96,20 +118,37 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
     public function testShouldCatchUniqueConstraintViolationExceptionAndThrowDuplicateJobException()
     {
         $job = new Job();
+        $job->setUnique(true);
+
+        $connection = $this->createConnectionMock();
+        $connection
+            ->expects($this->once())
+            ->method('transactional')
+            ->will($this->returnCallback(function ($callback) use ($connection) {
+                $callback($connection);
+            }))
+        ;
+        $connection
+            ->expects($this->once())
+            ->method('insert')
+            ->will($this->throwException($this->createUniqueConstraintViolationExceptionMock()))
+        ;
 
         $em = $this->createEntityManagerMock();
         $em
             ->expects($this->once())
-            ->method('persist')
-            ->with($this->identicalTo($job))
-        ;
-        $em
-            ->expects($this->once())
-            ->method('flush')
-            ->will($this->throwException($this->createUniqueConstraintViolationExceptionMock()))
+            ->method('getConnection')
+            ->will($this->returnValue($connection))
         ;
 
-        $storage = new JobStorage($em, $this->createRepositoryMock());
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue(Job::class))
+        ;
+
+        $storage = new JobStorage($em, $repository);
 
         $this->setExpectedException(DuplicateJobException::class);
 
@@ -120,7 +159,14 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
     {
         $job = new Job();
 
-        $storage = new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock());
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue(Job::class))
+        ;
+
+        $storage = new JobStorage($this->createEntityManagerMock(), $repository);
 
         $this->setExpectedException(
             \LogicException::class,
@@ -148,6 +194,11 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
         $repository = $this->createRepositoryMock();
         $repository
             ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue(Job::class))
+        ;
+        $repository
+            ->expects($this->once())
             ->method('find')
             ->with(12345, LockMode::PESSIMISTIC_WRITE)
             ->will($this->returnValue($lockedJob))
@@ -162,33 +213,103 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($lockedJob, $resultJob);
     }
 
-    public function testShouldSetUniqueNameIfJobIsUniqueAndStatusNew()
+    public function testShouldInsertIntoUniqueTableIfJobIsUniqueAndNew()
     {
         $job = new Job();
         $job->setName('job-name');
         $job->setUnique(true);
-        $job->setStatus(Job::STATUS_NEW);
 
-        $storage = new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock());
+        $connection = $this->createConnectionMock();
+        $connection
+            ->expects($this->once())
+            ->method('transactional')
+            ->will($this->returnCallback(function ($callback) use ($connection) {
+                $callback($connection);
+            }))
+        ;
+        $connection
+            ->expects($this->once())
+            ->method('insert')
+        ;
+
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue(Job::class))
+        ;
+
+        $em = $this->createEntityManagerMock();
+        $em
+            ->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($connection))
+        ;
+        $em
+            ->expects($this->once())
+            ->method('persist')
+        ;
+        $em
+            ->expects($this->once())
+            ->method('flush')
+        ;
+
+        $storage = new JobStorage($em, $repository);
         $storage->saveJob($job);
-
-        $this->assertEquals('job-name', $job->getUniqueName());
-        $this->assertEquals('job-name', $job->getName());
     }
 
-    public function testShouldUnsetUniqueNameIfJobIsUniqueAndStoppedAtIsSet()
+    public function testShouldDeleteRecordFromUniqueTableIfJobIsUniqueAndStoppedAtIsSet()
     {
         $job = new Job();
+        $job->setId(12345);
         $job->setName('job-name');
-        $job->setUniqueName('unique-name');
         $job->setUnique(true);
         $job->setStoppedAt(new \DateTime());
 
-        $storage = new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock());
-        $storage->saveJob($job);
+        $connection = $this->createConnectionMock();
+        $connection
+            ->expects($this->once())
+            ->method('delete')
+        ;
 
-        $this->assertEquals('job-name', $job->getName());
-        $this->assertNull($job->getUniqueName());
+        $repository = $this->createRepositoryMock();
+        $repository
+            ->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue(Job::class))
+        ;
+        $repository
+            ->expects($this->once())
+            ->method('find')
+            ->will($this->returnValue($job))
+        ;
+
+        $em = $this->createEntityManagerMock();
+        $em
+            ->expects($this->once())
+            ->method('transactional')
+            ->will($this->returnCallback(function ($callback) use ($em) {
+                $callback($em);
+            }))
+        ;
+        $em
+            ->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($connection))
+        ;
+
+        $storage = new JobStorage($em, $repository);
+        $storage->saveJob($job, function () {
+
+        });
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     */
+    private function createConnectionMock()
+    {
+        return $this->getMock(Connection::class, [], [], '', false);
     }
 
     /**

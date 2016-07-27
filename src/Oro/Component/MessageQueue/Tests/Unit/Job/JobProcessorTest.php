@@ -251,19 +251,19 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new \DateTime(), $job->getStartedAt(), '', 1);
     }
 
-    public function testStopChildJobShouldThrowIfRootJob()
+    public function testSuccessChildJobShouldThrowIfRootJob()
     {
         $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
         $rootJob = new Job();
         $rootJob->setId(12345);
 
-        $this->setExpectedException(\LogicException::class, 'Can\'t stop root jobs. id: "12345"');
+        $this->setExpectedException(\LogicException::class, 'Can\'t success root jobs. id: "12345"');
 
-        $processor->stopChildJob($rootJob, 'status');
+        $processor->successChildJob($rootJob);
     }
 
-    public function testStopChildJobShouldThrowIfJobHasNotRunningStatus()
+    public function testSuccessChildJobShouldThrowIfJobHasNotRunningStatus()
     {
         $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
 
@@ -274,44 +274,13 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             \LogicException::class,
-            'Can stop only running jobs. id: "12345", status: "oro.job.status.cancelled"'
+            'Can success only running jobs. id: "12345", status: "oro.job.status.cancelled"'
         );
 
-        $processor->stopChildJob($job, 'status');
+        $processor->successChildJob($job);
     }
 
-    public function testStopChildJobShouldThrowIfStatusIsNotOneOfStopStatuses()
-    {
-        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
-
-        $job = new Job();
-        $job->setId(12345);
-        $job->setRootJob(new Job());
-        $job->setStatus(Job::STATUS_RUNNING);
-
-        $this->setExpectedException(
-            \LogicException::class,
-            'This status is not valid stop status. id: "12345", '.
-            'status: "not-stop-status", valid: [oro.job.status.success, '.
-            'oro.job.status.failed, oro.job.status.cancelled]'
-        );
-
-        $processor->stopChildJob($job, 'not-stop-status');
-    }
-
-    public function stopStatusProvider()
-    {
-        return [
-            [Job::STATUS_SUCCESS],
-            [Job::STATUS_FAILED],
-            [Job::STATUS_CANCELLED],
-        ];
-    }
-
-    /**
-     * @dataProvider stopStatusProvider
-     */
-    public function testStopJobShouldUpdateJobWithStopStatusAndStopAtTime($stopStatus)
+    public function testSuccessJobShouldUpdateJobWithSuccessStatusAndStopAtTime()
     {
         $storage = $this->createJobStorage();
         $storage
@@ -331,10 +300,121 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $job->setStatus(Job::STATUS_RUNNING);
 
         $processor = new JobProcessor($storage, $producer);
-        $processor->stopChildJob($job, $stopStatus);
+        $processor->successChildJob($job);
 
-        $this->assertEquals($stopStatus, $job->getStatus());
+        $this->assertEquals(Job::STATUS_SUCCESS, $job->getStatus());
         $this->assertEquals(new \DateTime(), $job->getStoppedAt(), '', 1);
+    }
+
+    public function testFailChildJobShouldThrowIfRootJob()
+    {
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
+
+        $rootJob = new Job();
+        $rootJob->setId(12345);
+
+        $this->setExpectedException(\LogicException::class, 'Can\'t fail root jobs. id: "12345"');
+
+        $processor->failChildJob($rootJob);
+    }
+
+    public function testFailChildJobShouldThrowIfJobHasNotRunningStatus()
+    {
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
+
+        $job = new Job();
+        $job->setId(12345);
+        $job->setRootJob(new Job());
+        $job->setStatus(Job::STATUS_CANCELLED);
+
+        $this->setExpectedException(
+            \LogicException::class,
+            'Can fail only running jobs. id: "12345", status: "oro.job.status.cancelled"'
+        );
+
+        $processor->failChildJob($job);
+    }
+
+    public function testFailJobShouldUpdateJobWithFailStatusAndStopAtTime()
+    {
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('saveJob')
+            ->with($this->isInstanceOf(Job::class))
+        ;
+
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+        ;
+
+        $job = new Job();
+        $job->setRootJob(new Job());
+        $job->setStatus(Job::STATUS_RUNNING);
+
+        $processor = new JobProcessor($storage, $producer);
+        $processor->failChildJob($job);
+
+        $this->assertEquals(Job::STATUS_FAILED, $job->getStatus());
+        $this->assertEquals(new \DateTime(), $job->getStoppedAt(), '', 1);
+    }
+
+    public function testCancelChildJobShouldThrowIfRootJob()
+    {
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
+
+        $rootJob = new Job();
+        $rootJob->setId(12345);
+
+        $this->setExpectedException(\LogicException::class, 'Can\'t cancel root jobs. id: "12345"');
+
+        $processor->cancelChildJob($rootJob);
+    }
+
+    public function testCancelChildJobShouldThrowIfJobHasNotNewStatus()
+    {
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
+
+        $job = new Job();
+        $job->setId(12345);
+        $job->setRootJob(new Job());
+        $job->setStatus(Job::STATUS_CANCELLED);
+
+        $this->setExpectedException(
+            \LogicException::class,
+            'Can cancel only new jobs. id: "12345", status: "oro.job.status.cancelled"'
+        );
+
+        $processor->cancelChildJob($job);
+    }
+
+    public function testCancelJobShouldUpdateJobWithCancelStatusAndStoppedAtTimeAndStartedAtTime()
+    {
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('saveJob')
+            ->with($this->isInstanceOf(Job::class))
+        ;
+
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+        ;
+
+        $job = new Job();
+        $job->setRootJob(new Job());
+        $job->setStatus(Job::STATUS_NEW);
+
+        $processor = new JobProcessor($storage, $producer);
+        $processor->cancelChildJob($job);
+
+        $this->assertEquals(Job::STATUS_CANCELLED, $job->getStatus());
+        $this->assertEquals(new \DateTime(), $job->getStoppedAt(), '', 1);
+        $this->assertEquals(new \DateTime(), $job->getStartedAt(), '', 1);
     }
 
     public function testInterruptRootJobShouldThrowIfNotRootJob()

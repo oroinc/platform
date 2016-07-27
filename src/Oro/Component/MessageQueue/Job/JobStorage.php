@@ -80,20 +80,24 @@ class JobStorage
             }
 
             $this->em->transactional(function (EntityManager $em) use ($job, $lockCallback) {
-                /** @var JobEntity $job */
+                /** @var Job $job */
                 $job = $this->repository->find($job->getId(), LockMode::PESSIMISTIC_WRITE);
 
                 $lockCallback($job);
 
                 if ($job->isUnique() && $job->getStoppedAt()) {
-                    $em->getConnection()->delete('oro_message_queue_job_unique', ['name' => $job->getName()]);
+                    $em->getConnection()->delete('oro_message_queue_job_unique', [
+                        'name' => $job->getName()
+                    ]);
                 }
             });
         } else {
             if (! $job->getId() && $job->isUnique()) {
                 $this->em->getConnection()->transactional(function (Connection $connection) use ($job) {
                     try {
-                        $connection->insert('oro_message_queue_job_unique', ['name' => $job->getName()]);
+                        $connection->insert('oro_message_queue_job_unique', [
+                            'name' => $job->getName()
+                        ]);
                     } catch (UniqueConstraintViolationException $e) {
                         throw new DuplicateJobException();
                     }

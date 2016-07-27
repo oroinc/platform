@@ -30,13 +30,6 @@ class Job extends BaseJob
     /**
      * @var string
      *
-     * @ORM\Column(name="unique_name", type="string", unique=true, nullable=true)
-     */
-    protected $uniqueName;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="status", type="string", nullable=false)
      */
     protected $status;
