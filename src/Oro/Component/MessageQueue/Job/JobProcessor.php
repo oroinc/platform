@@ -117,7 +117,51 @@ class JobProcessor
     /**
      * @param Job $job
      */
-    public function stopChildJob(Job $job, $status)
+    public function successChildJob(Job $job)
+    {
+        $this->stopChildJob($job, Job::STATUS_SUCCESS);
+    }
+
+    /**
+     * @param Job $job
+     */
+    public function failChildJob(Job $job)
+    {
+        $this->stopChildJob($job, Job::STATUS_FAILED);
+    }
+
+    /**
+     * @param Job $job
+     */
+    public function cancelChildJob(Job $job)
+    {
+        if ($job->isRoot()) {
+            throw new \LogicException(sprintf('Can\'t cancel root jobs. id: "%s"', $job->getId()));
+        }
+
+        if ($job->getStatus() !== Job::STATUS_NEW) {
+            throw new \LogicException(sprintf(
+                'Can cancel only new jobs. id: "%s", status: "%s"',
+                $job->getId(),
+                $job->getStatus()
+            ));
+        }
+
+        $job->setStatus(Job::STATUS_CANCELLED);
+        $job->setStoppedAt($stoppedAt = new \DateTime());
+        $job->setStartedAt($stoppedAt);
+
+        $this->jobStorage->saveJob($job);
+
+        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
+            'id' => $job->getId()
+        ]);
+    }
+
+    /**
+     * @param Job $job
+     */
+    private function stopChildJob(Job $job, $status)
     {
         if ($job->isRoot()) {
             throw new \LogicException(sprintf('Can\'t stop root jobs. id: "%s"', $job->getId()));
@@ -131,7 +175,7 @@ class JobProcessor
             ));
         }
 
-        $validStopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED];
+        $validStopStatuses = [Job::STATUS_SUCCESS, Job::STATUS_FAILED];
         if (! in_array($status, $validStopStatuses)) {
             throw new \LogicException(sprintf(
                 'This status is not valid stop status. id: "%s", status: "%s", valid: [%s]',

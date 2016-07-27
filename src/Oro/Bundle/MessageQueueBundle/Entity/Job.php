@@ -3,13 +3,13 @@ namespace Oro\Bundle\MessageQueueBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Component\MessageQueue\Job\JobEntity;
+use Oro\Component\MessageQueue\Job\Job as BaseJob;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_message_queue_job")
  */
-class Job extends JobEntity
+class Job extends BaseJob
 {
     /**
      * @var int

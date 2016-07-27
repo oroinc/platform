@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
@@ -31,7 +32,7 @@ class JobStorage
     /**
      * @param int $id
      *
-     * @return JobEntity
+     * @return Job
      */
     public function findJobById($id)
     {
@@ -47,7 +48,7 @@ class JobStorage
     }
 
     /**
-     * @return JobEntity
+     * @return Job
      */
     public function createJob()
     {
@@ -64,53 +65,46 @@ class JobStorage
      */
     public function saveJob(Job $job, \Closure $lockCallback = null)
     {
-        if (! $job instanceof JobEntity) {
+        $class = $this->repository->getClassName();
+        if (! $job instanceof $class) {
             throw new \LogicException(sprintf(
                 'Got unexpected job instance: expected: "%s", actual" "%s"',
-                JobEntity::class,
+                $class,
                 get_class($job)
             ));
         }
 
-        try {
-            if ($lockCallback) {
-                if (! $job->getId()) {
-                    throw new \LogicException('Is not possible to create new job with lock, only update is allowed');
+        if ($lockCallback) {
+            if (! $job->getId()) {
+                throw new \LogicException('Is not possible to create new job with lock, only update is allowed');
+            }
+
+            $this->em->transactional(function (EntityManager $em) use ($job, $lockCallback) {
+                /** @var JobEntity $job */
+                $job = $this->repository->find($job->getId(), LockMode::PESSIMISTIC_WRITE);
+
+                $lockCallback($job);
+
+                if ($job->isUnique() && $job->getStoppedAt()) {
+                    $em->getConnection()->delete('oro_message_queue_job_unique', ['name' => $job->getName()]);
                 }
+            });
+        } else {
+            if (! $job->getId() && $job->isUnique()) {
+                $this->em->getConnection()->transactional(function (Connection $connection) use ($job) {
+                    try {
+                        $connection->insert('oro_message_queue_job_unique', ['name' => $job->getName()]);
+                    } catch (UniqueConstraintViolationException $e) {
+                        throw new DuplicateJobException();
+                    }
 
-                $this->em->transactional(function (EntityManager $em) use ($job, $lockCallback) {
-                    /** @var JobEntity $job */
-                    $job = $this->repository->find($job->getId(), LockMode::PESSIMISTIC_WRITE);
-
-                    $lockCallback($job);
-
-                    $this->updateUniqueNameField($job);
+                    $this->em->persist($job);
+                    $this->em->flush();
                 });
             } else {
-                $this->updateUniqueNameField($job);
                 $this->em->persist($job);
                 $this->em->flush();
             }
-        } catch (UniqueConstraintViolationException $e) {
-            throw new DuplicateJobException();
-        }
-    }
-
-    /**
-     * @param JobEntity $job
-     */
-    protected function updateUniqueNameField(JobEntity $job)
-    {
-        if (! $job->isUnique()) {
-            return;
-        }
-        
-        if (Job::STATUS_NEW === $job->getStatus()) {
-            $job->setUniqueName($job->getName());
-        }
-
-        if ($job->getStoppedAt()) {
-            $job->setUniqueName(null);
         }
     }
 }

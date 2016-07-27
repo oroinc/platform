@@ -6,7 +6,6 @@ use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
-use Oro\Component\MessageQueue\Job\JobEntity;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
@@ -47,7 +46,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSaveJobWithoutLockIfThereIsNoCallback()
     {
-        $job = new JobEntity();
+        $job = new Job();
 
         $em = $this->createEntityManagerMock();
         $em
@@ -70,7 +69,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSaveJobWithLockIfWithCallback()
     {
-        $job = new JobEntity();
+        $job = new Job();
         $job->setId(1234);
 
         $em = $this->createEntityManagerMock();
@@ -96,7 +95,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCatchUniqueConstraintViolationExceptionAndThrowDuplicateJobException()
     {
-        $job = new JobEntity();
+        $job = new Job();
 
         $em = $this->createEntityManagerMock();
         $em
@@ -119,7 +118,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowIfTryToSaveNewEntityWithLock()
     {
-        $job = new JobEntity();
+        $job = new Job();
 
         $storage = new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock());
 
@@ -134,9 +133,9 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldLockEntityAndPassNewInstanceIntoCallback()
     {
-        $job = new JobEntity();
+        $job = new Job();
         $job->setId(12345);
-        $lockedJob = new JobEntity();
+        $lockedJob = new Job();
 
         $em = $this->createEntityManagerMock();
         $em
@@ -165,7 +164,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSetUniqueNameIfJobIsUniqueAndStatusNew()
     {
-        $job = new JobEntity();
+        $job = new Job();
         $job->setName('job-name');
         $job->setUnique(true);
         $job->setStatus(Job::STATUS_NEW);
@@ -179,7 +178,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldUnsetUniqueNameIfJobIsUniqueAndStoppedAtIsSet()
     {
-        $job = new JobEntity();
+        $job = new Job();
         $job->setName('job-name');
         $job->setUniqueName('unique-name');
         $job->setUnique(true);
