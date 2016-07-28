@@ -23,7 +23,7 @@ class FilterProcessor extends SegmentQueryConverter
     {
         $this->setRootEntity($rootEntity);
         $this->rootEntityAlias          = $rootEntityAlias;
-        $this->definition['filters']    = $filters;
+        $this->definition['filters']    = !empty($filters['filters']) ? $filters : [];
         $this->definition['columns']    = [];
         $this->qb                       = $qb;
         $this->joinIdHelper             = new JoinIdentifierHelper($this->getRootEntity());
@@ -32,6 +32,8 @@ class FilterProcessor extends SegmentQueryConverter
         $this->columnAliases            = [];
         $this->virtualColumnExpressions = [];
         $this->virtualColumnOptions     = [];
+        $this->filters                  = [];
+        $this->currentFilterPath        = '';
         $this->buildQuery();
         $this->virtualColumnOptions     = null;
         $this->virtualColumnExpressions = null;
@@ -42,6 +44,7 @@ class FilterProcessor extends SegmentQueryConverter
 
         return $this->qb;
     }
+
     /**
      * {@inheritdoc}
      */
