@@ -72,6 +72,8 @@ class ProductDataProvider
 }
 ```
 
+Also you can implement [AbstractFormDataProvider](../../../../Component/Layout/DataProvider/AbstractFormDataProvider.php) if you use forms.	
+
 Registering a data provider
 ---------------------------
 
