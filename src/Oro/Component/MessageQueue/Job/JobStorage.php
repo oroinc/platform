@@ -20,13 +20,20 @@ class JobStorage
     private $repository;
 
     /**
+     * @var string
+     */
+    private $uniqueTableName;
+
+    /**
      * @param EntityManager    $em
      * @param EntityRepository $repository
+     * @param string           $uniqueTableName
      */
-    public function __construct(EntityManager $em, EntityRepository $repository)
+    public function __construct(EntityManager $em, EntityRepository $repository, $uniqueTableName)
     {
         $this->em = $em;
         $this->repository = $repository;
+        $this->uniqueTableName = $uniqueTableName;
     }
 
     /**
@@ -86,7 +93,7 @@ class JobStorage
                 $lockCallback($job);
 
                 if ($job->isUnique() && $job->getStoppedAt()) {
-                    $em->getConnection()->delete('oro_message_queue_job_unique', [
+                    $em->getConnection()->delete($this->uniqueTableName, [
                         'name' => $job->getName()
                     ]);
                 }
@@ -95,7 +102,7 @@ class JobStorage
             if (! $job->getId() && $job->isUnique()) {
                 $this->em->getConnection()->transactional(function (Connection $connection) use ($job) {
                     try {
-                        $connection->insert('oro_message_queue_job_unique', [
+                        $connection->insert($this->uniqueTableName, [
                             'name' => $job->getName()
                         ]);
                     } catch (UniqueConstraintViolationException $e) {

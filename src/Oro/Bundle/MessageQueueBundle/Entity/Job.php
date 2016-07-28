@@ -52,7 +52,7 @@ class Job extends BaseJob
      * @var Job
      *
      * @ORM\ManyToOne(targetEntity="Job", inversedBy="childJobs")
-     * @ORM\JoinColumn(name="root_job_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="root_job_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $rootJob;
 

@@ -14,7 +14,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock());
+        new JobStorage($this->createEntityManagerMock(), $this->createRepositoryMock(), 'unique_table');
     }
 
     public function testShouldCreateJobObject()
@@ -26,7 +26,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(Job::class))
         ;
 
-        $storage = new JobStorage($this->createEntityManagerMock(), $repository);
+        $storage = new JobStorage($this->createEntityManagerMock(), $repository, 'unique_table');
         $job = $storage->createJob();
 
         $this->assertInstanceOf(Job::class, $job);
@@ -41,7 +41,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('expected\class\name'))
         ;
 
-        $storage = new JobStorage($this->createEntityManagerMock(), $repository);
+        $storage = new JobStorage($this->createEntityManagerMock(), $repository, 'unique_table');
 
         $this->setExpectedException(
             \LogicException::class,
@@ -78,7 +78,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(Job::class))
         ;
 
-        $storage = new JobStorage($em, $repository);
+        $storage = new JobStorage($em, $repository, 'unique_table');
         $storage->saveJob($job);
     }
 
@@ -109,7 +109,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(Job::class))
         ;
 
-        $storage = new JobStorage($em, $repository);
+        $storage = new JobStorage($em, $repository, 'unique_table');
         $storage->saveJob($job, function () {
 
         });
@@ -148,7 +148,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(Job::class))
         ;
 
-        $storage = new JobStorage($em, $repository);
+        $storage = new JobStorage($em, $repository, 'unique_table');
 
         $this->setExpectedException(DuplicateJobException::class);
 
@@ -166,7 +166,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(Job::class))
         ;
 
-        $storage = new JobStorage($this->createEntityManagerMock(), $repository);
+        $storage = new JobStorage($this->createEntityManagerMock(), $repository, 'unique_table');
 
         $this->setExpectedException(
             \LogicException::class,
@@ -204,7 +204,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($lockedJob))
         ;
 
-        $storage = new JobStorage($em, $repository);
+        $storage = new JobStorage($em, $repository, 'unique_table');
         $resultJob = null;
         $storage->saveJob($job, function (Job $job) use (&$resultJob) {
             $resultJob = $job;
@@ -254,7 +254,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->method('flush')
         ;
 
-        $storage = new JobStorage($em, $repository);
+        $storage = new JobStorage($em, $repository, 'unique_table');
         $storage->saveJob($job);
     }
 
@@ -298,7 +298,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($connection))
         ;
 
-        $storage = new JobStorage($em, $repository);
+        $storage = new JobStorage($em, $repository, 'unique_table');
         $storage->saveJob($job, function () {
 
         });
