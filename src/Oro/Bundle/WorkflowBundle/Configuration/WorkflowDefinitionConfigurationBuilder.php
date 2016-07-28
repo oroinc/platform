@@ -6,7 +6,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
@@ -18,18 +17,11 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     protected $workflowAssembler;
 
     /**
-     * @var FieldGenerator
-     */
-    protected $fieldGenerator;
-
-    /**
      * @param WorkflowAssembler $workflowAssembler
-     * @param FieldGenerator $fieldGenerator
      */
-    public function __construct(WorkflowAssembler $workflowAssembler, FieldGenerator $fieldGenerator)
+    public function __construct(WorkflowAssembler $workflowAssembler)
     {
         $this->workflowAssembler = $workflowAssembler;
-        $this->fieldGenerator = $fieldGenerator;
     }
 
     /**
@@ -85,8 +77,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
         $this->setEntityAcls($workflowDefinition, $workflow);
         $this->setEntityRestrictions($workflowDefinition, $workflow);
-
-        $this->fieldGenerator->generateWorkflowFields($workflowDefinition->getRelatedEntity());
 
         return $workflowDefinition;
     }
