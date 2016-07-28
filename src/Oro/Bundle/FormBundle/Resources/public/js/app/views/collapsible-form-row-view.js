@@ -11,7 +11,8 @@ define(function(require) {
         autoRender: true,
 
         events: {
-            'click [data-name=collapse]': 'onCollapseToggle'
+            'click [data-name=collapse]': 'onCollapseToggle',
+            'changed .condition.controls': 'onChanged'
         },
 
         render: function() {
@@ -31,6 +32,10 @@ define(function(require) {
                 $controls.slideUp();
             }
             this.$el.toggleClass('collapsed');
+        },
+
+        onChanged: function() {
+            this.$el.trigger('content:changed');
         }
     });
 
