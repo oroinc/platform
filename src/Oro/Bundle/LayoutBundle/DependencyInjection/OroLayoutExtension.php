@@ -17,7 +17,6 @@ class OroLayoutExtension extends Extension
 {
     const UPDATE_LOADER_SERVICE_ID      = 'oro_layout.loader';
     const THEME_MANAGER_SERVICE_ID      = 'oro_layout.theme_manager';
-    const THEME_CONFIGS_PATH            = 'Resources/views/layouts/{folder}/';
 
     const RESOURCES_FOLDER_PLACEHOLDER  = '{folder}';
     const RESOURCES_FOLDER_PATTERN      = '[a-zA-Z][a-zA-Z0-9_\-:]*';
@@ -27,15 +26,16 @@ class OroLayoutExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $resources = $this->loadCumulativeResources(
-            $container,
-            'theme.yml',
-            'Resources/config/oro/layout.yml'
-        );
+        $resources = array_merge($this->loadThemeResources($container));
         foreach ($resources as $resource) {
             $configs[] = $this->getThemeConfig($resource);
         }
         $excludedPaths = $this->getExcludedPaths($resources);
+
+        $resources = $this->loadAdditionalResources($container);
+        foreach ($resources as $resource) {
+            $configs[] = $this->getAdditionalConfig($resource);
+        }
 
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
@@ -131,32 +131,48 @@ class OroLayoutExtension extends Extension
     }
 
     /**
-     * Load resources from views and config file path
+     * Load theme resources from views and config file paths
      *
      * @param ContainerBuilder $container
-     * @param string|null $viewsFilePath
-     * @param string|null $configFilePath
      *
      * @return CumulativeResourceInfo[]
      */
-    protected function loadCumulativeResources(
-        ContainerBuilder $container,
-        $viewsFilePath = null,
-        $configFilePath = null
-    ) {
-        $resourceLoaders = [];
-
-        if ($viewsFilePath) {
-            $resourceLoaders[] = new FolderingCumulativeFileLoader(
+    protected function loadThemeResources(ContainerBuilder $container)
+    {
+        $resourceLoaders = [
+            new FolderingCumulativeFileLoader(
                 self::RESOURCES_FOLDER_PLACEHOLDER,
                 self::RESOURCES_FOLDER_PATTERN,
-                new YamlCumulativeFileLoader(self::THEME_CONFIGS_PATH . $viewsFilePath)
-            );
-        }
+                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
+            )
+        ];
 
-        if ($configFilePath) {
-            $resourceLoaders[] = new YamlCumulativeFileLoader($configFilePath);
-        }
+        $resourceLoaders[] = new YamlCumulativeFileLoader('Resources/config/oro/layout.yml');
+
+        $configLoader = new CumulativeConfigLoader('oro_layout', $resourceLoaders);
+
+        return $configLoader->load($container);
+    }
+
+    /**
+     * Load additional resources from views and config file paths
+     *
+     * @param ContainerBuilder $container
+     *
+     * @return CumulativeResourceInfo[]
+     */
+    protected function loadAdditionalResources(ContainerBuilder $container)
+    {
+        $resourceLoaders = [];
+
+        $resourceLoaders[] = new FolderingCumulativeFileLoader(
+            self::RESOURCES_FOLDER_PLACEHOLDER,
+            self::RESOURCES_FOLDER_PATTERN,
+            [
+                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/assets.yml'),
+                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/images.yml')
+            ]
+        );
 
         $configLoader = new CumulativeConfigLoader('oro_layout', $resourceLoaders);
 
@@ -240,5 +256,23 @@ class OroLayoutExtension extends Extension
                 ]
             ];
         }
+    }
+
+    /**
+     * @param CumulativeResourceInfo $resource
+     * @return array
+     */
+    protected function getAdditionalConfig(CumulativeResourceInfo $resource)
+    {
+        $themeName = basename(dirname(dirname($resource->path)));
+
+        return [
+            'themes' => [
+                $themeName => [
+                    // prevents loading theme information in additional config
+                    'config' => $resource->data['config']
+                ]
+            ]
+        ];
     }
 }

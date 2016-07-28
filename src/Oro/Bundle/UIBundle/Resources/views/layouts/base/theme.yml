@@ -2,7 +2,7 @@
 # for all themes in "main" group
 label:  ~ # this is a "hidden" theme
 groups: [ main ]
-data:
+config:
     assets:
         styles:
             inputs:
