@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-interface CronCommandMultiJobsInterface
+interface CronCommandConcurrentJobsInterface
 {
     /**
      * Define maximum number of jobs that could be run simultaneously.

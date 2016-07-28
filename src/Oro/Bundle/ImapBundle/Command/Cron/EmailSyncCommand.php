@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
-use Oro\Bundle\CronBundle\Command\CronCommandMultiJobsInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,9 +10,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Component\Log\OutputLogger;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandConcurrentJobsInterface;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 
-class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface, CronCommandMultiJobsInterface
+class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface, CronCommandConcurrentJobsInterface
 {
     /**
      * The maximum number of email origins which can be synchronized
@@ -36,9 +36,9 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
     const MAX_EXEC_TIME_IN_MIN = 15;
 
     /**
-     * The maximum number of cron commands running running in the same time
+     * The maximum number of jobs running in the same time
      */
-    const MAX_JOBS_COUNT = 5;
+    const MAX_JOBS_COUNT = 3;
 
     /**
      * {@internaldoc}

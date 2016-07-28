@@ -20,6 +20,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 class CronCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'oro:cron';
+    const DEFAULT_MAX_COUNT_CONCURRENT_JOBS = 1;
 
     /**
      * {@inheritdoc}
@@ -118,12 +119,12 @@ class CronCommand extends ContainerAwareCommand
             $schedule = $matchedSchedules->first();
             $this->checkDefinition($command, $schedule);
 
-            $jobsCount = 1;
-            if ($command instanceof CronCommandMultiJobsInterface) {
-                $jobsCount = $command->getMaxJobsCount();
+            $maxCountConcurrentJobs = self::DEFAULT_MAX_COUNT_CONCURRENT_JOBS;
+            if ($command instanceof CronCommandConcurrentJobsInterface) {
+                $maxCountConcurrentJobs = $command->getMaxJobsCount();
             }
 
-            if ($job = $this->createJob($output, $schedule, $jobsCount)) {
+            if ($job = $this->createJob($output, $schedule, $maxCountConcurrentJobs)) {
                 $jobs[] = $job;
             }
         }
