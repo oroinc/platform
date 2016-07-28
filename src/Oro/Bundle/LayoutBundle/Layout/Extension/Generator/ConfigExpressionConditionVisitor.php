@@ -70,7 +70,7 @@ class ConfigExpressionConditionVisitor implements VisitorInterface
             )
             ->writeln('if ($expr->evaluate($context)) {')
             ->indent()
-            ->writeln('$this->isApplicable = true;');
+            ->writeln('$this->applicable = true;');
     }
 
     /**

@@ -50,7 +50,7 @@ class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionFac
         \$expr = \$this->expressionFactory->create('true', []);
         \$context = ['context' => \$item->getContext()];
         if (\$expr->evaluate(\$context)) {
-            \$this->isApplicable = true;
+            \$this->applicable = true;
             echo 123;
         }
     }

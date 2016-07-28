@@ -87,11 +87,6 @@ class ThemeExtension extends AbstractExtension
 
             $this->dependencyInitializer->initialize($update);
 
-            // don't allow to load imported layouts if expression conditions are satisfied
-            if ($update instanceof IsApplicableLayoutUpdateInterface && !$update->isApplicable()) {
-                return $update;
-            }
-
             if ($update instanceof ImportsAwareLayoutUpdateInterface) {
                 // load imports
                 $imports = $update->getImports();
@@ -108,6 +103,7 @@ class ThemeExtension extends AbstractExtension
                         $importUpdate = $this->loadLayoutUpdate($file, $context);
                         if ($importUpdate instanceof LayoutUpdateImportInterface) {
                             $importUpdate->setImport($import);
+                            $importUpdate->setParentUpdate($update);
                         }
                     }
                 }
