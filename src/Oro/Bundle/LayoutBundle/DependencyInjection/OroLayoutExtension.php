@@ -108,7 +108,7 @@ class OroLayoutExtension extends Extension
             $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resourceThemeLayoutUpdates);
         }
 
-        $foundThemeLayoutUpdates = $this->removeConfigsDirs($foundThemeLayoutUpdates, $config['themes']);
+        $foundThemeLayoutUpdates = $this->excludeDirectories($foundThemeLayoutUpdates);
 
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
 
@@ -119,19 +119,12 @@ class OroLayoutExtension extends Extension
      * Removes resources placed in Resources/views/layouts/{$theme}/config from layout updates
      *
      * @param array $foundThemeLayoutUpdates
-     * @param array $themes
      * @return array
      */
-    protected function removeConfigsDirs(array $foundThemeLayoutUpdates, array $themes)
+    protected function excludeDirectories(array $foundThemeLayoutUpdates)
     {
-        foreach ($themes as $theme => $value) {
-            if (isset($foundThemeLayoutUpdates[$theme]['config'])) {
-                unset($foundThemeLayoutUpdates[$theme]['config']);
-            }
-
-            if (empty($foundThemeLayoutUpdates[$theme])) {
-                unset($foundThemeLayoutUpdates[$theme]);
-            }
+        foreach ($foundThemeLayoutUpdates as $themeName => $layoutUpdates) {
+            $foundThemeLayoutUpdates[$themeName] = array_diff_key($layoutUpdates, ['config' => true]);
         }
 
         return $foundThemeLayoutUpdates;
