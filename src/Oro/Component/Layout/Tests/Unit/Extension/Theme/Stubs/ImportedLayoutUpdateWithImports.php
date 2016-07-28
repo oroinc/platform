@@ -18,6 +18,10 @@ class ImportedLayoutUpdateWithImports implements
     {
     }
 
+    public function setParentUpdate(ImportsAwareLayoutUpdateInterface $parentLayoutUpdate)
+    {
+    }
+
     /**
      * @return array
      */

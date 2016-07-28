@@ -33,6 +33,7 @@ class ConfigExpressionConditionVisitor implements VisitorInterface
         $class  = $visitContext->getClass();
 
         $class->addInterfaceName('Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface');
+        $class->addInterfaceName('Oro\Component\Layout\IsApplicableLayoutUpdateInterface');
 
         $setFactoryMethod = PhpMethod::create('setExpressionFactory');
         $setFactoryMethod->addParameter(
@@ -45,6 +46,15 @@ class ConfigExpressionConditionVisitor implements VisitorInterface
         $factoryProperty = PhpProperty::create('expressionFactory');
         $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
         $class->setProperty($factoryProperty);
+
+        $factoryProperty = PhpProperty::create('applicable');
+        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
+        $factoryProperty->setDefaultValue(false);
+        $class->setProperty($factoryProperty);
+
+        $setFactoryMethod = PhpMethod::create('isApplicable');
+        $setFactoryMethod->setBody($writer->reset()->write('return $this->applicable;')->getContent());
+        $class->setMethod($setFactoryMethod);
 
         $visitContext->getUpdateMethodWriter()
             ->writeln('if (null === $this->expressionFactory) {')
@@ -59,7 +69,8 @@ class ConfigExpressionConditionVisitor implements VisitorInterface
                 )
             )
             ->writeln('if ($expr->evaluate($context)) {')
-            ->indent();
+            ->indent()
+            ->writeln('$this->applicable = true;');
     }
 
     /**
