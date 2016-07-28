@@ -24,6 +24,9 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
+    /** @var Localization[]|array */
+    protected $entities = [];
+
     public function setUp()
     {
         $this->repository = $this->getMockBuilder(ObjectRepository::class)
@@ -34,12 +37,24 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var Localization[] $entities */
+        $this->entities = [
+            1 => $this->getEntity(Localization::class, ['id' => 1]),
+            3 => $this->getEntity(Localization::class, ['id' => 3]),
+            2 => $this->getEntity(Localization::class, ['id' => 2]),
+        ];
+
         $this->provider = new LocalizationProvider($this->repository, $this->configManager);
     }
 
     public function tearDown()
     {
-        unset($this->registry, $this->provider);
+        unset(
+            $this->repository,
+            $this->provider,
+            $this->configManager,
+            $this->entities
+        );
     }
 
     public function testGetLocalization()
@@ -47,48 +62,34 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
         /** @var Localization $entity */
         $entity = $this->getEntity(Localization::class, ['id' => 1]);
 
-        $this->repository->expects($this->once())
-            ->method('find')
-            ->with($entity->getId())
-            ->willReturn($entity);
+        $this->assertRepositoryCalls();
 
         $result = $this->provider->getLocalization($entity->getId());
 
         $this->assertEquals($entity, $result);
+
     }
 
     public function testGetLocalizations()
     {
-        /** @var Localization[] $entities */
-        $entities = [
-            $this->getEntity(Localization::class, ['id' => 1]),
-            $this->getEntity(Localization::class, ['id' => 2]),
-            $this->getEntity(Localization::class, ['id' => 3]),
-        ];
-
-        $this->repository->expects($this->once())
-            ->method('findBy')
-            ->willReturn($entities);
+        $this->assertRepositoryCalls();
 
         $result = $this->provider->getLocalizations();
 
-        $this->assertEquals($entities, $result);
+        $this->assertEquals($this->entities, $result);
     }
 
     public function testGetLocalizationsByIds()
     {
+        $this->assertRepositoryCalls();
+
         /** @var Localization[] $entities */
         $entities = [
-            $this->getEntity(Localization::class, ['id' => 1]),
-            $this->getEntity(Localization::class, ['id' => 3]),
+            1 => $this->getEntity(Localization::class, ['id' => 1]),
+            3 => $this->getEntity(Localization::class, ['id' => 3]),
         ];
 
         $ids = [1, 3];
-
-        $this->repository->expects($this->once())
-            ->method('findBy')
-            ->with(['id' => $ids])
-            ->willReturn($entities);
 
         $result = $this->provider->getLocalizations((array)$ids);
 
@@ -97,61 +98,79 @@ class LocalizationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDefaultLocalization()
     {
-        $localization = new Localization();
+        $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
+        $localization2 = $this->getEntity(Localization::class, ['id' => 2]);
+
+        $this->repository->expects($this->never())->method('find');
+        $this->repository->expects($this->once())->method('findBy')
+            ->willReturn([1 => $localization1, 2 => $localization2]);
 
         $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
             ->willReturn(1);
 
-        $this->repository->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($localization);
-
-        $this->assertSame($localization, $this->provider->getDefaultLocalization());
+        $this->assertSame($localization1, $this->provider->getDefaultLocalization());
     }
 
     public function testGetDefaultLocalizationAndNoDefaultLocalization()
     {
-        $localization1 = new Localization();
-        $localization2 = new Localization();
+        $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
+        $localization2 = $this->getEntity(Localization::class, ['id' => 2]);
 
         $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
-            ->willReturn(1);
+            ->willReturn(false);
 
-        $this->repository->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn(null);
-
-        $this->repository->expects($this->once())
-            ->method('findBy')
-            ->with([], ['name' => 'ASC'])
-            ->willReturn([$localization1, $localization2]);
+        $this->repository->expects($this->never())->method('find');
+        $this->repository->expects($this->once())->method('findBy')
+            ->willReturn([1 => $localization1, 2 => $localization2]);
 
         $this->assertSame($localization1, $this->provider->getDefaultLocalization());
     }
 
     public function testGetDefaultLocalizationAndNoDefaultLocalizationAndNoLocalizations()
     {
+        $this->repository->expects($this->never())->method('find');
+        $this->repository->expects($this->once())->method('findBy')->willReturn([]);
+
         $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
-            ->willReturn(1);
-
-        $this->repository->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn(null);
-
-        $this->repository->expects($this->once())
-            ->method('findBy')
-            ->with([], ['name' => 'ASC'])
-            ->willReturn([]);
+            ->willReturn(false);
 
         $this->assertNull($this->provider->getDefaultLocalization());
+    }
+
+    public function testGetDefaultLocalizationAndUnknownConfigDefaultLocalization()
+    {
+        $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
+        $localization2 = $this->getEntity(Localization::class, ['id' => 2]);
+
+        $this->configManager->expects($this->once())
+            ->method('get')
+            ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
+            ->willReturn(13);
+
+        $this->repository->expects($this->never())->method('find');
+        $this->repository->expects($this->once())->method('findBy')
+            ->willReturn([1 => $localization1, 2 => $localization2]);
+
+        $this->assertSame($localization1, $this->provider->getDefaultLocalization());
+    }
+
+    public function testWarmUpCache()
+    {
+        $this->repository->expects($this->once())
+            ->method('findBy')
+            ->willReturn($this->entities);
+
+        $this->provider->warmUpCache();
+    }
+
+    protected function assertRepositoryCalls(){
+        $this->repository->expects($this->never())->method('find');
+        $this->repository->expects($this->once())->method('findBy')->willReturn($this->entities);
     }
 }
