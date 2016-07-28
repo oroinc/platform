@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
 class WorkflowRegistry
@@ -54,7 +53,7 @@ class WorkflowRegistry
             );
         }
 
-        if (!isset($this->workflowByName[$name])) {
+        if (!array_key_exists($name, $this->workflowByName)) {
             /** @var WorkflowDefinition $definition */
             $definition = $this->getEntityRepository()->find($name);
             if (!$definition) {

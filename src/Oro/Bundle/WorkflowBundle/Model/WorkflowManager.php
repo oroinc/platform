@@ -177,13 +177,17 @@ class WorkflowManager
     /**
      * Start several workflows in one transaction
      *
-     * @param array|WorkflowStartArguments[] $startArgumentsArray instances of WorkflowStartArguments
+     * @param array|WorkflowStartArguments[] $startArgumentsList instances of WorkflowStartArguments
      */
-    public function massStartWorkflow(array $startArgumentsArray)
+    public function massStartWorkflow(array $startArgumentsList)
     {
         $this->inTransaction(
-            function (EntityManager $em) use (&$startArgumentsArray) {
-                foreach ($startArgumentsArray as $startArguments) {
+            function (EntityManager $em) use (&$startArgumentsList) {
+                if (count($startArgumentsList) === 0) {
+                    return; //skip flush when nothing to do
+                }
+
+                foreach ($startArgumentsList as $startArguments) {
                     if (!$startArguments instanceof WorkflowStartArguments) {
                         continue;
                     }
@@ -344,14 +348,13 @@ class WorkflowManager
      */
     public function getWorkflowItem($entity, $workflowName)
     {
-        $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if (!$this->entityConnector->isApplicableEntity($entityIdentifier)) {
+        if (!$this->entityConnector->isApplicableEntity($entity)) {
             return null;
         }
 
         return $this->getWorkflowItemRepository()->findOneByEntityMetadata(
             $this->doctrineHelper->getEntityClass($entity),
-            $entityIdentifier,
+            $this->doctrineHelper->getSingleEntityIdentifier($entity),
             $workflowName
         );
     }
@@ -371,15 +374,14 @@ class WorkflowManager
      */
     public function getWorkflowItemsByEntity($entity)
     {
-        $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
         if (!$this->entityConnector->isApplicableEntity($entity)) {
             return [];
         }
 
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-
-        return $this->getWorkflowItemRepository()->findAllByEntityMetadata($entityClass, $entityIdentifier);
+        return $this->getWorkflowItemRepository()->findAllByEntityMetadata(
+            $this->doctrineHelper->getEntityClass($entity),
+            $this->doctrineHelper->getSingleEntityIdentifier($entity)
+        );
     }
 
     /**
