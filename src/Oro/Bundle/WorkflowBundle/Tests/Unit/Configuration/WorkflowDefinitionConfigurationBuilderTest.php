@@ -24,6 +24,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             'name' => $definition->getName(),
             'label' => $definition->getLabel(),
             'entity' => $definition->getRelatedEntity(),
+            'defaults' => ['active' => $definition->isActive()],
+            'priority' => $definition->getPriority(),
             'configuration' => $definition->getConfiguration(),
         );
 
@@ -128,25 +130,21 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
     public function buildFromConfigurationDataProvider()
     {
         $minimumConfiguration = array(
-            'label'  => 'Test Workflow',
+            'label' => 'Test Workflow',
             'entity' => 'My\Entity',
+            'defaults' => ['active' => false],
             'priority' => 0,
-            'defaults' => [
-                'active' => false,
-            ],
         );
 
         $maximumConfiguration = array(
             'label' => 'Test Workflow',
             'is_system' => true,
             'entity' => 'My\Entity',
+            'defaults' => ['active' => false],
+            'priority' => 1,
             'start_step' => 'test_step',
             'entity_attribute' => 'my_entity',
             'steps_display_ordered' => true,
-            'priority' => 1,
-            'defaults' => [
-                'active' => true,
-            ],
             WorkflowConfiguration::NODE_STEPS => array(
                 array(
                     'name' => 'first',
@@ -182,9 +180,11 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'test_workflow' => $minimumConfiguration,
                 ),
                 'expectedData' => array(
-                    'name'  => 'test_workflow',
+                    'name' => 'test_workflow',
                     'label' => 'Test Workflow',
-                    'entity'     => 'My\Entity',
+                    'entity' => 'My\Entity',
+                    'defaults' => ['active' => false],
+                    'priority' => 0,
                     'configuration' => $this->filterConfiguration($minimumConfiguration),
                 ),
             ),
@@ -193,10 +193,12 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'test_workflow' => $maximumConfiguration,
                 ),
                 'expectedData' => array(
-                    'name'  => 'test_workflow',
+                    'name' => 'test_workflow',
                     'label' => 'Test Workflow',
                     'start_step' => 'test_step',
                     'entity' => 'My\Entity',
+                    'defaults' => ['active' => false],
+                    'priority' => 1,
                     'configuration' => $this->filterConfiguration($maximumConfiguration),
                 ),
                 'expected_acls' => array(

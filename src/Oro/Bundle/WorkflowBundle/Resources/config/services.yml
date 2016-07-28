@@ -139,7 +139,7 @@ services:
     oro_workflow.provider.virtual_relation.workflow:
         class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider'
         arguments:
-            - '@oro_workflow.manager'
+            - '@oro_workflow.manager.system_config'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }

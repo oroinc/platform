@@ -101,3 +101,9 @@ oro:
                     this_quarter: 'This quarter'
                     this_year: 'This year'
                     all_time: 'All time'
+            sort_by:
+                label: Sort By
+                property.placeholder: Choose a property...
+                order:
+                    asc.label: Ascending
+                    desc.label: Descending

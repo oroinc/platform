@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class WorkflowActivationMigrationQuery extends ParametrizedMigrationQuery
 {
