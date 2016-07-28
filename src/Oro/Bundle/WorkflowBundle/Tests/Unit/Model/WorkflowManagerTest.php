@@ -488,6 +488,67 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($workflowItem->getUpdated());
     }
 
+    public function testTransitIfAllowed()
+    {
+        $transition = 'test_transition';
+        $workflowName = 'test_workflow';
+
+        $workflowItem = new WorkflowItem();
+        $workflowItem->setWorkflowName($workflowName);
+
+        $workflow = $this->createWorkflow($workflowName);
+        $workflow->expects($this->once())
+            ->method('transit')
+            ->with($workflowItem, $transition);
+        $workflow->expects($this->once())
+            ->method('isTransitionAllowed')->with($workflowItem, $transition)->willReturn(true);
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getWorkflow')
+            ->with($workflowName)
+            ->will($this->returnValue($workflow));
+
+        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class);
+
+        $entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->assertEmpty($workflowItem->getUpdated());
+        $this->assertTrue(
+            $this->workflowManager->transitIfAllowed($workflowItem, $transition),
+            'If transit is allowed for current WorkflowItem and transition then TRUE expected after transition success.'
+        );
+        $this->assertNotEmpty($workflowItem->getUpdated());
+    }
+
+    public function testTransitIfAllowedFalse()
+    {
+        $transition = 'test_transition';
+        $workflowName = 'test_workflow';
+
+        $workflowItem = new WorkflowItem();
+        $workflowItem->setWorkflowName($workflowName);
+
+        $workflow = $this->createWorkflow($workflowName);
+
+        $workflow->expects($this->once())
+            ->method('isTransitionAllowed')
+            ->with($workflowItem, $transition)
+            ->willReturn(false);
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getWorkflow')
+            ->with($workflowName)
+            ->will($this->returnValue($workflow));
+
+        $this->assertEmpty($workflowItem->getUpdated());
+        $this->assertFalse(
+            $this->workflowManager->transitIfAllowed($workflowItem, $transition),
+            'If transit is NOT allowed for current WorkflowItem and transition then FALSE expected.'
+        );
+        $this->assertEmpty($workflowItem->getUpdated());
+    }
+
     /**
      * @param array $source
      * @param array $expected
@@ -887,6 +948,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             )
             ->setMethods(
                 [
+                    'isTransitionAllowed',
                     'isTransitionAvailable',
                     'isStartTransitionAvailable',
                     'getTransitionsByWorkflowItem',
