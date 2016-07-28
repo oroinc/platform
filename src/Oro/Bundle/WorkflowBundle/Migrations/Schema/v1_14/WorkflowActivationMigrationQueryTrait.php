@@ -49,6 +49,9 @@ class WorkflowActivationMigrationQuery extends ParametrizedMigrationQuery
         $statement->execute();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDescription()
     {
         return sprintf(
