@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_12;
+namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_13;
 
 use Psr\Log\LoggerInterface;
 

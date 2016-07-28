@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_12;
+namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_13;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -29,6 +29,14 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        /**
+         * If migration is already completed it should not run again
+         * ( for case of upgrade from 1.9)
+         */
+        if ($schema->hasTable('oro_calendar_event_attendee')) {
+            return;
+        }
+
         $this->createAttendee($schema);
         $this->createRecurrenceTable($schema);
 
