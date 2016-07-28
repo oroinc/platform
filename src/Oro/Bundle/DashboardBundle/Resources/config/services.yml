@@ -176,6 +176,11 @@ services:
         tags:
             - { name: form.type, alias: "oro_type_widget_items_choice" }
 
+    oro_dashboard.form.type.widget_choice:
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetChoiceType
+        tags:
+            - { name: form.type, alias: "oro_type_widget_choice" }
+
     oro_dashboard.form.type.widget_item:
         class: %oro_dashboard.form.type.widget_item.class%
         tags:
@@ -231,6 +236,11 @@ services:
         class: %oro_dashboard.widget_config_value.widget_items_choice.converter.class%
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_items_choice" }
+
+    oro_dashboard.widget_config_value.widget_choice.converter:
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetChoiceTypeConverter
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_choice" }
 
     oro_dashboard.form.type.widget_date:
         class: %oro_dashboard.form.type.widget_date.class%
