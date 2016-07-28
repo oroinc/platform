@@ -570,7 +570,7 @@ class LocaleDataProvider
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getAvailableLanguages()
     {
