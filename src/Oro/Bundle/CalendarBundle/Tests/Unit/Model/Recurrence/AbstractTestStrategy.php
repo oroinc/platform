@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity;
-use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 abstract class AbstractTestStrategy extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +23,8 @@ abstract class AbstractTestStrategy extends \PHPUnit_Framework_TestCase
     abstract protected function getType();
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     *
      * @param array $params
      * @param array $expected
      *

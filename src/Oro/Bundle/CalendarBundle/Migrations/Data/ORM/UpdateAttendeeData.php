@@ -7,8 +7,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
-
 class UpdateAttendeeData extends AbstractFixture implements DependentFixtureInterface
 {
     /**
@@ -59,7 +57,7 @@ SET
         WHERE
             ce.related_attendee_id = a.id
     );
-ALTER TABLE oro_calendar_event DROP COLUMN IF EXISTS invitation_status;
+ALTER TABLE oro_calendar_event DROP COLUMN invitation_status;
 SQL
         );
     }
