@@ -4,9 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Datagrid\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
-use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\FallbackProperty;
+use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 
-class FallbackPropertyTest extends \PHPUnit_Framework_TestCase
+class LocalizedValuePropertyTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var FallbackProperty
@@ -18,15 +18,15 @@ class FallbackPropertyTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->property = new FallbackProperty();
+        $this->property = new LocalizedValueProperty();
         $this->property->init(
-            PropertyConfiguration::createNamed(FallbackProperty::NAME, [])
+            PropertyConfiguration::createNamed(LocalizedValueProperty::NAME, [])
         );
     }
 
     public function testGetValue()
     {
-        $record = new ResultRecord([FallbackProperty::NAME => 'value1']);
+        $record = new ResultRecord([LocalizedValueProperty::NAME => 'value1']);
 
         $this->assertEquals('value1', $this->property->getValue($record));
     }
