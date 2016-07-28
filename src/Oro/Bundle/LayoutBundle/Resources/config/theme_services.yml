@@ -108,7 +108,7 @@ services:
         public: false
 
     oro_layout.layout_update_generator.extension.config_conditions:
-        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension
+        class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtension
         public: false
         arguments:
             - '@oro_layout.expression_language'

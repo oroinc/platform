@@ -28,7 +28,8 @@ class ActivityListController extends RestController
      * @param integer $entityId    Entity id
      *
      * @QueryParam(
-     *      name="page", requirements="\d+", nullable=true, description="Page number, starting from 1. Default is 1."
+     *     name="pageFilter", nullable=true,
+     *     description="Array with pager filters, e.g. [first|last item date, array of ids with same date, action type]"
      * )
      * @QueryParam(
      *      name="filter", nullable=true,
@@ -48,12 +49,13 @@ class ActivityListController extends RestController
     {
         $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         $filter      = $this->getRequest()->get('filter');
+        $pageFilter  = $this->getRequest()->get('pageFilter');
 
-        $results = $this->getmanager()->getListData(
+        $results = $this->getManager()->getListData(
             $entityClass,
             $entityId,
             $filter,
-            $this->getRequest()->get('page', 1)
+            $pageFilter
         );
 
         return new JsonResponse($results);

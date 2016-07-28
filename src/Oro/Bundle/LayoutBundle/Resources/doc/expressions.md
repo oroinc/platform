@@ -35,7 +35,7 @@ Encoders
 
 Out of the box the **Oro Platform** comes with `json` expression encoder, but encoders for other formats could be easily 
 added to the system using DI tagging mechanism. An encoder class should implements
-[ConfigExpressionEncoderInterface](../../Layout/Encoder/ConfigExpressionEncoderInterface.php) and be registered as a service with 
+[ExpressionEncoderInterface](../../Layout/Encoder/ExpressionEncoderInterface.php) and be registered as a service with 
 tag `oro_layout.expression.encoder` and tag attribute `format` is required.
 
 Examples
