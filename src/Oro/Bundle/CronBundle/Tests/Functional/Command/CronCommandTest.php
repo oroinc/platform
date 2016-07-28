@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
 
-use Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 use Oro\Bundle\CronBundle\Command\CronCommand;
+use Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
