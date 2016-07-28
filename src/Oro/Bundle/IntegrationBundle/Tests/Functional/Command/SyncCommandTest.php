@@ -17,6 +17,7 @@ class SyncCommandTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([LoadChannelData::class]);
+        $this->getMessageProducer()->clearTraces();
     }
 
     public function testShouldOutputHelpForTheCommand()
