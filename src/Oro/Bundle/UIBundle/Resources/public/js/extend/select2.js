@@ -359,6 +359,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
                     '<div></div>' +
                     '</li>');
             var choice = enableChoice ? enabledItem : disabledItem;
+            if (data.hidden) {
+                choice.addClass('hide');
+            }
             var id = this.id(data);
             var formatted;
 
