@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -20,6 +19,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
+use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
@@ -104,6 +104,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $folder->setSyncEnabled(false);
                 $this->logger->info(
                     sprintf('The folder "%s" cannot be selected and was skipped and disabled.', $folderName)
+                );
+            } catch (InvalidEmailFormatException $e) {
+                $folder->setSyncEnabled(false);
+                $this->logger->info(
+                    sprintf('The folder "%s" has unsupported email format and was skipped and disabled.', $folderName)
                 );
             }
             $this->em->flush($folder);
