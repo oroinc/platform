@@ -29,13 +29,13 @@ define([
                 $el.find('.reminder-status').remove();
             }
             switch (invitationStatus) {
-                case 'not_responded':
+                case 'none':
                     $timePlace.prepend(this.templates.notRespondedIcon);
                     break;
                 case 'accepted':
                     $timePlace.prepend(this.templates.acceptedIcon);
                     break;
-                case 'tentatively_accepted':
+                case 'tentative':
                     $timePlace.prepend(this.templates.tentativelyIcon);
                     break;
                 case 'declined':

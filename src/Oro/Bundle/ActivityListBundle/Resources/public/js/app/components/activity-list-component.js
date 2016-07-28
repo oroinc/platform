@@ -142,6 +142,7 @@ define(function(require) {
         onFilterStateChange: function() {
             this.listView.isFiltersEmpty = this.isFiltersEmpty();
             this.collection.setFilter(this.getFilterState());
+            this.collection.resetPageFilter();
             this.collection.setPage(1);
             this.listView._reload();
         },
@@ -250,9 +251,6 @@ define(function(require) {
                  */
                 widget.getAction('goto_previous', 'top', function(action) {
                     action.on('click', _.bind(listView.goto_previous, listView));
-                });
-                widget.getAction('goto_page', 'top', function(action) {
-                    action.on('change', _.bind(listView.goto_page, {e: this, list: listView}));
                 });
                 widget.getAction('goto_next', 'top', function(action) {
                     action.on('click', _.bind(listView.goto_next, listView));

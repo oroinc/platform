@@ -8,7 +8,6 @@ oro:
     form:
         choose_date: Choose a date
         choose_time: time
-        new: New
         inlineEditing:
             inline_edits: "Inline edits"
             successMessage: "Record has been succesfully updated"
