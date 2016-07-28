@@ -2,8 +2,7 @@
     <script type="text/javascript">
         require(['oroui/js/mediator', 'ready!app'], function(mediator) {
             mediator.execute('workflowSteps:update', {
-                currentStep: {{ currentStep|json_encode|raw }},
-                steps: {{ steps|json_encode|raw }}
+                stepsData: {{ stepsData|json_encode|raw }}
             });
         });
     </script>
