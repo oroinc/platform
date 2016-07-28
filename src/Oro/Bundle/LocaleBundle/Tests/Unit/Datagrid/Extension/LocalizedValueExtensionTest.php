@@ -69,7 +69,7 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testApplicable()
     {
         $config = DatagridConfiguration::create([
-            Configuration::PROPERTIES_KEY => [
+            'properties' => [
                 'property1' => [
                     LocalizedValueProperty::TYPE_KEY => LocalizedValueProperty::NAME,
                 ],
@@ -82,7 +82,7 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
     public function testNotApplicable()
     {
         $config = DatagridConfiguration::create([
-            Configuration::PROPERTIES_KEY => [
+            'properties' => [
                 'property1' => [],
             ],
         ]);
@@ -221,7 +221,6 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getSingleEntityIdentifierFieldName')
             ->with('Entity1', false)
             ->willReturn('primaryKey');
-
 
         $result = ResultsObject::create([
             'data' => [
