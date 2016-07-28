@@ -3,6 +3,7 @@
 namespace Oro\Component\Action\Action;
 
 use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatorInterface;

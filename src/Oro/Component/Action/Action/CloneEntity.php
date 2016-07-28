@@ -63,11 +63,6 @@ class CloneEntity extends CloneObject
         /** @var EntityManager $entityManager */
         $entityClassName = ClassUtils::getClass($target);
         $entityManager = $this->getEntityManager($entityClassName);
-
-        if (!$entityManager) {
-            throw new NotManageableEntityException($entityClassName);
-        }
-
         $entity = parent::cloneObject($context);
 
         // avoid duplicate ids

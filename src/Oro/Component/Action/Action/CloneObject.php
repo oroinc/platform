@@ -31,8 +31,8 @@ class CloneObject extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $object1 = $this->cloneObject($context);
-        $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_ATTRIBUTE], $object1);
+        $clonedObject = $this->cloneObject($context);
+        $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_ATTRIBUTE], $clonedObject);
     }
 
     /**
