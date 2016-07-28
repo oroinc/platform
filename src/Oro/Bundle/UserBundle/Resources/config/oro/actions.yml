@@ -2,3 +2,78 @@ operations:
     DELETE:
         exclude_datagrids:
             - owner-users-select-grid
+        exclude_entities:
+            - Oro\Bundle\UserBundle\Entity\Role
+    clone_role:
+        extends: CLONE
+        datagrids:
+            - roles-grid
+        routes:
+            - oro_user_role_index
+            - oro_user_role_update
+        acl_resource: [CREATE, entity:Oro\Bundle\UserBundle\Entity\Role]
+        preactions:
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@eq': [$.requestRoute, 'oro_action_widget_form']
+                actions:
+                    - '@trans':
+                        id: oro.action.clone.label
+                        attribute: $.clone.label
+                        params:
+                            '{label}': $.clone.label
+                    - '@call_service_method':
+                        attribute: $.aclRoleHandler
+                        service: service_container
+                        method: get
+                        method_parameters: ['oro_user.form.handler.acl_role']
+                    - '@call_method':
+                        object: $.aclRoleHandler
+                        method: createForm
+                        method_parameters: [$.clone]
+                    - '@call_method':
+                        object: $.aclRoleHandler
+                        method: process
+                        method_parameters: [$.data]
+                    - '@call_method':
+                        attribute: $.formView
+                        object: $.aclRoleHandler
+                        method: createView
+                    - '@call_service_method':
+                        attribute: $.privilegesConfig
+                        service: service_container
+                        method: getParameter
+                        method_parameters: ['oro_user.privileges']
+                    - '@call_service_method':
+                        attribute: $.categoryProvider
+                        service: service_container
+                        method: get
+                        method_parameters: ['oro_user.provider.role_privilege_category_provider']
+                    - '@call_method':
+                        attribute: $.tabs
+                        object: $.categoryProvider
+                        method: getTabs
+                    - '@call_service_method':
+                        attribute: $.privilegeCapabilityProvider
+                        service: service_container
+                        method: get
+                        method_parameters: ['oro_user.provider.role_privilege_capability_provider']
+                    - '@call_method':
+                        attribute: $.capabilitySetOptions
+                        object: $.privilegeCapabilityProvider
+                        method: getCapabilitySetOptions
+                        method_parameters: [$.data]
+        frontend_options:
+            show_dialog: false
+            template: 'OroUserBundle:Role:clone.html.twig'
+        attributes:
+            entity:
+                label: ' '
+                type: entity
+                options:
+                  class: 'Oro\Bundle\UserBundle\Entity\Role'
+        form_options:
+            attribute_fields:
+                entity:
+                    form_type: form
