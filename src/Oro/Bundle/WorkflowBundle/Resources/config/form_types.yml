@@ -71,9 +71,10 @@ services:
             - '%oro_workflow.workflow_definition.entity.class%'
             - ['label']
         calls:
-            - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
-            - [setAclHelper,["@oro_security.acl_helper"]]
-            - [setWorkflowManager,["@oro_workflow.manager"]]
+            - [initDoctrinePropertiesByManagerRegistry, ['@doctrine']]
+            - [setAclHelper, ['@oro_security.acl_helper']]
+            - [setWorkflowManager, ['@oro_workflow.manager']]
+            - [setWorkflowRegistry, ['@oro_workflow.registry']]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_workflow_replacement, acl_resource: oro_workflow_definition_view }
 

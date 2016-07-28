@@ -6,7 +6,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -14,6 +13,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 /**
  * @Route("/workflowdefinition")
@@ -199,25 +199,15 @@ class WorkflowDefinitionController extends Controller
             ['workflow' => $workflowDefinition->getName()]
         );
 
-        $response = $this->get('oro_form.model.update_handler')
-            ->handleUpdate(
-                $workflowDefinition,
-                $form,
-                null,
-                null,
-                null,
-                null,
-                function (WorkflowDefinition $workflowDefinition, FormInterface $form) {
-                    return [
-                        'form' => $form->createView(),
-                        'workflow' => $workflowDefinition->getName()
-                    ];
-                }
-            );
+        $workflowsToDeactivation = $this->getWorkflowsToDeactivation($workflowDefinition);
+
+        $response = $this->get('oro_form.model.update_handler')->update($workflowDefinition, $form, null);
+        $response['workflow'] = $workflowDefinition->getName();
+        $response['workflowsToDeactivation'] = $workflowsToDeactivation;
 
         if ($form->isValid()) {
             $workflowManager = $this->get('oro_workflow.manager');
-            $workflows = $form->getData();
+            $workflows = array_merge($form->getData(), $workflowsToDeactivation);
             
             $deactivated = [];
             foreach ($workflows as $workflowName) {
@@ -235,5 +225,22 @@ class WorkflowDefinitionController extends Controller
         }
 
         return $response;
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array|Workflow[]
+     */
+    protected function getWorkflowsToDeactivation(WorkflowDefinition $workflowDefinition)
+    {
+        $workflows = $this->get('oro_workflow.registry')
+            ->getActiveWorkflowsByActiveGroups($workflowDefinition->getActiveGroups());
+
+        return array_filter(
+            $workflows,
+            function (Workflow $workflow) use ($workflowDefinition) {
+                return $workflow->getName() !== $workflowDefinition->getName();
+            }
+        );
     }
 }
