@@ -246,8 +246,11 @@ class CronCommand extends ContainerAwareCommand
      *
      * @return null|Job
      */
-    protected function createJob(OutputInterface $output, Schedule $schedule, $maxJobsCount = 1)
-    {
+    protected function createJob(
+        OutputInterface $output,
+        Schedule $schedule,
+        $maxJobsCount = self::DEFAULT_MAX_COUNT_CONCURRENT_JOBS
+    ) {
         $cron = $this->getContainer()->get('oro_cron.helper.cron')->createCron($schedule->getDefinition());
         $arguments = array_values($schedule->getArguments());
 
