@@ -170,7 +170,7 @@ services:
             - '%oro_require_js.web_root%'
         calls:
             - [ setThemeManager, [ '@oro_layout.theme_manager' ] ]
-            - [ setActiveTheme, [ '%oro_layout.default_active_theme%' ] ]
+            - [ setContextHolder, [ '@oro_layout.layout_context_holder' ] ]
         tags:
             - { name: requirejs.config_provider, alias: oro_layout_requirejs_config_provider }
         lazy: true
@@ -180,3 +180,10 @@ services:
         arguments:
             - '@request_stack'
             - '@oro_config.user'
+
+    oro_layout.imports_storage:
+        class: Doctrine\Common\Collections\ArrayCollection
+        public: false
+
+    oro_layout.layout_context_holder:
+        class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder

@@ -130,8 +130,8 @@ class RestrictionsExtension extends AbstractTypeExtension
     protected function tryDisableFieldValues(FormInterface $form, $field, $disabledValues)
     {
         $fieldForm = $form->get($field);
-        if ($fieldForm->getConfig()->hasOption('disabled_values')) {
-            FormUtils::replaceField($form, $field, ['disabled_values' => $disabledValues]);
+        if ($fieldForm->getConfig()->hasOption('excluded_values')) {
+            FormUtils::replaceField($form, $field, ['excluded_values' => $disabledValues]);
         } else {
             FormUtils::replaceField($form, $field, ['read_only' => true]);
         }

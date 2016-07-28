@@ -158,8 +158,6 @@ oro:
             label.label:  Label
             owner.label:  Owner
             has_role.label: Has role
-            clone.label: 'Copy of %name%'
-            clone: 'Clone'
             extend_description.label: Description
 
         invite:

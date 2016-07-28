@@ -15,24 +15,16 @@ class EmailNotification implements EmailNotificationInterface
     const TEMPLATE_ENTITY = 'Oro\Bundle\EmailBundle\Entity\EmailTemplate';
     const ENTITY_CLASS_NAME = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $em;
 
-    /**
-     * @var CalendarEvent
-     */
+    /** @var CalendarEvent */
     protected $calendarEvent;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $templateName;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $emails = [];
 
     /**
@@ -73,7 +65,7 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function getTemplate()
     {
-        return $this->loadTemplate(self::ENTITY_CLASS_NAME, $this->templateName);
+        return $this->loadTemplate(static::ENTITY_CLASS_NAME, $this->templateName);
     }
 
     /**
@@ -84,6 +76,9 @@ class EmailNotification implements EmailNotificationInterface
         return $this->emails;
     }
 
+    /**
+     * @return CalendarEvent
+     */
     public function getEntity()
     {
         return $this->calendarEvent;

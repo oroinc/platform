@@ -51,30 +51,6 @@ class RoleController extends Controller
 
     /**
      * @Route(
-     *      "/clone/{id}",
-     *      name="oro_user_role_clone",
-     *      requirements={"id"="\d+"}
-     * )
-     * @AclAncestor("oro_user_role_create")
-     * @Template("OroUserBundle:Role:update.html.twig")
-     *
-     * @param Role $entity
-     * @return array
-     */
-    public function cloneAction(Role $entity)
-    {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-        $clonedLabel = $translator->trans('oro.user.role.clone.label', array('%name%' => $entity->getLabel()));
-
-        $clonedRole = clone $entity;
-        $clonedRole->setLabel($clonedLabel);
-
-        return $this->update($clonedRole);
-    }
-
-    /**
-     * @Route(
      *      "/{_format}",
      *      name="oro_user_role_index",
      *      requirements={"_format"="html|json"},
@@ -118,24 +94,16 @@ class RoleController extends Controller
         }
 
         $form = $aclRoleHandler->createView();
-        $tabs = array_map(function ($tab) {
-            /** @var PrivilegeCategory $tab */
-            return [
-                'id' => $tab->getId(),
-                'label' => $this->get('translator')->trans($tab->getLabel())
-            ];
-        }, $categoryProvider->getTabbedCategories());
+        $tabs = $categoryProvider->getTabs();
 
         return [
             'entity' => $role,
             'form' => $form,
             'tabsOptions' => [
-                'data' => array_values($tabs)
+                'data' => $tabs
             ],
-            'capabilitySetOptions' => [
-                'data' => $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilities($role),
-                'tabIds' => $categoryProvider->getTabList()
-            ],
+            'capabilitySetOptions' =>
+                $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilitySetOptions($role),
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete a role and un-assign it from all users or reassign users to another role before
