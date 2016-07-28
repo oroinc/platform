@@ -1,12 +1,12 @@
 <?php
-namespace Oro\Bundle\DashboardBundle\Query;
+
+namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 
-class FilterQueryProcessor extends SegmentQueryConverter
+class FilterProcessor extends SegmentQueryConverter
 {
     /** @var string */
     protected $rootEntityAlias;
@@ -23,7 +23,7 @@ class FilterQueryProcessor extends SegmentQueryConverter
     {
         $this->setRootEntity($rootEntity);
         $this->rootEntityAlias          = $rootEntityAlias;
-        $this->definition['filters']    = $filters;
+        $this->definition['filters']    = !empty($filters['filters']) ? $filters : [];
         $this->definition['columns']    = [];
         $this->qb                       = $qb;
         $this->joinIdHelper             = new JoinIdentifierHelper($this->getRootEntity());
@@ -32,6 +32,8 @@ class FilterQueryProcessor extends SegmentQueryConverter
         $this->columnAliases            = [];
         $this->virtualColumnExpressions = [];
         $this->virtualColumnOptions     = [];
+        $this->filters                  = [];
+        $this->currentFilterPath        = '';
         $this->buildQuery();
         $this->virtualColumnOptions     = null;
         $this->virtualColumnExpressions = null;
@@ -42,6 +44,7 @@ class FilterQueryProcessor extends SegmentQueryConverter
 
         return $this->qb;
     }
+
     /**
      * {@inheritdoc}
      */

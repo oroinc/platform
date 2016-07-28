@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\DataAuditBundle\EventListener;
 
-use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\DataAuditBundle\SegmentWidget\AuditFilter;
+use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 
 class SegmentWidgetOptionsListener
 {
@@ -56,7 +55,7 @@ class SegmentWidgetOptionsListener
             return;
         }
         $widgetOptions = $event->getWidgetOptions();
-        if ($this->contextChecker->isApplicableInContext($widgetOptions)) {
+        if (!$this->contextChecker->isApplicableInContext($widgetOptions)) {
             return;
         }
         $fieldsLoader = $widgetOptions['fieldsLoader'];

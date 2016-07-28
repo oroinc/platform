@@ -17,48 +17,36 @@ class WidgetFilterType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add(
-            'entity',
-            'hidden',
-            [
-                'data' => $options['entity'],
-            ]
-        );
+        $builder->add('entity', 'hidden', ['data' => $options['entity']]);
         $builder->add('definition', 'hidden', ['required' => false]);
         $factory = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event)  use ($factory) {
+            function (FormEvent $event) use ($factory) {
                 $form = $event->getForm();
                 $data = $event->getData();
-                if ($data) {
-                    $entity = $data['entity'];
-                } else {
-                    $entity = null;
-                }
+                $entity = $data ? $data['entity'] : null;
+                $filterOptions = [
+                    'mapped'             => false,
+                    'column_choice_type' => null,
+                    'entity'             => $entity,
+                    'auto_initialize'    => false
+                ];
                 $form->add(
-                    $factory->createNamed(
-                        'filter',
-                        'oro_query_designer_filter',
-                        null,
-                        array(
-                            'mapped'             => false,
-                            'column_choice_type' => 'oro_entity_field_select',
-                            'entity'             => $entity,
-                            'auto_initialize'    => false
-                        )
-                    )
+                    $factory->createNamed('filter', 'oro_query_designer_filter', null, $filterOptions)
                 );
             }
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['widgetType'] = $options['widgetType'];
+        $view->vars['widgetType']  = $options['widgetType'];
         $view->vars['collapsible'] = $options['collapsible'];
-        $view->vars['collapsed'] = $options['collapsed'];
+        $view->vars['collapsed']   = $options['collapsed'];
         parent::finishView($view, $form, $options);
     }
 
@@ -72,13 +60,9 @@ class WidgetFilterType extends AbstractType
         );
     }
 
-    public function getDefaultOptions()
-    {
-        return [
-            'filter_column_choice_type' => 'oro_entity_field_select'
-        ];
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'oro_dashboard_query_filter';
