@@ -9,26 +9,26 @@ use Psr\Log\LoggerInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 
 /**
  * Computes a value of "content" field for File entity.
  */
 class ComputeFileContent implements ProcessorInterface
 {
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    /** @var FileManager */
+    protected $fileManager;
 
     /** @var LoggerInterface */
     protected $logger;
 
     /**
-     * @param AttachmentManager $attachmentManager
-     * @param LoggerInterface   $logger
+     * @param FileManager     $fileManager
+     * @param LoggerInterface $logger
      */
-    public function __construct(AttachmentManager $attachmentManager, LoggerInterface $logger)
+    public function __construct(FileManager $fileManager, LoggerInterface $logger)
     {
-        $this->attachmentManager = $attachmentManager;
+        $this->fileManager = $fileManager;
         $this->logger = $logger;
     }
 
@@ -45,19 +45,20 @@ class ComputeFileContent implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        $contextFieldName = $config->findFieldNameByPropertyPath('content');
-        if (!$contextFieldName
-            || $config->getField($contextFieldName)->isExcluded()
-            || array_key_exists($contextFieldName, $data)
-        ) {
+        $contentField = $config->getField('content');
+        if (!$contentField || $contentField->isExcluded()) {
             return;
         }
 
-        $fileNameFieldName = $config->findFieldNameByPropertyPath('filename');
-        $data[$contextFieldName] = $fileNameFieldName && !empty($data[$fileNameFieldName])
-            ? $this->getFileContent($data[$fileNameFieldName])
-            : null;
-        $context->setResult($data);
+        if (empty($data['filename'])) {
+            return;
+        }
+
+        $content = $this->getFileContent($data['filename']);
+        if (null !== $content) {
+            $data[$contentField->getPropertyPath()] = $content;
+            $context->setResult($data);
+        }
     }
 
     /**
@@ -69,7 +70,7 @@ class ComputeFileContent implements ProcessorInterface
     {
         $content = null;
         try {
-            $content = $this->attachmentManager->getContent($fileName);
+            $content = $this->fileManager->getContent($fileName);
         } catch (FileNotFound $e) {
             $this->logger->error(
                 sprintf('The content for "%s" file cannot be loaded.', $fileName),
