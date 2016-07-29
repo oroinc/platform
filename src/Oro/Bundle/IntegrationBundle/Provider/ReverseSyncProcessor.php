@@ -2,24 +2,18 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\IntegrationBundle\Exception\LogicException;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 
 class ReverseSyncProcessor extends AbstractSyncProcessor
 {
     /**
-     * Process channel synchronization
-     *
-     * @param Integration $integration Integration object
-     * @param string      $connector   Connector name
-     * @param array       $parameters  Connector additional parameters
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function process(Integration $integration, $connector, array $parameters)
+    public function process(Integration $integration, $connector, array $parameters = [])
     {
         if (!$integration->isEnabled()) {
             return false;
@@ -33,7 +27,6 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
             if (!($realConnector instanceof TwoWaySyncConnectorInterface)) {
                 throw new LogicException('This connector does not support reverse sync.');
             }
-
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage(), ['exception' => $exception]);
 
