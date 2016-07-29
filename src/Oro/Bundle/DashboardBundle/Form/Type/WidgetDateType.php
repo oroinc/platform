@@ -36,7 +36,7 @@ class WidgetDateType extends AbstractType
             ]
         );
 
-        if ($options['use_date']) {
+        if ($options['enable_date']) {
             $builder->add(
                 'date',
                 'oro_date',
@@ -53,6 +53,6 @@ class WidgetDateType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('use_date', true);
+        $resolver->setDefault('enable_date', true);
     }
 }

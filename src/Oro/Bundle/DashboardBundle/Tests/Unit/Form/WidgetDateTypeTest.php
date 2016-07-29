@@ -33,7 +33,7 @@ class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(1))
             ->method('add')
             ->with('date', 'oro_date');
-        $this->formType->buildForm($builder, ['use_date' => true]);
+        $this->formType->buildForm($builder, ['enable_date' => true]);
     }
 
     public function testBuildFormWithoutDate()
@@ -45,6 +45,6 @@ class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with('useDate', 'checkbox')
             ->will($this->returnSelf());
-        $this->formType->buildForm($builder, ['use_date' => false]);
+        $this->formType->buildForm($builder, ['enable_date' => false]);
     }
 }

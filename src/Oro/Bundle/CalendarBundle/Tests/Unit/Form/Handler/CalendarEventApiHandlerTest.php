@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,6 +34,9 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var ActivityManager */
     protected $activityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AttendeeRelationManager */
+    private $attendeeRelationManager;
+
     /** @var CalendarEventHandler */
     protected $handler;
 
@@ -38,7 +45,13 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
+        $data = [
+            'contexts' => [],
+            'attendees' => new ArrayCollection()
+        ];
         $this->request = new Request();
+        $this->request->request = new ParameterBag($data);
+
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -49,6 +62,11 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->attendeeRelationManager = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->entity  = new CalendarEvent();
 
         $this->form->expects($this->once())
@@ -56,7 +74,7 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($this->entity));
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->identicalTo($this->request));
+            ->with($this->identicalTo($data));
         $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
@@ -74,15 +92,21 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             $this->request,
             $this->om,
             $this->emailSendProcessor,
-            $this->activityManager
+            $this->activityManager,
+            $this->attendeeRelationManager
         );
     }
 
     public function testProcessPOST()
     {
         $this->request->setMethod('POST');
-        $this->emailSendProcessor->expects($this->once())
+        $this->emailSendProcessor
+            ->expects($this->once())
             ->method('sendInviteNotification');
+
+        $this->form->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue(true));
 
         $this->handler->process($this->entity);
     }
@@ -101,9 +125,12 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->entity->setCalendar($defaultCalendar);
 
-        $this->form->expects($this->once())
+        $this->form->expects($this->exactly(2))
             ->method('has')
-            ->with('contexts')
+            ->withConsecutive(
+                ['invitedUsers'],
+                ['contexts']
+            )
             ->will($this->returnValue(true));
 
         $defaultCalendar->expects($this->once())
@@ -125,7 +152,6 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('removeActivityTarget');
         $this->handler->process($this->entity);
 
-
         $this->assertSame($defaultCalendar, $this->entity->getCalendar());
     }
 
@@ -133,8 +159,12 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
     {
         ReflectionUtil::setId($this->entity, 1);
         $this->request->setMethod('PUT');
-        $this->emailSendProcessor->expects($this->once())
+        $this->emailSendProcessor
+            ->expects($this->once())
             ->method('sendUpdateParentEventNotification');
+        $this->form->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue(true));
 
         $this->handler->process($this->entity);
     }

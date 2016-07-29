@@ -194,22 +194,30 @@
 {% block oro_dashboard_query_filter_row %}
     <div
     {% if collapsible %}
-        class="control-group collapsible{% if collapsed %} collapsed{% endif %}"
+        class="control-group widget-query-filter collapsible{% if collapsed %} collapsed{% endif %}"
             data-page-component-module="oroui/js/app/components/view-component"
             data-page-component-options="{{ {'view': 'oroform/js/app/views/collapsible-form-row-view'}|json_encode }}">
-        <label class="control-label">
-            <div class="collapse-expand-action-container">
-                <a class="collapse-action" data-name="collapse" href="#"></a>
-            </div>
-            {{ label|trans }}
-        </label>
     {% else %}
         class="control-group">
-        <label class="control-label">{{ label|trans }}</label>
     {% endif %}
+        <label class="control-label widget-query-filter">{{ label|trans }}</label>
+
+        {% if collapsible %}
+            {% set labelsMap = {
+                0: 'oro.dashboard.query_filter.collapse'|trans,
+                1: 'oro.dashboard.query_filter.expand'|trans,
+            } %}
+
+            <a class="collapse-action"
+               data-toggle-label="{{ labelsMap[not collapsed] }}"
+               data-name="collapse" href="#">{{ labelsMap[collapsed] }}</a>
+        {% endif %}
+
         <div class="controls">
             {{ form_row(form.entity) }}
             {{ form_row(form.definition) }}
+            {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+            {{ QD.query_designer_column_chain_template('column-chain-template') }}
             {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
             {{ segmentQD.query_designer_condition_builder({
                 'id': name ~ '-condition-builder',
@@ -240,10 +248,11 @@
                     criteriaList:     '#filter-criteria-list',
                     conditionBuilder: '#' ~ name ~ '-condition-builder'
                 },
-                entities:                     oro_query_filter_entities(),
-                metadata:                     oro_query_filter_metadata(),
-                disable_audit: true,
-                initEntityChangeEvents: false
+                entities:                   oro_query_filter_entities(),
+                metadata:                   oro_query_filter_metadata(),
+                disable_audit:              true,
+                initEntityChangeEvents:     false,
+                select2FieldChoiceTemplate: '#column-chain-template',
             } %}
             {% set widgetOptions = update_segment_widget_options(widgetOptions, name) %}
             <div
