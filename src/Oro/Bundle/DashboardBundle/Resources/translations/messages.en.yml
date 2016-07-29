@@ -72,7 +72,7 @@ oro:
             time.label: Hour
         date_range.label: Date range
         query_filter:
-            label: Query Filter
+            label: Advanced Filter
             collapse: Collapse
             expand: Expand
         previous_date_range.label: Compare with previous period
