@@ -69,6 +69,10 @@ class BigNumberFormatter
         $result = ['value' => $this->formatValue($value, $dataType)];
 
         if (count($previousData)) {
+            if (!$previousData['comparable']) {
+                return $result;
+            }
+
             $pastResult = $previousData['value'];
             $previousInterval = $previousData['dateRange'];
             $deviation = $value - $pastResult;
