@@ -26,7 +26,7 @@ layout:
                 styles:
                     blockType: style
                     options:
-                        src: { '@asset': $data.theme.data.assets.styles.output }
+                        src: { '@asset': $data.theme.config.assets.styles.output }
                 body:
                     blockType: body
                 scripts_before:
