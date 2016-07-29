@@ -24,8 +24,6 @@ default: &default
                 - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
                 - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
                 - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
-    autoload:
-            - '%paths.base%/../../../../../../../../app/bootstrap.php.cache'
     suites: []
 
 selenium2:

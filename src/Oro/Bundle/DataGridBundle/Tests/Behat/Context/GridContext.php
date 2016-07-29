@@ -291,13 +291,14 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     {
         $this->getGrid()->massCheck('All');
     }
+
     /**
      * @Then there is no records in grid
      * @Then all records should be deleted
      */
     public function thereIsNoRecordsInGrid()
     {
-        $this->getGrid()->assertNoRecords();
+        self::assertCount(0, $this->getGrid()->getRows());
     }
 
     /**
