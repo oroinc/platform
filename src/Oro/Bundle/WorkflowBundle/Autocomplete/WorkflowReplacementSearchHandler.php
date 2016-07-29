@@ -7,33 +7,19 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowReplacementSearchHandler extends SearchHandler
 {
     const DELIMITER = ';';
 
     /**
-     * @var WorkflowManager
-     */
-    protected $workflowManager;
-
-    /**
      * {@inheritdoc}
      */
     protected function checkAllDependenciesInjected()
     {
-        if (!$this->entityRepository || !$this->idFieldName || !$this->workflowManager) {
+        if (!$this->entityRepository || !$this->idFieldName) {
             throw new \RuntimeException('Search handler is not fully configured');
         }
-    }
-
-    /**
-     * @param WorkflowManager $workflowManager
-     */
-    public function setWorkflowManager(WorkflowManager $workflowManager)
-    {
-        $this->workflowManager = $workflowManager;
     }
 
     /**
@@ -66,7 +52,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
         }
 
         return array_filter($queryBuilder->getQuery()->getResult(), function (WorkflowDefinition $definition) {
-            return $this->workflowManager->isActiveWorkflow($definition);
+            return $definition->isActive();
         });
     }
 

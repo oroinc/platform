@@ -5,10 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
@@ -16,57 +20,40 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  */
 class WorkflowManager
 {
-    /**
-     * @var WorkflowRegistry
-     */
-    protected $workflowRegistry;
-
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var WorkflowSystemConfigManager
-     */
-    protected $config;
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    /** @var WorkflowEntityConnector */
+    private $entityConnector;
+
+    /** @var WorkflowRegistry */
+    private $workflowRegistry;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowSystemConfigManager $workflowSystemConfigManager
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param WorkflowEntityConnector $entityConnector
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         DoctrineHelper $doctrineHelper,
-        WorkflowSystemConfigManager $workflowSystemConfigManager
+        EventDispatcherInterface $eventDispatcher,
+        WorkflowEntityConnector $entityConnector
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->doctrineHelper = $doctrineHelper;
-        $this->config = $workflowSystemConfigManager;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->entityConnector = $entityConnector;
     }
 
     /**
-     * @param string|Workflow $workflow
-     * @return Collection
-     */
-    public function getStartTransitions($workflow)
-    {
-        $workflow = $this->getWorkflow($workflow);
-
-        return $workflow->getTransitionManager()->getStartTransitions();
-    }
-
-    /**
-     * Get workflow instance.
-     *
-     * string - workflow name
-     * WorkflowItem - getWorkflowName() method will be used to get workflow
-     * Workflow - will be returned by itself
-     *
      * @param string|Workflow|WorkflowItem $workflowIdentifier
-     * @throws WorkflowException
      * @return Workflow
+     * @throws WorkflowException
      */
     public function getWorkflow($workflowIdentifier)
     {
@@ -91,7 +78,7 @@ class WorkflowManager
      */
     public function getTransitionsByWorkflowItem(WorkflowItem $workflowItem)
     {
-        $workflow = $this->getWorkflow($workflowItem);
+        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
 
         return $workflow->getTransitionsByWorkflowItem($workflowItem);
     }
@@ -104,14 +91,14 @@ class WorkflowManager
      */
     public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, Collection $errors = null)
     {
-        $workflow = $this->getWorkflow($workflowItem);
+        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
 
         return $workflow->isTransitionAvailable($workflowItem, $transition, $errors);
     }
 
     /**
-     * @param string|Transition $transition
      * @param string|Workflow $workflow
+     * @param string|Transition $transition
      * @param object $entity
      * @param array $data
      * @param Collection $errors
@@ -124,7 +111,9 @@ class WorkflowManager
         array $data = [],
         Collection $errors = null
     ) {
-        $workflow = $this->getWorkflow($workflow);
+        //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
+        //any way. if developer has Workflow instance already it is possible to get decision from it directly as below
+        $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
 
         return $workflow->isStartTransitionAvailable($transition, $entity, $data, $errors);
     }
@@ -150,55 +139,14 @@ class WorkflowManager
                 $em->flush();
 
                 $workflow = $this->workflowRegistry->getWorkflow($currentWorkflowName);
-                if ($this->isActiveWorkflow($workflow) && $workflow->getStepManager()->hasStartStep()) {
-                    return $this->startWorkflow($workflow->getName(), $entity);
+                if ($workflow->isActive() && $workflow->getStepManager()->hasStartStep()) {
+                    return $this->startWorkflow($currentWorkflowName, $entity);
                 }
 
                 return null;
             },
             WorkflowItem::class
         );
-    }
-
-    /**
-     * @param callable $callable
-     * @param string $entityClass
-     * @return mixed
-     * @throws \Exception
-     */
-    private function inTransaction(callable $callable, $entityClass)
-    {
-        $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
-        $em->beginTransaction();
-        try {
-            $result = call_user_func($callable, $em);
-            $em->commit();
-
-            return $result;
-        } catch (\Exception $exception) {
-            $em->rollback();
-            throw $exception;
-        }
-    }
-
-    /**
-     * @param object|string $entity
-     * @return Workflow[]
-     */
-    public function getApplicableWorkflows($entity)
-    {
-        return $this->workflowRegistry->getActiveWorkflowsByEntityClass(
-            $this->doctrineHelper->getEntityClass($entity)
-        );
-    }
-
-    /**
-     * @param object|string $entity
-     * @return bool
-     */
-    public function hasApplicableWorkflows($entity)
-    {
-        return count($this->getApplicableWorkflows($entity)) !== 0;
     }
 
     /**
@@ -211,7 +159,8 @@ class WorkflowManager
      */
     public function startWorkflow($workflow, $entity, $transition = null, array $data = [])
     {
-        $workflow = $this->getWorkflow($workflow);
+        //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
+        $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
 
         return $this->inTransaction(
             function (EntityManager $em) use ($workflow, $entity, $transition, &$data) {
@@ -228,35 +177,29 @@ class WorkflowManager
     /**
      * Start several workflows in one transaction
      *
-     * Input data format:
-     * array(
-     *      array(
-     *          'workflow'   => <workflow identifier: string|Workflow>,
-     *          'entity'     => <entity used in workflow: object>,
-     *          'transition' => <start transition name: string>,     // optional
-     *          'data'       => <additional workflow data : array>,  // optional
-     *      ),
-     *      ...
-     * )
-     *
-     * @param array $data
-     * @throws \Exception
+     * @param array|WorkflowStartArguments[] $startArgumentsList instances of WorkflowStartArguments
      */
-    public function massStartWorkflow(array $data)
+    public function massStartWorkflow(array $startArgumentsList)
     {
         $this->inTransaction(
-            function (EntityManager $em) use (&$data) {
-                foreach ($data as $row) {
-                    if (empty($row['workflow']) || empty($row['entity'])) {
+            function (EntityManager $em) use (&$startArgumentsList) {
+                if (count($startArgumentsList) === 0) {
+                    return; //skip flush when nothing to do
+                }
+
+                foreach ($startArgumentsList as $startArguments) {
+                    if (!$startArguments instanceof WorkflowStartArguments) {
                         continue;
                     }
 
-                    $workflow = $this->getWorkflow($row['workflow']);
-                    $entity = $row['entity'];
-                    $transition = !empty($row['transition']) ? $row['transition'] : null;
-                    $rowData = !empty($row['data']) ? $row['data'] : [];
+                    $workflow = $this->workflowRegistry->getWorkflow($startArguments->getWorkflowName());
 
-                    $workflowItem = $workflow->start($entity, $rowData, $transition);
+                    $workflowItem = $workflow->start(
+                        $startArguments->getEntity(),
+                        $startArguments->getData(),
+                        $startArguments->getTransition()
+                    );
+
                     $em->persist($workflowItem);
                 }
 
@@ -271,12 +214,21 @@ class WorkflowManager
      *
      * @param WorkflowItem $workflowItem
      * @param string|Transition $transition
-     * @throws \Exception
      */
     public function transit(WorkflowItem $workflowItem, $transition)
     {
-        $workflow = $this->getWorkflow($workflowItem);
+        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
 
+        $this->transitWorkflow($workflow, $workflowItem, $transition);
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param WorkflowItem $workflowItem
+     * @param $transition
+     */
+    private function transitWorkflow(Workflow $workflow, WorkflowItem $workflowItem, $transition)
+    {
         $this->inTransaction(
             function (EntityManager $em) use ($workflow, $workflowItem, $transition) {
                 $workflow->transit($workflowItem, $transition);
@@ -285,6 +237,26 @@ class WorkflowManager
             },
             WorkflowItem::class
         );
+    }
+
+    /**
+     * Tries to transit workflow and checks weather given transition is allowed.
+     * Returns true on success - false otherwise.
+     * @param WorkflowItem $workflowItem
+     * @param $transition
+     * @return bool
+     */
+    public function transitIfAllowed(WorkflowItem $workflowItem, $transition)
+    {
+        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
+
+        if (!$workflow->isTransitionAllowed($workflowItem, $transition)) {
+            return false;
+        }
+
+        $this->transitWorkflow($workflow, $workflowItem, $transition);
+
+        return true;
     }
 
     /**
@@ -315,7 +287,7 @@ class WorkflowManager
 
                     /** @var WorkflowItem $workflowItem */
                     $workflowItem = $row['workflowItem'];
-                    $workflow = $this->getWorkflow($workflowItem);
+                    $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
                     $transition = $row['transition'];
 
                     $workflow->transit($workflowItem, $transition);
@@ -328,13 +300,44 @@ class WorkflowManager
     }
 
     /**
+     * @param callable $callable
      * @param string $entityClass
-     * @return bool
-     * @deprecated use hasApplicableWorkflows
+     * @return mixed
+     * @throws \Exception
      */
-    public function hasApplicableWorkflowsByEntityClass($entityClass)
+    private function inTransaction(callable $callable, $entityClass)
     {
-        return $this->workflowRegistry->hasActiveWorkflowsByEntityClass($entityClass);
+        $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
+        $em->beginTransaction();
+        try {
+            $result = call_user_func($callable, $em);
+            $em->commit();
+
+            return $result;
+        } catch (\Exception $exception) {
+            $em->rollback();
+            throw $exception;
+        }
+    }
+
+    /**
+     * @param object|string $entity
+     * @return Workflow[]|array
+     */
+    public function getApplicableWorkflows($entity)
+    {
+        return $this->workflowRegistry->getActiveWorkflowsByEntityClass(
+            $this->doctrineHelper->getEntityClass($entity)
+        )->toArray();
+    }
+
+    /**
+     * @param object|string $entity
+     * @return bool
+     */
+    public function hasApplicableWorkflows($entity)
+    {
+        return count($this->getApplicableWorkflows($entity)) !== 0;
     }
 
     /**
@@ -344,24 +347,15 @@ class WorkflowManager
      */
     public function getWorkflowItem($entity, $workflowName)
     {
-        $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if (!$this->isSupportedIdentifier($entityIdentifier)) {
+        if (!$this->entityConnector->isApplicableEntity($entity)) {
             return null;
         }
 
         return $this->getWorkflowItemRepository()->findOneByEntityMetadata(
             $this->doctrineHelper->getEntityClass($entity),
-            $entityIdentifier,
+            $this->doctrineHelper->getSingleEntityIdentifier($entity),
             $workflowName
         );
-    }
-
-    /**
-     * @return WorkflowItemRepository
-     */
-    protected function getWorkflowItemRepository()
-    {
-        return $this->doctrineHelper->getEntityRepository(WorkflowItem::class);
     }
 
     /**
@@ -379,79 +373,83 @@ class WorkflowManager
      */
     public function getWorkflowItemsByEntity($entity)
     {
-        $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
-        if (!$this->isSupportedIdentifier($entityIdentifier)) {
+        if (!$this->entityConnector->isApplicableEntity($entity)) {
             return [];
         }
 
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-
-        return $this->getWorkflowItemRepository()->findAllByEntityMetadata($entityClass, $entityIdentifier);
+        return $this->getWorkflowItemRepository()->findAllByEntityMetadata(
+            $this->doctrineHelper->getEntityClass($entity),
+            $this->doctrineHelper->getSingleEntityIdentifier($entity)
+        );
     }
 
     /**
      * Ensures that workflow is currently active
-     * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
+     * @param string $workflowName
+     * @return bool weather workflow was changed his state
      */
-    public function activateWorkflow($workflowIdentifier)
+    public function activateWorkflow($workflowName)
     {
-        $definition = $this->getDefinition($workflowIdentifier);
-
-        if (!$this->config->isActiveWorkflow($definition)) {
-            $this->config->setWorkflowActive($definition);
-        }
+        return $this->setWorkflowStatus($workflowName, true);
     }
 
     /**
      * Ensures that workflow is currently inactive
-     * @param string|WorkflowDefinition $workflowIdentifier
+     * @param string $workflowName
+     * @return bool weather workflow was changed his state
      */
-    public function deactivateWorkflow($workflowIdentifier)
+    public function deactivateWorkflow($workflowName)
     {
-        $definition = $this->getDefinition($workflowIdentifier);
+        return $this->setWorkflowStatus($workflowName, false);
+    }
 
-        if ($this->config->isActiveWorkflow($definition)) {
-            $this->config->setWorkflowInactive($definition);
+    /**
+     * @param string $workflowName
+     * @param bool $isActive
+     * @return bool weather workflow was changed his state
+     */
+    private function setWorkflowStatus($workflowName, $isActive)
+    {
+        $definition = $this->workflowRegistry->getWorkflow($workflowName)->getDefinition();
+
+        if ((bool)$isActive !== $definition->isActive()) {
+            $definition->setActive($isActive);
+            $this->doctrineHelper->getEntityManager(WorkflowDefinition::class)->flush($definition);
+            $this->eventDispatcher->dispatch(
+                $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED,
+                new WorkflowChangesEvent($definition)
+            );
+
+            return true;
         }
+
+        return false;
     }
 
     /**
-     * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
+     * @param string $workflowName
      * @return bool
      */
-    public function isActiveWorkflow($workflowIdentifier)
+    public function isActiveWorkflow($workflowName)
     {
-        $definition = $this->getDefinition($workflowIdentifier);
+        $definition = $this->workflowRegistry->getWorkflow($workflowName)->getDefinition();
 
-        return $this->config->isActiveWorkflow($definition);
+        return $definition->isActive();
     }
 
     /**
-     * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
-     * @return WorkflowDefinition
+     * @param string $workflowName
      */
-    protected function getDefinition($workflowIdentifier)
+    public function resetWorkflowData($workflowName)
     {
-        return $workflowIdentifier instanceof WorkflowDefinition
-            ? $workflowIdentifier
-            : $this->getWorkflow($workflowIdentifier)->getDefinition();
+        $this->getWorkflowItemRepository()->resetWorkflowData($workflowName);
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
+     * @return WorkflowItemRepository
      */
-    public function resetWorkflowData(WorkflowDefinition $workflowDefinition)
+    protected function getWorkflowItemRepository()
     {
-        $this->getWorkflowItemRepository()->resetWorkflowData($workflowDefinition);
-    }
-
-    /**
-     * @param mixed $identifier
-     * @return bool
-     */
-    protected function isSupportedIdentifier($identifier)
-    {
-        return is_int($identifier) || is_string($identifier);
+        return $this->doctrineHelper->getEntityRepository(WorkflowItem::class);
     }
 }
