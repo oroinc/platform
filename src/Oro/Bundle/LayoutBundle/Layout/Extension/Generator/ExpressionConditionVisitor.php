@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
+use CG\Generator\PhpMethod;
+use CG\Generator\PhpProperty;
+
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
@@ -32,6 +35,18 @@ class ExpressionConditionVisitor implements VisitorInterface
      */
     public function startVisit(VisitContext $visitContext)
     {
+        $writer = $visitContext->createWriter();
+        $class  = $visitContext->getClass();
+        $class->addInterfaceName('Oro\Component\Layout\IsApplicableLayoutUpdateInterface');
+
+        $factoryProperty = PhpProperty::create('applicable');
+        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
+        $factoryProperty->setDefaultValue(false);
+        $class->setProperty($factoryProperty);
+        $setFactoryMethod = PhpMethod::create('isApplicable');
+        $setFactoryMethod->setBody($writer->reset()->write('return $this->applicable;')->getContent());
+        $class->setMethod($setFactoryMethod);
+
         $visitContext->getUpdateMethodWriter()
             ->writeln(
                 sprintf(
@@ -40,7 +55,8 @@ class ExpressionConditionVisitor implements VisitorInterface
                 )
             )
             ->writeln(sprintf('if (%s) {', $this->expressionLanguage->compile($this->expression)))
-            ->indent();
+            ->indent()
+            ->writeln('$this->applicable = true;');
     }
 
     /**

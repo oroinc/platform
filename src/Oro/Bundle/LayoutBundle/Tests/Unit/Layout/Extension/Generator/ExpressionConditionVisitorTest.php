@@ -47,14 +47,22 @@ class ExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
 <<<CLASS
-class LayoutUpdateClass
+class LayoutUpdateClass implements \Oro\Component\Layout\IsApplicableLayoutUpdateInterface
 {
+    private \$applicable = false;
+
     public function updateLayout(\$layoutManipulator, \$item)
     {
         \$context = \$item->getContext();
         if ((true == \$context["enabled"])) {
+            \$this->applicable = true;
             echo 123;
         }
+    }
+
+    public function isApplicable()
+    {
+        return \$this->applicable;
     }
 }
 CLASS
