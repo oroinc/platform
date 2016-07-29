@@ -2,25 +2,26 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
-use Oro\Component\ConfigExpression\AssemblerInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
-class ConfigExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
+class ExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
     const NODE_CONDITIONS = 'conditions';
 
-    /** @var AssemblerInterface */
-    protected $expressionAssembler;
+    /** @var ExpressionLanguage */
+    protected $expressionLanguage;
 
     /**
-     * @param AssemblerInterface $expressionAssembler
+     * @param ExpressionLanguage $expressionLanguage
      */
-    public function __construct(AssemblerInterface $expressionAssembler)
+    public function __construct(ExpressionLanguage $expressionLanguage)
     {
-        $this->expressionAssembler = $expressionAssembler;
+        $this->expressionLanguage = $expressionLanguage;
     }
 
     /**
@@ -31,9 +32,9 @@ class ConfigExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorE
         $source = $data->getSource();
         if (is_array($source) && !empty($source[self::NODE_CONDITIONS])) {
             try {
-                $expr = $this->expressionAssembler->assemble($source[self::NODE_CONDITIONS]);
+                $expr = $this->expressionLanguage->parse($source[self::NODE_CONDITIONS], ['context']);
                 if ($expr) {
-                    $visitorCollection->append(new ConfigExpressionConditionVisitor($expr));
+                    $visitorCollection->append(new ExpressionConditionVisitor($expr, $this->expressionLanguage));
                 }
             } catch (\Exception $e) {
                 throw new SyntaxException(

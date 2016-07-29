@@ -4,9 +4,9 @@ namespace Oro\Bundle\LayoutBundle\Layout\Encoder;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompilerPass;
+use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ExpressionCompilerPass;
 
-class ConfigExpressionEncoderRegistry
+class ExpressionEncoderRegistry
 {
     /** @var ContainerInterface */
     protected $container;
@@ -29,7 +29,7 @@ class ConfigExpressionEncoderRegistry
      *
      * @param string $format
      *
-     * @return ConfigExpressionEncoderInterface
+     * @return ExpressionEncoderInterface
      *
      * @throws \RuntimeException if the appropriate encoder does not exist
      */
@@ -42,7 +42,7 @@ class ConfigExpressionEncoderRegistry
                     . 'Check that the appropriate encoder service is registered in '
                     . 'the container and marked by tag "%s".',
                     $format,
-                    ConfigExpressionCompilerPass::EXPRESSION_ENCODER_TAG
+                    ExpressionCompilerPass::EXPRESSION_ENCODER_TAG
                 )
             );
         }
