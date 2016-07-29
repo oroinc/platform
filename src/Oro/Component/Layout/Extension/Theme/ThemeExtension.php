@@ -7,9 +7,9 @@ use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
-use Oro\Component\Layout\IsApplicableLayoutUpdateInterface;
 use Oro\Component\Layout\LayoutUpdateImportInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
@@ -32,6 +32,9 @@ class ThemeExtension extends AbstractExtension
     /** @var PathProviderInterface */
     protected $pathProvider;
 
+    /** @var  ThemeManager */
+    protected $themeManager;
+
     /** @var  array */
     protected $updates;
 
@@ -40,17 +43,20 @@ class ThemeExtension extends AbstractExtension
      * @param LayoutUpdateLoaderInterface $loader
      * @param DependencyInitializer $dependencyInitializer
      * @param PathProviderInterface $provider
+     * @param ThemeManager $themeManager
      */
     public function __construct(
         array $resources,
         LayoutUpdateLoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
-        PathProviderInterface $provider
+        PathProviderInterface $provider,
+        ThemeManager $themeManager
     ) {
         $this->resources = $resources;
         $this->loader = $loader;
         $this->dependencyInitializer = $dependencyInitializer;
         $this->pathProvider = $provider;
+        $this->themeManager = $themeManager;
     }
 
     /**
@@ -97,8 +103,7 @@ class ThemeExtension extends AbstractExtension
                 }
                 foreach ($imports as $importData) {
                     $import = $this->createImport($importData);
-                    $importPaths = $this->getImportPaths($context, $import->getId());
-                    $files = $this->findApplicableResources($importPaths);
+                    $files = $this->getImportResources($context->get(static::THEME_KEY), $import->getId());
                     foreach ($files as $file) {
                         $importUpdate = $this->loadLayoutUpdate($file, $context);
                         if ($importUpdate instanceof LayoutUpdateImportInterface) {
@@ -130,23 +135,30 @@ class ThemeExtension extends AbstractExtension
     }
 
     /**
-     * @param ContextInterface $context
+     * @param string $themeName
      * @param string $importId
      *
-     * @return string
+     * @return array
      */
-    protected function getImportPaths(ContextInterface $context, $importId)
+    protected function getImportResources($themeName, $importId)
     {
-        return [
-            implode(
-                PathProviderInterface::DELIMITER,
-                [
-                    $context->get(static::THEME_KEY),
-                    static::IMPORT_FOLDER,
-                    $importId,
-                ]
-            )
-        ];
+        $theme = $this->themeManager->getTheme($themeName);
+
+        $importPath = implode(
+            PathProviderInterface::DELIMITER,
+            [
+                $theme->getName(),
+                static::IMPORT_FOLDER,
+                $importId,
+            ]
+        );
+
+        $files = $this->findApplicableResources([$importPath]);
+        if (!$files && $theme->getParentTheme()) {
+            $files = $this->getImportResources($theme->getParentTheme(), $importId);
+        }
+
+        return $files;
     }
 
     /**
