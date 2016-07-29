@@ -22,7 +22,7 @@ oro:
         view:                       View event
 
         action:
-            public_calendar_management: 
+            public_calendar_management:
                 label: Manage system calendars
                 description: If set to None, the user can see system calendars, but cannot create/edit/delete them
             public_calendar_event_management:
@@ -116,6 +116,17 @@ oro:
             system_calendar.label:   System Calendar
             invitation.label:        Guests
             invitation_status.label: Invitation status
+            attendees.label: Guests
+            related_attendee.label: Related Attendee
+
+            recurrence.label:      Recurrence
+            recurrence.exception.label: Part of Recurrence
+            recurrence.alias.recurrent: Recurrent
+            recurrence.na: N/A
+            recurring_event_exceptions.label: Recurring Event Exceptions
+            recurring_event.label: Recurring Event
+            original_start.label: Original Start
+            cancelled.label: Is Cancelled
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }}, updated by {{ editor }}
@@ -124,13 +135,13 @@ oro:
             delete_event:         Delete {{ entity }}
 
             statuses:
-                not_responded:        Not responded
-                tentatively_accepted: Tentatively accepted
+                none:                 Not responded
+                tentative:            Tentatively accepted
                 accepted:             Accepted
                 declined:             Declined
 
             actions:
-                tentatively_accepted: Tentative
+                tentative:            Tentative
                 accepted:             Accept
                 declined:             Decline
 
@@ -149,3 +160,79 @@ oro:
             visible.label:          Visible
             color.label:            Color
             background_color.label: Background
+
+        attendee:
+            entity_label: Attendee
+            entity_plural_label: Guests
+            calendar_event.label: Calendar Event
+            display_name.label: Display Name
+            email.label: Email
+            id.label: Id
+            user.label: User
+            organization.label: Organization
+            owner.label: Owner
+            status.label: Status
+            type.label: Type
+            type:
+                organizer.label: Organizer
+                optional.label: Optional
+                required.label: Required
+
+        autocomplete:
+            attendees: Calendar event Guests
+
+        #
+        # Oro/Bundle/CalendarBundle/Entity/Recurrence
+        #
+        recurrence:
+            entity_label:           Recurrence
+            entity_plural_label:    Recurrences
+            type.label:             Recurrence type
+            interval.label:         Interval
+            instance.label:         Instance
+            day_of_week.label:      Day of week
+            day_of_month.label:     Day of month
+            month_of_year.label:    Month of year
+            start_time.label:       Start time
+            end_time.label:         End time
+            occurrences.label:      Occurrences
+            timezone.label:         Time Zone
+
+            patterns:
+                occurrences: "{1} , end after 1 occurrence|]1,Inf[ , end after %count% occurrences"
+                end_date: ", end by %date%"
+                timezone: '(%timezone% GMT%timezone_offset%)'
+                daily: "{1} Daily every 1 day%occurrences%%end_date%%timezone_info%|]1,Inf[ Daily every %count% days%occurrences%%end_date%%timezone_info%"
+                weekly: "{1} Weekly every 1 week on %days%%occurrences%%end_date%%timezone_info%|]1,Inf[ Weekly every %count% weeks on %days%%occurrences%%end_date%%timezone_info%"
+                monthly: "{1} Monthly day %day% of every 1 month%occurrences%%end_date%%timezone_info%|]1,Inf[ Monthly day %day% of every %count% months%occurrences%%end_date%%timezone_info%"
+                monthnth: "{1} Monthly the %instance% %day% of every 1 month%occurrences%%end_date%%timezone_info%|]1,Inf[ Monthly the %instance% %day% of every %count% months%occurrences%%end_date%%timezone_info%"
+                yearly: "{1} Yearly every 1 year on %day%%occurrences%%end_date%%timezone_info%|]1,Inf[ Yearly every %count% years on %day%%occurrences%%end_date%%timezone_info%"
+                yearnth: "{1} Yearly every 1 year on the %instance% %day% of %month%%occurrences%%end_date%%timezone_info%|]1,Inf[ Yearly every %count% years on the %instance% %day% of %month%%occurrences%%end_date%%timezone_info%"
+                weekday: "Daily, every weekday%occurrences%%end_date%%timezone_info%"
+
+            types:
+                daily:              Daily
+                weekly:             Weekly
+                monthly:            Monthly
+                monthnth:           Monthnth
+                yearly:             Yearly
+                yearnth:            Yearnth
+
+            instances:
+                first:              First
+                second:             Second
+                third:              Third
+                fourth:             Fourth
+                last:               Last
+
+            days:
+                sunday:             Sunday
+                monday:             Monday
+                tuesday:            Tuesday
+                wednesday:          Wednesday
+                thursday:           Thursday
+                friday:             Friday
+                saturday:           Saturday
+                weekday:            weekday
+                weekend:            weekend
+                day:                day

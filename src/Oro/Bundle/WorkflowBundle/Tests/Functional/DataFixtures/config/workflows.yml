@@ -21,17 +21,50 @@ workflows:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: open
         steps:
-           open:
-               label: 'Open'
-               order: 10
-               allowed_transitions: ['start_transition']
+            open:
+                label: 'Open'
+                order: 10
+                allowed_transitions: ['start_transition']
         transition_definitions:
-           start_transiotion_definition: ~
+            start_transiotion_definition: ~
         transitions:
-           start_transition:
-               label: 'Start transition'
-               step_to: open
-               transition_definition: start_transiotion_definition
-               schedule:
-                   cron: '* * * * *'
-                   filter: 'e.id = 7'
+            start_transition:
+                label: 'Start transition'
+                step_to: open
+                transition_definition: start_transiotion_definition
+                schedule:
+                    cron: '* * * * *'
+                    filter: 'e.id = 7'
+
+    test_multistep_flow:
+        label: 'Test MultiStep Flow'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        start_step: starting_point
+        steps:
+            starting_point:
+                 label: '(Start)'
+                 order: -1
+                 _is_start: true
+                 allowed_transitions: ['starting_point_transition']
+            second_point:
+                  label: '(Second)'
+                  order: 0
+                  allowed_transitions: ['second_point_transition']
+            third_point:
+                  label: '(Final)'
+                  order: 1
+                  is_final: true
+                  allowed_transitions: ['ssecond_point_transition']
+        transition_definitions:
+            starting_point_transition_definition: ~
+            second_point_transition_definition: ~
+        transitions:
+            starting_point_transition:
+                 label: 'Start transition'
+                 step_to: second_point
+                 is_start: true
+                 transition_definition: starting_point_transition_definition
+            second_point_transition:
+                 label: 'Start transition'
+                 step_to: third_point
+                 transition_definition: second_point_transition_definition

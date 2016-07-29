@@ -3,11 +3,12 @@
 namespace Oro\Bundle\CalendarBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
@@ -16,6 +17,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence as RecurrenceEntity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -32,12 +35,17 @@ class EntityListener
     /** @var Calendar[] */
     protected $insertedCalendars = [];
 
+    /** @var Recurrence  */
+    protected $recurrenceModel;
+
     /**
      * @param ServiceLink $securityContextLink
+     * @param Recurrence  $recurrenceModel
      */
-    public function __construct(ServiceLink $securityContextLink)
+    public function __construct(ServiceLink $securityContextLink, Recurrence $recurrenceModel)
     {
         $this->securityContextLink = $securityContextLink;
+        $this->recurrenceModel     = $recurrenceModel;
     }
 
     /**
@@ -57,6 +65,21 @@ class EntityListener
                     $entity->setOrganization($organization);
                 }
             }
+        }
+
+        if ($entity instanceof RecurrenceEntity) {
+            $entity->setCalculatedEndTime($this->recurrenceModel->getCalculatedEndTime($entity));
+        }
+    }
+
+    /**
+     * @param LifecycleEventArgs $args
+     */
+    public function prePersist(LifecycleEventArgs $args)
+    {
+        $entity = $args->getEntity();
+        if ($entity instanceof RecurrenceEntity) {
+            $entity->setCalculatedEndTime($this->recurrenceModel->getCalculatedEndTime($entity));
         }
     }
 

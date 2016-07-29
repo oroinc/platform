@@ -29,10 +29,6 @@ GridPaginator:
   selector: 'div.toolbar div.pagination'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
 
-ActivityListPaginator:
-  selector: 'div.activity-list div.pagination'
-  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
-
 GridFloatingMenu:
   selector: '.dropdown-menu__floating'
   class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
