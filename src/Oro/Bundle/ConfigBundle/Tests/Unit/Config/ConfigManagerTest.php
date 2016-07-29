@@ -256,12 +256,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFromParentScope($parameterName, $full, $expectedResult)
     {
-        $this->userScopeManager->expects($this->once())
+        $this->userScopeManager->expects($this->atLeastOnce())
             ->method('getSettingValue')
             ->with($parameterName, $full)
             ->willReturn(null);
 
-        $this->globalScopeManager->expects($this->once())
+        $this->globalScopeManager->expects($this->atLeastOnce())
             ->method('getSettingValue')
             ->with($parameterName, $full)
             ->willReturnCallback(function ($name, $full) {
