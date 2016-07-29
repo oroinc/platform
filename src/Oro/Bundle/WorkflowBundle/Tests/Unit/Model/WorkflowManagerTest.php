@@ -3,19 +3,20 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
-use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
+use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -26,74 +27,44 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_WORKFLOW_NAME = 'test_workflow';
 
-    /**
-     * @var WorkflowManager
-     */
+    /** @var WorkflowManager */
     protected $workflowManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $registry;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowRegistry;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $configManager;
-
-    /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $eventDispatcher;
+    /** @var WorkflowSystemConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowSystemConfig;
 
     protected function setUp()
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getManager'))
-            ->getMockForAbstractClass();
-
-        $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
+        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->workflowSystemConfig = $this->getMockBuilder(WorkflowSystemConfigManager::class)
+            ->disableOriginalConstructor()->getMock();
 
         $this->workflowManager = new WorkflowManager(
-            $this->registry,
             $this->workflowRegistry,
             $this->doctrineHelper,
-            $this->configManager,
-            $this->eventDispatcher
+            $this->workflowSystemConfig
         );
     }
 
     protected function tearDown()
     {
         unset(
-            $this->registry,
             $this->workflowRegistry,
             $this->doctrineHelper,
-            $this->workflowManager,
-            $this->eventDispatcher
+            $this->workflowManager
         );
     }
 
@@ -103,80 +74,48 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $startTransition->setName('start_transition');
         $startTransition->setStart(true);
 
-        $startTransitions = new ArrayCollection(array($startTransition));
-        $workflow = $this->createWorkflow('test_workflow', array(), $startTransitions->toArray());
+        $startTransitions = new ArrayCollection([$startTransition]);
+        $workflow = $this->createWorkflow('test_workflow', [], $startTransitions->toArray());
         $this->assertEquals($startTransitions, $this->workflowManager->getStartTransitions($workflow));
     }
 
     /**
-     * @param string $workflowItemDefinition
-     * @param string $activeDefinition
-     * @param bool $result
-     * @dataProvider getActiveWorkflowDataProvider
+     * @param mixed $workflowIdentifier
+     * @dataProvider getWorkflowDataProvider
      */
-    public function testIsResetAllowed($workflowItemDefinition, $activeDefinition, $result)
+    public function testGetWorkflow($workflowIdentifier)
     {
-        $entity       = new \DateTime('now');
-        $entityId     = 1;
-        $entityClass  = get_class($entity);
-        $workflowItem = null === $workflowItemDefinition ? null : $this->createWorkflowItem($workflowItemDefinition);
+        $expectedWorkflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME);
 
-        if (null === $activeDefinition) {
-            $workflow = null;
+        if ($workflowIdentifier instanceof Workflow) {
+            $this->workflowRegistry->expects($this->never())
+                ->method('getWorkflow');
         } else {
-            $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-                ->disableOriginalConstructor()
-                ->setMethods(null)
-                ->getMock();
-            $workflow->setName($activeDefinition);
+            $this->workflowRegistry->expects($this->any())
+                ->method('getWorkflow')
+                ->with(self::TEST_WORKFLOW_NAME)
+                ->will($this->returnValue($expectedWorkflow));
         }
 
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityClass')
-            ->with($entity)
-            ->will($this->returnValue($entityClass));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifier')
-            ->with($entity)
-            ->will($this->returnValue($entityId));
-
-        $workflowItemsRepository =
-            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
-                ->disableOriginalConstructor()
-                ->setMethods(array('findByEntityMetadata'))
-                ->getMock();
-        $workflowItemsRepository->expects($this->once())
-            ->method('findByEntityMetadata')
-            ->with($entityClass, $entityId)
-            ->will($this->returnValue($workflowItem));
-        $this->registry->expects($this->any())
-            ->method('getRepository')
-            ->with('OroWorkflowBundle:WorkflowItem')
-            ->will($this->returnValue($workflowItemsRepository));
-
-        $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflowByEntityClass')
-            ->with($entityClass)
-            ->will($this->returnValue($workflow));
-
-        $this->assertEquals($result, $this->workflowManager->isResetAllowed($entity));
+        $this->assertEquals($expectedWorkflow, $this->workflowManager->getWorkflow($workflowIdentifier));
     }
 
     /**
      * @return array
      */
-    public function getActiveWorkflowDataProvider()
+    public function getWorkflowDataProvider()
     {
-        return array(
-            array('active-workflow', 'active-workflow', false),
-            array('active-workflow', 'current-workflow', true),
-            array(null, 'current-workflow', false),
-            array(null, 'active-workflow', false),
-            array('current-workflow', null, false),
-            array('active-workflow', null, false),
-            array(null, null, false),
-        );
+        return [
+            'string' => [
+                'workflowIdentifier' => self::TEST_WORKFLOW_NAME,
+            ],
+            'workflow item' => [
+                'workflowIdentifier' => $this->createWorkflowItem(self::TEST_WORKFLOW_NAME),
+            ],
+            'workflow' => [
+                'workflowIdentifier' => $this->createWorkflow(self::TEST_WORKFLOW_NAME),
+            ],
+        ];
     }
 
     public function testGetTransitionsByWorkflowItem()
@@ -189,7 +128,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $transition = new Transition();
         $transition->setName('test_transition');
 
-        $transitions = new ArrayCollection(array($transition));
+        $transitions = new ArrayCollection([$transition]);
 
         $workflow = $this->createWorkflow($workflowName);
         $workflow->expects($this->once())
@@ -239,12 +178,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowName = 'test_workflow';
         $errors = new ArrayCollection();
         $entity = new \DateTime('now');
-        $data = array();
+        $data = [];
 
         $entityAttribute = new Attribute();
         $entityAttribute->setName('entity_attribute');
         $entityAttribute->setType('entity');
-        $entityAttribute->setOptions(array('class' => 'DateTime'));
+        $entityAttribute->setOptions(['class' => 'DateTime']);
 
         $stringAttribute = new Attribute();
         $stringAttribute->setName('other_attribute');
@@ -252,7 +191,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $transition = 'test_transition';
 
-        $workflow = $this->createWorkflow($workflowName, array($entityAttribute, $stringAttribute));
+        $workflow = $this->createWorkflow($workflowName, [$entityAttribute, $stringAttribute]);
         $workflow->expects($this->once())
             ->method('isStartTransitionAvailable')
             ->with($transition, $entity, $data, $errors)
@@ -268,170 +207,160 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @param boolean $withStartStep
-     * @dataProvider resetWorkflowItemProvider
-     */
-    public function testResetWorkflowItem($withStartStep)
+    public function testResetWorkflowItemWithoutStartStep()
     {
-        $workflowName       = self::TEST_WORKFLOW_NAME;
-        $activeWorkflowName = self::TEST_WORKFLOW_NAME . '_active';
-        $workflowItem       = $this->createWorkflowItem();
-        $entity             = new WorkflowAwareEntity();
-        $workflowStep       = new WorkflowStep();
+        $workflowItem = new WorkflowItem();
+        $workflowName = 'test_workflow';
+        $workflowDefinition = (new WorkflowDefinition())->setName($workflowName);
+        $entity = new EntityStub(42);
+        $workflowItem
+            ->setEntity($entity)
+            ->setWorkflowName($workflowName);
 
-        $entity->setWorkflowItem($workflowItem);
-        $entity->setWorkflowStep($workflowStep);
+        $em = $this->getTransactionScopedEntityManager(WorkflowItem::class, 1);
 
-        $workflowItem->setEntity($entity);
+        $em->expects($this->once())->method('remove')->with($workflowItem);
+        $em->expects($this->once())->method('flush');
 
-        $workflowDefinition = new WorkflowDefinition();
-        $workflowDefinition->setRelatedEntity(get_class($entity));
-
-        $workflowItem->setDefinition($workflowDefinition);
-
-        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $restrictionManager, null, null, null))
-            ->setMethods(null)
-            ->getMock();
-        $workflow->setName($workflowName);
-
-        $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
-        $stepManager->expects($this->any())->method('hasStartStep')
-            ->will($this->returnValue($withStartStep));
-
-        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $activeWorkflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs([new EntityConnector(), $aclManager, $restrictionManager, $stepManager, null, null])
-            ->setMethods(['start'])
-            ->getMock();
-        $activeWorkflow->setName($activeWorkflowName);
-        $activeWorkflow->setDefinition($workflowDefinition);
-        if ($withStartStep) {
-            $workflowDefinition->setName($activeWorkflowName);
-            $workflowItemActive = $this->createWorkflowItem($activeWorkflowName);
-            $workflowItemActive->setEntity($entity);
-            $workflowItemActive->setDefinition($workflowDefinition);
-
-            $activeWorkflow->expects($this->once())
-                ->method('start')
-                ->with($entity, array(), null)
-                ->will($this->returnValue($workflowItemActive));
-        } else {
-            $activeWorkflow->expects($this->never())
-                ->method('start');
-        }
-
-        $this->workflowRegistry->expects($this->any())
-            ->method('getWorkflow')
-            ->will(
-                $this->returnCallback(
-                    function ($workflowIdentifier) use ($workflow, $activeWorkflow) {
-                        return is_string($workflowIdentifier) ? $activeWorkflow : $workflow;
-                    }
-                )
-            );
+        $workflow = $this->createWorkflow('test_workflow');
+        /**@var StepManager|\PHPUnit_Framework_MockObject_MockObject $stepManager */
+        $stepManager = $this->getMockBuilder(StepManager::class)->disableOriginalConstructor()->getMock();
+        $stepManager->expects($this->once())->method('hasStartStep')->willReturn(false);
+        $workflow->expects($this->once())->method('getStepManager')->willReturn($stepManager);
+        $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
 
         $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflowByEntityClass')
-            ->will($this->returnValue($activeWorkflow));
-
-        $entityManager = $this->createEntityManager();
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($entityManager));
-
-        if ($withStartStep) {
-            $this->registry->expects($this->once())
-                ->method('getManager')
-                ->will($this->returnValue($entityManager));
-        } else {
-            $this->registry->expects($this->never())
-                ->method('getManager');
-        }
-
-        $activeWorkflowItem = $this->workflowManager->resetWorkflowItem($workflowItem);
-        if ($withStartStep) {
-            $this->assertNotNull($activeWorkflowItem);
-            $this->assertEquals($activeWorkflowName, $activeWorkflowItem->getDefinition()->getName());
-        } else {
-            $this->assertNull($activeWorkflowItem);
-        }
-
-        $this->assertNull($entity->getWorkflowStep());
-        $this->assertNull($entity->getWorkflowItem());
-    }
-
-    /**
-     * @return array
-     */
-    public function resetWorkflowItemProvider()
-    {
-        return array(
-            array(true),
-            array(false)
-        );
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Reset workflow exception message
-     */
-    public function testResetWorkflowItemException()
-    {
-        $workflowItem = $this->createWorkflowItem();
-        $entity       = new WorkflowAwareEntity();
-        $workflowItem->setEntity($entity);
-
-        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $restrictionManager, null, null, null))
-            ->setMethods(null)
-            ->getMock();
-
-        $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
-            ->method('beginTransaction');
-        $entityManager->expects($this->once())
-            ->method('remove')
-            ->will($this->throwException(new \Exception('Reset workflow exception message')));
-        $entityManager->expects($this->once())
-            ->method('rollback');
-
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($entityManager));
-        $this->workflowRegistry->expects($this->any())
             ->method('getWorkflow')
-            ->with(self::TEST_WORKFLOW_NAME)
-            ->will($this->returnValue($workflow));
+            ->with('test_workflow')
+            ->willReturn($workflow);
+
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(true);
 
         $this->workflowManager->resetWorkflowItem($workflowItem);
+    }
+
+    public function testResetWorkflowItemWithStartStep()
+    {
+        $workflowItem = new WorkflowItem();
+        $newItem = new WorkflowItem();
+        $workflowName = 'test_workflow';
+        $workflowDefinition = (new WorkflowDefinition())->setName($workflowName);
+        $entity = new EntityStub(42);
+        $workflowItem
+            ->setEntity($entity)
+            ->setWorkflowName($workflowName);
+
+        $em = $this->getTransactionScopedEntityManager(WorkflowItem::class, 2); //add one more transaction startWorkflow
+
+        $em->expects($this->once())->method('remove')->with($workflowItem);
+        $em->expects($this->once())->method('persist')->with($newItem);
+        $em->expects($this->exactly(2))->method('flush');
+
+        $workflow = $this->createWorkflow('test_workflow');
+        /**@var StepManager|\PHPUnit_Framework_MockObject_MockObject $stepManager */
+        $stepManager = $this->getMockBuilder(StepManager::class)->disableOriginalConstructor()->getMock();
+        $stepManager->expects($this->once())->method('hasStartStep')->willReturn(true);
+        $workflow->expects($this->once())->method('getStepManager')->willReturn($stepManager);
+        $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
+        $workflow->expects($this->once())->method('start')->with($entity, [], null)->willReturn($newItem);
+
+        $this->workflowRegistry->expects($this->exactly(2))
+            ->method('getWorkflow')
+            ->with('test_workflow')
+            ->willReturn($workflow);
+
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(true);
+
+        $item = $this->workflowManager->resetWorkflowItem($workflowItem);
+        $this->assertSame($newItem, $item, 'should return item created while workflow->start invoked');
+    }
+
+    /**
+     * @param string $manageableEntityClass
+     * @param int $transactionDepth
+     * @return EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getTransactionScopedEntityManager($manageableEntityClass, $transactionDepth = 1)
+    {
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+
+        $this->doctrineHelper->expects($this->exactly($transactionDepth))
+            ->method('getEntityManagerForClass')
+            ->with($manageableEntityClass)
+            ->willReturn($entityManager);
+        $entityManager->expects($this->exactly($transactionDepth))->method('beginTransaction');
+        $entityManager->expects($this->exactly($transactionDepth))->method('commit');
+
+        return $entityManager;
+    }
+
+    public function testGetApplicableWorkflows()
+    {
+        $entity = new \DateTime('now');
+        $entityClass = get_class($entity);
+        $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entity)
+            ->will($this->returnValue($entityClass));
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByEntityClass')
+            ->with($entityClass)
+            ->will($this->returnValue([$workflow]));
+
+        $this->assertEquals([$workflow], $this->workflowManager->getApplicableWorkflows($entity));
+    }
+
+    public function testHasApplicableWorkflowsTrue()
+    {
+        $entity = new \DateTime('now');
+        $entityClass = get_class($entity);
+        $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entity)
+            ->will($this->returnValue($entityClass));
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByEntityClass')
+            ->with($entityClass)
+            ->will($this->returnValue([$workflow]));
+
+        $this->assertTrue($this->workflowManager->hasApplicableWorkflows($entity));
+    }
+
+    public function testHasApplicableWorkflowsFalse()
+    {
+        $entity = new \DateTime('now');
+        $entityClass = get_class($entity);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entity)
+            ->will($this->returnValue($entityClass));
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByEntityClass')
+            ->with($entityClass)
+            ->will($this->returnValue([]));
+
+        $this->assertFalse($this->workflowManager->hasApplicableWorkflows($entity));
     }
 
     public function testStartWorkflow()
     {
         $entity = new \DateTime();
         $transition = 'test_transition';
-        $workflowData = array('key' => 'value');
+        $workflowData = ['key' => 'value'];
         $workflowItem = new WorkflowItem();
         $workflowItem->getData()->add($workflowData);
 
@@ -441,47 +370,18 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with($entity, $workflowData, $transition)
             ->will($this->returnValue($workflowItem));
 
-        $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
-            ->method('beginTransaction');
-        $entityManager->expects($this->once())
+        $em = $this->getTransactionScopedEntityManager(WorkflowItem::class);
+
+        $em->expects($this->once())
             ->method('persist')
             ->with($workflowItem);
-        $entityManager->expects($this->once())
+        $em->expects($this->once())
             ->method('flush');
-        $entityManager->expects($this->once())
-            ->method('commit');
-
-        $this->registry->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($entityManager));
 
         $actualWorkflowItem = $this->workflowManager->startWorkflow($workflow, $entity, $transition, $workflowData);
 
         $this->assertEquals($workflowItem, $actualWorkflowItem);
         $this->assertEquals($workflowData, $actualWorkflowItem->getData()->getValues());
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Start workflow exception message
-     */
-    public function testStartWorkflowException()
-    {
-        $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
-            ->method('beginTransaction');
-        $entityManager->expects($this->once())
-            ->method('persist')
-            ->will($this->throwException(new \Exception('Start workflow exception message')));
-        $entityManager->expects($this->once())
-            ->method('rollback');
-
-        $this->registry->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($entityManager));
-
-        $this->workflowManager->startWorkflow($this->createWorkflow(), null, 'test_transition');
     }
 
     /**
@@ -491,11 +391,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMassStartWorkflow(array $source, array $expected)
     {
-        $entityManager = $this->createEntityManager();
-        $this->registry->expects($this->once())->method('getManager')
-            ->will($this->returnValue($entityManager));
-
-        $entityManager->expects($this->once())->method('beginTransaction');
+        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class);
 
         if ($expected) {
             foreach ($expected as $iteration => $row) {
@@ -518,82 +414,55 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         }
 
         $entityManager->expects($this->once())->method('flush');
-        $entityManager->expects($this->once())->method('commit');
 
         $this->workflowManager->massStartWorkflow($source);
     }
 
+    /**
+     * @return array
+     */
     public function massStartDataProvider()
     {
         $firstEntity = new \DateTime('2012-12-12');
         $secondEntity = new \DateTime('2012-12-13');
 
-        return array(
-            'no data' => array(
-                'source' => array(),
-                'expected' => array(),
-            ),
-            'regular data' => array(
-                'source' => array(
-                    array('workflow' => 'first', 'entity' => $firstEntity),
-                    array('workflow' => 'second', 'entity' => $secondEntity),
-                ),
-                'expected' => array(
-                    array('workflow' => 'first', 'entity' => $firstEntity, 'transition' => null, 'data' => array()),
-                    array('workflow' => 'second', 'entity' => $secondEntity, 'transition' => null, 'data' => array()),
-                ),
-            ),
-            'extra cases' => array(
-                'source' => array(
-                    array('workflow' => 'first', 'entity' => $firstEntity, 'transition' => 'start'),
-                    array(
+        return [
+            'no data' => [
+                'source' => [],
+                'expected' => [],
+            ],
+            'regular data' => [
+                'source' => [
+                    ['workflow' => 'first', 'entity' => $firstEntity],
+                    ['workflow' => 'second', 'entity' => $secondEntity],
+                ],
+                'expected' => [
+                    ['workflow' => 'first', 'entity' => $firstEntity, 'transition' => null, 'data' => []],
+                    ['workflow' => 'second', 'entity' => $secondEntity, 'transition' => null, 'data' => []],
+                ],
+            ],
+            'extra cases' => [
+                'source' => [
+                    ['workflow' => 'first', 'entity' => $firstEntity, 'transition' => 'start'],
+                    [
                         'workflow' => 'second',
                         'entity' => $secondEntity,
                         'transition' => 'start',
-                        'data' => array('field' => 'value')
-                    ),
-                    array('some', 'strange', 'data'),
-                ),
-                'expected' => array(
-                    array('workflow' => 'first', 'entity' => $firstEntity, 'transition' => 'start', 'data' => array()),
-                    array(
+                        'data' => ['field' => 'value']
+                    ],
+                    ['some', 'strange', 'data'],
+                ],
+                'expected' => [
+                    ['workflow' => 'first', 'entity' => $firstEntity, 'transition' => 'start', 'data' => []],
+                    [
                         'workflow' => 'second',
                         'entity' => $secondEntity,
                         'transition' => 'start',
-                        'data' => array('field' => 'value'),
-                    ),
-                ),
-            )
-        );
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Mass start workflow exception message
-     */
-    public function testMassStartWorkflowException()
-    {
-        $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())->method('beginTransaction');
-        $entityManager->expects($this->once())->method('rollback');
-        $entityManager->expects($this->never())->method('persist');
-        $entityManager->expects($this->never())->method('commit');
-
-        $this->registry->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($entityManager));
-
-        $workflowName = 'test_workflow';
-        $entity = new \DateTime();
-        $workflow = $this->createWorkflow($workflowName);
-
-        $workflow->expects($this->once())->method('start')->with($entity, array(), null)
-            ->will($this->throwException(new \Exception('Mass start workflow exception message')));
-
-        $this->workflowRegistry->expects($this->once())->method('getWorkflow')->with($workflowName)
-            ->will($this->returnValue($workflow));
-
-        $this->workflowManager->massStartWorkflow(array(array('workflow' => $workflowName, 'entity' => $entity)));
+                        'data' => ['field' => 'value'],
+                    ],
+                ],
+            ]
+        ];
     }
 
     public function testTransit()
@@ -614,53 +483,14 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with($workflowName)
             ->will($this->returnValue($workflow));
 
-        $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
-            ->method('beginTransaction');
+        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class);
+
         $entityManager->expects($this->once())
             ->method('flush');
-        $entityManager->expects($this->once())
-            ->method('commit');
-
-        $this->registry->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($entityManager));
 
         $this->assertEmpty($workflowItem->getUpdated());
         $this->workflowManager->transit($workflowItem, $transition);
         $this->assertNotEmpty($workflowItem->getUpdated());
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Transit exception message
-     */
-    public function testTransitException()
-    {
-        $workflowName = 'test_workflow';
-
-        $workflowItem = new WorkflowItem();
-        $workflowItem->setWorkflowName($workflowName);
-
-        $this->workflowRegistry->expects($this->once())
-            ->method('getWorkflow')
-            ->with($workflowName)
-            ->will($this->returnValue($this->createWorkflow($workflowName)));
-
-        $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
-            ->method('beginTransaction');
-        $entityManager->expects($this->once())
-            ->method('flush')
-            ->will($this->throwException(new \Exception('Transit exception message')));
-        $entityManager->expects($this->once())
-            ->method('rollback');
-
-        $this->registry->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($entityManager));
-
-        $this->workflowManager->transit($workflowItem, 'test_transition');
     }
 
     /**
@@ -670,11 +500,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMassTransit(array $source, array $expected)
     {
-        $entityManager = $this->createEntityManager();
-        $this->registry->expects($this->once())->method('getManager')
-            ->willReturn($entityManager);
-
-        $entityManager->expects($this->once())->method('beginTransaction');
+        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class);
 
         /** @var WorkflowItem[] $workflowItems */
         $workflowItems = [];
@@ -698,7 +524,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         }
 
         $entityManager->expects($this->once())->method('flush');
-        $entityManager->expects($this->once())->method('commit');
 
         $this->workflowManager->massTransit($source);
 
@@ -741,58 +566,80 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Mass transit exception message
+     * @dataProvider getWorkflowItemDataProvider
+     *
+     * @param int|string $id
      */
-    public function testMassTransitException()
+    public function testGetWorkflowItem($id)
     {
-        $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())->method('beginTransaction');
-        $entityManager->expects($this->once())->method('rollback');
-        $entityManager->expects($this->never())->method('commit');
-
-        $this->registry->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($entityManager));
-
-        $workflow = $this->createWorkflow();
-        $workflowItem = $this->createWorkflowItem();
-        $transition = 'test_transition';
-
-        $workflow->expects($this->once())->method('transit')->with($workflowItem, $transition)
-            ->willThrowException(new \Exception('Mass transit exception message'));
-
-        $this->workflowRegistry->expects($this->once())->method('getWorkflow')
-            ->willReturn($workflow);
-
-        $this->workflowManager->massTransit([['workflowItem' => $workflowItem, 'transition' => $transition]]);
-    }
-
-    public function testGetApplicableWorkflow()
-    {
-        $entity = new \DateTime('now');
-        $entityClass = get_class($entity);
-        $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME);
+        $entity = new EntityStub($id);
+        $workflowName = 'test_workflow';
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entity)
-            ->will($this->returnValue($entityClass));
-        $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflowByEntityClass')
-            ->with($entityClass)
-            ->will($this->returnValue($workflow));
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn($id);
 
-        $this->assertEquals($workflow, $this->workflowManager->getApplicableWorkflow($entity));
+        $repository = $this->getMockBuilder(WorkflowItemRepository::class)->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->with(WorkflowItem::class)
+            ->willReturn($repository);
+        $this->doctrineHelper->expects($this->once())->method('getEntityClass')->with($entity)
+            ->willReturn(EntityStub::class);
+        $repository->expects($this->once())->method('findOneByEntityMetadata')
+            ->with(EntityStub::class, $id, $workflowName)
+            ->willReturn(['result']);
+
+        $result = $this->workflowManager->getWorkflowItem($entity, $workflowName);
+
+        $this->assertEquals(['result'], $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function getWorkflowItemDataProvider()
+    {
+        return [
+            [42],
+            ['string']
+        ];
+    }
+
+    /**
+     * @dataProvider unsupportedIdentifiersDataProvider
+     * @param mixed $id
+     */
+    public function testGetWorkflowItemUnsupportedIdentifier($id)
+    {
+        $entity = new EntityStub($id);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')->with($entity)->willReturn($id);
+
+        $this->doctrineHelper->expects($this->never())->method('getEntityRepository');
+
+        $result = $this->workflowManager->getWorkflowItem($entity, 'workflow_name');
+
+        $this->assertNull($result, 'If not an integer identifier got - return null');
+    }
+
+    /**
+     * @return array
+     */
+    public function unsupportedIdentifiersDataProvider()
+    {
+        return [
+            [['array']],
+            [1.123123],
+            [(object)[]]
+        ];
     }
 
     /**
      * @param mixed $entityId
-     * @param WorkflowItem $workflowItem
+     * @param WorkflowItem[] $workflowItems
      *
      * @dataProvider entityDataProvider
      */
-    public function testGetWorkflowItemByEntity($entityId, WorkflowItem $workflowItem = null)
+    public function testGetWorkflowItemsByEntity($entityId, array $workflowItems = [])
     {
         $entity = new \DateTime('now');
         $entityClass = get_class($entity);
@@ -810,20 +657,20 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowItemsRepository =
             $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
                 ->disableOriginalConstructor()
-                ->setMethods(array('findByEntityMetadata'))
+                ->setMethods(['findAllByEntityMetadata'])
                 ->getMock();
         $workflowItemsRepository->expects($this->any())
-            ->method('findByEntityMetadata')
+            ->method('findAllByEntityMetadata')
             ->with($entityClass, $entityId)
-            ->will($this->returnValue($workflowItem));
-        $this->registry->expects($this->any())
-            ->method('getRepository')
-            ->with('OroWorkflowBundle:WorkflowItem')
+            ->will($this->returnValue($workflowItems));
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with(WorkflowItem::class)
             ->will($this->returnValue($workflowItemsRepository));
 
         $this->assertEquals(
-            $workflowItem,
-            $this->workflowManager->getWorkflowItemByEntity($entity)
+            $workflowItems,
+            $this->workflowManager->getWorkflowItemsByEntity($entity)
         );
     }
 
@@ -833,61 +680,73 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     public function entityDataProvider()
     {
         return [
-            'integer'           => [1, $this->createWorkflowItem()],
-            'integer_as_string' => ['123', $this->createWorkflowItem()],
-            'string'            => ['identifier', null],
-            'null'              => [null, null],
-            'object'            => [new \stdClass(), null],
+            'integer' => [1, [$this->createWorkflowItem()]],
+            'integer_as_string' => ['123', [$this->createWorkflowItem()]],
+            'string' => ['identifier', []],
+            'null' => [null, []],
+            'object' => [new \stdClass(), []],
         ];
     }
 
-    /**
-     * @param mixed $workflowIdentifier
-     * @dataProvider getWorkflowDataProvider
-     */
-    public function testGetWorkflow($workflowIdentifier)
+    public function testActivateWorkflow()
     {
-        $expectedWorkflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME);
+        $workflowDefinition = new WorkflowDefinition();
 
-        if ($workflowIdentifier instanceof Workflow) {
-            $this->workflowRegistry->expects($this->never())
-                ->method('getWorkflow');
-        } else {
-            $this->workflowRegistry->expects($this->any())
-                ->method('getWorkflow')
-                ->with(self::TEST_WORKFLOW_NAME)
-                ->will($this->returnValue($expectedWorkflow));
-        }
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(false);
+        $this->workflowSystemConfig->expects($this->once())->method('setWorkflowActive')->with($workflowDefinition);
 
-        $this->assertEquals($expectedWorkflow, $this->workflowManager->getWorkflow($workflowIdentifier));
+        $this->workflowManager->activateWorkflow($workflowDefinition);
     }
 
-    /**
-     * @return array
-     */
-    public function getWorkflowDataProvider()
+    public function testActivateWorkflowSkipIfAlreadyActive()
     {
-        return array(
-            'string' => array(
-                'workflowIdentifier' => self::TEST_WORKFLOW_NAME,
-            ),
-            'workflow item' => array(
-                'workflowIdentifier' => $this->createWorkflowItem(self::TEST_WORKFLOW_NAME),
-            ),
-            'workflow' => array(
-                'workflowIdentifier' => $this->createWorkflow(self::TEST_WORKFLOW_NAME),
-            ),
-        );
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(true);
+        $this->workflowSystemConfig->expects($this->never())->method('setWorkflowActive');
+
+        $this->workflowManager->activateWorkflow($workflowDefinition);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Can't find workflow by given identifier.
-     */
-    public function testGetWorkflowCantFind()
+    public function testDeactivateWorkflow()
     {
-        $incorrectIdentifier = null;
-        $this->workflowManager->getWorkflow($incorrectIdentifier);
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(true);
+        $this->workflowSystemConfig->expects($this->once())->method('setWorkflowInactive')->with($workflowDefinition);
+
+        $this->workflowManager->deactivateWorkflow($workflowDefinition);
+    }
+
+    public function testDeactivateWorkflowSkipIfNotActive()
+    {
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())
+            ->method('isActiveWorkflow')
+            ->with($workflowDefinition)
+            ->willReturn(false);
+        $this->workflowSystemConfig->expects($this->never())->method('setWorkflowInactive');
+
+        $this->workflowManager->deactivateWorkflow($workflowDefinition);
+    }
+
+    public function testIsActiveWorkflow()
+    {
+        $workflowDefinition = new WorkflowDefinition();
+
+        $this->workflowSystemConfig->expects($this->once())->method('isActiveWorkflow')->with($workflowDefinition);
+
+        $this->workflowManager->isActiveWorkflow($workflowDefinition);
     }
 
     /**
@@ -897,7 +756,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMockBuilder('Doctrine\Orm\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('beginTransaction', 'remove', 'persist', 'flush', 'commit', 'rollback'))
+            ->setMethods(['beginTransaction', 'remove', 'persist', 'flush', 'commit', 'rollback'])
             ->getMock();
     }
 
@@ -921,26 +780,25 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createWorkflow(
         $name = self::TEST_WORKFLOW_NAME,
-        array $entityAttributes = array(),
-        array $startTransitions = array()
+        array $entityAttributes = [],
+        array $startTransitions = []
     ) {
         $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
-            ->setMethods(array('getManagedEntityAttributes'))
+            ->setMethods(['getManagedEntityAttributes'])
             ->getMock();
         $attributeManager->expects($this->any())
             ->method('getManagedEntityAttributes')
             ->will($this->returnValue($entityAttributes));
 
         $transitionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionManager')
-            ->setMethods(array('getStartTransitions'))
+            ->setMethods(['getStartTransitions'])
             ->getMock();
         $transitionManager->expects($this->any())
             ->method('getStartTransitions')
             ->will($this->returnValue(new ArrayCollection($startTransitions)));
 
-        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -951,16 +809,18 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs(
-                [$entityConnector, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
             )
             ->setMethods(
-                array(
+                [
                     'isTransitionAvailable',
                     'isStartTransitionAvailable',
                     'getTransitionsByWorkflowItem',
                     'start',
+                    'getDefinition',
+                    'getStepManager',
                     'transit'
-                )
+                ]
             )
             ->getMock();
 
@@ -970,163 +830,15 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         return $workflow;
     }
 
+    /**
+     * @return array
+     */
     public function trueFalseDataProvider()
     {
-        return array(
-            array(true),
-            array(false)
-        );
-    }
-
-    /**
-     * @param bool $result
-     * @dataProvider trueFalseDataProvider
-     */
-    public function testHasApplicableWorkflowByEntityClass($result)
-    {
-        $entityClass = 'TestEntity';
-
-        $this->workflowRegistry->expects($this->once())
-            ->method('hasActiveWorkflowByEntityClass')
-            ->with($entityClass)
-            ->will($this->returnValue($result));
-
-        $this->assertEquals($result, $this->workflowManager->hasApplicableWorkflowByEntityClass($entityClass));
-    }
-
-    public function activateWorkflowDataProvider()
-    {
-        $workflowDefinition = new WorkflowDefinition();
-        $workflowDefinition->setName('test_workflow');
-        $workflowDefinition->setRelatedEntity('\DateTime');
-
-        return array(
-            'by workflow name' => array(
-                'workflow_identifier' => 'test_workflow'
-            ),
-            'by workflow definition' => array(
-                'workflow_identifier' => $workflowDefinition
-            ),
-        );
-    }
-
-    /**
-     * @param mixed $workflowIdentifier
-     * @dataProvider activateWorkflowDataProvider
-     */
-    public function testActivateWorkflow($workflowIdentifier)
-    {
-        if ($workflowIdentifier instanceof WorkflowDefinition) {
-            $workflowName = $workflowIdentifier->getName();
-            $entityClass = $workflowIdentifier->getRelatedEntity();
-            $workflowDefinition = $workflowIdentifier;
-        } else {
-            $workflowName = $workflowIdentifier;
-            $entityClass = '\DateTime';
-            $workflowDefinition = new WorkflowDefinition();
-            $workflowDefinition->setRelatedEntity($entityClass);
-            /** @var Workflow $workflow */
-            $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-                ->disableOriginalConstructor()
-                ->setMethods(null)
-                ->getMock();
-            $workflowDefinition->setName($workflowName);
-            $workflow->setDefinition($workflowDefinition);
-            $this->workflowRegistry->expects($this->once())->method('getWorkflow')->with($workflowIdentifier)
-                ->will($this->returnValue($workflow));
-        }
-
-        $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $entityConfig->expects($this->once())->method('set')->with('active_workflow', $workflowName);
-
-        $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowConfigProvider->expects($this->once())->method('hasConfig')->with($entityClass)
-            ->will($this->returnValue(true));
-        $workflowConfigProvider->expects($this->once())->method('getConfig')->with($entityClass)
-            ->will($this->returnValue($entityConfig));
-
-        $this->configManager->expects($this->once())->method('getProvider')->with('workflow')
-            ->will($this->returnValue($workflowConfigProvider));
-        $this->configManager->expects($this->once())->method('persist')->with($entityConfig);
-        $this->configManager->expects($this->once())->method('flush');
-
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                $this->equalTo(WorkflowEvents::WORKFLOW_ACTIVATED),
-                $this->logicalAnd(
-                    $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent'),
-                    $this->attributeEqualTo('definition', $workflowDefinition)
-                )
-            );
-
-        $this->workflowManager->activateWorkflow($workflowIdentifier);
-    }
-
-    public function testDeactivateWorkflow()
-    {
-        $entityClass = '\DateTime';
-        $workflowMock = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $entityConfig->expects($this->once())->method('set')->with('active_workflow', null);
-
-        $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflowByEntityClass')
-            ->with($entityClass)
-            ->willReturn($workflowMock);
-
-        $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowConfigProvider->expects($this->once())->method('hasConfig')->with($entityClass)
-            ->will($this->returnValue(true));
-        $workflowConfigProvider->expects($this->once())->method('getConfig')->with($entityClass)
-            ->will($this->returnValue($entityConfig));
-
-        $this->configManager->expects($this->once())->method('getProvider')->with('workflow')
-            ->will($this->returnValue($workflowConfigProvider));
-        $this->configManager->expects($this->once())->method('persist')->with($entityConfig);
-        $this->configManager->expects($this->once())->method('flush');
-
-        $definition = new WorkflowDefinition();
-        $workflowMock->expects($this->once())->method('getDefinition')->willReturn($definition);
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                $this->equalTo(WorkflowEvents::WORKFLOW_DEACTIVATED),
-                $this->logicalAnd(
-                    $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent'),
-                    $this->attributeEqualTo('definition', $definition)
-                )
-            );
-
-        $this->workflowManager->deactivateWorkflow($entityClass);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Entity \DateTime is not configurable
-     */
-    public function testNotConfigurableEntityException()
-    {
-        $entityClass = '\DateTime';
-
-        $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowConfigProvider->expects($this->once())->method('hasConfig')->with($entityClass)
-            ->will($this->returnValue(false));
-        $workflowConfigProvider->expects($this->never())->method('getConfig');
-
-        $this->configManager->expects($this->once())->method('getProvider')->with('workflow')
-            ->will($this->returnValue($workflowConfigProvider));
-
-        $this->workflowManager->deactivateWorkflow($entityClass);
+        return [
+            [true],
+            [false]
+        ];
     }
 
     public function testResetWorkflowData()
@@ -1138,16 +850,16 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowDefinition->setName($name)->setRelatedEntity($entityClass);
 
         $workflowItemsRepository =
-            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
+            $this->getMockBuilder(WorkflowItemRepository::class)
                 ->disableOriginalConstructor()
-                ->setMethods(array('resetWorkflowData'))
+                ->setMethods(['resetWorkflowData'])
                 ->getMock();
         $workflowItemsRepository->expects($this->once())->method('resetWorkflowData')
-            ->with($entityClass);
+            ->with($workflowDefinition);
 
-        $this->registry->expects($this->once())
-            ->method('getRepository')
-            ->with('OroWorkflowBundle:WorkflowItem')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->with(WorkflowItem::class)
             ->will($this->returnValue($workflowItemsRepository));
 
         $this->workflowManager->resetWorkflowData($workflowDefinition);

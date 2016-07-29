@@ -49,7 +49,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
@@ -71,7 +71,6 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestProductTypeTable($schema);
 
         /** Foreign keys generation **/
-        $this->addTestWorkflowAwareEntityForeignKeys($schema);
         $this->addTestSearchItemForeignKeys($schema);
         $this->addTestSearchItemValueForeignKeys($schema);
         $this->addTestActivityForeignKeys($schema);
@@ -103,10 +102,7 @@ class OroTestFrameworkBundleInstaller implements
     {
         $table = $schema->createTable('test_workflow_aware_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('workflow_item_id', 'integer', ['notnull' => false]);
-        $table->addColumn('workflow_step_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addUniqueIndex(['workflow_item_id'], 'uniq_f824a8531023c4ee');
         $table->setPrimaryKey(['id']);
     }
 
@@ -422,28 +418,6 @@ class OroTestFrameworkBundleInstaller implements
             'biO2MNDOwner',
             'name',
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
-        );
-    }
-
-    /**
-     * Add test_workflow_aware_entity foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addTestWorkflowAwareEntityForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('test_workflow_aware_entity');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_workflow_item'),
-            ['workflow_item_id'],
-            ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_workflow_step'),
-            ['workflow_step_id'],
-            ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
     }
 

@@ -159,7 +159,7 @@ datagrid:
             deactivate_link:
                 type:       url
                 route:      oro_api_workflow_deactivate
-                params:     [ entityClass ]
+                params:     [ workflowDefinition ]
         sorters:
             columns:
                 label:
@@ -185,7 +185,7 @@ datagrid:
                 icon:          ok
                 link:          activate_link
             deactivate:
-                type:          ajax
+                type:          workflow-deactivate
                 acl_resource:  oro_workflow_definition_update
                 label:         oro.workflow.workflowdefinition.datagrid.deactivate
                 icon:          remove

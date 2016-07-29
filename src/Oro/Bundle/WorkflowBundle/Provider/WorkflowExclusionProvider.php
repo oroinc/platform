@@ -7,21 +7,22 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\AbstractExclusionProvider;
 
 /**
- * The implementation of ExclusionProviderInterface that can be used to ignore
- * "workflowItem" and "workflowStep" relations.
+ * The implementation of ExclusionProviderInterface that can be used to ignore virtual vields.
  */
 class WorkflowExclusionProvider extends AbstractExclusionProvider
 {
     /**
      * {@inheritdoc}
      */
-    public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
+    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        $mapping = $metadata->getAssociationMapping($associationName);
-        if (!$mapping['isOwningSide'] || !($mapping['type'] & ClassMetadata::TO_ONE)) {
-            return false;
-        }
-
-        return $associationName === 'workflowItem' || $associationName === 'workflowStep';
+        return in_array(
+            $fieldName,
+            [
+                WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME,
+                WorkflowVirtualRelationProvider::STEPS_RELATION_NAME,
+            ],
+            true
+        );
     }
 }

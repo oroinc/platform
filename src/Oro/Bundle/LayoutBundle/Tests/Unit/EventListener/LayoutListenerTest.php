@@ -17,6 +17,7 @@ use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
+use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -35,6 +36,9 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutDataCollector|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutDataCollector;
 
+    /** @var LayoutContextHolder|\PHPUnit_Framework_MockObject_MockObject */
+    protected $layoutContextHolder;
+
     protected function setUp()
     {
         $this->layoutManager = $this->getMockBuilder('Oro\Component\Layout\LayoutManager')
@@ -48,7 +52,16 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new LayoutListener($this->layoutHelper, $this->layoutManager, $this->layoutDataCollector);
+        $this->layoutContextHolder = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->listener = new LayoutListener(
+            $this->layoutHelper,
+            $this->layoutManager,
+            $this->layoutContextHolder,
+            $this->layoutDataCollector
+        );
     }
 
     public function testShouldNotModifyResponseWithoutLayoutAnnotation()
