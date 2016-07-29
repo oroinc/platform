@@ -11,7 +11,6 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
