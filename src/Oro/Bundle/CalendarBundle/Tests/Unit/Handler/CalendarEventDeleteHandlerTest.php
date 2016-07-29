@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Handler;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Handler\CalendarEventDeleteHandler;
@@ -19,6 +22,9 @@ class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailSendProcessor;
+
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var CalendarEventDeleteHandler */
     protected $handler;
@@ -46,12 +52,14 @@ class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
         $ownerDeletionManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->requestStack = new RequestStack();
 
         $this->handler = new CalendarEventDeleteHandler();
         $this->handler->setCalendarConfig($this->calendarConfig);
         $this->handler->setSecurityFacade($this->securityFacade);
         $this->handler->setOwnerDeletionManager($ownerDeletionManager);
         $this->handler->setEmailSendProcessor($this->emailSendProcessor);
+        $this->handler->setRequestStack($this->requestStack);
     }
 
     public function testHandleDelete()
@@ -151,5 +159,37 @@ class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $this->handler->handleDelete(1, $this->manager);
+    }
+
+    public function testProcessDeleteShouldSendNotificationIfQueryIsPresent()
+    {
+        $this->requestStack->push(new Request(['notifyInvitedUsers' => true]));
+
+        $event = new CalendarEvent();
+        $this->emailSendProcessor->expects($this->once())
+            ->method('sendDeleteEventNotification')
+            ->with($event);
+
+        $this->handler->processDelete($event, $this->manager->getObjectManager());
+    }
+
+    public function testProcessDeleteShouldSendNotificationIfRequestIsNull()
+    {
+        $event = new CalendarEvent();
+        $this->emailSendProcessor->expects($this->once())
+            ->method('sendDeleteEventNotification')
+            ->with($event);
+
+        $this->handler->processDelete($event, $this->manager->getObjectManager());
+    }
+
+    public function testProcessDeleteshouldNotSendNotification()
+    {
+        $this->requestStack->push(new Request());
+
+        $this->emailSendProcessor->expects($this->never())
+            ->method('sendDeleteEventNotification');
+
+        $this->handler->processDelete(new CalendarEvent(), $this->manager->getObjectManager());
     }
 }
