@@ -11,7 +11,7 @@ use Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent;
 class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $attachmentManager;
+    protected $fileManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
@@ -24,13 +24,13 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
+        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
         $this->context = new CustomizeLoadedDataContext();
-        $this->processor = new ComputeFileContent($this->attachmentManager, $this->logger);
+        $this->processor = new ComputeFileContent($this->fileManager, $this->logger);
     }
 
     public function testProcessWhenNoData()
@@ -66,56 +66,26 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessWhenContentFieldIsAlreadyExist()
+    public function testProcessWhenFileNameFieldDoesNotExist()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content');
-
-        $this->context->setResult(['filename' => 'test.txt', 'content' => 'test']);
-        $this->context->setConfig($config);
-        $this->processor->process($this->context);
-        $this->assertEquals(
-            ['filename' => 'test.txt', 'content' => 'test'],
-            $this->context->getResult()
-        );
-    }
-
-    public function testProcessWhenContentFieldDoesNotExistButNoConfigForFileNameField()
-    {
-        $config = new EntityDefinitionConfig();
-        $config->addField('content');
-
-        $this->context->setResult(['filename' => 'test.txt']);
-        $this->context->setConfig($config);
-        $this->processor->process($this->context);
-        $this->assertEquals(
-            ['filename' => 'test.txt', 'content' => null],
-            $this->context->getResult()
-        );
-    }
-
-    public function testProcessWhenContentFieldDoesNotExistButFileNameFieldDoesNotExistAsWell()
-    {
-        $config = new EntityDefinitionConfig();
-        $config->addField('content');
-        $config->addField('filename');
+        $config->addField('content')->setPropertyPath('file');
 
         $this->context->setResult([]);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['content' => null],
+            [],
             $this->context->getResult()
         );
     }
 
-    public function testProcessWhenContentFieldDoesNotExist()
+    public function testProcessWhenContentFieldShouldBeSet()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content');
-        $config->addField('filename');
+        $config->addField('content')->setPropertyPath('file');
 
-        $this->attachmentManager->expects($this->once())
+        $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.txt')
             ->willReturn('test');
@@ -124,36 +94,34 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['filename' => 'test.txt', 'content' => base64_encode('test')],
+            ['filename' => 'test.txt', 'file' => base64_encode('test')],
             $this->context->getResult()
         );
     }
 
-    public function testProcessWhenContentFieldDoesNotExistAndFileNameIsEmpty()
+    public function testProcessWhenFileNameIsEmpty()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content');
-        $config->addField('filename');
+        $config->addField('content')->setPropertyPath('file');
 
-        $this->attachmentManager->expects($this->never())
+        $this->fileManager->expects($this->never())
             ->method('getContent');
 
         $this->context->setResult(['filename' => null]);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['filename' => null, 'content' => null],
+            ['filename' => null],
             $this->context->getResult()
         );
     }
 
-    public function testProcessWhenContentFieldDoesNotExistAndFileIsEmpty()
+    public function testProcessWhenFileIsEmpty()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content');
-        $config->addField('filename');
+        $config->addField('content')->setPropertyPath('file');
 
-        $this->attachmentManager->expects($this->once())
+        $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.txt')
             ->willReturn('');
@@ -162,19 +130,18 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['filename' => 'test.txt', 'content' => base64_encode('')],
+            ['filename' => 'test.txt', 'file' => base64_encode('')],
             $this->context->getResult()
         );
     }
 
-    public function testProcessWhenContentFieldDoesNotExistAndFileIsNotFound()
+    public function testProcessWhenFileIsNotFound()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content');
-        $config->addField('filename');
+        $config->addField('content')->setPropertyPath('file');
 
         $exception = new FileNotFound('test.txt');
-        $this->attachmentManager->expects($this->once())
+        $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.txt')
             ->willThrowException($exception);
@@ -186,7 +153,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
         $this->assertEquals(
-            ['filename' => 'test.txt', 'content' => null],
+            ['filename' => 'test.txt'],
             $this->context->getResult()
         );
     }
@@ -195,14 +162,13 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Exception
      * @expectedExceptionMessage some error
      */
-    public function testProcessWhenContentFieldDoesNotExistAndUnexpectedExceptionOccurred()
+    public function testProcessWhenUnexpectedExceptionOccurred()
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('content');
-        $config->addField('filename');
+        $config->addField('content')->setPropertyPath('file');
 
         $exception = new \Exception('some error');
-        $this->attachmentManager->expects($this->once())
+        $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.txt')
             ->willThrowException($exception);

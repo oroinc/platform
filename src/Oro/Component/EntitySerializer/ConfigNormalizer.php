@@ -168,6 +168,10 @@ class ConfigNormalizer
             $config[ConfigUtil::FIELDS][$property] = null;
         } elseif (!array_key_exists($property, $config[ConfigUtil::FIELDS])) {
             $config[ConfigUtil::FIELDS][$property] = null;
+        } elseif (is_array($config[ConfigUtil::FIELDS][$property])
+            && ConfigUtil::isExclude($config[ConfigUtil::FIELDS][$property])
+        ) {
+            $config[ConfigUtil::FIELDS][$property][ConfigUtil::EXCLUDE] = false;
         }
     }
 

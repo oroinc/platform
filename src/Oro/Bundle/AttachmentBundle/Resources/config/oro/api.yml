@@ -6,13 +6,15 @@ oro_api:
                     data_type: association:manyToOne
         Oro\Bundle\AttachmentBundle\Entity\File:
             fields:
+                filename:
+                    exclude: true
+                extension:
+                    exclude: true
                 content:
                     data_type: string
+                    property_path: file
                     depends_on: [filename]
             actions:
-                create: false
-                update: false
-                delete: false
                 delete_list: false
                 get_subresource: false
                 get_relationship: false
