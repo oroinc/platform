@@ -59,6 +59,15 @@ class AddFileContentFormListener implements ProcessorInterface
         }
 
         if (!array_key_exists(self::ORIGINAL_FILE_NAME_FIELD_NAME, $data)) {
+            $event->getForm()->addError(
+                new FormError(
+                    sprintf(
+                        'The "%s" field should be specified together with "%s" field.',
+                        self::ORIGINAL_FILE_NAME_FIELD_NAME,
+                        self::CONTENT_FIELD_NAME
+                    )
+                )
+            );
             $data[self::CONTENT_FIELD_NAME] = null;
             $event->setData($data);
 

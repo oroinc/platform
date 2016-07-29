@@ -76,7 +76,8 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
         $form->setData($model);
         $form->submit(['content' => base64_encode('test')]);
         $this->assertTrue($form->isSynchronized());
-        $this->assertTrue($form->isValid());
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->getErrors());
 
         $this->assertNull($model->getFile());
     }
