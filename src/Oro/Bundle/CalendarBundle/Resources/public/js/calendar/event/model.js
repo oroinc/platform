@@ -30,12 +30,17 @@ define([
             reminders: {},
             parentEventId: null,
             invitationStatus: null,
-            invitedUsers: null,
+            attendees: null,
             editable: false,
             removable: false,
             calendarAlias: null,
             calendar: null, // calendarId
-            calendarUid: null // calculated automatically, equals to calendarAlias + calendarId
+            calendarUid: null, // calculated automatically, equals to calendarAlias + calendarId
+            recurrence: null,
+            recurrencePattern: null,
+            recurringEventId: null,
+            originalStart: null,
+            isCancelled: null
         },
 
         initialize: function() {
@@ -68,15 +73,42 @@ define([
                 attrs[key] = val;
             }
 
+            var fields = [
+                'id',
+                'editable',
+                'removable',
+                'calendarUid',
+                'parentEventId',
+                'invitationStatus',
+                'recurrence',
+                'recurrencePattern',
+                'recurringEventId',
+                'originalStart',
+                'isCancelled',
+                'durationEditable',
+                'startEditable'
+            ];
+
+            if (this.get('recurrence')) {
+                fields.push('start', 'end');
+            }
+
             modelData = _.extend(
                 {id: this.originalId},
                 _.omit(
                     this.toJSON(),
-                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus']
+                    fields
                 ),
                 attrs || {}
             );
-            modelData.invitedUsers = modelData.invitedUsers ? modelData.invitedUsers.join(',') : undefined;
+            modelData.attendees = _.map(
+                modelData.attendees,
+                _.partial(_.pick, _, 'displayName', 'email', 'status', 'type')
+            );
+
+            if (!this.get('id')) {
+                modelData.notifyInvitedUsers = true;
+            }
 
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);
@@ -95,6 +127,11 @@ define([
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
             }
+
+            if (this.get('recurrence')) {
+                var start = new Date(this.get('start'));
+                this.set('id', this.id + '_' + start.getTime());
+            }
         },
 
         validate: function(attrs) {
@@ -109,11 +146,8 @@ define([
 
         getInvitationStatus: function() {
             var invitationStatus = this.get('invitationStatus');
-            var invitedUsers = this.get('invitedUsers');
-            if (!invitationStatus && invitedUsers && invitedUsers.length) {
-                invitationStatus = 'accepted';
-            }
-            return invitationStatus;
+
+            return invitationStatus === '' ? null : invitationStatus;
         }
     });
 

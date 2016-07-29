@@ -38,7 +38,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true
@@ -198,17 +199,9 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
         // isEditable can be overridden from email template
         $this->isEditable = false;
 
-        $boolParams     = array('isSystem', 'isEditable');
-        $templateParams = array('name', 'subject', 'entityName', 'isSystem', 'isEditable');
-        foreach ($templateParams as $templateParam) {
-            if (preg_match('#@' . $templateParam . '\s?=\s?(.*)\n#i', $content, $match)) {
-                $val = trim($match[1]);
-                if (isset($boolParams[$templateParam])) {
-                    $val = (bool)$val;
-                }
-                $this->$templateParam = $val;
-                $content              = trim(str_replace($match[0], '', $content));
-            }
+        $parsedContent = self::parseContent($content);
+        foreach ($parsedContent['params'] as $param => $val) {
+            $this->$param = $val;
         }
 
         // make sure that user's template is editable
@@ -217,7 +210,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
         }
 
         $this->type         = $type;
-        $this->content      = $content;
+        $this->content      = $parsedContent['content'];
         $this->translations = new ArrayCollection();
     }
 
@@ -563,5 +556,33 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     public function __toString()
     {
         return (string)$this->getName();
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return array With keys 'content', 'params'
+     */
+    public static function parseContent($content)
+    {
+        $params = [];
+
+        $boolParams     = array('isSystem', 'isEditable');
+        $templateParams = array('name', 'subject', 'entityName', 'isSystem', 'isEditable');
+        foreach ($templateParams as $templateParam) {
+            if (preg_match('#@' . $templateParam . '\s?=\s?(.*)\n#i', $content, $match)) {
+                $val = trim($match[1]);
+                if (isset($boolParams[$templateParam])) {
+                    $val = (bool)$val;
+                }
+                $params[$templateParam] = $val;
+                $content                = trim(str_replace($match[0], '', $content));
+            }
+        }
+
+        return [
+            'content' => $content,
+            'params'  => $params,
+        ];
     }
 }

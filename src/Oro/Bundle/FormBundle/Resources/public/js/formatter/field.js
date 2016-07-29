@@ -36,6 +36,14 @@ define([
          * @param {*} val
          * @returns {string}
          */
+        html: function(val) {
+            return _.isNull(val) || _.isUndefined(val) ? __('N/A') : val.replace(/\n/g, '<br />\n');
+        },
+
+        /**
+         * @param {*} val
+         * @returns {string}
+         */
         integer: function(val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : numberFormatter.formatInteger(val);
         },

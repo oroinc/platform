@@ -17,38 +17,9 @@
 
 {% block oro_organizations_select_widget %}
     {% spaceless %}
-        {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}
-        {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
-        <div {{ block('widget_container_attributes') }}>
-            {% set options = {
-                dataInputSelector: 'input[name="' ~ form.vars.full_name ~ '"]',
-                tree: [{id: default_organization, children: form.vars.organization_tree_ids}],
-                selectedBusinessUnits: form.vars.selected_business_units,
-                selectedOrganizations: form.vars.selected_organizations,
-                accordionEnabled: accordion_enabled
-            } %}
-            {% include 'OroOrganizationBundle:Js:organizationStructure.js.twig' %}
-            <div class="accordion organization-structure{% if not accordion_enabled %} disabled{% endif %}"
-                 data-page-component-module="oroorganization/js/app/components/organization-structure-tree-component"
-                 data-page-component-options="{{ options|json_encode }}">
-                <div class="accordion-group">
-                    <div class="accordion-heding{% if not accordion_enabled %} hide{% endif %}">
-                        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#organization_{{ default_organization }}"></a>
-                        <input type="checkbox"
-                               data-name="organization"
-                               value="{{ form.vars.selected_organizations }}"
-                               checked="checked"
-                               class="hide org org-id-{{ form.vars.selected_organizations }}"/>
-                    </div>
-                    <div id="organization_{{ default_organization }}" class="accordion-body collapse{% if not accordion_enabled %} in{% endif %}">
-                        <div class="accordion-inner"></div>
-                    </div>
-                </div>
-                <input type="hidden" name="{{ form.vars.full_name }}"
-                       value="{{ {organizations: form.vars.selected_organizations,
-                                  businessUnits: form.vars.selected_business_units}|json_encode }}">
-            </div>
-        </div>
+        <input type="hidden" name="{{ form.organizations.vars.full_name }}"
+               value="{{ {organizations: form.vars.selected_organizations}|json_encode }}">
+        {{ form_widget(form.businessUnits) }}
     {% endspaceless %}
 {% endblock %}
 

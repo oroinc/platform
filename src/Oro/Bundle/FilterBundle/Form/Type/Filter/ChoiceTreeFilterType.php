@@ -47,6 +47,8 @@ class ChoiceTreeFilterType extends AbstractType
                 'operator_type'    => 'choice',
                 'operator_options' => array(),
                 'show_filter'      => false,
+                'autocomplete_url' => '',
+                'className' => '',
                 'data'=> array()
             )
         )->setRequired(
@@ -56,7 +58,8 @@ class ChoiceTreeFilterType extends AbstractType
                 'operator_choices',
                 'operator_type',
                 'operator_options',
-                'show_filter'
+                'show_filter',
+                'className'
             )
         );
     }
