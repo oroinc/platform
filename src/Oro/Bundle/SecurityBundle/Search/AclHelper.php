@@ -77,8 +77,8 @@ class AclHelper
                     }
                 }
             }
-
         }
+
         if (count($ownerExpressions) !== 0) {
             $query->getCriteria()->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $ownerExpressions));
         }

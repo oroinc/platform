@@ -1,0 +1,40 @@
+<div class="widget-content"
+     data-page-component-module="oroworkflow/js/app/components/deactivate-form-widget-component"
+     data-page-component-options="{{ {
+         '_wid': app.request.get('_wid'),
+         'workflow': workflow,
+         'deactivated': savedId is defined and deactivated is defined ? deactivated|join(', ') : null,
+         'selectors': {
+             'form': '#' ~ form.vars.id
+         },
+         'buttonName': 'activate'
+     }|json_encode }}">
+    <div class="alert alert-warning">
+        <div class="message">
+            {{ 'oro.workflow.workflowdefinition.form.replace_message'|trans }}
+        </div>
+    </div>
+
+    {% if form.vars.errors|length > 0 %}
+        <div class="alert alert-error">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
+
+    <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ app.request.uri }}" {{ form_enctype(form) }}
+          method="{{ form.vars.method }}" data-collect="true" class="form-dialog">
+        <fieldset class="form-horizontal">
+            {{ form_row(form) }}
+        </fieldset>
+
+        <div class="hidden">
+            {{ form_rest(form) }}
+        </div>
+
+        <div class="widget-actions">
+            <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
+            <button type="button" data-action-name="activate" class="btn btn-success">{{ 'oro.workflow.workflowdefinition.datagrid.activate'|trans }}</button>
+        </div>
+    </form>
+    {{ oro_form_js_validation(form) }}
+</div>

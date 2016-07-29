@@ -164,9 +164,12 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
 
     /**
      * @param TrackingWebsite $website
+     * @return $this
      */
     public function setWebsite($website)
     {
         $this->website = $website;
+
+        return $this;
     }
 }

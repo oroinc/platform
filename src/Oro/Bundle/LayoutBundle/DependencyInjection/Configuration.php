@@ -6,6 +6,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+
 class Configuration implements ConfigurationInterface
 {
     const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
@@ -18,6 +20,15 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_layout');
+
+        SettingsBuilder::append($rootNode, [
+            'debug_block_info' => [
+                'value' => false
+            ],
+            'debug_developer_toolbar' => [
+                'value' => true
+            ],
+        ]);
 
         $rootNode
             ->children()

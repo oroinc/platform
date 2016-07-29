@@ -46,6 +46,10 @@ a {
   &.no-action {
     color: @textColor;
   }
+  &.disabled {
+    color: #bfbfbf;
+    pointer-events: none;
+  }
 }
 form {
   margin: 0;
@@ -3226,5 +3230,16 @@ label .popover-content {
     [class^="icon-"], a [class*=" icon-"] {
       margin: 0;
     }
+  }
+}
+
+.chart-hint {
+  color: #666;
+  text-align: center;
+}
+
+.stackedbar-chart {
+  .flotr-overlay {
+    cursor: all-scroll;
   }
 }

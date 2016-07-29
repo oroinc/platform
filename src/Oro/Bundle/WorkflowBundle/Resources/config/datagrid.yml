@@ -148,10 +148,6 @@ datagrid:
                 type:       url
                 route:      oro_workflow_definition_update
                 params:     [ name ]
-            clone_link:
-                type:       url
-                route:      oro_workflow_definition_clone
-                params:     [ name ]
             delete_link:
                 type:       url
                 route:      oro_api_workflow_definition_delete
@@ -163,7 +159,7 @@ datagrid:
             deactivate_link:
                 type:       url
                 route:      oro_api_workflow_deactivate
-                params:     [ entityClass ]
+                params:     [ workflowDefinition ]
         sorters:
             columns:
                 label:
@@ -189,17 +185,11 @@ datagrid:
                 icon:          ok
                 link:          activate_link
             deactivate:
-                type:          ajax
+                type:          workflow-deactivate
                 acl_resource:  oro_workflow_definition_update
                 label:         oro.workflow.workflowdefinition.datagrid.deactivate
                 icon:          remove
                 link:          deactivate_link
-            clone:
-                type:          navigate
-                acl_resource:  oro_workflow_definition_create
-                label:         oro.grid.action.clone
-                icon:          copy
-                link:          clone_link
             update:
                 type:          navigate
                 acl_resource:  oro_workflow_definition_update
