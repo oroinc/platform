@@ -9,8 +9,6 @@ use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 
-use Oro\Component\Layout\ContextInterface;
-
 class ActionsDataProvider
 {
     /**
@@ -32,11 +30,6 @@ class ActionsDataProvider
      * @var TranslatorInterface
      */
     protected $translator;
-
-    /**
-     * @var ContextInterface
-     */
-    protected $context;
 
     /**
      * @param OperationManager $operationManager
@@ -70,36 +63,39 @@ class ActionsDataProvider
                 $group = implode('_', $groupNameParts);
             }
 
-            return $this->getByGroup($groups);
+            return $this->getByGroup(null, $groups);
         } else {
             throw new \RuntimeException('Property ' . $var . ' is unknown');
         }
     }
 
     /**
+     * @param null $entity
      * @return array
      */
-    public function getAll()
+    public function getAll($entity = null)
     {
-        return $this->getByGroup();
+        return $this->getByGroup($entity);
     }
 
     /**
+     * @param null $entity
      * @return array
      */
-    public function getWithoutGroup()
+    public function getWithoutGroup($entity = null)
     {
-        return $this->getByGroup(false);
+        return $this->getByGroup($entity, false);
     }
 
     /**
+     * @param object|null $entity
      * @param array|null|bool|string $groups
      * @return array
      */
-    public function getByGroup($groups = null)
+    public function getByGroup($entity = null, $groups = null)
     {
-        if ($this->context && $this->context->data()->has('entity')) {
-            $context = $this->contextHelper->getActionParameters(['entity' => $this->context->data()->get('entity')]);
+        if ($entity) {
+            $context = $this->contextHelper->getActionParameters(['entity' => $entity]);
         } else {
             $context = null;
         }
@@ -147,15 +143,5 @@ class ActionsDataProvider
         }
 
         return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getData(ContextInterface $context)
-    {
-        $this->context = $context;
-
-        return $this;
     }
 }
