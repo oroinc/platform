@@ -3,11 +3,11 @@ namespace Oro\Component\MessageQueue\Job;
 
 class Job
 {
-    const STATUS_NEW = 'oro.job.status.new';
-    const STATUS_RUNNING = 'oro.job.status.running';
-    const STATUS_SUCCESS = 'oro.job.status.success';
-    const STATUS_FAILED = 'oro.job.status.failed';
-    const STATUS_CANCELLED = 'oro.job.status.cancelled';
+    const STATUS_NEW = 'oro.message_queue_job.status.new';
+    const STATUS_RUNNING = 'oro.message_queue_job.status.running';
+    const STATUS_SUCCESS = 'oro.message_queue_job.status.success';
+    const STATUS_FAILED = 'oro.message_queue_job.status.failed';
+    const STATUS_CANCELLED = 'oro.message_queue_job.status.cancelled';
 
     /**
      * @var int

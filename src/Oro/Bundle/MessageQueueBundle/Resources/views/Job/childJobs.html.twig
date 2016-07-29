@@ -1,0 +1,7 @@
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+
+{% set gridName  = 'oro_message_queue_child_jobs' %}
+{% set params  = {'root_job_id': job.id} %}
+{% set pageTitle = 'oro.message_queue_job.header.child_jobs'|trans %}
+
+{% oro_title_set({ params: { '%name%': job.name, '%id%': job.id } }) %}
