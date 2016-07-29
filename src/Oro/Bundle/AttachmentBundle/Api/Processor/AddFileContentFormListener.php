@@ -63,8 +63,8 @@ class AddFileContentFormListener implements ProcessorInterface
                 new FormError(
                     sprintf(
                         'The "%s" field should be specified together with "%s" field.',
-                        self::ORIGINAL_FILE_NAME_FIELD_NAME,
-                        self::CONTENT_FIELD_NAME
+                        self::CONTENT_FIELD_NAME,
+                        self::ORIGINAL_FILE_NAME_FIELD_NAME
                     )
                 )
             );

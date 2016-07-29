@@ -59,7 +59,7 @@ class FileListener
         $entity = $args->getEntity();
         if ($entity instanceof File) {
             $this->fileManager->upload($entity);
-            // delete File record from DB if in form was clicked delete button and new file was not selected
+            // delete File record from DB if delete button was clicked in UI form and new file was not provided
             if ($entity->isEmptyFile() && null === $entity->getFilename()) {
                 $args->getEntityManager()->remove($entity);
             }
