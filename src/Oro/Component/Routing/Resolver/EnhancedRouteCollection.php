@@ -28,23 +28,40 @@ class EnhancedRouteCollection extends RouteCollection
      */
     public function insert($routeName, Route $route, $targetRouteName, $prepend = false)
     {
-        $routes = $this->all();
-        if (empty($targetRouteName)) {
-            if (!$prepend || empty($routes)) {
+        $this->remove($routeName);
+        $index = $this->findRouteIndex($targetRouteName);
+        if (false === $index) {
+            if ($prepend) {
+                $this->setRoutes(array_merge([$routeName => $route], $this->all()));
+            } else {
                 $this->add($routeName, $route);
-
-                return;
             }
-
-            $index = 0;
         } else {
-            $index = array_search($targetRouteName, array_keys($routes), true);
+            if (!$prepend) {
+                $index++;
+            }
+            $routes = $this->all();
+            $result = array_slice($routes, 0, $index, true);
+            $result[$routeName] = $route;
+            $result = array_merge($result, array_slice($routes, $index, null, true));
+            $this->setRoutes($result);
+        }
+    }
+
+    /**
+     * Searches the routes for a given route name and returns its index if successful.
+     *
+     * @param string $routeName
+     *
+     * @return int|bool The index of the route if it is found; otherwise, false.
+     */
+    protected function findRouteIndex($routeName)
+    {
+        if (empty($routeName)) {
+            return false;
         }
 
-        $result             = array_slice($routes, 0, $index + ($prepend ? 0 : 1), true);
-        $result[$routeName] = $route;
-        $result             = array_merge($result, array_slice($routes, $index + ($prepend ? 0 : 1), null, true));
-        $this->setRoutes($result);
+        return array_search($routeName, array_keys($this->all()), true);
     }
 
     /**
@@ -56,7 +73,7 @@ class EnhancedRouteCollection extends RouteCollection
     {
         // unfortunately $routes property is private and there is no other way
         // to insert a route at the specified position except to use the reflection
-        $r = new \ReflectionClass('Symfony\Component\Routing\RouteCollection');
+        $r = new \ReflectionClass(RouteCollection::class);
         $p = $r->getProperty('routes');
         $p->setAccessible(true);
         $p->setValue($this, $routes);

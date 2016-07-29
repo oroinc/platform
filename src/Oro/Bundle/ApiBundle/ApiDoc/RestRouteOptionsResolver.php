@@ -144,9 +144,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         );
         if ($existingRoute) {
             // move existing route before the current route
-            $existingRouteName = $routes->getName($existingRoute);
-            $routes->remove($existingRouteName);
-            $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+            $routes->insert($routes->getName($existingRoute), $existingRoute, $routeName, true);
         } else {
             // add an additional strict route based on the base route and current entity
             $strictRoute = $routes->cloneRoute($route);
@@ -155,12 +153,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             $requirements = $strictRoute->getRequirements();
             unset($requirements[self::ENTITY_ATTRIBUTE]);
             $strictRoute->setRequirements($requirements);
-            $routes->insert(
-                $routes->generateRouteName($routeName),
-                $strictRoute,
-                $routeName,
-                true
-            );
+            $routes->insert($routes->generateRouteName($routeName), $strictRoute, $routeName, true);
         }
     }
 
@@ -202,9 +195,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             );
             if ($existingRoute) {
                 // move existing route before the current route
-                $existingRouteName = $routes->getName($existingRoute);
-                $routes->remove($existingRouteName);
-                $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+                $routes->insert($routes->getName($existingRoute), $existingRoute, $routeName, true);
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
@@ -221,12 +212,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 unset($requirements[self::ENTITY_ATTRIBUTE]);
                 unset($requirements[self::ASSOCIATION_ATTRIBUTE]);
                 $strictRoute->setRequirements($requirements);
-                $routes->insert(
-                    $routes->generateRouteName($routeName),
-                    $strictRoute,
-                    $routeName,
-                    true
-                );
+                $routes->insert($routes->generateRouteName($routeName), $strictRoute, $routeName, true);
             }
         }
     }
