@@ -5,7 +5,6 @@ namespace Oro\Bundle\LocaleBundle\Datagrid\Extension;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -17,11 +16,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class LocalizedValueExtension extends AbstractExtension
 {
+    use LocalizationQueryTrait;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -105,12 +107,12 @@ class LocalizedValueExtension extends AbstractExtension
                 $propertyPath = sprintf('%s.%s', $rootEntityAlias, $propertyPath);
             }
 
-            $joinAlias = Inflector::pluralize($name);
-            $join = Inflector::pluralize($propertyPath);
-
-            $queryBuilder
-                ->addSelect(sprintf('%s.string as %s', $joinAlias, $name))
-                ->innerJoin($join, $joinAlias, Expr\Join::WITH, $joinAlias . '.localization IS NULL');
+            $this->joinDefaultLocalizedValue(
+                $queryBuilder,
+                Inflector::pluralize($propertyPath),
+                Inflector::pluralize($name),
+                $name
+            );
 
             if ($queryBuilder->getDQLPart('groupBy')) {
                 $queryBuilder->addGroupBy($name);
