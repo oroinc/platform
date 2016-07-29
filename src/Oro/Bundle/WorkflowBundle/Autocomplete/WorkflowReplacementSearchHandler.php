@@ -79,7 +79,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
         $searchTerm = substr($search, 0, $delimiterPos);
         $workflowName = substr($search, $delimiterPos + 1);
 
-        return [$searchTerm, $workflowName === false ? '' : $workflowName];
+        return [$searchTerm, (string) $workflowName];
     }
 
     /**
