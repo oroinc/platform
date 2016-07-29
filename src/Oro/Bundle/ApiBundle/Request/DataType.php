@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * All the supported data-types of an incoming values which implemented by out of the box.
+ * All the supported data-types of an incoming values which are implemented "out of the box".
  * New data-types can be added by implementing a value normalization processors.
  * @see Oro\Bundle\ApiBundle\Request\ValueNormalizer
  */

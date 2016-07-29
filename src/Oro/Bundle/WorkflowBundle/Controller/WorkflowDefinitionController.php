@@ -114,35 +114,6 @@ class WorkflowDefinitionController extends Controller
 
     /**
      * @Route(
-     *      "/clone/{name}",
-     *      name="oro_workflow_definition_clone"
-     * )
-     * @AclAncestor("oro_workflow_definition_create")
-     * @Template("OroWorkflowBundle:WorkflowDefinition:update.html.twig")
-     *
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array
-     */
-    public function cloneAction(WorkflowDefinition $workflowDefinition)
-    {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-        $clonePrefix = $translator->trans('oro.workflow.workflowdefinition.clone_label_prefix');
-
-        $clonedDefinition = new WorkflowDefinition();
-        $clonedDefinition->import($workflowDefinition)
-            ->setName($workflowDefinition->getName() . uniqid('_clone_'))
-            ->setLabel($clonePrefix . $workflowDefinition->getLabel())
-            ->setSystem(false);
-
-        $response = $this->updateAction($clonedDefinition);
-        $response['delete_allowed'] = false;
-
-        return $response;
-    }
-
-    /**
-     * @Route(
      *      "/view/{name}",
      *      name="oro_workflow_definition_view"
      * )

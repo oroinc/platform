@@ -49,7 +49,7 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
         $this->assertEquals(
             [
                 new TestConfigExtra('test'),
-                new EntityDefinitionConfigExtra($this->context->getAction()),
+                new EntityDefinitionConfigExtra($this->context->getAction(), true),
                 new CustomizeLoadedDataConfigExtra(),
                 new DataTransformersConfigExtra(),
                 new FiltersConfigExtra(),

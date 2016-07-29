@@ -68,11 +68,28 @@ class ConfigManager
     }
 
     /**
+     * @param object $entity
+     * @return int
+     */
+    public function setScopeIdFromEntity($entity)
+    {
+        return $this->getScopeManager()->setScopeIdFromEntity($entity);
+    }
+
+    /**
      * @param int $scopeId
      */
     public function setScopeId($scopeId)
     {
         $this->getScopeManager()->setScopeId($scopeId);
+    }
+
+    /**
+     * @return string
+     */
+    public function getScopeInfo()
+    {
+        return $this->getScopeManager()->getScopeInfo();
     }
 
     /**

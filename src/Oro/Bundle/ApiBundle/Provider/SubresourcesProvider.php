@@ -34,7 +34,7 @@ class SubresourcesProvider
     }
 
     /**
-     * Gets an entity sub resources available through a given Data API version.
+     * Gets an entity sub-resources available through a given Data API version.
      *
      * @param string      $entityClass The FQCN of an entity
      * @param string      $version     The Data API version
@@ -52,7 +52,7 @@ class SubresourcesProvider
         /** @var CollectSubresourcesContext $context */
         $context = $this->processor->createContext();
         $context->setVersion($version);
-        $context->getRequestType()->set($requestType->toArray());
+        $context->getRequestType()->set($requestType);
         $context->setResources($this->resourcesProvider->getResources($version, $requestType));
 
         $this->processor->process($context);

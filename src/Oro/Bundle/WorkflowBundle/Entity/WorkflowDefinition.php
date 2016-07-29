@@ -24,7 +24,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "category"="account_management"
  *          },
  *          "note"={
  *              "immutable"=true
@@ -171,6 +172,22 @@ class WorkflowDefinition implements DomainObjectInterface
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
         $this->restrictions = new ArrayCollection();
+    }
+
+    public function __clone()
+    {
+        if ($this->name) {
+            $this->setName($this->getName() . uniqid('_clone_'));
+            $this->setSystem(false);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getLabel();
     }
 
     /**

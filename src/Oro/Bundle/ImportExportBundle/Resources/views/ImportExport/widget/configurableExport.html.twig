@@ -1,0 +1,54 @@
+<div class="widget-content import-widget-content">
+    <div class="form-container">
+        <form method="post"
+              data-nohash="true"
+              id="{{ form.vars.id }}"
+              name="{{ form.vars.name }}"
+              action="{{ path('oro_importexport_export_config', {entity: entityName, options: options, exportJob: exportJob}) }}"
+              class="form-horizontal"
+                {{ form_enctype(form) }}>
+
+            <fieldset class="form">
+                <div>
+                    {{ form_row(form.processorAlias) }}
+                </div>
+                {{ form_rest(form) }}
+            </fieldset>
+
+            <div class="widget-actions">
+                <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                <button class="btn btn-primary" type="submit">
+                    {{ 'Export'|trans }}
+                </button>
+            </div>
+        </form>
+        {{ oro_form_js_validation(form) }}
+    </div>
+
+    <script type="text/javascript">
+        require(['oroui/js/widget-manager', 'jquery', 'oroimportexport/js/export-handler', 'oroui/js/messenger'],
+                function(WidgetManager, $, exportHandler, messenger) {
+                    WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                        var form = $('[name="oro_importexport_export"]');
+                        form.on('submit', function(e) {
+                            e.preventDefault();
+                            var exportStartedMessage = exportHandler.startExportNotificationMessage();
+                            widget.remove();
+                            $.ajax(e.target.action, {
+                                data: form.serialize(),
+                                method: e.target.method
+                            }).done(function(data) {
+                                exportHandler.handleExportResponse(data);
+                            }).fail(function() {
+                                messenger.notificationFlashMessage(
+                                        'error',
+                                        '{{ 'Errors occured during file export.'|trans }}'
+                                );
+                            }).always(function() {
+                                exportStartedMessage.close();
+                            });
+                        });
+                    });
+                });
+    </script>
+</div>
