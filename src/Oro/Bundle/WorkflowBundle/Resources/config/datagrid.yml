@@ -110,7 +110,7 @@ datagrid:
                     - w.name as workflowDefinition
                     - w.relatedEntity
                     - w.relatedEntity as entityClass
-                    - w.relatedEntity as active
+                    - w.active as active
                     - w.label
                     - w.system
                     - w.createdAt

@@ -8,15 +8,11 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowReplacementSearchHandler extends SearchHandler
 {
     const DELIMITER = ';';
-
-    /** @var WorkflowManager */
-    protected $workflowManager;
 
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
@@ -26,7 +22,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
      */
     protected function checkAllDependenciesInjected()
     {
-        if (!$this->entityRepository || !$this->idFieldName || !$this->workflowManager || !$this->workflowRegistry) {
+        if (!$this->entityRepository || !$this->idFieldName || !$this->workflowRegistry) {
             throw new \RuntimeException('Search handler is not fully configured');
         }
     }
@@ -94,7 +90,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
     {
         $workflows = [$workflowName];
 
-        $workflow = $this->workflowManager->getWorkflow($workflowName);
+        $workflow = $this->workflowRegistry->getWorkflow($workflowName);
         if ($workflow) {
             $activeWorkflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
                 $workflow->getDefinition()->getActiveGroups()

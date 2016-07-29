@@ -207,10 +207,18 @@ class WorkflowDefinitionController extends Controller
 
         if ($form->isValid()) {
             $workflowManager = $this->get('oro_workflow.manager');
-            $workflows = array_merge($form->getData(), $workflowsToDeactivation);
+            $workflowNames = array_merge(
+                $form->getData(),
+                array_map(
+                    function (Workflow $workflow) {
+                        return $workflow->getName();
+                    },
+                    $workflowsToDeactivation
+                )
+            );
             
             $deactivated = [];
-            foreach ($workflows as $workflowName) {
+            foreach ($workflowNames as $workflowName) {
                 if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
                     $workflow = $workflowManager->getWorkflow($workflowName);
 
