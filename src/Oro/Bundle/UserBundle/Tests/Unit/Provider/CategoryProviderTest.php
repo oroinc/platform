@@ -12,7 +12,8 @@ class CategoryProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->categoryProvider = new RolePrivilegeCategoryProvider();
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->categoryProvider = new RolePrivilegeCategoryProvider($translator);
     }
 
     public function testCategoryListFetchSuccess()
