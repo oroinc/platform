@@ -5,6 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -12,7 +14,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -74,7 +75,6 @@ class WorkflowManager
     /**
      * @param WorkflowItem $workflowItem
      * @return Collection|Transition[]
-     * @deprecated
      */
     public function getTransitionsByWorkflowItem(WorkflowItem $workflowItem)
     {
@@ -220,7 +220,7 @@ class WorkflowManager
     {
         $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
 
-        return $this->transitWorkflow($workflow, $workflowItem, $transition);
+        $this->transitWorkflow($workflow, $workflowItem, $transition);
     }
 
     /**

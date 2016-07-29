@@ -6,8 +6,8 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
@@ -30,6 +30,10 @@ class WorkflowEntityConnectorTest extends \PHPUnit_Framework_TestCase
         $this->entityConnector = new WorkflowEntityConnector($this->registry);
     }
 
+    /**
+     * @param $class
+     * @return string
+     */
     protected function cacheKey($class)
     {
         return WorkflowEntityConnector::WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX . $class;

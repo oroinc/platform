@@ -193,8 +193,7 @@ class Workflow
 
         $transitionIsValid = $this->checkTransitionValid($transition, $workflowItem, $fireExceptions);
 
-        return $transitionIsValid
-        && $transition->isAllowed($workflowItem, $errors);
+        return $transitionIsValid && $transition->isAllowed($workflowItem, $errors);
     }
 
     /**

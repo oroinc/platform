@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
-use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,7 +10,9 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -21,6 +20,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
 /**
@@ -735,6 +735,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowName = 'test_workflow';
 
         $workflowMock = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        /** @var WorkflowDefinition $workflowDefinition */
         $workflowDefinition = $this->getMockBuilder(WorkflowDefinition::class)->getMock();
         $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 
@@ -797,6 +798,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowName = 'test_workflow';
 
         $workflowMock = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        /** @var WorkflowDefinition $workflowDefinition */
         $workflowDefinition = $this->getMockBuilder(WorkflowDefinition::class)->getMock();
         $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 

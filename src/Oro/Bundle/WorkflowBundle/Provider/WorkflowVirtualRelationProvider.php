@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterface
 {
@@ -14,17 +14,17 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
     const ITEMS_RELATION_NAME = 'workflowItems_virtual';
     const STEPS_RELATION_NAME = 'workflowSteps_virtual';
 
-    /** @var WorkflowSystemConfigManager */
+    /** @var WorkflowManager */
     protected $workflowManager;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @param WorkflowSystemConfigManager $workflowManager
+     * @param WorkflowManager $workflowManager
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(WorkflowSystemConfigManager $workflowManager, DoctrineHelper $doctrineHelper)
+    public function __construct(WorkflowManager $workflowManager, DoctrineHelper $doctrineHelper)
     {
         $this->workflowManager = $workflowManager;
         $this->doctrineHelper = $doctrineHelper;
@@ -36,7 +36,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
     public function isVirtualRelation($className, $fieldName)
     {
         return in_array($fieldName, [self::ITEMS_RELATION_NAME, self::STEPS_RELATION_NAME], true)
-            && count($this->workflowManager->getActiveWorkflowNamesByEntity($className));
+            && $this->workflowManager->hasApplicableWorkflows($className);
     }
 
     /**
@@ -44,7 +44,7 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
      */
     public function getVirtualRelations($className)
     {
-        if (!count($this->workflowManager->getActiveWorkflowNamesByEntity($className))) {
+        if (!$this->workflowManager->hasApplicableWorkflows($className)) {
             return [];
         }
 

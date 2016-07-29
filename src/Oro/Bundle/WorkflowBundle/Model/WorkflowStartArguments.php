@@ -4,31 +4,23 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 class WorkflowStartArguments
 {
-    /**
-     * @var Workflow
-     */
+    /** @var Workflow */
     private $workflowName;
 
-    /**
-     * @var object
-     */
+    /** @var object */
     private $entity;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $data;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $transition;
 
     /**
      * @param string $workflowName
      * @param object $entity
      * @param array $data
-     * @param null $transition
+     * @param string|null $transition
      */
     public function __construct($workflowName, $entity, array $data = [], $transition = null)
     {

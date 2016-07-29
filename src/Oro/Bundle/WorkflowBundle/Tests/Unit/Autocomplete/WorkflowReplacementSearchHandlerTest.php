@@ -44,10 +44,6 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->entityRepository->expects($this->any())->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->queryBuilder->expects($this->any())->method('getQuery')->willReturn($this->query);
         $this->queryBuilder->expects($this->any())->method('expr')->willReturn(new Query\Expr());

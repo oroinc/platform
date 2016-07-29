@@ -116,7 +116,7 @@ class WidgetController extends Controller
         $data = null;
         $saved = false;
         if ($request->isMethod('POST')) {
-            $transitionForm->submit($this->getRequest());
+            $transitionForm->submit($request);
 
             if ($transitionForm->isValid()) {
                 // Create new WorkflowData instance with all data required to start.
@@ -190,7 +190,7 @@ class WidgetController extends Controller
 
         $saved = false;
         if ($request->isMethod('POST')) {
-            $transitionForm->submit($this->getRequest());
+            $transitionForm->submit($request);
 
             if ($transitionForm->isValid()) {
                 $workflowItem->setUpdated();

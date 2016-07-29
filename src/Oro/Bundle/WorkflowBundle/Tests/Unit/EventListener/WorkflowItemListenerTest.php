@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\LifecycleEventArgs;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener;
@@ -71,13 +74,6 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('setEntityClass')
             ->with($entityClass);
 
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->atLeastOnce())
-            ->method('getEntity')
-            ->will($this->returnValue($workflowItem));
-
         $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
             ->getMock();
@@ -85,6 +81,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('scheduleExtraUpdate')
             ->with($workflowItem, ['entityId' => [null, $entityId], 'entityClass' => [null, $entityClass]]);
 
+        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $em */
         $em = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -92,11 +89,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
 
-        $event->expects($this->once())
-            ->method('getEntityManager')
-            ->will($this->returnValue($em));
-
-        $this->listener->postPersist($event);
+        $this->listener->postPersist($this->getEvent($workflowItem, $em));
     }
 
     /**
@@ -111,14 +104,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $workflowItem->expects($this->once())
             ->method('getEntity');
 
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->atLeastOnce())
-            ->method('getEntity')
-            ->will($this->returnValue($workflowItem));
-
-        $this->listener->postPersist($event);
+        $this->listener->postPersist($this->getEvent($workflowItem));
     }
 
     /**
@@ -130,9 +116,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $entity = new \DateTime();
         $workflowItem = new WorkflowItem();
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+
 
         $this->entityConnector->expects($this->once())
             ->method('isApplicableEntity')
@@ -143,26 +127,17 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getWorkflowItemsByEntity')
             ->with($entity)
             ->willReturn($hasWorkflowItems ? [$workflowItem] : null);
+        $entityManager = null;
         if ($hasWorkflowItems) {
+            $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+                ->disableOriginalConstructor()
+                ->getMock();
             $entityManager->expects($this->once())
                 ->method('remove')
                 ->with($workflowItem);
-        } else {
-            $entityManager->expects($this->never())
-                ->method('remove');
         }
 
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->any())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
-        $event->expects($this->any())
-            ->method('getEntityManager')
-            ->will($this->returnValue($entityManager));
-
-        $this->listener->preRemove($event);
+        $this->listener->preRemove($this->getEvent($entity, $entityManager));
     }
 
     /**
@@ -189,43 +164,24 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowManager->expects($this->never())->method($this->anything());
 
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->once())->method('getEntity')->willReturn($entity);
-        $event->expects($this->never())->method('getEntityManager');
-
-        $this->listener->preRemove($event);
+        $this->listener->preRemove($this->getEvent($entity));
     }
 
     public function testScheduleStartWorkflowForNewEntityNoWorkflow()
     {
         $entity = new \stdClass();
 
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->any())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
         $this->workflowManager->expects($this->atLeastOnce())
             ->method('getApplicableWorkflows')
             ->with($entity);
 
-        $this->listener->postPersist($event);
+        $this->listener->postPersist($this->getEvent($entity));
         $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
     }
 
     public function testScheduleStartWorkflowForNewEntityNoStartStep()
     {
         $entity = new \stdClass();
-
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->any())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
 
         $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
         $stepManager->expects($this->any())->method('hasStartStep')
@@ -243,7 +199,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->with($entity)
             ->willReturn([$workflow]);
 
-        $this->listener->postPersist($event);
+        $this->listener->postPersist($this->getEvent($entity));
         $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
     }
 
@@ -314,12 +270,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function prepareEventForWorkflow($entity, $workflowName)
     {
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->any())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
+        $event = $this->getEvent($entity);
 
         $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
         $stepManager->expects($this->any())->method('hasStartStep')
@@ -334,5 +285,25 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->any())->method('getName')->willReturn($workflowName);
 
         return array($event, $workflow);
+    }
+
+    /**
+     * @param $entity
+     * @param EntityManager|null $entityManager
+     * @return LifecycleEventArgs
+     */
+    private function getEvent($entity, EntityManager $entityManager = null)
+    {
+        $event = $this->getMockBuilder(LifecycleEventArgs::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event->expects($this->atLeastOnce())
+            ->method('getEntity')
+            ->will($this->returnValue($entity));
+        $event->expects($this->exactly($entityManager ? 1 : 0))
+            ->method('getEntityManager')
+            ->will($this->returnValue($entityManager));
+
+        return $event;
     }
 }
