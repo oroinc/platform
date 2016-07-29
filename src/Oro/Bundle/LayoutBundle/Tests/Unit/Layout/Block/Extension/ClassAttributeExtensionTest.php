@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
-use Oro\Component\ConfigExpression\Func;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
 
+use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension;
-use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonConfigExpressionEncoder;
+use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder;
 
 class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,13 +19,13 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $encoderRegistry = $this
-            ->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry')
+            ->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $encoderRegistry->expects($this->any())
             ->method('getEncoder')
             ->with('json')
-            ->will($this->returnValue(new JsonConfigExpressionEncoder()));
+            ->will($this->returnValue(new JsonExpressionEncoder(new ExpressionManipulator())));
 
         $this->extension = new ClassAttributeExtension($encoderRegistry);
     }

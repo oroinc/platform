@@ -34,3 +34,5 @@ oro:
               label:     Step label
               value:     Step value
               is_nozzle: Is step nozzle
+      stackedbar_chart:
+          hint: Drag the chart to see more data.

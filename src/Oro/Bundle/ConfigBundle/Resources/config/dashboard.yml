@@ -5,6 +5,7 @@ oro_dashboard_config:
                 settings:
                     label:      oro.dashboard.widgets.quick_launchpad.title
                     icon:       cogs
+                    class:      mobile-hide
                     route:      oro_config_configuration_system
                     acl:        oro_config_system
                     position:   50

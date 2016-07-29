@@ -1,5 +1,9 @@
 Add another email: Add another email
 Additional: Additional
+"Opportunity Information": "Opportunity Information"
+"New contact": "New contact"
+"Information": "Information"
+"Contact Details": "Contact Details"
 
 "%groups% and %roles%": "%groups% and %roles%"
 
@@ -154,8 +158,6 @@ oro:
             label.label:  Label
             owner.label:  Owner
             has_role.label: Has role
-            clone.label: 'Copy of %name%'
-            clone: 'Clone'
             extend_description.label: Description
 
         invite:

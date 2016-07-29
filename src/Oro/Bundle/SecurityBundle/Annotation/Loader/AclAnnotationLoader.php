@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Doctrine\Common\Annotations\Reader as AnnotationReader;
 
-use Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 
 class AclAnnotationLoader implements AclAnnotationLoaderInterface
@@ -34,7 +34,7 @@ class AclAnnotationLoader implements AclAnnotationLoaderInterface
      */
     public function load(AclAnnotationStorage $storage)
     {
-        $configLoader = OroSecurityExtension::getAclAnnotationLoader();
+        $configLoader = AclAnnotationMetadataDumper::getAclAnnotationLoader();
         $resources    = $configLoader->load();
         foreach ($resources as $resource) {
             foreach ($resource->data as $file) {

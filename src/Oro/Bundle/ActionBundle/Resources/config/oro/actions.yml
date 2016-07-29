@@ -122,6 +122,51 @@ operations:
                         - '@not_empty': $.gridName
                 parameters: [$.gridName]
 
+    CLONE:
+        extends: CRUD_ACTION
+        replace:
+            - preconditions
+        order: 30
+        groups:
+            - view_navButtons
+            - update_navButtons
+            - datagridRowAction
+        preactions:
+            - '@call_service_method':
+                service: oro_action.helper.default_operation_request
+                method: isExecutionRouteRequest
+                attribute: $.isExecutionRequest
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@not_blank': $.data
+                        - '@eq': [$.requestRoute, 'oro_action_widget_form'] # display a form template ot dialog
+                actions:
+                    - '@clone_object':
+                        target: $.data
+                        attribute: $.clone
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@not_blank': $.data
+                        - '@eq': [$.isExecutionRequest, true] # no form or dialogue
+                        - '@empty': $.clone
+                actions:
+                    - '@clone_entity':
+                        target: $.data
+                        attribute: $.clone
+                        flush: true
+        preconditions:
+            '@and':
+                - '@not_blank': $.data
+                - '@or':
+                    - '@not_blank': $.routes[name]
+                    - '@not_blank': $.gridName
+        label: oro.action.clone
+        frontend_options:
+            title: oro.action.clone_entity
+        button_options:
+            icon: icon-copy
 action_groups:
     DELETE:
         parameters:
