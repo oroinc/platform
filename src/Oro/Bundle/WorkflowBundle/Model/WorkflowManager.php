@@ -214,7 +214,6 @@ class WorkflowManager
      *
      * @param WorkflowItem $workflowItem
      * @param string|Transition $transition
-     * @return bool
      */
     public function transit(WorkflowItem $workflowItem, $transition)
     {
