@@ -32,7 +32,7 @@ define(function(require) {
                     .text(toggleLabel);
             }
 
-            var $controls = this.$('.controls.colla');
+            var $controls = this.$('.controls');
             if (this.$el.hasClass('collapsed')) {
                 $controls.slideDown(_.bind(function() {
                     this.$el.trigger('content:changed');
