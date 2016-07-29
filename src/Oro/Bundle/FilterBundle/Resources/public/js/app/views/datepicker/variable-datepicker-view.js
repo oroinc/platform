@@ -158,7 +158,9 @@ define(function(require) {
             var tabs;
             this.$dropdown = this.$frontDateField
                 .wrap('<div class="dropdown datefilter">').parent();
-            this.$dropdown.append('<div class="dropdown-menu dropdown-menu-calendar test"></div>');
+            this.$dropdown
+                .append('<div class="dropdown-menu dropdown-menu-calendar"></div>')
+                .on('shown.bs.dropdown', _.bind(this.onOpen, this));
             tabs = new TabsView({
                 el: this.$dropdown.find('.dropdown-menu'),
                 template: options.dropdownTemplate,
@@ -168,7 +170,8 @@ define(function(require) {
                 }
             });
             this.subview('tabs', tabs);
-            this.$frontDateField.on('focus, click', _.bind(this.open, this));
+            this.$frontDateField
+                .attr({'data-toggle': 'dropdown'});
         },
 
         /**
@@ -321,8 +324,11 @@ define(function(require) {
         /**
          * Opens dropdown with date-picker + variable-picker
          */
-        open: function() {
-            this.$dropdown.addClass('open');
+        onOpen: function(e) {
+            if (e.namespace !== 'bs.dropdown') {
+                // handle only events triggered with proper NS (omit just any show events)
+                return;
+            }
             var value = this.$frontDateField.val();
             if (!this.dateVariableHelper.isDateVariable(value)) {
                 this.$calendar.datepicker('setDate', value);
@@ -340,7 +346,7 @@ define(function(require) {
          * Closes dropdown with date-picker + variable-picker
          */
         close: function() {
-            this.$dropdown.removeClass('open');
+            this.$dropdown.trigger('tohide');
             this.trigger('close', this);
         }
     });
