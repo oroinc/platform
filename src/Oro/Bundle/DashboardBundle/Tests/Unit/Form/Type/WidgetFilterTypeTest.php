@@ -38,24 +38,48 @@ class WidgetFilterTypeTest extends TypeTestCase
 
         $this->assertTrue($form->isValid());
         $this->assertEquals(
-            $formData,
+            ['entity' => 'TestClass', 'definition' => ['filters' => []]],
             $form->getData()
         );
     }
 
-    public function testView()
+    /**
+     * @dataProvider testViewDataProvider
+     *
+     * @param array $options
+     * @param array $expectedData
+     * @param array $value
+     */
+    public function testView(array $options, array $expectedData, $value = [])
     {
-        $options = [
-            'entity'      => 'TestClass',
-            'widgetType'  => 'test_widget',
-            'collapsible' => true,
-            'collapsed'   => false
-        ];
-        $form    = $this->factory->create(new WidgetFilterType(), null, $options);
+        $form    = $this->factory->create(
+            new WidgetFilterType(),
+            $value,
+            array_merge(['entity' => 'TestClass', 'widgetType' => 'test_widget'], $options)
+        );
         $view    = $form->createView();
         $this->assertEquals('test_widget', $view->vars['widgetType']);
-        $this->assertTrue($view->vars['collapsible']);
-        $this->assertFalse($view->vars['collapsed']);
+        $this->assertEquals($expectedData['collapsible'], $view->vars['collapsible']);
+        $this->assertEquals($expectedData['collapsed'], $view->vars['collapsed']);
+    }
+
+    public function testViewDataProvider()
+    {
+        return [
+            'default options' => [
+                [],
+                ['collapsible' => false, 'collapsed' => false],
+            ],
+            'enable expand_filled' => [
+                ['expand_filled' => true],
+                ['collapsible' => false, 'collapsed' => true],
+            ],
+            'enable expand_filled with value' => [
+                ['expand_filled' => true],
+                ['collapsible' => false, 'collapsed' => false],
+                ['definition' => ['filters' => [1]]]
+            ]
+        ];
     }
 
     /**

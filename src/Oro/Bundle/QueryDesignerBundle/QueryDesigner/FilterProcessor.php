@@ -21,9 +21,13 @@ class FilterProcessor extends SegmentQueryConverter
      */
     public function process(QueryBuilder $qb, $rootEntity, array $filters, $rootEntityAlias)
     {
+        if (!$filters) {
+            // nothing to do
+            return $qb;
+        }
         $this->setRootEntity($rootEntity);
         $this->rootEntityAlias          = $rootEntityAlias;
-        $this->definition['filters']    = !empty($filters['filters']) ? $filters : [];
+        $this->definition['filters']    = $filters;
         $this->definition['columns']    = [];
         $this->qb                       = $qb;
         $this->joinIdHelper             = new JoinIdentifierHelper($this->getRootEntity());

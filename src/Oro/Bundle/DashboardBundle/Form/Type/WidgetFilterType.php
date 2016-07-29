@@ -10,6 +10,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToJsonTransformer;
+
 class WidgetFilterType extends AbstractType
 {
     /**
@@ -37,17 +39,19 @@ class WidgetFilterType extends AbstractType
                 );
             }
         );
+        $builder->get('definition')
+            ->addViewTransformer(new ArrayToJsonTransformer());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widgetType']  = $options['widgetType'];
         $view->vars['collapsible'] = $options['collapsible'];
-        $view->vars['collapsed']   = $options['collapsed'];
-        parent::finishView($view, $form, $options);
+        $view->vars['collapsed']   = $this->resolveCollapsed($view, $options);
+        parent::buildView($view, $form, $options);
     }
 
     /**
@@ -56,7 +60,13 @@ class WidgetFilterType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            ['widgetType' => null, 'entity' => null, 'collapsible' => false, 'collapsed' => true]
+            [
+                'widgetType'    => null,
+                'entity'        => null,
+                'collapsible'   => false,
+                'collapsed'     => false,
+                'expand_filled' => false
+            ]
         );
     }
 
@@ -66,5 +76,25 @@ class WidgetFilterType extends AbstractType
     public function getName()
     {
         return 'oro_dashboard_query_filter';
+    }
+
+    /**
+     * @param FormView $view
+     * @param array    $options
+     *
+     * @return bool
+     */
+    protected function resolveCollapsed(FormView $view, array $options)
+    {
+        if ($options['collapsed']) {
+            return true;
+        }
+        if (!$options['expand_filled']) {
+            return $options['collapsed'];
+        }
+
+        $val = $view->vars['value'];
+
+        return empty($val['definition']['filters']);
     }
 }
