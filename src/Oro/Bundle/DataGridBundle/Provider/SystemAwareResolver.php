@@ -92,14 +92,6 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
-        while (strpos($val, '%') !== false) {
-            $newVal = $this->resolveParameter($val);
-            if ($newVal == $val) {
-                break;
-            }
-            $val = $newVal;
-        }
-
         while (is_scalar($val) && strpos($val, '::') !== false) {
             $newVal = $this->resolveStatic($datagridName, $key, $val);
             if ($newVal == $val) {
@@ -125,25 +117,6 @@ class SystemAwareResolver implements ContainerAwareInterface
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
-    }
-
-    /**
-     * Replace %parameter% with it's value.
-     *
-     * @param string $val
-     * @return mixed
-     */
-    protected function resolveParameter($val)
-    {
-        if (preg_match('#%([\w\._]+)%#', $val, $match)) {
-            $val = $this->replaceValueInString(
-                $val,
-                $match[0],
-                $this->container->getParameter($match[1])
-            );
-        }
-
-        return $val;
     }
 
     /**
