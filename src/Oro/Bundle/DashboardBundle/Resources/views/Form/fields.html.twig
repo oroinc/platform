@@ -109,7 +109,7 @@
     <div id="{{ rowId }}" class="dashboard-widget-items">
         <div class="control-group">
             <label class="control-label">{{ label|trans }}</label>
-            <div class="controls">
+            <div class="control-group controls">
                 <div class="">
                     {{ UI.clientButton({
                         'aCss': 'no-hash add-button',
@@ -121,17 +121,17 @@
                     }) }}
                 </div>
             </div>
-        </div>
-        <div class="grid-container">
-            <table id="{{ form.vars.id }}" class="grid table table-bordered table-condensed">
-                <thead>
-                    <tr>
-                        <th><span>{{ form.vars.item_label|trans }}</span></th>
-                        <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
-                    </tr>
-                </thead>
-                <tbody class="item-container"></tbody>
-            </table>
+            <div class="controls">
+                <table id="{{ form.vars.id }}" class="grid table table-bordered table-condensed">
+                    <thead>
+                        <tr>
+                            <th><span>{{ form.vars.item_label|trans }}</span></th>
+                            <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="item-container"></tbody>
+                </table>
+            </div>
         </div>
     </div>
     {{ form_javascript(form) }}
