@@ -154,8 +154,11 @@ class ThemeExtension extends AbstractExtension
         );
 
         $files = $this->findApplicableResources([$importPath]);
-        if (!$files && $theme->getParentTheme()) {
-            $files = $this->getImportResources($theme->getParentTheme(), $importId);
+        if ($theme->getParentTheme()) {
+            $files = array_merge(
+                $this->getImportResources($theme->getParentTheme(), $importId),
+                $files
+            );
         }
 
         return $files;
