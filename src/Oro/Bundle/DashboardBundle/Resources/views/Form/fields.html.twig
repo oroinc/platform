@@ -194,19 +194,25 @@
 {% block oro_dashboard_query_filter_row %}
     <div
     {% if collapsible %}
-        class="control-group collapsible{% if collapsed %} collapsed{% endif %}"
+        class="control-group widget-query-filter collapsible{% if collapsed %} collapsed{% endif %}"
             data-page-component-module="oroui/js/app/components/view-component"
             data-page-component-options="{{ {'view': 'oroform/js/app/views/collapsible-form-row-view'}|json_encode }}">
-        <label class="control-label">
-            <div class="collapse-expand-action-container">
-                <a class="collapse-action" data-name="collapse" href="#"></a>
-            </div>
-            {{ label|trans }}
-        </label>
     {% else %}
         class="control-group">
-        <label class="control-label">{{ label|trans }}</label>
     {% endif %}
+        <label class="control-label widget-query-filter">{{ label|trans }}</label>
+
+        {% if collapsible %}
+            {% set labelsMap = {
+                0: 'oro.dashboard.query_filter.collapse'|trans,
+                1: 'oro.dashboard.query_filter.expand'|trans,
+            } %}
+
+            <a class="collapse-action"
+               data-toggle-label="{{ labelsMap[not collapsed] }}"
+               data-name="collapse" href="#">{{ labelsMap[collapsed] }}</a>
+        {% endif %}
+
         <div class="controls">
             {{ form_row(form.entity) }}
             {{ form_row(form.definition) }}

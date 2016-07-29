@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var CollapsibleFormRowView;
+    var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     require('jquery.select2');
@@ -22,8 +23,16 @@ define(function(require) {
             return this;
         },
 
-        onCollapseToggle: function() {
-            var $controls = this.$('.controls');
+        onCollapseToggle: function(e) {
+            var $target = $(e.target);
+            var toggleLabel = $target.data('toggle-label');
+            if (toggleLabel) {
+                $target
+                    .data('toggle-label', $target.text())
+                    .text(toggleLabel);
+            }
+
+            var $controls = this.$('.controls.colla');
             if (this.$el.hasClass('collapsed')) {
                 $controls.slideDown(_.bind(function() {
                     this.$el.trigger('content:changed');
