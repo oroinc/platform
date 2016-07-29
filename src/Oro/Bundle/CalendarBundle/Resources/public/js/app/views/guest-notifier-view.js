@@ -20,7 +20,11 @@ define([
          * @constructor
          */
         initialize: function() {
+            var self = this;
             this.$form = this.$el.closest('form');
+            this.$form.on('select2-data-loaded', function() {
+                self.formInitialState = self.getFormState();
+            });
             this.formInitialState = this.getFormState();
             this.isModalShown = false;
 
@@ -58,6 +62,7 @@ define([
                     this.isModalShown = false;
                 }, this));
                 this.listenTo(this.confirmModal, 'cancel', _.bind(function() {
+                    this.$form.find('input[name*="[notifyInvitedUsers]"]').val('');
                     this.$form.submit();
                     this.isModalShown = false;
                 }, this));

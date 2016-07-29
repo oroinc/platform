@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\CalendarBundle\Twig\DateFormatExtension;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 
 class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
@@ -32,7 +31,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->markTestSkipped('CRM-5745');
-
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -45,7 +43,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->extension = new DateFormatExtension($this->formatter, $this->configManager);
     }
 
@@ -68,12 +65,9 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formatter->expects($this->any())
             ->method('formatTime')
             ->will($this->returnValue('Time'));
-
         $startDate = new \DateTime($start);
         $endDate = $end === null ? null : new \DateTime($end);
-
         $result = $this->extension->formatCalendarDateRange($startDate, $endDate, $skipTime);
-
         $this->assertEquals($expected, $result);
     }
 
@@ -111,7 +105,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
     ) {
         $startDate = new \DateTime($start);
         $endDate = $end === null ? null : new \DateTime($end);
-
         $this->configManager->expects($this->any())
             ->method('get')
             ->will(
@@ -122,7 +115,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-
         $this->extension->formatCalendarDateRangeOrganization(
             $startDate,
             $endDate,
@@ -133,10 +125,8 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
             $timeZone,
             $organization
         );
-
         $this->configManager->expects($this->never())
             ->method('get');
-
         $this->extension->formatCalendarDateRangeOrganization(
             $startDate,
             $endDate,
@@ -151,7 +141,6 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
     public function formatCalendarDateRangeOrganizationProvider()
     {
         $organization = new Organization(1);
-
         return [
             'Localization settings from global scope' => [
                 '2016-05-01T10:30:15+00:00',
@@ -162,8 +151,8 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
                 $organization
             ],
             'Localization settings from params values' => [
-            '2016-05-01T10:30:15+00:00',
-            '2016-05-01T11:30:15+00:00',
+                '2016-05-01T10:30:15+00:00',
+                '2016-05-01T11:30:15+00:00',
                 ['locale' => 'en_US', 'timeZone' => 'UTC'], // config global scope
                 'en_US',
                 'Europe/Athens',
