@@ -230,16 +230,19 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
     public function testPreUploadDeleteFile()
     {
         $fileEntity = $this->createFileEntity();
-        $fileEntity->setEmptyFile(true)
-            ->setFilename('test.doc')
-            ->setExtension('doc')
-            ->setOriginalFilename('test.doc');
+        $fileEntity
+            ->setEmptyFile(true)
+            ->setExtension('txt')
+            ->setFileSize(100)
+            ->setMimeType('text/plain');
 
         $this->fileManager->preUpload($fileEntity);
 
-        $this->assertNull($fileEntity->getFilename());
-        $this->assertNull($fileEntity->getExtension());
         $this->assertNull($fileEntity->getOriginalFilename());
+        $this->assertNull($fileEntity->getExtension());
+        $this->assertNull($fileEntity->getMimeType());
+        $this->assertNull($fileEntity->getFileSize());
+        $this->assertNull($fileEntity->getFilename());
     }
 
     public function testPreUploadForUploadedFile()
@@ -256,9 +259,10 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('csv', $fileEntity->getExtension());
         $this->assertEquals('text/csv', $fileEntity->getMimeType());
         $this->assertEquals(9, $fileEntity->getFileSize());
+        $this->assertNotEquals('testFile.txt', $fileEntity->getFilename());
     }
 
-    public function testPreUpload()
+    public function testPreUploadForRegularFile()
     {
         $fileEntity = $this->createFileEntity();
         $file = new File(__DIR__ . '/../Fixtures/testFile/test.txt');
@@ -272,6 +276,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('txt', $fileEntity->getExtension());
         $this->assertEquals('text/plain', $fileEntity->getMimeType());
         $this->assertEquals(9, $fileEntity->getFileSize());
+        $this->assertNotEquals('testFile.txt', $fileEntity->getFilename());
     }
 
     public function testUpload()
@@ -279,18 +284,17 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $fileEntity = $this->createFileEntity();
         $fileEntity->setEmptyFile(false);
 
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->setConstructorArgs([__DIR__ . '/../Fixtures/testFile/test.txt'])
-            ->getMock();
-        $fileEntity->setFile($file);
         $path = __DIR__ . '/../Fixtures/testFile/test.txt';
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->setConstructorArgs([$path])
+            ->getMock();
         $file->expects($this->once())
             ->method('getPathname')
             ->willReturn(realpath($path));
-
         $file->expects($this->once())
             ->method('isFile')
             ->willReturn(true);
+        $fileEntity->setFile($file);
 
         $memoryBuffer = new InMemoryBuffer($this->filesystem, 'test.txt');
 
@@ -306,7 +310,11 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getAdapter')
             ->willReturn($adapter);
         $adapter->expects($this->once())
-            ->method('setMetadata');
+            ->method('setMetadata')
+            ->with(
+                $fileEntity->getFilename(),
+                ['contentType' => $fileEntity->getMimeType()]
+            );
 
         $this->fileManager->upload($fileEntity);
         $memoryBuffer->open(new StreamMode('rb+'));
@@ -315,23 +323,80 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test data', $memoryBuffer->read(100));
     }
 
+    public function testDeleteFile()
+    {
+        $fileName = 'text.txt';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(true);
+        $this->filesystem->expects($this->once())
+            ->method('delete')
+            ->with($fileName);
+
+        $this->fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileForNotExistingFile()
+    {
+        $fileName = 'text.txt';
+
+        $this->filesystem->expects($this->once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(false);
+        $this->filesystem->expects($this->never())
+            ->method('delete');
+
+        $this->fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileWhenFileNameIsEmpty()
+    {
+        $this->filesystem->expects($this->never())
+            ->method('has');
+        $this->filesystem->expects($this->never())
+            ->method('delete');
+
+        $this->fileManager->deleteFile(null);
+    }
+
     public function testWriteFileToStorage()
     {
         $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
+        $fileName = 'test2.txt';
 
-        $newFileName = 'test2.txt';
-
-        $resultStream = new InMemoryBuffer($this->filesystem, $newFileName);
+        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($newFileName)
+            ->with($fileName)
             ->willReturn($resultStream);
 
-        $this->fileManager->writeFileToStorage($localFilePath, $newFileName);
+        $this->fileManager->writeFileToStorage($localFilePath, $fileName);
         $resultStream->open(new StreamMode('rb+'));
         $resultStream->seek(0);
 
         $this->assertEquals('Test data', $resultStream->read(100));
+    }
+
+    public function testWriteToStorage()
+    {
+        $content = 'Test data';
+        $fileName = 'test2.txt';
+
+        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
+
+        $this->filesystem->expects($this->once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+
+        $this->fileManager->writeToStorage($content, $fileName);
+        $resultStream->open(new StreamMode('rb+'));
+        $resultStream->seek(0);
+
+        $this->assertEquals($content, $resultStream->read(100));
     }
 }

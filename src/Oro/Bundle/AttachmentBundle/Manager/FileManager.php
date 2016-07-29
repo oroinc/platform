@@ -177,23 +177,23 @@ class FileManager
      * Copies a file from local filesystem to the storage
      *
      * @param string $localFilePath
-     * @param string $destinationFileName
+     * @param string $fileName
      */
-    public function writeFileToStorage($localFilePath, $destinationFileName)
+    public function writeFileToStorage($localFilePath, $fileName)
     {
         $srcStream = new LocalStream($localFilePath);
-        $this->writeStreamToStorage($srcStream, $destinationFileName);
+        $this->writeStreamToStorage($srcStream, $fileName);
     }
 
     /**
      * Writes the specified data to the storage
      *
      * @param string $content
-     * @param string $destinationFileName
+     * @param string $fileName
      */
-    public function writeToStorage($content, $destinationFileName)
+    public function writeToStorage($content, $fileName)
     {
-        $dstStream = $this->filesystem->createStream($destinationFileName);
+        $dstStream = $this->filesystem->createStream($fileName);
 
         $dstStream->open(new StreamMode('wb+'));
         $dstStream->write($content);
@@ -270,11 +270,11 @@ class FileManager
      * Writes a stream to the storage
      *
      * @param Stream $srcStream
-     * @param string $destinationFileName
+     * @param string $fileName
      */
-    protected function writeStreamToStorage(Stream $srcStream, $destinationFileName)
+    protected function writeStreamToStorage(Stream $srcStream, $fileName)
     {
-        $dstStream = $this->filesystem->createStream($destinationFileName);
+        $dstStream = $this->filesystem->createStream($fileName);
 
         $srcStream->open(new StreamMode('rb+'));
         $dstStream->open(new StreamMode('wb+'));
