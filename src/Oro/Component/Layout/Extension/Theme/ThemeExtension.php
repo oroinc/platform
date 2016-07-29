@@ -9,6 +9,7 @@ use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
+use Oro\Component\Layout\IsApplicableLayoutUpdateInterface;
 use Oro\Component\Layout\LayoutUpdateImportInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
@@ -102,6 +103,7 @@ class ThemeExtension extends AbstractExtension
                         $importUpdate = $this->loadLayoutUpdate($file, $context);
                         if ($importUpdate instanceof LayoutUpdateImportInterface) {
                             $importUpdate->setImport($import);
+                            $importUpdate->setParentUpdate($update);
                         }
                     }
                 }

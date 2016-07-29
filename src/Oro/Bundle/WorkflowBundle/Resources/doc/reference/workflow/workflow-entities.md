@@ -30,6 +30,7 @@ Table of Contents
    - [Workflow Entity Acl Identity Repository](#workflow-entity-acl-identity-repository)
  - [Support Entities](#support-entities)
    - [Workflow Manager](#workflow-manager)
+   - [Workflow Aware Manager](#workflow-aware-manager)
    - [Workflow Data](#workflow-data)
    - [Workflow Result](#workflow-result)
    - [Step Manager](#step-manager)
@@ -71,7 +72,7 @@ transition;
 for specified WorkflowItem and optionally returns list of errors or/and fire exception;
 * **transit(WorkflowItem, Transition)** - performs transit for specified WorkflowItem by name of transition or
 transition instance;
-* **resetWorkflowData()** - perform reset workflow item data for the specific entity;
+* **resetWorkflowData()** - perform reset workflow item data for the specific workflow;
 * **createWorkflowItem(Entity, array data)** - create WorkflowItem instance for the specific entity and initialize it
 with passed data;
 * **getAttributesMapping()** - Get attribute names mapped to property paths if any have;
@@ -93,8 +94,8 @@ objects by their names or managed entities.
 
 **Methods:**
 * **getWorkflow(workflowName)** - extracts Workflow object by it's name;
-* **getActiveWorkflowByEntityClass(entityClass)** - returns active Workflow that is applicable to passed entity class;
-* **hasActiveWorkflowByEntityClass(entityClass)** - check is there an active workflow for entity class.
+* **getActiveWorkflowsByEntityClass(entityOrClass)** - returns all Workflows for passed entity or entity class;
+* **hasActiveWorkflowsByEntityClass(entityOrClass)** - checks if entity or entity class have linked workflows.
 
 Step
 ----
@@ -305,13 +306,10 @@ Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository
 
 **Methods:**
 * **findByEntityMetadata(entityClass, entityIdentifier)** - returns list of all Workflow Items related to input parameters;
-* **getByDefinitionQueryBuilder(WorkflowDefinition)** - returns instance of QueryBuilder based on input workflow
-definition parameters;
 * **getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition)** - returns instance of QueryBuilder for related Entity
 and herewith updated workflow step by input WorkflowDefinition start step;
-* **resetWorkflowData(entityClass, excludedWorkflowNames, batchSize)** - perform reset workflow items data for all Entities,
-which related with current workflow. Optional you can control the size of batch, which will be reseted in the single query.
-Also you can excluded some groups of entities from list on resetting, specifying the names of workflows, which would be excluded;
+* **resetWorkflowData(WorkflowDefinition, batchSize)** - perform reset workflow items data for given definition.
+Optional you can control the size of batch, which will be reseted in the single query.
 
 Workflow Step
 -------------
@@ -405,9 +403,42 @@ workflow itself;
 * **activateWorkflow(workflowIdentifier)** - perform activation workflow by workflow name, Workflow instance,
 WorkflowItem instance or WorkflowDefinition instance;
 * **deactivateWorkflow(entityClass)** - perform deactivation workflow by entity class;
-* **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for all Entities, which related with
-input workflow definition;
-* **isResetAllowed(entity)** - check that entity workflow item is equal to the active workflow item;
+* **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for given workflow definition;
+
+Workflow Aware Manager
+----------------------
+**Class:** `Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager`
+
+**Abstract Service:** `oro_workflow.abstract.workflow_aware_manager`
+
+**Description**
+With ability to have multiple workflows for an Entity there comes necessity to manage specific workflow.
+This class with a service is useful for cases when your functionality strictly rely on predefined workflow name.
+So you can define your own child of service with specified workflow name through `setWorkflowName` method to be sure that you are managing your specific instance of `Workflow` or its related entities.
+
+**Example of Service Definition:**
+```YAML
+services:
+    my_bundle.workflow.manager.my_special_flow:
+        parent: oro_workflow.abstract.workflow_aware_manager
+        calls:
+            - ['setWorkflowName', ['my_special_flow']]
+```
+
+**Predefined Workflow**
+
+To be able to manage specific `workflow` the manager should be configured by `setWorkflowName` method.
+Later, you can access this name from different parts of application by using your instance of manager and its `getWorkflowName` method.
+You should avoid to use name of workflow as a string at multiple code places. So for this purpose the manager can be helpful as well.
+
+**Methods:**
+* **startWorkflow(entity)** - simply starts workflow defined through `setWorkflowName` method for provided `entity`.
+* **getWorkflow()** - returns `Oro\Bundle\WorkflowBundle\Model\Workflow` instance of defined workflow.
+* **getWorkflowItem(entity)** - retrieves `Oro\Bundle\WorkflowBundle\Entity\WorkflowItem` instance for specified entity from predefined workflow.
+
+* **setWorkflowName(workflowName)** - configures the manager to manage specific workflow.
+* **getWorkflowName():string** - gets current configured name of workflow for the manager.
+
 
 Workflow Data
 -------------
@@ -475,16 +506,6 @@ Context is used in action and conditions and thereby it's usually an instance of
 This class is a simple helper that encapsulates logic of accessing properties of context using
 Symfony\Component\PropertyAccess\PropertyAccessor.
 
-Entity Connector
-----------------
-
-**Class:**
-Oro\Bundle\WorkflowBundle\Model\EntityConnector
-
-**Description:**
-Provides methods to get and set Workflow Item and Workflow Step to the specific entity. Also can define
-whether entity or class has properties to store Workflow Item and Workflow Step.
-
 ACL Manager
 -----------
 
@@ -494,7 +515,7 @@ Oro\Bundle\WorkflowBundle\Acl\AclManager
 **Description:**
 Additional service that process ACL for workflow definitions and calculate Acl Identity entities for specified
 Workflow Item.
-k
+
 Workflow Entity Voter
 ---------------------
 

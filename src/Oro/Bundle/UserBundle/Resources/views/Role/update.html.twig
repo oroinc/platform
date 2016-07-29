@@ -7,6 +7,7 @@
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
 
 {% block navButtons %}
+    {{ parent() }}
     {% if entityId and resource_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
                 'dataUrl': path('oro_api_delete_role', {'id': entityId}),
@@ -20,15 +21,6 @@
         }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {% if entityId and resource_granted('CREATE', form.vars.value)%}
-        {{ UI.button({
-            'iCss': 'icon-copy',
-            'label': 'oro.user.role.clone'|trans,
-            'title': 'oro.user.role.clone'|trans,
-            'path': path('oro_user_role_clone', {'id': entityId}),
-        }) }}
-    {% endif %}
-    {{ UI.buttonSeparator() }}
     {{ UI.cancelButton(path('oro_user_role_index')) }}
     {% set html = UI.saveAndCloseButton({
         'type': 'button',
