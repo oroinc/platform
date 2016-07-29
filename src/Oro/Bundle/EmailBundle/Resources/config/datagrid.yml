@@ -75,9 +75,9 @@ datagrid:
                 - oroemail/js/datagrid/auto-response-rules-extension
 
     base-email-grid:
+        acl_resource: oro_email_email_view
         source:
             type: orm
-            skip_acl_apply: true
             query:
                 select:
                     - partial eu.{id, email}

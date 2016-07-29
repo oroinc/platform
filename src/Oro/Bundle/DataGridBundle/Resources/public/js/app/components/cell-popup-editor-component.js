@@ -82,7 +82,7 @@ define(function(require) {
         createView: function() {
             var View = this.options.view;
             var cell = this.options.cell;
-            var viewOptions = _.extend({}, this.options.viewOptions, {
+            var viewOptions = _.extend({}, this.options.viewOptions, this.getRestrictedOptions(), {
                 autoRender: true,
                 model: cell.model,
                 fieldName: cell.column.get('name'),
@@ -141,6 +141,30 @@ define(function(require) {
             });
             viewInstance.trigger('change');
             this.errorHolderView.render();
+        },
+
+        getRestrictedOptions: function() {
+            var entityRestrictions = this.options.cell.model.get('entity_restrictions');
+            var applicableRestrictions = _.filter(entityRestrictions, function(restriction) {
+                return restriction.field === this.options.cell.column.get('name');
+            }, this);
+
+            var restrictedOptions = {};
+            _.each(applicableRestrictions, function(restriction) {
+                if (restriction.mode === 'disallow') {
+                    restrictedOptions.choices = _.omit(
+                        this.options.viewOptions.choices,
+                        restriction.values
+                    );
+                } else if (restriction.mode === 'allow') {
+                    restrictedOptions.choices = _.pick(
+                        this.options.viewOptions.choices,
+                        restriction.values
+                    );
+                }
+            }, this);
+
+            return restrictedOptions;
         },
 
         /**

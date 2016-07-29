@@ -36,11 +36,21 @@ class OroElementFactory implements SuiteAwareInterface
     /**
      * @param string $name
      *
+     * @return bool
+     */
+    public function hasElement($name)
+    {
+        return array_key_exists($name, $this->configuration);
+    }
+
+    /**
+     * @param string $name
+     *
      * @return Element
      */
     public function createElement($name)
     {
-        if (false === array_key_exists($name, $this->configuration)) {
+        if (!$this->hasElement($name)) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not find element with "%s" name',
                 $name
@@ -63,7 +73,7 @@ class OroElementFactory implements SuiteAwareInterface
      */
     public function wrapElement($name, NodeElement $element)
     {
-        if (false === array_key_exists($name, $this->configuration)) {
+        if (!$this->hasElement($name)) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not find element with "%s" name',
                 $name

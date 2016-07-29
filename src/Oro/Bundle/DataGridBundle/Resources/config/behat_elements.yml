@@ -18,6 +18,10 @@ GridFilterDateTimeItem:
   selector: 'div.filter-item:contains("%s")'
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem
 
+MultipleChoice:
+  selector: 'div.filter-item:contains("%s")'
+  class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice
+
 DateTimePicker:
   class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker
 
