@@ -52,7 +52,7 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        href: { @value: $data.theme.icon }
+                        href: '=data["theme"].getIcon()'
                         rel: shortcut icon
                 head_style:
                     blockType: container

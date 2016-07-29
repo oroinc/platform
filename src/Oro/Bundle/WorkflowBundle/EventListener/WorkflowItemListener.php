@@ -7,7 +7,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowItemListener
@@ -18,19 +18,19 @@ class WorkflowItemListener
     protected $doctrineHelper;
 
     /**
-     * @var EntityConnector
-     */
-    protected $entityConnector;
-
-    /**
      * @var WorkflowManager
      */
     protected $workflowManager;
 
     /**
+     * @var WorkflowEntityConnector
+     */
+    protected $entityConnector;
+
+    /**
      * @var array
      */
-    protected $entitiesScheduledForWorkflowStart = array();
+    protected $entitiesScheduledForWorkflowStart = [];
 
     /**
      * @var int
@@ -39,17 +39,17 @@ class WorkflowItemListener
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param EntityConnector $entityConnector
      * @param WorkflowManager $workflowManager
+     * @param WorkflowEntityConnector $entityConnector
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityConnector $entityConnector,
-        WorkflowManager $workflowManager
+        WorkflowManager $workflowManager,
+        WorkflowEntityConnector $entityConnector
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->entityConnector = $entityConnector;
         $this->workflowManager = $workflowManager;
+        $this->entityConnector = $entityConnector;
     }
 
     /**
@@ -69,13 +69,17 @@ class WorkflowItemListener
     protected function scheduleStartWorkflowForNewEntity(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        $activeWorkflow = $this->workflowManager->getApplicableWorkflow($entity);
+        $activeWorkflows = $this->workflowManager->getApplicableWorkflows($entity);
 
-        if ($activeWorkflow && $activeWorkflow->getStepManager()->hasStartStep()) {
-            $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = array(
-                'entity' => $entity,
-                'workflow' => $activeWorkflow
-            );
+        if ($activeWorkflows) {
+            foreach ($activeWorkflows as $activeWorkflow) {
+                if ($activeWorkflow->getStepManager()->hasStartStep()) {
+                    $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = [
+                        'entity' => $entity,
+                        'workflow' => $activeWorkflow
+                    ];
+                }
+            }
         }
     }
 
@@ -96,8 +100,17 @@ class WorkflowItemListener
             $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
             $workflowItem->setEntityId($entityId);
 
+            $entityClass = $this->doctrineHelper->getEntityClass($entity);
+            $workflowItem->setEntityClass($entityClass);
+
             $unitOfWork = $args->getEntityManager()->getUnitOfWork();
-            $unitOfWork->scheduleExtraUpdate($workflowItem, array('entityId' => array(null, $entityId)));
+            $unitOfWork->scheduleExtraUpdate(
+                $workflowItem,
+                [
+                    'entityId' => [null, $entityId],
+                    'entityClass' => [null, $entityClass]
+                ]
+            );
         }
     }
 
@@ -118,17 +131,24 @@ class WorkflowItemListener
     }
 
     /**
-     * Remove related workflow item
+     * Remove related workflow items
      *
      * @param LifecycleEventArgs $args
      */
     public function preRemove(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        if ($this->entityConnector->isWorkflowAware($entity)) {
-            $workflowItem = $this->entityConnector->getWorkflowItem($entity);
-            if ($workflowItem) {
-                $args->getEntityManager()->remove($workflowItem);
+        
+        if (!$this->entityConnector->isApplicableEntity($entity)) {
+            return;
+        }
+
+        $workflowItems = $this->workflowManager->getWorkflowItemsByEntity($entity);
+        
+        if ($workflowItems) {
+            $em = $args->getEntityManager();
+            foreach ($workflowItems as $workflowItem) {
+                $em->remove($workflowItem);
             }
         }
     }

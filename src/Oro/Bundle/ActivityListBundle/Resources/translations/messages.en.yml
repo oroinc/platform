@@ -44,9 +44,8 @@ oro:
                         threaded.label: Threaded
 
         pagination:
-            page: Page:
-            total: of {{ pages }} | Total of {{ records }} records
-            total_mobile: 'of {{ pages }} | Total: {{ records }}'
+            newer: Newer
+            older: Older
 
         condition_builder:
             criteria:
