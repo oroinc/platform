@@ -2,31 +2,29 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
-use Oro\Component\ConfigExpression\Condition;
-use Oro\Component\ConfigExpression\Func;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\LayoutBundle\Layout\Processor\ConfigExpressionProcessor;
-use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension;
+use Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor;
+use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ExpressionExtension;
 
-class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
+class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ConfigExpressionProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExpressionProcessor|\PHPUnit_Framework_MockObject_MockObject */
     protected $processor;
 
-    /** @var ConfigExpressionExtension */
+    /** @var ExpressionExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->processor = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Processor\ConfigExpressionProcessor')
+        $this->processor = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new ConfigExpressionExtension($this->processor);
+        $this->extension = new ExpressionExtension($this->processor);
     }
 
     public function testGetExtendedType()

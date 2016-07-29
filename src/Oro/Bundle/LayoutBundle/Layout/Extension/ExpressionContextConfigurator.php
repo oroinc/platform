@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
 
-class ConfigExpressionContextConfigurator implements ContextConfiguratorInterface
+class ExpressionContextConfigurator implements ContextConfiguratorInterface
 {
     /**
      * {@inheritdoc}

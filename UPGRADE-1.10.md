@@ -298,6 +298,8 @@ Corresponding block type classes was removed.
  [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
 - Added possibility to create layout update imports, for details please check out documentation [Imports](./src/Oro/Bundle/LayoutBundle/Resources/doc/imports.md).
 - Added new `\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface`.
+- Changed current expression language in layouts to symfony expression language, for details please check out documentation at
+ [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.

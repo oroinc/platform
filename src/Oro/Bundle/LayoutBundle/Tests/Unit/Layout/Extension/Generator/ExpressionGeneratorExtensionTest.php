@@ -2,34 +2,34 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
-use Oro\Component\ConfigExpression\AssemblerInterface;
-use Oro\Component\ConfigExpression\Condition;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
+
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtension;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension;
-
-class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class ExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AssemblerInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $expressionAssembler;
+    /** @var ExpressionLanguage|\PHPUnit_Framework_MockObject_MockObject */
+    protected $expressionLanguage;
 
-    /** @var ConfigExpressionGeneratorExtension */
+    /** @var ExpressionGeneratorExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->expressionAssembler = $this->getMock('Oro\Component\ConfigExpression\AssemblerInterface');
+        $this->expressionLanguage = $this->getMock(ExpressionLanguage::class);
 
-        $this->extension = new ConfigExpressionGeneratorExtension($this->expressionAssembler);
+        $this->extension = new ExpressionGeneratorExtension($this->expressionLanguage);
     }
 
     public function testNoConditions()
     {
         $visitors = new VisitorCollection();
 
-        $this->expressionAssembler->expects($this->never())
-            ->method('assemble');
+        $this->expressionLanguage->expects($this->never())
+            ->method('parse');
 
         $this->extension->prepare(
             $this->createGeneratorData([]),
@@ -43,12 +43,12 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $visitors = new VisitorCollection();
 
-        $this->expressionAssembler->expects($this->never())
-            ->method('assemble');
+        $this->expressionLanguage->expects($this->never())
+            ->method('parse');
 
         $this->extension->prepare(
             $this->createGeneratorData([
-                ConfigExpressionGeneratorExtension::NODE_CONDITIONS => null
+                ExpressionGeneratorExtension::NODE_CONDITIONS => null
             ]),
             $visitors
         );
@@ -60,23 +60,25 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $visitors = new VisitorCollection();
 
-        $this->expressionAssembler->expects($this->once())
-            ->method('assemble')
-            ->with([['@true' => null]])
-            ->will($this->returnValue(new Condition\TrueCondition()));
+        $expression = $this->getMockBuilder(ParsedExpression::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->expressionLanguage->expects($this->once())
+            ->method('parse')
+            ->with('true')
+            ->will($this->returnValue($expression));
 
         $this->extension->prepare(
             $this->createGeneratorData([
-                ConfigExpressionGeneratorExtension::NODE_CONDITIONS => [
-                    ['@true' => null]
-                ]
+                ExpressionGeneratorExtension::NODE_CONDITIONS => 'true'
             ]),
             $visitors
         );
 
         $this->assertCount(1, $visitors);
         $this->assertInstanceOf(
-            'Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionConditionVisitor',
+            'Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionConditionVisitor',
             $visitors->current()
         );
     }
@@ -85,16 +87,14 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $visitors = new VisitorCollection();
 
-        $this->expressionAssembler->expects($this->once())
-            ->method('assemble')
-            ->with([['@true' => null]])
+        $this->expressionLanguage->expects($this->once())
+            ->method('parse')
+            ->with('unknown')
             ->will($this->returnValue(null));
 
         $this->extension->prepare(
             $this->createGeneratorData([
-                ConfigExpressionGeneratorExtension::NODE_CONDITIONS => [
-                    ['@true' => null]
-                ]
+                ExpressionGeneratorExtension::NODE_CONDITIONS => 'unknown'
             ]),
             $visitors
         );
@@ -110,16 +110,14 @@ class ConfigExpressionGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $visitors = new VisitorCollection();
 
-        $this->expressionAssembler->expects($this->once())
-            ->method('assemble')
-            ->with([['@true' => null]])
+        $this->expressionLanguage->expects($this->once())
+            ->method('parse')
+            ->with('true')
             ->will($this->throwException(new \Exception('some error')));
 
         $this->extension->prepare(
             $this->createGeneratorData([
-                ConfigExpressionGeneratorExtension::NODE_CONDITIONS => [
-                    ['@true' => null]
-                ]
+                ExpressionGeneratorExtension::NODE_CONDITIONS => 'true'
             ]),
             $visitors
         );

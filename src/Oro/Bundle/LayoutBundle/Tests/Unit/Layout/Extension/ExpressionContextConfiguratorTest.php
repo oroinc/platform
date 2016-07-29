@@ -4,16 +4,16 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionContextConfigurator;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ExpressionContextConfigurator;
 
-class ConfigExpressionContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class ExpressionContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ConfigExpressionContextConfigurator */
+    /** @var ExpressionContextConfigurator */
     protected $contextConfigurator;
 
     protected function setUp()
     {
-        $this->contextConfigurator = new ConfigExpressionContextConfigurator();
+        $this->contextConfigurator = new ExpressionContextConfigurator();
     }
 
     public function testDefaultValuesAfterConfigureContext()

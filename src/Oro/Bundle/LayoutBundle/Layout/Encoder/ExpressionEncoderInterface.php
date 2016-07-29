@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Encoder;
 
-use Oro\Component\ConfigExpression\ExpressionInterface;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
+
 use Oro\Component\Layout\Action;
 
-interface ConfigExpressionEncoderInterface
+interface ExpressionEncoderInterface
 {
     /**
      * Returns string representation of the given expression.
      *
-     * @param ExpressionInterface $expr
+     * @param ParsedExpression $expr
      *
      * @return string
      */
-    public function encodeExpr(ExpressionInterface $expr);
+    public function encodeExpr(ParsedExpression $expr);
 
     /**
      * Returns string representation of the given action.

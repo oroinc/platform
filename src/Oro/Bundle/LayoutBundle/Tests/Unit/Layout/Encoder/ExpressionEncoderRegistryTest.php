@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Encoder;
 
-use Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry;
+use Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry;
 
-class ConfigExpressionEncoderRegistryTest extends \PHPUnit_Framework_TestCase
+class ExpressionEncoderRegistryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $container;
@@ -12,19 +12,19 @@ class ConfigExpressionEncoderRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $encoder;
 
-    /** @var ConfigExpressionEncoderRegistry */
+    /** @var ExpressionEncoderRegistry */
     protected $encoderRegistry;
 
     protected function setUp()
     {
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->encoder   = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderInterface');
+        $this->encoder   = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderInterface');
         $this->container->expects($this->any())
             ->method('get')
             ->with('test_encoder_service')
             ->will($this->returnValue($this->encoder));
 
-        $this->encoderRegistry = new ConfigExpressionEncoderRegistry(
+        $this->encoderRegistry = new ExpressionEncoderRegistry(
             $this->container,
             ['test' => 'test_encoder_service']
         );
