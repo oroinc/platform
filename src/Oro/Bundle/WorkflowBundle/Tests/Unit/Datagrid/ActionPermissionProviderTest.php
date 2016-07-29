@@ -4,15 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 
 class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowSystemConfigManager
-     */
-    protected $configManager;
-
     /**
      * @var ActionPermissionProvider
      */
@@ -20,10 +14,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder(WorkflowSystemConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->provider = new ActionPermissionProvider($this->configManager);
+        $this->provider = new ActionPermissionProvider();
     }
 
     /**
@@ -33,7 +24,6 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetWorkflowDefinitionPermissionsSystemRelated(array $expected, $input)
     {
-        $this->configManager->expects($this->once())->method('getActiveWorkflowNamesByEntity')->willReturn([]);
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
@@ -81,19 +71,12 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $expected
      * @param object $input
-     * @param array $activeWorkflowNames
      * @dataProvider getWorkflowDefinitionActivationDataProvider
      */
     public function testGetWorkflowDefinitionPermissionsActivationRelated(
         array $expected,
-        $input,
-        array $activeWorkflowNames
+        $input
     ) {
-        $relatedEntity = $input->getValue('entityClass');
-        $this->configManager->expects($this->once())
-            ->method('getActiveWorkflowNamesByEntity')
-            ->with($relatedEntity)
-            ->willReturn($activeWorkflowNames);
 
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
@@ -114,8 +97,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $this->getDefinitionMock(),
-                []
+                'input' => $this->getDefinitionMock(false)
             ),
             'active definition' => array(
                 'expected' => array(
@@ -126,8 +108,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => false,
                     'deactivate' => true
                 ),
-                'input' => $this->getDefinitionMock(),
-                ['workflow_name']
+                'input' => $this->getDefinitionMock(true)
             ),
             'inactive definition' => array(
                 'expected' => array(
@@ -138,16 +119,16 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $this->getDefinitionMock(),
-                ['other_workflow_name']
+                'input' => $this->getDefinitionMock(false)
             )
         );
     }
 
     /**
+     * @param bool $active weather workflow is active
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getDefinitionMock()
+    protected function getDefinitionMock($active)
     {
         $definition = $this->getMock(ResultRecordInterface::class);
 
@@ -156,6 +137,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     array(
+                        array('active', $active),
                         array('name', 'workflow_name'),
                         array('entityClass', \stdClass::class)
                     )

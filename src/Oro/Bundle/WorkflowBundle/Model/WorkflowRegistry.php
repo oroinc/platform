@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
@@ -18,25 +19,19 @@ class WorkflowRegistry
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
-    /** @var WorkflowSystemConfigManager */
-    protected $configManager;
-
     /** @var Workflow[] */
     protected $workflowByName = [];
 
     /**
      * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
-     * @param WorkflowSystemConfigManager $configManager
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
-        WorkflowAssembler $workflowAssembler,
-        WorkflowSystemConfigManager $configManager
+        WorkflowAssembler $workflowAssembler
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;
-        $this->configManager = $configManager;
     }
 
     /**
@@ -49,7 +44,16 @@ class WorkflowRegistry
      */
     public function getWorkflow($name, $exceptionOnNotFound = true)
     {
-        if (!isset($this->workflowByName[$name])) {
+        if (!is_string($name)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Expected value is workflow name string. But got %s',
+                    is_object($name) ? get_class($name) : gettype($name)
+                )
+            );
+        }
+
+        if (!array_key_exists($name, $this->workflowByName)) {
             /** @var WorkflowDefinition $definition */
             $definition = $this->getEntityRepository()->find($name);
             if (!$definition) {
@@ -75,7 +79,7 @@ class WorkflowRegistry
     protected function getAssembledWorkflow(WorkflowDefinition $definition)
     {
         $workflowName = $definition->getName();
-        if (!isset($this->workflowByName[$workflowName])) {
+        if (!array_key_exists($workflowName, $this->workflowByName)) {
             $workflow = $this->workflowAssembler->assemble($definition);
             $this->workflowByName[$workflowName] = $workflow;
         }
@@ -87,33 +91,24 @@ class WorkflowRegistry
      * Get Active Workflows that applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow[] named array of active Workflow instances
+     * @return Workflow[]|ArrayCollection named array of active Workflow instances
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
         $class = ClassUtils::getRealClass($entityClass);
 
-        $workflows = [];
+        $criteria = [
+            'relatedEntity' => $class,
+            'active' => true
+        ];
 
-        foreach ($this->configManager->getActiveWorkflowNamesByEntity($entityClass) as $activeWorkflow) {
-            $workflow = $this->getWorkflow($activeWorkflow, false);
-            if ($workflow instanceof Workflow && $workflow->getDefinition()->getRelatedEntity() === $class) {
-                $workflows[$activeWorkflow] = $workflow;
-            }
+        $workflows = new ArrayCollection();
+        foreach ($this->getEntityRepository()->findBy($criteria) as $definition) {
+            /** @var WorkflowDefinition $definition */
+            $workflows->set($definition->getName(), $this->getAssembledWorkflow($definition));
         }
 
         return $workflows;
-    }
-
-    /**
-     * Check is there an active workflow for entity class
-     *
-     * @param string $entityClass
-     * @return bool
-     */
-    public function hasActiveWorkflowsByEntityClass($entityClass)
-    {
-        return count($this->getActiveWorkflowsByEntityClass($entityClass)) > 0;
     }
 
     /**

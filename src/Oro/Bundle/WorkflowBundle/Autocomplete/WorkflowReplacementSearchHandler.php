@@ -32,14 +32,6 @@ class WorkflowReplacementSearchHandler extends SearchHandler
     }
 
     /**
-     * @param WorkflowManager $workflowManager
-     */
-    public function setWorkflowManager(WorkflowManager $workflowManager)
-    {
-        $this->workflowManager = $workflowManager;
-    }
-
-    /**
      * @param WorkflowRegistry $workflowRegistry
      */
     public function setWorkflowRegistry(WorkflowRegistry $workflowRegistry)
@@ -77,7 +69,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
         }
 
         return array_filter($queryBuilder->getQuery()->getResult(), function (WorkflowDefinition $definition) {
-            return $this->workflowManager->isActiveWorkflow($definition);
+            return $definition->isActive();
         });
     }
 

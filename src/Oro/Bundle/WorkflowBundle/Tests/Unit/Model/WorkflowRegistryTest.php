@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -10,7 +11,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager;
 
 class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,9 +25,6 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
     /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
     private $assembler;
-
-    /** @var WorkflowSystemConfigManager|\PHPUnit_Framework_MockObject_MockObject */
-    private $configManager;
 
     /** @var WorkflowRegistry */
     private $registry;
@@ -57,15 +54,12 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->with(WorkflowDefinition::class)
             ->willReturn($this->entityManager);
 
-        $this->configManager = $this->getMockBuilder(WorkflowSystemConfigManager::class)
-            ->disableOriginalConstructor()->getMock();
-
         $this->assembler = $this->getMockBuilder(WorkflowAssembler::class)
             ->disableOriginalConstructor()
             ->setMethods(['assemble'])
             ->getMock();
 
-        $this->registry = new WorkflowRegistry($this->managerRegistry, $this->assembler, $this->configManager);
+        $this->registry = new WorkflowRegistry($this->managerRegistry, $this->assembler);
     }
 
     protected function tearDown()
@@ -178,77 +172,17 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->createWorkflow($workflowName, $entityClass);
         $workflowDefinition = $workflow->getDefinition();
 
-        $this->configManager
-            ->expects($this->once())
-            ->method('getActiveWorkflowNamesByEntity')
-            ->with($entityClass)
-            ->willReturn([$workflowName]);
-
         $this->entityRepository->expects($this->once())
-            ->method('find')
-            ->with($workflowName)
-            ->willReturn($workflowDefinition);
+            ->method('findBy')
+            ->with(['relatedEntity' => $entityClass, 'active' => true])
+            ->willReturn([$workflowDefinition]);
         $this->prepareAssemblerMock($workflowDefinition, $workflow);
         $this->setUpEntityManagerMock($workflowDefinition);
 
         $this->assertEquals(
-            ['test_workflow' => $workflow],
+            new ArrayCollection(['test_workflow' => $workflow]),
             $this->registry->getActiveWorkflowsByEntityClass($entityClass)
         );
-    }
-
-    /**
-     * @param bool $notEmptyList
-     * @param bool $canAssemble
-     * @param bool $expected
-     * @dataProvider hasActiveWorkflowsByEntityClassDataProvider
-     */
-    public function testHasActiveWorkflowsByEntityClass($notEmptyList, $canAssemble, $expected)
-    {
-        $entityClass = 'testEntityClass';
-        $workflowName = 'test_workflow';
-        $workflow = $this->createWorkflow($workflowName, $entityClass);
-        $workflowDefinition = $canAssemble ? $workflow->getDefinition() : null;
-
-        $this->prepareAssemblerMock($workflowDefinition, $workflow);
-        $this->setUpEntityManagerMock($workflowDefinition);
-
-        $this->configManager
-            ->expects($this->once())
-            ->method('getActiveWorkflowNamesByEntity')
-            ->with($entityClass)
-            ->willReturn($notEmptyList ? [$workflowName] : []);
-
-        $this->entityRepository->expects($this->exactly((int)$notEmptyList))
-            ->method('find')
-            ->with($workflowName)
-            ->willReturn($workflowDefinition);
-
-        $this->assertEquals($expected, $this->registry->hasActiveWorkflowsByEntityClass($entityClass));
-    }
-
-    /**
-     * @return array
-     */
-    public function hasActiveWorkflowsByEntityClassDataProvider()
-    {
-        return [
-            'empty list' => [
-                'notEmptyList' => false,
-                'canAssemble' => false,
-                'expected' => false,
-            ],
-            'can not assemble' => [
-                'notEmptyList' => true,
-                'canAssemble' => false,
-                'expected' => false,
-            ],
-            'can assemble without expected entity class' => [
-                'notEmptyList' => true,
-                'canAssemble' => true,
-                'expected' => true,
-            ]
-        ];
     }
 
     /**

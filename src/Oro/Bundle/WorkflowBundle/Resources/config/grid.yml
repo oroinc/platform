@@ -1,13 +1,10 @@
 parameters:
-    oro_workflow.datagrid.action_permission_provider.class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
     oro_workflow.datagrid.entity_name_provider.class: Oro\Bundle\WorkflowBundle\Datagrid\GridEntityNameProvider
     oro_workflow.datagrid.listener.workflow_step_column.class: Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener
 
 services:
     oro_workflow.datagrid.action_permission_provider:
-        class: %oro_workflow.datagrid.action_permission_provider.class%
-        arguments:
-            - '@oro_workflow.manager.system_config'
+        class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
 
     oro_workflow.datagrid.abstract_entity_name_provider:
         class: %oro_workflow.datagrid.entity_name_provider.class%

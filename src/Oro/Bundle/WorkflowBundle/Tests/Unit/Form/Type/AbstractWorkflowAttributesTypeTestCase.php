@@ -53,8 +53,6 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
 
         $workflow = new Workflow($doctrineHelper, $aclManager, $restrictionManager);
 
-        $workflow->setName($workflowName);
-
         foreach ($attributes as $name => $attribute) {
             $workflow->getAttributeManager()->getAttributes()->set($name, $attribute);
         }
@@ -62,6 +60,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         $workflow->getStepManager()->setSteps($steps);
 
         $definition = new WorkflowDefinition();
+        $definition->setName($workflowName);
         $definition->setRelatedEntity($relatedEntity);
         $workflow->setDefinition($definition);
 
