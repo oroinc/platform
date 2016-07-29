@@ -112,7 +112,7 @@ define([
                 this.$tip.find('.popover-close').hide();
             }
 
-            this.$tip.find('.popover-close').on('click', _.bind(function () {
+            this.$tip.find('.popover-close').on('click', _.bind(function() {
                 this.hide();
             }, this));
         }

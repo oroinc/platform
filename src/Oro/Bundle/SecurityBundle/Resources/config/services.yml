@@ -599,14 +599,6 @@ services:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
               - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: collectEntityMapEvent, priority: -100 }
 
-    oro_security.layout_expression.acl_granted:
-        class: Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted
-        arguments:
-            - '@oro_security.security_facade'
-            - '@doctrine'
-        tags:
-            - { name: oro_layout.expression, alias: acl|acl_granted }
-
     oro_security.walker_hint_provider.current_user:
         public: false
         class: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider
@@ -641,3 +633,11 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
+
+    oro_security.layout.data_provider.acl:
+        class: Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider
+        arguments:
+            - '@oro_security.security_facade'
+            - '@doctrine'
+        tags:
+            - { name: layout.data_provider, alias: acl }

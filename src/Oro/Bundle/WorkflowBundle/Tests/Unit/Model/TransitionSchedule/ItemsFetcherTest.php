@@ -2,14 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionSchedule;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Step;
-use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher;
@@ -37,9 +33,10 @@ class ItemsFetcherTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->queryFactory = $this->getMockBuilder(
-            'Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory'
-        )->disableOriginalConstructor()->getMock();
+        $this->queryFactory = $this
+            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
@@ -59,25 +56,27 @@ class ItemsFetcherTest extends \PHPUnit_Framework_TestCase
     {
         $workflowName = 'test_workflow';
         $transitionName = 'test_transition';
+        $dql = 'schedule_filter != null';
+
         /** @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject $query */
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->setMethods(['getArrayResult'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $this->queryFactory->expects($this->once())->method('create')->with(
-            ['step1', 'step2'],
-            'EntityClass',
-            'schedule_filter != null'
-        )->willReturn($query);
-
         $query->expects($this->once())->method('getArrayResult')->willReturn([['id' => 1], ['id' => 2]]);
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Transition');
-        $transition->expects($this->once())->method('getScheduleFilter')->willReturn('schedule_filter != null');
+        $transition->expects($this->once())->method('getScheduleFilter')->willReturn($dql);
         $transition->expects($this->once())->method('isScheduleCheckConditions')->willReturn($checkConditions);
 
-        $this->prepareMocks($workflowName, $transitionName, $transition);
+        $workflow = $this->prepareMocks($workflowName, $transitionName, $transition);
+
+        $this->queryFactory->expects($this->once())
+            ->method('create')
+            ->with($workflow, $transitionName, $dql)
+            ->willReturn($query);
+
         if ($checkConditions) {
             $workflowItem1 = (new WorkflowItem())->setId(1);
             $workflowItem2 = (new WorkflowItem())->setId(2);
@@ -128,7 +127,7 @@ class ItemsFetcherTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cant get transition by given identifier "test_nonexistent_transition"
+     * @expectedExceptionMessage Can't get transition by given identifier "test_nonexistent_transition"
      */
     public function testNoTransitionFoundException()
     {
@@ -163,39 +162,30 @@ class ItemsFetcherTest extends \PHPUnit_Framework_TestCase
      * @param string $workflowName
      * @param string $transitionName
      * @param Transition $transition
+     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
      */
     private function prepareMocks($workflowName, $transitionName, Transition $transition)
     {
         /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()->getMock();
-        /**@var StepManager|\PHPUnit_Framework_MockObject_MockObject $stepManager */
-        $stepManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\StepManager')
-            ->disableOriginalConstructor()->getMock();
-        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $workflowDefinition */
-        $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
+
         /** @var TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager */
         $transitionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionManager')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->workflowManager->expects($this->once())->method('getWorkflow')->with($workflowName)
             ->willReturn($workflow);
 
         $workflow->expects($this->once())->method('getTransitionManager')->willReturn($transitionManager);
-        $workflow->expects($this->once())->method('getStepManager')->willReturn($stepManager);
-        $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
 
-        $transitionManager->expects($this->once())->method('getTransition')->with($transitionName)
+        $transitionManager->expects($this->once())
+            ->method('getTransition')
+            ->with($transitionName)
             ->willReturn($transition);
 
-        $step1 = (new Step())->setName('step1');
-        $step2 = (new Step())->setName('step2');
-
-        $stepManager->expects($this->once())->method('getRelatedTransitionSteps')
-            ->with($transitionName)
-            ->willReturn(new ArrayCollection([$step1, $step2]));
-
-        $workflowDefinition->expects($this->once())->method('getRelatedEntity')->willReturn('EntityClass');
+        return $workflow;
     }
 }

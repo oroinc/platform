@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 use Oro\Component\Layout\LayoutContext;
@@ -40,8 +40,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|DependencyInitializer */
     protected $dependencyInitializer;
 
-    /** @var  ArrayCollection|LayoutUpdateImport[] */
-    protected $importStorage;
+    /** @var  \PHPUnit_Framework_MockObject_MockObject|ThemeManager */
+    protected $themeManager;
 
     /** @var array */
     protected static $resources = [
@@ -95,6 +95,10 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer')
             ->disableOriginalConstructor()->getMock();
 
+        $this->themeManager = $this
+            ->getMockBuilder('Oro\Component\Layout\Extension\Theme\Model\ThemeManager')
+            ->disableOriginalConstructor()->getMock();
+
         $loader = new LayoutUpdateLoader();
         $loader->addDriver('yml', $this->yamlDriver);
         $loader->addDriver('php', $this->phpDriver);
@@ -103,7 +107,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             self::$resources,
             $loader,
             $this->dependencyInitializer,
-            $this->provider
+            $this->provider,
+            $this->themeManager
         );
     }
 
@@ -240,6 +245,17 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
+        $theme = $this->getMock(Theme::class, [], [$themeName]);
+        $theme->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($themeName));
+
+        $this->themeManager->expects($this->any())
+            ->method('getTheme')
+            ->with($themeName)
+            ->will($this->returnValue($theme));
+
         $actualLayoutUpdates = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
         $this->assertEquals(
             [$layoutUpdate, $importedLayoutUpdateWithImports, $secondLevelImportedLayoutUpdate],
@@ -287,6 +303,18 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+
+
+        /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
+        $theme = $this->getMock(Theme::class, [], [$themeName]);
+        $theme->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($themeName));
+
+        $this->themeManager->expects($this->any())
+            ->method('getTheme')
+            ->with($themeName)
+            ->will($this->returnValue($theme));
 
         $actualLayoutUpdates = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
         $this->assertEquals(
@@ -363,6 +391,18 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('load')
             ->with('import-resource-gold.yml')
             ->willReturn($secondImportLayoutUpdate);
+
+
+        /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
+        $theme = $this->getMock(Theme::class, [], [$themeName]);
+        $theme->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($themeName));
+
+        $this->themeManager->expects($this->any())
+            ->method('getTheme')
+            ->with($themeName)
+            ->will($this->returnValue($theme));
 
         $actualLayoutUpdates = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
         $this->assertEquals(

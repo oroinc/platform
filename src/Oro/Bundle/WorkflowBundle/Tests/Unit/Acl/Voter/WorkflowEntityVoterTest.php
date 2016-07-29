@@ -314,7 +314,7 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
 
         $config->expects($this->any())
             ->method('get')
-            ->with('active_workflow', false, false)
+            ->with('active_workflows', false, false)
             ->willReturn(true);
 
         $this->configProvider
