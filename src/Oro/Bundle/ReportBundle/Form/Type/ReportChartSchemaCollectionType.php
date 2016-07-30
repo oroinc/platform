@@ -34,6 +34,14 @@ class ReportChartSchemaCollectionType extends ConfigProviderAwareType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_report_chart_data_schema_collection';
     }
 }
