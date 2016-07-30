@@ -21,12 +21,13 @@ class EnhancedRouteCollection extends RouteCollection
      * Adds a new route near the specified target route.
      * If the target route name is empty adds a new route to the beginning or end of the route collection.
      *
-     * @param string $routeName       The route name
-     * @param Route  $route           A Route instance
-     * @param string $targetRouteName The name of a route near which the new route should be added
-     * @param bool   $prepend         Determines whether the new route should be added before or after the target route
+     * @param string      $routeName       The route name
+     * @param Route       $route           A Route instance
+     * @param string|null $targetRouteName The name of a route near which the new route should be added
+     * @param bool        $prepend         Determines whether the new route should be added
+     *                                     before or after the target route
      */
-    public function insert($routeName, Route $route, $targetRouteName, $prepend = false)
+    public function insert($routeName, Route $route, $targetRouteName = null, $prepend = false)
     {
         $this->remove($routeName);
         $index = $this->findRouteIndex($targetRouteName);
@@ -45,6 +46,50 @@ class EnhancedRouteCollection extends RouteCollection
             $result[$routeName] = $route;
             $result = array_merge($result, array_slice($routes, $index, null, true));
             $this->setRoutes($result);
+        }
+    }
+
+    /**
+     * Adds a route collection near the specified target route.
+     * If the target route name is empty adds a given route collection to the beginning or end of the route collection.
+     *
+     * @param RouteCollection $collection      A RouteCollection instance
+     * @param string          $targetRouteName The name of a route near which the new route should be added
+     * @param bool            $prepend         Determines whether the new route should be added
+     *                                         before or after the target route
+     */
+    public function insertCollection(RouteCollection $collection, $targetRouteName = null, $prepend = false)
+    {
+        if (empty($targetRouteName) && !$prepend) {
+            $this->addCollection($collection);
+
+            return;
+        }
+
+        $insertedRoutes = $collection->all();
+        foreach ($insertedRoutes as $name => $route) {
+            $this->remove($name);
+        }
+
+        $index = $this->findRouteIndex($targetRouteName);
+        if (false === $index) {
+            $index = !$prepend ? $this->count() : 0;
+        } elseif (!$prepend) {
+            $index++;
+        }
+
+        $routes = $this->all();
+        $this->setRoutes(
+            array_merge(
+                array_slice($routes, 0, $index, true),
+                $insertedRoutes,
+                array_slice($routes, $index, null, true)
+            )
+        );
+
+        $insertedResources = $collection->getResources();
+        foreach ($insertedResources as $resource) {
+            $this->addResource($resource);
         }
     }
 
