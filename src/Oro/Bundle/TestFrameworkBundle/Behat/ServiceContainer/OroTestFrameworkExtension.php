@@ -80,12 +80,20 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
+        $this->loadSessionsListener($container);
     }
 
     public function processDbDumpers(ContainerBuilder $container)
     {
         $dbDumper = $this->getDbDumper($container);
         $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
+    }
+
+    private function loadSessionsListener(ContainerBuilder $container)
+    {
+        $container
+            ->getDefinition('mink.listener.sessions')
+            ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
     }
 
     /**
