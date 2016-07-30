@@ -20,7 +20,7 @@ class ExpressionCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $this->loadExpressionEncoders($container);
-        $this->loadExpressionLanguageFunctions($container);
+        $this->loadExpressionLanguageProviders($container);
     }
 
     /**
@@ -47,7 +47,7 @@ class ExpressionCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
-    protected function loadExpressionLanguageFunctions(ContainerBuilder $container)
+    protected function loadExpressionLanguageProviders(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::EXPRESSION_LANGUAGE_SERVICE)) {
             return;
