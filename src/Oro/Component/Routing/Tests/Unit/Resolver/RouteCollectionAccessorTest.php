@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Symfony\Component\Routing\RouteCollection;
 
 class RouteCollectionAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -109,6 +110,72 @@ class RouteCollectionAccessorTest extends \PHPUnit_Framework_TestCase
         $testRoute = new Route('/test');
 
         $this->accessor->insert('test', $testRoute, $targetRouteName, $prepend);
+        $this->assertEquals($expected, array_keys($this->collection->all()));
+        $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
+    }
+
+    /**
+     * @dataProvider insertDataProvider
+     */
+    public function testInsertCollection($targetRouteName, $prepend, $expected)
+    {
+        $this->collection->add('route1', new Route('/route1'));
+        $this->collection->add('route2', new Route('/route2'));
+        $resource1 = new TestResource('resource1');
+        $this->collection->addResource($resource1);
+
+        $testRoute = new Route('/test');
+        $collection = new RouteCollection();
+        $collection->add('test', $testRoute);
+        $testResource = new TestResource('test resource');
+        $collection->addResource($testResource);
+
+        $this->accessor->insertCollection($collection, $targetRouteName, $prepend);
+        $this->assertEquals($expected, array_keys($this->collection->all()));
+        $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
+        $resources = $this->collection->getResources();
+        $this->assertCount(2, $resources);
+        $this->assertSame($resource1, $resources[0]);
+        $this->assertSame($testResource, $resources[1]);
+    }
+
+    /**
+     * @dataProvider insertDataProvider
+     */
+    public function testInsertCollectionWithExistingRoute($targetRouteName, $prepend, $expected)
+    {
+        $this->collection->add('route1', new Route('/route1'));
+        $this->collection->add('test', new Route('/test'));
+        $this->collection->add('route2', new Route('/route2'));
+
+        $testRoute = new Route('/test');
+        $collection = new RouteCollection();
+        $collection->add('test', $testRoute);
+
+        $this->accessor->insertCollection($collection, $targetRouteName, $prepend);
+        $this->assertEquals($expected, array_keys($this->collection->all()));
+        $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
+    }
+
+    /**
+     * @dataProvider insertDataProvider
+     */
+    public function testInsertCollectionWithAlreadyBuiltRouteMap($targetRouteName, $prepend, $expected)
+    {
+        $route1 = new Route('/route1');
+        $route2 = new Route('/route2');
+
+        $this->collection->add('route1', $route1);
+        $this->collection->add('route2', $route2);
+
+        // force the route map building
+        $this->assertSame($route1, $this->accessor->getByPath('/route1', []));
+
+        $testRoute = new Route('/test');
+        $collection = new RouteCollection();
+        $collection->add('test', $testRoute);
+
+        $this->accessor->insertCollection($collection, $targetRouteName, $prepend);
         $this->assertEquals($expected, array_keys($this->collection->all()));
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
