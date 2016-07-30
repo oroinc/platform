@@ -40,4 +40,16 @@ class ApiDocExtractor extends BaseExtractor implements
 
         return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function extractAnnotations(array $routes, $view = ApiDoc::DEFAULT_VIEW)
+    {
+        return $this->doExtractAnnotations(
+            $routes,
+            $view,
+            $this->container->getParameter('nelmio_api_doc.exclude_sections')
+        );
+    }
 }
