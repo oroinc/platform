@@ -96,7 +96,7 @@ trait ApiDocExtractorTrait
             $method = $this->getReflectionMethod($route->getDefault('_controller'));
             if ($method) {
                 /** @var ApiDoc $annotation */
-                $annotation = $this->reader->getMethodAnnotation($method, ApiDoc::class);
+                $annotation = $this->reader->getMethodAnnotation($method, static::ANNOTATION_CLASS);
                 if ($annotation
                     && (
                         in_array($view, $annotation->getViews(), true)
