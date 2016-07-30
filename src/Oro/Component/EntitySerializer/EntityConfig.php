@@ -75,18 +75,8 @@ class EntityConfig
      */
     public function __clone()
     {
-        $this->items = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->items
-        );
-        $this->fields = array_map(
-            function ($field) {
-                return clone $field;
-            },
-            $this->fields
-        );
+        $this->items = ConfigUtil::cloneItems($this->items);
+        $this->fields = ConfigUtil::cloneObjects($this->fields);
     }
 
     /**
