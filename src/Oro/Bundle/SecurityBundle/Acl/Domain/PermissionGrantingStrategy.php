@@ -216,10 +216,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                                     $triggeredMask = $requiredMask;
                                 }
                             } elseif (0 !== count(array_diff(
-                                    $aclExt->getPermissions($requiredMask, true),
-                                    $aclExt->getPermissions($ace->getMask(), true)
-                                ))
-                            ) {
+                                $aclExt->getPermissions($requiredMask, true),
+                                $aclExt->getPermissions($ace->getMask(), true)
+                            ))) {
                                 $triggeredAce = $ace;
                                 $triggeredMask = $requiredMask;
                             }

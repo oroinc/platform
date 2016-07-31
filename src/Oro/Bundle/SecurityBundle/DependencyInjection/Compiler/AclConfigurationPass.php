@@ -113,7 +113,7 @@ class AclConfigurationPass implements CompilerPassInterface
             if ($container->hasDefinition(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY)) {
                 $cacheDef->replaceArgument(1, new Reference(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY));
             }
-            $cacheDef->addMethodCall('setUnderlyingCache',  array(new Reference(self::UNDERLYING_CACHE)));
+            $cacheDef->addMethodCall('setUnderlyingCache', array(new Reference(self::UNDERLYING_CACHE)));
         }
     }
 
