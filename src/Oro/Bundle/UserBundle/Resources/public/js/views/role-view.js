@@ -215,8 +215,8 @@ define([
                 }, {});
 
                 fieldPrivelege = knownFieldIdentities[data.identityId];
-                var permission = fieldPrivelege.permissions[data.permissionName];
-                permission.accessLevel = data.accessLevel;
+                var fieldPermission = fieldPrivelege.permissions[data.permissionName];
+                fieldPermission.accessLevel = data.accessLevel;
             }
 
             this.$privileges.val(JSON.stringify(obj)).trigger('change');
