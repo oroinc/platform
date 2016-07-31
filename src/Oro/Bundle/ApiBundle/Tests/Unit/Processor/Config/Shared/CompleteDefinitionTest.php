@@ -90,7 +90,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'exclusion_policy' => 'all',
+                'fields'           => [
                     'field1' => null
                 ]
             ],
@@ -124,7 +125,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'exclusion_policy' => 'all',
+                'fields'           => [
                     'association1' => [
                         'target_class'     => 'Test\Association1Target',
                         'exclusion_policy' => 'all'
@@ -166,7 +168,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'exclusion_policy' => 'all',
+                'fields'           => [
                     'association1' => [
                         'target_class' => 'Test\Association1Target'
                     ],
@@ -218,7 +221,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'exclusion_policy' => 'all',
+                'fields'           => [
                     'association1' => [
                         'target_class'           => 'Test\Association1Target',
                         'exclusion_policy'       => 'all',
@@ -279,7 +283,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'exclusion_policy' => 'all',
+                'fields'           => [
                     'association1' => [
                         'target_class'           => 'Test\Association1Target',
                         'data_type'              => 'string',
@@ -344,7 +349,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'exclusion_policy' => 'all',
+                'fields'           => [
                     'association1' => [
                         'target_class'           => 'Test\Association1Target',
                         'data_type'              => 'string',
@@ -454,6 +460,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'     => null,
@@ -522,6 +529,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -581,6 +589,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -649,6 +658,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -723,6 +733,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -803,6 +814,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -882,6 +894,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -961,6 +974,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -1039,6 +1053,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -1120,6 +1135,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -1202,6 +1218,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -1260,6 +1277,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id' => null
@@ -1295,6 +1313,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id' => null
@@ -1334,6 +1353,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['renamedId'],
                 'fields'                 => [
                     'renamedId' => [
@@ -1378,6 +1398,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'        => null,
@@ -1415,6 +1436,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['renamedId'],
                 'fields'                 => [
                     'renamedId' => [
@@ -1460,6 +1482,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'        => null,
@@ -1510,6 +1533,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'        => null,
@@ -1559,6 +1583,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'   => null,
@@ -1624,6 +1649,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -1703,6 +1729,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -1786,6 +1813,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -1869,6 +1897,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
@@ -1953,6 +1982,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
+                'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,

@@ -34,6 +34,8 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  * If "identifier_fields_only" config extra exists:
  * * Adds identifier fields which were not configured yet based on an entity metadata.
  * * Removes all other fields and association.
+ * Sets "exclusion_policy = all" for the entity. It means that the configuration
+ * of all fields and associations was completed.
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -121,6 +123,9 @@ class CompleteDefinition implements ProcessorInterface
                 $this->completeObjectAssociations($definition, $context->getVersion(), $context->getRequestType());
             }
         }
+
+        // mark the entity configuration as processed
+        $definition->setExcludeAll();
     }
 
     /**
