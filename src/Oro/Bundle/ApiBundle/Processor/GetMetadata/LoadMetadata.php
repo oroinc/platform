@@ -26,7 +26,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class LoadEntityMetadata implements ProcessorInterface
+class LoadMetadata implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
