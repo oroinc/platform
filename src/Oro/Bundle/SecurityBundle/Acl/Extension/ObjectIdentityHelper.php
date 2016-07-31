@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-
 class ObjectIdentityHelper
 {
     const FIELD_DELIMITER = '::';
