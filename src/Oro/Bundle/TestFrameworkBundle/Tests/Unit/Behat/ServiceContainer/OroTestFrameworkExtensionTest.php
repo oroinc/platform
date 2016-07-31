@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtens
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\TestBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
@@ -169,6 +170,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilder->set('symfony2_extension.kernel', $kernel);
         $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));
+        $containerBuilder->setDefinition('mink.listener.sessions', new Definition());
 
         return $containerBuilder;
     }
