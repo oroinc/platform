@@ -156,13 +156,12 @@ class AclRoleHandler
      * Create form for role manipulation
      *
      * @param AbstractRole $role
-     * @param null|string  $className
      *
      * @return FormInterface
      */
-    public function createForm(AbstractRole $role, $className = null)
+    public function createForm(AbstractRole $role)
     {
-        $this->loadPrivilegeConfigPermissions($className);
+        $this->loadPrivilegeConfigPermissions();
 
         $this->form = $this->createRoleFormInstance($role, $this->privilegeConfig);
 
@@ -170,9 +169,9 @@ class AclRoleHandler
     }
 
     /**
-     * @param string $className
+     * Load privilege config permissions
      */
-    protected function loadPrivilegeConfigPermissions($className = null)
+    protected function loadPrivilegeConfigPermissions()
     {
         foreach ($this->privilegeConfig as $configName => $config) {
             $this->privilegeConfig[$configName]['permissions']
