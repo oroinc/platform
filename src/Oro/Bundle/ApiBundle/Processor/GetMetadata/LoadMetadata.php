@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -26,7 +27,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class LoadEntityMetadata implements ProcessorInterface
+class LoadMetadata implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -34,21 +35,27 @@ class LoadEntityMetadata implements ProcessorInterface
     /** @var EntityMetadataFactory */
     protected $entityMetadataFactory;
 
+    /** @var MetadataProvider */
+    protected $metadataProvider;
+
     /** @var AssociationManager */
     protected $associationManager;
 
     /**
      * @param DoctrineHelper        $doctrineHelper
      * @param EntityMetadataFactory $entityMetadataFactory
+     * @param MetadataProvider      $metadataProvider
      * @param AssociationManager    $associationManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityMetadataFactory $entityMetadataFactory,
+        MetadataProvider $metadataProvider,
         AssociationManager $associationManager
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityMetadataFactory = $entityMetadataFactory;
+        $this->metadataProvider = $metadataProvider;
         $this->associationManager = $associationManager;
     }
 
@@ -67,9 +74,15 @@ class LoadEntityMetadata implements ProcessorInterface
         $entityClass = $context->getClassName();
         $config = $context->getConfig();
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            $context->setResult($this->loadEntityMetadata($entityClass, $config));
+            $entityMetadata = $this->loadEntityMetadata($entityClass, $config);
+            if ($config) {
+                $this->completeAssociationMetadata($entityMetadata, $config, $context);
+            }
+            $context->setResult($entityMetadata);
         } elseif ($config && $config->hasFields()) {
-            $context->setResult($this->loadObjectMetadata($entityClass, $config));
+            $entityMetadata = $this->loadObjectMetadata($entityClass, $config);
+            $this->completeAssociationMetadata($entityMetadata, $config, $context);
+            $context->setResult($entityMetadata);
         }
     }
 
@@ -309,14 +322,14 @@ class LoadEntityMetadata implements ProcessorInterface
     }
 
     /**
-     * @param EntityDefinitionConfig $definition
+     * @param EntityDefinitionConfig $config
      *
      * @return array [property path => field name, ...]
      */
-    protected function getAllowedFields(EntityDefinitionConfig $definition)
+    protected function getAllowedFields(EntityDefinitionConfig $config)
     {
         $result = [];
-        $fields = $definition->getFields();
+        $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->isExcluded()) {
                 $propertyPath = $field->getPropertyPath() ?: $fieldName;
@@ -404,6 +417,41 @@ class LoadEntityMetadata implements ProcessorInterface
         } else {
             $associationMetadata->setAssociationType(RelationType::MANY_TO_ONE);
             $associationMetadata->setIsCollection(false);
+        }
+    }
+
+    /**
+     * @param EntityMetadata         $entityMetadata
+     * @param EntityDefinitionConfig $config
+     * @param MetadataContext        $context
+     */
+    protected function completeAssociationMetadata(
+        EntityMetadata $entityMetadata,
+        EntityDefinitionConfig $config,
+        MetadataContext $context
+    ) {
+        $associations = $entityMetadata->getAssociations();
+        foreach ($associations as $associationName => $association) {
+            if (null !== $association->getTargetMetadata()) {
+                // metadata for an associated entity is already loaded
+                continue;
+            }
+            $field = $config->getField($associationName);
+            if (null === $field || !$field->hasTargetEntity()) {
+                // a configuration of an association fields does not exist
+                continue;
+            }
+
+            $targetMetadata = $this->metadataProvider->getMetadata(
+                $association->getTargetClassName(),
+                $context->getVersion(),
+                $context->getRequestType(),
+                $context->getExtras(),
+                $field->getTargetEntity()
+            );
+            if (null !== $targetMetadata) {
+                $association->setTargetMetadata($targetMetadata);
+            }
         }
     }
 }
