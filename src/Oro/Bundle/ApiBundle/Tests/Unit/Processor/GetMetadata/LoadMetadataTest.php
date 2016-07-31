@@ -18,6 +18,9 @@ class LoadMetadataTest extends MetadataProcessorTestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $metadataProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $associationManager;
 
     /** @var LoadMetadata */
@@ -31,6 +34,10 @@ class LoadMetadataTest extends MetadataProcessorTestCase
             ->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->metadataProvider = $this
+            ->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->associationManager = $this
             ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
             ->disableOriginalConstructor()
@@ -39,6 +46,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $this->processor = new LoadMetadata(
             $this->doctrineHelper,
             new EntityMetadataFactory($this->doctrineHelper),
+            $this->metadataProvider,
             $this->associationManager
         );
     }
