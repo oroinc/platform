@@ -28,7 +28,7 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testTransform()
     {
-        $this->assertNull($this->transformer->transform(null));
+        $this->assertEquals(0, $this->transformer->transform(null));
         $bu1 = new BusinessUnit();
         $bu1->setId(1);
         $bu2 = new BusinessUnit();

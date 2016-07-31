@@ -4,9 +4,10 @@ parameters:
 
 services:
     oro_requirejs.twig.requirejs_extension:
-        class:                            %oro_requirejs.twig.class%
+        class: Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension
         arguments:
-            - "@service_container"
+            - '@oro_requirejs.config_provider.manager'
+            - '%oro_require_js.web_root%'
         tags:
             - { name: twig.extension }
 
@@ -23,4 +24,19 @@ services:
             - OroRequireJSBundle::require_config.js.twig
         calls:
             - [ setCache, [ '@oro_requirejs.cache' ] ]
+        lazy: true
+
+    oro_requirejs.config_provider.manager:
+        class: Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager
+
+    oro_requirejs.provider.requirejs_config:
+        class: Oro\Bundle\RequireJSBundle\Provider\ConfigProvider
+        arguments:
+            - '@templating'
+            - '@oro_requirejs.cache'
+            - '%oro_require_js%'
+            - '%kernel.bundles%'
+            - '%oro_require_js.web_root%'
+        tags:
+            - { name: requirejs.config_provider, alias: oro_requirejs_config_provider }
         lazy: true

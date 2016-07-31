@@ -54,8 +54,16 @@ define(function(require) {
                 this.subview('dropdown', dropdown);
                 this.$el.append(dropdown.$el);
             }
-            if (!accessLevels.length) {
-                accessLevels.fetch();
+            if (!this.accessLevels.length) {
+                this.accessLevels.fetch({
+                    success: function(collection) {
+                        _.each(collection.models, function(model) {
+                            if (isNaN(model.get('access_level'))) {
+                                collection.remove(model);
+                            }
+                        });
+                    }
+                });
             }
         },
 

@@ -12,7 +12,9 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\LogicException;
 
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
+use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
+use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 
 /**
  * The LayoutListener class handles the @Layout annotation.
@@ -30,13 +32,31 @@ class LayoutListener
     protected $layoutManager;
 
     /**
+     * @var LayoutContextHolder
+     */
+    protected $layoutContextHolder;
+
+    /**
+     * @var LayoutDataCollector
+     */
+    protected $layoutDataCollector;
+
+    /**
      * @param LayoutHelper $layoutHelper
      * @param LayoutManager $layoutManager
+     * @param LayoutContextHolder $layoutContextHolder
+     * @param LayoutDataCollector $layoutDataCollector
      */
-    public function __construct(LayoutHelper $layoutHelper, LayoutManager $layoutManager)
-    {
+    public function __construct(
+        LayoutHelper $layoutHelper,
+        LayoutManager $layoutManager,
+        LayoutContextHolder $layoutContextHolder,
+        LayoutDataCollector $layoutDataCollector
+    ) {
         $this->layoutHelper = $layoutHelper;
         $this->layoutManager = $layoutManager;
+        $this->layoutContextHolder = $layoutContextHolder;
+        $this->layoutDataCollector = $layoutDataCollector;
     }
 
     /**
@@ -69,9 +89,13 @@ class LayoutListener
             }
             $this->configureContext($context, $layoutAnnotation);
             $layout = $this->getLayout($context, $layoutAnnotation);
+            $this->layoutDataCollector->collectContextItems($context);
+            $this->layoutContextHolder->setContext($context);
         } elseif ($parameters instanceof ContextInterface) {
             $this->configureContext($parameters, $layoutAnnotation);
             $layout = $this->getLayout($parameters, $layoutAnnotation);
+            $this->layoutDataCollector->collectContextItems($parameters);
+            $this->layoutContextHolder->setContext($parameters);
         } elseif ($parameters instanceof Layout) {
             if (!$layoutAnnotation->isEmpty()) {
                 throw new LogicException(
@@ -83,6 +107,8 @@ class LayoutListener
         } else {
             return;
         }
+        
+        $this->layoutDataCollector->collectViews($layout->getView());
 
         $response = new Response();
         $response->setContent($layout->render());
