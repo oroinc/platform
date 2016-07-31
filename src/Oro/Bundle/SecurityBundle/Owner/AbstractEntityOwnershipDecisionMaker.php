@@ -158,6 +158,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
     {
@@ -229,6 +230,9 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
     {

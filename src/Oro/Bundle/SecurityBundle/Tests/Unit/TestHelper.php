@@ -88,8 +88,7 @@ class TestHelper
     ) {
         if ($idAccessor === null) {
             $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-                ->disableOriginalConstructor()
-                ->getMock();
+                ->disableOriginalConstructor()->getMock();
 
             $idAccessor = new ObjectIdAccessor($doctrineHelper);
         }
@@ -101,12 +100,10 @@ class TestHelper
         }
 
         $treeProviderMock = $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
 
         $treeProviderMock->expects($this->testCase->any())
-            ->method('getTree')
-            ->will($this->testCase->returnValue($ownerTree));
+            ->method('getTree')->will($this->testCase->returnValue($ownerTree));
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
@@ -118,8 +115,7 @@ class TestHelper
         }
 
         $config = $this->testCase->getMockBuilder('\Doctrine\ORM\Configuration')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
         $config->expects($this->testCase->any())
             ->method('getEntityNamespaces')
             ->will(
@@ -131,11 +127,9 @@ class TestHelper
             );
 
         $em = $this->testCase->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
         $em->expects($this->testCase->any())
-            ->method('getConfiguration')
-            ->will($this->testCase->returnValue($config));
+            ->method('getConfiguration')->will($this->testCase->returnValue($config));
 
         $doctrine = $this->testCase->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()

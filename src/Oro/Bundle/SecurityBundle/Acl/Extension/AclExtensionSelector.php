@@ -87,11 +87,7 @@ class AclExtensionSelector
         if (is_string($val)) {
             list($id, $type, $fieldName) = ObjectIdentityHelper::parseIdentityString($val);
         } elseif (is_object($val)) {
-            if ($val instanceof FieldVote) {
-                $fieldName = $val->getField();
-                $val = $val->getDomainObject();
-            }
-
+            list($val, $fieldName) = $this->getObjectAndFieldForObject($val);
             if ($val instanceof ObjectIdentityInterface) {
                 $type = $val->getType();
                 $id = $val->getIdentifier();
@@ -163,5 +159,21 @@ class AclExtensionSelector
     protected function getStringValue($value)
     {
         return $value ? (string)$value : 'null';
+    }
+
+    /**
+     * @param object $val
+     *
+     * @return array [val, fieldName]
+     */
+    protected function getObjectAndFieldForObject($val)
+    {
+        $fieldName = null;
+        if ($val instanceof FieldVote) {
+            $fieldName = $val->getField();
+            $val = $val->getDomainObject();
+        }
+
+        return [$val, $fieldName];
     }
 }

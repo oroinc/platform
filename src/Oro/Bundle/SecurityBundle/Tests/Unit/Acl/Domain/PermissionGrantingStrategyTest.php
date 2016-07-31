@@ -84,19 +84,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider $treeProviderMock */
         $treeProviderMock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
 
-        $treeProviderMock->expects($this->any())
-            ->method('getTree')
-            ->will($this->returnValue($this->ownerTree));
+        $treeProviderMock->expects($this->any())->method('getTree')->will($this->returnValue($this->ownerTree));
 
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider->expects($this->any())
-            ->method('hasConfig')
-            ->willReturn(false);
+            ->disableOriginalConstructor()->getMock();
+        $configProvider->expects($this->any())->method('hasConfig')->willReturn(false);
 
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())

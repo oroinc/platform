@@ -183,15 +183,7 @@ class RootBasedAclWrapper implements AclInterface
             $groupedAces[(string)$ace->getSecurityIdentity()][] = $ace;
         }
 
-        /** @var EntryInterface[] $rootAces */
-        $rootAces = $field
-            ? $this->rootAcl->getObjectFieldAces($field)
-            : $this->rootAcl->getObjectAces();
-
-        $rootAces = $field && empty($rootAces)
-            ? $this->rootAcl->getClassFieldAces($field)
-            : $rootAces;
-
+        $rootAces = $this->getAces($field);
         foreach ($rootAces as $rootAce) {
             $exists = false;
             $rootSid = (string)$rootAce->getSecurityIdentity();
@@ -208,5 +200,21 @@ class RootBasedAclWrapper implements AclInterface
                 $aces[] = $rootAce;
             }
         }
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return array|EntryInterface[]
+     */
+    protected function getAces($field = null)
+    {
+        $rootAces = $field
+            ? $this->rootAcl->getObjectFieldAces($field)
+            : $this->rootAcl->getObjectAces();
+
+        return $field && empty($rootAces)
+            ? $this->rootAcl->getClassFieldAces($field)
+            : $rootAces;
     }
 }
