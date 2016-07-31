@@ -19,7 +19,7 @@ define(function(require) {
                     model: PermissionModel
                 });
 
-                var routeParameters = {oid: item.identity.replace(reg, '_'), permission:''};
+                var routeParameters = {oid: item.identity.replace(reg, '_'), permission: ''};
                 if (options.metadata.options.access_level_route) {
                     routeParameters.routeName = options.metadata.options.access_level_route;
                 }
