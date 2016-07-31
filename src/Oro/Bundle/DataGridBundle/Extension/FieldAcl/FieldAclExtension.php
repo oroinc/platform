@@ -15,7 +15,6 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration as InlineConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -85,19 +84,6 @@ class FieldAclExtension extends AbstractExtension
             new Configuration(),
             ['fields_acl' => $fieldAclConfig]
         );
-
-        // if we have enabled Field ACL for grid, turn off inline editing.
-        // @todo: Should be deleted in scope of BAP-11104
-        foreach ($validated['columns'] as $column) {
-            if ($column[PropertyInterface::DISABLED_KEY] !== true) {
-                $config->offsetSetByPath(
-                    InlineConfiguration::ENABLED_CONFIG_PATH,
-                    false
-                );
-
-                break;
-            }
-        }
 
         $config->offsetSetByPath(
             Configuration::FIELDS_ACL,

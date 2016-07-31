@@ -123,16 +123,19 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
         // in case if we have error in the non accessable fields - add validation error.
         if (count($hiddenFieldsWithErrors)) {
-            $viewErrors = $view->vars['errors'];
+            $viewErrors = array_key_exists('errors', $view->vars) ? $view->vars['errors'] : [];
             $errorsArray = [];
             foreach ($viewErrors as $error) {
                 $errorsArray[] = $error;
             }
             $errorsArray[] = $error = new FormError(
-                'The form contains fields that are required or not valid but you have no access to them. '
-                . 'Please contact your administrator to solve this issue.'
+                sprintf(
+                    'The form contains fields "%s" that are required or not valid but you have no access to them. '
+                    . 'Please contact your administrator to solve this issue.',
+                    implode(', ', array_keys($hiddenFieldsWithErrors))
+                )
             );
-            $view->vars['errors'] = new FormErrorIterator($viewErrors->getForm(), $errorsArray);
+            $view->vars['errors'] = new FormErrorIterator($form, $errorsArray);
             foreach ($hiddenFieldsWithErrors as $fieldName => $errorsString) {
                 $this->logger->error(
                     sprintf(
@@ -235,17 +238,15 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     {
         $entity = $this->getEntityByForm($form->getParent());
         if (!$entity) {
-            $isGranted = true;
-        } else {
-            $isNewEntity = is_null($this->doctrineHelper->getSingleEntityIdentifier($entity));
-
-            $isGranted = $this->securityFacade->isGranted(
-                $isNewEntity ? 'CREATE' : 'EDIT',
-                new FieldVote($entity, $this->getPropertyByForm($form))
-            );
+            return true;
         }
 
-        return $isGranted;
+        $isNewEntity = is_null($this->doctrineHelper->getSingleEntityIdentifier($entity));
+
+        return $this->securityFacade->isGranted(
+            $isNewEntity ? 'CREATE' : 'EDIT',
+            new FieldVote($entity, $this->getPropertyByForm($form))
+        );
     }
 
     /**
