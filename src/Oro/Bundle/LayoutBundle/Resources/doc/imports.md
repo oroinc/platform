@@ -68,13 +68,13 @@ tree:
         form_fields_cancel: ~
 ```
 
-If you provide block theme for imported layout update end identifier hasn't known. Use special syntax for block name in template ```__{unique import identifier}_{import block id before namespace added}_widget```
+If you provide block theme for imported layout update end identifier hasn't known. Use special syntax for block name in template ```__{unique import identifier}{import block id before namespace added}_widget```
 
 ```twig
-{% block __account_user_role_form_actions_update_widget %}
+{% block __account_user_role_form_actions__update_widget %}
 {% endblock %}
 
-{% block __account_user_role_form_actions_root_widget %}
+{% block __account_user_role_form_actions__root_widget %}
 {% endblock %}
 ```
 

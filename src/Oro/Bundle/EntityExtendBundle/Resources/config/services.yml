@@ -83,7 +83,7 @@ services:
             - "@translator"
             - "@oro_entity.doctrine_helper"
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_entity_extend.entity_generator:
         class: %oro_entity_extend.entity_generator.class%

@@ -1,0 +1,3 @@
+Activity List:
+  selector: '.activity-list'
+  class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
