@@ -54,8 +54,8 @@ define(function(require) {
                 this.subview('dropdown', dropdown);
                 this.$el.append(dropdown.$el);
             }
-            if (!this.accessLevels.length) {
-                this.accessLevels.fetch({
+            if (!accessLevels.length) {
+                accessLevels.fetch({
                     success: function(collection) {
                         _.each(collection.models, function(model) {
                             if (isNaN(model.get('access_level'))) {
