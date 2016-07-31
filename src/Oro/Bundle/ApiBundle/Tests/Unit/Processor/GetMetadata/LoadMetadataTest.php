@@ -10,9 +10,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
-use Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadEntityMetadata;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadMetadata;
 
-class LoadEntityMetadataTest extends MetadataProcessorTestCase
+class LoadMetadataTest extends MetadataProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -20,7 +20,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $associationManager;
 
-    /** @var LoadEntityMetadata */
+    /** @var LoadMetadata */
     protected $processor;
 
     protected function setUp()
@@ -36,7 +36,7 @@ class LoadEntityMetadataTest extends MetadataProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new LoadEntityMetadata(
+        $this->processor = new LoadMetadata(
             $this->doctrineHelper,
             new EntityMetadataFactory($this->doctrineHelper),
             $this->associationManager
