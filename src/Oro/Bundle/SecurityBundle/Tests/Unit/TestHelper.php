@@ -189,6 +189,7 @@ class TestHelper
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
+     * @param ConfigProvider $configProvider
      * @return FieldAclExtension
      */
     public function createFieldAclExtension(
@@ -196,7 +197,7 @@ class TestHelper
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider = null
     ) {
         if ($idAccessor === null) {
             $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
