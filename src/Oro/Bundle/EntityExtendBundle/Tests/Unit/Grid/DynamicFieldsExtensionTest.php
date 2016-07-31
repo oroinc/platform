@@ -434,9 +434,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFrom')
             ->will($this->returnValue(self::ENTITY_NAME));
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
         $qb->expects($this->once())
             ->method('getDQLPart')
             ->with('from')

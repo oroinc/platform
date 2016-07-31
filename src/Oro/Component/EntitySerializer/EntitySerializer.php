@@ -285,6 +285,9 @@ class EntitySerializer
      * @param EntityConfig $config
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function serializeItem($entity, $entityClass, EntityConfig $config)
     {

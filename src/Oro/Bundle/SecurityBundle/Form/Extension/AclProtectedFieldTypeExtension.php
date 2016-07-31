@@ -121,32 +121,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             }
         }
 
-        // in case if we have error in the non accessable fields - add validation error.
-        if (count($hiddenFieldsWithErrors)) {
-            $viewErrors = array_key_exists('errors', $view->vars) ? $view->vars['errors'] : [];
-            $errorsArray = [];
-            foreach ($viewErrors as $error) {
-                $errorsArray[] = $error;
-            }
-            $errorsArray[] = $error = new FormError(
-                sprintf(
-                    'The form contains fields "%s" that are required or not valid but you have no access to them. '
-                    . 'Please contact your administrator to solve this issue.',
-                    implode(', ', array_keys($hiddenFieldsWithErrors))
-                )
-            );
-            $view->vars['errors'] = new FormErrorIterator($form, $errorsArray);
-            foreach ($hiddenFieldsWithErrors as $fieldName => $errorsString) {
-                $this->logger->error(
-                    sprintf(
-                        'Non accessable field `%s` detected in form `%s`. Validation errors: %s',
-                        $fieldName,
-                        $form->getName(),
-                        $errorsString
-                    )
-                );
-            }
-        }
+        $this->processHiddenFieldsWithErrors($hiddenFieldsWithErrors, $view, $form);
     }
 
     /**
@@ -280,5 +255,41 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         $isMapped  = $form->getConfig()->getMapped();
 
         return $isMapped && $propertyPath && $propertyPath->getLength() == 1 ? (string)$propertyPath : $form->getName();
+    }
+
+    /**
+     * in case if we have error in the non accessable fields - add validation error.
+     *
+     * @param array         $hiddenFieldsWithErrors
+     * @param FormView      $view
+     * @param FormInterface $form
+     */
+    protected function processHiddenFieldsWithErrors($hiddenFieldsWithErrors, FormView $view, FormInterface $form)
+    {
+        if (count($hiddenFieldsWithErrors)) {
+            $viewErrors = array_key_exists('errors', $view->vars) ? $view->vars['errors'] : [];
+            $errorsArray = [];
+            foreach ($viewErrors as $error) {
+                $errorsArray[] = $error;
+            }
+            $errorsArray[] = $error = new FormError(
+                sprintf(
+                    'The form contains fields "%s" that are required or not valid but you have no access to them. '
+                    . 'Please contact your administrator to solve this issue.',
+                    implode(', ', array_keys($hiddenFieldsWithErrors))
+                )
+            );
+            $view->vars['errors'] = new FormErrorIterator($form, $errorsArray);
+            foreach ($hiddenFieldsWithErrors as $fieldName => $errorsString) {
+                $this->logger->error(
+                    sprintf(
+                        'Non accessable field `%s` detected in form `%s`. Validation errors: %s',
+                        $fieldName,
+                        $form->getName(),
+                        $errorsString
+                    )
+                );
+            }
+        }
     }
 }
