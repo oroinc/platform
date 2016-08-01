@@ -16,8 +16,7 @@ use Oro\Bundle\LocaleBundle\Model\ExtendFallback;
 class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
 {
     /**
-     * @var array Array cotaining the classes and the fields which are configured to be extended
-     * with default getter
+     * @var array Array contains classes and fields which are configured to be extended with default getter
      */
     protected $methodExtensions = [];
 
@@ -26,11 +25,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
      */
     public function supports(array $schema)
     {
-        if (!isset($schema['class'])) {
-            return false;
-        }
-
-        return isset($this->methodExtensions[$schema['class']]);
+        return isset($schema['class'], $this->methodExtensions[$schema['class']]);
     }
 
     /**
@@ -38,8 +33,8 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
      */
     public function generate(array $schema, PhpClass $class)
     {
-        if (!isset($schema['class']) || !isset($this->methodExtensions[$schema['class']])) {
-            return false;
+        if (!$this->supports($schema)) {
+            return;
         }
 
         $fields = $this->methodExtensions[$schema['class']];

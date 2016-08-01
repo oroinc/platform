@@ -21,20 +21,41 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testSupports()
     {
-        $this->assertFalse(
-            $this->extension->supports([])
-        );
+        $this->extension->addDefaultMethodFields('testClass', []);
+
+        $this->assertTrue($this->extension->supports(['class' => 'testClass']));
+    }
+
+    public function testSupportsWithoutClass()
+    {
+        $this->assertFalse($this->extension->supports([]));
+    }
+
+    public function testSupportsWithoutExtension()
+    {
+        $this->assertFalse($this->extension->supports(['class' => 'testClass']));
+    }
+
+    public function testAddDefaultMethodFields()
+    {
+        $this->assertAttributeEquals([], 'methodExtensions', $this->extension);
 
         $this->extension->addDefaultMethodFields('testClass', []);
-        $this->assertTrue(
-            $this->extension->supports([
-                'class' => 'testClass'
-            ])
+        $this->assertAttributeEquals(['testClass' => []], 'methodExtensions', $this->extension);
+
+        $this->extension->addDefaultMethodFields('testClass', ['test1' => 'data1']);
+        $this->assertAttributeEquals(['testClass' => ['test1' => 'data1']], 'methodExtensions', $this->extension);
+
+        $this->extension->addDefaultMethodFields('testClass', ['test2' => 'data2']);
+        $this->assertAttributeEquals(
+            ['testClass' => ['test1' => 'data1', 'test2' => 'data2']],
+            'methodExtensions',
+            $this->extension
         );
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testMethodNotGenerated()
     {
@@ -49,7 +70,7 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testMethodNotGeneratedIncompleteFields()
     {
@@ -65,6 +86,18 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->generate($schema, $class);
 
         $class->getMethod('getDefaultTestField');
+    }
+
+    public function testGenerateWithoutFields()
+    {
+        $class = PhpClass::create('Test\Entity');
+        $clonedClass = clone $class;
+
+        $this->extension->addDefaultMethodFields('Test\Entity', []);
+        $this->extension->generate(['class' => 'Test\Entity'], $class);
+
+        $this->assertEquals($class, $clonedClass);
+        $this->assertEmpty($class->getMethods());
     }
 
     public function testMethodGenerated()
@@ -84,6 +117,7 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             $class,
             'getName',
             'return $this->getFallbackValue($this->names, $localization);',
+            "/**\n * @param Localization|null \$localization\n * @return LocalizedFallbackValue|null\n */",
             [
                 $this->getParameter('localization', Localization::class, true),
             ]
@@ -92,13 +126,15 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertMethod(
             $class,
             'getDefaultName',
-            'return $this->getDefaultFallbackValue($this->names);'
+            'return $this->getDefaultFallbackValue($this->names);',
+            "/**\n * @return LocalizedFallbackValue|null\n */"
         );
 
         $this->assertMethod(
             $class,
             'setDefaultName',
             'return $this->setDefaultFallbackValue($this->names, $value);',
+            "/**\n * @param string \$value\n * @return \$this\n */",
             [
                 $this->getParameter('value'),
             ]
@@ -127,9 +163,10 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
      * @param PhpClass $class
      * @param string $methodName
      * @param string $methodBody
+     * @param string $docblock
      * @param array $parameters
      */
-    protected function assertMethod(PhpClass $class, $methodName, $methodBody, array $parameters = [])
+    protected function assertMethod(PhpClass $class, $methodName, $methodBody, $docblock, array $parameters = [])
     {
         $this->assertTrue($class->hasMethod($methodName));
 
@@ -137,6 +174,7 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $method = $class->getMethod($methodName);
 
         $this->assertEquals($methodBody, $method->getBody());
+        $this->assertEquals($docblock, $method->getDocblock());
         $this->assertEquals($parameters, $method->getParameters());
     }
 }

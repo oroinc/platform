@@ -31,7 +31,7 @@ class CurrentLocalizationProvider
             $this->currentLocalization = null;
 
             if (!$this->extensions) {
-                return;
+                return null;
             }
 
             foreach ($this->extensions as $extension) {

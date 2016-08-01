@@ -4,12 +4,12 @@ namespace Oro\Bundle\LocaleBundle\Datagrid\Extension;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Inflector\Inflector;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
@@ -58,9 +58,7 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $properties = $this->getProperties($config);
-
-        return count($properties) > 0;
+        return count($this->getProperties($config)) > 0;
     }
 
     /**
@@ -96,7 +94,7 @@ class LocalizedValueExtension extends AbstractExtension
 
         $properties = $this->getProperties($config);
 
-        /* @var $queryBuilder QueryBuilder */
+        /** @var OrmDatasource $datasource */
         $queryBuilder = $datasource->getQueryBuilder();
 
         foreach ($properties as $name => $definition) {
@@ -169,16 +167,6 @@ class LocalizedValueExtension extends AbstractExtension
     }
 
     /**
-     * @param string $fieldName
-     * @param string $prefix
-     * @return string
-     */
-    protected function getMethodName($fieldName, $prefix)
-    {
-        return $prefix . ucfirst(Inflector::camelize(Inflector::singularize($fieldName)));
-    }
-
-    /**
      * @param DatagridConfiguration $config
      * @return array
      */
@@ -188,7 +176,7 @@ class LocalizedValueExtension extends AbstractExtension
             $config->offsetGetOr(Configuration::PROPERTIES_KEY, []),
             function ($property) {
                 return isset($property[LocalizedValueProperty::TYPE_KEY]) &&
-                    $property[LocalizedValueProperty::TYPE_KEY] == LocalizedValueProperty::NAME;
+                    $property[LocalizedValueProperty::TYPE_KEY] === LocalizedValueProperty::NAME;
             }
         );
 

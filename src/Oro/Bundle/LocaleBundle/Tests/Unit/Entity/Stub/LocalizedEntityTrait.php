@@ -29,6 +29,8 @@ trait LocalizedEntityTrait
                 break;
             }
         }
+
+        return null;
     }
 
     /**
@@ -48,9 +50,13 @@ trait LocalizedEntityTrait
                 case $getterName:
                 case $defaultGetterName:
                     return $this->getFallbackValue($this->$propertyName);
-                break;
+                    break;
+                default:
+                    break;
             }
         }
+
+        return null;
     }
 
     /**
@@ -72,13 +78,16 @@ trait LocalizedEntityTrait
                 case $getterName:
                 case $defaultGetterName:
                     return $this->getFallbackValue($this->$propertyName, $value);
-                break;
-
+                    break;
                 case $defaultSetterName:
                     return $this->setDefaultFallbackValue($this->$propertyName, $value);
-                break;
+                    break;
+                default:
+                    break;
             }
         }
+
+        return null;
     }
 
     /**

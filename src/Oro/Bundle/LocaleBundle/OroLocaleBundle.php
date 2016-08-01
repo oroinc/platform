@@ -9,7 +9,7 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\AddDateTimeFormatConver
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\CurrentLocalizationPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
-use Oro\Bundle\LocaleBundle\Entity\Localization;;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class OroLocaleBundle extends Bundle
 {
