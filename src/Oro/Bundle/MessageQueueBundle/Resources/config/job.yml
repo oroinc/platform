@@ -34,3 +34,6 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.job.grid.root_job_action_configuration:
+        class: Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration

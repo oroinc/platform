@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
-use Oro\Component\MessageQueue\Client\MessageProducer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class JobProcessor
 {
@@ -11,15 +11,15 @@ class JobProcessor
     private $jobStorage;
 
     /**
-     * @var MessageProducer
+     * @var MessageProducerInterface
      */
     private $producer;
 
     /**
-     * @param JobStorage      $jobStorage
-     * @param MessageProducer $producer
+     * @param JobStorage               $jobStorage
+     * @param MessageProducerInterface $producer
      */
-    public function __construct(JobStorage $jobStorage, MessageProducer $producer)
+    public function __construct(JobStorage $jobStorage, MessageProducerInterface $producer)
     {
         $this->jobStorage = $jobStorage;
         $this->producer = $producer;

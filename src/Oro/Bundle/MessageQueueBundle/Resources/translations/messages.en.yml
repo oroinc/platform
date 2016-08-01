@@ -1,9 +1,13 @@
 oro:
     message_queue_job:
+        rest:
+            job_interrupted: Job interrupted
         action:
             job_management: Access job queue
 
         grid:
+            action:
+                interrupt: Interrupt
             columns:
                 id: ID
                 name: Name
