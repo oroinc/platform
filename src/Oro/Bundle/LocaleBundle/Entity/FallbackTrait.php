@@ -58,30 +58,7 @@ trait FallbackTrait
      */
     private function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
     {
-        $filteredValues = $values->filter(
-            function (LocalizedFallbackValue $title) use ($localization) {
-                return $localization === $title->getLocalization();
-            }
-        );
-
-        if ($filteredValues->count() > 1) {
-            throw new \LogicException(
-                sprintf('There must be only one %s title', $localization ? $localization->getName() : 'default')
-            );
-        }
-
-        return $this->getValue($filteredValues, $localization);
-    }
-
-    /**
-     * @param Collection $values
-     * @param Localization|null $localization
-     * @return null|LocalizedFallbackValue
-     */
-    private function getValue(Collection $values, Localization $localization = null)
-    {
-        /** @var LocalizedFallbackValue $value */
-        $value = $values->count() ? $values->first() : null;
+        $value = $this->getValue($values, $localization);
         if ($value) {
             switch ($value->getFallback()) {
                 case FallbackType::PARENT_LOCALIZATION:
@@ -100,5 +77,26 @@ trait FallbackTrait
         }
 
         return $value;
+    }
+
+    /**
+     * @param Collection $values
+     * @param Localization|null $localization
+     * @return LocalizedFallbackValue|null
+     */
+    private function getValue(Collection $values, Localization $localization = null)
+    {
+        $filteredValues = $values->filter(
+            function (LocalizedFallbackValue $title) use ($localization) {
+                return $localization === $title->getLocalization();
+            }
+        );
+
+        if ($filteredValues->count() > 1) {
+            $title = $localization ? $localization->getName() : 'default';
+            throw new \LogicException(sprintf('There must be only one %s title', $title));
+        }
+
+        return $filteredValues->count() ? $filteredValues->first() : null;
     }
 }
