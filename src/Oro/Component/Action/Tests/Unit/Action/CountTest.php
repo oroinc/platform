@@ -76,7 +76,8 @@ class CountTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [[1, 2, 3], 3],
-            [new ArrayCollection([1, 2, 3, 4, 5]), 5]
+            [new ArrayCollection([1, 2, 3, 4, 5]), 5],
+            [new \stdClass(), 0]
         ];
     }
 }

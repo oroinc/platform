@@ -40,8 +40,8 @@ class Count extends AbstractAction
     protected function executeAction($context)
     {
         $array = $this->contextAccessor->getValue($context, $this->options['array']);
-        if ($array instanceof Collection) {
-            $array = $array->toArray();
+        if (!is_array($array) && !$array instanceof \Countable) {
+            $array = [];
         }
 
         $this->contextAccessor->setValue($context, $this->options['attribute'], count($array));
