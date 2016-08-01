@@ -17,16 +17,27 @@ class SystemCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $attendeeManager = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\AttendeeManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $attendeeManager->expects($this->any())
+            ->method('getAttendeeListsByCalendarEventIds')
+            ->will($this->returnCallback(function (array $calendarEventIds) {
+                return array_fill_keys($calendarEventIds, []);
+            }));
+
         $this->reminderManager = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->securityFacade  = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->normalizer = new SystemCalendarEventNormalizer(
             $this->reminderManager,
-            $this->securityFacade
+            $this->securityFacade,
+            $attendeeManager
         );
     }
 
@@ -106,6 +117,7 @@ class SystemCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'title'     => 'test',
                         'start'     => $startDate->format('c'),
                         'end'       => $endDate->format('c'),
+                        'attendees' => [],
                         'editable'  => false,
                         'removable' => false
                     ],
@@ -128,6 +140,7 @@ class SystemCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'title'     => 'test',
                         'start'     => $startDate->format('c'),
                         'end'       => $endDate->format('c'),
+                        'attendees' => [],
                         'editable'  => false,
                         'removable' => false
                     ],
@@ -159,6 +172,7 @@ class SystemCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'title'    => 'test',
                         'start'    => $startDate->format('c'),
                         'end'      => $endDate->format('c'),
+                        'attendees' => [],
                     ],
                 ]
             ],

@@ -13,7 +13,10 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 class GridViewRepository extends EntityRepository
 {
     /** @var array */
-    protected $cache = [];
+    private $defaultViewCache = [];
+
+    /** @var array */
+    private $viewsCache = [];
 
     /**
      * @param AclHelper     $aclHelper
@@ -24,8 +27,8 @@ class GridViewRepository extends EntityRepository
      */
     public function findGridViews(AclHelper $aclHelper, UserInterface $user, $gridName)
     {
-        $cacheKey = sprintf('%s.%s', $user->getUsername(), $gridName);
-        if (!isset($this->cache[$cacheKey])) {
+        $cacheKey = $this->getCacheKey($user, $gridName);
+        if (!isset($this->viewsCache[$cacheKey])) {
             $qb = $this->createQueryBuilder('gv');
             $qb
                 ->andWhere('gv.gridName = :gridName')
@@ -44,10 +47,10 @@ class GridViewRepository extends EntityRepository
                 )
                 ->orderBy('gv.gridName');
 
-            $this->cache[$cacheKey] = $aclHelper->apply($qb)->getResult();
+            $this->viewsCache[$cacheKey] = $aclHelper->apply($qb)->execute();
         }
 
-        return $this->cache[$cacheKey];
+        return $this->viewsCache[$cacheKey];
     }
 
     /**
@@ -59,10 +62,14 @@ class GridViewRepository extends EntityRepository
      */
     public function findDefaultGridView(AclHelper $aclHelper, UserInterface $user, $gridName)
     {
-        $qb = $this->getFindDefaultGridViewQb($user, $gridName);
-        $qb->setMaxResults(1);
+        $cacheKey = $this->getCacheKey($user, $gridName);
+        if (!array_key_exists($cacheKey, $this->defaultViewCache)) {
+            $qb = $this->getFindDefaultGridViewQb($user, $gridName);
+            $qb->setMaxResults(1);
+            $this->defaultViewCache[$cacheKey] = $aclHelper->apply($qb)->getOneOrNullResult();
+        }
 
-        return $aclHelper->apply($qb)->getOneOrNullResult();
+        return $this->defaultViewCache[$cacheKey];
     }
 
     /**
@@ -102,7 +109,7 @@ class GridViewRepository extends EntityRepository
         $qb = $this->createQueryBuilder('gv');
         $qb->innerJoin('gv.users', 'u')
             ->where('gv.gridName = :gridName')
-            ->andWhere('u = :user');
+            ->andWhere('u.user = :user');
 
         if ($checkOwner) {
             $qb->andWhere(
@@ -124,5 +131,15 @@ class GridViewRepository extends EntityRepository
         $qb->setParameters($parameters);
 
         return $qb;
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param string $gridName
+     * @return string
+     */
+    protected function getCacheKey(UserInterface $user, $gridName)
+    {
+        return sprintf('%s.%s', $user->getUsername(), $gridName);
     }
 }

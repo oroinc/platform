@@ -46,3 +46,17 @@ You can use this field type like:
      */
     protected $mapConfigField;
 ```
+
+
+**duration** field type allow to store time duration in seconds. It's an alias to integer type.
+
+You can use this field type like:
+
+```php
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="duration", type="duration")
+     */
+    protected $duration;
+```

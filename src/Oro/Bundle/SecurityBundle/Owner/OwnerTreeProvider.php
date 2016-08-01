@@ -3,9 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -48,25 +51,9 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     /**
      * {@inheritdoc}
      */
-    protected function getTreeData()
-    {
-        return new OwnerTree();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function supports()
     {
         return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTree()
-    {
-        return parent::getTree();
     }
 
     /**
@@ -86,65 +73,107 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      */
     protected function fillTree(OwnerTreeInterface $tree)
     {
-        $userClass         = $this->getOwnershipMetadataProvider()->getBasicLevelClass();
-        $businessUnitClass = $this->getOwnershipMetadataProvider()->getLocalLevelClass();
+        $ownershipMetadataProvider = $this->getOwnershipMetadataProvider();
+        $userClass = $ownershipMetadataProvider->getBasicLevelClass();
+        $businessUnitClass = $ownershipMetadataProvider->getLocalLevelClass();
+        $connection = $this->getManagerForClass($userClass)->getConnection();
 
-        /** @var User[] $users */
-
-        $users = $this->getManagerForClass($userClass)
-            ->getRepository($userClass)
-            ->createQueryBuilder('u')
-            ->leftJoin('u.owner', 'owner')
-            ->leftJoin('u.organizations', 'organizations')
-            ->leftJoin('u.businessUnits', 'bu')
-            ->leftJoin('bu.organization', 'bu_organization')
-            ->select(
-                'partial u.{id}',
-                'partial owner.{id}',
-                'partial organizations.{id}',
-                'partial bu.{id}',
-                'partial bu_organization.{id}'
-            )
-            ->getQuery()
-            ->getArrayResult();
-
-        /** @var BusinessUnit[] $businessUnits */
-        $businessUnitsRepo = $this->getManagerForClass($businessUnitClass)->getRepository($businessUnitClass);
-        $businessUnits     = $businessUnitsRepo
-            ->createQueryBuilder('bu')
-            ->select([
-                'bu.id',
-                'IDENTITY(bu.organization) organization',
-                'IDENTITY(bu.owner) owner' //aka parent business unit
-            ])
-            ->addSelect('(CASE WHEN bu.owner IS NULL THEN 0 ELSE 1 END) AS HIDDEN ORD')
-            ->addOrderBy('ORD, owner', 'ASC')
-            ->getQuery()
-            ->getArrayResult();
-
+        list($businessUnits, $columnMap) = $this->executeQuery(
+            $connection,
+            $this
+                ->getRepository($businessUnitClass)
+                ->createQueryBuilder('bu')
+                ->select(
+                    'bu.id, IDENTITY(bu.organization) orgId, IDENTITY(bu.owner) parentId'
+                    . ', (CASE WHEN bu.owner IS NULL THEN 0 ELSE 1 END) AS HIDDEN ORD'
+                )
+                ->addOrderBy('ORD, parentId', 'ASC')
+                ->getQuery()
+        );
         foreach ($businessUnits as $businessUnit) {
-            if (!empty($businessUnit['organization'])) {
-                $tree->addLocalEntity($businessUnit['id'], (int)$businessUnit['organization']);
-                $tree->addDeepEntity($businessUnit['id'], $businessUnit['owner']);
+            $orgId = $this->getId($businessUnit, $columnMap['orgId']);
+            if (null !== $orgId) {
+                $buId = $this->getId($businessUnit, $columnMap['id']);
+                $tree->addLocalEntity($buId, $orgId);
+                $tree->addDeepEntity($buId, $this->getId($businessUnit, $columnMap['parentId']));
             }
         }
 
         $tree->buildTree();
 
+        list($users, $columnMap) = $this->executeQuery(
+            $connection,
+            $this
+                ->getRepository($userClass)
+                ->createQueryBuilder('u')
+                ->innerJoin('u.organizations', 'organizations')
+                ->leftJoin('u.businessUnits', 'bu')
+                ->select(
+                    'u.id as userId, organizations.id as orgId, IDENTITY(u.owner) as owningBuId, bu.id as buId'
+                )
+                ->addOrderBy('orgId')
+                ->getQuery()
+        );
+        $lastUserId = false;
+        $lastOrgId = false;
+        $processedUsers = [];
         foreach ($users as $user) {
-            $owner = $user['owner'];
-            $tree->addBasicEntity($user['id'], isset($owner['id']) ? $owner['id'] : null);
-
-            foreach ($user['organizations'] as $organization) {
-                $tree->addGlobalEntity($user['id'], $organization['id']);
-
-                foreach ($user['businessUnits'] as $businessUnit) {
-                    if ($organization['id'] == $businessUnit['organization']['id']) {
-                        $tree->addLocalEntityToBasic($user['id'], $businessUnit['id'], $organization['id']);
-                    }
-                }
+            $userId = $this->getId($user, $columnMap['userId']);
+            $orgId = $this->getId($user, $columnMap['orgId']);
+            $owningBuId = $this->getId($user, $columnMap['owningBuId']);
+            $buId = $this->getId($user, $columnMap['buId']);
+            if ($userId !== $lastUserId && !isset($processedUsers[$userId])) {
+                $tree->addBasicEntity($userId, $owningBuId);
+                $processedUsers[$userId] = true;
             }
+            if ($orgId !== $lastOrgId || $userId !== $lastUserId) {
+                $tree->addGlobalEntity($userId, $orgId);
+            }
+            if (null !== $buId) {
+                $tree->addLocalEntityToBasic($userId, $buId, $orgId);
+            }
+            $lastUserId = $userId;
+            $lastOrgId = $orgId;
         }
+    }
+
+    /**
+     * @param array  $item
+     * @param string $property
+     *
+     * @return int|null
+     */
+    protected function getId($item, $property)
+    {
+        $id = $item[$property];
+
+        return null !== $id ? (int)$id : null;
+    }
+
+    /**
+     * @param Connection $connection
+     * @param Query      $query
+     *
+     * @return array [rows, columnMap]
+     */
+    protected function executeQuery(Connection $connection, Query $query)
+    {
+        $parsedQuery = QueryUtils::parseQuery($query);
+
+        return [
+            $connection->executeQuery(QueryUtils::getExecutableSql($query, $parsedQuery)),
+            array_flip($parsedQuery->getResultSetMapping()->scalarMappings)
+        ];
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return EntityRepository
+     */
+    protected function getRepository($entityClass)
+    {
+        return $this->getManagerForClass($entityClass)->getRepository($entityClass);
     }
 
     /**

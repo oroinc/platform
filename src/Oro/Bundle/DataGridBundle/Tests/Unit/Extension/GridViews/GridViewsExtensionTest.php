@@ -13,6 +13,8 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 {
     private $eventDispatcher;
 
+    protected $serviceLink;
+
     /** @var GridViewsExtension */
     private $gridViewsExtension;
 
@@ -44,12 +46,24 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->serviceLink = $this->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $gridViewStub = new GridViewManagerStub();
+
+        $this->serviceLink->expects($this->any())
+            ->method('getService')
+            ->will($this->returnValue($gridViewStub));
+
+
         $this->gridViewsExtension = new GridViewsExtension(
             $this->eventDispatcher,
             $securityFacade,
             $translator,
             $registry,
-            $aclHelper
+            $aclHelper,
+            $this->serviceLink
         );
     }
 

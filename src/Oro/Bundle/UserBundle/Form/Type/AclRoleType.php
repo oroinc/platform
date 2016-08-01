@@ -69,7 +69,7 @@ class AclRoleType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -82,9 +82,17 @@ class AclRoleType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     *M-BM- {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_user_role_form';
     }

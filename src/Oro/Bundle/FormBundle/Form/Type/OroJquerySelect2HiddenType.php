@@ -273,6 +273,14 @@ class OroJquerySelect2HiddenType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_jqueryselect2_hidden';
     }
 }
