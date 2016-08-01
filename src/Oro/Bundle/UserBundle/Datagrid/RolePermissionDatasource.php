@@ -94,7 +94,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
         foreach ($privilege->getPermissions() as $permissionName => $permission) {
             /** @var AclPermission $permission */
             $permissionEntity = $this->permissionManager->getPermissionByName($permission->getName());
-            if ($permissionEntity) {
+            if ($permissionEntity && $this->isSupportedPermission($permissionName)) {
                 $privilegePermission = $this->getPrivilegePermission(
                     $privilege,
                     $permissionEntity,
@@ -108,6 +108,16 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
         array_multisort($orders, $item['permissions']);
 
         return $item;
+    }
+
+    /**
+     * @param string $permissionName
+     *
+     * @return bool
+     */
+    protected function isSupportedPermission($permissionName)
+    {
+        return true;
     }
 
     /**
