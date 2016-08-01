@@ -239,6 +239,9 @@ services:
             - '@oro_api.entity_serializer.field_accessor'
             - '@oro_api.entity_serializer.config_normalizer'
             - '@oro_api.entity_serializer.data_normalizer'
+        calls:
+            # replace to compiler pass injection ?
+            - ["setFieldsFilter", ['@oro_security.serializer.filter_chain']]
 
     oro_api.entity_serializer.doctrine_helper:
         class: Oro\Component\EntitySerializer\DoctrineHelper

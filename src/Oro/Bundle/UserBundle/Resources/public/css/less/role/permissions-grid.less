@@ -17,10 +17,71 @@
       border-bottom-right-radius: 4px !important;
     }
   }
+  .grid-header-cell:first-child {
+    width: 160px;
+  }
+  .collapse-expand-action-container {
+    .collapse-action{
+      color: #727272;
+      font-size: 13px;
+      font-family: Helvetica, Arial, sans-serif;
+      font-weight: bold;
+      &:before {
+        content: '−';
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        font-weight: normal;
+        border: 1px solid #c3c3c3;
+        margin-right: 8px;
+        background-color: #fcfcfc;
+        font-size: 12px;
+        line-height: 12px;
+        padding: 1px 0 0px 0;
+        text-align: center;
+        color: #727272;
+        #gradient > .horizontal(#fcfcfc, #e9e9e9);
+      }
+      &.collapsed:before {
+        content: '+';
+      }
+    }
+  }
+  .entity-name {
+    float: left;
+    width: 136px;
+    font-weight: bold;
+  }
+  .entity-row-action {
+    position: relative;
+    float: right;
+    width: 20px;
+  }
+  .fields-list {
+    display: none;
+    & > :first-child {
+      margin-top: 8px;
+    }
+    & > :last-child {
+      margin-bottom: 8px;
+    }
+  }
+}
+.collapse-expand-action-container .collapse-action {
+  .field-less & {
+    visibility: hidden;
+  }
+  .collapsed &:before {
+    content: '+';
+  }
 }
 .action-permissions {
   list-style: none;
   margin: 0;
+  .entity-permission-container > & {
+    margin-left: 160px;
+    margin-right: 24px;
+  }
   & &__item {
     float: left;
     width: 160px;
@@ -72,6 +133,22 @@
     }
   }
 }
+.field-permission-container {
+  margin-left: 40px;
+  padding: 4px 0;
+  border-top: 1px solid @generalBorderColor;
+  &:first-child {
+    border-top: 0 none;
+  }
+  .field-name{
+    float: left;
+    width: 120px;
+    padding-left: 10px;
+  }
+  .action-permissions {
+    margin-left: 120px;
+  }
+}
 .role-permissions-action-launcher {
   .launchers-list .launcher-item a&:hover,
   .launchers-list .launcher-item a&:focus {
@@ -79,10 +156,11 @@
   }
 }
 .dropdown-menu__role-permissions-action {
-  .grid .action-cell & {
+  .grid .entity-row-action & {
     padding: 5px 0;
     top: auto;
     margin-top: 17px;
+    left: auto;
     right: -10px;
   }
   .dropdown-menu-collection__list > li {
