@@ -15,7 +15,8 @@ class ActionMetadataTest extends \PHPUnit_Framework_TestCase
             'SomeName',
             'SomeGroup',
             'SomeLabel',
-            'SomeDescription'
+            'SomeDescription',
+            'SomeCategory'
         );
     }
 
@@ -25,6 +26,7 @@ class ActionMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('SomeGroup', $this->metadata->getGroup());
         $this->assertEquals('SomeLabel', $this->metadata->getLabel());
         $this->assertEquals('SomeDescription', $this->metadata->getDescription());
+        $this->assertEquals('SomeCategory', $this->metadata->getCategory());
     }
 
     public function testSerialize()
@@ -35,5 +37,6 @@ class ActionMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('SomeGroup', $emptyMetadata->getGroup());
         $this->assertEquals('SomeLabel', $this->metadata->getLabel());
         $this->assertEquals('SomeDescription', $this->metadata->getDescription());
+        $this->assertEquals('SomeCategory', $this->metadata->getCategory());
     }
 }

@@ -7,12 +7,9 @@ class ProcessorIterator implements \Iterator
     /**
      * @var array
      *  [
-     *      action => [
-     *          [
-     *              'processor'  => processorId,
-     *              'attributes' => [key => value, ...]
-     *          ],
-     *          ...
+     *      [
+     *          'processor'  => processorId,
+     *          'attributes' => [key => value, ...]
      *      ],
      *      ...
      *  ]
@@ -27,9 +24,6 @@ class ProcessorIterator implements \Iterator
 
     /** @var ProcessorFactoryInterface */
     protected $processorFactory;
-
-    /** @var string */
-    protected $action;
 
     /** @var int */
     protected $index;
@@ -82,7 +76,7 @@ class ProcessorIterator implements \Iterator
      */
     public function getAction()
     {
-        return $this->action;
+        return $this->context->getAction();
     }
 
     /**
@@ -96,7 +90,7 @@ class ProcessorIterator implements \Iterator
             return null;
         }
 
-        $attributes = $this->processors[$this->action][$this->index]['attributes'];
+        $attributes = $this->processors[$this->index]['attributes'];
 
         return isset($attributes['group'])
             ? $attributes['group']
@@ -114,7 +108,7 @@ class ProcessorIterator implements \Iterator
             return null;
         }
 
-        return $this->processors[$this->action][$this->index]['processor'];
+        return $this->processors[$this->index]['processor'];
     }
 
     /**
@@ -128,7 +122,7 @@ class ProcessorIterator implements \Iterator
             return null;
         }
 
-        return $this->processors[$this->action][$this->index]['attributes'];
+        return $this->processors[$this->index]['attributes'];
     }
 
     /**
@@ -136,7 +130,7 @@ class ProcessorIterator implements \Iterator
      */
     public function current()
     {
-        $processorId = $this->processors[$this->action][$this->index]['processor'];
+        $processorId = $this->processors[$this->index]['processor'];
         $processor   = $this->processorFactory->getProcessor($processorId);
         if (null === $processor) {
             throw new \RuntimeException(sprintf('The processor "%s" does not exist.', $processorId));
@@ -174,11 +168,8 @@ class ProcessorIterator implements \Iterator
      */
     public function rewind()
     {
-        $this->action   = $this->context->getAction();
         $this->index    = -1;
-        $this->maxIndex = isset($this->processors[$this->action])
-            ? count($this->processors[$this->action]) - 1
-            : -1;
+        $this->maxIndex = count($this->processors) - 1;
         $this->nextApplicable();
     }
 
@@ -191,7 +182,7 @@ class ProcessorIterator implements \Iterator
         while ($this->index <= $this->maxIndex) {
             $applicable = $this->applicableChecker->isApplicable(
                 $this->context,
-                $this->processors[$this->action][$this->index]['attributes']
+                $this->processors[$this->index]['attributes']
             );
             if ($applicable !== ApplicableCheckerInterface::NOT_APPLICABLE) {
                 break;

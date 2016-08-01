@@ -46,7 +46,6 @@ class EmailCacheManager
     {
         if ($email->getEmailBody() === null) {
             $this->emailBodySynchronizer->syncOneEmailBody($email);
-            $this->em->flush();
         }
 
         $this->eventDispatcher->dispatch(EmailBodyLoaded::NAME, new EmailBodyLoaded($email));

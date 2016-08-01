@@ -6,10 +6,10 @@ default: &default
             default_session: 'first_session'
             sessions:
                 second_session:
-                    selenium2:
+                    oroSelenium2:
                         wd_host: "http://localhost:8643/wd/hub"
                 first_session:
-                    selenium2:
+                    oroSelenium2:
                         wd_host: "http://localhost:8643/wd/hub"
         Behat\Symfony2Extension:
             kernel:
@@ -21,6 +21,7 @@ default: &default
             shared_contexts:
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
+                - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
                 - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
                 - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
     autoload:
@@ -33,8 +34,8 @@ selenium2:
         Behat\MinkExtension:
             sessions:
                 second_session:
-                    selenium2:
+                    oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
                 first_session:
-                    selenium2:
+                    oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'

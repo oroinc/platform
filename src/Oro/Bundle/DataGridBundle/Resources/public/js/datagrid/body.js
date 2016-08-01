@@ -1,10 +1,11 @@
 define([
     'underscore',
     'backbone',
+    'chaplin',
     'backgrid',
     './row',
     '../pageable-collection'
-], function(_, Backbone, Backgrid, Row, PageableCollection) {
+], function(_, Backbone, Chaplin, Backgrid, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -19,9 +20,14 @@ define([
      * @class   orodatagrid.datagrid.Body
      * @extends Backgrid.Body
      */
-    Body = Backgrid.Body.extend({
+    Body = Chaplin.CollectionView.extend({
+
+        tagName: 'tbody',
+        autoRender: false,
         /** @property */
-        row: Row,
+        itemView: Row,
+        animationDuration: 0,
+        renderItems: true,
 
         /** @property {String} */
         rowClassName: undefined,
@@ -31,45 +37,17 @@ define([
             className: 'grid-body'
         },
 
+        listen: {
+            'backgrid:sort collection': 'sort'
+        },
+
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            var opts = options || {};
-
-            if (!opts.row) {
-                opts.row = this.row;
-            }
-
-            if (opts.rowClassName) {
-                this.rowClassName = opts.rowClassName;
-            }
-
-            this.columns = options.columns;
-            this.filteredColumns = options.filteredColumns;
-
-            this.backgridInitialize(opts);
-        },
-
-        /**
-         * Create this function instead of original Body.__super__.initialize to customize options for subviews
-         *
-         * @param {Object} options
-         */
-        backgridInitialize: function(options) {
-            this.row = options.row || Row;
-            this.createRows();
-
-            this.emptyText = options.emptyText;
-            this._unshiftEmptyRowMayBe();
-
-            var collection = this.collection;
-            this.listenTo(collection, 'add', this.insertRow);
-            this.listenTo(collection, 'remove', this.removeRow);
-            this.listenTo(collection, 'sort', this.refresh);
-            this.listenTo(collection, 'reset', this.refresh);
-            this.listenTo(collection, 'backgrid:sort', this.sort);
-            this.listenTo(collection, 'backgrid:edited', this.moveToNextCell);
+            _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText']));
+            this.rows = this.subviews;
+            Body.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -79,93 +57,44 @@ define([
             if (this.disposed) {
                 return;
             }
-            _.each(this.rows, function(row) {
-                row.dispose();
-            });
-            delete this.rows;
             delete this.columns;
             delete this.filteredColumns;
 
             Body.__super__.dispose.call(this);
         },
 
-        createRows: function() {
-            this.rows = this.collection.map(function(model, i) {
+        initItemView: function(model) {
+            Row = this.row || this.itemView;
+            if (Row) {
                 var rowOptions = {
+                    autoRender: false,
+                    model: model,
                     collection: this.filteredColumns,
-                    columns: this.columns,
-                    model: model
+                    columns: this.columns
                 };
-                this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
-                var row = new this.row(rowOptions);
-                this.subview('row' + i, row);
-                this.attachListenerToSingleRow(row);
-                return row;
-            }, this);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        refresh: function() {
-            _.each(this.rows, function(row) {
-                // dispose in Chaplin's way, instead of Backbone's remove
-                row.dispose();
-            });
-            this.rows = [];
-            this.backgridRefresh();
-            return this;
+                this.columns.trigger('configureInitializeOptions', Row, rowOptions);
+                return new Row(rowOptions);
+            } else {
+                throw new Error('The one of Body#row or Body#itemView properties ' +
+                    'must be defined or the initItemView() must be overridden.');
+            }
         },
 
         /**
          * Create this function instead of original Body.__super__.refresh to customize options for subviews
          */
         backgridRefresh: function() {
-            this.createRows();
-            this._unshiftEmptyRowMayBe();
-
             this.render();
-
             this.collection.trigger('backgrid:refresh', this);
-
             return this;
         },
 
         /**
          * @inheritDoc
          */
-        insertRow: function(model, collection, options) {
-            if (this.rows[0] instanceof Backgrid.EmptyRow) {
-                this.rows.pop().remove();
-            }
-
-            // insertRow() is called directly
-            if (!(collection instanceof Backbone.Collection) && !options) {
-                this.collection.add(model, (options = collection));
-                return;
-            }
-
-            var row = new this.row({
-                collection: this.filteredColumns,
-                columns: this.columns,
-                model: model
-            });
-
-            var index = collection.indexOf(model);
-            this.rows.splice(index, 0, row);
-
-            var $el = this.$el;
-            var $children = $el.children();
-            var $rowEl = row.render().$el;
-
-            if (index >= $children.length) {
-                $el.append($rowEl);
-            } else {
-                $children.eq(index).before($rowEl);
-                this.attachListenerToSingleRow(this.rows[index]);
-            }
-
-            return this;
+        insertView: function(model, view) {
+            Body.__super__.insertView.apply(this, arguments);
+            this.attachListenerToSingleRow(view);
         },
 
         /**
@@ -180,6 +109,18 @@ define([
             }, this);
         },
 
+        initFallback: function() {
+            if (!this.fallbackSelector && this.emptyText) {
+                var fallbackElement = new Backgrid.EmptyRow({
+                    emptyText: this.emptyText,
+                    columns: this.columns
+                }).render().el;
+                this.fallbackSelector = _.map(fallbackElement.classList, function(name) {return '.' + name;}).join('');
+                this.$el.append(fallbackElement);
+            }
+            Body.__super__.initFallback.apply(this, arguments);
+        },
+
         /**
          * @inheritDoc
          */
@@ -191,6 +132,29 @@ define([
             }
             this._resolveDeferredRender();
             return this;
+        },
+
+        makeComparator: function(attr, order, func) {
+
+            return function(left, right) {
+                // extract the values from the models
+                var t;
+                var l = func(left, attr);
+                var r = func(right, attr);
+                // if descending order, swap left and right
+                if (order === 1) {
+                    t = l;
+                    l = r;
+                    r = t;
+                }
+                // compare as usual
+                if (l === r) {
+                    return 0;
+                } else if (l < r) {
+                    return -1;
+                }
+                return 1;
+            };
         },
 
         /**

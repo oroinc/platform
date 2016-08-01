@@ -21,7 +21,7 @@ interface DatasourceInterface
     /**
      * Returns data extracted via datasource
      *
-     * @return array
+     * @return ResultRecordInterface[]
      */
     public function getResults();
 }
