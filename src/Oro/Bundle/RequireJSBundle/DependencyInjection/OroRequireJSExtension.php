@@ -4,7 +4,6 @@ namespace Oro\Bundle\RequireJSBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -30,15 +29,5 @@ class OroRequireJSExtension extends Extension
         $container->setParameter('oro_require_js', $config);
         $container->setParameter('oro_require_js.web_root', $config['web_root']);
         $container->setParameter('oro_require_js.build_path', $config['build_path']);
-
-        if (!$container->hasDefinition('oro.cache.abstract') && $container->hasDefinition('oro_requirejs.cache')) {
-            $oldDefinition = $container->getDefinition('oro_requirejs.cache');
-
-            $definition = new Definition('Doctrine\\Common\\Cache\\PhpFileCache', array('%kernel.cache_dir%/oro_data'));
-            $definition->setMethodCalls($oldDefinition->getMethodCalls());
-            $definition->setPublic(false);
-
-            $container->setDefinition('oro_requirejs.cache', $definition);
-        }
     }
 }
