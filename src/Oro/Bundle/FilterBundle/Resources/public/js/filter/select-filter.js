@@ -233,10 +233,10 @@ define([
                         return this._getSelectedText(checkedItems);
                     }, this),
                     position: {
-                        my: 'left top+7',
+                        my: 'left top',
                         at: 'left bottom',
-                        of: this.$(this.containerSelector),
-                        collision: 'fit none',
+                        of: this.$el,
+                        collision: 'fit flip',
                         within: $dropdownContainer
                     },
                     open: _.bind(function() {

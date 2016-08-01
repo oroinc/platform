@@ -34,6 +34,14 @@ class RelatedEntityCollectionApiType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_related_entity_collection_api';
     }
 }

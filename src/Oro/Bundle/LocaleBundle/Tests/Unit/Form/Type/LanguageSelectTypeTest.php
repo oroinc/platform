@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
@@ -56,8 +57,14 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
 
         $form = $this->factory->create($this->formType);
 
-        $choices = $form->getConfig()->getOption('choices');
+        $choices = $form->createView()->vars['choices'];
 
-        $this->assertEquals($data, $choices);
+        $this->assertEquals(
+            [
+                new ChoiceView('en', 'en', 'English'),
+                new ChoiceView('es', 'es', 'Spain')
+            ],
+            $choices
+        );
     }
 }
