@@ -48,7 +48,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $containerBuilder = new ContainerBuilder();
+        $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
 
         $extension = new OroTestFrameworkExtension();
