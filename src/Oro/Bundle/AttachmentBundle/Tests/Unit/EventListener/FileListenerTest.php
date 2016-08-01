@@ -4,6 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileListener;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
@@ -75,9 +77,7 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     public function testPrePersistForFileEntityButWithFileObject()
     {
         $entity = new File();
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
         $loggedUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->disableOriginalConstructor()
@@ -86,9 +86,6 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
         $this->fileManager->expects($this->once())
             ->method('preUpload')
             ->with($entity);
-        $file->expects($this->once())
-            ->method('isFile')
-            ->willReturn(true);
         $this->securityFacade->expects($this->once())
             ->method('getLoggedUser')
             ->willReturn($loggedUser);
@@ -122,9 +119,7 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     public function testPreUpdateForFileEntityButWithFileObject()
     {
         $entity = new File();
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
         $loggedUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->disableOriginalConstructor()
@@ -133,9 +128,6 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
         $this->fileManager->expects($this->once())
             ->method('preUpload')
             ->with($entity);
-        $file->expects($this->once())
-            ->method('isFile')
-            ->willReturn(true);
         $this->securityFacade->expects($this->once())
             ->method('getLoggedUser')
             ->willReturn($loggedUser);
@@ -213,9 +205,7 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     public function testPostPersistForFileEntityButWithFileObject()
     {
         $entity = new File();
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
         $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
@@ -310,9 +300,7 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     public function testPostUpdateForFileEntityButWithFileObject()
     {
         $entity = new File();
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
         $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
