@@ -36,6 +36,8 @@ define(function(require) {
 
         widgets: {},
 
+        options: {},
+
         _cachedWidgetsByPriority: null,
 
         /**
@@ -51,6 +53,7 @@ define(function(require) {
                 Widget: null
             });
 
+            this.options = widget.options;
             this.widgets[widget.key] = widget;
             delete this._cachedWidgetsByPriority;
             delete this._cachedCompoundQuery;
@@ -143,7 +146,7 @@ define(function(require) {
          * @param {Object} options
          */
         createWidget: function($input, Widget, options) {
-            options = $.extend(true, {}, $input.data('input-widget-options') || {}, options || {});
+            options = $.extend(true, {}, $input.data('input-widget-options') || {}, _.extend(options, this.options) || {});
             if (!options) {
                 options = {};
             }
