@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -164,9 +165,7 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
         $content = 'test';
         $originalFileName = 'test.txt';
 
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = new ComponentFile(__DIR__ . '/../../Fixtures/testFile/test.txt');
 
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])
@@ -200,12 +199,7 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
         $originalFileName = 'test.txt';
         $mimeType = 'text/plain';
 
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $file->expects($this->any())
-            ->method('getPathname')
-            ->willReturn(realpath(__DIR__ . '/../../Fixtures/testFile/test.txt'));
+        $file = new ComponentFile(__DIR__ . '/../../Fixtures/testFile/test.txt');
 
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])

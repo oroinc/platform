@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -108,9 +108,7 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
 
         $entity = new File();
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
         $this->fileManager->expects($this->any())
@@ -149,9 +147,7 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList([new ConstraintViolation('', '', [], '', '', '')]);
 
         $entity = new File();
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
         $this->fileManager->expects($this->any())

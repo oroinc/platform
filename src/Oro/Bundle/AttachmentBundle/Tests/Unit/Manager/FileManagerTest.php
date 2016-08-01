@@ -284,16 +284,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $fileEntity = $this->createFileEntity();
         $fileEntity->setEmptyFile(false);
 
-        $path = __DIR__ . '/../Fixtures/testFile/test.txt';
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->setConstructorArgs([$path])
-            ->getMock();
-        $file->expects($this->once())
-            ->method('getPathname')
-            ->willReturn(realpath($path));
-        $file->expects($this->once())
-            ->method('isFile')
-            ->willReturn(true);
+        $file = new File(__DIR__ . '/../Fixtures/testFile/test.txt');
         $fileEntity->setFile($file);
 
         $memoryBuffer = new InMemoryBuffer($this->filesystem, 'test.txt');

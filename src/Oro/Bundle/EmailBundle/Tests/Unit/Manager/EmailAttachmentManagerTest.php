@@ -8,8 +8,8 @@ use Doctrine\ORM\EntityManager;
 
 use Gaufrette\Filesystem;
 
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
@@ -19,8 +19,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
@@ -62,23 +60,8 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $configFileValidator;
 
-    /**
-     * @var KernelInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $kernel;
-
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
-
-    /**
-     * @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacadeLink;
-
-    /**
-     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityFacade;
 
     /**
      * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
@@ -164,12 +147,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
         ReflectionUtil::setId($emailAttachment, 1);
         $emailAttachment->setContent($this->getContentMock());
 
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $file->expects($this->any())
-            ->method('getPathname')
-            ->willReturn(__DIR__ . '/../Fixtures/attachment/test.txt');
+        $file = new ComponentFile(__DIR__ . '/../Fixtures/attachment/test.txt');
 
         $this->fileManager->expects($this->once())
             ->method('writeToTemporaryFile')
