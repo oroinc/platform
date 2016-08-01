@@ -598,7 +598,7 @@ Example of usage:
 ```php
 /** @var MetadataProvider $metadataProvider */
 $metadataProvider = $container->get('oro_api.metadata_provider');
-$metadata = $metadataProvider->getMetadata($entityClassName, $version, $requestType, $metadataExtras, $entityConfig);
+$metadata = $metadataProvider->getMetadata($entityClassName, $version, $requestType, $entityConfig, $metadataExtras);
 ```
 
 normalize_value Action

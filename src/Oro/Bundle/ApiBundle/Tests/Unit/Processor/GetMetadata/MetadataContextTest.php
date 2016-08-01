@@ -39,9 +39,6 @@ class MetadataContextTest extends \PHPUnit_Framework_TestCase
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
         $this->assertSame($config, $this->context->getConfig());
-
-        $this->context->setConfig(null);
-        $this->assertNull($this->context->getConfig());
     }
 
     public function testHasExtraAndGetExtras()

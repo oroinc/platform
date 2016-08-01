@@ -21,7 +21,7 @@ class MetadataContext extends ApiContext
     /** @var MetadataExtraInterface[] */
     protected $extras = [];
 
-    /** @var EntityDefinitionConfig|null */
+    /** @var EntityDefinitionConfig */
     protected $config;
 
     /**
@@ -56,7 +56,7 @@ class MetadataContext extends ApiContext
     /**
      * Gets the configuration of an entity.
      *
-     * @return EntityDefinitionConfig|null
+     * @return EntityDefinitionConfig
      */
     public function getConfig()
     {
@@ -68,7 +68,7 @@ class MetadataContext extends ApiContext
      *
      * @param EntityDefinitionConfig $definition
      */
-    public function setConfig(EntityDefinitionConfig $definition = null)
+    public function setConfig(EntityDefinitionConfig $definition)
     {
         $this->config = $definition;
     }
