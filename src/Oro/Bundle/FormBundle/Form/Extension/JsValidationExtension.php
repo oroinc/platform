@@ -8,9 +8,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class JsValidationExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /**
      * @var ConstraintsProvider
      */
@@ -188,13 +191,5 @@ class JsValidationExtension extends AbstractTypeExtension
         }
 
         return $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 }
