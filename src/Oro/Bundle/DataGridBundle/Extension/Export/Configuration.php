@@ -15,7 +15,10 @@ class Configuration implements ConfigurationInterface
         $builder = new TreeBuilder();
 
         $builder->root('export')
-            ->treatTrueLike(['csv' => ['label' => 'oro.grid.export.csv']])
+            ->treatTrueLike([
+                'csv' => ['label' => 'oro.grid.export.csv'],
+                'xlsx' => ['label' => 'oro.grid.export.xlsx'],
+            ])
             ->treatFalseLike([])
             ->treatNullLike([])
             ->useAttributeAsKey('name')

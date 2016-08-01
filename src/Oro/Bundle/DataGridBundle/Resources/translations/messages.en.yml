@@ -37,6 +37,7 @@ oro:
                 success_message: "{0} No entities were deleted|{1} One entity was deleted|]1,Inf[ %count% entities were deleted"
         datagrid.page_size.all: All
         export.csv: CSV
+        export.xlsx: XLSX
         open_link: Open
 
         action:
