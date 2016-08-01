@@ -43,6 +43,10 @@ class RoleController extends Controller
      * )
      * @Route("/update/{id}", name="oro_user_role_update", requirements={"id"="\d+"}, defaults={"id"=0})
      * @Template
+     *
+     * @param Role $entity
+     *
+     * @return array
      */
     public function updateAction(Role $entity)
     {
@@ -64,7 +68,7 @@ class RoleController extends Controller
      * )
      * @Template
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         return array(
             'entity_class' => $this->container->getParameter('oro_user.role.entity.class')
