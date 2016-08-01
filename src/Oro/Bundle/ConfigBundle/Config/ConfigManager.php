@@ -283,6 +283,61 @@ class ConfigManager
     }
 
     /**
+     * Get the defaults defined in the settings bag
+     *
+     * @param string $name Config key name
+     * @param bool $full
+     *
+     * @return mixed|null
+     */
+    public function getSettingsDefaults($name, $full = false)
+    {
+        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        if (!empty($this->settings[$section][$key])) {
+            $setting = $this->settings[$section][$key];
+            if (!$full && is_array($setting) && array_key_exists('value', $setting)) {
+                return $setting['value'];
+            }
+
+            return $setting;
+        }
+
+        return null;
+    }
+
+    /**
+     * Cascade merge array value with parent scopes.
+     * Fill the missing sub-values with those defined in the parent scopes and return the result.
+     * E.g. 'config.user_scope'=>['a'=>null, 'b'=>1] and 'config.system_scope' => ['a'=>1, 'b'=>2, 'c'=>3]
+     * will result to 'config.users_cope'=> ['a'=>null, 'b'=>1, 'c'=>3]
+     * Return unchanged if config option is not an array
+     *
+     * @param mixed $value
+     * @param string $name Config name
+     * @param bool $full
+     *
+     * @return mixed
+     */
+    public function getMergedWithParentValue($value, $name, $full = false)
+    {
+        if (!$this->isArrayValue($value, $full)) {
+            return $value;
+        }
+
+        // get the value part only (if full)
+        $currentValue = (array) $this->getPlainValue($value, $full);
+
+        // merge missing sub-values with those defined in the parent scopes
+        $managers = $this->getScopeManagersToGetValue(false);
+        foreach ($managers as $scopeName => $manager) {
+            $scopeValue = $manager->getSettingValue($name, $full);
+            $currentValue = array_merge((array) $this->getPlainValue($scopeValue, $full), $currentValue);
+        }
+
+        return $this->updateWithPlainValue($value, $currentValue, $full);
+    }
+
+    /**
      * @return AbstractScopeManager
      */
     protected function getScopeManager()
@@ -320,27 +375,7 @@ class ConfigManager
         $value = $event->getValue();
 
         if (null === $value) {
-            list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
-            if (!empty($this->settings[$section][$key])) {
-                $setting = $this->settings[$section][$key];
-                if (!$full && is_array($setting) && array_key_exists('value', $setting)) {
-                    $value = $setting['value'];
-                } else {
-                    $value = $setting;
-                }
-            }
-        }
-
-        if ($this->isArrayValue($value, $full)) {
-            // merge missing subvalues with those defined in the parent scopes
-            $currentValue = (array) $this->getPlainValue($value, $full);
-
-            foreach ($managers as $scopeName => $manager) {
-                $scopeValue = $manager->getSettingValue($name, $full);
-                $currentValue = array_merge((array) $this->getPlainValue($scopeValue, $full), $currentValue);
-            }
-
-            $value = $this->updateWithPlainValue($value, $currentValue, $full);
+            return $this->getSettingsDefaults($name, $full);
         }
 
         return $value;
