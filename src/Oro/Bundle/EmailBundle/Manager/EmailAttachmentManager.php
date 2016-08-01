@@ -177,20 +177,12 @@ class EmailAttachmentManager
     }
 
     /**
-     * @return Attachment
-     */
-    public function buildAttachmentInstance()
-    {
-        return new Attachment();
-    }
-
-    /**
      * @param EmailAttachment $emailAttachment
      * @param object          $entity
      */
     protected function linkAttachmentToEntity(EmailAttachment $emailAttachment, $entity)
     {
-        $attachment = $this->buildAttachmentInstance();
+        $attachment = new Attachment();
         if (!$attachment->supportTarget(ClassUtils::getClass($entity))) {
             return;
         }
