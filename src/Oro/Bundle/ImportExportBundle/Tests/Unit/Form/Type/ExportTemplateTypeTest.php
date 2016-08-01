@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -36,8 +37,8 @@ class ExportTemplateTypeTest extends FormIntegrationTestCase
             'second_alias'
         ];
         $expectedChoices = [
-            'first_alias' => 'oro.importexport.export_template.first_alias',
-            'second_alias' => 'oro.importexport.export_template.second_alias',
+            new ChoiceView('first_alias', 'first_alias', 'oro.importexport.export_template.first_alias'),
+            new ChoiceView('second_alias', 'second_alias', 'oro.importexport.export_template.second_alias')
         ];
         $usedAlias = 'second_alias';
 
@@ -50,7 +51,12 @@ class ExportTemplateTypeTest extends FormIntegrationTestCase
 
         $processorAliasConfig = $form->get('processorAlias')->getConfig();
         $this->assertEquals('oro.importexport.export.processor', $processorAliasConfig->getOption('label'));
-        $this->assertEquals($expectedChoices, $processorAliasConfig->getOption('choices'));
+
+        $this->assertEquals(
+            $expectedChoices,
+            $form->get('processorAlias')->createView()->vars['choices']
+        );
+
         $this->assertTrue($processorAliasConfig->getOption('required'));
         $this->assertNull($processorAliasConfig->getOption('placeholder'));
 
