@@ -125,18 +125,6 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $this->assertSame($metadata, $this->context->getResult());
     }
 
-    public function testProcessForNotManageableEntityWithoutConfig()
-    {
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn(false);
-
-        $this->processor->process($this->context);
-
-        $this->assertNull($this->context->getResult());
-    }
-
     public function testProcessForNotManageableEntityWithoutFieldsInConfig()
     {
         $config = [
@@ -228,60 +216,6 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                 ['Test\Association1Target']
             )
         );
-
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
-    }
-
-    public function testProcessForManageableEntityWithoutConfig()
-    {
-        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $classMetadata->expects($this->once())
-            ->method('getIdentifierFieldNames')
-            ->willReturn(['id']);
-        $classMetadata->expects($this->once())
-            ->method('usesIdGenerator')
-            ->willReturn(true);
-
-        $classMetadata->expects($this->once())
-            ->method('getFieldNames')
-            ->willReturn(
-                [
-                    'id',
-                    'name',
-                ]
-            );
-        $classMetadata->expects($this->exactly(2))
-            ->method('getTypeOfField')
-            ->willReturnMap(
-                [
-                    ['id', 'integer'],
-                    ['name', 'string'],
-                ]
-            );
-        $classMetadata->expects($this->once())
-            ->method('getAssociationNames')
-            ->willReturn([]);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadataForClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($classMetadata);
-
-        $this->processor->process($this->context);
-
-        $this->assertNotNull($this->context->getResult());
-
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
-        $expectedMetadata->setInheritedType(false);
-        $expectedMetadata->setIdentifierFieldNames(['id']);
-        $expectedMetadata->setHasIdentifierGenerator(true);
-        $expectedMetadata->addField($this->createFieldMetadata('id', 'integer'));
-        $expectedMetadata->addField($this->createFieldMetadata('name', 'string'));
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }

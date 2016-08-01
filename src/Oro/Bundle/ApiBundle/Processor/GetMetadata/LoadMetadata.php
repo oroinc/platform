@@ -75,11 +75,9 @@ class LoadMetadata implements ProcessorInterface
         $config = $context->getConfig();
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $entityMetadata = $this->loadEntityMetadata($entityClass, $config);
-            if ($config) {
-                $this->completeAssociationMetadata($entityMetadata, $config, $context);
-            }
+            $this->completeAssociationMetadata($entityMetadata, $config, $context);
             $context->setResult($entityMetadata);
-        } elseif ($config && $config->hasFields()) {
+        } elseif ($config->hasFields()) {
             $entityMetadata = $this->loadObjectMetadata($entityClass, $config);
             $this->completeAssociationMetadata($entityMetadata, $config, $context);
             $context->setResult($entityMetadata);
@@ -87,40 +85,36 @@ class LoadMetadata implements ProcessorInterface
     }
 
     /**
-     * @param string                      $entityClass
-     * @param EntityDefinitionConfig|null $config
+     * @param string                 $entityClass
+     * @param EntityDefinitionConfig $config
      *
      * @return EntityMetadata
      */
-    protected function loadEntityMetadata($entityClass, EntityDefinitionConfig $config = null)
+    protected function loadEntityMetadata($entityClass, EntityDefinitionConfig $config)
     {
         // filter excluded fields on this stage though there is another processor doing the same
         // it is done due to performance reasons
-        $allowedFields = null !== $config
-            ? $this->getAllowedFields($config)
-            : [];
+        $allowedFields = $this->getAllowedFields($config);
 
         $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $entityMetadata = $this->createEntityMetadata($classMetadata, $config);
         $this->loadFields($entityMetadata, $classMetadata, $allowedFields, $config);
         $this->loadAssociations($entityMetadata, $classMetadata, $allowedFields, $config);
-        if (null !== $config && $config->hasFields()) {
-            $this->loadPropertiesFromConfig($entityMetadata, $config);
-        }
+        $this->loadPropertiesFromConfig($entityMetadata, $config);
 
         return $entityMetadata;
     }
 
     /**
-     * @param ClassMetadata               $classMetadata
-     * @param EntityDefinitionConfig|null $config
+     * @param ClassMetadata          $classMetadata
+     * @param EntityDefinitionConfig $config
      *
      * @return EntityMetadata
      */
-    protected function createEntityMetadata(ClassMetadata $classMetadata, EntityDefinitionConfig $config = null)
+    protected function createEntityMetadata(ClassMetadata $classMetadata, EntityDefinitionConfig $config)
     {
         $entityMetadata = $this->entityMetadataFactory->createEntityMetadata($classMetadata);
-        if (null !== $config && $config->hasFields()) {
+        if ($config->hasFields()) {
             $idFieldNames = $entityMetadata->getIdentifierFieldNames();
             if (!empty($idFieldNames)) {
                 $normalizedIdFieldNames = [];
@@ -136,89 +130,74 @@ class LoadMetadata implements ProcessorInterface
     }
 
     /**
-     * @param EntityMetadata              $entityMetadata
-     * @param ClassMetadata               $classMetadata
-     * @param array                       $allowedFields
-     * @param EntityDefinitionConfig|null $config
+     * @param EntityMetadata         $entityMetadata
+     * @param ClassMetadata          $classMetadata
+     * @param array                  $allowedFields
+     * @param EntityDefinitionConfig $config
      */
     protected function loadFields(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         array $allowedFields,
-        EntityDefinitionConfig $config = null
+        EntityDefinitionConfig $config
     ) {
-        $hasConfig = null !== $config;
         $fields = $classMetadata->getFieldNames();
         foreach ($fields as $propertyPath) {
-            if ($hasConfig && !isset($allowedFields[$propertyPath])) {
+            if (!isset($allowedFields[$propertyPath])) {
                 continue;
             }
-            if ($hasConfig) {
-                $fieldName = $allowedFields[$propertyPath];
-                $field = $config->getField($fieldName);
-                if ($field->isMetaProperty()) {
-                    $metaPropertyMetadata = $this->entityMetadataFactory->createMetaPropertyMetadata(
-                        $classMetadata,
-                        $propertyPath,
-                        $field->getDataType()
-                    );
-                    if ($propertyPath !== $fieldName) {
-                        $metaPropertyMetadata->setName($fieldName);
-                    }
-                    $entityMetadata->addMetaProperty($metaPropertyMetadata);
-                } else {
-                    $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
-                        $classMetadata,
-                        $propertyPath,
-                        $field->getDataType()
-                    );
-                    if ($propertyPath !== $fieldName) {
-                        $fieldMetadata->setName($fieldName);
-                    }
-                    $entityMetadata->addField($fieldMetadata);
-                }
-            } else {
-                $entityMetadata->addField(
-                    $this->entityMetadataFactory->createFieldMetadata($classMetadata, $propertyPath)
+            $fieldName = $allowedFields[$propertyPath];
+            $field = $config->getField($fieldName);
+            if ($field->isMetaProperty()) {
+                $metaPropertyMetadata = $this->entityMetadataFactory->createMetaPropertyMetadata(
+                    $classMetadata,
+                    $propertyPath,
+                    $field->getDataType()
                 );
+                if ($propertyPath !== $fieldName) {
+                    $metaPropertyMetadata->setName($fieldName);
+                }
+                $entityMetadata->addMetaProperty($metaPropertyMetadata);
+            } else {
+                $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
+                    $classMetadata,
+                    $propertyPath,
+                    $field->getDataType()
+                );
+                if ($propertyPath !== $fieldName) {
+                    $fieldMetadata->setName($fieldName);
+                }
+                $entityMetadata->addField($fieldMetadata);
             }
         }
     }
 
     /**
-     * @param EntityMetadata              $entityMetadata
-     * @param ClassMetadata               $classMetadata
-     * @param array                       $allowedFields
-     * @param EntityDefinitionConfig|null $config
+     * @param EntityMetadata         $entityMetadata
+     * @param ClassMetadata          $classMetadata
+     * @param array                  $allowedFields
+     * @param EntityDefinitionConfig $config
      */
     protected function loadAssociations(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         array $allowedFields,
-        EntityDefinitionConfig $config = null
+        EntityDefinitionConfig $config
     ) {
-        $hasConfig = null !== $config;
         $associations = $classMetadata->getAssociationNames();
         foreach ($associations as $propertyPath) {
-            if ($hasConfig && !isset($allowedFields[$propertyPath])) {
+            if (!isset($allowedFields[$propertyPath])) {
                 continue;
             }
-            if ($hasConfig) {
-                $associationName = $allowedFields[$propertyPath];
-                $field = $config->getField($associationName);
-                $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
-                    $classMetadata,
-                    $propertyPath,
-                    $field->getDataType()
-                );
-                if ($propertyPath !== $associationName) {
-                    $associationMetadata->setName($associationName);
-                }
-            } else {
-                $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
-                    $classMetadata,
-                    $propertyPath
-                );
+            $associationName = $allowedFields[$propertyPath];
+            $field = $config->getField($associationName);
+            $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
+                $classMetadata,
+                $propertyPath,
+                $field->getDataType()
+            );
+            if ($propertyPath !== $associationName) {
+                $associationMetadata->setName($associationName);
             }
             $entityMetadata->addAssociation($associationMetadata);
         }
@@ -446,8 +425,8 @@ class LoadMetadata implements ProcessorInterface
                 $association->getTargetClassName(),
                 $context->getVersion(),
                 $context->getRequestType(),
-                $context->getExtras(),
-                $field->getTargetEntity()
+                $field->getTargetEntity(),
+                $context->getExtras()
             );
             if (null !== $targetMetadata) {
                 $association->setTargetMetadata($targetMetadata);

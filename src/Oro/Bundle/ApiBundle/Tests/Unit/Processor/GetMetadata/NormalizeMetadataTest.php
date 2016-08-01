@@ -94,12 +94,6 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutConfig()
-    {
-        $this->context->setResult(new EntityMetadata());
-        $this->processor->process($this->context);
-    }
-
     public function testProcessNormalizationWithoutLinkedProperties()
     {
         $config = [

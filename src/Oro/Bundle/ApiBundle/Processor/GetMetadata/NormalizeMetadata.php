@@ -55,15 +55,9 @@ class NormalizeMetadata implements ProcessorInterface
             return;
         }
 
-        $config = $context->getConfig();
-        if (null === $config) {
-            // a configuration does not exist
-            return;
-        }
-
         $this->normalizeMetadata(
             $entityMetadata,
-            $config,
+            $context->getConfig(),
             $this->doctrineHelper->isManageableEntityClass($context->getClassName())
         );
     }
