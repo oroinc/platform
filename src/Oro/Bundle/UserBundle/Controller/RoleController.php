@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -41,34 +43,14 @@ class RoleController extends Controller
      * )
      * @Route("/update/{id}", name="oro_user_role_update", requirements={"id"="\d+"}, defaults={"id"=0})
      * @Template
+     *
+     * @param Role $entity
+     *
+     * @return array
      */
     public function updateAction(Role $entity)
     {
         return $this->update($entity);
-    }
-
-    /**
-     * @Route(
-     *      "/clone/{id}",
-     *      name="oro_user_role_clone",
-     *      requirements={"id"="\d+"}
-     * )
-     * @AclAncestor("oro_user_role_create")
-     * @Template("OroUserBundle:Role:update.html.twig")
-     *
-     * @param Role $entity
-     * @return array
-     */
-    public function cloneAction(Role $entity)
-    {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-        $clonedLabel = $translator->trans('oro.user.role.clone.label', array('%name%' => $entity->getLabel()));
-
-        $clonedRole = clone $entity;
-        $clonedRole->setLabel($clonedLabel);
-
-        return $this->update($clonedRole);
     }
 
     /**
@@ -86,7 +68,7 @@ class RoleController extends Controller
      * )
      * @Template
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         return array(
             'entity_class' => $this->container->getParameter('oro_user.role.entity.class')
@@ -94,34 +76,46 @@ class RoleController extends Controller
     }
 
     /**
-     * @param Role $entity
+     * @param Role $role
+     *
      * @return array
      */
-    protected function update(Role $entity)
+    protected function update(Role $role)
     {
-        $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
-        $aclRoleHandler->createForm($entity);
+        $categoryProvider = $this->get('oro_user.provider.role_privilege_category_provider');
 
-        if ($aclRoleHandler->process($entity)) {
+        /** @var AclRoleHandler $aclRoleHandler */
+        $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
+        $aclRoleHandler->createForm($role);
+
+        if ($aclRoleHandler->process($role)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.user.controller.role.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get('oro_ui.router')->redirect($role);
         }
 
-        return array(
-            'entity' => $entity,
-            'form' => $aclRoleHandler->createView(),
+        $form = $aclRoleHandler->createView();
+        $tabs = $categoryProvider->getTabs();
+
+        return [
+            'entity' => $role,
+            'form' => $form,
+            'tabsOptions' => [
+                'data' => $tabs
+            ],
+            'capabilitySetOptions' =>
+                $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilitySetOptions($role),
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete a role and un-assign it from all users or reassign users to another role before
             'allow_delete' =>
-                $entity->getId() &&
+                $role->getId() &&
                 !$this->get('doctrine.orm.entity_manager')
                     ->getRepository('OroUserBundle:Role')
-                    ->hasAssignedUsers($entity)
-        );
+                    ->hasAssignedUsers($role)
+        ];
     }
 }

@@ -37,22 +37,34 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     protected $description;
 
     /**
+     * @var string
+     */
+    protected $category;
+
+    /** @var array|FieldSecurityMetadata[] */
+    protected $fields;
+
+    /**
      * Constructor
      *
-     * @param string   $securityType
-     * @param string   $className
-     * @param string   $group
-     * @param string   $label
+     * @param string $securityType
+     * @param string $className
+     * @param string $group
+     * @param string $label
      * @param string[] $permissions
-     * @param string   $description
+     * @param string $description
+     * @param string $category
+     * @param FieldSecurityMetadata[] $fields
      */
     public function __construct(
         $securityType = '',
         $className = '',
         $group = '',
         $label = '',
-        $permissions = array(),
-        $description = ''
+        $permissions = [],
+        $description = '',
+        $category = '',
+        $fields = []
     ) {
         $this->securityType = $securityType;
         $this->className    = $className;
@@ -60,6 +72,8 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
         $this->label        = $label;
         $this->permissions  = $permissions;
         $this->description  = $description;
+        $this->category     = $category;
+        $this->fields       = $fields;
     }
 
     /**
@@ -123,6 +137,30 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
+     * @return string
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param string $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @return array|FieldSecurityMetadata[]
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -135,6 +173,8 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
                 $this->label,
                 $this->permissions,
                 $this->description,
+                $this->category,
+                $this->fields
             )
         );
     }
@@ -151,6 +191,8 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
             $this->label,
             $this->permissions,
             $this->description,
+            $this->category,
+            $this->fields
             ) = unserialize($serialized);
     }
 
@@ -170,6 +212,8 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
         $result->label        = $data['label'];
         $result->permissions  = $data['permissions'];
         $result->description  = $data['description'];
+        $result->category     = $data['category'];
+        $result->fields       = $data['fields'];
 
         return $result;
     }

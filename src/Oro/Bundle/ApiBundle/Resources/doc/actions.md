@@ -5,24 +5,24 @@ Table of Contents
 -----------------
  - [Overview](#overview)
  - Existing actions
-    - [**collect_resources** Action](#collect_resources-action)
-    - [**collect_subresources** Action](#collect_subresources-action)
-    - [**get** Action](#get-action)
-    - [**get_list** Action](#get_list-action)
-    - [**delete** Action](#delete-action)
-    - [**delete_list** Action](#delete_list-action)
-    - [**create** Action](#create-action)
-    - [**update** Action](#update-action)
-    - [**get_subresource** Action](#get_subresource-action)
-    - [**get_relationship** Action](#get_relationship-action)
-    - [**update_relationship** Action](#update_relationship-action)
-    - [**add_relationship** Action](#add_relationship-action)
-    - [**delete_relationship** Action](#delete_relationship-action)
-    - [**customize_loaded_data** Action](#customize_loaded_data-action)
-    - [**get_config** Action](#get_config-action)
-    - [**get_relation_config** Action](#get_relation_config-action)
-    - [**get_metadata** Action](#get_metadata-action)
-    - [**normalize_value** Action](#normalize_value-action)
+   - [**get** action](#get-action)
+   - [**get_list** action](#get_list-action)
+   - [**delete** action](#delete-action)
+   - [**delete_list** action](#delete_list-action)
+   - [**create** action](#create-action)
+   - [**update** action](#update-action)
+   - [**get_subresource** action](#get_subresource-action)
+   - [**get_relationship** action](#get_relationship-action)
+   - [**update_relationship** action](#update_relationship-action)
+   - [**add_relationship** action](#add_relationship-action)
+   - [**delete_relationship** action](#delete_relationship-action)
+   - [**customize_loaded_data** action](#customize_loaded_data-action)
+   - [**get_config** action](#get_config-action)
+   - [**get_relation_config** action](#get_relation_config-action)
+   - [**get_metadata** action](#get_metadata-action)
+   - [**normalize_value** action](#normalize_value-action)
+   - [**collect_resources** action](#collect_resources-action)
+   - [**collect_subresources** action](#collect_subresources-action)
  - [**Context** class](#context-class)
  - [**SubresourceContext** class](#subresourcecontext-class)
  - [Creating new action](#creating-new-action)
@@ -43,8 +43,6 @@ The following table shows all actions provided out of the box:
 
 | Action Name           | Description |
 | ---                   | --- |
-| [collect_resources](#collect_resources-action) | Returns a list of all resources accessible through Data API |
-| [collect_subresources](#collect_subresources-action) | Returns a list of all sub-resources accessible through Data API for a given entity type |
 | [get](#get-action) | Returns an entity by its identifier |
 | [get_list](#get_list-action) | Returns a list of entities |
 | [delete](#delete-action) | Deletes an entity by its identifier |
@@ -61,56 +59,12 @@ The following table shows all actions provided out of the box:
 | [get_relation_config](#get_relation_config-action) | Returns a configuration of an entity if it is used in a relationship |
 | [get_metadata](#get_metadata-action) | Returns a metadata of an entity |
 | [normalize_value](#normalize_value-action) | Converts a value to a requested data type |
+| [collect_resources](#collect_resources-action) | Returns a list of all resources accessible through Data API |
+| [collect_subresources](#collect_subresources-action) | Returns a list of all sub-resources accessible through Data API for a given entity type |
 
 Please see [processors](./processors.md) section for more details about how to create a processor.
 
 Also you can use the [oro:api:debug](./debug_commands.md#oroapidebug) command to see all actions and processors.
-
-collect_resources Action
-------------------------
-
-This action is intended to get a list of all resources accessible through Data API.
-
-The context class: [CollectResourcesContext](../../Processor/CollectResources/CollectResourcesContext.php).
-
-The main processor class: [CollectResourcesProcessor](../../Processor/CollectResourcesProcessor.php).
-
-Existing worker processors: [processors.collect_resources.yml](../../Resources/config/processors.collect_resources.yml) or run `php app/console oro:api:debug collect_resources`.
-
-Also [ResourcesProvider](../../Provider/ResourcesProvider.php) was created to make usage of this action as easy as possible.
-
-Example of usage:
-
-```php
-/** @var ResourcesProvider $resourcesProvider */
-$resourcesProvider = $container->get('oro_api.resources_provider');
-// get all Data API resources
-$resources = $resourcesProvider->getResources($version, $requestType);
-// check whether an entity type is accessible through Data API
-$isAccessible = $resourcesProvider->isResourceAccessible($entityClass, $version, $requestType);
-```
-
-collect_subresources Action
----------------------------
-
-This action is intended to get a list of all sub-resources accessible through Data API for a given entity type.
-
-The context class: [CollectSubresourcesContext](../../Processor/CollectSubresources/CollectSubresourcesContext.php).
-
-The main processor class: [CollectSubresourcesProcessor](../../Processor/CollectSubresourcesProcessor.php).
-
-Existing worker processors: [processors.collect_subresources.yml](../../Resources/config/processors.collect_subresources.yml) or run `php app/console oro:api:debug collect_subresources`.
-
-Also [SubresourcesProvider](../../Provider/SubresourcesProvider.php) was created to make usage of this action as easy as possible.
-
-Example of usage:
-
-```php
-/** @var SubresourcesProvider $subresourcesProvider */
-$subresourcesProvider = $container->get('oro_api.subresources_provider');
-// get all sub-resources for a given entity
-$entitySubresources = $subresourcesProvider->getSubresources($entityClass, $version, $requestType);
-```
 
 get Action
 ----------
@@ -134,8 +88,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted. | If you add a new processor in this group, it should be added in the **security_check** group of actions that execute this action, e.g. look at **security_check** group of [create](#create-action) or [update](#update-action) actions. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted. | If you add a new processor in this group, it should be added in the **security_check** group of actions that execute this action, e.g. look at **security_check** group of [create](#create-action) or [update](#update-action) actions. |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php). |
@@ -166,8 +120,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
@@ -198,8 +152,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load an entity to be deleted | |
 | load_data | Loading an entity that should be deleted and save it in the `result` property of the context | |
 | delete_data | Deleting the entity stored in the `result` property of the context | |
@@ -236,8 +190,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load an entities list to be deleted | |
 | load_data | Loading an entities list that should be deleted and save it in the `result` property of the context | |
 | delete_data | Deleting the entities list stored in the `result` property of the context | |
@@ -268,8 +222,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to a newly created entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.create.load_normalized_entity** processor. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to a newly created entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.create.load_normalized_entity** processor. |
 | load_data | Creating an new entity object | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -301,8 +255,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to updated entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.update.load_normalized_entity** processor. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to updated entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.update.load_normalized_entity** processor. |
 | load_data | Loading an entity object to be updated | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -334,8 +288,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
@@ -366,8 +320,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
 | load_data | Loading data | |
 | normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
@@ -398,8 +352,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -430,8 +384,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -462,8 +416,8 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
-| security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |
 | transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
@@ -483,44 +437,106 @@ The main processor class: [CustomizeLoadedDataProcessor](../../Processor/Customi
 
 There are no worker processors in ApiBundle. To see existing worker processors from other bundles run `php app/console oro:api:debug customize_loaded_data`.
 
-An example of own processor to modify loaded data:
+An example of a processor to modify loaded data:
 
 ```php
 <?php
 
-namespace Acme\Bundle\UserBundle\Api\Processor;
+namespace Oro\Bundle\AttachmentBundle\Api\Processor;
+
+use Gaufrette\Exception\FileNotFound;
+
+use Psr\Log\LoggerInterface;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 
 /**
- * Computes a value of "fullName" field for User entity.
+ * Computes a value of "content" field for File entity.
  */
-class ComputeUserFullName implements ProcessorInterface
+class ComputeFileContent implements ProcessorInterface
 {
+    /** @var FileManager */
+    protected $fileManager;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /**
+     * @param FileManager     $fileManager
+     * @param LoggerInterface $logger
+     */
+    public function __construct(FileManager $fileManager, LoggerInterface $logger)
+    {
+        $this->fileManager = $fileManager;
+        $this->logger = $logger;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
+        /** @var CustomizeLoadedDataContext $context */
+
         $data = $context->getResult();
-        if (!empty($data)
-            && empty($data['fullName'])
-            && array_key_exists('firstName', $data)
-            && array_key_exists('lastName', $data)
-        ) {
-            $data['fullName'] = $data['firstName'] . ' ' . $data['lastName'];
+        if (!is_array($data)) {
+            return;
+        }
+
+        $config = $context->getConfig();
+        $contentField = $config->getField('content');
+        if (!$contentField || $contentField->isExcluded()) {
+            return;
+        }
+
+        if (empty($data['filename'])) {
+            return;
+        }
+
+        $content = $this->getFileContent($data['filename']);
+        if (null !== $content) {
+            $data[$contentField->getPropertyPath()] = $content;
             $context->setResult($data);
         }
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return string|null
+     */
+    protected function getFileContent($fileName)
+    {
+        $content = null;
+        try {
+            $content = $this->fileManager->getContent($fileName);
+        } catch (FileNotFound $e) {
+            $this->logger->error(
+                sprintf('The content for "%s" file cannot be loaded.', $fileName),
+                ['exception' => $e]
+            );
+        }
+        if (null !== $content) {
+            $content = base64_encode($content);
+        }
+
+        return $content;
     }
 }
 ```
 
 ```yaml
-    acme.api.customize_loaded_data.compute_user_full_name:
-        class: Acme\Bundle\UserBundle\Api\Processor\ComputeUserFullName
+    oro_attachment.api.customize_loaded_data.compute_file_content:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent
+        arguments:
+            - '@oro_attachment.manager'
+            - '@logger'
         tags:
-            - { name: oro.api.processor, action: customize_loaded_data, class: "Oro\Bundle\UserBundle\Entity\User" }
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\AttachmentBundle\Entity\File }
+            - { name: monolog.logger, channel: api }
 ```
 
 get_config Action
@@ -583,7 +599,7 @@ Example of usage:
 ```php
 /** @var MetadataProvider $metadataProvider */
 $metadataProvider = $container->get('oro_api.metadata_provider');
-$metadata = $metadataProvider->getMetadata($entityClassName, $version, $requestType, $metadataExtras, $entityConfig);
+$metadata = $metadataProvider->getMetadata($entityClassName, $version, $requestType, $entityConfig, $metadataExtras);
 ```
 
 normalize_value Action
@@ -607,6 +623,52 @@ $valueNormalizer = $container->get('oro_api.metadata_provider');
 $normalizedValue = $valueNormalizer->normalizeValue($value, $dataType, $requestType);
 ```
 
+collect_resources Action
+------------------------
+
+This action is intended to get a list of all resources accessible through Data API.
+
+The context class: [CollectResourcesContext](../../Processor/CollectResources/CollectResourcesContext.php).
+
+The main processor class: [CollectResourcesProcessor](../../Processor/CollectResourcesProcessor.php).
+
+Existing worker processors: [processors.collect_resources.yml](../../Resources/config/processors.collect_resources.yml) or run `php app/console oro:api:debug collect_resources`.
+
+Also [ResourcesProvider](../../Provider/ResourcesProvider.php) was created to make usage of this action as easy as possible.
+
+Example of usage:
+
+```php
+/** @var ResourcesProvider $resourcesProvider */
+$resourcesProvider = $container->get('oro_api.resources_provider');
+// get all Data API resources
+$resources = $resourcesProvider->getResources($version, $requestType);
+// check whether an entity type is accessible through Data API
+$isAccessible = $resourcesProvider->isResourceAccessible($entityClass, $version, $requestType);
+```
+
+collect_subresources Action
+---------------------------
+
+This action is intended to get a list of all sub-resources accessible through Data API for a given entity type.
+
+The context class: [CollectSubresourcesContext](../../Processor/CollectSubresources/CollectSubresourcesContext.php).
+
+The main processor class: [CollectSubresourcesProcessor](../../Processor/CollectSubresourcesProcessor.php).
+
+Existing worker processors: [processors.collect_subresources.yml](../../Resources/config/processors.collect_subresources.yml) or run `php app/console oro:api:debug collect_subresources`.
+
+Also [SubresourcesProvider](../../Provider/SubresourcesProvider.php) was created to make usage of this action as easy as possible.
+
+Example of usage:
+
+```php
+/** @var SubresourcesProvider $subresourcesProvider */
+$subresourcesProvider = $container->get('oro_api.subresources_provider');
+// get all sub-resources for a given entity
+$entitySubresources = $subresourcesProvider->getSubresources($entityClass, $version, $requestType);
+```
+
 Context class
 -------------
 
@@ -622,6 +684,7 @@ General methods:
 - **setResponseHeaders(parameterBag)** - Sets an object that will be used to accessing response headers.
 - **getResponseStatusCode()** - Gets the response status code.
 - **setResponseStatusCode(statusCode)** - Sets the response status code.
+- **isSuccessResponse()** - Indicates whether a result document represents a success response.
 - **getFilters()** - Gets a [list of filters](../../Filter/FilterCollection.php) is used to add additional restrictions to a query is used to get entity data.
 - **getFilterValues()** - Gets a collection of the [FilterValue](../../Filter/FilterValue.php) objects that contains all incoming filters.
 - **setFilterValues(accessor)** - Sets an [object](../../Filter/FilterValueAccessorInterface.php) that will be used to accessing incoming filters.
@@ -647,13 +710,13 @@ Entity configuration related methods:
 - **hasConfig()** - Checks whether a configuration of an entity exists.
 - **getConfig()** - Gets a [configuration of an entity](../../Config/EntityDefinitionConfig.php).
 - **setConfig(config)** - Sets a custom configuration of an entity. This method can be used to completely override the default configuration of an entity.
-- **hasConfigOfFilters()** - Checks whether an entity has a configuration of filters.
+- **hasConfigOfFilters(initialize)** - Checks whether an entity has a configuration of filters.
 - **getConfigOfFilters()** - Gets a [configuration of filters](../../Config/FiltersConfig.php) for an entity.
 - **setConfigOfFilters(config)** - Sets a custom configuration of filters. This method can be used to completely override the default configuration of filters.
-- **hasConfigOfSorters()** - Checks whether an entity has a configuration of sorters.
+- **hasConfigOfSorters(initialize)** - Checks whether an entity has a configuration of sorters.
 - **getConfigOfSorters()** - Gets a [configuration of sorters](../../Config/SortersConfig.php) for an entity.
 - **setConfigOfSorters(config)** - Sets a custom configuration of sorters. This method can be used to completely override the default configuration of sorters.
-- **hasConfigOf(configSection)** - Checks whether a configuration of the given section exists.
+- **hasConfigOf(configSection, initialize)** - Checks whether a configuration of the given section exists.
 - **getConfigOf(configSection)** - Gets a configuration from the given section.
 - **setConfigOf(configSection, config)** - Sets a configuration for the given section. This method can be used to completely override the default configuration for the given section.
 

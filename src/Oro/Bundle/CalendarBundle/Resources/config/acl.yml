@@ -27,15 +27,18 @@ oro_public_calendar_management:
     type: action
     group_name: ""
     description: oro.calendar.action.public_calendar_management.description
+    category: "calendar"
 
 oro_public_calendar_event_management:
     label: oro.calendar.action.public_calendar_event_management.label
     type: action
     group_name: ""
     description: oro.calendar.action.public_calendar_event_management.description
+    category: "calendar"
 
 oro_system_calendar_event_management:
     label: oro.calendar.action.system_calendar_event_management.label
     type: action
     group_name: ""
     description: oro.calendar.action.system_calendar_event_management.description
+    category: "calendar"

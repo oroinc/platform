@@ -163,7 +163,13 @@ class RelationshipsRestJsonApiTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertApiResponseStatusCodeEquals($response, 204, $resourceKey, 'update relationship');
+        $this->assertUpdateApiResponseStatusCodeEquals(
+            $response,
+            204,
+            $resourceKey,
+            'update relationship',
+            ['data' => $data]
+        );
     }
 
     /**
@@ -200,7 +206,13 @@ class RelationshipsRestJsonApiTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertApiResponseStatusCodeEquals($response, 204, $resourceKey, 'add relationship');
+        $this->assertUpdateApiResponseStatusCodeEquals(
+            $response,
+            204,
+            $resourceKey,
+            'add relationship',
+            ['data' => $data]
+        );
     }
 
     /**

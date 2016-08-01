@@ -31,6 +31,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 /**
  * Class OwnerFormExtension
@@ -38,6 +39,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class OwnerFormExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -102,16 +105,6 @@ class OwnerFormExtension extends AbstractTypeExtension
         $this->aclVoter                  = $aclVoter;
         $this->treeProvider              = $treeProvider;
         $this->entityOwnerAccessor       = $entityOwnerAccessor;
-    }
-
-    /**
-     * Returns the name of the type being extended.
-     *
-     * @return string The name of the type being extended
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 
     /**
@@ -399,26 +392,19 @@ class OwnerFormExtension extends AbstractTypeExtension
              */
             $builder->add(
                 $this->fieldName,
-                'oro_business_unit_tree_select',
-                array_merge(
-                    [
-                        'empty_value'          => $emptyValueLabel,
-                        'mapped'               => true,
-                        'label'                => $this->fieldLabel,
-                        'business_unit_ids'    => $this->getBusinessUnitIds(),
-                        'configs'              => [
-                            'is_safe' => true,
-                        ],
-                        'translatable_options' => false,
-                        'choices'              => $this->businessUnitManager->getTreeOptions(
-                            $this->businessUnitManager->getBusinessUnitsTree(
-                                null,
-                                $this->getOrganizationContextId()
-                            )
-                        )
-                    ],
-                    $validation
-                )
+                'oro_type_business_unit_select_autocomplete',
+                [
+                    'required' => false,
+                    'label' => $this->fieldLabel,
+                    'autocomplete_alias' => 'business_units_owner_search_handler',
+                    'empty_value' => $emptyValueLabel,
+                    'configs' => [
+                        'multiple' => false,
+                        'allowClear'  => false,
+                        'autocomplete_alias' => 'business_units_owner_search_handler',
+                        'component'   => 'tree-autocomplete',
+                    ]
+                ]
             );
         } else {
             $businessUnits = $user->getBusinessUnits();

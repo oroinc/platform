@@ -14,8 +14,6 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 class ConfigurationCompilerPass implements CompilerPassInterface
 {
     const PROCESSOR_BAG_SERVICE_ID          = 'oro_api.processor_bag';
-    const ACTION_PROCESSOR_BAG_SERVICE_ID   = 'oro_api.action_processor_bag';
-    const ACTION_PROCESSOR_TAG              = 'oro.api.action_processor';
     const FILTER_FACTORY_SERVICE_ID         = 'oro_api.filter_factory';
     const FILTER_FACTORY_TAG                = 'oro.api.filter_factory';
     const DEFAULT_FILTER_FACTORY_SERVICE_ID = 'oro_api.filter_factory.default';
@@ -41,30 +39,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     {
         $config = DependencyInjectionUtil::getConfig($container);
 
-        $this->registerActionProcessors($container);
         $this->registerProcessingGroups($container, $config);
         $this->registerFilters($container, $config);
         $this->configureForms($container, $config);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function registerActionProcessors(ContainerBuilder $container)
-    {
-        $actionProcessorBagServiceDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::ACTION_PROCESSOR_BAG_SERVICE_ID
-        );
-        if (null !== $actionProcessorBagServiceDef) {
-            $taggedServices = $container->findTaggedServiceIds(self::ACTION_PROCESSOR_TAG);
-            foreach ($taggedServices as $id => $attributes) {
-                $actionProcessorBagServiceDef->addMethodCall(
-                    'addProcessor',
-                    [new Reference($id)]
-                );
-            }
-        }
     }
 
     /**
@@ -285,8 +262,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     {
         $typeExtensions = [];
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_EXTENSION_TAG) as $serviceId => $tag) {
-            $alias = isset($tag[0]['alias'])
-                ? $tag[0]['alias']
+            $tagKey = $this->getTagKeyForExtension();
+            $alias = isset($tag[0][$tagKey])
+                ? $tag[0][$tagKey]
                 : $serviceId;
             $typeExtensions[$alias][] = $serviceId;
         }
@@ -310,5 +288,16 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         arsort($guessers, SORT_NUMERIC);
 
         return array_keys($guessers);
+    }
+
+    /**
+     * Provide compatibility between Symfony 2.8 and version below this
+     * @return string
+     */
+    public function getTagKeyForExtension()
+    {
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
+            ? 'extended-type'
+            : 'alias';
     }
 }

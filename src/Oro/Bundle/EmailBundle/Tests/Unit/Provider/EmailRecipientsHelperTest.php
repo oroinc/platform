@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EmailBundle\Model\RecipientEntity;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\SearchBundle\Query\Result;
 
@@ -189,6 +191,132 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
                 [
                     new Recipient('recipient2@example.com', 'Recipient2 <recipient2@example.com>'),
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider prepareFormRecipientIdsDataProvider
+     */
+    public function testPrepareFormRecipientIds($ids, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, EmailRecipientsHelper::prepareFormRecipientIds($ids));
+    }
+
+    public function prepareFormRecipientIdsDataProvider()
+    {
+        return [
+            [
+                [
+                    '"Recipient1 Name; Name2" <recipient1@example.com>',
+                    '"Recipient2 Name, Name2" <recipient2@example.com>'
+                ],
+
+                base64_encode('"Recipient1 Name; Name2" <recipient1@example.com>') . ';'
+                . base64_encode('"Recipient2 Name, Name2" <recipient2@example.com>')
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider extractFormRecipientIdsDataProvider
+     */
+    public function testExtractFormRecipientIds($value, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, EmailRecipientsHelper::extractFormRecipientIds($value));
+    }
+
+    public function extractFormRecipientIdsDataProvider()
+    {
+        return [
+            [
+                base64_encode('"Recipient1 Name; Name2" <recipient1@example.com>') . ';'
+                . base64_encode('"Recipient2 Name, Name2" <recipient2@example.com>'),
+                [
+                    '"Recipient1 Name; Name2" <recipient1@example.com>',
+                    '"Recipient2 Name, Name2" <recipient2@example.com>'
+                ]
+            ],
+            [
+                'recipient1@example.com;recipient2@example.com',
+                [
+                    'recipient1@example.com',
+                    'recipient2@example.com'
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider recipientsFromResultProvider
+     */
+    public function testRecipientsFromResult(array $result, $entityClass, array $expectedRecipients)
+    {
+        $this->assertEquals(
+            $expectedRecipients,
+            $this->emailRecipientsHelper->recipientsFromResult($result, $entityClass)
+        );
+    }
+
+    public function recipientsFromResultProvider()
+    {
+        return [
+            [
+                [
+                    [
+                        'name'  => 'Recipient',
+                        'email' => 'recipient@example.com',
+                        'entityId'     => 1,
+                        'organization' => 'org',
+                    ],
+                ],
+                'Class',
+                [
+                    'Recipient <recipient@example.com>|Class|org' => new CategorizedRecipient(
+                        'recipient@example.com',
+                        'Recipient <recipient@example.com>',
+                        new RecipientEntity(
+                            'Class',
+                            1,
+                            'Recipient',
+                            'org'
+                        )
+                    )
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider plainRecipientsFromResultProvider
+     */
+    public function testRlainRecipientsFromResult(array $result, $entityClass, array $expectedRecipients)
+    {
+        $this->assertEquals(
+            $expectedRecipients,
+            $this->emailRecipientsHelper->plainRecipientsFromResult($result, $entityClass)
+        );
+    }
+
+    public function plainRecipientsFromResultProvider()
+    {
+        return [
+            [
+                [
+                    [
+                        'name'  => 'Recipient',
+                        'email' => 'recipient@example.com',
+                        'entityId'     => 1,
+                        'organization' => 'org',
+                    ],
+                ],
+                'Class',
+                [
+                    'recipient@example.com' => new CategorizedRecipient(
+                        'recipient@example.com',
+                        'Recipient <recipient@example.com>'
+                    )
+                ]
             ],
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection;
 
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationMetadataDumper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -27,7 +28,8 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     public function load(array $configs, ContainerBuilder $container)
     {
         self::getAclConfigLoader()->registerResources($container);
-        self::getAclAnnotationLoader()->registerResources($container);
+        $aclMetadataManager = new AclAnnotationMetadataDumper($container->getParameterBag());
+        $aclMetadataManager->dump();
 
         $configuration = new Configuration();
         $this->processConfiguration($configuration, $configs);
@@ -58,17 +60,6 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         return new CumulativeConfigLoader(
             'oro_acl_config',
             new YamlCumulativeFileLoader('Resources/config/acl.yml')
-        );
-    }
-
-    /**
-     * @return CumulativeConfigLoader
-     */
-    public static function getAclAnnotationLoader()
-    {
-        return new CumulativeConfigLoader(
-            'oro_acl_annotation',
-            new AclAnnotationCumulativeResourceLoader(['Controller'])
         );
     }
 

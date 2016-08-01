@@ -48,7 +48,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
         $this->result[self::DATA] = null;
         if (null !== $object) {
-            $this->result[self::DATA] = $this->transformObjectToArray($object, $metadata);
+            $this->result[self::DATA] = $this->convertObjectToArray($object, $metadata);
         }
     }
 
@@ -61,9 +61,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
         $this->result[self::DATA] = [];
         if (is_array($collection) || $collection instanceof \Traversable) {
-            foreach ($collection as $object) {
-                $this->result[self::DATA][] = $this->transformObjectToArray($object, $metadata);
-            }
+            $this->result[self::DATA] = $this->convertCollectionToArray($collection, $metadata);
         } else {
             throw $this->createUnexpectedValueException('array or \Traversable', $collection);
         }
@@ -72,25 +70,41 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setErrorObject(Error $error, EntityMetadata $metadata = null)
+    public function setErrorObject(Error $error)
     {
         $this->assertNoData();
 
-        $this->result[self::ERRORS] = [$this->transformErrorToArray($error)];
+        $this->result[self::ERRORS] = [$this->convertErrorToArray($error)];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setErrorCollection(array $errors, EntityMetadata $metadata = null)
+    public function setErrorCollection(array $errors)
     {
         $this->assertNoData();
 
         $errorsData = [];
         foreach ($errors as $error) {
-            $errorsData[] = $this->transformErrorToArray($error);
+            $errorsData[] = $this->convertErrorToArray($error);
         }
         $this->result[self::ERRORS] = $errorsData;
+    }
+
+    /**
+     * @param array|\Traversable  $collection
+     * @param EntityMetadata|null $metadata
+     *
+     * @return array
+     */
+    protected function convertCollectionToArray($collection, EntityMetadata $metadata = null)
+    {
+        $result = [];
+        foreach ($collection as $object) {
+            $result[] = $this->convertObjectToArray($object, $metadata);
+        }
+
+        return $result;
     }
 
     /**
@@ -99,14 +113,78 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
      *
      * @return array
      */
-    abstract protected function transformObjectToArray($object, EntityMetadata $metadata = null);
+    abstract protected function convertObjectToArray($object, EntityMetadata $metadata = null);
 
     /**
      * @param Error $error
      *
      * @return array
      */
-    abstract protected function transformErrorToArray(Error $error);
+    abstract protected function convertErrorToArray(Error $error);
+
+    /**
+     * @param string $entityClass
+     * @param bool   $throwException
+     *
+     * @return string|null
+     */
+    abstract protected function convertToEntityType($entityClass, $throwException = true);
+
+    /**
+     * @param mixed               $object
+     * @param EntityMetadata|null $metadata
+     *
+     * @return string
+     */
+    protected function getEntityTypeForObject($object, EntityMetadata $metadata)
+    {
+        $className = $this->objectAccessor->getClassName($object);
+
+        return $className
+            ? $this->getEntityType($className, $metadata->getClassName())
+            : $this->getEntityType($metadata->getClassName());
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param string|null $fallbackEntityClass
+     *
+     * @return string
+     */
+    protected function getEntityType($entityClass, $fallbackEntityClass = null)
+    {
+        if (null === $fallbackEntityClass) {
+            $entityType = $this->convertToEntityType($entityClass);
+        } else {
+            $entityType = $this->convertToEntityType($entityClass, false);
+            if (!$entityType) {
+                $entityType = $this->convertToEntityType($fallbackEntityClass);
+            }
+        }
+
+        return $entityType;
+    }
+
+    /**
+     * Checks whether a given metadata contains only identifier fields(s).
+     *
+     * @param EntityMetadata $metadata
+     *
+     * @return bool
+     */
+    protected function isIdentity(EntityMetadata $metadata)
+    {
+        if (count($metadata->getAssociations()) > 0) {
+            return false;
+        }
+
+        $idFields = $metadata->getIdentifierFieldNames();
+        $fields = $metadata->getFields();
+
+        return
+            count($fields) === count($idFields)
+            && count(array_diff_key($fields, array_flip($idFields))) === 0;
+    }
 
     /**
      * Checks that the primary data does not exist.
@@ -114,7 +192,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     protected function assertNoData()
     {
         if (array_key_exists(self::DATA, $this->result)) {
-            throw new \RuntimeException('A primary data already exist.');
+            throw new \InvalidArgumentException('A primary data already exist.');
         }
     }
 

@@ -50,7 +50,7 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        href: { @value: $data.theme.icon }
+                        href: '=data["theme"].getIcon()'
                         rel: shortcut icon
                 head_style:
                     blockType: container
@@ -428,7 +428,7 @@ layout:
             parentId: body_wrapper
             blockType: block
             options:
-                visible: { @value: $context.debug }
+                visible: '=context["debug"]'
 ```
 Note that if `visible` evaluates to false, the block will not be added to the final layout at all.
 
@@ -534,21 +534,16 @@ layout:
         - @setOption:
             id: head
             optionName: title
-            optionValue:
-                @join:
-                    - ' - '
-                    - { @value: {@value: $data.product.name} }
-                    - { @value: {@value: $data.product.subcategory} }
-                    - { @value: {@value: $data.product.category} }
+            optionValue: '=data["product"].getName()~" - "~data["product"].getSubcategory()~" - "~data["product"].getCategory()'
         - @add:
             id: link_canonical
             parentId: head
             blockType: external_resource
             options:
                 rel:  canonical
-                href: {@value: $data.product.url}
+                href: '=data["product"].getUrl()'
 ```
-Note how we use [Join](../../../../Component/ConfigExpression/Func/Join.php) function to compose the page title from different product fields.
+Note how we use [Symfony expression syntax](http://symfony.com/doc/current/components/expression_language/syntax.html) to compose the page title from different product fields.
 
 ### Data providers ###
 
@@ -606,9 +601,9 @@ layout:
             blockType: block
             options:
                vars:
-                  default_language: { @value: $data.locale.default_language }
-                  available_languages: { @value: $data.locale.available_languages }
-                  product_url: { @value: $data.product.url }
+                  default_language: '=data["locale"].getDefaultLanguage()'
+                  available_languages: '=data["locale"].getAvailableLanguages()'
+                  product_url: '=data["product"].getUrl()'
 ```
 
 We also need to create the block template for the language switcher:
@@ -706,7 +701,7 @@ layout:
         - @setOption:
             id: lang_switch
             optionName: vars.current_language
-            optionValue: { @value: $data.current_language }
+            optionValue: '=data["current_language"]'
 ```
 
 Now if you go to `/layout/test?product_id=99&___store=french` url you'll see that French language is preselected.
@@ -726,7 +721,7 @@ layout:
             blockType: meta
             options:
                 name: 'description'
-                content: {@value: $data.product.description}
+                content: '=data["product"].getDescription()'
             siblingId: meta
 ```
 If you need to place some block before another one, you should use the `prepend: true` attribute.
@@ -1043,7 +1038,7 @@ layout:
             parentId: breadcrumbs
             blockType: text
             options:
-                text: { @value: $data.product.name }
+                text: '=data["product"].getName()'
 ```
 
 This should render into the following HTML:
@@ -1180,8 +1175,8 @@ layout:
                     'searh_form:end': ~
 ```
 
-Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block)
-For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form.
+Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block).
+For all this block fields we need to specify `form_name` option to bind it to our custom `search_form` form. Also we can use only one block type `form` which will create three child block: `form_start`, `form_fields`, `form_end`.
 
 All that is left is to define the search autocomplete block in our block theme file we'll:
 ```twig
@@ -1397,7 +1392,7 @@ services:
             - [setOptionsConfig, [{datetime: {required: true}, format: {default: 'd-m-Y'}, timezone: ~}]]
             - [setName, ['datetime']]
         tags:
-             - { name: layout.block_type, alias: datetime }
+            - { name: layout.block_type, alias: datetime }
 ```
 
 `setOptions` is associative array where key is the name of option, and value is a array with 'default' and 'require' possible keys. Also you can provide '~' as a value what mean define option.
@@ -1410,7 +1405,7 @@ services:
         calls:
             - [setName, ['sidebar']]
         tags:
-             - { name: layout.block_type, alias: sidebar }
+            - { name: layout.block_type, alias: sidebar }
 ```
 
 Block type inherited from "text" type:
@@ -1423,10 +1418,23 @@ services:
             - [setName, ['title']]
             - [setParent, ['text']]
         tags:
-             - { name: layout.block_type, alias: title }
+            - { name: layout.block_type, alias: title }
 ```
 
-Usually the definition of layout block types are located in `Resource\config\block_types.yml`, but you can use any file.
+Also you can create block type extension via DI configuration. This configuration allows to setup additional options for block types.
+
+```yaml
+services:
+    custom_acme_demo.block_type.extension.sidebar:
+        parent: oro_layout.block_type.extension.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{minimized: {default: false}]]
+            - [setExtendedType, ['sidebar']]
+        tags:
+            - { name: layout.block_type_extension, alias: sidebar }
+```
+
+Usually the definition of layout block types and types extension are located in `Resource\config\block_types.yml`, but you can use any file.
 
 If you want to create block type with custom properties mapping extend your block type class from `Oro\Component\Layout\Block\Type\AbstractType` or implement `Oro\Component\Layout\BlockTypeInterface`.
 
@@ -1513,12 +1521,12 @@ layout:
                 product_image:
                     blockType: image
                     options:
-                        path: { @value: $data.product.image }
-                        alt: { @value: $data.product.name }
+                        path: '=data["product"].getImage()'
+                        alt: '=data["product"].getName()'
                         attr:
                             id: image-main
                             class: gallery-image visible
-                            title: { @value: $data.product.name }
+                            title: '=data["product"].getName()'
                 product_gallery:
                     blockType: list
                     options:
@@ -1528,7 +1536,7 @@ layout:
                     blockType: link
                     options:
                         path: '#'
-                        image: { @value: $data.product.image }
+                        image: '=data["product"].getImage()'
                         attr:
                             class: thumb-link
             tree:
@@ -1624,12 +1632,12 @@ layout:
                     blockType: block
                     options:
                         vars:
-                            name: { @value: $data.product.name }
+                            name: '=data["product"].getName()'
                 product_price:
                     blockType: block
                     options:
                         vars:
-                            price: { @value: $data.product.price }
+                            price: '=data["product"].getPrice()'
                 # All blocks are managed in the layout update. No custom block templates are required.
                 product_extra:
                     blockType: container
@@ -1642,11 +1650,7 @@ layout:
                     options:
                         type: p
                         attr:
-                            class:
-                                @join:
-                                    - ' '
-                                    - availability
-                                    - { @iif: [$data.product.is_in_stock, 'in-stock', 'out-of-stock'] }
+                            class: '=availability~"  "~data["product"].getIsInStock() ? "in-stock" : "out-of-stock"'
                 product_availability_label_wrapper:
                     blockType: container
                     options:
@@ -1666,7 +1670,7 @@ layout:
                 product_availability_value:
                     blockType: text
                     options:
-                        text: { @iif: [$data.product.is_in_stock, 'In Stock', 'Out of Stock'] }
+                        text: 'data.["product"].getIsInStock() ? "In Stock" : "Out of Stock"'
                 product_short_description:
                     blockType: container
                     options:
@@ -1682,7 +1686,7 @@ layout:
                 product_short_description_value:
                     blockType: text
                     options:
-                        text: { @value: $data.product.short_description }
+                        text: 'data["product"].getShortDescription()'
                 # Adding list of links in 2 different ways.
                 # 1 - Using only layout update
                 product_add_to_links:
@@ -1693,11 +1697,7 @@ layout:
                 product_add_to_wishlist_link:
                     blockType: link
                     options:
-                        path:
-                            @join:
-                              - '/'
-                              - wishlist/index/add/product/
-                              - { @value: $data.product.id }
+                        path: '="/wishlist/index/add/product/"~data["product"].getId()'
                         text: Add to Wishlist
                         attr:
                             class: link-wishlist
@@ -1773,7 +1773,7 @@ layout:
             parentId: product_collateral_tabs
             blockType: text
             options:
-                text: { @value: $data.product.description }
+                text: '=data["product"].getDescription()'
                 vars:
                     tabLabel: "Description"
         # Adding footer links
@@ -1994,9 +1994,9 @@ And the footer like this:
 
 Simplify block attribute configuration
 -------------
-For simplify block attribute configuration use twig function `layout_attr_merge(attr, default_attr)`:
+For simplify block attribute configuration use twig function `layout_attr_defaults(attr, default_attr)`:
 ```twig
-{% set attr = layout_attr_merge(attr, {
+{% set attr = layout_attr_defaults(attr, {
     required: 'required',
     autofocus: true,
     '~class': " input input_block input_md {{ class_prefix }}__form__input"

@@ -7,7 +7,6 @@ parameters:
     oro_workflow.form.type.transition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
     oro_workflow.form.type.workflow_step_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType
     oro_workflow.form.type.workflow_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType
-    oro_workflow.form.type.applicable_entities.class: Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType
 
     oro_workflow.form.type.workflow_definition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType
 
@@ -47,6 +46,13 @@ services:
         tags:
             - { name: form.type, alias: oro_workflow_step_select }
 
+    oro_workflow.form.type.workflow_definition_select:
+        class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType
+        arguments:
+            - '@oro_workflow.manager'
+        tags:
+            - { name: form.type, alias: oro_workflow_definition_select }
+
     oro_workflow.form.type.workflow_select:
         class: %oro_workflow.form.type.workflow_select.class%
         arguments:
@@ -54,23 +60,38 @@ services:
         tags:
             - { name: form.type, alias: oro_workflow_select }
 
+    oro_workflow.form.type.workflow_replacement_select:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType'
+        tags:
+            - { name: form.type, alias: oro_workflow_replacement_select }
+
+    oro_wofkflow.form.autocomplete.wofkflow_replacement.search_handler:
+        class: 'Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler'
+        arguments:
+            - '%oro_workflow.workflow_definition.entity.class%'
+            - ['label']
+        calls:
+            - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
+            - [setAclHelper,["@oro_security.acl_helper"]]
+            - [setWorkflowManager,["@oro_workflow.manager"]]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: oro_workflow_replacement, acl_resource: oro_workflow_definition_view }
+
+    oro_workflow.form.type.applicable_entities:
+        class: Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType
+        arguments:
+            - '@oro_workflow.entity_connector'
+        tags:
+            - { name: form.type, alias: oro_workflow_applicable_entities}
+
     oro_workflow.form.type.workflow_definition:
         class: %oro_workflow.form.type.workflow_definition.class%
         tags:
             - { name: form.type, alias: oro_workflow_definition }
 
-    oro_workflow.form.type.applicable_entities:
-        class: %oro_workflow.form.type.applicable_entities.class%
-        arguments:
-            - '@oro_entity_config.config_manager'
-            - '@oro_workflow.entity_connector'
-        tags:
-            - { name: form.type, alias: oro_workflow_applicable_entities }
-
     oro_workflow.form.workflow_definition:
         class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
+        factory: ['@form.factory', 'createNamed']
         arguments: ["oro_workflow_definition_form", "oro_workflow_definition", null]
 
     oro_workflow.form.extension.restriction:
@@ -80,4 +101,4 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.restriction.manager'
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }

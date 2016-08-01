@@ -61,7 +61,7 @@ class EmailTemplateTranslationType extends AbstractType
                         ),
                         'content' => array_merge(
                             [
-                                'field_type'      => 'oro_rich_text',
+                                'field_type'      => 'oro_email_template_rich_text',
                                 'attr'            => [
                                     'class'                => 'template-editor',
                                     'data-wysiwyg-enabled' => $isWysiwygEnabled,
@@ -87,6 +87,14 @@ class EmailTemplateTranslationType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_email_emailtemplate_translatation';
     }

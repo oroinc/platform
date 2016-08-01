@@ -64,7 +64,7 @@ define([
                 items: items
             });
 
-            var $filterContainer = this.$('.controls');
+            var $filterContainer = this.$('.controls:first');
             $filterContainer.prepend(select);
             this.itemSelect = $filterContainer.find('select');
             this.itemSelect.inputWidget('create', 'select2', {
@@ -140,7 +140,8 @@ define([
 
             model.set('show', true);
 
-            this.itemSelect.inputWidget('val', '').change();
+            this.itemSelect.inputWidget('val', '');
+            this.itemSelect.change();
         },
 
         _onAddAllClick: function() {
@@ -148,7 +149,8 @@ define([
                 item.set('show', true);
             });
 
-            this.itemSelect.inputWidget('val', '').change();
+            this.itemSelect.inputWidget('val', '');
+            this.itemSelect.change();
         },
 
         _toggleButtons: function() {

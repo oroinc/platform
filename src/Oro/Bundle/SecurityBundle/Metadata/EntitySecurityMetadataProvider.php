@@ -2,33 +2,33 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class EntitySecurityMetadataProvider
 {
     const ACL_SECURITY_TYPE = 'ACL';
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $securityConfigProvider;
 
-    /**
-     * @var ConfigProvider
-     */
+    /**  @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
+    /**  @var CacheProvider */
     protected $cache;
 
     /**
@@ -50,11 +50,13 @@ class EntitySecurityMetadataProvider
         ConfigProvider $securityConfigProvider,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
+        ManagerRegistry $doctrine,
         CacheProvider  $cache = null
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
         $this->extendConfigProvider   = $extendConfigProvider;
+        $this->doctrine               = $doctrine;
         $this->cache                  = $cache;
     }
 
@@ -88,7 +90,7 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Warms up the cache
+     * Warms up the cache.
      */
     public function warmUpCache()
     {
@@ -105,7 +107,7 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Clears the cache by security type
+     * Clears the cache by security type.
      *
      * If the $securityType is not specified, clear all cached data
      *
@@ -128,7 +130,7 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Get entity metadata
+     * Get entity metadata.
      *
      * @param string $className
      * @param string $securityType
@@ -148,7 +150,7 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Makes sure that metadata for the given security type are loaded and cached
+     * Makes sure that metadata for the given security type are loaded and cached.
      *
      * @param string $securityType The security type.
      */
@@ -168,7 +170,7 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Loads metadata for the given security type and save them in cache
+     * Loads metadata for the given security type and save them in cache.
      *
      * @param $securityType
      */
@@ -210,7 +212,9 @@ class EntitySecurityMetadataProvider
                     $securityConfig->get('group_name'),
                     $label,
                     $permissions,
-                    $description
+                    $description,
+                    $securityConfig->get('category'),
+                    $this->getFields($securityConfig, $className)
                 );
             }
         }
@@ -220,5 +224,64 @@ class EntitySecurityMetadataProvider
         }
 
         $this->localCache[$securityType] = $data;
+    }
+
+    /**
+     * Gets an array of fields metadata.
+     *
+     * @param $securityConfig
+     * @param string $className
+     *
+     * @return array|FieldSecurityMetadata[]
+     */
+    protected function getFields(ConfigInterface $securityConfig, $className)
+    {
+        $fields = [];
+        if ($securityConfig->get('field_acl_supported') && $securityConfig->get('field_acl_enabled')) {
+            $fieldsConfig = $this->securityConfigProvider->getConfigs($className);
+            $classMetadata = $this->doctrine
+                ->getManagerForClass($className)
+                ->getMetadataFactory()
+                ->getMetadataFor($className);
+
+            foreach ($fieldsConfig as $fieldInfo) {
+                $fieldName = $fieldInfo->getId()->getFieldName();
+                if ($classMetadata->isIdentifier($fieldName)) {
+                    // we should not limit access to identifier fields.
+                    continue;
+                }
+                $fields[$fieldName] = new FieldSecurityMetadata(
+                    $fieldName,
+                    $this->getFieldLabel($classMetadata, $fieldName)
+                );
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Gets a label of a field.
+     *
+     * @param ClassMetadata $metadata
+     * @param string        $fieldName
+     *
+     * @return string
+     */
+    protected function getFieldLabel(ClassMetadata $metadata, $fieldName)
+    {
+        $className = $metadata->getName();
+        if (!$metadata->hasField($fieldName) && !$metadata->hasAssociation($fieldName)) {
+            // virtual field or relation
+            return ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+        }
+
+        $label = $this->entityConfigProvider->hasConfig($className, $fieldName)
+            ? $this->entityConfigProvider->getConfig($className, $fieldName)->get('label')
+            : null;
+
+        return !empty($label)
+            ? $label
+            : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
     }
 }

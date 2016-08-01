@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -21,6 +25,9 @@ class InlineEditingExtension extends AbstractExtension
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
+    /** @var AuthorizationCheckerInterface */
+    protected $authChecker;
+
     /**
      * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
      * @param SecurityFacade $securityFacade
@@ -29,11 +36,13 @@ class InlineEditingExtension extends AbstractExtension
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
         SecurityFacade $securityFacade,
-        EntityClassNameHelper $entityClassNameHelper
+        EntityClassNameHelper $entityClassNameHelper,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->securityFacade = $securityFacade;
         $this->guesser = $inlineEditColumnOptionsGuesser;
         $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->authChecker = $authorizationChecker;
     }
 
     /**
@@ -83,10 +92,24 @@ class InlineEditingExtension extends AbstractExtension
         // add inline editing where it is possible, do not use ACL, because additional parameters for columns needed
         $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
         $blackList = $configuration->getBlackList();
+        $behaviour = $config->offsetGetByPath(Configuration::BEHAVIOUR_CONFIG_PATH);
 
         foreach ($columns as $columnName => &$column) {
             if (!in_array($columnName, $blackList, true)) {
-                $newColumn = $this->guesser->getColumnOptions($columnName, $configItems['entity_name'], $column);
+                // Check access to edit field in Class level.
+                // If access not granted - skip inline editing for such field.
+                if (!$this->authChecker->isGranted(
+                    'EDIT',
+                    new FieldVote(new ObjectIdentity('entity', $configItems['entity_name']), $columnName)
+                )) {
+                    continue;
+                }
+                $newColumn = $this->guesser->getColumnOptions(
+                    $columnName,
+                    $configItems['entity_name'],
+                    $column,
+                    $behaviour
+                );
 
                 // frontend type key must not be replaced with default value
                 $frontendTypeKey = PropertyInterface::FRONTEND_TYPE_KEY;

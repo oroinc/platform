@@ -19,30 +19,10 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 250 }
 
-    oro_api.delete_relationship.validate_request_type_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+    oro_api.delete_relationship.validate_request_type_and_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 210 }
-
-    oro_api.delete_relationship.validate_parent_class_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentClassNameExists
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 210 }
-
-    oro_api.delete_relationship.validate_association_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateAssociationNameExists
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 210 }
-
-    oro_api.delete_relationship.normalize_version:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 200 }
-
-    oro_api.delete_relationship.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 50 }
 
     oro_api.delete_relationship.normalize_parent_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
@@ -70,31 +50,13 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 10 }
 
     #
-    # security_check
-    #
-
-    oro_api.delete_relationship.parent_entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - EDIT
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: 10 }
-
-    # VIEW permissions for the parent entity are required because the response may contains the updated relationship
-    oro_api.delete_relationship.parent_entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.security_facade'
-            - VIEW
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: 5 }
-
-    #
     # normalize_input
     #
+
+    oro_api.delete_relationship.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_input, priority: 240 }
 
     oro_api.delete_relationship.validate_parent_entity_id_exists:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityIdExists
@@ -132,6 +94,29 @@ services:
             - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_input, requestType: json_api, priority: -50 }
+
+    #
+    # security_check
+    #
+
+    oro_api.delete_relationship.parent_entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - EDIT
+        tags:
+            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: 10 }
+
+    # VIEW permissions for the parent entity are required because the response may contains the updated relationship
+    oro_api.delete_relationship.parent_entity_type_security_check.view:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: delete_relationship, group: security_check, priority: 5 }
 
     #
     # load_data

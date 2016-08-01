@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 
 class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
@@ -70,29 +73,6 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testLabel()
-    {
-        $config = new EntityDefinitionFieldConfig();
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-
-        $config->setLabel('text');
-        $this->assertTrue($config->hasLabel());
-        $this->assertEquals('text', $config->getLabel());
-        $this->assertEquals(['label' => 'text'], $config->toArray());
-
-        $config->setLabel(null);
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-
-        $config->setLabel('text');
-        $config->setLabel('');
-        $this->assertFalse($config->hasLabel());
-        $this->assertNull($config->getLabel());
-        $this->assertEquals([], $config->toArray());
-    }
-
     public function testDescription()
     {
         $config = new EntityDefinitionFieldConfig();
@@ -113,6 +93,20 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config->setDescription('');
         $this->assertFalse($config->hasDescription());
         $this->assertNull($config->getDescription());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testMetaProperty()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertFalse($config->isMetaProperty());
+
+        $config->setMetaProperty(true);
+        $this->assertTrue($config->isMetaProperty());
+        $this->assertEquals(['meta_property' => true], $config->toArray());
+
+        $config->setMetaProperty(false);
+        $this->assertFalse($config->isMetaProperty());
         $this->assertEquals([], $config->toArray());
     }
 
@@ -146,6 +140,46 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($targetEntity1, $config->getTargetEntity());
     }
 
+    public function testTargetClass()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getTargetClass());
+
+        $config->setTargetClass('Test\Class');
+        $this->assertEquals('Test\Class', $config->getTargetClass());
+        $this->assertEquals(['target_class' => 'Test\Class'], $config->toArray());
+
+        $config->setTargetClass(null);
+        $this->assertNull($config->getTargetClass());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testTargetType()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertFalse($config->hasTargetType());
+        $this->assertNull($config->getTargetType());
+        $this->assertNull($config->isCollectionValuedAssociation());
+
+        $config->setTargetType('to-one');
+        $this->assertTrue($config->hasTargetType());
+        $this->assertEquals('to-one', $config->getTargetType());
+        $this->assertFalse($config->isCollectionValuedAssociation());
+        $this->assertEquals(['target_type' => 'to-one'], $config->toArray());
+
+        $config->setTargetType('to-many');
+        $this->assertTrue($config->hasTargetType());
+        $this->assertEquals('to-many', $config->getTargetType());
+        $this->assertTrue($config->isCollectionValuedAssociation());
+        $this->assertEquals(['target_type' => 'to-many'], $config->toArray());
+
+        $config->setTargetType(null);
+        $this->assertFalse($config->hasTargetType());
+        $this->assertNull($config->getTargetType());
+        $this->assertNull($config->isCollectionValuedAssociation());
+        $this->assertEquals([], $config->toArray());
+    }
+
     public function testCollapsed()
     {
         $config = new EntityDefinitionFieldConfig();
@@ -161,6 +195,45 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($config->hasCollapsed());
         $this->assertFalse($config->isCollapsed());
         $this->assertEquals([], $config->toArray());
+    }
+
+    public function testFormType()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getFormType());
+
+        $config->setFormType('test');
+        $this->assertEquals('test', $config->getFormType());
+        $this->assertEquals(['form_type' => 'test'], $config->toArray());
+
+        $config->setFormType(null);
+        $this->assertNull($config->getFormType());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testFormOptions()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getFormOptions());
+
+        $config->setFormOptions(['key' => 'val']);
+        $this->assertEquals(['key' => 'val'], $config->getFormOptions());
+        $this->assertEquals(['form_options' => ['key' => 'val']], $config->toArray());
+
+        $config->setFormOptions(null);
+        $this->assertNull($config->getFormOptions());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testAddFormConstraint()
+    {
+        $config = new EntityDefinitionFieldConfig();
+
+        $config->addFormConstraint(new NotNull());
+        $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+
+        $config->addFormConstraint(new NotBlank());
+        $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
     }
 
     public function testSetDataTransformers()
@@ -182,6 +255,20 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $config->setDataTransformers([]);
         $this->assertFalse($config->hasDataTransformers());
         $this->assertEquals([], $config->getDataTransformers());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testDependsOn()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        $this->assertNull($config->getDependsOn());
+
+        $config->setDependsOn(['field1']);
+        $this->assertEquals(['field1'], $config->getDependsOn());
+        $this->assertEquals(['depends_on' => ['field1']], $config->toArray());
+
+        $config->setDependsOn([]);
+        $this->assertNull($config->getDependsOn());
         $this->assertEquals([], $config->toArray());
     }
 }

@@ -22,6 +22,9 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
     /** @var EntitySecurityMetadata */
     protected $entity;
 
@@ -53,6 +56,10 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             array('fetch', 'save', 'delete', 'deleteAll')
         );
 
+        $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->entity = new EntitySecurityMetadata(Provider::ACL_SECURITY_TYPE, 'SomeClass', 'SomeGroup', 'SomeLabel');
 
         $this->extendConfigProvider->expects($this->any())
@@ -71,6 +78,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
+            $this->doctrine,
             $this->cache
         );
 
@@ -102,6 +110,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $securityConfig->set('type', Provider::ACL_SECURITY_TYPE);
         $securityConfig->set('permissions', 'All');
         $securityConfig->set('group_name', 'SomeGroup');
+        $securityConfig->set('category', '');
 
         $securityConfigs = array($securityConfig);
         $this->securityConfigProvider->expects($this->any())
@@ -124,6 +133,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
+            $this->doctrine,
             $this->cache
         );
 
@@ -144,6 +154,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
+            $this->doctrine,
             $this->cache
         );
         $result = $provider->getEntities();
@@ -164,6 +175,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
+            $this->doctrine,
             $this->cache
         );
 

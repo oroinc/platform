@@ -27,6 +27,11 @@ class ActionMetadata implements AclClassInfo, \Serializable
     protected $description;
 
     /**
+     * @var string
+     */
+    protected $category;
+
+    /**
      * Gets an action name
      *
      * @return string
@@ -67,19 +72,45 @@ class ActionMetadata implements AclClassInfo, \Serializable
     }
 
     /**
+     * @return string
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return [];
+    }
+
+    /**
+     * @param string $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+    }
+
+    /**
      * Constructor
      *
      * @param string $name
      * @param string $group
      * @param string $label
      * @param string $description
+     * @param string $category
      */
-    public function __construct($name = '', $group = '', $label = '', $description = '')
+    public function __construct($name = '', $group = '', $label = '', $description = '', $category = '')
     {
         $this->name  = $name;
         $this->group = $group;
         $this->label = $label;
         $this->description = $description;
+        $this->category = $category;
     }
 
     /**
@@ -93,6 +124,7 @@ class ActionMetadata implements AclClassInfo, \Serializable
                 $this->group,
                 $this->label,
                 $this->description,
+                $this->category
             )
         );
     }
@@ -107,6 +139,7 @@ class ActionMetadata implements AclClassInfo, \Serializable
             $this->group,
             $this->label,
             $this->description,
+            $this->category
             ) = unserialize($serialized);
     }
 
@@ -124,6 +157,7 @@ class ActionMetadata implements AclClassInfo, \Serializable
         $result->group = $data['group'];
         $result->label = $data['label'];
         $result->description = $data['description'];
+        $result->category = $data['category'];
 
         return $result;
     }

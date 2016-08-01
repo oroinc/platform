@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
-class RequestActionProcessor extends ActionProcessor
+class RequestActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
     const NORMALIZE_RESULT_GROUP = 'normalize_result';
 
@@ -19,6 +23,9 @@ class RequestActionProcessor extends ActionProcessor
 
     /** @var MetadataProvider */
     protected $metadataProvider;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * @param ProcessorBagInterface $processorBag
@@ -41,11 +48,20 @@ class RequestActionProcessor extends ActionProcessor
     /**
      * {@inheritdoc}
      */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function executeProcessors(ComponentContextInterface $context)
     {
         /** @var Context $context */
 
         $processors = $this->processorBag->getProcessors($context);
+        $processorId = null;
 
         try {
             /** @var ProcessorInterface $processor */
@@ -59,10 +75,18 @@ class RequestActionProcessor extends ActionProcessor
                     $this->executeNormalizeResultProcessors($context);
                     break;
                 } else {
+                    $processorId = $processors->getProcessorId();
                     $processor->process($context);
                 }
             }
         } catch (\Exception $e) {
+            if (null !== $this->logger) {
+                $this->logger->error(
+                    sprintf('The execution of "%s" processor is failed.', $processorId),
+                    ['exception' => $e]
+                );
+            }
+
             // rethrow an exception occurred in any processor from the "normalize_result" group,
             // this is required to prevent circular handling of such exception
             // also rethrow an exception in case if the "normalize_result" group is disabled
@@ -90,7 +114,18 @@ class RequestActionProcessor extends ActionProcessor
         $processors = $this->processorBag->getProcessors($context);
         /** @var ProcessorInterface $processor */
         foreach ($processors as $processor) {
-            $processor->process($context);
+            try {
+                $processor->process($context);
+            } catch (\Exception $e) {
+                if (null !== $this->logger) {
+                    $this->logger->error(
+                        sprintf('The execution of "%s" processor is failed.', $processors->getProcessorId()),
+                        ['exception' => $e]
+                    );
+                }
+
+                throw $e;
+            }
         }
     }
 
@@ -110,7 +145,7 @@ class RequestActionProcessor extends ActionProcessor
             if ($detail) {
                 $exceptionMessage .= ' ' . $detail;
             }
-            $exception = new \RuntimeException($exceptionMessage);
+            $exception = new RuntimeException($exceptionMessage);
         }
 
         return $exception;

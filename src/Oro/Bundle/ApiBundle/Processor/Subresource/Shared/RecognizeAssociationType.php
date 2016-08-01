@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
+ * Makes sure that the association name exists in the Context.
  * Computes the related entity class name and the relationship type
  * based on the parent class name and the association name
  * and sets them into the "class" and the "collection" attributes of the Context.
@@ -40,10 +41,21 @@ class RecognizeAssociationType implements ProcessorInterface
             return;
         }
 
+        $associationName = $context->getAssociationName();
+        if (!$associationName) {
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::RELATIONSHIP,
+                    'The association name must be set in the context.'
+                )
+            );
+
+            return;
+        }
+
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
         $parentEntityClass = $context->getParentClassName();
-        $associationName = $context->getAssociationName();
 
         $entitySubresources = $this->subresourcesProvider->getSubresources(
             $parentEntityClass,

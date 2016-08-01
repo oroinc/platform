@@ -103,13 +103,12 @@ datagrid:
                 phone:
                     type: string
                     data_name: u.phone
-                ownerName:
-                    type: choice
-                    data_name: ownerName
-                    options:
-                        field_options:
-                            choices: "@oro_organization.provider.business_units_grid->getOwnerChoices"
-                            translatable_options: false
+                businessUnitId:
+                    label: oro.business_unit.label
+                    type: choice-tree
+                    autocomplete_alias: business_units_tree_search_handler
+                    data_name: u.owner
+                    className: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
                 createdAt:
                     type: datetime
                     data_name: u.createdAt

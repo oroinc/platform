@@ -19,30 +19,10 @@ services:
         tags:
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 250 }
 
-    oro_api.add_relationship.validate_request_type_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+    oro_api.add_relationship.validate_request_type_and_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion
         tags:
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 210 }
-
-    oro_api.add_relationship.validate_parent_class_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentClassNameExists
-        tags:
-            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 210 }
-
-    oro_api.add_relationship.validate_association_name_exists:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateAssociationNameExists
-        tags:
-            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 210 }
-
-    oro_api.add_relationship.normalize_version:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
-        tags:
-            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 200 }
-
-    oro_api.add_relationship.normalize_include_header:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-        tags:
-            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 50 }
 
     oro_api.add_relationship.normalize_parent_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
@@ -72,6 +52,11 @@ services:
     #
     # normalize_input
     #
+
+    oro_api.add_relationship.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: normalize_input, priority: 240 }
 
     oro_api.add_relationship.validate_parent_entity_id_exists:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityIdExists

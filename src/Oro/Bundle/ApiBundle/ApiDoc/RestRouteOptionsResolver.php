@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
@@ -19,13 +19,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
     const ENTITY_ATTRIBUTE        = 'entity';
     const ENTITY_PLACEHOLDER      = '{entity}';
-    const ID_ATTRIBUTE            = 'id';
-    const ID_PLACEHOLDER          = '{id}';
     const ASSOCIATION_ATTRIBUTE   = 'association';
     const ASSOCIATION_PLACEHOLDER = '{association}';
-
-    /** @var bool */
-    protected $isApplicationInstalled;
 
     /** @var RestDocViewDetector */
     protected $docViewDetector;
@@ -36,36 +31,27 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var SubresourcesProvider */
     protected $subresourcesProvider;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var array */
+    /** @var array [entity type => ApiResource, ...] */
     protected $resources;
 
     /**
-     * @param bool|string|null     $isApplicationInstalled
      * @param RestDocViewDetector  $docViewDetector
      * @param ResourcesProvider    $resourcesProvider
      * @param SubresourcesProvider $subresourcesProvider
-     * @param DoctrineHelper       $doctrineHelper
      * @param ValueNormalizer      $valueNormalizer
      */
     public function __construct(
-        $isApplicationInstalled,
         RestDocViewDetector $docViewDetector,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
-        DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
-        $this->isApplicationInstalled = !empty($isApplicationInstalled);
         $this->docViewDetector = $docViewDetector;
         $this->resourcesProvider = $resourcesProvider;
         $this->subresourcesProvider = $subresourcesProvider;
-        $this->doctrineHelper = $doctrineHelper;
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -74,14 +60,14 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if (!$this->isApplicationInstalled || $this->docViewDetector->getRequestType()->isEmpty()) {
-            return;
-        }
-        if ($route->getOption('group') === 'rest_api_deprecated') {
+        $group = $route->getOption('group');
+        if ($group === 'rest_api_deprecated') {
             $routes->remove($routes->getName($route));
             return;
         }
-        if ($route->getOption('group') !== self::ROUTE_GROUP) {
+        if ($group !== self::ROUTE_GROUP
+            || $this->docViewDetector->getRequestType()->isEmpty()
+        ) {
             return;
         }
 
@@ -97,43 +83,25 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * @param string $entityType
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityType)
-    {
-        return ValueNormalizerUtil::convertToEntityClass(
-            $this->valueNormalizer,
-            $entityType,
-            $this->docViewDetector->getRequestType()
-        );
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return string
-     */
-    protected function getEntityType($entityClass)
-    {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $this->docViewDetector->getRequestType()
-        );
-    }
-
-    /**
-     * @return ApiResource[]
+     * @return ApiResource[] [entity type => ApiResource, ...]
      */
     protected function getResources()
     {
         if (null === $this->resources) {
-            $this->resources = $this->resourcesProvider->getResources(
+            $this->resources = [];
+            $requestType = $this->docViewDetector->getRequestType();
+            $resources = $this->resourcesProvider->getResources(
                 $this->docViewDetector->getVersion(),
-                $this->docViewDetector->getRequestType()
+                $requestType
             );
+            foreach ($resources as $resource) {
+                $entityType = $this->valueNormalizer->normalizeValue(
+                    $resource->getEntityClass(),
+                    DataType::ENTITY_TYPE,
+                    $requestType
+                );
+                $this->resources[$entityType] = $resource;
+            }
         }
 
         return $this->resources;
@@ -142,47 +110,70 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param ApiResource[]           $resources
+     * @param ApiResource[]           $resources [entity type => ApiResource, ...]
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $resources)
     {
         $routeName = $routes->getName($route);
 
+        $cache = new RouteCollection();
         $action = $route->getDefault('_action');
-        foreach ($resources as $resource) {
+        foreach ($resources as $entityType => $resource) {
             $entityClass = $resource->getEntityClass();
-            $entityType = $this->getEntityType($entityClass);
             if ($this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER)) {
-                $this->addSubresources($action, $entityType, $entityClass, $routeName, $route, $routes);
+                $cache = $this->addSubresources(
+                    $action,
+                    $entityType,
+                    $entityClass,
+                    $routeName,
+                    $route,
+                    $routes,
+                    $cache
+                );
             } elseif (!in_array($action, $resource->getExcludedActions(), true)) {
-                $this->addResource($entityType, $entityClass, $routeName, $route, $routes);
+                $cache = $this->addResource(
+                    $entityType,
+                    $routeName,
+                    $route,
+                    $routes,
+                    $cache
+                );
             }
+        }
+        // add cached routes before the current route
+        if ($cache->count()) {
+            $routes->insertCollection($cache, $routeName, true);
         }
     }
 
     /**
      * @param string                  $entityType
-     * @param string                  $entityClass
      * @param string                  $routeName
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
+     * @param RouteCollection         $cache
+     *
+     * @return RouteCollection
      */
     protected function addResource(
         $entityType,
-        $entityClass,
         $routeName,
         Route $route,
-        RouteCollectionAccessor $routes
+        RouteCollectionAccessor $routes,
+        RouteCollection $cache
     ) {
         $existingRoute = $routes->getByPath(
             str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath()),
             $route->getMethods()
         );
         if ($existingRoute) {
+            // add cached routes before the current route and reset the cache
+            if ($cache->count()) {
+                $routes->insertCollection($cache, $routeName, true);
+                $cache = new RouteCollection();
+            }
             // move existing route before the current route
-            $existingRouteName = $routes->getName($existingRoute);
-            $routes->remove($existingRouteName);
-            $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+            $routes->insert($routes->getName($existingRoute), $existingRoute, $routeName, true);
         } else {
             // add an additional strict route based on the base route and current entity
             $strictRoute = $routes->cloneRoute($route);
@@ -191,16 +182,10 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             $requirements = $strictRoute->getRequirements();
             unset($requirements[self::ENTITY_ATTRIBUTE]);
             $strictRoute->setRequirements($requirements);
-            if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
-                $this->setIdRequirement($strictRoute, $entityClass);
-            }
-            $routes->insert(
-                $routes->generateRouteName($routeName),
-                $strictRoute,
-                $routeName,
-                true
-            );
+            $cache->add(sprintf('%s_%d', $routes->generateRouteName($routeName), $cache->count()), $strictRoute);
         }
+
+        return $cache;
     }
 
     /**
@@ -210,6 +195,9 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      * @param string                  $routeName
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
+     * @param RouteCollection         $cache
+     *
+     * @return RouteCollection
      */
     protected function addSubresources(
         $action,
@@ -217,7 +205,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         $entityClass,
         $routeName,
         Route $route,
-        RouteCollectionAccessor $routes
+        RouteCollectionAccessor $routes,
+        RouteCollection $cache
     ) {
         $entitySubresources = $this->subresourcesProvider->getSubresources(
             $entityClass,
@@ -226,7 +215,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         );
         $subresources = $entitySubresources->getSubresources();
         if (empty($subresources)) {
-            return;
+            return $cache;
         }
 
         $entityRoutePath = str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath());
@@ -240,10 +229,13 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 $route->getMethods()
             );
             if ($existingRoute) {
+                // add cached routes before the current route and reset the cache
+                if ($cache->count()) {
+                    $routes->insertCollection($cache, $routeName, true);
+                    $cache = new RouteCollection();
+                }
                 // move existing route before the current route
-                $existingRouteName = $routes->getName($existingRoute);
-                $routes->remove($existingRouteName);
-                $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+                $routes->insert($routes->getName($existingRoute), $existingRoute, $routeName, true);
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
@@ -260,61 +252,11 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 unset($requirements[self::ENTITY_ATTRIBUTE]);
                 unset($requirements[self::ASSOCIATION_ATTRIBUTE]);
                 $strictRoute->setRequirements($requirements);
-                if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
-                    $this->setIdRequirement($strictRoute, $entityClass);
-                }
-                $routes->insert(
-                    $routes->generateRouteName($routeName),
-                    $strictRoute,
-                    $routeName,
-                    true
-                );
+                $cache->add(sprintf('%s_%d', $routes->generateRouteName($routeName), $cache->count()), $strictRoute);
             }
         }
-    }
 
-    /**
-     * @param Route  $route
-     * @param string $entityClass
-     */
-    protected function setIdRequirement(Route $route, $entityClass)
-    {
-        $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $idFields     = $metadata->getIdentifierFieldNames();
-        $idFieldCount = count($idFields);
-        if ($idFieldCount === 1) {
-            // single identifier
-            $route->setRequirement(
-                self::ID_ATTRIBUTE,
-                $this->getIdFieldRequirement($metadata->getTypeOfField(reset($idFields)))
-            );
-        } elseif ($idFieldCount > 1) {
-            // combined identifier
-            $requirements = [];
-            foreach ($idFields as $field) {
-                $requirements[] = $field . '=' . $this->getIdFieldRequirement($metadata->getTypeOfField($field));
-            }
-            $route->setRequirement(
-                self::ID_ATTRIBUTE,
-                implode(',', $requirements)
-            );
-        }
-    }
-
-    /**
-     * @param string $fieldType
-     *
-     * @return string
-     */
-    protected function getIdFieldRequirement($fieldType)
-    {
-        $result = $this->valueNormalizer->getRequirement($fieldType, $this->docViewDetector->getRequestType());
-
-        if (ValueNormalizer::DEFAULT_REQUIREMENT === $result) {
-            $result = '[^\.]+';
-        }
-
-        return $result;
+        return $cache;
     }
 
     /**

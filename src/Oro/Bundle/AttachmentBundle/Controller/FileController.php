@@ -61,7 +61,7 @@ class FileController extends Controller
         }
 
         $response->headers->set('Content-Length', $attachment->getFileSize());
-        $response->setContent($this->get('oro_attachment.manager')->getContent($attachment));
+        $response->setContent($this->get('oro_attachment.file_manager')->getContent($attachment));
 
         return $response;
     }
@@ -74,27 +74,18 @@ class FileController extends Controller
      */
     public function getResizedAttachmentImageAction($id, $width, $height, $filename)
     {
-        $attachment = $this->getFileByIdAndFileName($id, $filename);
-        $path       = substr($this->getRequest()->getPathInfo(), 1);
-        $filterName = 'attachment_' . $width . '_' . $height;
-
-        $this->get('liip_imagine.filter.configuration')->set(
-            $filterName,
-            [
-                'filters' => [
-                    'thumbnail' => [
-                        'size' => [$width, $height]
-                    ]
-                ]
-            ]
+        $file = $this->getFileByIdAndFileName($id, $filename);
+        $thumbnail = $this->get('oro_attachment.thumbnail_factory')->createThumbnail(
+            $this->get('oro_attachment.file_manager')->getContent($file),
+            $width,
+            $height
         );
-        $binary         = $this->get('liip_imagine')->load(
-            $this->get('oro_attachment.manager')->getContent($attachment)
-        );
-        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
-        $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
 
-        return $this->get('liip_imagine.cache.manager')->store($response, $path, $filterName);
+        return $this->get('liip_imagine.cache.manager')->store(
+            new Response((string)$thumbnail->getImage(), 200, ['Content-Type' => $file->getMimeType()]),
+            substr($this->getRequest()->getPathInfo(), 1),
+            $thumbnail->getFilter()
+        );
     }
 
     /**
@@ -105,37 +96,34 @@ class FileController extends Controller
      */
     public function getFilteredImageAction($id, $filter, $filename)
     {
-        $attachment     = $this->getFileByIdAndFileName($id, $filename);
-        $path           = substr($this->getRequest()->getPathInfo(), 1);
-        $binary         = $this->get('liip_imagine')->load(
-            $this->get('oro_attachment.manager')->getContent($attachment)
+        $file = $this->getFileByIdAndFileName($id, $filename);
+        $image = $this->get('oro_attachment.image_factory')->createImage(
+            $this->get('oro_attachment.file_manager')->getContent($file),
+            $filter
         );
-        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filter);
-        $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
 
-        return $this->get('liip_imagine.cache.manager')->store($response, $path, $filter);
+        return $this->get('liip_imagine.cache.manager')->store(
+            new Response((string)$image, 200, ['Content-Type' => $file->getMimeType()]),
+            substr($this->getRequest()->getPathInfo(), 1),
+            $filter
+        );
     }
 
     /**
-     * Get file
+     * @param int    $id
+     * @param string $fileName
      *
-     * @param $id
-     * @param $fileName
      * @return File
+     *
      * @throws NotFoundHttpException
      */
     protected function getFileByIdAndFileName($id, $fileName)
     {
-        $attachment = $this->get('doctrine')->getRepository('OroAttachmentBundle:File')->findOneBy(
-            [
-                'id'               => $id,
-                'originalFilename' => $fileName
-            ]
-        );
-        if (!$attachment) {
+        $file = $this->get('doctrine')->getRepository('OroAttachmentBundle:File')->find($id);
+        if (!$file || ($file->getFilename() !== $fileName && $file->getOriginalFilename() !== $fileName)) {
             throw new NotFoundHttpException('File not found');
         }
 
-        return $attachment;
+        return $file;
     }
 }

@@ -13,7 +13,6 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExceptionTextExtractorConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExclusionProviderConfigurationCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\VirtualFieldProviderConfigurationCompilerPass;
 
 class OroApiBundle extends Bundle
 {
@@ -28,7 +27,6 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new DataTransformerConfigurationCompilerPass());
         $container->addCompilerPass(new ExclusionProviderConfigurationCompilerPass());
         $container->addCompilerPass(new ExceptionTextExtractorConfigurationCompilerPass());
-        $container->addCompilerPass(new VirtualFieldProviderConfigurationCompilerPass());
         $container->addCompilerPass(
             new LoadProcessorsCompilerPass(
                 'oro_api.processor_bag',

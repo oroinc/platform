@@ -71,6 +71,10 @@ oro:
             day.label: Day
             time.label: Hour
         date_range.label: Date range
+        query_filter:
+            label: Advanced Filter
+            collapse: Collapse
+            expand: Expand
         previous_date_range.label: Compare with previous period
         datagrid:
             columns:
@@ -82,7 +86,7 @@ oro:
                 add.label: Add
                 add_all.label: Add all
                 delete.label: Delete column
-        form.choose_business_unit: Choose Business Unit
+        form.choose_business_unit: Choose a business unit...
 
         widget:
             big_number:
@@ -93,3 +97,17 @@ oro:
                 no_changes: No changes
                 compare_to.label: Compare to
                 no_available_metrics: No available metrics
+            filter:
+                date_range:
+                    today: 'Today'
+                    this_week: 'This week'
+                    this_month: 'This month'
+                    this_quarter: 'This quarter'
+                    this_year: 'This year'
+                    all_time: 'All time'
+            sort_by:
+                label: Sort By
+                property.placeholder: Choose a property...
+                order:
+                    asc.label: Ascending
+                    desc.label: Descending

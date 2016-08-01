@@ -744,10 +744,8 @@ services:
     oro_email.manager.email_attachment_manager:
         class: %oro_email.manager.email_attachment_manager.class%
         arguments:
-            - '@knp_gaufrette.filesystem_map'
+            - '@oro_attachment.file_manager'
             - '@doctrine.orm.entity_manager'
-            - '@kernel'
-            - '@oro_security.security_facade.link'
             - '@router'
             - '@oro_attachment.validator.file_config_validator'
             - '@oro_attachment.association_helper'
@@ -781,8 +779,8 @@ services:
     oro_email.email_attachment_transformer:
         class: %oro_email.email_attachment_transformer.class%
         arguments:
-            - '@knp_gaufrette.filesystem_map'
             - '@oro_email.form.factory'
+            - '@oro_attachment.file_manager'
             - '@oro_attachment.manager'
             - '@oro_email.manager.email_attachment_manager'
 
@@ -844,6 +842,8 @@ services:
             - '@oro_activity.manager'
             - '@oro_search.index'
             - '@oro_entity.entity_name_resolver'
+        calls:
+            - [setTokenStorage, ['@security.token_storage']]
 
     oro_email.email.flag.manager:
         class: %oro_email.email.flag.manager.class%
@@ -859,7 +859,6 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_ui.html_tag_helper'
             - '@router'
-            - '@oro_email.email.cache.manager'
             - '@oro_entity_config.config_manager'
 
     oro_email.datagrid.origin_folder.provider:

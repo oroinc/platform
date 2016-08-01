@@ -17,10 +17,12 @@ parameters:
     oro_dashboard.datetime.helper.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
     oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
     oro_dashboard.event_listener.widget_items_load_data.class: Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener
+    oro_dashboard.event_listener.widget_sort_by.class: Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener
 
     oro_dashboard.widget_config_value.previous_date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
     oro_dashboard.widget_config_value.widget_title.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter
     oro_dashboard.widget_config_value.widget_items_choice.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter
+    oro_dashboard.widget_config_value.widget_sort_by.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetSortByConverter
 
     oro_dashboard.form.type.widget_date_range.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType
     oro_dashboard.form.type.date_range_value.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeValueType
@@ -30,11 +32,8 @@ parameters:
     oro_dashboard.form.type.widget_items.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsType
     oro_dashboard.form.type.widget_item.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemType
     oro_dashboard.event_listener.widget_items_form_subscriber.class: Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber
-    oro_dashboard.form.type.widget_user_multiselect.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetUserMultiselect
-    oro_dashboard.widget_config_value.widget_user_multiselect.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetUserMultiselectConverter
     oro_dashboard.form.type.widget_date.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType
-    oro_dashboard.form.type.widget_business_unit_select.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetBusinessUnitSelect
-    oro_dashboard.widget_config_value.widget_business_unit_select.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetBusinessUnitSelectConverter
+    oro_dashboard.form.type.widget_sort_by.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetSortByType
 
     # BigNumber
     oro_dashboard.provider.big_number.processor.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
@@ -138,6 +137,22 @@ services:
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItemsByItemsChoice }
             - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItems }
 
+    oro_dashboard.event_listener.widget_sort_by:
+        class: %oro_dashboard.event_listener.widget_sort_by.class%
+        arguments:
+            - '@oro_dashboard.widget_configs'
+        abstract: true
+
+    oro_dashboard.type.widget_jqueryselect2_hidden:
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_form.autocomplete.search_registry'
+            - '@oro_entity_config.provider.form'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: form.type, alias: oro_widget_entity_jqueryselect2_hidden }
+
     oro_dashboard.form.type.widget_date_range:
         class: %oro_dashboard.form.type.widget_date_range.class%
         arguments:
@@ -169,6 +184,11 @@ services:
         class: %oro_dashboard.form.type.widget_items_choice.class%
         tags:
             - { name: form.type, alias: "oro_type_widget_items_choice" }
+
+    oro_dashboard.form.type.widget_choice:
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetChoiceType
+        tags:
+            - { name: form.type, alias: "oro_type_widget_choice" }
 
     oro_dashboard.form.type.widget_item:
         class: %oro_dashboard.form.type.widget_item.class%
@@ -226,41 +246,30 @@ services:
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_items_choice" }
 
-    oro_dashboard.form.type.widget_user_multiselect:
-        class: %oro_dashboard.form.type.widget_user_multiselect.class%
-        arguments:
-            - '@doctrine.orm.entity_manager'
+    oro_dashboard.widget_config_value.widget_choice.converter:
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetChoiceTypeConverter
         tags:
-            - { name: form.type, alias: "oro_type_widget_user_multiselect" }
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_choice" }
 
-    oro_dashboard.widget_config_value.widget_user_multiselect.converter:
-        class: %oro_dashboard.widget_config_value.widget_user_multiselect.converter.class%
+    oro_dashboard.widget_config_value.widget_sort_by.converter:
+        class: %oro_dashboard.widget_config_value.widget_sort_by.converter.class%
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
         tags:
-            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_user_multiselect" }
+            - { name: oro_dashboard.value.converter, alias: oro_type_widget_sort_by }
 
     oro_dashboard.form.type.widget_date:
         class: %oro_dashboard.form.type.widget_date.class%
         tags:
             - { name: form.type, alias: "oro_type_widget_date" }
 
-    oro_dashboard.form.type.widget_business_unit_select:
-        class: %oro_dashboard.form.type.widget_business_unit_select.class%
+    oro_dashboard.form.type.widget_sort_by:
+        class: %oro_dashboard.form.type.widget_sort_by.class%
         arguments:
-            - '@doctrine.orm.entity_manager'
-            - %oro_organization.business_unit.entity.class%
+            - '@oro_entity.entity_field_provider'
         tags:
-            - { name: form.type, alias: "oro_type_widget_business_unit_select" }
-
-    oro_dashboard.widget_config_value.widget_business_unit_select.converter:
-        class: %oro_dashboard.widget_config_value.widget_business_unit_select.converter.class%
-        arguments:
-            - "@=service('doctrine.orm.entity_manager').getRepository(parameter('oro_organization.business_unit.entity.class'))"
-            - '@oro_security.security_facade'
-            - '@oro_organization.provider.busines_unit_acl'
-        tags:
-            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_business_unit_select" }
+            - { name: form.type, alias: oro_type_widget_sort_by }
 
     # BigNumber
     oro_dashboard.provider.big_number.processor:
@@ -268,6 +277,7 @@ services:
         arguments:
             - '@oro_dashboard.provider.big_number.formatter'
             - '@oro_dashboard.provider.big_number.date_helper'
+            - '@oro_user.dashboard.owner_helper'
 
     oro_dashboard.provider.big_number.formatter:
         class: %oro_dashboard.provider.big_number.formatter.class%
@@ -280,3 +290,28 @@ services:
             - '@doctrine'
             - '@oro_security.acl_helper'
             - '@oro_locale.settings'
+
+    oro_dashboard.filter.date_range:
+        class: Oro\Bundle\DashboardBundle\Filter\DateRangeFilter
+        parent: oro_filter.date_range_filter
+
+    oro_dashboard.filter.date_filter_processor:
+        class: Oro\Bundle\DashboardBundle\Filter\DateFilterProcessor
+        arguments:
+            - '@oro_dashboard.filter.date_range'
+            - '@oro_filter.utils.date_filter_modifier'
+
+    # Twig extension
+    oro_dashboard.twig.extension:
+        class: Oro\Bundle\DashboardBundle\Twig\DashboardExtension
+        arguments:
+            - '@oro_dashboard.widget_config_value.date_range.converter'
+            - '@oro_query_designer.query_designer.manager'
+            - '@oro_report.entity_provider'
+        tags:
+            - { name: twig.extension }
+
+    oro_dashboard.form.type.widget_filter:
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetFilterType
+        tags:
+            - { name: form.type, alias: oro_dashboard_query_filter }

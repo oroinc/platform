@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
 /**
  * Represents a sorter configuration for a field.
  */
@@ -26,22 +28,17 @@ class SorterFieldConfig implements FieldConfigInterface
      */
     public function toArray()
     {
-        $result = $this->items;
+        $result = $this->convertItemsToArray();
         $this->removeItemWithDefaultValue($result, self::EXCLUDE);
 
         return $result;
     }
 
     /**
-     * Make a deep copy of object.
+     * Makes a deep copy of the object.
      */
     public function __clone()
     {
-        $this->items = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->items
-        );
+        $this->items = ConfigUtil::cloneItems($this->items);
     }
 }
