@@ -32,14 +32,8 @@ class CronCommandTest extends WebTestCase
     public function testCheckRunDuplicateJob()
     {
         $this->mockCronHelper(true);
-        $command = $this->application->find('oro:cron');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
-            'command'      => $command->getName(),
-            '--skipCheckDaemon' => true,
-        ));
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['--skipCheckDaemon' => true]);
         $this->assertNotEmpty($result);
 
         $this->checkMessage('allJobNew', $result);
