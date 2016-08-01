@@ -1,15 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
-
-use Symfony\Component\Form\FormEvents;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension;
+use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
+class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -20,8 +18,8 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $enumSynchronizer;
 
-    /** @var EnumFieldConfigExtension */
-    protected $extension;
+    /** @var EnumFieldConfigSubscriber */
+    protected $subscriber;
 
     public function setUp()
     {
@@ -37,33 +35,11 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
-        $this->extension = new EnumFieldConfigExtension(
+        $this->subscriber = new EnumFieldConfigSubscriber(
             $this->configManager,
             $this->translator,
             $this->enumSynchronizer
         );
-    }
-
-    public function testGetExtendedType()
-    {
-        $this->assertEquals(
-            'oro_entity_config_type',
-            $this->extension->getExtendedType()
-        );
-    }
-
-    public function testBuildForm()
-    {
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
-
-        $builder->expects($this->at(0))
-            ->method('addEventListener')
-            ->with(FormEvents::PRE_SET_DATA, [$this->extension, 'preSetData']);
-        $builder->expects($this->at(1))
-            ->method('addEventListener')
-            ->with(FormEvents::POST_SUBMIT, [$this->extension, 'postSubmit']);
-
-        $this->extension->buildForm($builder, []);
     }
 
     public function testPreSetDataForEntityConfigModel()
@@ -77,7 +53,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->never())
             ->method('setData');
 
-        $this->extension->preSetData($event);
+        $this->subscriber->preSetData($event);
     }
 
     public function testPreSetDataForNotEnumFieldType()
@@ -94,7 +70,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->never())
             ->method('setData');
 
-        $this->extension->preSetData($event);
+        $this->subscriber->preSetData($event);
     }
 
     /**
@@ -118,7 +94,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->never())
             ->method('setData');
 
-        $this->extension->preSetData($event);
+        $this->subscriber->preSetData($event);
     }
 
     /**
@@ -186,7 +162,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($expectedData);
 
-        $this->extension->preSetData($event);
+        $this->subscriber->preSetData($event);
     }
 
     public function testPostSubmitForEntityConfigModel()
@@ -200,7 +176,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->never())
             ->method('setData');
 
-        $this->extension->postSubmit($event);
+        $this->subscriber->postSubmit($event);
     }
 
     public function testPostSubmitForNotEnumFieldType()
@@ -217,7 +193,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->never())
             ->method('setData');
 
-        $this->extension->postSubmit($event);
+        $this->subscriber->postSubmit($event);
     }
 
     /**
@@ -242,7 +218,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->never())
             ->method('setData');
 
-        $this->extension->postSubmit($event);
+        $this->subscriber->postSubmit($event);
     }
 
     /**
@@ -321,7 +297,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($expectedData);
 
-        $this->extension->postSubmit($event);
+        $this->subscriber->postSubmit($event);
     }
 
     /**
@@ -404,7 +380,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($expectedData);
 
-        $this->extension->postSubmit($event);
+        $this->subscriber->postSubmit($event);
     }
 
     /**
@@ -484,7 +460,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($expectedData);
 
-        $this->extension->postSubmit($event);
+        $this->subscriber->postSubmit($event);
     }
 
     public function enumTypeProvider()
