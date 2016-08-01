@@ -53,7 +53,8 @@ UPGRADE FROM 1.9 to 1.10
 - Added migration `Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery` for updating ACL Entries to use custom Permissions.
 - Added `acl_permission` twig extension - allows get `Permission` by `AclPermission`.
 - Added third parameter `$byCurrentGroup` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface::getPermissions` for getting permissions only for current application group name. Updated same method in `Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension` and `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`.
-- Added second parameter `$permissionName` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`.
+- Added second parameter `$permissionName` to `getAccessLevelNames` method of `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`.
+- Added `getFieldExtension` method of `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`.
 - For php version from 7.0.0 to 7.0.5 we replaced `Symfony\Component\Security\Acl\Domain\Entry` on `Oro\Bundle\SecurityBundle\Acl\Domain\Entry` to avoid [bug](https://bugs.php.net/bug.php?id=71940) with unserialization of an object reference
 - Method `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::getTreeData` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider::createTreeObject` instead.
 - Method `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBU` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Owner\OwnerTree::getUsersAssignedToBusinessUnit` instead.
