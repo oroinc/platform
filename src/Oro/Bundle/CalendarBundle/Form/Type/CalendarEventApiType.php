@@ -206,6 +206,14 @@ class CalendarEventApiType extends CalendarEventType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'oro_calendar_event_api';
     }
 }

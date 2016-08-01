@@ -1706,4 +1706,12 @@ abstract class AbstractQueryConverter
             $functionExpr
         );
     }
+
+    /**
+     * @param string $rootEntity
+     */
+    protected function setRootEntity($rootEntity)
+    {
+        $this->rootEntity = $rootEntity;
+    }
 }

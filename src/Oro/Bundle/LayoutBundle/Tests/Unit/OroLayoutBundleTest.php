@@ -16,7 +16,7 @@ class OroLayoutBundleTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->at(1))
             ->method('addCompilerPass')
             ->with(
-                $this->isInstanceOf('Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompilerPass')
+                $this->isInstanceOf('Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ExpressionCompilerPass')
             );
 
         $bundle = new OroLayoutBundle();

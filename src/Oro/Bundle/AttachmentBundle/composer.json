@@ -5,8 +5,8 @@
     "keywords": ["BAP", "Attachment", "File", "Image"],
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/symfony": ">=2.1",
+        "php": ">=5.5.9",
+        "symfony/symfony": "2.8.*",
         "liip/imagine-bundle": "dev-master",
         "knplabs/knp-gaufrette-bundle": "dev-master"
     },
