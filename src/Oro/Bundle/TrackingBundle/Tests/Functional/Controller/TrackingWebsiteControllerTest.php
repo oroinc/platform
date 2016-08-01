@@ -42,6 +42,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
      */
     public function testView()
     {
+        $this->markTestSkipped('skipping because of Segmentation fault in travis. Should be fixed in CRM-5973');
         $response = $this->client->requestGrid(
             'website-grid'
         );
@@ -65,6 +66,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
      */
     public function testGetTrackIdByIdentifier()
     {
+        $this->markTestSkipped('skipping because of Segmentation fault in travis. Should be fixed in CRM-5973');
         $response = $this->client->requestGrid(
             'website-grid',
             ['website-grid[_filter][identifier][value]' => 'unique']
@@ -82,6 +84,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
      */
     public function testUpdate($id)
     {
+        $this->markTestSkipped('skipping because of Segmentation fault in travis. Should be fixed in CRM-5973');
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_tracking_website_update', ['id' => $id])
