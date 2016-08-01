@@ -225,6 +225,7 @@
 {% block button_widget_button -%}
     {% spaceless %}
         <button{{ block('block_attributes') }}
+                type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
             {%- if action in ['submit', 'reset'] %} type="{{ action }}"{% endif %}
             {%- if name is defined %} name="{{ name }}"{% endif %}
             {%- if value is defined %} value="{{ value }}"{% endif %}>
