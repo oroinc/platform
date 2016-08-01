@@ -22,6 +22,11 @@ oro:
         header:
             root_jobs: Jobs List
             child_jobs: Child Jobs List
+            startedAt: Started At
+            stoppedAt: Stopped At
+            unique: Unique
+            interrupted: Interrupted
+            name: Job "%name%"
 
         status:
             new: New

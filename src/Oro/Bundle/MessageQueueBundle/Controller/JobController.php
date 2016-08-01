@@ -36,7 +36,7 @@ class JobController extends Controller
     public function childJobsAction(Job $job)
     {
         return [
-            'job' => $job,
+            'entity' => $job,
         ];
     }
 }
