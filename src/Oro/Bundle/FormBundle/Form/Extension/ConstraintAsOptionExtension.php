@@ -7,9 +7,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class ConstraintAsOptionExtension extends AbstractTypeExtension
 {
+    use FormExtendedTypeTrait;
+    
     /**
      * @var ConstraintFactory
      */
@@ -37,13 +40,5 @@ class ConstraintAsOptionExtension extends AbstractTypeExtension
                 }
             ]
         );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
     }
 }

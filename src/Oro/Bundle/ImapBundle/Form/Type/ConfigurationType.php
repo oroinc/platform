@@ -19,6 +19,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ConfigurationType extends AbstractType
 {
@@ -361,6 +362,14 @@ class ConfigurationType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return self::NAME;
     }
