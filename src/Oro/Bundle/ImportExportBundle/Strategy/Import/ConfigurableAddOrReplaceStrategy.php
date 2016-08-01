@@ -57,6 +57,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->chainEntityClassNameProvider = $chainEntityClassNameProvider;
         $this->translator                   = $translator;
         $this->newEntitiesHelper            = $newEntitiesHelper;
+        $this->doctrineHelper               = $doctrineHelper;
     }
 
 
