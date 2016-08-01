@@ -154,7 +154,8 @@
             'title': title,
             'widgetName': widgetName,
             'description': description,
-            'isNew': widget.isNew
+            'isNew': widget.isNew,
+            'configurationDialogOptions':  widget.configuration_dialog_options
             }]) %}
         {% endif %}
     {% endfor %}
@@ -203,7 +204,8 @@
                         },
                         'allowEdit': options.allowEdit,
                         'showConfig': options.allowEdit and widget.config.configuration|length > 0,
-                        'widgetName': widget.entity.name
+                        'widgetName': widget.entity.name,
+                        'configurationDialogOptions': widget.config.configuration_dialog_options
                     })
                 }}
             {% endif %}

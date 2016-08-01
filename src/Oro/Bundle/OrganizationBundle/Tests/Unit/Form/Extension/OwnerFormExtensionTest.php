@@ -155,11 +155,6 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetExtendedType()
-    {
-        $this->assertEquals('form', $this->extension->getExtendedType());
-    }
-
     public function testNotCompoundForm()
     {
         $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')

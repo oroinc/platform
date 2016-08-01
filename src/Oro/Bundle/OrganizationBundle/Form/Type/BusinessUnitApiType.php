@@ -39,6 +39,14 @@ class BusinessUnitApiType extends BusinessUnitType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'business_unit';
     }
 }

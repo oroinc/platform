@@ -6,8 +6,8 @@
     "homepage": "https://github.com/laboro/FilterBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3",
-        "symfony/symfony": ">=2.1",
+        "php": ">=5.5.9",
+        "symfony/symfony": "2.8.*",
         "oro/ui-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/locale-bundle": "dev-master",

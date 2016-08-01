@@ -262,8 +262,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     {
         $typeExtensions = [];
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_EXTENSION_TAG) as $serviceId => $tag) {
-            $alias = isset($tag[0]['alias'])
-                ? $tag[0]['alias']
+            $tagKey = $this->getTagKeyForExtension();
+            $alias = isset($tag[0][$tagKey])
+                ? $tag[0][$tagKey]
                 : $serviceId;
             $typeExtensions[$alias][] = $serviceId;
         }
@@ -287,5 +288,16 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         arsort($guessers, SORT_NUMERIC);
 
         return array_keys($guessers);
+    }
+
+    /**
+     * Provide compatibility between Symfony 2.8 and version below this
+     * @return string
+     */
+    public function getTagKeyForExtension()
+    {
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
+            ? 'extended-type'
+            : 'alias';
     }
 }

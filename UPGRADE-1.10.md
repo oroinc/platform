@@ -23,6 +23,10 @@ always returning 204 (No Content), now it returns HTTP 200 (OK) if the response 
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
 - Added new class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter`.
 - `oro_type_widget_user_multiselect` form type was renamed to `oro_type_widget_user_select` and moved to UserBundle.
+- Class `Oro\Bundle\DashboardBundle\Twig\FilterDateRangeExtension` was renamed to `Oro\Bundle\DashboardBundle\Twig\DashboardExtension`. Service was renamed to `oro_dashboard.twig.extension`. Added parameters `Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager $manager` and `Oro\Bundle\EntityBundle\Provider\EntityProvider $entityProvider` to the constructor.
+
+####DataAuditBundle
+- The constructor of the `Oro/Bundle/DataAuditBundle/EventListener/SegmentWidgetOptionsListener` class was changed. Before: `__construct(HttpKernelInterface $httpKernel)`. After: `__construct(HttpKernelInterface $httpKernel, SecurityFacade $securityFacade, ContextChecker $contextChecker)`.
 
 ####DataGridBundle
 - Events `Oro\Bundle\DataGridBundle\Event\OrmResultBefore` second constructor argument `$query` type changed from `Doctrine\ORM\Query` to `Doctrine\ORM\AbstractQuery`.
@@ -300,6 +304,8 @@ Corresponding block type classes was removed.
  [Debug Information](./src/Oro/Bundle/LayoutBundle/Resources/doc/debug_information.md) section.
 - Added possibility to create layout update imports, for details please check out documentation [Imports](./src/Oro/Bundle/LayoutBundle/Resources/doc/imports.md).
 - Added new `\Oro\Component\Layout\ImportsAwareLayoutUpdateInterface`.
+- Changed current expression language in layouts to symfony expression language, for details please check out documentation at
+ [Expressions](./src/Oro/Bundle/LayoutBundle/Resources/doc/expressions.md) section.
 
 ####EmbeddedFormBundle:
 - Layout block types was replaced with DI only configuration for `embed_form_success` and `embed_form_legacy_form` block types.
