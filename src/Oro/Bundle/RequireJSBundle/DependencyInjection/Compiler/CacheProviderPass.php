@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Definition;
  * for the RequireJS configuration with the Doctrine PhpFileCache if the
  * OroCacheBundle is not available.
  *
- * @author Stefano Arlandini <stefano.arlandini@nooo.it>
+ * @author Stefano Arlandini <sarlandini@alice.it>
  */
 class CacheProviderPass implements CompilerPassInterface
 {
