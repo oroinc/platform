@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
@@ -21,16 +22,20 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var array */
     protected $cachedEntities = array();
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ImportStrategyHelper $strategyHelper
-     * @param FieldHelper $fieldHelper
-     * @param DatabaseHelper $databaseHelper
+     * @param EventDispatcherInterface     $eventDispatcher
+     * @param ImportStrategyHelper         $strategyHelper
+     * @param FieldHelper                  $fieldHelper
+     * @param DatabaseHelper               $databaseHelper
      * @param ChainEntityClassNameProvider $chainEntityClassNameProvider
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface          $translator
+     * @param DoctrineHelper               $doctrineHelper
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -38,11 +43,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         FieldHelper $fieldHelper,
         DatabaseHelper $databaseHelper,
         ChainEntityClassNameProvider $chainEntityClassNameProvider,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        DoctrineHelper $doctrineHelper
     ) {
         parent::__construct($eventDispatcher, $strategyHelper, $fieldHelper, $databaseHelper);
         $this->chainEntityClassNameProvider = $chainEntityClassNameProvider;
-        $this->translator = $translator;
+        $this->translator                   = $translator;
+        $this->doctrineHelper               = $doctrineHelper;
     }
 
 
@@ -262,6 +269,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
             $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
+
+            $this->doctrineHelper->getEntityManager($entity)->detach($entity);
 
             return null;
         }
