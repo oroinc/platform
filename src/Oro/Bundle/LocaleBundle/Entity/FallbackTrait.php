@@ -69,7 +69,7 @@ trait FallbackTrait
         }
 
         $value = $filteredValues->count() ? $filteredValues->first() : null;
-        if ($value) {
+        if ($value && $localization) {
             switch ($value->getFallback()) {
                 case FallbackType::PARENT_LOCALIZATION:
                     $value = $this->getLocalizedFallbackValue($values, $localization->getParentLocalization());
