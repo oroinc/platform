@@ -4,9 +4,13 @@ namespace Oro\Bundle\ConfigBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class FormFieldType extends AbstractType
 {
@@ -41,6 +45,40 @@ class FormFieldType extends AbstractType
 
         $builder->add('use_parent_scope_value', $useParentType, $useParentOptions);
         $builder->add('value', $options['target_field_type'], $options['target_field_options']);
+
+        if ($options['resettable']) {
+            $this->addFieldDisableListeners($builder);
+        }
+    }
+
+    /**
+     * Add listeners that disable fields according to the state of `use_parent_scope_value` checkbox
+     *
+     * @param FormBuilderInterface $builder
+     */
+    protected function addFieldDisableListeners(FormBuilderInterface $builder)
+    {
+        // Initially disable/enable 'value' field depending on the checkbox 'use_parent_scope_value'
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = $event->getData();
+                $disabled = isset($data['use_parent_scope_value']) ? $data['use_parent_scope_value'] : false;
+                FormUtils::replaceField($form, 'value', ['disabled' => $disabled]);
+            }
+        );
+
+        // Update field again to apply the submitted 'use_parent_scope_value' state and properly map 'value' to entity
+        $builder->get('use_parent_scope_value')->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $form = $event->getForm()->getParent();
+                $data = $event->getForm()->getData();
+                $disabled = isset($data['use_parent_scope_value']) ? $data['use_parent_scope_value'] : false;
+                FormUtils::replaceField($form, 'value', ['disabled' => $disabled]);
+            }
+        );
     }
 
     /**
