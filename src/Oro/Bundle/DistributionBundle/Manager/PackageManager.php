@@ -318,7 +318,8 @@ class PackageManager
                         return !in_array($package->getName(), $previousInstalled);
                     }
                 );
-                $this->scriptRunner->clearApplicationCache();
+
+                $this->scriptRunner->removeApplicationCache();
                 $this->scriptRunner->runPlatformUpdate();
                 array_map(
                     function (PackageInterface $package) {
