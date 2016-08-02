@@ -277,6 +277,18 @@ class GridContext extends OroFeatureContext implements OroElementFactoryAware
     }
 
     /**
+     * Reset filter
+     * Example: And I reset Activity Type filter
+     *
+     * @When /^(?:|I )reset (?P<filterName>([\w\s]+)) filter$/
+     */
+    public function resetFilter($filterName)
+    {
+        $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
+        $filterItem->find('css', 'span.reset-filter')->click();
+    }
+
+    /**
      * @When /^(?:|I )check All Visible records in grid$/
      */
     public function iCheckAllVisibleRecordsInGrid()
