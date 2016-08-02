@@ -2,11 +2,10 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\ContextAccessor;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CallServiceMethod extends AbstractAction
 {
@@ -105,9 +104,9 @@ class CallServiceMethod extends AbstractAction
     {
         $parameters = $this->getOption($this->options, 'method_parameters', []);
 
-        foreach ($parameters as $name => $value) {
-            $parameters[$name] = $this->contextAccessor->getValue($context, $value);
-        }
+        array_walk_recursive($parameters, function (&$value) use ($context) {
+            $value = $this->contextAccessor->getValue($context, $value);
+        });
 
         return $parameters;
     }

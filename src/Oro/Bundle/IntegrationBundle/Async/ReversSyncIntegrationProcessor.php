@@ -21,6 +21,7 @@ class ReversSyncIntegrationProcessor implements
     TopicSubscriberInterface
 {
     use ContainerAwareTrait;
+
     /**
      * @var RegistryInterface
      */
@@ -46,7 +47,6 @@ class ReversSyncIntegrationProcessor implements
         ReverseSyncProcessor $reverseSyncProcessor,
         TypesRegistry $typesRegistry
     ) {
-
         $this->doctrine = $doctrine;
         $this->reverseSyncProcessor = $reverseSyncProcessor;
         $this->typesRegistry = $typesRegistry;
@@ -65,7 +65,7 @@ class ReversSyncIntegrationProcessor implements
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        // TODO unique job
+        // TODO CRM-5838 unique job
 
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
