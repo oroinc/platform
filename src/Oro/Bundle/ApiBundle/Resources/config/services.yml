@@ -369,6 +369,7 @@ services:
 
     oro_api.rest.doc_view_detector:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
+        public: false
         arguments:
             - '@request_stack'
 
