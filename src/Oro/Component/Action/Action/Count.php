@@ -16,26 +16,18 @@ class Count extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (array_key_exists('value', $options)) {
-            $this->options['value'] = $options['value'];
-        }
-
-        if (array_key_exists('attribute', $options)) {
-            $this->options['attribute'] = $options['attribute'];
-        }
-
-        //validation
-        if (!array_key_exists('value', $this->options)) {
+        if (!isset($options['value'])) {
             throw new InvalidParameterException('Parameter `value` is required.');
         }
 
-        if (empty($this->options['attribute'])) {
+        if (empty($options['attribute'])) {
             throw new InvalidParameterException('Parameter `attribute` is required.');
         }
-
-        if (!$this->options['attribute'] instanceof PropertyPathInterface) {
+        if (!$options['attribute'] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Parameter `attribute` must be a valid property definition.');
         }
+
+        $this->options = $options;
 
         return $this;
     }
