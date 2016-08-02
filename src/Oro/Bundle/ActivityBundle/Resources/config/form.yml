@@ -24,7 +24,7 @@ services:
         calls:
             - [setRequest, ["@?request="]]
         tags:
-            - { name: form.type_extension, alias: form }
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_activity.type.multiple_association_choice:
         class: %oro_activity.type.multiple_association_choice.class%

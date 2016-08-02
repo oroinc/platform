@@ -58,31 +58,31 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
     /**
      * Assert number of records in activity list
      *
-     * @Then /^there (?:is|are) (?P<number>(?:|one|two|\d+)) records in activity list$/
+     * @Then /^there (?:is|are) (?P<number>(?:|one|two|\d+)) record(?:|s) in activity list$/
      */
     public function thereIsNumberRecordsInActivityList($number)
     {
-        /** @var GridPaginator $activityListPaginator */
-        $activityListPaginator = $this->createElement('ActivityListPaginator');
-        $itemsCount = $activityListPaginator->getTotalRecordsCount();
-
-        self::assertEquals(
+        self::assertCount(
             $this->getCount($number),
-            $itemsCount,
-            sprintf('Expect that Activity list has %s items, but found %s', $number, $itemsCount)
+            $this->getActivityListItems(),
+            sprintf('Expect that Activity list has %s items', $number)
         );
     }
 
     /**
-     * Example: When go to 5 page of activity list
-     *
-     * @When /^(?:|I )go to (?P<pageNumber>\d+) page of activity list$/
+     * @When /^(?:|I )go to (?P<linkLocator>(?:[nN]ewer|[oO]lder)) activities$/
      */
-    public function goToPageOfActivityList($pageNumber)
+    public function goToNewerOrOlderActivities($linkLocator)
     {
-        /** @var GridPaginator $activityListPaginator */
-        $activityListPaginator = $this->createElement('ActivityListPaginator');
-        $activityListPaginator->find('css', 'input[type="number"]')->setValue($pageNumber);
+        $link = $this->createElement('Activity List')->findLink(ucfirst($linkLocator));
+
+        if (!$link) {
+            self::fail(sprintf('Can\'t find "%s" button', $linkLocator));
+        } elseif ($link->getParent()->hasClass('disabled')) {
+            self::fail(sprintf('Button "%s" is disabled', $linkLocator));
+        }
+
+        $link->click();
     }
 
     /**
@@ -253,7 +253,7 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     protected function getCollapsedItem()
     {
-        $items = $this->getSession()->getPage()->findAll('css', 'div.accordion-body');
+        $items = $this->createElement('Activity List')->findAll('css', 'div.accordion-body');
         $collapsedItem = array_filter($items, function (NodeElement $element) {
             return $element->hasClass('in');
         });
@@ -283,17 +283,9 @@ class ActivityContext extends OroFeatureContext implements OroElementFactoryAwar
      */
     protected function getActivityListItems()
     {
-        $page = $this->getSession()->getPage();
-        $sections = $page->findAll('css', 'h4.scrollspy-title');
+        $activityList = $this->createElement('Activity List');
 
-        /** @var NodeElement $section */
-        foreach ($sections as $section) {
-            if ('Activity' === $section->getText()) {
-                return $section->getParent()->findAll('css', 'div.list-item');
-            }
-        }
-
-        self::fail(sprintf('Can\'t find Activity section on page'));
+        return $activityList->findAll('css', 'div.list-item');
     }
 
     /**

@@ -8,6 +8,7 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
@@ -60,9 +61,16 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
     private $groupProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    private $doctrineHelper;
+
     protected function setUp()
     {
         $this->tree = new OwnerTree();
+
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->securityMetadataProvider = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
@@ -112,7 +120,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                         [
                             'oro_security.acl.object_id_accessor',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            new ObjectIdAccessor(),
+                            new ObjectIdAccessor($this->doctrineHelper),
                         ],
                         [
                             'oro_security.owner.entity_owner_accessor',
@@ -125,8 +133,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider);
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
-            new ObjectIdAccessor(),
-            $entityOwnerAccessor,
+            new ObjectIdAccessor($this->doctrineHelper),
+            $entityOwnerAccessor, //new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
         $this->decisionMaker->setContainer($container);
@@ -141,7 +149,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = TestHelper::get($this)->createEntityAclExtension(
             $this->metadataProvider,
             $this->tree,
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($this->doctrineHelper),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider
@@ -431,14 +439,23 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $extension = new EntityAclExtension(
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($doctrineHelper),
             $entityClassResolver,
             $this->securityMetadataProvider,
             $this->metadataProvider,
             $this->decisionMaker,
             $this->permissionManager,
-            $this->groupProvider
+            $this->groupProvider,
+            $fieldAclExtension
         );
 
         $this->assertEquals($expectedData, $extension->getAllowedPermissions(
@@ -1144,15 +1161,20 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
+
 
         $extension = new EntityAclExtension(
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($this->doctrineHelper),
             $entityClassResolverMock,
             $entityMetadataProvider,
             $this->metadataProvider,
             $this->decisionMaker,
             $this->permissionManager,
-            $this->groupProvider
+            $this->groupProvider,
+            $fieldAclExtension
         );
 
         $this->assertEquals($expected, $extension->supports($type, $id));

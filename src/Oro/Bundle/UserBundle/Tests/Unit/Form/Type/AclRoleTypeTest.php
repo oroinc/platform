@@ -23,9 +23,7 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
             ->with('label', 'text', array('required' => true, 'label' => 'oro.user.role.role.label'));
         $builder->expects($this->at(1))->method('add')
             ->with(
-                'field',
-                'oro_acl_collection',
-                $this->contains(array('privileges_config' => 'field_config'))
+                'appendUsers'
             );
         $this->formType->buildForm($builder, array());
     }
