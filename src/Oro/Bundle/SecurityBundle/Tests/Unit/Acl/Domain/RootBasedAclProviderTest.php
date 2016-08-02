@@ -21,6 +21,9 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $strategy;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $underlyingCache;
+
     protected function setUp()
     {
         $this->strategy = $this->getMockForAbstractClass(
@@ -36,6 +39,10 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->provider->setBaseAclProvider($this->baseProvider);
+        $this->underlyingCache = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->provider->setUnderlyingCache($this->underlyingCache);
     }
 
     public function testFindChildren()
@@ -69,9 +76,9 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
         $acl     = $this->getAcl($oid);
         $rootAcl = $this->getAcl($rootOid);
 
-        $this->baseProvider->expects($this->once())
-            ->method('isReplaceWithUnderlyingAcl')
-            ->with($this->identicalTo($acl))
+        $this->underlyingCache->expects($this->once())
+            ->method('isUnderlying')
+            ->with($this->identicalTo($oid))
             ->will($this->returnValue(false));
         $this->baseProvider->expects($this->once())
             ->method('isEmptyAcl')
@@ -79,9 +86,8 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
         $this->baseProvider->expects($this->never())
             ->method('cacheEmptyAcl');
-        // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
-        //$this->baseProvider->expects($this->never())
-        //    ->method('cacheWithUnderlyingAcl');
+        $this->underlyingCache->expects($this->never())
+            ->method('cacheUnderlying');
 
         $this->setFindAclExpectation(
             [
@@ -103,17 +109,16 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
         $oid  = new ObjectIdentity(123, 'Test');
         $acl  = $this->getAcl($oid);
 
-        $this->baseProvider->expects($this->once())
-            ->method('isReplaceWithUnderlyingAcl')
-            ->with($this->identicalTo($acl))
+        $this->underlyingCache->expects($this->once())
+            ->method('isUnderlying')
+            ->with($this->identicalTo($oid))
             ->will($this->returnValue(false));
         $this->baseProvider->expects($this->never())
             ->method('isEmptyAcl');
         $this->baseProvider->expects($this->never())
             ->method('cacheEmptyAcl');
-        // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
-        //$this->baseProvider->expects($this->never())
-        //    ->method('cacheWithUnderlyingAcl');
+        $this->underlyingCache->expects($this->never())
+            ->method('cacheUnderlying');
 
         $this->setFindAclExpectation(
             [
@@ -134,20 +139,23 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
         $rootAcl       = $this->getAcl($rootOid);
         $underlyingAcl = $this->getAcl($underlyingOid);
 
-        $this->baseProvider->expects($this->once())
-            ->method('isReplaceWithUnderlyingAcl')
-            ->with($underlyingAcl)
-            ->will($this->returnValue(false));
+        $this->underlyingCache->expects($this->any())
+            ->method('isUnderlying')
+            ->willReturnMap(
+                [
+                    [$underlyingOid, false],
+                    [$oid, false],
+                ]
+            );
         $this->baseProvider->expects($this->once())
             ->method('isEmptyAcl')
             ->with($this->identicalTo($underlyingAcl))
             ->will($this->returnValue(false));
         $this->baseProvider->expects($this->never())
             ->method('cacheEmptyAcl');
-        // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
-        //$this->baseProvider->expects($this->once())
-        //    ->method('cacheWithUnderlyingAcl')
-        //    ->with($oid);
+        $this->underlyingCache->expects($this->once())
+            ->method('cacheUnderlying')
+            ->with($oid);
 
         $this->setFindAclExpectation(
             [
@@ -173,23 +181,22 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
         $rootAcl       = $this->getAcl($rootOid);
         $underlyingAcl = $this->getAcl($underlyingOid);
 
-        $this->baseProvider->expects($this->at(1))
-            ->method('isReplaceWithUnderlyingAcl')
-            ->with($acl)
-            ->will($this->returnValue(true));
-        $this->baseProvider->expects($this->at(3))
-            ->method('isReplaceWithUnderlyingAcl')
-            ->with($underlyingAcl)
-            ->will($this->returnValue(false));
+        $this->underlyingCache->expects($this->any())
+            ->method('isUnderlying')
+            ->willReturnMap(
+                [
+                    [$underlyingOid, false],
+                    [$oid, true],
+                ]
+            );
         $this->baseProvider->expects($this->once())
             ->method('isEmptyAcl')
             ->with($this->identicalTo($underlyingAcl))
             ->will($this->returnValue(false));
         $this->baseProvider->expects($this->never())
             ->method('cacheEmptyAcl');
-        // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
-        //$this->baseProvider->expects($this->never())
-        //    ->method('cacheWithUnderlyingAcl');
+        $this->underlyingCache->expects($this->never())
+            ->method('cacheUnderlying');
 
         $this->setFindAclExpectation(
             [
@@ -213,18 +220,21 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
         $underlyingOid = new ObjectIdentity('entity', 'Test');
         $underlyingAcl = $this->getAcl($underlyingOid);
 
-        $this->baseProvider->expects($this->once())
-            ->method('isReplaceWithUnderlyingAcl')
-            ->with($underlyingAcl)
-            ->will($this->returnValue(false));
+        $this->underlyingCache->expects($this->any())
+            ->method('isUnderlying')
+            ->willReturnMap(
+                [
+                    [$underlyingOid, false],
+                    [$oid, false],
+                ]
+            );
         $this->baseProvider->expects($this->never())
             ->method('isEmptyAcl');
         $this->baseProvider->expects($this->never())
             ->method('cacheEmptyAcl');
-        // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
-        //$this->baseProvider->expects($this->once())
-        //    ->method('cacheWithUnderlyingAcl')
-        //    ->with($oid);
+        $this->underlyingCache->expects($this->once())
+            ->method('cacheUnderlying')
+            ->with($oid);
 
         $this->setFindAclExpectation(
             [
@@ -243,16 +253,16 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
         $rootOid       = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $rootAcl       = $this->getAcl($rootOid);
 
-        $this->baseProvider->expects($this->never())
-            ->method('isReplaceWithUnderlyingAcl');
+        $this->underlyingCache->expects($this->any())
+            ->method('isUnderlying')
+            ->willReturn(false);
         $this->baseProvider->expects($this->never())
             ->method('isEmptyAcl');
         $this->baseProvider->expects($this->once())
             ->method('cacheEmptyAcl')
             ->with($oid);
-        // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
-        //$this->baseProvider->expects($this->never())
-        //    ->method('cacheWithUnderlyingAcl');
+        $this->underlyingCache->expects($this->never())
+            ->method('cacheUnderlying');
 
         $this->setFindAclExpectation(
             [
