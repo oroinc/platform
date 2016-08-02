@@ -3,9 +3,9 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\CurrentLocalizationPass;
-use Symfony\Component\DependencyInjection\Definition;
 
 class CurrentLocalizationPassTest extends \PHPUnit_Framework_TestCase
 {
