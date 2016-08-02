@@ -264,7 +264,7 @@ Now:
 - `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::DECLINED` marked as deprecated. Use `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::STATUS_DECLINED`.
 - `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getInvitationStatus` marked as deprecated. To get invitation status call methods `getRelatedAttendee()->getStatus()`.
 - Guests `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` of event are now represented via collection accessible by methods `getAttendees` and `setAttendees`. Before to get all guets it was required to get all user owners of child events from parent event. Now parent event holds collection of entities `Oro\Bundle\CalendarBundle\Entity\Attendee`. Every attendee entity could refer to `Oro\Bundle\UserBundle\Entity\User`, but it's optional.
-- All email templates of events notifications were updated: `Migrations/Data/ORM/data/emails/invitation`.
+- All email templates of events notifications were updated: `Migrations/Data/ORM/data/emails/invitation`. 
 - Field `invitedUsers` in `Oro\Bundle\CalendarBundle\Form\Type\CalendarEvent[Api]Type` was deprecated. Use new field `attendees`. 
 - Field `invitationStatus` in `Oro\Bundle\CalendarBundle\Entity\CalendarEvent` was removed. Use new field `relatedAttendee.status`.
 - Field `doctrineHelper` in `Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer` was removed. This can bring a `backward compatibility break` if you have own implementation of this class.
