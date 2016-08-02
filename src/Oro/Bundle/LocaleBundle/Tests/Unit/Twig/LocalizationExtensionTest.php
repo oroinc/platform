@@ -71,7 +71,7 @@ class LocalizationExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_formatting_code_title', $filters[1]->getName());
 
         $this->assertInstanceOf('Twig_SimpleFilter', $filters[2]);
-        $this->assertEquals('oro_localized_value', $filters[2]->getName());
+        $this->assertEquals('localized_value', $filters[2]->getName());
     }
 
     public function testGetName()

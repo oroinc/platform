@@ -57,7 +57,7 @@ class LocalizationExtension extends \Twig_Extension
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFilter(
-                'oro_localized_value',
+                'localized_value',
                 [$this->localizationHelper, 'getLocalizedValue'],
                 ['is_safe' => ['html']]
             ),
